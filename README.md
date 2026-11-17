@@ -1,4 +1,4 @@
-# SQL手记
+# 数屿SQL
 
 面向 Android 手机的 SQL 离线学习应用。
 
