@@ -11,7 +11,7 @@
     {
       "id": "kp02-01",
       "chapterId": "ch02",
-      "title": "SELECT 与 FROM",
+      "title": "SELECT、FROM 与派生列",
       "learningObjective": "能够运用本节知识完成：生成商品价目表",
       "prerequisites": [
         "kp02-02"
@@ -197,7 +197,66 @@
         "problem": "商品清单只需名称与价格，内部编号仍可用来稳定排序。",
         "codeExplanation": "FROM 决定读哪张表，SELECT 决定显示哪些列及其顺序。表达式可以放在同一列表里，并用 AS 标明单位或含义。",
         "resultExplanation": "查询保留每件商品一行。要增加估算库存额，可再投影 price * stock 并命名，原字段及行数仍保持。",
-        "checkpoints": []
+        "checkpoints": [],
+        "mergedConcepts": [
+          {
+            "sourceId": "kp02-03",
+            "explanation": "price * stock AS stock_value 给每件商品派生库存货值。AS 给结果列命名，原表结构及每商品一行的粒度都保持。价格可空时，货值为空意味着待补成本，直接填 0 会误报。"
+          }
+        ],
+        "mergeExamples": [
+          {
+            "label": "库存货值怎么得来",
+            "explanation": "逐行用价格乘库存数量。AS 只命名结果列，库存为零时货值也为零。",
+            "sql": "SELECT product_id, price, stock, price * stock AS stock_value\nFROM products\nORDER BY product_id;",
+            "result": {
+              "columns": [
+                "product_id",
+                "price",
+                "stock",
+                "stock_value"
+              ],
+              "rows": [
+                [
+                  1,
+                  15,
+                  150,
+                  2250
+                ],
+                [
+                  2,
+                  89,
+                  40,
+                  3560
+                ],
+                [
+                  3,
+                  35,
+                  200,
+                  7000
+                ],
+                [
+                  4,
+                  65,
+                  180,
+                  11700
+                ],
+                [
+                  5,
+                  45,
+                  80,
+                  3600
+                ],
+                [
+                  6,
+                  15,
+                  0,
+                  0
+                ]
+              ]
+            }
+          }
+        ]
       }
     },
     {
@@ -366,7 +425,9 @@
         "problem": "为界面生成实际出现过的门店和类别组合。",
         "codeExplanation": "DISTINCT 作用于投影后的整个元组。选出 store_id 与 category 再去重，不能只按其中一列判断重复。",
         "resultExplanation": "同一类别可在多个门店出现。同样可用多列 DISTINCT 提取活跃的日期和渠道组合。",
-        "checkpoints": []
+        "checkpoints": [],
+        "mergedConcepts": [],
+        "mergeExamples": []
       }
     }
   ],

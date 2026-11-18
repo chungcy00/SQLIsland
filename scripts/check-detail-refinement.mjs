@@ -41,7 +41,7 @@ try {
       assert.equal(await page.locator('[data-lesson-section=purpose] p').innerText(), '能够运用本节知识完成：' + goal);
       assert.equal(await page.locator('[data-lesson-section=purpose] h2').count(), 0);
       if (kp.useCase !== goal) assert.equal(await page.locator('.lesson-scenario').innerText(), kp.useCase);
-      assert.equal(await page.locator('.lesson-concept').textContent(), kp.concept);
+      assert.equal(await page.locator('.lesson-concept').textContent(), kp.concept + kp.teaching.mergedConcepts.map(item => item.explanation).join(''));
       const completeSql = formatSqlForDisplay(kp.mysqlSql);
       const sqlBlocks = await page.locator('[data-lesson-section=example] pre code').allTextContents();
       assert.ok(sqlBlocks.includes(completeSql));

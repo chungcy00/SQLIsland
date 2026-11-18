@@ -1,6 +1,8 @@
 """Add the verified teaching excerpts and synchronize the course reading edition."""
 from pathlib import Path
 import json
+from collections import defaultdict
+from contextlib import closing
 import re
 import sqlite3
 
@@ -8,6 +10,16 @@ ROOT = Path(__file__).resolve().parents[1]
 C = ROOT / 'resources/CONTENT/courses_resource'
 Q = ROOT / 'resources/CONTENT/question_resource'
 EXPLANATIONS = ROOT / 'scripts/curriculum/lesson-explanations.tsv'
+TITLE_UPDATES = {
+    'kp02-01': 'SELECT、FROM 与派生列',
+    'kp11-02': '文本截取、字符数与字节数',
+    'kp12-01': '数值计算、除法与舍入',
+    'kp13-02': '交集、差集与排序',
+    'kp15-04': 'ROWS、RANGE 与并列累计',
+    'kp17-01': '表结构与数据约束',
+    'kp17-02': '数据修改与事务',
+    'kp18-01': '索引与执行计划',
+}
 REWRITTEN = {'kp19-03':'q0265','kp20-01':'q0288','kp20-02':'q0290','kp20-03':'q0255'}
 
 VIEW_CHECKPOINTS = {
@@ -71,7 +83,7 @@ def cte_checkpoints(sql):
 def body(k, databases):
     if k.get('datasetId'):
         return sqlite3.connect(databases[k['datasetId']].as_uri()+'?mode=ro',uri=True)
-    db=sqlite3.connect(':memory:')
+    db=sqlite3.connect(':memory:',isolation_level=None)
     for table in k['sourceTables']:
         cols=','.join('"'+col['name']+'" '+(col.get('sqliteType') or col['type']) for col in table['columns'])
         db.execute('CREATE TABLE "'+table['name']+'" ('+cols+')')
@@ -148,6 +160,17 @@ def main():
             by_id[target].update({key:source[old][key] for key in keys if key in source[old]})
     for kid,qid in REWRITTEN.items():
         refresh_rewritten(by_id[kid],questions[qid])
+    migration=load(C/'curriculum-migration.json')
+    notes=defaultdict(list)
+    pairs=set()
+    for line in EXPLANATIONS.with_name('merged-teaching.tsv').read_text().splitlines():
+        source,target,explanation=line.split('\t')
+        pair=('kp'+source,'kp'+target)
+        assert pair not in pairs
+        pairs.add(pair)
+        notes[pair[1]].append({'sourceId':pair[0],'explanation':explanation})
+    assert pairs=={(source,target) for source,targets in migration['targets'].items() for target in targets}
+    examples=load(EXPLANATIONS.with_name('merged-examples.json'))
     report=[]
     for p,chapter in chapters.items():
         reading=[f"# 第{chapter['number']:02d}章 {chapter['title']}",f"阶段：{chapter['stage']}｜学习目标：{chapter['objective']}"]
@@ -155,7 +178,17 @@ def main():
             chapter['advancedTaskIds']=[k['taskId'] for k in chapter['knowledgePoints'] if k.get('taskId')]
         for k in chapter['knowledgePoints']:
             why, method, meaning=explanations[k['id'][2:]]
-            k['teaching']={'problem':why,'codeExplanation':method,'resultExplanation':meaning,'checkpoints':[]}
+            k['title']=TITLE_UPDATES.get(k['id'],k['title'])
+            k['teaching']={'problem':why,'codeExplanation':method,'resultExplanation':meaning,
+                'checkpoints':[],'mergedConcepts':notes[k['id']],'mergeExamples':[]}
+            if k['id'] in examples:
+                for label,explanation,sql in examples[k['id']]:
+                    with closing(body(k,dbs)) as db:
+                        # Native SQLite accepts IIF under the same semantics as the app’s IF adapter.
+                        db.create_function('IF',3,lambda cond,yes,no:yes if cond else no)
+                        result=query(db,sql)
+                    k['teaching']['mergeExamples'].append({'label':label,'explanation':explanation,'sql':sql,'result':result})
+
             candidates=cte_checkpoints(k['sqliteSql']) if k['sqliteSql'] and (chapter['number']>=19 or k['id'] in {'kp08-05','kp14-01','kp15-05'}) else []
             if k['id'] in VIEW_CHECKPOINTS:
                 candidates = [(name,sql+' LIMIT 3;') for name,sql in VIEW_CHECKPOINTS[k['id']]]
@@ -173,8 +206,8 @@ def main():
                         result=query(db,sql)
                         k['teaching']['checkpoints'].append({'name':name,'label':label,'sql':sql,'result':result})
             result=k['result']
-            report.append({'id':k['id'],'intermediateQueries':len(candidates),'finalExpectedRows':result.get('totalRows',len(result.get('rows',[]))) if result else None})
-            lesson=[f"## {k['id']} {k['title']}",'### 核心概念',k['concept'],'### 语法']
+            report.append({'id':k['id'],'intermediateQueries':len(candidates),'mergedSources':[n['sourceId'] for n in notes[k['id']]],'mergedExamples':len(k['teaching']['mergeExamples']),'finalExpectedRows':result.get('totalRows',len(result.get('rows',[]))) if result else None})
+            lesson=[f"## {k['id']} {k['title']}",'### 核心概念',k['concept'],*[n['explanation'] for n in notes[k['id']]],'### 语法']
             lesson+=['```sql\n'+k['syntax']+'\n```'] if k.get('syntax')!=k.get('mysqlSql') else []
             lesson=lesson if lesson[-1]!='### 语法' else lesson[:-1]
             if k['executionSteps']:
@@ -185,6 +218,8 @@ def main():
             lesson+=['### SQL 示例',why,method]
             for step in k['teaching']['checkpoints']:
                 lesson+=[f"**{step['label']}**",'```sql\n'+step['sql']+'\n```',table_markdown(step['result']['columns'],step['result']['rows'])]
+            for example in k['teaching']['mergeExamples']:
+                lesson += [f"**{example['label']}**",example['explanation'],'```sql\n'+example['sql']+'\n```',table_markdown(example['result']['columns'],example['result']['rows'])]
             if k['mysqlSql']:
                 lesson+=['```sql\n'+k['mysqlSql']+'\n```']
             if result and 'columns' in result:
@@ -193,7 +228,7 @@ def main():
             reading.extend(value for value in lesson if value)
         write(p,chapter)
         (C/'reading'/f'{p.stem}.md').write_text('\n\n'.join(reading)+'\n')
-    write(C/'validation/curriculum-revision.json',{'lessons':report,'sqliteIntermediateQueries':sum(r['intermediateQueries'] for r in report),'mysqlNative':'未执行'})
+    write(C/'validation/curriculum-revision.json',{'lessons':report,'sqliteIntermediateQueries':sum(r['intermediateQueries'] for r in report),'mergedSources':len(migration['targets']),'mergedTargetMappings':len(pairs),'sqliteMergedExamples':sum(r['mergedExamples'] for r in report),'mysqlNative':'未执行'})
 
 if __name__=='__main__':
     main()

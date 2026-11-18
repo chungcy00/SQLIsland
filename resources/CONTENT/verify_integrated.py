@@ -9,6 +9,15 @@ def sha(p):
  with p.open('rb') as f:
   for b in iter(lambda:f.read(1024*1024),b''):h.update(b)
  return h.hexdigest()
+def execute_snippet(connection, sql):
+ buffer=''
+ cursor=None
+ for line in sql.splitlines(keepends=True):
+  buffer+=line
+  if sqlite3.complete_statement(buffer):
+   cursor=connection.execute(buffer.strip())
+   buffer=''
+ return connection.execute(buffer.strip()) if buffer.strip() else cursor
 def main():
  for row in load(R/'manifest.json')['files']:
   p=R/row['path'];assert p.is_file() and sha(p)==row['sha256'],row['path']
@@ -16,6 +25,11 @@ def main():
  counts=load(R/'manifest.json')['counts']
  ki={k['id']:k for k in ks};qi={q['id']:q for q in qs};fi={f['id']:f for f in fs};assert len(ks)==len(ki)==counts['knowledgePoints'] and len(qs)==len(qi)==counts['questions'] and len(fs)==len(fi)==counts['flashcards']
  assert [len(load(Q/'questions'/f'ch{i:02}.json')['questions']) for i in range(1,21)]==[entry['count'] for entry in load(Q/'manifest.json')['chapters']]
+ migration=load(C/'curriculum-migration.json')
+ expected_mappings={(source,target) for source,targets in migration['targets'].items() for target in targets}
+ teaching_mappings=[(item['sourceId'],k['id']) for k in ks for item in k['teaching']['mergedConcepts'] if item['explanation'].strip()]
+ assert len(teaching_mappings)==len(set(teaching_mappings)) and set(teaching_mappings)==expected_mappings
+ assert not set(ki).intersection(set(migration['targets'])|set(migration['removed']))
  assert all(set(k.get(field,[]))<=ki.keys() for k in ks for field in ('prerequisites','relatedKnowledgePointIds'))
  assert all(set(q.get(field,[]))<=ki.keys() for q in qs for field in ('knowledgePointIds','primaryKnowledgePointIds','prerequisiteKnowledgePointIds'))
  for k in ks:
@@ -35,7 +49,7 @@ def main():
    assert rows==full['rows'] and cols==full['columns'],k['id']
    assert rows[:len(res['rows'])]==res['rows'] and len(rows)==res['totalRows'];biz+=1
   else:
-   c=sqlite3.connect(':memory:');c.execute('PRAGMA foreign_keys=ON')
+   c=sqlite3.connect(':memory:',isolation_level=None);c.execute('PRAGMA foreign_keys=ON');c.create_function('IF',3,lambda cond,yes,no:yes if cond else no)
    for fid in k['fixtureIds']:
     f=load(C/'fixtures'/f'{fid}.json');c.execute('CREATE TABLE "'+f['table']+'"('+','.join('"'+a['name']+'" '+a['sqliteType'] for a in f['columns'])+')');c.executemany('INSERT INTO "'+f['table']+'" VALUES('+','.join('?' for _ in f['columns'])+')',f['rows'])
    c.commit()
@@ -45,6 +59,9 @@ def main():
    connection=conns[k['datasetId']] if k.get('datasetId') else c
    cursor=connection.execute(step['sql'])
    assert [col[0] for col in cursor.description]==step['result']['columns'] and [list(row) for row in cursor]==step['result']['rows'],(k['id'],step['name'])
+  for step in k.get('teaching',{}).get('mergeExamples',[]):
+   cursor=execute_snippet(conns[k['datasetId']] if k.get('datasetId') else c, step['sql'])
+   assert [col[0] for col in cursor.description]==step['result']['columns'] and [list(row) for row in cursor]==step['result']['rows'],(k['id'],step['label'])
   if not k.get('taskId'):c.close()
   passed+=1
  for c in conns.values():c.close()

@@ -183,7 +183,9 @@
         "problem": "读订单表前先决定报表的一行代表什么，避免把记录数当成客户数。",
         "codeExplanation": "FROM 选定订单来源，SELECT 只保留订单编号、类别和金额，最后按编号定序，行粒度保持不变。",
         "resultExplanation": "结果仍是一行一笔订单；1 和 3 可以属于同一位客户。若要计算客户数，要在订单表上按客户去重并约定匿名订单口径。",
-        "checkpoints": []
+        "checkpoints": [],
+        "mergedConcepts": [],
+        "mergeExamples": []
       }
     },
     {
@@ -363,7 +365,9 @@
         "problem": "汇总前查数据字典，先确认类型、单位和允许缺失的字段。",
         "codeExplanation": "product_id 用于标识，price 用于金额计算，stock 用于数量判断。直接展示三列可并排核对金额和数量的差别。",
         "resultExplanation": "库存为 0 的商品有明确记录。实际导入时要分清零与缺失，金额列优先采用精确小数或整数分。",
-        "checkpoints": []
+        "checkpoints": [],
+        "mergedConcepts": [],
+        "mergeExamples": []
       }
     },
     {
@@ -569,7 +573,9 @@
         "problem": "统计每位客户的下单次数，同时保留还没下单的客户。",
         "codeExplanation": "用主键与外键匹配。LEFT JOIN 保留客户主档，COUNT(o.id) 跳过未匹配形成的 NULL，GROUP BY 恢复到客户粒度。",
         "resultExplanation": "客户 1 有两笔订单，客户 4 有零笔；同一连接适用于检查供应商是否供过货。",
-        "checkpoints": []
+        "checkpoints": [],
+        "mergedConcepts": [],
+        "mergeExamples": []
       }
     }
   ],

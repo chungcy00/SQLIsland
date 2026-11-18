@@ -11,7 +11,7 @@
     {
       "id": "kp17-01",
       "chapterId": "ch17",
-      "title": "CREATE TABLE 与约束",
+      "title": "表结构与数据约束",
       "learningObjective": "能够运用本节知识完成：为实验室建立库存表",
       "prerequisites": [
         "kp17-02"
@@ -99,13 +99,44 @@
         "problem": "建表时把必要数据规则写成约束，减少后续纠错。",
         "codeExplanation": "先创建有主键与数量校验的表，再读回预置行验证。修改结构前先确认依赖，试验时使用个人库或临时副本。UNIQUE 可为备用键去重。ALTER TABLE 用于调整结构，DROP TABLE 会删除表及数据，执行前先检查引用和备份。",
         "resultExplanation": "读到两条初始库存。主键限制重复，CHECK 约束合法数量，外键可防孤立记录；多人操作用事务保持一致。",
-        "checkpoints": []
+        "checkpoints": [],
+        "mergedConcepts": [
+          {
+            "sourceId": "kp17-03",
+            "explanation": "库存表需要新增标签可用 ALTER TABLE ADD COLUMN，既有行的值由默认值和可空性决定。DROP TABLE 会删除整张表及数据，迁移演练应放在副本里，先核对外键和备份。"
+          },
+          {
+            "sourceId": "kp17-05",
+            "explanation": "子表的非空外键须存在于父表，避免库存明细指向不存在的商品。SKU 可用 UNIQUE 保护业务编号，行主键仍用 id。若字段可空，UNIQUE 的重复值规则与是否允许 NULL 要分别核对。"
+          }
+        ],
+        "mergeExamples": [
+          {
+            "label": "保留记录并新增结构",
+            "explanation": "在演练库先创建表、写入记录，再新增带默认值的标签。查询能看到原记录仍在，并获得标签默认值。",
+            "sql": "CREATE TABLE sample_stock (id INTEGER PRIMARY KEY, sku VARCHAR(30) NOT NULL UNIQUE);\nINSERT INTO sample_stock VALUES (1,'MASK-1');\nALTER TABLE sample_stock ADD COLUMN label VARCHAR(30) DEFAULT '未分类';\nSELECT id, sku, label FROM sample_stock ORDER BY id;",
+            "result": {
+              "columns": [
+                "id",
+                "sku",
+                "label"
+              ],
+              "rows": [
+                [
+                  1,
+                  "MASK-1",
+                  "未分类"
+                ]
+              ]
+            }
+          }
+        ]
       }
     },
     {
       "id": "kp17-02",
       "chapterId": "ch17",
-      "title": "INSERT、UPDATE、DELETE",
+      "title": "数据修改与事务",
       "learningObjective": "能够运用本节知识完成：维护个人实验室库存记录",
       "prerequisites": [
         "kp17-01"
@@ -192,7 +223,32 @@
         "problem": "修改库存时先限定对象，再检查提交后的值。",
         "codeExplanation": "INSERT 新建行，UPDATE 用主键 WHERE 定位，DELETE 删除指定记录。先用同条件 SELECT 核对范围，成组变更时用事务。START TRANSACTION 后先读回核对，正确时 COMMIT，发现差异时 ROLLBACK；MySQL 的部分 DDL 会隐式提交。",
         "resultExplanation": "示例更新后 ID 2 为 25。若预览发现目标范围意外扩大，应回滚并修正条件。",
-        "checkpoints": []
+        "checkpoints": [],
+        "mergedConcepts": [
+          {
+            "sourceId": "kp17-04",
+            "explanation": "把库存扣减和发货记录放入同一事务。先写后查，全部正确时 COMMIT，任一步失败时 ROLLBACK。用同一连接查询事务后的库存，可以直接核对回滚有没有撤销修改。"
+          }
+        ],
+        "mergeExamples": [
+          {
+            "label": "写完后验证再决定是否提交",
+            "explanation": "临时将数量从 20 改成 15，回滚后再查同一编号，会重新看到 20。库存变动与发货记录应共享同一个事务。",
+            "sql": "CREATE TABLE sample_stock (id INTEGER PRIMARY KEY, qty INTEGER NOT NULL);\nINSERT INTO sample_stock VALUES (1,20);\nBEGIN TRANSACTION;\nUPDATE sample_stock SET qty = qty - 5 WHERE id = 1;\nROLLBACK;\nSELECT id, qty AS qty_after_rollback FROM sample_stock ORDER BY id;",
+            "result": {
+              "columns": [
+                "id",
+                "qty_after_rollback"
+              ],
+              "rows": [
+                [
+                  1,
+                  20
+                ]
+              ]
+            }
+          }
+        ]
       }
     }
   ],

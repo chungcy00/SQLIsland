@@ -242,7 +242,9 @@
         "problem": "订单明细要展示已登记的客户姓名时，先确认只需要有匹配订单。",
         "codeExplanation": "INNER JOIN 按 customer_id 等值匹配。左边是订单，右边客户键唯一，因此每笔有主档的订单至多匹配一行。",
         "resultExplanation": "匿名订单被省略，同一客户多笔订单仍各保留一行。若需要保留匿名订单，换成以订单为保留侧的 LEFT JOIN。",
-        "checkpoints": []
+        "checkpoints": [],
+        "mergedConcepts": [],
+        "mergeExamples": []
       }
     },
     {
@@ -498,7 +500,44 @@
         "problem": "检查客户订单覆盖时，客户主档中的未下单客户也需要显示。",
         "codeExplanation": "LEFT JOIN 保留左侧客户，RIGHT JOIN 可通过交换左右表来表达同一关系。若要找未匹配记录，检查右表不可空键；双侧未匹配可合并两次左连接并用 UNION ALL。",
         "resultExplanation": "客户 4 的订单列为 NULL；客户 1 的重复行来自两笔订单。报告未购买客户时可进一步只保留右键为空的行。",
-        "checkpoints": []
+        "checkpoints": [],
+        "mergedConcepts": [
+          {
+            "sourceId": "kp08-06",
+            "explanation": "从订单向客户做 RIGHT JOIN，和交换两侧后从客户做 LEFT JOIN 保留相同客户。对客户分组时数订单的非空主键，未下单客户得到 0；数 COUNT(*) 会把补出的行算成 1。"
+          }
+        ],
+        "mergeExamples": [
+          {
+            "label": "从另一侧保留全部客户",
+            "explanation": "RIGHT JOIN 的右侧是客户。计数用订单 id，未匹配的客户得到 0。",
+            "sql": "SELECT c.customer_id, COUNT(o.id) AS matched_orders\nFROM orders o RIGHT JOIN customers c ON o.customer_id = c.customer_id\nGROUP BY c.customer_id ORDER BY c.customer_id;",
+            "result": {
+              "columns": [
+                "customer_id",
+                "matched_orders"
+              ],
+              "rows": [
+                [
+                  1,
+                  2
+                ],
+                [
+                  2,
+                  1
+                ],
+                [
+                  3,
+                  1
+                ],
+                [
+                  4,
+                  0
+                ]
+              ]
+            }
+          }
+        ]
       }
     },
     {
@@ -737,7 +776,9 @@
         "problem": "只统计二月的订单量，但仍需显示销量为零的客户。",
         "codeExplanation": "将二月条件放在 ON 中限制匹配，再 COUNT 订单键。若在 WHERE 筛右表日期，补出的 NULL 行会被过滤。",
         "resultExplanation": "客户 1 有一笔符合条件的订单，客户 2 为零。套用到有无某月付款的供应商时保持筛选位置。",
-        "checkpoints": []
+        "checkpoints": [],
+        "mergedConcepts": [],
+        "mergeExamples": []
       }
     },
     {
@@ -928,7 +969,48 @@
         "problem": "同一张员工表包含员工和主管，要按角色读取两次。",
         "codeExplanation": "用别名 e 和 m 区分角色，经 manager_id 匹配主键。自连接仍遵循普通的连接基数；需要构造所有组合时使用 CROSS JOIN，双侧对照还要单独考虑未匹配行。需要“仓库 × 月份”的完整报表时，先 CROSS JOIN 维度再用 LEFT JOIN 接事实表；直接连接任意明细容易制造笛卡尔积。",
         "resultExplanation": "A 的主管缺失，B 对应 A。可用同样思路配对同类商品，再加编号大小条件避免镜像及自配对。",
-        "checkpoints": []
+        "checkpoints": [],
+        "mergedConcepts": [
+          {
+            "sourceId": "kp08-06",
+            "explanation": "CROSS JOIN 不用关联键，两组各有 n、m 行时返回 n×m 组配对。需要先确定是要保留某一侧记录，还是明确构造全部组合，才能选择外连接或交叉连接。"
+          },
+          {
+            "sourceId": "kp08-07",
+            "explanation": "做完整门店月报时，先将门店主档与去重后的月份交叉连接，得到每店每月一行，再左接已按门店和月份聚合的交易。无交易填零前需确认该门店当月确实营业。"
+          }
+        ],
+        "mergeExamples": [
+          {
+            "label": "生成门店月份骨架",
+            "explanation": "两个门店各配两个月，因此有四行。得到骨架后，可以在两列键上左接已汇总的月销售。",
+            "sql": "WITH stores AS (SELECT 1 AS store_id UNION ALL SELECT 2),\nmonths AS (SELECT '2025-01' AS month_key UNION ALL SELECT '2025-02')\nSELECT s.store_id, m.month_key FROM stores s CROSS JOIN months m\nORDER BY s.store_id, m.month_key;",
+            "result": {
+              "columns": [
+                "store_id",
+                "month_key"
+              ],
+              "rows": [
+                [
+                  1,
+                  "2025-01"
+                ],
+                [
+                  1,
+                  "2025-02"
+                ],
+                [
+                  2,
+                  "2025-01"
+                ],
+                [
+                  2,
+                  "2025-02"
+                ]
+              ]
+            }
+          }
+        ]
       }
     },
     {
@@ -1196,7 +1278,9 @@
               ]
             }
           }
-        ]
+        ],
+        "mergedConcepts": [],
+        "mergeExamples": []
       }
     }
   ],

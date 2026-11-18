@@ -191,7 +191,9 @@
         "problem": "库存标签要求互斥分类，缺货优先于低库存。",
         "codeExplanation": "CASE 按写下的顺序判断，首个真条件决定值。先判 stock=0，再判 stock<50，否则归正常。",
         "resultExplanation": "库存 40 为低库存，0 为缺货。若库存允许 NULL，增加缺失分支，避免默认归正常。",
-        "checkpoints": []
+        "checkpoints": [],
+        "mergedConcepts": [],
+        "mergeExamples": []
       }
     },
     {
@@ -362,7 +364,52 @@
         "problem": "一趟扫描同时统计低库存和正常库存商品。",
         "codeExplanation": "CASE 将每个条件转换成当前行的 1 或 0，SUM 按类别累计。可改用 COUNT(CASE WHEN 条件 THEN 1 END)，不满足时返回 NULL。MySQL 的 IF(条件,真值,假值) 适合生成单列二选一；需要多分支或跨库兼容时使用 CASE。",
         "resultExplanation": "本例低库存 2，正常 4。分组后同样可以按门店生成多个状态计数，注意同一行可能符合非互斥条件。",
-        "checkpoints": []
+        "checkpoints": [],
+        "mergedConcepts": [
+          {
+            "sourceId": "kp09-04",
+            "explanation": "MySQL IF(条件,真值,假值) 适合二选一，条件为 NULL 时也落入假值分支。需要把“库存未知”单列时，应先在 CASE 中用 IS NULL 判断，避免把未知误归为正常。"
+          }
+        ],
+        "mergeExamples": [
+          {
+            "label": "把一条规则转成显示标签",
+            "explanation": "IF 的第三个参数处理假或未知条件。这个样例的库存来自非空商品记录，若允许未知库存，应改成可显式判断 NULL 的 CASE。",
+            "sql": "SELECT product_id, IF(stock < 50, '需关注', '正常') AS stock_label\nFROM products ORDER BY product_id;",
+            "result": {
+              "columns": [
+                "product_id",
+                "stock_label"
+              ],
+              "rows": [
+                [
+                  1,
+                  "正常"
+                ],
+                [
+                  2,
+                  "需关注"
+                ],
+                [
+                  3,
+                  "正常"
+                ],
+                [
+                  4,
+                  "正常"
+                ],
+                [
+                  5,
+                  "正常"
+                ],
+                [
+                  6,
+                  "需关注"
+                ]
+              ]
+            }
+          }
+        ]
       }
     },
     {
@@ -539,7 +586,9 @@
         "problem": "指标包含除法时，分母 0 表示无法定义，应留给业务解释。",
         "codeExplanation": "NULLIF(stock,0) 将零分母转换为 NULL。先乘 1.0 以保留小数运算，再由 ROUND 处理展示精度。",
         "resultExplanation": "库存为零的商品结果是 NULL。规则可以复用于毛利率、转化率和环比。",
-        "checkpoints": []
+        "checkpoints": [],
+        "mergedConcepts": [],
+        "mergeExamples": []
       }
     }
   ],

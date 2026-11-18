@@ -134,7 +134,9 @@
         "problem": "同一列可分别回答录入行数、填报数和不同取值数。",
         "codeExplanation": "COUNT(*) 数全部行，COUNT(value) 数非空值，COUNT(DISTINCT value) 在非空值中去重后再数。",
         "resultExplanation": "四行记录有三个非空值和两个不同取值。可用这三个统计量解释填报率和样本的重复程度。",
-        "checkpoints": []
+        "checkpoints": [],
+        "mergedConcepts": [],
+        "mergeExamples": []
       }
     },
     {
@@ -263,7 +265,9 @@
         "problem": "在汇报均值前核对样本分母，避免把缺失记录默认为零。",
         "codeExplanation": "SUM、AVG 忽略 NULL；均值相当于总和除以非空行数。若需要补零，要在聚合前明确写 COALESCE。",
         "resultExplanation": "20 除以 3 得约 6.67，零参与计算，缺失不计。计算跨组均值时应合并各组的分子和分母。",
-        "checkpoints": []
+        "checkpoints": [],
+        "mergedConcepts": [],
+        "mergeExamples": []
       }
     },
     {
@@ -417,7 +421,9 @@
         "problem": "获得价格范围用于检查跨度，再回原表寻找对应商品。",
         "codeExplanation": "MIN 与 MAX 将非空价格压成一行，不保留对应商品编号。若需要商品明细，用子查询比较极值或使用排名。",
         "resultExplanation": "区间是 15 到 89，最低价可能属于多件商品。把编号任意放进聚合输出不能证明它对应极值。",
-        "checkpoints": []
+        "checkpoints": [],
+        "mergedConcepts": [],
+        "mergeExamples": []
       }
     }
   ],

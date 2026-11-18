@@ -172,7 +172,8 @@ small,
   object-fit: contain;
 }
 .page {
-  padding: 16px 18px 96px;
+  --page-inset: 18px;
+  padding: 16px var(--page-inset) 96px;
   max-width: 600px;
   margin: 0 auto;
   min-height: calc(100dvh - 64px);
@@ -866,8 +867,7 @@ li {
 }
 @media (max-width: 350px) {
   .page {
-    padding-left: 12px;
-    padding-right: 12px;
+    --page-inset: 12px;
   }
   .rating button {
     font-size: 0.75rem;
@@ -2193,9 +2193,23 @@ pre, .code-input {white-space: pre-wrap; overflow-wrap: anywhere; overflow-x: hi
 .sql-editor #sql-editor {overflow-x: hidden;}
 .editor-line-measure {position: absolute; visibility: hidden; pointer-events: none; white-space: pre-wrap; overflow-wrap: anywhere; word-break: normal; padding: 0; border: 0; tab-size: 2; letter-spacing: 0;}
 
+.quiz-details {
+  padding-bottom: calc(62px + env(safe-area-inset-bottom));
+}
 .quiz-details > .sequence-actions {
-  margin-top: 24px;
-  padding-top: 14px;
-  border-top: 1px solid var(--line);
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 15;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 8px var(--page-inset) calc(8px + env(safe-area-inset-bottom));
+  pointer-events: none;
+}
+.quiz-details > .sequence-actions button {pointer-events: auto;}
+.has-sql-keyboard .quiz-details > .sequence-actions {
+  bottom: var(--sql-keyboard-height, 240px);
+  padding-bottom: 8px;
 }
 .editor-is-fullscreen .quiz-details > .sequence-actions {display: none;}

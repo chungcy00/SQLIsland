@@ -66,15 +66,31 @@ try {
     await page.setViewportSize({width,height:844});
     const footer = page.locator('.quiz-details .sequence-actions');
     await page.evaluate(() => window.scrollTo(0, 0));
-    assert.equal(await footer.evaluate(node => getComputedStyle(node).position), 'static');
-    assert.ok((await footer.boundingBox()).y >= 844);
-    await footer.scrollIntoViewIfNeeded();
+    assert.equal(await footer.evaluate(node => getComputedStyle(node).position), 'fixed');
+    assert.equal(await footer.evaluate(node => getComputedStyle(node).borderTopWidth), '0px');
+    assert.equal(await footer.evaluate(node => getComputedStyle(node).backgroundColor), 'rgba(0, 0, 0, 0)');
+    const firstButton = await footer.locator('button').first().boundingBox();
+    const question = await page.locator('.quiz-details').boundingBox();
+    assert.ok(Math.abs(firstButton.x - question.x) <= 1);
+    const atTop = await footer.boundingBox();
+    assert.ok(Math.abs(atTop.y + atTop.height - 844) <= 1);
+    await page.evaluate(() => window.scrollTo(0, 450));
     await page.waitForFunction(() => window.scrollY > 0);
-    assert.ok((await footer.boundingBox()).y < 844);
-    assert.equal(await footer.evaluate(node => node === node.parentElement.lastElementChild), true);
+    assert.equal((await footer.boundingBox()).y, atTop.y);
+    await page.locator('#sql-editor').focus();
+    const keyboard = page.locator('.keyboard-wrap:not(.hidden)');
+    await keyboard.waitFor();
+    const resize = keyboard.locator('.keyboard-resize');
+    for (const key of ['Home', 'End', 'ArrowDown']) {
+      await resize.press(key);
+      const [aboveKeyboard, pad] = await Promise.all([footer.boundingBox(), keyboard.boundingBox()]);
+      assert.ok(Math.abs(aboveKeyboard.y + aboveKeyboard.height - pad.y) <= 1);
+      const next = footer.getByRole('button', {name: '下一题'});
+      await next.click({trial: true});
+    }
     await page.locator('[data-action=quizTab][data-arg=数据表]').click();
     await page.locator('.source-table').first().waitFor();
-    assert.equal(await footer.evaluate(node => node === node.parentElement.lastElementChild), true);
+    assert.equal((await footer.boundingBox()).y, atTop.y);
     await page.locator('[data-action=quizTab][data-arg=题目]').click();
     await page.locator('#sql-editor').waitFor();
   }
@@ -82,7 +98,14 @@ try {
   for (const q of content.questions.filter(q => q.gradingRevision)) {
     await visit('/question/'+q.id, '#sql-editor[data-id='+q.id+']');
     await page.locator('#sql-editor').fill(q.referenceSolutions[1].mysqlSql);
-    await page.locator('[data-action=submitQuestion]').click();
+    const submit = page.locator('[data-action=submitQuestion]');
+    await submit.evaluate(button => {
+      const header = document.querySelector('.appbar').getBoundingClientRect();
+      const footer = document.querySelector('.quiz-details .sequence-actions').getBoundingClientRect();
+      const position = button.getBoundingClientRect();
+      window.scrollBy(0, (position.top + position.bottom - header.bottom - footer.top) / 2);
+    });
+    await submit.click();
     await page.locator('.judge-feedback').getByText('回答正确',{exact:true}).waitFor({timeout:60000});
   }
 
@@ -91,7 +114,7 @@ try {
     const sections = await page.locator('[data-lesson-section]').evaluateAll(nodes => nodes.map(node => node.dataset.lessonSection));
     assert.ok(sections.indexOf('steps') < sections.indexOf('example'), k.id);
     assert.equal(await page.locator('#lesson-result table').count(),0,k.id);
-    assert.equal(await page.locator('.lesson-checkpoint').count(),k.teaching.checkpoints.length,k.id);
+    assert.equal(await page.locator('.lesson-checkpoint').count(),k.teaching.checkpoints.length+k.teaching.mergeExamples.length,k.id);
     await page.locator('[data-action=lessonRun]').click();
     await page.waitForFunction(() => document.querySelector('#lesson-result small')?.textContent.includes('本次 SQLite'),{},{timeout:6000}).catch(async error => {
       throw Error(k.id+' '+(await page.locator('#snackbar').textContent())+' '+error.message);
@@ -101,7 +124,7 @@ try {
     assert.equal(await page.locator('#lesson-result p').last().innerText(),k.teaching.resultExplanation,k.id);
   }
   assert.deepEqual(errors,[]);
-  console.log('80 browser lesson executions, four rewritten submissions, 80/200/200 counts, in-flow footer reached by scrolling, and historical-state migration passed.');
+  console.log('80 browser lesson executions, four rewritten submissions, 80/200/200 counts, fixed separator-free footer, and historical-state migration passed.');
 } finally {
   await browser.close();
 }

@@ -78,103 +78,103 @@
     },
     {
       "path": "courses_resource/courses/ch01.json",
-      "bytes": 16367,
-      "sha256": "4c66487dfefe9ec92d072c35d685c97e21d705309c06f8a7a1e9a57102b15bdc"
+      "bytes": 16544,
+      "sha256": "c5efadd8fc51a060628167824a6cfc07aaa22a05341ba2e6aaa05274d530ffcb"
     },
     {
       "path": "courses_resource/courses/ch02.json",
-      "bytes": 10242,
-      "sha256": "492cf9d17a6c3384066fe140edee4bb547218a488b30c3863bee4b10c603ef02"
+      "bytes": 11992,
+      "sha256": "2bf7a703abc3687b21c9f00495b086ef156f915a2363845c87f5565cd424691c"
     },
     {
       "path": "courses_resource/courses/ch03.json",
-      "bytes": 18938,
-      "sha256": "ad7867500d19cb6b694597bac60000bc84e2a64365f9004b1c896e0e63b4e029"
+      "bytes": 19174,
+      "sha256": "ac7ef079392a58b4630040f110f79056aff534ae8023dd3c91a98a5b7638de00"
     },
     {
       "path": "courses_resource/courses/ch04.json",
-      "bytes": 9861,
-      "sha256": "2c1a44958a786c9335f8c9d0853a31e22244a7858b2528596c7250c6eca2f206"
+      "bytes": 9979,
+      "sha256": "52ff245240a25d667f15deb97f25f773bef102aaef9b026d3d38f5551aaefdde"
     },
     {
       "path": "courses_resource/courses/ch05.json",
-      "bytes": 8508,
-      "sha256": "c1c12eaceb521dcb86a2ecf0d9fa4b71e9386cd7986c921373cf8abb4c6be7ff"
+      "bytes": 9540,
+      "sha256": "63b786c682c2534cf3fb4b3e996a169d695da60bf3404a2775fdb7d579d5a16b"
     },
     {
       "path": "courses_resource/courses/ch06.json",
-      "bytes": 12373,
-      "sha256": "656cb0e4b9a42cefafc41958fae9b10a33ca95bd47a0a9414d8924aa6be1d8ea"
+      "bytes": 12550,
+      "sha256": "6ef32b5996efd4163b4877bd797a8112f5599fbd79ba61d43c322e42ae9812bf"
     },
     {
       "path": "courses_resource/courses/ch07.json",
-      "bytes": 17334,
-      "sha256": "0e4f277c7c868e41877d0ab27d0902aa13c3b1748faa262efcd8a2c4c1de62a4"
+      "bytes": 17511,
+      "sha256": "7ed3d4320629eab009c180bc70bf40d85b15adac085c20f1898b5ab5f7d6a560"
     },
     {
       "path": "courses_resource/courses/ch08.json",
-      "bytes": 33039,
-      "sha256": "382586b01e6d90f50579f5b2fdabb389d0c129bee3de4e0dc0d4fcfb3c91e3b1"
+      "bytes": 36131,
+      "sha256": "ba55b1e65fb912b1d9867960a513ade88bea39ff803295b310b27a0e6368d244"
     },
     {
       "path": "courses_resource/courses/ch09.json",
-      "bytes": 15359,
-      "sha256": "eec561da2f72aa661ebce4d6bb94806ea2865dbbb8e90941043694754ba3e587"
+      "bytes": 16946,
+      "sha256": "b4e7b100af2fe681527e3960c11de7c090dfbc8657aacb1666507f50bfeb1bc4"
     },
     {
       "path": "courses_resource/courses/ch10.json",
-      "bytes": 22374,
-      "sha256": "817a8fb1c2b503841cb22d8391fb56836774b54b8450c330b008add24e3d0312"
+      "bytes": 22610,
+      "sha256": "d8692c511b1b930d202ca1daa2dd8a3d56a7696f74d9f4ace9adb328665b2103"
     },
     {
       "path": "courses_resource/courses/ch11.json",
-      "bytes": 15579,
-      "sha256": "d58d44717f8e9b4d7603a986c1cb5e62857ae6bf4e0f4027cc735628ef6f6149"
+      "bytes": 16707,
+      "sha256": "8afddfcd70b11e2d88eb022940fe333a8d2cd67565d6000fa979c2ecb56095ea"
     },
     {
       "path": "courses_resource/courses/ch12.json",
-      "bytes": 16147,
-      "sha256": "2ff7916d473916c59c3bfd0c4d1eb396c1e59f15282609f69b7c2d93ff4542f6"
+      "bytes": 17374,
+      "sha256": "90af2fdc8e86695a50a7b80ff7abbf080fd1ce59bdcfd0a6b2fad3f9c57c3bdf"
     },
     {
       "path": "courses_resource/courses/ch13.json",
-      "bytes": 8847,
-      "sha256": "c952e1d77259a8c2486d852c11fe0780a0b0491a7ef8b3eabbbcd94c03605025"
+      "bytes": 10912,
+      "sha256": "a4bed0633e49c632c2773d82c75eb14ae0ba0ae2e3a54c9969b30a8f5e8f53b6"
     },
     {
       "path": "courses_resource/courses/ch14.json",
-      "bytes": 7547,
-      "sha256": "d7af1e5461889a775d9fef81bfcd3febfb1fb2a0a6340a4008ce50d93171cb18"
+      "bytes": 7606,
+      "sha256": "3bf1d092874d934146d570925fdac3987acd7c9527a22d62d447b1bfd47025f9"
     },
     {
       "path": "courses_resource/courses/ch15.json",
-      "bytes": 27495,
-      "sha256": "461aaff631a10971fd0c65e6abfadaccaf44782ea2f56180a756b08de927bb73"
+      "bytes": 29454,
+      "sha256": "e5d5ac4f361ae72879f56b76756b8629387b37e880b92ea646f23dad9fcbea54"
     },
     {
       "path": "courses_resource/courses/ch16.json",
-      "bytes": 15429,
-      "sha256": "1353734a64c915850de9dafeeca3b9017d637859a6df893be4d325a84393a057"
+      "bytes": 15606,
+      "sha256": "ae622b2627104d649dd8d40295c54e7ee727b2faee5877a1e28bd85e4ac65d8b"
     },
     {
       "path": "courses_resource/courses/ch17.json",
-      "bytes": 7078,
-      "sha256": "d3ecf671880ffd4245547097fa9f5f3bf571eabdbb997f195fbd230c912d91ad"
+      "bytes": 9783,
+      "sha256": "5efc82db731d19ecb2b96190c1fc8c61ae944d9a8cf842b90f74a3228dd8a2bb"
     },
     {
       "path": "courses_resource/courses/ch18.json",
-      "bytes": 5736,
-      "sha256": "38a29b524a7659dc12019dcebea94eac464379bfbe1773c5b7692497c1a5edb4"
+      "bytes": 6419,
+      "sha256": "a8babc1139d7fcdc8398e9dcd46d6317d4ac7b33b502357239f52445d73584e3"
     },
     {
       "path": "courses_resource/courses/ch19.json",
-      "bytes": 276349,
-      "sha256": "98ccff40c47c64d31a3e74af78ef7ca765329999b9bf4a32c3debfa9ed52f6d4"
+      "bytes": 285781,
+      "sha256": "23df25d123e62bdaf539a18cd6af9385c0d4ddec459f017eb924292db8ad6604"
     },
     {
       "path": "courses_resource/courses/ch20.json",
-      "bytes": 183236,
-      "sha256": "e96affcdcefabdbe735cc78e0e6c28dba96eb39b7db6c239ef24eb0e63fed5ad"
+      "bytes": 186589,
+      "sha256": "218e955f707ca41475630f21acef1c8b4c253f45ed1f8ea345c0ed608608411d"
     },
     {
       "path": "courses_resource/curriculum-migration.json",
@@ -458,8 +458,8 @@
     },
     {
       "path": "courses_resource/manifest.json",
-      "bytes": 35434,
-      "sha256": "c1037684604976309187a408dc2f8fb8204f432244cc8e3d7cd8b9d02adc75eb"
+      "bytes": 35462,
+      "sha256": "24f1734e110dc959f93571a6f4fac70c441e1a28521b4ffb74947570d501732f"
     },
     {
       "path": "courses_resource/reading/ch01.md",
@@ -468,8 +468,8 @@
     },
     {
       "path": "courses_resource/reading/ch02.md",
-      "bytes": 2864,
-      "sha256": "d1c91db1c29f752c8d5bd174726dfad496680c627b0be5082f50dd30be8c7bc0"
+      "bytes": 3536,
+      "sha256": "c74352998a65af48470ddcd4f225f1ba40d8cd6ec1fb11d6ceaf03b44fb3ef30"
     },
     {
       "path": "courses_resource/reading/ch03.md",
@@ -483,8 +483,8 @@
     },
     {
       "path": "courses_resource/reading/ch05.md",
-      "bytes": 2524,
-      "sha256": "cdb20cfb7941e1229f49d2e55adb3806dc1897072571367c63884f31faa2192a"
+      "bytes": 3017,
+      "sha256": "924621e5881d55b5df1f7494037dc17842ed6da323a0145f07d6471081bc0598"
     },
     {
       "path": "courses_resource/reading/ch06.md",
@@ -498,13 +498,13 @@
     },
     {
       "path": "courses_resource/reading/ch08.md",
-      "bytes": 8821,
-      "sha256": "0b388d6e9a452896fd86bc8a9a6bb295a341d7be147b4048aa15823e98effce4"
+      "bytes": 10325,
+      "sha256": "7872bb566ac157dc0d3a1ab160e70cc499e10937b8a2fa26c5c9418d9692c79d"
     },
     {
       "path": "courses_resource/reading/ch09.md",
-      "bytes": 4398,
-      "sha256": "1c4f475f7f2270da5bfc6ba1147ce118e2b5e54b3ec68204a6f3f11abddc1370"
+      "bytes": 5063,
+      "sha256": "b35558812ecfc099cae58bf502d6ed074b30f755e2f6fda9c27306d5f1831d48"
     },
     {
       "path": "courses_resource/reading/ch10.md",
@@ -513,18 +513,18 @@
     },
     {
       "path": "courses_resource/reading/ch11.md",
-      "bytes": 4618,
-      "sha256": "2e0ebbdd9f0a8115c41fa91cd3e161237b99d09d1f81804f1ded789406cedb8a"
+      "bytes": 5176,
+      "sha256": "ac44210af7ca5839e94f3935e42bfd72654410febca0d6d495959a347bc84cd0"
     },
     {
       "path": "courses_resource/reading/ch12.md",
-      "bytes": 5296,
-      "sha256": "82f6967fbd379d8b2f1a3aae6f5d097681c639a2f8d9983bf07572d109d04803"
+      "bytes": 5866,
+      "sha256": "204c794d087b2143d50d1486669933f6169cb3682525813c03f1ba37e582afa9"
     },
     {
       "path": "courses_resource/reading/ch13.md",
-      "bytes": 2748,
-      "sha256": "a72e4f50219ab37e5aeda38b6074f6a290289928efe872c05983da1f0df87231"
+      "bytes": 3808,
+      "sha256": "3cfb9179676a0ed595557e075313196d0298be085e54785da19e8eacc5309bb1"
     },
     {
       "path": "courses_resource/reading/ch14.md",
@@ -533,8 +533,8 @@
     },
     {
       "path": "courses_resource/reading/ch15.md",
-      "bytes": 8304,
-      "sha256": "2a78f231565ea3b12dca48b2f1f36160b4e41288a04fce235a8669d9d6ae45e2"
+      "bytes": 9309,
+      "sha256": "8d555c3f7a39b76dc8e6aa71d9fa9079f4ad30dd76b756a63987ba204501a9f6"
     },
     {
       "path": "courses_resource/reading/ch16.md",
@@ -543,23 +543,23 @@
     },
     {
       "path": "courses_resource/reading/ch17.md",
-      "bytes": 2553,
-      "sha256": "73b0444e5c18a9786b2eea497599d7ab5f8906ff41074c45f9e11ac390eb014d"
+      "bytes": 4228,
+      "sha256": "9af583521ae922ed147b2ec00ff2c8ee136fee2f10d0f5506c64680f4a64efd5"
     },
     {
       "path": "courses_resource/reading/ch18.md",
-      "bytes": 1672,
-      "sha256": "c2700c33df9d1c93d0c97482c2c4391f27be686aa9ff2398e6362db6f1dac59f"
+      "bytes": 2112,
+      "sha256": "e0765d8be3fe12ef9229c5037f6c7ac004f1a4d1c688f74150cbc2cd9315c81e"
     },
     {
       "path": "courses_resource/reading/ch19.md",
-      "bytes": 92608,
-      "sha256": "223f745c9a4a4c81b284473f304577e30b591f9294f31de26688faa4dabb932a"
+      "bytes": 98306,
+      "sha256": "30364fd4310d16a0882a518b0327062e2100be9bc286d8c4cba49b0dc4502975"
     },
     {
       "path": "courses_resource/reading/ch20.md",
-      "bytes": 54899,
-      "sha256": "9b7b6f9f6d4c9f33ca7e21b8ef3ba9c05f4f987e1d421356b98803d346f281af"
+      "bytes": 56822,
+      "sha256": "2ae5c82d1f166f4c2f28089e45dc2981d216e2c9e16818585e132b052ac0fcba"
     },
     {
       "path": "courses_resource/reference/CURRICULUM.md",
@@ -593,8 +593,8 @@
     },
     {
       "path": "courses_resource/validation/curriculum-revision.json",
-      "bytes": 7883,
-      "sha256": "bae1d782ae1a0422cde970b43559d02bfb0700867889d9e0096d84d0a1ac2be3"
+      "bytes": 13516,
+      "sha256": "95c5624d8eb0abfcecab225392a313d5853a1ee93f56fc1b10a8433fe12e1ab8"
     },
     {
       "path": "courses_resource/validation/execution.json",
@@ -3289,7 +3289,7 @@
     {
       "path": "flashcard_resource/manifest.json",
       "bytes": 56197,
-      "sha256": "c6afc1a6ffec3bf6bbb7eb23920829420af188f1d69443ce1a7ea27677d60e41"
+      "sha256": "c8eee5e340a339996cf108dcd09897b1e6cf6af302fdbe5d0f4ef77084813e01"
     },
     {
       "path": "flashcard_resource/reading/ch01.md",
@@ -3298,8 +3298,8 @@
     },
     {
       "path": "flashcard_resource/reading/ch02.md",
-      "bytes": 6190,
-      "sha256": "d0aeac0276b489411790fd0c77b20a5a7e851686fb3b88d745eb760e7f1beb54"
+      "bytes": 6234,
+      "sha256": "ac6318d75681fc6a24a55b88378d18af12932d8534b50a3e503e4e587d72e1d6"
     },
     {
       "path": "flashcard_resource/reading/ch03.md",
@@ -3343,18 +3343,18 @@
     },
     {
       "path": "flashcard_resource/reading/ch11.md",
-      "bytes": 6766,
-      "sha256": "bd07c61990cbba701de67adc526a8c2b614202c159615c92c88c28bc8f1203a4"
+      "bytes": 6808,
+      "sha256": "63f84435858a757b237ec7e334437f6a351c7ec46bb29b3358bede26242bc7e0"
     },
     {
       "path": "flashcard_resource/reading/ch12.md",
-      "bytes": 9905,
-      "sha256": "d71bf573dcc36c8520f409f9f8df527b1c3b459f7188f7a3694ad15065e3fceb"
+      "bytes": 9973,
+      "sha256": "291a93e0b566734c8a51b382ad988c69e29e876e0dfb308bef5926f566c22dfa"
     },
     {
       "path": "flashcard_resource/reading/ch13.md",
-      "bytes": 6069,
-      "sha256": "c5eb4d3fa8463a3df484205b53387ae46f28d5608bf99cdee5d0b513438b3709"
+      "bytes": 6081,
+      "sha256": "e0d2937d5776a845fbbf17a1bb7922f464077990504e720142519e1c7df1d359"
     },
     {
       "path": "flashcard_resource/reading/ch14.md",
@@ -3363,8 +3363,8 @@
     },
     {
       "path": "flashcard_resource/reading/ch15.md",
-      "bytes": 11886,
-      "sha256": "7e44459aaece7faef6a0e39dc1e5d047969f3820374ba6c6f5bd63f9e27a77e9"
+      "bytes": 11898,
+      "sha256": "4fb0f14963a83dd02fd1c3a919d132b7f51cb2d96f79d863670bc4aae1477fda"
     },
     {
       "path": "flashcard_resource/reading/ch16.md",
@@ -3373,13 +3373,13 @@
     },
     {
       "path": "flashcard_resource/reading/ch17.md",
-      "bytes": 7116,
-      "sha256": "1e981bf3ab9554221582bf5820cd9d3c07049bf59836e095e2448e87cb65acc4"
+      "bytes": 7112,
+      "sha256": "5854c974c975e85ed5c48eed1fd0876ba65481b16191153d24c8b7014a62fb0a"
     },
     {
       "path": "flashcard_resource/reading/ch18.md",
-      "bytes": 4717,
-      "sha256": "b95a0f21743382a928d11fde863d743eb6f0205b10a9bd4eda4d5b2cf0236cd0"
+      "bytes": 4732,
+      "sha256": "209c455406ec7b2441e6be73d63bf8f75f0e953d5c0d40bf000ba78fc756ab90"
     },
     {
       "path": "flashcard_resource/reading/ch19.md",
@@ -3423,8 +3423,8 @@
     },
     {
       "path": "flashcard_resource/reference/source_index.json",
-      "bytes": 89413,
-      "sha256": "cfbb3b9c6465e7bc73b8952c866ee47be8e2c733c9703ab9347584cbcaffa3e0"
+      "bytes": 89467,
+      "sha256": "bff124557c17d5199aeb80ec65f8ead6000f704e7012b10337c9e1b2552b30a9"
     },
     {
       "path": "flashcard_resource/review_policy.json",
@@ -12773,8 +12773,8 @@
     },
     {
       "path": "verify_integrated.py",
-      "bytes": 5553,
-      "sha256": "86a8882dce3c1cc0d21163ec89ad563349b835ee72c6c607fdc9ca20c0ba8a67"
+      "bytes": 6725,
+      "sha256": "d6b5c4d82756643163a0ddb0d8d4851081f4278d2df1430c0c0129af6eebf618"
     }
   ]
 }

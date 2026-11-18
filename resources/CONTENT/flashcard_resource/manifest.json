@@ -1013,8 +1013,8 @@
     },
     {
       "path": "reading/ch02.md",
-      "bytes": 6190,
-      "sha256": "d0aeac0276b489411790fd0c77b20a5a7e851686fb3b88d745eb760e7f1beb54"
+      "bytes": 6234,
+      "sha256": "ac6318d75681fc6a24a55b88378d18af12932d8534b50a3e503e4e587d72e1d6"
     },
     {
       "path": "reading/ch03.md",
@@ -1058,18 +1058,18 @@
     },
     {
       "path": "reading/ch11.md",
-      "bytes": 6766,
-      "sha256": "bd07c61990cbba701de67adc526a8c2b614202c159615c92c88c28bc8f1203a4"
+      "bytes": 6808,
+      "sha256": "63f84435858a757b237ec7e334437f6a351c7ec46bb29b3358bede26242bc7e0"
     },
     {
       "path": "reading/ch12.md",
-      "bytes": 9905,
-      "sha256": "d71bf573dcc36c8520f409f9f8df527b1c3b459f7188f7a3694ad15065e3fceb"
+      "bytes": 9973,
+      "sha256": "291a93e0b566734c8a51b382ad988c69e29e876e0dfb308bef5926f566c22dfa"
     },
     {
       "path": "reading/ch13.md",
-      "bytes": 6069,
-      "sha256": "c5eb4d3fa8463a3df484205b53387ae46f28d5608bf99cdee5d0b513438b3709"
+      "bytes": 6081,
+      "sha256": "e0d2937d5776a845fbbf17a1bb7922f464077990504e720142519e1c7df1d359"
     },
     {
       "path": "reading/ch14.md",
@@ -1078,8 +1078,8 @@
     },
     {
       "path": "reading/ch15.md",
-      "bytes": 11886,
-      "sha256": "7e44459aaece7faef6a0e39dc1e5d047969f3820374ba6c6f5bd63f9e27a77e9"
+      "bytes": 11898,
+      "sha256": "4fb0f14963a83dd02fd1c3a919d132b7f51cb2d96f79d863670bc4aae1477fda"
     },
     {
       "path": "reading/ch16.md",
@@ -1088,13 +1088,13 @@
     },
     {
       "path": "reading/ch17.md",
-      "bytes": 7116,
-      "sha256": "1e981bf3ab9554221582bf5820cd9d3c07049bf59836e095e2448e87cb65acc4"
+      "bytes": 7112,
+      "sha256": "5854c974c975e85ed5c48eed1fd0876ba65481b16191153d24c8b7014a62fb0a"
     },
     {
       "path": "reading/ch18.md",
-      "bytes": 4717,
-      "sha256": "b95a0f21743382a928d11fde863d743eb6f0205b10a9bd4eda4d5b2cf0236cd0"
+      "bytes": 4732,
+      "sha256": "209c455406ec7b2441e6be73d63bf8f75f0e953d5c0d40bf000ba78fc756ab90"
     },
     {
       "path": "reading/ch19.md",
@@ -1138,8 +1138,8 @@
     },
     {
       "path": "reference/source_index.json",
-      "bytes": 89413,
-      "sha256": "cfbb3b9c6465e7bc73b8952c866ee47be8e2c733c9703ab9347584cbcaffa3e0"
+      "bytes": 89467,
+      "sha256": "bff124557c17d5199aeb80ec65f8ead6000f704e7012b10337c9e1b2552b30a9"
     },
     {
       "path": "review_policy.json",

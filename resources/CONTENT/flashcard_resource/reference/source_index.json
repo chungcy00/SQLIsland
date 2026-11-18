@@ -58,7 +58,7 @@
     },
     "kp02-01": {
       "chapterId": "ch02",
-      "title": "SELECT 与 FROM"
+      "title": "SELECT、FROM 与派生列"
     },
     "kp02-02": {
       "chapterId": "ch02",
@@ -174,7 +174,7 @@
     },
     "kp11-02": {
       "chapterId": "ch11",
-      "title": "SUBSTRING 截取文本"
+      "title": "文本截取、字符数与字节数"
     },
     "kp11-03": {
       "chapterId": "ch11",
@@ -182,7 +182,7 @@
     },
     "kp12-01": {
       "chapterId": "ch12",
-      "title": "ROUND 与 ABS"
+      "title": "数值计算、除法与舍入"
     },
     "kp12-02": {
       "chapterId": "ch12",
@@ -202,7 +202,7 @@
     },
     "kp13-02": {
       "chapterId": "ch13",
-      "title": "INTERSECT 与 EXCEPT"
+      "title": "交集、差集与排序"
     },
     "kp14-01": {
       "chapterId": "ch14",
@@ -222,7 +222,7 @@
     },
     "kp15-04": {
       "chapterId": "ch15",
-      "title": "ROWS、RANGE 与累计"
+      "title": "ROWS、RANGE 与并列累计"
     },
     "kp15-05": {
       "chapterId": "ch15",
@@ -242,15 +242,15 @@
     },
     "kp17-01": {
       "chapterId": "ch17",
-      "title": "CREATE TABLE 与约束"
+      "title": "表结构与数据约束"
     },
     "kp17-02": {
       "chapterId": "ch17",
-      "title": "INSERT、UPDATE、DELETE"
+      "title": "数据修改与事务"
     },
     "kp18-01": {
       "chapterId": "ch18",
-      "title": "索引与选择性"
+      "title": "索引与执行计划"
     },
     "kp19-01": {
       "chapterId": "ch19",

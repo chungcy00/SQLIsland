@@ -177,13 +177,15 @@
         "problem": "报表需要把类别与商品名组合成可读标签。",
         "codeExplanation": "CONCAT 显式插入分隔符，顺序决定标签结构。MySQL 中空值会传递，需保留部分文本时先约定 COALESCE 的备用值。",
         "resultExplanation": "得到如“护肤品 - Mask”的新列，仍是一商品一行。也能用于码表显示，原始键应单独保留供连接。",
-        "checkpoints": []
+        "checkpoints": [],
+        "mergedConcepts": [],
+        "mergeExamples": []
       }
     },
     {
       "id": "kp11-02",
       "chapterId": "ch11",
-      "title": "SUBSTRING 截取文本",
+      "title": "文本截取、字符数与字节数",
       "learningObjective": "能够运用本节知识完成：提取商品编码前缀",
       "prerequisites": [
         "kp11-01",
@@ -364,7 +366,32 @@
         "problem": "编码前缀要按字符位置提取，不能凭样例结果硬截固定字节。",
         "codeExplanation": "SUBSTRING 从第一个字符起取三个字符，适合固定长度前缀；分隔符位置变化时先定位再截取。CHAR_LENGTH 计算字符数，LENGTH 在 MySQL 中计算字节数；多字节商品名应按字符截取。",
         "resultExplanation": "Mask 取 Mas，Serum 取 Ser。分组使用前缀前应检查是否把不同业务含义的编码误合并。",
-        "checkpoints": []
+        "checkpoints": [],
+        "mergedConcepts": [
+          {
+            "sourceId": "kp11-04",
+            "explanation": "字符限制用 CHAR_LENGTH，接口字节预算在 MySQL 中用 LENGTH。以 UTF-8 的“古晋”为例，2 个字符占 6 字节；SQLite 对 TEXT 的 length 数字符，转成 BLOB 后才数编码字节。"
+          }
+        ],
+        "mergeExamples": [
+          {
+            "label": "同一名称的字符数与字节数",
+            "explanation": "条件是 UTF-8 编码。SQLite 中转为 BLOB 可核对字节长度；MySQL 使用 CHAR_LENGTH 数字符，LENGTH 数字节。",
+            "sql": "SELECT LENGTH('古晋') AS character_count,\n  LENGTH(CAST('古晋' AS BLOB)) AS byte_count;",
+            "result": {
+              "columns": [
+                "character_count",
+                "byte_count"
+              ],
+              "rows": [
+                [
+                  2,
+                  6
+                ]
+              ]
+            }
+          }
+        ]
       }
     },
     {
@@ -549,7 +576,9 @@
         "problem": "来源系统书写不一致时，在匹配前先统一清洗规则。",
         "codeExplanation": "TRIM 删边缘空白，LOWER 归一大小写，REPLACE 按明确的字符替换；每者处理不同问题。",
         "resultExplanation": "前两行清洗后名字和类别相同，为后续重复审查提供候选。空白可能有业务含义，不能无条件删除所有内部空格。",
-        "checkpoints": []
+        "checkpoints": [],
+        "mergedConcepts": [],
+        "mergeExamples": []
       }
     }
   ],

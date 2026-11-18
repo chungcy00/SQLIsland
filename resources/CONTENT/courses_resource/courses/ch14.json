@@ -250,7 +250,9 @@
               ]
             }
           }
-        ]
+        ],
+        "mergedConcepts": [],
+        "mergeExamples": []
       }
     }
   ],

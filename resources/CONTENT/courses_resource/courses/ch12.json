@@ -11,7 +11,7 @@
     {
       "id": "kp12-01",
       "chapterId": "ch12",
-      "title": "ROUND 与 ABS",
+      "title": "数值计算、除法与舍入",
       "learningObjective": "能够运用本节知识完成：展示金额和差异幅度",
       "prerequisites": [
         "kp12-04"
@@ -95,7 +95,34 @@
         "problem": "金额报告要区分精度处理、方向和偏离幅度。",
         "codeExplanation": "ROUND 调整结果精度，ABS 返回绝对大小。计算汇总和比率时通常先以原精度运算，最后舍入。MySQL 的 DIV 取截断后的整数商；需要小数时用 /，并用 NULLIF 防止除零。保留原精度直到最终展示。",
         "resultExplanation": "12.346 显示为 12.35，-25 的幅度是 25。查超阈值时可按 ABS 筛选，并保留有正负方向的原差额。",
-        "checkpoints": []
+        "checkpoints": [],
+        "mergedConcepts": [
+          {
+            "sourceId": "kp12-05",
+            "explanation": "计算单件成本应保留小数，拆箱只剩多少完整箱时则取整数商。MySQL 的 7 DIV 2 为 3，SQLite 两个整数相除也会截断，写 7.0 / 2 得 3.5；7 % 2 的余数是 1。"
+          }
+        ],
+        "mergeExamples": [
+          {
+            "label": "七件两件一箱",
+            "explanation": "保留小数时是 3.5，实际只能装 3 个完整箱，余 1 件。这里用 CAST 截断得到整数商；MySQL 原生整数商也可以用 DIV。",
+            "sql": "SELECT 7.0 / 2 AS quotient, CAST(7.0 / 2 AS INTEGER) AS full_boxes,\n  7 % 2 AS spare_units;",
+            "result": {
+              "columns": [
+                "quotient",
+                "full_boxes",
+                "spare_units"
+              ],
+              "rows": [
+                [
+                  3.5,
+                  3,
+                  1
+                ]
+              ]
+            }
+          }
+        ]
       }
     },
     {
@@ -286,7 +313,9 @@
         "problem": "日期可以派生可排序的月份键、年份和月份编号。",
         "codeExplanation": "DATE_FORMAT 生成含年份的月份文本，YEAR、MONTH 提取数值部分。跨年报表不能仅用 MONTH 分组。",
         "resultExplanation": "一月订单形成同一个 2026-01 键，但各订单行仍独立。后续 GROUP BY 月键才形成月度汇总。",
-        "checkpoints": []
+        "checkpoints": [],
+        "mergedConcepts": [],
+        "mergeExamples": []
       }
     },
     {
@@ -365,7 +394,9 @@
         "problem": "计算经过的天数要先明确参数顺序和是否考虑完整时间单位。",
         "codeExplanation": "DATEDIFF(结束,开始) 比较日期，TIMESTAMPDIFF(单位,开始,结束) 按单位计算完整经过值，参数顺序不同。",
         "resultExplanation": "从 1 月 31 日到 2 月 3 日经过 3 天。计算账龄时先确定截止日，保留负值来区分未到期。",
-        "checkpoints": []
+        "checkpoints": [],
+        "mergedConcepts": [],
+        "mergeExamples": []
       }
     },
     {
@@ -524,7 +555,9 @@
         "problem": "按月筛有时分秒的记录时，用下一月月初做独立上界。",
         "codeExplanation": "半开区间含二月月初且不含三月月初，不依赖时间字段的小数秒精度，也无需给索引列包一层函数。",
         "resultExplanation": "二月三笔合计 2400。用同样规则建立连续、不重叠的月报或季度报表。",
-        "checkpoints": []
+        "checkpoints": [],
+        "mergedConcepts": [],
+        "mergeExamples": []
       }
     }
   ],

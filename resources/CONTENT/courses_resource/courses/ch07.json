@@ -210,7 +210,9 @@
         "problem": "将逐笔订单变成类别销售汇总。",
         "codeExplanation": "GROUP BY 定义一个类别一组，SUM 在每组内累计 sales，最终按汇总额排序。",
         "resultExplanation": "由订单粒度降为类别粒度，共三组。改分组键可得到按门店或按月份的同类报表。",
-        "checkpoints": []
+        "checkpoints": [],
+        "mergedConcepts": [],
+        "mergeExamples": []
       }
     },
     {
@@ -420,7 +422,9 @@
         "problem": "只在已经算好的类别总额中寻找超过阈值的类别。",
         "codeExplanation": "日期等明细条件放 WHERE；金额阈值取决于 SUM，应写在 GROUP BY 之后的 HAVING。",
         "resultExplanation": "合计 1500 和 1400 的两类保留，700 的类别被过滤。把阈值应用在单笔销售会丢掉共同达到门槛的小额记录。",
-        "checkpoints": []
+        "checkpoints": [],
+        "mergedConcepts": [],
+        "mergeExamples": []
       }
     },
     {
@@ -625,7 +629,9 @@
         "problem": "同一类别在不同门店应分别统计，避免汇总粒度不明。",
         "codeExplanation": "门店和类别共同构成组键；输出的普通列应属于这些键或由键唯一决定，度量列使用聚合。",
         "resultExplanation": "结果一行是一个门店类别组合。加入月份会划分更细，直接删除一个键则合并对应分组。",
-        "checkpoints": []
+        "checkpoints": [],
+        "mergedConcepts": [],
+        "mergeExamples": []
       }
     }
   ],

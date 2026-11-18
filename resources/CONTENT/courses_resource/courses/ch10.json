@@ -170,7 +170,9 @@
         "problem": "查找高于全表平均价格的商品，需要用数据自己算阈值。",
         "codeExplanation": "AVG 产生一个数，外层每个商品都与同一结果比较。若子查询可能多行，应先聚合或改用集合语义。",
         "resultExplanation": "价格 89 和 65 等高于平均的商品入选；阈值随数据变化。可加类别分组或写相关子查询改成类内比较。",
-        "checkpoints": []
+        "checkpoints": [],
+        "mergedConcepts": [],
+        "mergeExamples": []
       }
     },
     {
@@ -374,7 +376,9 @@
         "problem": "寻找拥有至少一笔大额订单的客户，同时避免重复客户行。",
         "codeExplanation": "内层返回满足金额条件的客户编号集合，外层 IN 做成员判断。即使内层同一编号出现多次，每位外层客户也只验证一次。",
         "resultExplanation": "客户 1 和 3 入选。需要展示大额订单详情时才应改用连接并接受不同粒度。",
-        "checkpoints": []
+        "checkpoints": [],
+        "mergedConcepts": [],
+        "mergeExamples": []
       }
     },
     {
@@ -582,7 +586,9 @@
         "problem": "仅判断订单是否存在，不需要搬运订单明细。",
         "codeExplanation": "相关条件把 o.customer_id 与当前外层客户绑定。EXISTS 一旦找到任意符合行就成立，SELECT 1 只表达存在性。",
         "resultExplanation": "有订单客户各保留一行，未下单的客户 4 被过滤。加上日期条件可筛指定期间活跃客户。",
-        "checkpoints": []
+        "checkpoints": [],
+        "mergedConcepts": [],
+        "mergeExamples": []
       }
     },
     {
@@ -788,7 +794,9 @@
         "problem": "寻找未下单客户时，订单数据里可能含匿名客户编号。",
         "codeExplanation": "NOT EXISTS 找不到匹配即为真。NOT IN 只要候选中有 NULL，未匹配比较就可能变成 UNKNOWN。",
         "resultExplanation": "客户 4 被正确找出，匿名订单不干扰判断。采购核对同样可用反连接检测缺失收货。",
-        "checkpoints": []
+        "checkpoints": [],
+        "mergedConcepts": [],
+        "mergeExamples": []
       }
     }
   ],

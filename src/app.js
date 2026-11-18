@@ -460,9 +460,11 @@ function rich(value) {
 }
 function lessonTeaching(k) {
   if (!k.teaching) return "";
-  const { problem, codeExplanation, checkpoints } = k.teaching;
+  const { problem, codeExplanation, checkpoints, mergeExamples = [] } = k.teaching;
   return `<p>${e(problem)}</p><p>${e(codeExplanation)}</p>${checkpoints.map((step) =>
     `<details class="lesson-checkpoint"><summary>${e(step.label)} · <code>${e(step.name)}</code></summary>${lessonCode(step.sql)}${table(step.result.columns, step.result.rows)}</details>`
+  ).join("")}${mergeExamples.map((example) =>
+    `<details class="lesson-checkpoint"><summary>${e(example.label)}</summary><p>${e(example.explanation)}</p>${lessonCode(example.sql)}${table(example.result.columns, example.result.rows)}</details>`
   ).join("")}`;
 }
 function lessonResult(k, result) {
@@ -490,7 +492,7 @@ function lessonPage(id) {
   persist().catch((err) => toast(err.message));
   shell("知识点详情", `<div class="lesson-details">
     <header class="lesson-intro"><div class="question-meta">${tag(chapter.title)}${tag(k.compatibility?.status || "MySQL 教学")}<small>${position} / ${chapter.knowledgePoints.length}</small></div><h1 class="lesson-title">${e(k.title)}</h1>${goal ? `<section class="lesson-purpose" data-lesson-section="purpose"><p>能够运用本节知识完成：${e(goal)}</p></section>` : ""}</header>
-    <div class="lesson-foundation"><section class="lesson-section" data-lesson-section="concept"><h2>核心概念</h2>${scenario ? `<p class="lesson-scenario">${e(scenario)}</p>` : ""}<div class="lesson-concept">${readingChunks(k.concept).map((chunk) => `<p>${e(chunk)}</p>`).join("")}</div>${sharedExample ? parameters : ""}</section>
+    <div class="lesson-foundation"><section class="lesson-section" data-lesson-section="concept"><h2>核心概念</h2>${scenario ? `<p class="lesson-scenario">${e(scenario)}</p>` : ""}<div class="lesson-concept">${readingChunks(k.concept).map((chunk) => `<p>${e(chunk)}</p>`).join("")}${(k.teaching?.mergedConcepts || []).map((item) => `<p>${e(item.explanation)}</p>`).join("")}</div>${sharedExample ? parameters : ""}</section>
     ${!sharedExample ? `<section class="lesson-section" data-lesson-section="syntax"><h2>语法</h2>${lessonCode(k.syntax)}${parameters}</section>` : ""}</div>
     ${(k.executionSteps || []).length ? `<section class="lesson-section" data-lesson-section="steps"><h2>执行思路</h2><ol class="steps">${k.executionSteps.map((step, i) => `<li class="step"><b>${i + 1}</b><span>${e(step)}</span></li>`).join("")}</ol></section>` : ""}
     <section class="lesson-section" data-lesson-section="data"><h2>示例数据</h2>${renderTables(k.sourceTables)}</section>
@@ -2364,10 +2366,20 @@ function saveEditorDraft(input) {
 }
 app.addEventListener("focusin", (event) => {
   if (event.target.id !== "sql-editor" || !route().startsWith("/question/") || !state.settings.customKeyboard) return;
+  const input = event.target;
   questionKeyboard = true;
   document.querySelector(".keyboard-wrap")?.classList.remove("hidden");
   document.body.classList.add("has-sql-keyboard");
   applyKeyboardHeight();
+  requestAnimationFrame(() => {
+    if (document.activeElement !== input || input.closest(".fullscreen")) return;
+    const navigation = app.querySelector(".quiz-details > .sequence-actions");
+    if (!navigation) return;
+    const availableBottom = navigation.getBoundingClientRect().top - 8;
+    const editor = input.getBoundingClientRect();
+    const covered = editor.top + Math.min(editor.height, 96) - availableBottom;
+    if (covered > 0) window.scrollBy(0, covered);
+  });
 });
 app.addEventListener("editorchange", (event) => saveEditorDraft(event.target));
 app.addEventListener("input", (event) => {

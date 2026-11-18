@@ -162,13 +162,45 @@
         "problem": "合并两批客户记录时，先区分要保留来源重复还是只要客户清单。",
         "codeExplanation": "UNION ALL 保留重叠，UNION 对整行做去重。参与合并的列要同序、同含义；最终排序写在最后。",
         "resultExplanation": "同一编号在两边出现时，本例保留两行。若要模拟双侧保留的对账，将匹配和单侧未匹配拆开后用 UNION ALL 拼接。",
-        "checkpoints": []
+        "checkpoints": [],
+        "mergedConcepts": [
+          {
+            "sourceId": "kp13-04",
+            "explanation": "两批名单合并后如需唯一客户，先只输出 customer_id 再用 UNION。加入来源标签后，同一客户的两行整行不同，仍会保留；若同时要来源及唯一客户，先明确去重键再汇总来源。"
+          }
+        ],
+        "mergeExamples": [
+          {
+            "label": "合并成不重复的客户清单",
+            "explanation": "UNION 忽略这批数据的来源，仅对客户编号去重。同一个编号在两批都出现时只返回一次。",
+            "sql": "SELECT customer_id FROM old_customers\nUNION\nSELECT customer_id FROM new_customers\nORDER BY customer_id;",
+            "result": {
+              "columns": [
+                "customer_id"
+              ],
+              "rows": [
+                [
+                  1
+                ],
+                [
+                  2
+                ],
+                [
+                  3
+                ],
+                [
+                  4
+                ]
+              ]
+            }
+          }
+        ]
       }
     },
     {
       "id": "kp13-02",
       "chapterId": "ch13",
-      "title": "INTERSECT 与 EXCEPT",
+      "title": "交集、差集与排序",
       "learningObjective": "能够运用本节知识完成：识别两期都购买的客户",
       "prerequisites": [
         "kp13-01"
@@ -299,7 +331,30 @@
         "problem": "比较两个时期或来源的客户集合。",
         "codeExplanation": "INTERSECT 返回双方都存在的编号，EXCEPT 返回仅左侧存在的编号；也可用 EXISTS 或 NOT EXISTS 按键表达。集合结果的整体 ORDER BY 写在最后；需要先限制某个输入集时，用子查询封装该分支。",
         "resultExplanation": "共有客户为 2 和 3；互换 EXCEPT 两侧会改变结果。核对客户迁入迁出时分别运行两个方向。",
-        "checkpoints": []
+        "checkpoints": [],
+        "mergedConcepts": [
+          {
+            "sourceId": "kp13-03",
+            "explanation": "把旧名单放在 EXCEPT 左侧可找流失，互换两侧可找新增。ORDER BY 放在整个差集末尾，只对最后输出排序；先取某批的前 N 条时，需要把该批先封装成子查询。"
+          }
+        ],
+        "mergeExamples": [
+          {
+            "label": "找出旧名单里后来消失的客户",
+            "explanation": "旧名单放在左边，结果只包含旧有而新无的编号。反过来写得到新增客户。",
+            "sql": "SELECT customer_id FROM old_customers\nEXCEPT\nSELECT customer_id FROM new_customers\nORDER BY customer_id;",
+            "result": {
+              "columns": [
+                "customer_id"
+              ],
+              "rows": [
+                [
+                  1
+                ]
+              ]
+            }
+          }
+        ]
       }
     }
   ],

@@ -165,7 +165,9 @@
         "problem": "按闭区间查商品时先确认边界值是否要保留。",
         "codeExplanation": "WHERE 的两个比较分别约束下界和上界，AND 要求二者都真。SELECT 只在通过筛选的行上投影。",
         "resultExplanation": "价格正好 35 和 65 的记录都保留。若改为半开区间，明确把上界改为小于。",
-        "checkpoints": []
+        "checkpoints": [],
+        "mergedConcepts": [],
+        "mergeExamples": []
       }
     },
     {
@@ -332,7 +334,9 @@
         "problem": "促销候选可以由低价或高库存触发，但缺货商品一律排除。",
         "codeExplanation": "括号先形成候选集合，外层 AND 再应用排除条件。加括号让逻辑不依赖读者凭印象判断运算优先级。",
         "resultExplanation": "低价但库存为零的商品被排除。写多条件时先手工列出最容易漏掉的反例，再检查括号。",
-        "checkpoints": []
+        "checkpoints": [],
+        "mergedConcepts": [],
+        "mergeExamples": []
       }
     },
     {
@@ -499,7 +503,9 @@
         "problem": "筛选指定品类内的价格带，同时表达枚举值和区间。",
         "codeExplanation": "IN 匹配任一允许的类别，BETWEEN 连同上下界一起比较，AND 取两个条件的交集。",
         "resultExplanation": "两个边界价可以入选，其他类别即使价格符合也不入选。日期时间通常改用左闭右开，避免漏掉最后一天的非零时刻。",
-        "checkpoints": []
+        "checkpoints": [],
+        "mergedConcepts": [],
+        "mergeExamples": []
       }
     },
     {
@@ -658,7 +664,9 @@
         "problem": "查找命名中含下划线的商品时，需要把字面标记和通配符分开。",
         "codeExplanation": "两端 % 匹配任意前后缀，ESCAPE '!' 使 !_ 只匹配字符下划线；普通 _ 则匹配任意单个字符。",
         "resultExplanation": "Soap_1 被命中。识别含百分号的标签时用同样办法把 % 转义。",
-        "checkpoints": []
+        "checkpoints": [],
+        "mergedConcepts": [],
+        "mergeExamples": []
       }
     }
   ],

@@ -144,7 +144,34 @@
         "problem": "判断已知数值与筛出缺失是两件不同的工作，质量报表要分别统计。",
         "codeExplanation": "与 NULL 做普通比较时得到 UNKNOWN，WHERE 只留下 TRUE。要显式选缺失写 IS NULL，要确认存在用 IS NOT NULL。",
         "resultExplanation": "示例 value <> 10 只留下 0；缺失行没有留下。可用 IS NULL 单独审计，别把 NULL 当作 0 或空字符串。",
-        "checkpoints": []
+        "checkpoints": [],
+        "mergedConcepts": [
+          {
+            "sourceId": "kp01-04",
+            "explanation": "订单的客户外键为空时，可能是允许匿名下单的业务规则。用 IS NULL 找出这批记录后，再结合状态或来源判断是否缺报；只检查 COUNT(customer_id) 会跳过它们。"
+          }
+        ],
+        "mergeExamples": [
+          {
+            "label": "单独找出不知道的值",
+            "explanation": "普通比较会跳过缺失行。换成 IS NULL 明确选择缺失，0 仍留在已知记录中。",
+            "sql": "SELECT id, value, note FROM nullable_values\nWHERE value IS NULL ORDER BY id;",
+            "result": {
+              "columns": [
+                "id",
+                "value",
+                "note"
+              ],
+              "rows": [
+                [
+                  1,
+                  null,
+                  null
+                ]
+              ]
+            }
+          }
+        ]
       }
     },
     {
@@ -286,7 +313,9 @@
         "problem": "展示缺失值时可以设备用值，仍需保留有含义的零和空字符串。",
         "codeExplanation": "IFNULL 只有两个候选；COALESCE 依次取首个非 NULL 的值。仅在 SELECT 输出处理，避免把缺失误写回源表。",
         "resultExplanation": "第二行的 0 和空文本都保留。若业务认为空文本也缺失，先用 NULLIF 把它转换为 NULL。",
-        "checkpoints": []
+        "checkpoints": [],
+        "mergedConcepts": [],
+        "mergeExamples": []
       }
     }
   ],

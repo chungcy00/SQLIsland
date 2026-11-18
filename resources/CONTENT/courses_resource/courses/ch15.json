@@ -228,7 +228,9 @@
         "problem": "分析单笔订单在类别中的位置时，同时需要原始行和类别合计。",
         "codeExplanation": "PARTITION BY 定义窗口范围，OVER 从每条输入行出发补上所在分区的聚合，不压缩成一行一类。",
         "resultExplanation": "护肤品的两行都得到 1400，可继续计算各笔占比；若报表只要各类合计则用 GROUP BY。",
-        "checkpoints": []
+        "checkpoints": [],
+        "mergedConcepts": [],
+        "mergeExamples": []
       }
     },
     {
@@ -430,7 +432,9 @@
         "problem": "排行榜对并列的处理取决于实际规则。",
         "codeExplanation": "ROW_NUMBER 加唯一决胜键产生连续位置；RANK 并列且跳号；DENSE_RANK 并列但不跳号。不能给后两者加破坏并列的唯一排序键。",
         "resultExplanation": "同薪员工可有不同位置编号但相同排名。每组最多三人用 ROW_NUMBER，保留所有并列名次时用 RANK 或 DENSE_RANK。",
-        "checkpoints": []
+        "checkpoints": [],
+        "mergedConcepts": [],
+        "mergeExamples": []
       }
     },
     {
@@ -597,13 +601,15 @@
         "problem": "趋势报表需要从相邻记录取上期、下期值。",
         "codeExplanation": "按月份排序后 LAG 向前取一行、LEAD 向后取一行，边界缺邻居时返回 NULL。先确认月份行连续。",
         "resultExplanation": "一月的上期为空，二月上期为 1000。跨门店分析需按门店分区，避免从上一家店取值。",
-        "checkpoints": []
+        "checkpoints": [],
+        "mergedConcepts": [],
+        "mergeExamples": []
       }
     },
     {
       "id": "kp15-04",
       "chapterId": "ch15",
-      "title": "ROWS、RANGE 与累计",
+      "title": "ROWS、RANGE 与并列累计",
       "learningObjective": "能够运用本节知识完成：计算年度累计销售额",
       "prerequisites": [
         "kp15-03",
@@ -763,7 +769,48 @@
         "problem": "累计金额取决于窗口包含哪些行，尤其在同日多笔交易时。",
         "codeExplanation": "ROWS 从分区首行逐条累加到当前行，若同值行排序不唯一应加决胜键。RANGE 常把排序值相同的行纳入同一批。",
         "resultExplanation": "前两月累计为 1000 和 2500。若需要逐笔余额，使用 ROWS 并指定稳定顺序；按自然期间看趋势时先汇总。",
-        "checkpoints": []
+        "checkpoints": [],
+        "mergedConcepts": [
+          {
+            "sourceId": "kp15-06",
+            "explanation": "两位员工薪资同为 5,000 时，按薪资的 RANGE 截至当前值会同时计入两位，显示相同累计；ROWS 加员工编号决胜则逐行累加，分别得到 5,000 和 10,000。两列回答的是同薪档累计与逐人累计两个问题。"
+          }
+        ],
+        "mergeExamples": [
+          {
+            "label": "同薪时逐人累计还是同档累计",
+            "explanation": "第 1、2 行同薪。RANGE 把两行一起计入当前值；ROWS 用 employee_id 拆开同薪，再逐行累计。",
+            "sql": "WITH salaries AS (\n  SELECT 1 AS employee_id, 5000 AS salary UNION ALL\n  SELECT 2, 5000 UNION ALL SELECT 3, 6000\n)\nSELECT employee_id, salary,\n  SUM(salary) OVER (ORDER BY salary RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS range_total,\n  SUM(salary) OVER (ORDER BY salary, employee_id ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS rows_total\nFROM salaries ORDER BY salary, employee_id;",
+            "result": {
+              "columns": [
+                "employee_id",
+                "salary",
+                "range_total",
+                "rows_total"
+              ],
+              "rows": [
+                [
+                  1,
+                  5000,
+                  10000,
+                  5000
+                ],
+                [
+                  2,
+                  5000,
+                  10000,
+                  10000
+                ],
+                [
+                  3,
+                  6000,
+                  16000,
+                  16000
+                ]
+              ]
+            }
+          }
+        ]
       }
     },
     {
@@ -958,7 +1005,9 @@
               ]
             }
           }
-        ]
+        ],
+        "mergedConcepts": [],
+        "mergeExamples": []
       }
     }
   ],

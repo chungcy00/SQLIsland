@@ -180,7 +180,9 @@
         "problem": "展示价格榜时，相同价格也要能在两次查询中按同一顺序显示。",
         "codeExplanation": "先按 price DESC 定主顺序，再以唯一 product_id ASC 决胜；后一列只比较前一列同值的记录。",
         "resultExplanation": "相同价格的两个商品按编号排列。稳定排序也是分页、取首条和可复现导出的前提。",
-        "checkpoints": []
+        "checkpoints": [],
+        "mergedConcepts": [],
+        "mergeExamples": []
       }
     },
     {
@@ -346,7 +348,9 @@
         "problem": "读取固定大小的第二页，并沿用第一页的稳定排序。",
         "codeExplanation": "先 ORDER BY 建立全序，再由 OFFSET 跳过前两行，由 LIMIT 读取随后的两行。",
         "resultExplanation": "第二页返还价格 45 和 35 的商品。高频大页码场景可用上一页的价格和编号作为起点。",
-        "checkpoints": []
+        "checkpoints": [],
+        "mergedConcepts": [],
+        "mergeExamples": []
       }
     }
   ],

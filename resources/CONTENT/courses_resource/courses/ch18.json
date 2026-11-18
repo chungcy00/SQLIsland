@@ -11,7 +11,7 @@
     {
       "id": "kp18-01",
       "chapterId": "ch18",
-      "title": "索引与选择性",
+      "title": "索引与执行计划",
       "learningObjective": "能够运用本节知识完成：理解索引适合精确过滤的场景",
       "prerequisites": [],
       "concept": "索引是辅助访问结构；高选择性条件通常减少候选记录，但优化器仍可能选择扫描小表。",
@@ -180,7 +180,18 @@
         "problem": "当查询经常按价格找少量商品时，索引才有机会减少扫描。",
         "codeExplanation": "直接比较 price=89 让引擎可使用索引范围。尽量避免在被检索列上先做表达式运算；结合 EXPLAIN 分析选择性与实际计划。复合索引先检查最左列能否匹配常用条件，范围条件后的列是否参与定位需看 EXPLAIN。",
         "resultExplanation": "查询返回一件商品，正确结果不会因索引而改变。将这套核查用于门店日期等复合过滤时，还要看索引列顺序。",
-        "checkpoints": []
+        "checkpoints": [],
+        "mergedConcepts": [
+          {
+            "sourceId": "kp18-02",
+            "explanation": "门店月报经常按门店等值和日期范围筛选，可测试 (store_id,order_date) 复合索引。只按日期查全公司时通常不能直接依赖这个前导键，应以代表性查询检查计划。"
+          },
+          {
+            "sourceId": "kp18-03",
+            "explanation": "MySQL EXPLAIN 看估计访问方式、索引和行数，EXPLAIN ANALYZE 实际执行并报告测量结果。SQLite 可用 EXPLAIN QUERY PLAN 查看 SEARCH 和 SCAN，输出标签不能当成 MySQL 的耗时或估计行数。"
+          }
+        ],
+        "mergeExamples": []
       }
     }
   ],

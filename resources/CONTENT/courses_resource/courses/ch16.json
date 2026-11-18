@@ -159,7 +159,9 @@
         "problem": "先量化疑似重复，再决定哪些记录允许归并。",
         "codeExplanation": "按清洗后的名称、金额及类别分组，HAVING 筛选计数超过一的组合。这样的组合是待复核的业务键。",
         "resultExplanation": "两条 Mask 被归为一组。若同值交易确实可能多次发生，应加发票号等业务标识或人工复核。",
-        "checkpoints": []
+        "checkpoints": [],
+        "mergedConcepts": [],
+        "mergeExamples": []
       }
     },
     {
@@ -327,7 +329,9 @@
         "problem": "数据质量报告要区分缺失、异常和通过的记录。",
         "codeExplanation": "CASE 优先检查缺失和全空白文本，然后才比较转换后的金额。用稳定主键保留可回查线索。",
         "resultExplanation": "同样的检查可批量汇总每种异常类型。存在非法数字字符串时应先验证可转换性，不能依赖数据库隐式转换。",
-        "checkpoints": []
+        "checkpoints": [],
+        "mergedConcepts": [],
+        "mergeExamples": []
       }
     },
     {
@@ -504,7 +508,9 @@
         "problem": "不同来源的金额文本及类别写法需要转成统一的对账口径。",
         "codeExplanation": "CAST 为金额指定目标类型，TRIM 与 LOWER 归一类别后用 CASE 映射。建议保留原字段以便回溯。",
         "resultExplanation": "两种写法可映射为同一数值和类别，行粒度保持不变。遇到无法识别的类别，应按明确规则标记。",
-        "checkpoints": []
+        "checkpoints": [],
+        "mergedConcepts": [],
+        "mergeExamples": []
       }
     }
   ],

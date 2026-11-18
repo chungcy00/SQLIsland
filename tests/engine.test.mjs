@@ -250,7 +250,7 @@ test("course checkpoints match their recorded results in SQLite WASM", async () 
   const datasets = JSON.parse(await readFile("dist/databases.json")).datasets;
   let count = 0;
   for (const lesson of content.chapters.flatMap(chapter => chapter.knowledgePoints)) {
-    const steps = lesson.teaching.checkpoints;
+    const steps = [...lesson.teaching.checkpoints, ...lesson.teaching.mergeExamples];
     if (!steps.length) continue;
     const dataset = datasets.find(item => item.id === lesson.datasetId);
     const base = dataset ? await readFile("dist/" + dataset.path) : undefined;
@@ -259,12 +259,12 @@ test("course checkpoints match their recorded results in SQLite WASM", async () 
       if (lesson.setupSql) db.run(lesson.setupSql);
       for (const step of steps) {
         assert.ok(compareResults(query(db, step.sql), step.result, "ordered").pass,
-          lesson.id + " " + step.name);
+          lesson.id + " " + (step.name || step.label));
         count++;
       }
     } finally {
       db.close();
     }
   }
-  assert.equal(count, 73);
+  assert.equal(count, 85);
 });
