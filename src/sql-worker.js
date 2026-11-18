@@ -84,6 +84,7 @@ self.onmessage = async ({ data }) => {
           ? q.testFixtures
           : q.testFixtures.filter((f) => f.visibility === "public").slice(0, 1);
         let display;
+        let publicComparison;
         let completed = 0;
         for (const entry of fixtures) {
           const fixture = await readJson(entry.path);
@@ -104,7 +105,7 @@ self.onmessage = async ({ data }) => {
             );
             try {
               const actual = query(db, sql, 50000);
-              if (!display) display = actual;
+              if (entry.visibility === "public" && !display) display = actual;
               result = submit
                 ? compareResults(
                     actual,
@@ -115,16 +116,26 @@ self.onmessage = async ({ data }) => {
                     q.numericTolerance?.columnAbsolute,
                   )
                 : { pass: true };
+              if (submit && !result.pass && entry.visibility === "public") {
+                publicComparison = {
+                  actual: { columns: actual.columns, rows: actual.rows.slice(0, 40), rowCount: actual.rows.length },
+                  expected: { columns: fixture.expected.columns, rows: fixture.expected.rows.slice(0, 40), rowCount: fixture.expected.rows.length },
+                };
+              }
             } finally {
               db.close();
             }
           }
           completed++;
+          if (!result.pass && entry.visibility !== "public" && !result.unsupported) {
+            result = { ...result, message: "隐藏场景未通过，请检查筛选、关联、边界值和业务口径。" };
+          }
           if (!result.pass) break;
         }
         result = {
           ...result,
           result: display,
+          publicComparison,
           fixtures: completed,
           submitted: submit,
         };

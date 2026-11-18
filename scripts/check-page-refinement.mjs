@@ -20,7 +20,15 @@ try {
   await completed.waitFor();
   assert.equal(await completed.locator('.point-check').count(), 1);
   assert.match(await completed.locator('.grow').evaluate((n) => getComputedStyle(n).textDecorationLine), /line-through/);
-  assert.equal(await page.locator('.chapter-progress').count(), 20);
+  assert.equal(await page.locator('.chapter-progress[role=progressbar]').count(), 20);
+  await page.locator('#search').fill('数据库基础');
+  await page.waitForFunction(() => document.querySelectorAll('.chapter-card').length === 1);
+  await page.locator('[data-action=toggleChapter]').click();
+  await page.waitForFunction(() => document.querySelector('[data-action=toggleChapter]')?.getAttribute('aria-expanded') === 'false');
+  assert.equal(await page.locator('.knowledge-row').count(), 0);
+  await page.locator('[data-action=toggleChapter]').click();
+  await page.locator('.knowledge-row.current').waitFor();
+  assert.match(await page.locator('.knowledge-row.current').innerText(), /上次学到/);
   await page.screenshot({ path: 'artifacts/refined-learn.png', fullPage: true });
   await page.locator('#search').fill('zzzz-no-match');
   await page.locator('[data-action=resetLearning]').click();
@@ -28,9 +36,11 @@ try {
   assert.equal(await page.locator('.chapter-card').count(), 20);
   await route('/practice');
   assert.equal(await page.locator('.practice-selectors select').count(), 3);
+  const initialRows = await page.locator('.question-id').count();
+  assert.equal(initialRows, 8);
   await page.locator('[data-filter=status]').selectOption('未作答');
   await page.locator('[data-filter=type]').selectOption('选择');
-  assert.match(await page.locator('.active-filters').innerText(), /选择/);
+  assert.equal(await page.locator('[data-filter=type]').inputValue(), '选择');
   await page.locator('[data-action=questionDifficulty][data-arg=挑战]').click();
   assert.equal(await page.locator('.question-difficulties .selected').innerText(), '挑战');
   await page.getByRole('button', { name: '重置筛选', exact: true }).first().click();
@@ -39,10 +49,46 @@ try {
   await page.waitForFunction(() => document.querySelectorAll('.question-id').length === 1);
   assert.equal(await page.locator('.question-id').count(), 1);
   assert.equal(await page.locator('main .link-row h3').innerText(), 'NULL 与缺失记录');
+  await page.locator('[data-action=togglePracticeChapter]').click();
+  await page.waitForFunction(() => document.querySelector('[data-action=togglePracticeChapter]')?.getAttribute('aria-expanded') === 'false');
+  assert.equal(await page.locator('.question-id').count(), 0);
+  await page.locator('[data-action=togglePracticeChapter]').click();
+  await page.locator('.chapter-question-row').waitFor();
+  await page.locator('.chapter-question-row').click();
+  await page.waitForURL('**/#/question/q0002');
+  await page.locator('.quiz-title').waitFor();
+  await page.locator('[data-action=back]').click();
+  await page.waitForURL('**/#/practice');
+  await page.locator('.chapter-question-row').waitFor();
+  assert.equal(await page.locator('#search').inputValue(), 'q0002');
+  assert.equal(await page.locator('.question-id').count(), 1);
   await page.locator('[data-action=resetQuestions]').click();
-  await page.locator('[data-action=moreQuestions]').click();
-  await page.waitForFunction(() => document.querySelectorAll('.question-id').length === 160);
-  assert.equal(await page.locator('.question-id').count(), 160);
+  await page.waitForFunction(() => document.querySelectorAll('.question-id').length === 8);
+  assert.equal(await page.locator('.question-id').count(), initialRows);
+  assert.equal(await page.locator('.practice-chapters .chapter-card').count(), 20);
+  const chapterButtons = page.locator('[data-action=togglePracticeChapter]');
+  for (let index = 0; index < await chapterButtons.count(); index++) {
+    if (await chapterButtons.nth(index).getAttribute('aria-expanded') === 'false') {
+      await chapterButtons.nth(index).click();
+      await page.waitForFunction((i) => document.querySelectorAll('[data-action=togglePracticeChapter]')[i]?.getAttribute('aria-expanded') === 'true', index);
+    }
+  }
+  assert.equal(await page.locator('.question-id').count(), 300);
+  assert.equal(new Set(await page.locator('.question-id').allTextContents()).size, 300);
+  await chapterButtons.first().click();
+  await page.waitForFunction(() => document.querySelector('[data-action=togglePracticeChapter]')?.getAttribute('aria-expanded') === 'false');
+  await chapterButtons.first().click();
+  await page.waitForFunction(() => document.querySelector('[data-action=togglePracticeChapter]')?.getAttribute('aria-expanded') === 'true');
+  await page.locator('.chapter-question-row').first().scrollIntoViewIfNeeded();
+  const practiceScroll = await page.evaluate(() => window.scrollY);
+  await page.locator('.chapter-question-row').first().click();
+  await page.waitForURL('**/#/question/q0001');
+  await page.locator('.quiz-title').waitFor();
+  await page.locator('[data-action=back]').click();
+  await page.waitForURL('**/#/practice');
+  await page.locator('.practice-chapters').waitFor();
+  await page.waitForFunction((scroll) => Math.abs(window.scrollY - scroll) < 3, practiceScroll);
+  assert.equal(await chapterButtons.first().getAttribute('aria-expanded'), 'true');
   await page.evaluate(() => window.scrollTo(0, 0));
   await page.screenshot({ path: 'artifacts/refined-practice.png' });
   await route('/cards');
@@ -86,7 +132,7 @@ try {
   await note.fill('简短笔记');
   assert.ok(await note.evaluate((n) => n.clientHeight) <= initialHeight + 2);
   await route('/question/q0012');
-  assert.equal(await page.locator('main > pre').innerText(), 'SELECT {{blank1}} category\nFROM products\nORDER BY category;');
+  assert.equal(await page.locator('.initial-sql pre').innerText(), 'SELECT {{blank1}} category\nFROM products\nORDER BY category;');
   await route('/card-edit/new');
   for (const id of ['card-front', 'card-back', 'card-explanation']) {
     const field = page.locator('#' + id);

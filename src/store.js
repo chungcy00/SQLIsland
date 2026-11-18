@@ -27,6 +27,7 @@ export const defaults = () => ({
   studySeconds: 0,
   studyDays: {},
   learningView: { stage: "全部", expanded: ["ch01"] },
+  practiceView: { expanded: ["ch01"] },
   labWorkspaces: {},
 });
 let database;

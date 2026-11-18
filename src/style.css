@@ -1604,9 +1604,6 @@ li {
 .filter-grid > button {
   align-self: end;
 }
-.active-filters {
-  margin: 10px 0;
-}
 .question-status {
   display: flex;
   flex: 0 0 22px;
@@ -1950,3 +1947,195 @@ textarea:not(#sql-editor) {
 .erd-fullscreen .erd-inspector { position: absolute; bottom: 42px; left: 12px; right: 12px; max-height: 42vh; overflow: auto; z-index: 4; }
 .erd-fullscreen .erd-search-results { max-height: 35vh; }
 .erd-is-fullscreen { overflow: hidden; }
+
+/* Shared chapter headers keep progress counts and controls aligned. */
+.chapter-toggle .grow {
+  min-width: 0;
+  margin: 0;
+  line-height: 1.45;
+}
+.chapter-toggle .chapter-count {
+  flex: none;
+  white-space: nowrap;
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
+}
+.chapter-toggle > .chevron {
+  flex: none;
+}
+.current-chapter > .chapter-toggle,
+.knowledge-row.current {
+  background: var(--blue);
+}
+.learning-position {
+  flex: none;
+  font-size: .6875rem;
+  color: var(--primary);
+  font-weight: 400;
+}
+.knowledge-row.current {
+  padding-left: 8px;
+  padding-right: 8px;
+  border-radius: 8px;
+}
+.knowledge-row .grow {
+  min-width: 0;
+}
+.practice-chapters {
+  margin-top: 14px;
+}
+.chapter-questions {
+  padding: 0 14px 4px;
+}
+.chapter-question-row {
+  padding: 14px 2px;
+  gap: 10px;
+  border-top: 1px solid var(--line);
+  border-bottom: 0;
+  border-radius: 0;
+}
+.chapter-question-row .grow {
+  min-width: 0;
+}
+.question-row-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-bottom: 6px;
+}
+.question-row-meta .question-id {
+  margin: 0 3px 0 0;
+}
+.question-row-meta .tag {
+  margin: 0;
+  padding: 2px 5px;
+  font-size: .625rem;
+  font-weight: 400;
+}
+.chapter-question-row h3 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  margin: 0;
+  font-size: .875rem;
+  line-height: 1.55;
+}
+.chapter-question-row > .chevron {
+  flex: none;
+}
+@media (max-width: 360px) {
+  .chapter-toggle {gap: 8px; padding: 14px 10px;}
+  .chapter-toggle .grow {font-size: .875rem;}
+  .chapter-number {width: 34px; height: 36px;}
+  .learning-position {font-size: .625rem;}
+  .knowledge-row {gap: 8px;}
+}
+.question-status.needs-review {
+  color: var(--error);
+}
+.chapter-toggle .chapter-count {
+  min-width: 40px;
+  text-align: right;
+}
+.chapter-question-row .question-status {
+  justify-content: center;
+  align-items: center;
+}
+.chapter-question-row .question-status .icon,
+.knowledge-row > .chevron {
+  width: 18px;
+  height: 18px;
+}
+.chapter-toggle:focus-visible,
+.knowledge-row:focus-visible,
+.chapter-question-row:focus-visible {
+  outline-offset: -3px;
+}
+
+/* Detail pages share a compact reading rhythm. */
+.lesson-section {margin: 22px 0;}
+.lesson-section > h2:first-child {margin-top: 0;}
+.lesson-section p, .requirement-sections p, .judge-feedback p,
+.reference-answer p, .option-explanation {white-space: pre-line; overflow-wrap: anywhere;}
+.parameter-list {margin: 6px 0 10px 12px; padding-left: 20px; list-style: disc; font-size: .8125rem; color: var(--muted);}
+.parameter-list > li {margin: 0; padding: 1px 0; line-height: 1.55; overflow-wrap: anywhere;}
+.parameter-list strong {font-weight: 600; margin-right: 10px;}
+.source-table {margin: 14px 0;}
+.table-heading {gap: 10px; margin: 0 0 8px;}
+.table-heading h2, .table-heading h3 {margin: 0; font-size: .875rem;}
+.table-heading small {flex: none; font-variant-numeric: tabular-nums;}
+.remaining-rows {margin-top: 6px; font-size: .8125rem;}
+.remaining-rows > summary {padding: 10px 0; color: var(--primary); min-height: 44px;}
+.long-code {margin: 10px 0 0;}
+.long-code > summary {color: var(--primary); font-size: .8125rem; min-height: 44px; padding: 12px 0;}
+.long-code > pre {margin-top: 0;}
+.long-code[open] + .code-excerpt {display: none;}
+.code-excerpt pre {margin-top: 0; max-height: 220px; overflow: hidden;}
+.example-heading {margin-top: 18px; gap: 10px;}
+.example-heading h3 {margin: 0;}
+.example-heading button {display: inline-flex; align-items: center; gap: 4px;}
+.lesson-details .steps {display: flex; flex-direction: column; gap: 12px; overflow: visible; list-style: none; margin: 0; padding: 0;}
+.lesson-details .step {display: flex; align-items: flex-start; gap: 12px; min-width: 0; max-width: none; padding: 0; border-radius: 0; background: transparent; line-height: 1.7;}
+.lesson-details .step b {display: flex; align-items: center; justify-content: center; flex: 0 0 28px; height: 28px; margin: 0; border-radius: 50%; background: var(--blue); color: var(--primary); font-size: .8125rem;}
+.lesson-details .step span {padding-top: 2px; min-width: 0;}
+.lesson-cautions {background: var(--cream); border-radius: 14px; padding: 12px;}
+.mistake-comparison {margin: 12px 0; font-size: .875rem;}
+.mistake-comparison > div {display: grid; grid-template-columns: 32px 1fr; gap: 10px; padding: 6px 0;}
+.mistake-comparison dt {font-weight: 600;}
+.mistake-comparison dd {margin: 0; white-space: pre-line; overflow-wrap: anywhere;}
+.mistake-comparison > div:last-child dt {color: var(--green);}
+.lesson-completion {margin-top: 20px;}
+.sequence-actions {margin: 20px 0 12px;}
+.sequence-actions button {display: flex; align-items: center; justify-content: center; gap: 6px; min-width: 0;}
+.question-location {display: flex; justify-content: space-between; gap: 10px; color: var(--muted); font-size: .75rem; margin: 0 0 18px;}
+.question-location span {white-space: nowrap; font-variant-numeric: tabular-nums;}
+.choice-requirements {margin: 18px 0; white-space: pre-line;}
+.choice-item {margin-bottom: 10px;}
+.choice-item .option {margin-bottom: 0; align-items: flex-start;}
+.choice-item .option b {flex: 0 0 18px;}
+.choice-item .option > span {flex: 1; min-width: 0; overflow-wrap: anywhere;}
+.choice-item .option > .icon {flex: 0 0 18px; width: 18px; height: 18px; margin-top: 4px;}
+.option-explanation {font-size: .8125rem; margin: 0; padding: 8px 14px 8px 44px; color: var(--muted);}
+.option-explanation.correct {color: var(--green);}
+.option-explanation .icon {width: 15px; height: 15px; margin-right: 5px; vertical-align: middle;}
+.question-context {font-size: .8125rem; color: var(--muted); line-height: 1.7; margin: 16px 0; white-space: pre-line;}
+.requirement-sections > section {margin: 18px 0;}
+.requirement-sections h2 {font-size: .9375rem; margin: 0 0 8px;}
+.requirement-sections p {margin: 0; line-height: 1.85;}
+.input-guidance {font-size: .8125rem; color: var(--muted); margin: 10px 0 14px; line-height: 1.7;}
+.prediction-workspace h2, .editor-heading {font-size: .9375rem; margin: 16px 0 10px;}
+.judge-feedback {margin: 18px 0;}
+.judge-feedback .notice p {margin: 6px 0;}
+.judge-feedback .notice small {display: block; margin-top: 6px;}
+.judge-feedback details, .reference-answer {margin: 12px 0;}
+.judge-feedback summary, .reference-answer summary {min-height: 44px; padding: 10px 0; font-weight: 600;}
+.answer-support {margin: 20px 0;}
+.hint-list {list-style: none; padding: 0; margin: 12px 0;}
+.hint-list li {background: var(--cream); border-radius: 12px; padding: 12px 14px; margin: 8px 0;}
+.hint-list p {margin: 4px 0 0; font-size: .875rem; white-space: pre-line;}
+.hint-list small {font-weight: 600;}
+.project-intro {display: flex; align-items: center; gap: 16px; margin: 12px 0 18px;}
+.project-intro .summary-illustration {width: 80px; height: 80px; flex: none; margin: 0;}
+.project-intro p {margin: 0 0 6px; line-height: 1.65;}
+.project-intro small, .project-grain {font-size: .75rem; color: var(--muted);}
+.project-schema {margin: 14px 0;}
+.project-schema > summary {min-height: 44px; padding: 10px 0; font-size: .875rem; font-weight: 600;}
+.project-schema dl {margin: 6px 0;}
+.project-schema dl > div {padding: 10px 0; border-top: 1px solid var(--line);}
+.project-schema dt {font-size: .8125rem; font-weight: 600; overflow-wrap: anywhere;}
+.project-schema dd {margin: 4px 0 0; font-size: .75rem; color: var(--muted);}
+.project-schema dd small {display: block; margin-top: 3px;}
+.project-tasks .chapter-question-row:last-child {border-bottom: 1px solid var(--line);}
+.quiz-details .tabs {margin-bottom: 16px;}
+.code-collapse-label, .long-code[open] .code-expand-label {display: none;}
+.long-code[open] .code-collapse-label {display: inline;}
+.lesson-concept > p {margin: 0 0 8px;}
+.requirement-text > p + p {margin-top: 6px;}
+.mistake-comparison > div:first-child {color: var(--error);}
+.lesson-cautions > h2 {margin: 0 0 8px;}
+.lesson-cautions > p {margin: 6px 0; line-height: 1.65;}
+.lesson-cautions > p:last-child {margin-bottom: 0;}
+.lesson-cautions .mistake-comparison {margin: 6px 0; line-height: 1.65;}
+.lesson-cautions .mistake-comparison > div {padding: 3px 0; gap: 8px;}

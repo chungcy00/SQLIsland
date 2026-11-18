@@ -1,10 +1,12 @@
 {
-  "version": "0.3.3",
-  "versionCode": 7,
+  "version": "0.3.4",
+  "versionCode": 8,
   "releaseDate": "2026-11-18",
   "repository": "chungcy00/SQLIsland",
   "notes": [
-    "更新桌面图标为岛屿学习主题插画。"
+    "优化学习、练习及业务项目详情的排版与信息层级。",
+    "增加连续学习、按当前练习范围切题及课程示例进入实验室。",
+    "完善逐选项解析、提示和公开判题结果对比。"
   ],
   "appName": "数屿SQL",
   "assetPrefix": "ShuyuSQL"
