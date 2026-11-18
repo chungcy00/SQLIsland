@@ -1,14 +1,14 @@
 {
-  "versionCode": 8,
-  "versionName": "0.3.4",
+  "versionCode": 9,
+  "versionName": "0.3.5",
   "releaseDate": "2026-11-18",
-  "apkName": "ShuyuSQL-0.3.4.apk",
-  "apkUrl": "https://github.com/chungcy00/SQLIsland/releases/download/v0.3.4/ShuyuSQL-0.3.4.apk",
-  "sha256": "efd93d565008387f90a57fd29421f4aa2b6c38f4b5ef8abf97d3ac3de0feb38f",
-  "bytes": 54256823,
+  "apkName": "ShuyuSQL-0.3.5.apk",
+  "apkUrl": "https://github.com/chungcy00/SQLIsland/releases/download/v0.3.5/ShuyuSQL-0.3.5.apk",
+  "sha256": "9a7b2a8e5fe5f980427847e70efe3757ba5f8850f3cec70bb909cc6e1fac2c48",
+  "bytes": 54260919,
   "notes": [
-    "优化学习、练习及业务项目详情的排版与信息层级。",
-    "增加连续学习、按当前练习范围切题及课程示例进入实验室。",
-    "完善逐选项解析、提示和公开判题结果对比。"
+    "调整全部知识点的学习顺序，先理解概念与思路，再查看数据和SQL实操。",
+    "参考AI Studio优化标题层级和内容分组，统一学习目标句式，压紧执行步骤。",
+    "合并50个业务知识点中相同的语法与示例SQL展示。"
   ]
 }

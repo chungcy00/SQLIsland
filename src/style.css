@@ -2076,9 +2076,9 @@ textarea:not(#sql-editor) {
 .example-heading {margin-top: 18px; gap: 10px;}
 .example-heading h3 {margin: 0;}
 .example-heading button {display: inline-flex; align-items: center; gap: 4px;}
-.lesson-details .steps {display: flex; flex-direction: column; gap: 12px; overflow: visible; list-style: none; margin: 0; padding: 0;}
-.lesson-details .step {display: flex; align-items: flex-start; gap: 12px; min-width: 0; max-width: none; padding: 0; border-radius: 0; background: transparent; line-height: 1.7;}
-.lesson-details .step b {display: flex; align-items: center; justify-content: center; flex: 0 0 28px; height: 28px; margin: 0; border-radius: 50%; background: var(--blue); color: var(--primary); font-size: .8125rem;}
+.lesson-details .steps {display: flex; flex-direction: column; gap: 6px; overflow: visible; list-style: none; margin: 0; padding: 0;}
+.lesson-details .step {display: flex; align-items: flex-start; gap: 10px; margin: 0; min-width: 0; max-width: none; padding: 0; border-radius: 0; background: transparent; line-height: 1.7;}
+.lesson-details .step b {display: flex; align-items: center; justify-content: center; flex: 0 0 24px; height: 24px; margin: 0; border-radius: 50%; background: var(--blue); color: var(--primary); font-size: .8125rem;}
 .lesson-details .step span {padding-top: 2px; min-width: 0;}
 .lesson-cautions {background: var(--cream); border-radius: 14px; padding: 12px;}
 .mistake-comparison {margin: 12px 0; font-size: .875rem;}
@@ -2137,5 +2137,29 @@ textarea:not(#sql-editor) {
 .lesson-cautions > h2 {margin: 0 0 8px;}
 .lesson-cautions > p {margin: 6px 0; line-height: 1.65;}
 .lesson-cautions > p:last-child {margin-bottom: 0;}
-.lesson-cautions .mistake-comparison {margin: 6px 0; line-height: 1.65;}
-.lesson-cautions .mistake-comparison > div {padding: 3px 0; gap: 8px;}
+.lesson-cautions .mistake-comparison {margin: 4px 0; line-height: 1.45;}
+.lesson-cautions .mistake-comparison > div {padding: 0; gap: 6px;}
+
+.lesson-purpose p {margin: 0; line-height: 1.7;}
+.lesson-purpose > h2 {font-size: .875rem; margin-bottom: 6px;}
+.lesson-details .example-heading {margin-top: 0;}
+.lesson-details .example-heading h2 {margin: 0;}
+
+.lesson-intro {margin-bottom: 16px;}
+.lesson-title {font-size: 1.5rem; line-height: 1.4; font-weight: 700; margin: 10px 0 8px; overflow-wrap: anywhere;}
+.lesson-intro .lesson-purpose p {font-size: .875rem; color: var(--primary);}
+.lesson-foundation .lesson-section {margin: 0;}
+.lesson-foundation .lesson-section + .lesson-section {margin-top: 16px;}
+.lesson-foundation .lesson-concept > p:last-child {margin-bottom: 0;}
+.lesson-details .lesson-section > h2, .lesson-details .example-heading h2 {font-size: 1rem; font-weight: 600; line-height: 1.5; margin-bottom: 8px;}
+.lesson-details .lesson-section {margin-top: 18px; margin-bottom: 18px;}
+.lesson-details .lesson-foundation .lesson-section:first-child {margin-top: 0; margin-bottom: 0;}
+.lesson-details .lesson-foundation .lesson-section:last-child {margin-bottom: 0;}
+
+.lesson-scenario {font-size: .875rem; line-height: 1.7; color: var(--muted); margin: 0 0 10px;}
+
+.source-table .table-heading > h3 {display: flex; min-width: 0; align-items: baseline; white-space: nowrap;}
+.source-table-name {min-width: 0; overflow: hidden; text-overflow: ellipsis;}
+
+.lesson-details [data-lesson-section="data"] > h2 {margin-bottom: 4px;}
+.lesson-details [data-lesson-section="data"] .source-table:first-of-type {margin-top: 4px;}

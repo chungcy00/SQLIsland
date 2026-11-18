@@ -15,7 +15,8 @@ async function visit(path, selector = 'main') {
     await page.waitForFunction(id => document.querySelector('.question-meta small')?.textContent === id.toUpperCase(), id);
   } else if (path.startsWith('/lesson/') || path.startsWith('/chapter/')) {
     const item = path.startsWith('/lesson/') ? content.chapters.flatMap(c => c.knowledgePoints).find(k => k.id === id) : content.chapters.find(c => c.id === id);
-    await page.waitForFunction(title => document.querySelector('.appbar h1')?.textContent === title, item.title);
+    const titleSelector = path.startsWith('/lesson/') ? '.lesson-title' : '.appbar h1';
+    await page.waitForFunction(({ title, selector }) => document.querySelector(selector)?.textContent === title, { title: item.title, selector: titleSelector });
   } else if (path.startsWith('/projects/')) {
     const title = { retail:'零售销售分析', inventory:'库存管理', ecommerce:'电商客户分析', finance:'财务数据分析', hr:'人力资源分析', procurement:'采购数据分析' }[id];
     await page.waitForFunction(title => document.querySelector('.appbar h1')?.textContent === title, title);
@@ -27,11 +28,33 @@ try {
     assert.equal(await page.locator('.knowledge-row').count(), chapter.knowledgePoints.length);
     for (const kp of chapter.knowledgePoints) {
       await visit('/lesson/' + kp.id, '#note');
-      assert.equal(await page.locator('.appbar h1').innerText(), kp.title);
+      assert.equal(await page.locator('.lesson-title').innerText(), kp.title);
+      for (const selector of ['.lesson-intro', '.lesson-foundation']) {
+        const style = await page.locator(selector).evaluate(n => ({ border: getComputedStyle(n).borderTopWidth, padding: getComputedStyle(n).padding }));
+        assert.equal(style.border, '0px');
+        assert.equal(style.padding, '0px');
+      }
+      const sharedExample = formatSqlForDisplay(kp.syntax) === formatSqlForDisplay(kp.mysqlSql);
+      const sections = await page.locator('[data-lesson-section]').evaluateAll(nodes => nodes.map(n => n.dataset.lessonSection));
+      assert.deepEqual(sections, ['purpose', 'concept', ...(!sharedExample ? ['syntax'] : []), 'steps', 'data', 'example']);
+      const goal = (kp.learningObjective || kp.useCase || '').replace(/^(能够运用本节知识完成|在统一企业数据库中独立完成)[：:]\s*/, '');
+      assert.equal(await page.locator('[data-lesson-section=purpose] p').innerText(), '能够运用本节知识完成：' + goal);
+      assert.equal(await page.locator('[data-lesson-section=purpose] h2').count(), 0);
+      if (kp.useCase !== goal) assert.equal(await page.locator('.lesson-scenario').innerText(), kp.useCase);
+      assert.equal(await page.locator('.lesson-concept').textContent(), kp.concept);
+      const completeSql = formatSqlForDisplay(kp.mysqlSql);
+      const sqlBlocks = await page.locator('[data-lesson-section=example] pre code').allTextContents();
+      assert.ok(sqlBlocks.includes(completeSql));
+      if (sharedExample) assert.equal(await page.locator('[data-lesson-section=syntax]').count(), 0);
       assert.equal(await page.locator('.step').count(), kp.executionSteps.length);
+      assert.equal(await page.locator('.step').first().evaluate(n => getComputedStyle(n).marginTop), '0px');
+      assert.equal(await page.locator('.steps').evaluate(n => getComputedStyle(n).rowGap), '6px');
       assert.equal(await page.locator('.parameter-list li').count(), Object.keys(kp.parameters || {}).length);
       if (Object.keys(kp.parameters || {}).length) assert.equal(await page.locator('.parameter-list').evaluate(n => getComputedStyle(n).listStyleType), 'disc');
       assert.equal(await page.locator('.source-table').count(), kp.sourceTables.length);
+      assert.equal(await page.locator('[data-lesson-section=data] > h2').innerText(), '示例数据');
+      assert.equal(await page.locator('.source-table-label').count(), 0);
+      assert.deepEqual(await page.locator('.source-table-name').allTextContents(), kp.sourceTables.map(t => t.name));
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
       assert.equal(await page.locator('.steps').evaluateAll(nodes => nodes.some(n => n.scrollWidth > n.clientWidth)), false);
       for (const code of await page.locator('.long-code > pre code').allTextContents()) assert.ok(code.length);
