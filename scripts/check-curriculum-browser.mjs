@@ -83,14 +83,20 @@ try {
     const resize = keyboard.locator('.keyboard-resize');
     for (const key of ['Home', 'End', 'ArrowDown']) {
       await resize.press(key);
-      const [aboveKeyboard, pad] = await Promise.all([footer.boundingBox(), keyboard.boundingBox()]);
-      assert.ok(Math.abs(aboveKeyboard.y + aboveKeyboard.height - pad.y) <= 1);
-      const next = footer.getByRole('button', {name: '下一题'});
-      await next.click({trial: true});
+      const bounds = await footer.evaluate(node => {
+        const rect = node.getBoundingClientRect();
+        const cover = document.elementFromPoint(rect.x + rect.width / 2, rect.y + rect.height / 2);
+        return {top:rect.top,bottom:rect.bottom,covered:!!cover?.closest('.keyboard-wrap')};
+      });
+      assert.equal(bounds.top, atTop.y);
+      assert.equal(bounds.bottom, 844);
+      assert.equal(bounds.covered, true);
+      assert.equal(await footer.locator('button').last().isVisible(), false);
     }
     await page.locator('[data-action=quizTab][data-arg=数据表]').click();
     await page.locator('.source-table').first().waitFor();
     assert.equal((await footer.boundingBox()).y, atTop.y);
+    await footer.getByRole('button', {name:'下一题'}).click({trial:true});
     await page.locator('[data-action=quizTab][data-arg=题目]').click();
     await page.locator('#sql-editor').waitFor();
   }
@@ -101,7 +107,8 @@ try {
     const submit = page.locator('[data-action=submitQuestion]');
     await submit.evaluate(button => {
       const header = document.querySelector('.appbar').getBoundingClientRect();
-      const footer = document.querySelector('.quiz-details .sequence-actions').getBoundingClientRect();
+      const controls = document.querySelector('.keyboard-wrap:not(.hidden), .quiz-details .sequence-actions');
+      const footer = controls.getBoundingClientRect();
       const position = button.getBoundingClientRect();
       window.scrollBy(0, (position.top + position.bottom - header.bottom - footer.top) / 2);
     });

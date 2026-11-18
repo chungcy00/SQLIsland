@@ -2208,8 +2208,5 @@ pre, .code-input {white-space: pre-wrap; overflow-wrap: anywhere; overflow-x: hi
   pointer-events: none;
 }
 .quiz-details > .sequence-actions button {pointer-events: auto;}
-.has-sql-keyboard .quiz-details > .sequence-actions {
-  bottom: var(--sql-keyboard-height, 240px);
-  padding-bottom: 8px;
-}
+.has-sql-keyboard .quiz-details > .sequence-actions {visibility: hidden;}
 .editor-is-fullscreen .quiz-details > .sequence-actions {display: none;}

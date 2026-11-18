@@ -2368,14 +2368,14 @@ app.addEventListener("focusin", (event) => {
   if (event.target.id !== "sql-editor" || !route().startsWith("/question/") || !state.settings.customKeyboard) return;
   const input = event.target;
   questionKeyboard = true;
-  document.querySelector(".keyboard-wrap")?.classList.remove("hidden");
+  const keyboard = input.closest(".editor-workspace")?.querySelector(".keyboard-wrap");
+  if (!keyboard) return;
+  keyboard.classList.remove("hidden");
   document.body.classList.add("has-sql-keyboard");
   applyKeyboardHeight();
   requestAnimationFrame(() => {
     if (document.activeElement !== input || input.closest(".fullscreen")) return;
-    const navigation = app.querySelector(".quiz-details > .sequence-actions");
-    if (!navigation) return;
-    const availableBottom = navigation.getBoundingClientRect().top - 8;
+    const availableBottom = keyboard.getBoundingClientRect().top - 8;
     const editor = input.getBoundingClientRect();
     const covered = editor.top + Math.min(editor.height, 96) - availableBottom;
     if (covered > 0) window.scrollBy(0, covered);
