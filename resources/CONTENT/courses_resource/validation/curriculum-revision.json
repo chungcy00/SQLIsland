@@ -1,0 +1,406 @@
+{
+  "lessons": [
+    {
+      "id": "kp01-01",
+      "intermediateQueries": 0,
+      "finalExpectedRows": 5
+    },
+    {
+      "id": "kp01-02",
+      "intermediateQueries": 0,
+      "finalExpectedRows": 6
+    },
+    {
+      "id": "kp01-03",
+      "intermediateQueries": 0,
+      "finalExpectedRows": 4
+    },
+    {
+      "id": "kp02-01",
+      "intermediateQueries": 0,
+      "finalExpectedRows": 6
+    },
+    {
+      "id": "kp02-02",
+      "intermediateQueries": 0,
+      "finalExpectedRows": 3
+    },
+    {
+      "id": "kp03-01",
+      "intermediateQueries": 0,
+      "finalExpectedRows": 3
+    },
+    {
+      "id": "kp03-02",
+      "intermediateQueries": 0,
+      "finalExpectedRows": 3
+    },
+    {
+      "id": "kp03-03",
+      "intermediateQueries": 0,
+      "finalExpectedRows": 3
+    },
+    {
+      "id": "kp03-04",
+      "intermediateQueries": 0,
+      "finalExpectedRows": 1
+    },
+    {
+      "id": "kp04-01",
+      "intermediateQueries": 0,
+      "finalExpectedRows": 6
+    },
+    {
+      "id": "kp04-02",
+      "intermediateQueries": 0,
+      "finalExpectedRows": 2
+    },
+    {
+      "id": "kp05-01",
+      "intermediateQueries": 0,
+      "finalExpectedRows": 1
+    },
+    {
+      "id": "kp05-02",
+      "intermediateQueries": 0,
+      "finalExpectedRows": 4
+    },
+    {
+      "id": "kp06-01",
+      "intermediateQueries": 0,
+      "finalExpectedRows": 1
+    },
+    {
+      "id": "kp06-02",
+      "intermediateQueries": 0,
+      "finalExpectedRows": 1
+    },
+    {
+      "id": "kp06-03",
+      "intermediateQueries": 0,
+      "finalExpectedRows": 1
+    },
+    {
+      "id": "kp07-01",
+      "intermediateQueries": 0,
+      "finalExpectedRows": 3
+    },
+    {
+      "id": "kp07-02",
+      "intermediateQueries": 0,
+      "finalExpectedRows": 2
+    },
+    {
+      "id": "kp07-03",
+      "intermediateQueries": 0,
+      "finalExpectedRows": 3
+    },
+    {
+      "id": "kp08-01",
+      "intermediateQueries": 0,
+      "finalExpectedRows": 4
+    },
+    {
+      "id": "kp08-02",
+      "intermediateQueries": 0,
+      "finalExpectedRows": 5
+    },
+    {
+      "id": "kp08-03",
+      "intermediateQueries": 0,
+      "finalExpectedRows": 4
+    },
+    {
+      "id": "kp08-04",
+      "intermediateQueries": 0,
+      "finalExpectedRows": 4
+    },
+    {
+      "id": "kp08-05",
+      "intermediateQueries": 1,
+      "finalExpectedRows": 4
+    },
+    {
+      "id": "kp09-01",
+      "intermediateQueries": 0,
+      "finalExpectedRows": 6
+    },
+    {
+      "id": "kp09-02",
+      "intermediateQueries": 0,
+      "finalExpectedRows": 1
+    },
+    {
+      "id": "kp09-03",
+      "intermediateQueries": 0,
+      "finalExpectedRows": 6
+    },
+    {
+      "id": "kp10-01",
+      "intermediateQueries": 0,
+      "finalExpectedRows": 3
+    },
+    {
+      "id": "kp10-02",
+      "intermediateQueries": 0,
+      "finalExpectedRows": 2
+    },
+    {
+      "id": "kp10-03",
+      "intermediateQueries": 0,
+      "finalExpectedRows": 3
+    },
+    {
+      "id": "kp10-04",
+      "intermediateQueries": 0,
+      "finalExpectedRows": 1
+    },
+    {
+      "id": "kp11-01",
+      "intermediateQueries": 0,
+      "finalExpectedRows": 6
+    },
+    {
+      "id": "kp11-02",
+      "intermediateQueries": 0,
+      "finalExpectedRows": 6
+    },
+    {
+      "id": "kp11-03",
+      "intermediateQueries": 0,
+      "finalExpectedRows": 6
+    },
+    {
+      "id": "kp12-01",
+      "intermediateQueries": 0,
+      "finalExpectedRows": 1
+    },
+    {
+      "id": "kp12-02",
+      "intermediateQueries": 0,
+      "finalExpectedRows": 5
+    },
+    {
+      "id": "kp12-03",
+      "intermediateQueries": 0,
+      "finalExpectedRows": 1
+    },
+    {
+      "id": "kp12-04",
+      "intermediateQueries": 0,
+      "finalExpectedRows": 1
+    },
+    {
+      "id": "kp13-01",
+      "intermediateQueries": 0,
+      "finalExpectedRows": 7
+    },
+    {
+      "id": "kp13-02",
+      "intermediateQueries": 0,
+      "finalExpectedRows": 2
+    },
+    {
+      "id": "kp14-01",
+      "intermediateQueries": 2,
+      "finalExpectedRows": 2
+    },
+    {
+      "id": "kp15-01",
+      "intermediateQueries": 0,
+      "finalExpectedRows": 5
+    },
+    {
+      "id": "kp15-02",
+      "intermediateQueries": 0,
+      "finalExpectedRows": 4
+    },
+    {
+      "id": "kp15-03",
+      "intermediateQueries": 0,
+      "finalExpectedRows": 4
+    },
+    {
+      "id": "kp15-04",
+      "intermediateQueries": 0,
+      "finalExpectedRows": 4
+    },
+    {
+      "id": "kp15-05",
+      "intermediateQueries": 1,
+      "finalExpectedRows": 4
+    },
+    {
+      "id": "kp16-01",
+      "intermediateQueries": 0,
+      "finalExpectedRows": 1
+    },
+    {
+      "id": "kp16-02",
+      "intermediateQueries": 0,
+      "finalExpectedRows": 6
+    },
+    {
+      "id": "kp16-03",
+      "intermediateQueries": 0,
+      "finalExpectedRows": 6
+    },
+    {
+      "id": "kp17-01",
+      "intermediateQueries": 0,
+      "finalExpectedRows": 2
+    },
+    {
+      "id": "kp17-02",
+      "intermediateQueries": 0,
+      "finalExpectedRows": 2
+    },
+    {
+      "id": "kp18-01",
+      "intermediateQueries": 0,
+      "finalExpectedRows": 1
+    },
+    {
+      "id": "kp19-01",
+      "intermediateQueries": 2,
+      "finalExpectedRows": 12
+    },
+    {
+      "id": "kp19-02",
+      "intermediateQueries": 2,
+      "finalExpectedRows": 45
+    },
+    {
+      "id": "kp19-03",
+      "intermediateQueries": 1,
+      "finalExpectedRows": 1
+    },
+    {
+      "id": "kp19-32",
+      "intermediateQueries": 6,
+      "finalExpectedRows": 144
+    },
+    {
+      "id": "kp19-33",
+      "intermediateQueries": 2,
+      "finalExpectedRows": 23
+    },
+    {
+      "id": "kp19-36",
+      "intermediateQueries": 1,
+      "finalExpectedRows": 54
+    },
+    {
+      "id": "kp19-41",
+      "intermediateQueries": 1,
+      "finalExpectedRows": 2
+    },
+    {
+      "id": "kp19-42",
+      "intermediateQueries": 2,
+      "finalExpectedRows": 1794
+    },
+    {
+      "id": "kp19-43",
+      "intermediateQueries": 5,
+      "finalExpectedRows": 231
+    },
+    {
+      "id": "kp19-46",
+      "intermediateQueries": 2,
+      "finalExpectedRows": 35
+    },
+    {
+      "id": "kp19-47",
+      "intermediateQueries": 2,
+      "finalExpectedRows": 4739
+    },
+    {
+      "id": "kp19-48",
+      "intermediateQueries": 1,
+      "finalExpectedRows": 153
+    },
+    {
+      "id": "kp19-49",
+      "intermediateQueries": 3,
+      "finalExpectedRows": 1182
+    },
+    {
+      "id": "kp19-50",
+      "intermediateQueries": 3,
+      "finalExpectedRows": 984
+    },
+    {
+      "id": "kp19-52",
+      "intermediateQueries": 4,
+      "finalExpectedRows": 84
+    },
+    {
+      "id": "kp19-56",
+      "intermediateQueries": 1,
+      "finalExpectedRows": 3469
+    },
+    {
+      "id": "kp19-57",
+      "intermediateQueries": 2,
+      "finalExpectedRows": 55
+    },
+    {
+      "id": "kp19-58",
+      "intermediateQueries": 2,
+      "finalExpectedRows": 928
+    },
+    {
+      "id": "kp20-01",
+      "intermediateQueries": 1,
+      "finalExpectedRows": 3
+    },
+    {
+      "id": "kp20-02",
+      "intermediateQueries": 4,
+      "finalExpectedRows": 12
+    },
+    {
+      "id": "kp20-03",
+      "intermediateQueries": 2,
+      "finalExpectedRows": 4
+    },
+    {
+      "id": "kp20-06",
+      "intermediateQueries": 4,
+      "finalExpectedRows": 500
+    },
+    {
+      "id": "kp20-08",
+      "intermediateQueries": 2,
+      "finalExpectedRows": 15
+    },
+    {
+      "id": "kp20-13",
+      "intermediateQueries": 2,
+      "finalExpectedRows": 0
+    },
+    {
+      "id": "kp20-15",
+      "intermediateQueries": 2,
+      "finalExpectedRows": 60
+    },
+    {
+      "id": "kp20-18",
+      "intermediateQueries": 2,
+      "finalExpectedRows": 5
+    },
+    {
+      "id": "kp20-21",
+      "intermediateQueries": 2,
+      "finalExpectedRows": 12
+    },
+    {
+      "id": "kp20-23",
+      "intermediateQueries": 6,
+      "finalExpectedRows": 12
+    }
+  ],
+  "sqliteIntermediateQueries": 73,
+  "mysqlNative": "未执行"
+}

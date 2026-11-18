@@ -56,10 +56,6 @@
       "chapterId": "ch01",
       "title": "主键、外键和一对多"
     },
-    "kp01-04": {
-      "chapterId": "ch01",
-      "title": "NULL 与缺失记录"
-    },
     "kp02-01": {
       "chapterId": "ch02",
       "title": "SELECT 与 FROM"
@@ -67,10 +63,6 @@
     "kp02-02": {
       "chapterId": "ch02",
       "title": "DISTINCT 去重"
-    },
-    "kp02-03": {
-      "chapterId": "ch02",
-      "title": "表达式与 AS 别名"
     },
     "kp03-01": {
       "chapterId": "ch03",
@@ -148,14 +140,6 @@
       "chapterId": "ch08",
       "title": "连接膨胀与预聚合"
     },
-    "kp08-06": {
-      "chapterId": "ch08",
-      "title": "RIGHT JOIN 与 CROSS JOIN 实操"
-    },
-    "kp08-07": {
-      "chapterId": "ch08",
-      "title": "笛卡尔积与完整维度"
-    },
     "kp09-01": {
       "chapterId": "ch09",
       "title": "CASE WHEN 分类"
@@ -167,10 +151,6 @@
     "kp09-03": {
       "chapterId": "ch09",
       "title": "NULLIF 与安全除法"
-    },
-    "kp09-04": {
-      "chapterId": "ch09",
-      "title": "IF 二选一"
     },
     "kp10-01": {
       "chapterId": "ch10",
@@ -200,10 +180,6 @@
       "chapterId": "ch11",
       "title": "TRIM、REPLACE 与大小写"
     },
-    "kp11-04": {
-      "chapterId": "ch11",
-      "title": "CHAR_LENGTH 与 LENGTH"
-    },
     "kp12-01": {
       "chapterId": "ch12",
       "title": "ROUND 与 ABS"
@@ -220,10 +196,6 @@
       "chapterId": "ch12",
       "title": "日期区间与月边界"
     },
-    "kp12-05": {
-      "chapterId": "ch12",
-      "title": "数值除法与整数除法"
-    },
     "kp13-01": {
       "chapterId": "ch13",
       "title": "UNION 与 UNION ALL"
@@ -232,21 +204,9 @@
       "chapterId": "ch13",
       "title": "INTERSECT 与 EXCEPT"
     },
-    "kp13-03": {
-      "chapterId": "ch13",
-      "title": "差集与排序范围"
-    },
-    "kp13-04": {
-      "chapterId": "ch13",
-      "title": "UNION 去重与合并结果"
-    },
     "kp14-01": {
       "chapterId": "ch14",
       "title": "WITH 与多个 CTE"
-    },
-    "kp14-02": {
-      "chapterId": "ch14",
-      "title": "递归 CTE 与层级"
     },
     "kp15-01": {
       "chapterId": "ch15",
@@ -268,10 +228,6 @@
       "chapterId": "ch15",
       "title": "移动平均与环比"
     },
-    "kp15-06": {
-      "chapterId": "ch15",
-      "title": "RANGE 与 ROWS 的并列效应"
-    },
     "kp16-01": {
       "chapterId": "ch16",
       "title": "识别重复与去重规则"
@@ -292,29 +248,9 @@
       "chapterId": "ch17",
       "title": "INSERT、UPDATE、DELETE"
     },
-    "kp17-03": {
-      "chapterId": "ch17",
-      "title": "ALTER TABLE 与 DROP TABLE"
-    },
-    "kp17-04": {
-      "chapterId": "ch17",
-      "title": "事务、COMMIT 与 ROLLBACK"
-    },
-    "kp17-05": {
-      "chapterId": "ch17",
-      "title": "主外键、UNIQUE 与数据完整性"
-    },
     "kp18-01": {
       "chapterId": "ch18",
       "title": "索引与选择性"
-    },
-    "kp18-02": {
-      "chapterId": "ch18",
-      "title": "复合索引与可搜索条件"
-    },
-    "kp18-03": {
-      "chapterId": "ch18",
-      "title": "EXPLAIN 与执行计划"
     },
     "kp19-01": {
       "chapterId": "ch19",
@@ -328,118 +264,6 @@
       "chapterId": "ch19",
       "title": "电商：复购率和客户粒度"
     },
-    "kp19-04": {
-      "chapterId": "ch19",
-      "title": "财务：截止日未付金额"
-    },
-    "kp19-05": {
-      "chapterId": "ch19",
-      "title": "人力资源：指定日期在职人数"
-    },
-    "kp19-06": {
-      "chapterId": "ch19",
-      "title": "采购：订购与收货差异"
-    },
-    "kp19-07": {
-      "chapterId": "ch19",
-      "title": "零售：类别销售表现"
-    },
-    "kp19-08": {
-      "chapterId": "ch19",
-      "title": "零售：月度净销售增长率"
-    },
-    "kp19-09": {
-      "chapterId": "ch19",
-      "title": "零售：各店前三畅销商品"
-    },
-    "kp19-10": {
-      "chapterId": "ch19",
-      "title": "零售：类别销售贡献率"
-    },
-    "kp19-11": {
-      "chapterId": "ch19",
-      "title": "库存：积压候选"
-    },
-    "kp19-12": {
-      "chapterId": "ch19",
-      "title": "库存：低库存预警"
-    },
-    "kp19-13": {
-      "chapterId": "ch19",
-      "title": "库存：滞销商品"
-    },
-    "kp19-14": {
-      "chapterId": "ch19",
-      "title": "库存：库存金额"
-    },
-    "kp19-15": {
-      "chapterId": "ch19",
-      "title": "电商：客单价"
-    },
-    "kp19-16": {
-      "chapterId": "ch19",
-      "title": "电商：消费分层"
-    },
-    "kp19-17": {
-      "chapterId": "ch19",
-      "title": "电商：首购次月留存"
-    },
-    "kp19-18": {
-      "chapterId": "ch19",
-      "title": "电商：客户消费排名"
-    },
-    "kp19-19": {
-      "chapterId": "ch19",
-      "title": "财务：费用分类汇总"
-    },
-    "kp19-20": {
-      "chapterId": "ch19",
-      "title": "财务：收入月度增长"
-    },
-    "kp19-21": {
-      "chapterId": "ch19",
-      "title": "财务：金额异常候选"
-    },
-    "kp19-22": {
-      "chapterId": "ch19",
-      "title": "财务：预算与实际差异"
-    },
-    "kp19-23": {
-      "chapterId": "ch19",
-      "title": "人力资源：部门内薪资排名"
-    },
-    "kp19-24": {
-      "chapterId": "ch19",
-      "title": "人力资源：期间离职率"
-    },
-    "kp19-25": {
-      "chapterId": "ch19",
-      "title": "人力资源：部门平均薪酬"
-    },
-    "kp19-26": {
-      "chapterId": "ch19",
-      "title": "人力资源：任职时长"
-    },
-    "kp19-27": {
-      "chapterId": "ch19",
-      "title": "采购：订单采购成本"
-    },
-    "kp19-28": {
-      "chapterId": "ch19",
-      "title": "采购：供应商履约率"
-    },
-    "kp19-29": {
-      "chapterId": "ch19",
-      "title": "采购：交付延误与未到齐"
-    },
-    "kp19-30": {
-      "chapterId": "ch19",
-      "title": "采购：发票与订单金额核对"
-    },
-    "kp19-31": {
-      "chapterId": "ch19",
-      "title": "门店净销售、利润与目标达成"
-    },
     "kp19-32": {
       "chapterId": "ch19",
       "title": "门店月度环比同比与持续下滑"
@@ -448,33 +272,9 @@
       "chapterId": "ch19",
       "title": "高销售低毛利商品诊断"
     },
-    "kp19-34": {
-      "chapterId": "ch19",
-      "title": "促销与非促销的日均表现"
-    },
-    "kp19-35": {
-      "chapterId": "ch19",
-      "title": "门店综合经营异常看板"
-    },
     "kp19-36": {
       "chapterId": "ch19",
       "title": "低销量高库存诊断"
-    },
-    "kp19-37": {
-      "chapterId": "ch19",
-      "title": "类别库存周转率及周转天数"
-    },
-    "kp19-38": {
-      "chapterId": "ch19",
-      "title": "销售速度与采购周期缺货风险"
-    },
-    "kp19-39": {
-      "chapterId": "ch19",
-      "title": "按先进先出假设推算库存库龄"
-    },
-    "kp19-40": {
-      "chapterId": "ch19",
-      "title": "补货优先级与供应商风险"
     },
     "kp19-41": {
       "chapterId": "ch19",
@@ -487,14 +287,6 @@
     "kp19-43": {
       "chapterId": "ch19",
       "title": "首购月份留存矩阵"
-    },
-    "kp19-44": {
-      "chapterId": "ch19",
-      "title": "营销渠道转化与获客成本"
-    },
-    "kp19-45": {
-      "chapterId": "ch19",
-      "title": "高价值流失风险客户"
     },
     "kp19-46": {
       "chapterId": "ch19",
@@ -516,25 +308,9 @@
       "chapterId": "ch19",
       "title": "多规则异常交易筛查"
     },
-    "kp19-51": {
-      "chapterId": "ch19",
-      "title": "月末人员规模与变动"
-    },
     "kp19-52": {
       "chapterId": "ch19",
       "title": "月度离职率与趋势"
-    },
-    "kp19-53": {
-      "chapterId": "ch19",
-      "title": "同岗位薪资分布与异常"
-    },
-    "kp19-54": {
-      "chapterId": "ch19",
-      "title": "部门人力成本与加班"
-    },
-    "kp19-55": {
-      "chapterId": "ch19",
-      "title": "入职同期群90及180日留任"
     },
     "kp19-56": {
       "chapterId": "ch19",
@@ -548,14 +324,6 @@
       "chapterId": "ch19",
       "title": "采购、收货、发票三方核对"
     },
-    "kp19-59": {
-      "chapterId": "ch19",
-      "title": "同商品跨供应商采购价差"
-    },
-    "kp19-60": {
-      "chapterId": "ch19",
-      "title": "供应商多指标综合评价"
-    },
     "kp20-01": {
       "chapterId": "ch20",
       "title": "多表汇总与贡献率"
@@ -568,125 +336,39 @@
       "chapterId": "ch20",
       "title": "分组内排名与前N名"
     },
-    "kp20-04": {
-      "chapterId": "ch20",
-      "title": "综合分析：异常识别与复核"
-    },
-    "kp20-05": {
-      "chapterId": "ch20",
-      "title": "畅销缺货与滞销积压双向筛查"
-    },
     "kp20-06": {
       "chapterId": "ch20",
       "title": "商品销售贡献与库存资金占用错配"
-    },
-    "kp20-07": {
-      "chapterId": "ch20",
-      "title": "跨仓库存调拨候选"
     },
     "kp20-08": {
       "chapterId": "ch20",
       "title": "销售毛利与库存投资回报"
     },
-    "kp20-09": {
-      "chapterId": "ch20",
-      "title": "逾期在途与缺货叠加"
-    },
-    "kp20-10": {
-      "chapterId": "ch20",
-      "title": "收货入库完整性核对"
-    },
-    "kp20-11": {
-      "chapterId": "ch20",
-      "title": "供应商延迟与仓库资金压力"
-    },
-    "kp20-12": {
-      "chapterId": "ch20",
-      "title": "门店贡献利润与费用"
-    },
     "kp20-13": {
       "chapterId": "ch20",
       "title": "订单结算与收入核对"
-    },
-    "kp20-14": {
-      "chapterId": "ch20",
-      "title": "门店月度收入与费用偏离"
     },
     "kp20-15": {
       "chapterId": "ch20",
       "title": "采购承诺、收货、开票及付款敞口"
     },
-    "kp20-16": {
-      "chapterId": "ch20",
-      "title": "三方不一致且已经付款的发票"
-    },
-    "kp20-17": {
-      "chapterId": "ch20",
-      "title": "供应商资金风险分层"
-    },
     "kp20-18": {
       "chapterId": "ch20",
       "title": "渠道广告后的贡献利润"
-    },
-    "kp20-19": {
-      "chapterId": "ch20",
-      "title": "首购客户90天毛利与获客成本"
-    },
-    "kp20-20": {
-      "chapterId": "ch20",
-      "title": "退款影响与渠道利润风险"
     },
     "kp20-21": {
       "chapterId": "ch20",
       "title": "门店人效及人工占比"
     },
-    "kp20-22": {
-      "chapterId": "ch20",
-      "title": "门店人员变化与销售变化诊断"
-    },
     "kp20-23": {
       "chapterId": "ch20",
       "title": "月度经营汇总表"
-    },
-    "kp20-24": {
-      "chapterId": "ch20",
-      "title": "跨域季度风险评分与经营报告"
     }
   },
   "questions": {
-    "q0001": {
-      "chapterId": "ch01",
-      "title": "读取订单记录的编号",
-      "knowledgePointIds": [
-        "kp01-01"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp01-01"
-      ]
-    },
-    "q0002": {
-      "chapterId": "ch01",
-      "title": "NULL 与缺失记录 · 数据库中的 NULL 与数字0在表示销售额时有什么根…",
-      "knowledgePointIds": [
-        "kp01-04"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp01-04"
-      ]
-    },
     "q0003": {
       "chapterId": "ch01",
       "title": "数据类型与数据字典 · 要描述产品名称、货币精度以及该字段能否为空，最合适的…",
-      "knowledgePointIds": [
-        "kp01-02"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp01-02"
-      ]
-    },
-    "q0004": {
-      "chapterId": "ch01",
-      "title": "读取商品的基础字段",
       "knowledgePointIds": [
         "kp01-02"
       ],
@@ -714,16 +396,6 @@
         "kp01-01"
       ]
     },
-    "q0007": {
-      "chapterId": "ch01",
-      "title": "主键、外键和一对多 · 某订单表的 order_id 声明为主键且不使用额外…",
-      "knowledgePointIds": [
-        "kp01-03"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp01-03"
-      ]
-    },
     "q0008": {
       "chapterId": "ch01",
       "title": "主键、外键和一对多 · 客户表 customer_id 是主键，订单表 cu…",
@@ -742,16 +414,6 @@
       ],
       "primaryKnowledgePointIds": [
         "kp02-02"
-      ]
-    },
-    "q0010": {
-      "chapterId": "ch02",
-      "title": "订单销售额加收固定费用",
-      "knowledgePointIds": [
-        "kp02-03"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp02-03"
       ]
     },
     "q0011": {
@@ -774,29 +436,9 @@
         "kp02-02"
       ]
     },
-    "q0013": {
-      "chapterId": "ch02",
-      "title": "商品类别目录",
-      "knowledgePointIds": [
-        "kp02-01"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp02-01"
-      ]
-    },
     "q0014": {
       "chapterId": "ch02",
       "title": "SELECT 与 FROM · 执行不含写操作的普通 SELECT 查询时，哪项描述…",
-      "knowledgePointIds": [
-        "kp02-01"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp02-01"
-      ]
-    },
-    "q0015": {
-      "chapterId": "ch02",
-      "title": "员工姓名与编号清单",
       "knowledgePointIds": [
         "kp02-01"
       ],
@@ -818,7 +460,7 @@
       "chapterId": "ch02",
       "title": "推算员工年基础薪资",
       "knowledgePointIds": [
-        "kp02-03"
+        "kp02-01"
       ],
       "primaryKnowledgePointIds": [
         "kp02-03"
@@ -828,7 +470,7 @@
       "chapterId": "ch02",
       "title": "每件商品折扣后报价",
       "knowledgePointIds": [
-        "kp02-03"
+        "kp02-01"
       ],
       "primaryKnowledgePointIds": [
         "kp02-03"
@@ -838,40 +480,10 @@
       "chapterId": "ch02",
       "title": "表达式与 AS 别名 · 语句 SELECT price*0.9 AS off…",
       "knowledgePointIds": [
-        "kp02-03"
+        "kp02-01"
       ],
       "primaryKnowledgePointIds": [
         "kp02-03"
-      ]
-    },
-    "q0020": {
-      "chapterId": "ch02",
-      "title": "库存数量换算整箱与散件",
-      "knowledgePointIds": [
-        "kp02-03"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp02-03"
-      ]
-    },
-    "q0021": {
-      "chapterId": "ch03",
-      "title": "显示非指定门店的订单",
-      "knowledgePointIds": [
-        "kp03-01"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp03-01"
-      ]
-    },
-    "q0022": {
-      "chapterId": "ch03",
-      "title": "闭区间销售金额",
-      "knowledgePointIds": [
-        "kp03-03"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp03-03"
       ]
     },
     "q0023": {
@@ -887,16 +499,6 @@
     "q0024": {
       "chapterId": "ch03",
       "title": "严格高于门槛的商品",
-      "knowledgePointIds": [
-        "kp03-01"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp03-01"
-      ]
-    },
-    "q0025": {
-      "chapterId": "ch03",
-      "title": "不超过库存警戒数量",
       "knowledgePointIds": [
         "kp03-01"
       ],
@@ -944,16 +546,6 @@
         "kp03-02"
       ]
     },
-    "q0030": {
-      "chapterId": "ch03",
-      "title": "排除指定类别",
-      "knowledgePointIds": [
-        "kp03-01"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp03-01"
-      ]
-    },
     "q0031": {
       "chapterId": "ch03",
       "title": "排除高价或缺货情况",
@@ -994,26 +586,6 @@
         "kp03-03"
       ]
     },
-    "q0035": {
-      "chapterId": "ch03",
-      "title": "任一促销条件成立",
-      "knowledgePointIds": [
-        "kp03-02"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp03-02"
-      ]
-    },
-    "q0036": {
-      "chapterId": "ch03",
-      "title": "名称前缀",
-      "knowledgePointIds": [
-        "kp03-04"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp03-04"
-      ]
-    },
     "q0037": {
       "chapterId": "ch03",
       "title": "排除两个商品类别",
@@ -1022,16 +594,6 @@
       ],
       "primaryKnowledgePointIds": [
         "kp03-03"
-      ]
-    },
-    "q0038": {
-      "chapterId": "ch03",
-      "title": "组合订单核查",
-      "knowledgePointIds": [
-        "kp03-02"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp03-02"
       ]
     },
     "q0039": {
@@ -1064,16 +626,6 @@
         "kp03-04"
       ]
     },
-    "q0042": {
-      "chapterId": "ch03",
-      "title": "一月完整订单记录",
-      "knowledgePointIds": [
-        "kp03-03"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp03-03"
-      ]
-    },
     "q0043": {
       "chapterId": "ch04",
       "title": "分页第二页",
@@ -1097,26 +649,6 @@
     "q0045": {
       "chapterId": "ch04",
       "title": "仓库盘点优先顺序",
-      "knowledgePointIds": [
-        "kp04-01"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp04-01"
-      ]
-    },
-    "q0046": {
-      "chapterId": "ch04",
-      "title": "最便宜的两件商品",
-      "knowledgePointIds": [
-        "kp04-02"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp04-02"
-      ]
-    },
-    "q0047": {
-      "chapterId": "ch04",
-      "title": "按售价从低到高",
       "knowledgePointIds": [
         "kp04-01"
       ],
@@ -1194,16 +726,6 @@
         "kp05-02"
       ]
     },
-    "q0055": {
-      "chapterId": "ch05",
-      "title": "有登记客户的订单",
-      "knowledgePointIds": [
-        "kp05-01"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp05-01"
-      ]
-    },
     "q0056": {
       "chapterId": "ch05",
       "title": "空文本与未知文本",
@@ -1212,16 +734,6 @@
       ],
       "primaryKnowledgePointIds": [
         "kp05-01"
-      ]
-    },
-    "q0057": {
-      "chapterId": "ch05",
-      "title": "未知备注默认文字",
-      "knowledgePointIds": [
-        "kp05-02"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp05-02"
       ]
     },
     "q0058": {
@@ -1304,16 +816,6 @@
         "kp06-01"
       ]
     },
-    "q0066": {
-      "chapterId": "ch06",
-      "title": "库存合计可用数量",
-      "knowledgePointIds": [
-        "kp06-02"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp06-02"
-      ]
-    },
     "q0067": {
       "chapterId": "ch06",
       "title": "最高与最低售价差额",
@@ -1354,16 +856,6 @@
         "kp06-01"
       ]
     },
-    "q0071": {
-      "chapterId": "ch06",
-      "title": "销售明细折后合计",
-      "knowledgePointIds": [
-        "kp06-02"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp06-02"
-      ]
-    },
     "q0072": {
       "chapterId": "ch06",
       "title": "SUM 与 AVG · 对完全空的输入表执行没有 GROUP BY 的 SU…",
@@ -1372,16 +864,6 @@
       ],
       "primaryKnowledgePointIds": [
         "kp06-02"
-      ]
-    },
-    "q0073": {
-      "chapterId": "ch06",
-      "title": "销售额范围与样本量",
-      "knowledgePointIds": [
-        "kp06-03"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp06-03"
       ]
     },
     "q0074": {
@@ -1432,26 +914,6 @@
       ],
       "primaryKnowledgePointIds": [
         "kp07-01"
-      ]
-    },
-    "q0079": {
-      "chapterId": "ch07",
-      "title": "每种类别的最高库存",
-      "knowledgePointIds": [
-        "kp07-01"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp07-01"
-      ]
-    },
-    "q0080": {
-      "chapterId": "ch07",
-      "title": "同价商品类别组合",
-      "knowledgePointIds": [
-        "kp07-03"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp07-03"
       ]
     },
     "q0081": {
@@ -1524,16 +986,6 @@
         "kp07-02"
       ]
     },
-    "q0088": {
-      "chapterId": "ch07",
-      "title": "客户消费汇总",
-      "knowledgePointIds": [
-        "kp07-01"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp07-01"
-      ]
-    },
     "q0089": {
       "chapterId": "ch07",
       "title": "平均价格达标类别",
@@ -1557,16 +1009,6 @@
     "q0091": {
       "chapterId": "ch07",
       "title": "月份和门店销售汇总",
-      "knowledgePointIds": [
-        "kp07-03"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp07-03"
-      ]
-    },
-    "q0092": {
-      "chapterId": "ch07",
-      "title": "按客户类别统计最大单笔金额",
       "knowledgePointIds": [
         "kp07-03"
       ],
@@ -1608,7 +1050,7 @@
       "chapterId": "ch08",
       "title": "门店月份骨架",
       "knowledgePointIds": [
-        "kp08-07"
+        "kp08-04"
       ],
       "primaryKnowledgePointIds": [
         "kp08-07"
@@ -1644,16 +1086,6 @@
         "kp08-02"
       ]
     },
-    "q0100": {
-      "chapterId": "ch08",
-      "title": "每个供应商的商品组合",
-      "knowledgePointIds": [
-        "kp08-07"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp08-07"
-      ]
-    },
     "q0101": {
       "chapterId": "ch08",
       "title": "门店是否拥有订单",
@@ -1668,7 +1100,7 @@
       "chapterId": "ch08",
       "title": "右连接保留每家门店",
       "knowledgePointIds": [
-        "kp08-06"
+        "kp08-02"
       ],
       "primaryKnowledgePointIds": [
         "kp08-06"
@@ -1678,30 +1110,10 @@
       "chapterId": "ch08",
       "title": "门店与类别完整维度",
       "knowledgePointIds": [
-        "kp08-07"
+        "kp08-04"
       ],
       "primaryKnowledgePointIds": [
         "kp08-07"
-      ]
-    },
-    "q0104": {
-      "chapterId": "ch08",
-      "title": "右连接保留所有发票",
-      "knowledgePointIds": [
-        "kp08-06"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp08-06"
-      ]
-    },
-    "q0105": {
-      "chapterId": "ch08",
-      "title": "员工薪资对应员工姓名",
-      "knowledgePointIds": [
-        "kp08-01"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp08-01"
       ]
     },
     "q0106": {
@@ -1742,16 +1154,6 @@
       ],
       "primaryKnowledgePointIds": [
         "kp08-02"
-      ]
-    },
-    "q0110": {
-      "chapterId": "ch08",
-      "title": "同类别不同商品配对",
-      "knowledgePointIds": [
-        "kp08-04"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp08-04"
       ]
     },
     "q0111": {
@@ -1868,7 +1270,7 @@
       "chapterId": "ch09",
       "title": "薪资是否高于五千",
       "knowledgePointIds": [
-        "kp09-04"
+        "kp09-02"
       ],
       "primaryKnowledgePointIds": [
         "kp09-04"
@@ -1882,16 +1284,6 @@
       ],
       "primaryKnowledgePointIds": [
         "kp09-01"
-      ]
-    },
-    "q0124": {
-      "chapterId": "ch09",
-      "title": "原始名称状态",
-      "knowledgePointIds": [
-        "kp09-04"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp09-04"
       ]
     },
     "q0125": {
@@ -1934,16 +1326,6 @@
         "kp09-01"
       ]
     },
-    "q0129": {
-      "chapterId": "ch09",
-      "title": "商品售价分层",
-      "knowledgePointIds": [
-        "kp09-01"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp09-01"
-      ]
-    },
     "q0130": {
       "chapterId": "ch09",
       "title": "门店一月二月销售并列展示",
@@ -1974,16 +1356,6 @@
         "kp10-01"
       ]
     },
-    "q0133": {
-      "chapterId": "ch10",
-      "title": "最低报价的全部商品",
-      "knowledgePointIds": [
-        "kp10-01"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp10-01"
-      ]
-    },
     "q0134": {
       "chapterId": "ch10",
       "title": "高于所有商品平均库存",
@@ -1994,29 +1366,9 @@
         "kp10-01"
       ]
     },
-    "q0135": {
-      "chapterId": "ch10",
-      "title": "领取高于部门无关全体均值的薪资",
-      "knowledgePointIds": [
-        "kp10-01"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp10-01"
-      ]
-    },
     "q0136": {
       "chapterId": "ch10",
       "title": "经营日用品的门店",
-      "knowledgePointIds": [
-        "kp10-02"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp10-02"
-      ]
-    },
-    "q0137": {
-      "chapterId": "ch10",
-      "title": "出现于采购明细的商品",
       "knowledgePointIds": [
         "kp10-02"
       ],
@@ -2074,16 +1426,6 @@
         "kp10-03"
       ]
     },
-    "q0143": {
-      "chapterId": "ch10",
-      "title": "有一月订单的客户",
-      "knowledgePointIds": [
-        "kp10-02"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp10-02"
-      ]
-    },
     "q0144": {
       "chapterId": "ch10",
       "title": "没有登记订单的客户",
@@ -2112,16 +1454,6 @@
       ],
       "primaryKnowledgePointIds": [
         "kp10-04"
-      ]
-    },
-    "q0147": {
-      "chapterId": "ch10",
-      "title": "存在至少一笔小额订单的门店",
-      "knowledgePointIds": [
-        "kp10-03"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp10-03"
       ]
     },
     "q0148": {
@@ -2164,26 +1496,6 @@
         "kp11-03"
       ]
     },
-    "q0152": {
-      "chapterId": "ch11",
-      "title": "汉字与英文字段字符数",
-      "knowledgePointIds": [
-        "kp11-04"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp11-04"
-      ]
-    },
-    "q0153": {
-      "chapterId": "ch11",
-      "title": "提取日期月份字符",
-      "knowledgePointIds": [
-        "kp11-02"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp11-02"
-      ]
-    },
     "q0154": {
       "chapterId": "ch11",
       "title": "原始类别统一大写",
@@ -2208,20 +1520,10 @@
       "chapterId": "ch11",
       "title": "CHAR_LENGTH 与 LENGTH · MySQL 的 CHAR_LENGTH('古晋') …",
       "knowledgePointIds": [
-        "kp11-04"
+        "kp11-02"
       ],
       "primaryKnowledgePointIds": [
         "kp11-04"
-      ]
-    },
-    "q0157": {
-      "chapterId": "ch11",
-      "title": "门店月份组合键",
-      "knowledgePointIds": [
-        "kp11-01"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp11-01"
       ]
     },
     "q0158": {
@@ -2244,26 +1546,6 @@
         "kp11-03"
       ]
     },
-    "q0160": {
-      "chapterId": "ch11",
-      "title": "字符长度与字节长度并列",
-      "knowledgePointIds": [
-        "kp11-04"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp11-04"
-      ]
-    },
-    "q0161": {
-      "chapterId": "ch12",
-      "title": "年度标签提取",
-      "knowledgePointIds": [
-        "kp12-02"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp12-02"
-      ]
-    },
     "q0162": {
       "chapterId": "ch12",
       "title": "月份整数标签",
@@ -2284,21 +1566,11 @@
         "kp12-01"
       ]
     },
-    "q0164": {
-      "chapterId": "ch12",
-      "title": "二月开始之前的累计销售额",
-      "knowledgePointIds": [
-        "kp12-04"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp12-04"
-      ]
-    },
     "q0165": {
       "chapterId": "ch12",
       "title": "数值除法与整数除法 · 在 MySQL 8.4 中，7 / 2 与 7 DI…",
       "knowledgePointIds": [
-        "kp12-05"
+        "kp12-01"
       ],
       "primaryKnowledgePointIds": [
         "kp12-05"
@@ -2312,26 +1584,6 @@
       ],
       "primaryKnowledgePointIds": [
         "kp12-01"
-      ]
-    },
-    "q0167": {
-      "chapterId": "ch12",
-      "title": "每件含税售价",
-      "knowledgePointIds": [
-        "kp12-01"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp12-01"
-      ]
-    },
-    "q0168": {
-      "chapterId": "ch12",
-      "title": "计算采购每箱整数件数",
-      "knowledgePointIds": [
-        "kp12-05"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp12-05"
       ]
     },
     "q0169": {
@@ -2374,21 +1626,11 @@
         "kp12-04"
       ]
     },
-    "q0173": {
-      "chapterId": "ch12",
-      "title": "截至指定日期的在职员工",
-      "knowledgePointIds": [
-        "kp12-04"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp12-04"
-      ]
-    },
     "q0174": {
       "chapterId": "ch12",
       "title": "实际收货覆盖比例",
       "knowledgePointIds": [
-        "kp12-05"
+        "kp12-01"
       ],
       "primaryKnowledgePointIds": [
         "kp12-05"
@@ -2428,7 +1670,7 @@
       "chapterId": "ch13",
       "title": "老名单中流失的客户",
       "knowledgePointIds": [
-        "kp13-03"
+        "kp13-02"
       ],
       "primaryKnowledgePointIds": [
         "kp13-03"
@@ -2444,21 +1686,11 @@
         "kp13-01"
       ]
     },
-    "q0180": {
-      "chapterId": "ch13",
-      "title": "两期均存在的客户",
-      "knowledgePointIds": [
-        "kp13-02"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp13-02"
-      ]
-    },
     "q0181": {
       "chapterId": "ch13",
       "title": "企业两期客户覆盖规模",
       "knowledgePointIds": [
-        "kp13-04"
+        "kp13-01"
       ],
       "primaryKnowledgePointIds": [
         "kp13-04"
@@ -2472,56 +1704,6 @@
       ],
       "primaryKnowledgePointIds": [
         "kp13-01"
-      ]
-    },
-    "q0183": {
-      "chapterId": "ch13",
-      "title": "对称差客户名单",
-      "knowledgePointIds": [
-        "kp13-03"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp13-03"
-      ]
-    },
-    "q0184": {
-      "chapterId": "ch14",
-      "title": "递归 CTE 与层级 · 递归 CTE 在从一条记录不断生成后续记录时，最重要…",
-      "knowledgePointIds": [
-        "kp14-02"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp14-02"
-      ]
-    },
-    "q0185": {
-      "chapterId": "ch14",
-      "title": "生成1至6整数序列",
-      "knowledgePointIds": [
-        "kp14-02"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp14-02"
-      ]
-    },
-    "q0186": {
-      "chapterId": "ch14",
-      "title": "生成不越过截止日的巡检计划",
-      "knowledgePointIds": [
-        "kp14-02"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp14-02"
-      ]
-    },
-    "q0187": {
-      "chapterId": "ch14",
-      "title": "计算递归阶乘",
-      "knowledgePointIds": [
-        "kp14-02"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp14-02"
       ]
     },
     "q0188": {
@@ -2554,16 +1736,6 @@
         "kp14-01"
       ]
     },
-    "q0191": {
-      "chapterId": "ch14",
-      "title": "直属与间接下属层级",
-      "knowledgePointIds": [
-        "kp14-02"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp14-02"
-      ]
-    },
     "q0192": {
       "chapterId": "ch14",
       "title": "高价值客户与其订单明细",
@@ -2572,16 +1744,6 @@
       ],
       "primaryKnowledgePointIds": [
         "kp14-01"
-      ]
-    },
-    "q0193": {
-      "chapterId": "ch14",
-      "title": "每位员工到根主管的层数",
-      "knowledgePointIds": [
-        "kp14-02"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp14-02"
       ]
     },
     "q0194": {
@@ -2612,16 +1774,6 @@
       ],
       "primaryKnowledgePointIds": [
         "kp15-02"
-      ]
-    },
-    "q0197": {
-      "chapterId": "ch15",
-      "title": "比较两期前的销售额",
-      "knowledgePointIds": [
-        "kp15-03"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp15-03"
       ]
     },
     "q0198": {
@@ -2694,16 +1846,6 @@
         "kp15-01"
       ]
     },
-    "q0205": {
-      "chapterId": "ch15",
-      "title": "当前及相邻月份三行合计",
-      "knowledgePointIds": [
-        "kp15-04"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp15-04"
-      ]
-    },
     "q0206": {
       "chapterId": "ch15",
       "title": "不同薪资档的连续名次",
@@ -2724,16 +1866,6 @@
         "kp15-02"
       ]
     },
-    "q0208": {
-      "chapterId": "ch15",
-      "title": "未来剩余月累计",
-      "knowledgePointIds": [
-        "kp15-04"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp15-04"
-      ]
-    },
     "q0209": {
       "chapterId": "ch15",
       "title": "下一笔客户订单日期",
@@ -2742,16 +1874,6 @@
       ],
       "primaryKnowledgePointIds": [
         "kp15-03"
-      ]
-    },
-    "q0210": {
-      "chapterId": "ch15",
-      "title": "每类别按商品编号累计库存",
-      "knowledgePointIds": [
-        "kp15-04"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp15-04"
       ]
     },
     "q0211": {
@@ -2768,17 +1890,7 @@
       "chapterId": "ch15",
       "title": "并列薪资的范围累计",
       "knowledgePointIds": [
-        "kp15-06"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp15-06"
-      ]
-    },
-    "q0213": {
-      "chapterId": "ch15",
-      "title": "唯一序号下的逐人累计薪资",
-      "knowledgePointIds": [
-        "kp15-06"
+        "kp15-04"
       ],
       "primaryKnowledgePointIds": [
         "kp15-06"
@@ -2787,16 +1899,6 @@
     "q0214": {
       "chapterId": "ch15",
       "title": "相邻记录销售环比",
-      "knowledgePointIds": [
-        "kp15-05"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp15-05"
-      ]
-    },
-    "q0215": {
-      "chapterId": "ch15",
-      "title": "门店内销售占比最高订单",
       "knowledgePointIds": [
         "kp15-05"
       ],
@@ -2894,16 +1996,6 @@
         "kp16-03"
       ]
     },
-    "q0225": {
-      "chapterId": "ch16",
-      "title": "按任意已知名称标志缺失",
-      "knowledgePointIds": [
-        "kp16-02"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp16-02"
-      ]
-    },
     "q0226": {
       "chapterId": "ch16",
       "title": "清洗后计算有效金額",
@@ -2917,16 +2009,6 @@
     "q0227": {
       "chapterId": "ch16",
       "title": "标准化后的重复名称与金额组合",
-      "knowledgePointIds": [
-        "kp16-01"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp16-01"
-      ]
-    },
-    "q0228": {
-      "chapterId": "ch16",
-      "title": "识别重复原始名称",
       "knowledgePointIds": [
         "kp16-01"
       ],
@@ -2968,30 +2050,10 @@
       "chapterId": "ch17",
       "title": "事务、COMMIT 与 ROLLBACK · MySQL InnoDB 表在显式事务中执行普通 U…",
       "knowledgePointIds": [
-        "kp17-04"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp17-04"
-      ]
-    },
-    "q0233": {
-      "chapterId": "ch17",
-      "title": "删除过期临时数据表",
-      "knowledgePointIds": [
-        "kp17-03"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp17-03"
-      ]
-    },
-    "q0234": {
-      "chapterId": "ch17",
-      "title": "清除零库存演示记录",
-      "knowledgePointIds": [
         "kp17-02"
       ],
       "primaryKnowledgePointIds": [
-        "kp17-02"
+        "kp17-04"
       ]
     },
     "q0235": {
@@ -3004,84 +2066,14 @@
         "kp17-02"
       ]
     },
-    "q0236": {
-      "chapterId": "ch17",
-      "title": "新增盘点记录",
-      "knowledgePointIds": [
-        "kp17-02"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp17-02"
-      ]
-    },
-    "q0237": {
-      "chapterId": "ch17",
-      "title": "增加库存文字标签列",
-      "knowledgePointIds": [
-        "kp17-03"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp17-03"
-      ]
-    },
-    "q0238": {
-      "chapterId": "ch17",
-      "title": "创建受约束的库存表",
-      "knowledgePointIds": [
-        "kp17-01"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp17-01"
-      ]
-    },
-    "q0239": {
-      "chapterId": "ch17",
-      "title": "创建引用库存表的流水表",
-      "knowledgePointIds": [
-        "kp17-05"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp17-05"
-      ]
-    },
-    "q0240": {
-      "chapterId": "ch17",
-      "title": "通过保存点撤销临时补货",
-      "knowledgePointIds": [
-        "kp17-04"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp17-04"
-      ]
-    },
     "q0241": {
       "chapterId": "ch18",
       "title": "EXPLAIN 与执行计划 · 学习 MySQL EXPLAIN 时，下面哪个说法准…",
       "knowledgePointIds": [
-        "kp18-03"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp18-03"
-      ]
-    },
-    "q0242": {
-      "chapterId": "ch18",
-      "title": "重写简单等值筛选",
-      "knowledgePointIds": [
         "kp18-01"
       ],
       "primaryKnowledgePointIds": [
-        "kp18-01"
-      ]
-    },
-    "q0243": {
-      "chapterId": "ch18",
-      "title": "投影最小字段集合",
-      "knowledgePointIds": [
-        "kp18-02"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp18-02"
+        "kp18-03"
       ]
     },
     "q0244": {
@@ -3094,71 +2086,10 @@
         "kp18-01"
       ]
     },
-    "q0245": {
-      "chapterId": "ch18",
-      "title": "复合索引与可搜索条件 · MySQL B-tree 复合索引 (store_i…",
-      "knowledgePointIds": [
-        "kp18-02"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp18-02"
-      ]
-    },
-    "q0246": {
-      "chapterId": "ch18",
-      "title": "合适的区间条件",
-      "knowledgePointIds": [
-        "kp18-01"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp18-01"
-      ]
-    },
-    "q0247": {
-      "chapterId": "ch18",
-      "title": "复合键前缀和日期范围",
-      "knowledgePointIds": [
-        "kp18-02"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp18-02"
-      ]
-    },
-    "q0248": {
-      "chapterId": "ch18",
-      "title": "重写月份函数为日期范围",
-      "knowledgePointIds": [
-        "kp18-02"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp18-02"
-      ]
-    },
-    "q0249": {
-      "chapterId": "ch18",
-      "title": "创建指定顺序的复合索引",
-      "knowledgePointIds": [
-        "kp18-02"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp18-02"
-      ]
-    },
-    "q0250": {
-      "chapterId": "ch18",
-      "title": "避免一对多连接用于存在判断",
-      "knowledgePointIds": [
-        "kp18-02"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp18-02"
-      ]
-    },
     "q0251": {
       "chapterId": "ch19",
       "title": "门店净销售、利润与目标达成",
       "knowledgePointIds": [
-        "kp19-31",
         "kp19-01"
       ],
       "primaryKnowledgePointIds": [
@@ -3170,8 +2101,6 @@
       "title": "门店月度环比同比与持续下滑",
       "knowledgePointIds": [
         "kp19-32",
-        "kp19-08",
-        "kp19-20",
         "kp20-02"
       ],
       "primaryKnowledgePointIds": [
@@ -3183,35 +2112,11 @@
       "title": "高销售低毛利商品诊断",
       "knowledgePointIds": [
         "kp19-33",
-        "kp19-07",
-        "kp19-09",
+        "kp19-01",
         "kp20-03"
       ],
       "primaryKnowledgePointIds": [
         "kp19-33"
-      ]
-    },
-    "q0254": {
-      "chapterId": "ch19",
-      "title": "促销与非促销的日均表现",
-      "knowledgePointIds": [
-        "kp19-34",
-        "kp19-01"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp19-34"
-      ]
-    },
-    "q0255": {
-      "chapterId": "ch19",
-      "title": "门店综合经营异常看板",
-      "knowledgePointIds": [
-        "kp19-35",
-        "kp19-09",
-        "kp20-04"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp19-35"
       ]
     },
     "q0256": {
@@ -3219,9 +2124,7 @@
       "title": "低销量高库存诊断",
       "knowledgePointIds": [
         "kp19-36",
-        "kp19-11",
-        "kp19-13",
-        "kp19-14"
+        "kp19-02"
       ],
       "primaryKnowledgePointIds": [
         "kp19-36"
@@ -3231,47 +2134,10 @@
       "chapterId": "ch19",
       "title": "类别库存周转率及周转天数",
       "knowledgePointIds": [
-        "kp19-37",
-        "kp19-02",
-        "kp19-14"
+        "kp19-02"
       ],
       "primaryKnowledgePointIds": [
         "kp19-37"
-      ]
-    },
-    "q0258": {
-      "chapterId": "ch19",
-      "title": "销售速度与采购周期缺货风险",
-      "knowledgePointIds": [
-        "kp19-38",
-        "kp19-12"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp19-38"
-      ]
-    },
-    "q0259": {
-      "chapterId": "ch19",
-      "title": "按先进先出假设推算库存库龄",
-      "knowledgePointIds": [
-        "kp19-39",
-        "kp19-11",
-        "kp19-14"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp19-39"
-      ]
-    },
-    "q0260": {
-      "chapterId": "ch19",
-      "title": "补货优先级与供应商风险",
-      "knowledgePointIds": [
-        "kp19-40",
-        "kp19-12",
-        "kp19-13"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp19-40"
       ]
     },
     "q0261": {
@@ -3279,8 +2145,7 @@
       "title": "新老客户净收入及客单价",
       "knowledgePointIds": [
         "kp19-41",
-        "kp19-03",
-        "kp19-15"
+        "kp19-03"
       ],
       "primaryKnowledgePointIds": [
         "kp19-41"
@@ -3290,9 +2155,7 @@
       "chapterId": "ch19",
       "title": "最近消费、频率、金额客户分层",
       "knowledgePointIds": [
-        "kp19-42",
-        "kp19-16",
-        "kp19-18"
+        "kp19-42"
       ],
       "primaryKnowledgePointIds": [
         "kp19-42"
@@ -3303,31 +2166,17 @@
       "title": "首购月份留存矩阵",
       "knowledgePointIds": [
         "kp19-43",
-        "kp19-17",
         "kp19-03"
       ],
       "primaryKnowledgePointIds": [
         "kp19-43"
       ]
     },
-    "q0264": {
-      "chapterId": "ch19",
-      "title": "营销渠道转化与获客成本",
-      "knowledgePointIds": [
-        "kp19-44",
-        "kp19-15"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp19-44"
-      ]
-    },
     "q0265": {
       "chapterId": "ch19",
       "title": "高价值流失风险客户",
       "knowledgePointIds": [
-        "kp19-45",
-        "kp19-16",
-        "kp19-18"
+        "kp19-03"
       ],
       "primaryKnowledgePointIds": [
         "kp19-45"
@@ -3337,9 +2186,7 @@
       "chapterId": "ch19",
       "title": "预算与实际费用差异",
       "knowledgePointIds": [
-        "kp19-46",
-        "kp19-19",
-        "kp19-22"
+        "kp19-46"
       ],
       "primaryKnowledgePointIds": [
         "kp19-46"
@@ -3350,7 +2197,7 @@
       "title": "供应商发票与付款核对",
       "knowledgePointIds": [
         "kp19-47",
-        "kp19-04"
+        "kp19-48"
       ],
       "primaryKnowledgePointIds": [
         "kp19-47"
@@ -3360,8 +2207,7 @@
       "chapterId": "ch19",
       "title": "应付账款账龄",
       "knowledgePointIds": [
-        "kp19-48",
-        "kp19-04"
+        "kp19-48"
       ],
       "primaryKnowledgePointIds": [
         "kp19-48"
@@ -3372,8 +2218,8 @@
       "title": "银行流水与凭证全量对账",
       "knowledgePointIds": [
         "kp19-49",
-        "kp19-19",
-        "kp20-04"
+        "kp19-46",
+        "kp19-50"
       ],
       "primaryKnowledgePointIds": [
         "kp19-49"
@@ -3383,76 +2229,27 @@
       "chapterId": "ch19",
       "title": "多规则异常交易筛查",
       "knowledgePointIds": [
-        "kp19-50",
-        "kp19-21",
-        "kp20-04"
+        "kp19-50"
       ],
       "primaryKnowledgePointIds": [
         "kp19-50"
-      ]
-    },
-    "q0271": {
-      "chapterId": "ch19",
-      "title": "月末人员规模与变动",
-      "knowledgePointIds": [
-        "kp19-51",
-        "kp19-05"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp19-51"
       ]
     },
     "q0272": {
       "chapterId": "ch19",
       "title": "月度离职率与趋势",
       "knowledgePointIds": [
-        "kp19-52",
-        "kp19-24"
+        "kp19-52"
       ],
       "primaryKnowledgePointIds": [
         "kp19-52"
-      ]
-    },
-    "q0273": {
-      "chapterId": "ch19",
-      "title": "同岗位薪资分布与异常",
-      "knowledgePointIds": [
-        "kp19-53",
-        "kp19-23",
-        "kp19-25"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp19-53"
-      ]
-    },
-    "q0274": {
-      "chapterId": "ch19",
-      "title": "部门人力成本与加班",
-      "knowledgePointIds": [
-        "kp19-54",
-        "kp19-25"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp19-54"
-      ]
-    },
-    "q0275": {
-      "chapterId": "ch19",
-      "title": "入职同期群90及180日留任",
-      "knowledgePointIds": [
-        "kp19-55",
-        "kp19-26"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp19-55"
       ]
     },
     "q0276": {
       "chapterId": "ch19",
       "title": "采购价格与合同、历史价格比较",
       "knowledgePointIds": [
-        "kp19-56",
-        "kp19-27"
+        "kp19-56"
       ],
       "primaryKnowledgePointIds": [
         "kp19-56"
@@ -3462,9 +2259,7 @@
       "chapterId": "ch19",
       "title": "供应商准时、完整交付与质量",
       "knowledgePointIds": [
-        "kp19-57",
-        "kp19-28",
-        "kp19-29"
+        "kp19-57"
       ],
       "primaryKnowledgePointIds": [
         "kp19-57"
@@ -3475,46 +2270,21 @@
       "title": "采购、收货、发票三方核对",
       "knowledgePointIds": [
         "kp19-58",
-        "kp19-06",
-        "kp19-30"
+        "kp19-57",
+        "kp19-47"
       ],
       "primaryKnowledgePointIds": [
         "kp19-58"
       ]
     },
-    "q0279": {
-      "chapterId": "ch19",
-      "title": "同商品跨供应商采购价差",
-      "knowledgePointIds": [
-        "kp19-59",
-        "kp19-27"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp19-59"
-      ]
-    },
-    "q0280": {
-      "chapterId": "ch19",
-      "title": "供应商多指标综合评价",
-      "knowledgePointIds": [
-        "kp19-60",
-        "kp19-28"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp19-60"
-      ]
-    },
-    "q0281": {
+    "q0255": {
       "chapterId": "ch20",
-      "title": "畅销缺货与滞销积压双向筛查",
+      "title": "门店综合经营异常看板",
       "knowledgePointIds": [
-        "kp20-05",
-        "kp19-11",
-        "kp19-12",
-        "kp20-04"
+        "kp20-03"
       ],
       "primaryKnowledgePointIds": [
-        "kp20-05"
+        "kp19-35"
       ]
     },
     "q0282": {
@@ -3522,24 +2292,11 @@
       "title": "商品销售贡献与库存资金占用错配",
       "knowledgePointIds": [
         "kp20-06",
-        "kp19-07",
-        "kp19-10",
+        "kp19-01",
         "kp20-01"
       ],
       "primaryKnowledgePointIds": [
         "kp20-06"
-      ]
-    },
-    "q0283": {
-      "chapterId": "ch20",
-      "title": "跨仓库存调拨候选",
-      "knowledgePointIds": [
-        "kp20-07",
-        "kp19-12",
-        "kp20-01"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp20-07"
       ]
     },
     "q0284": {
@@ -3548,55 +2305,16 @@
       "knowledgePointIds": [
         "kp20-08",
         "kp19-02",
-        "kp19-10",
         "kp20-01"
       ],
       "primaryKnowledgePointIds": [
         "kp20-08"
       ]
     },
-    "q0285": {
-      "chapterId": "ch20",
-      "title": "逾期在途与缺货叠加",
-      "knowledgePointIds": [
-        "kp20-09",
-        "kp19-29",
-        "kp20-04"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp20-09"
-      ]
-    },
-    "q0286": {
-      "chapterId": "ch20",
-      "title": "收货入库完整性核对",
-      "knowledgePointIds": [
-        "kp20-10",
-        "kp19-06",
-        "kp20-04"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp20-10"
-      ]
-    },
-    "q0287": {
-      "chapterId": "ch20",
-      "title": "供应商延迟与仓库资金压力",
-      "knowledgePointIds": [
-        "kp20-11",
-        "kp19-29",
-        "kp20-01"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp20-11"
-      ]
-    },
     "q0288": {
       "chapterId": "ch20",
       "title": "门店贡献利润与费用",
       "knowledgePointIds": [
-        "kp20-12",
-        "kp19-01",
         "kp20-01"
       ],
       "primaryKnowledgePointIds": [
@@ -3608,8 +2326,8 @@
       "title": "订单结算与收入核对",
       "knowledgePointIds": [
         "kp20-13",
-        "kp19-04",
-        "kp20-04"
+        "kp19-48",
+        "kp19-50"
       ],
       "primaryKnowledgePointIds": [
         "kp20-13"
@@ -3619,8 +2337,6 @@
       "chapterId": "ch20",
       "title": "门店月度收入与费用偏离",
       "knowledgePointIds": [
-        "kp20-14",
-        "kp19-20",
         "kp20-02"
       ],
       "primaryKnowledgePointIds": [
@@ -3632,37 +2348,12 @@
       "title": "采购承诺、收货、开票及付款敞口",
       "knowledgePointIds": [
         "kp20-15",
-        "kp19-04",
-        "kp19-27",
+        "kp19-48",
+        "kp19-56",
         "kp20-01"
       ],
       "primaryKnowledgePointIds": [
         "kp20-15"
-      ]
-    },
-    "q0292": {
-      "chapterId": "ch20",
-      "title": "三方不一致且已经付款的发票",
-      "knowledgePointIds": [
-        "kp20-16",
-        "kp19-30",
-        "kp20-04"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp20-16"
-      ]
-    },
-    "q0293": {
-      "chapterId": "ch20",
-      "title": "供应商资金风险分层",
-      "knowledgePointIds": [
-        "kp20-17",
-        "kp19-04",
-        "kp19-28",
-        "kp20-04"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp20-17"
       ]
     },
     "q0294": {
@@ -3670,35 +2361,11 @@
       "title": "渠道广告后的贡献利润",
       "knowledgePointIds": [
         "kp20-18",
-        "kp19-15",
+        "kp19-41",
         "kp20-01"
       ],
       "primaryKnowledgePointIds": [
         "kp20-18"
-      ]
-    },
-    "q0295": {
-      "chapterId": "ch20",
-      "title": "首购客户90天毛利与获客成本",
-      "knowledgePointIds": [
-        "kp20-19",
-        "kp19-17",
-        "kp20-02"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp20-19"
-      ]
-    },
-    "q0296": {
-      "chapterId": "ch20",
-      "title": "退款影响与渠道利润风险",
-      "knowledgePointIds": [
-        "kp20-20",
-        "kp19-01",
-        "kp20-04"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp20-20"
       ]
     },
     "q0297": {
@@ -3706,23 +2373,11 @@
       "title": "门店人效及人工占比",
       "knowledgePointIds": [
         "kp20-21",
-        "kp19-05",
+        "kp19-52",
         "kp20-01"
       ],
       "primaryKnowledgePointIds": [
         "kp20-21"
-      ]
-    },
-    "q0298": {
-      "chapterId": "ch20",
-      "title": "门店人员变化与销售变化诊断",
-      "knowledgePointIds": [
-        "kp20-22",
-        "kp19-05",
-        "kp20-02"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp20-22"
       ]
     },
     "q0299": {
@@ -3730,24 +2385,12 @@
       "title": "月度经营汇总表",
       "knowledgePointIds": [
         "kp20-23",
-        "kp19-20",
+        "kp19-32",
         "kp20-01",
         "kp20-02"
       ],
       "primaryKnowledgePointIds": [
         "kp20-23"
-      ]
-    },
-    "q0300": {
-      "chapterId": "ch20",
-      "title": "跨域季度风险评分与经营报告",
-      "knowledgePointIds": [
-        "kp20-24",
-        "kp20-01",
-        "kp20-04"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp20-24"
       ]
     }
   },

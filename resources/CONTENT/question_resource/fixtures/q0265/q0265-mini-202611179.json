@@ -8,13 +8,17 @@
   "sharedDataSha256": "f88591bb8a3ea3a748206eada73fe85ade1ec92ade7b41d510a02dc75dfd7e83",
   "expected": {
     "columns": [
-      "customer_id",
-      "freq",
-      "net_cents",
-      "gross_cents",
-      "recency_days"
+      "purchasing_customers",
+      "repeat_customers",
+      "repeat_pct"
     ],
-    "rows": []
+    "rows": [
+      [
+        14,
+        10,
+        71.43
+      ]
+    ]
   },
   "orderPolicy": "ordered",
   "numericTolerance": {
@@ -24,5 +28,5 @@
     "nullDistinct": true
   },
   "columnPolicy": "exact_names_in_order",
-  "contentVersion": "4.2.1"
+  "contentVersion": "5.0.0"
 }

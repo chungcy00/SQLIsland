@@ -17,7 +17,6 @@
       "relatedKnowledgePointIds": [],
       "relatedQuestionIds": [
         "q0011",
-        "q0013",
         "q0014"
       ],
       "questionLinkPolicy": "通过共享课程知识点关联正式题库；业务卡额外保留对应BP任务编号。关联不表示题目与卡片完全相同。",
@@ -53,19 +52,14 @@
       "id": "fc0009",
       "chapterId": "ch02",
       "knowledgePointIds": [
-        "kp02-01",
-        "kp02-03"
+        "kp02-01"
       ],
       "primaryKnowledgePointIds": [
-        "kp02-01",
-        "kp02-03"
+        "kp02-01"
       ],
       "relatedKnowledgePointIds": [],
       "relatedQuestionIds": [
-        "q0010",
         "q0011",
-        "q0013",
-        "q0015",
         "q0017"
       ],
       "questionLinkPolicy": "通过共享课程知识点关联正式题库；业务卡额外保留对应BP任务编号。关联不表示题目与卡片完全相同。",
@@ -263,18 +257,13 @@
       "id": "fc0011",
       "chapterId": "ch02",
       "knowledgePointIds": [
-        "kp02-03"
+        "kp02-01"
       ],
       "primaryKnowledgePointIds": [
-        "kp02-03"
+        "kp02-01"
       ],
       "relatedKnowledgePointIds": [],
-      "relatedQuestionIds": [
-        "q0010",
-        "q0017",
-        "q0019",
-        "q0020"
-      ],
+      "relatedQuestionIds": [],
       "questionLinkPolicy": "通过共享课程知识点关联正式题库；业务卡额外保留对应BP任务编号。关联不表示题目与卡片完全相同。",
       "type": "代码填空",
       "difficulty": "入门",
@@ -568,17 +557,13 @@
       "id": "fc0013",
       "chapterId": "ch02",
       "knowledgePointIds": [
-        "kp02-03"
+        "kp02-01"
       ],
       "primaryKnowledgePointIds": [
-        "kp02-03"
+        "kp02-01"
       ],
       "relatedKnowledgePointIds": [],
-      "relatedQuestionIds": [
-        "q0010",
-        "q0017",
-        "q0018"
-      ],
+      "relatedQuestionIds": [],
       "questionLinkPolicy": "通过共享课程知识点关联正式题库；业务卡额外保留对应BP任务编号。关联不表示题目与卡片完全相同。",
       "type": "错误纠正",
       "difficulty": "入门",

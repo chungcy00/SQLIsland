@@ -13,9 +13,7 @@
       "chapterId": "ch07",
       "title": "GROUP BY 分组",
       "learningObjective": "能够运用本节知识完成：按商品类别汇总销售额",
-      "prerequisites": [
-        "ch06"
-      ],
+      "prerequisites": [],
       "concept": "依据分组键将输入行归入不同组，再对每组计算聚合值；本例三个类别。",
       "syntax": "SELECT key, SUM(value) FROM t GROUP BY key;",
       "parameters": {
@@ -131,11 +129,9 @@
       },
       "relatedQuestionIds": [
         "q0078",
-        "q0079",
         "q0081",
         "q0082",
-        "q0083",
-        "q0088"
+        "q0083"
       ],
       "relatedFlashcardIds": [
         "fc0044",
@@ -201,17 +197,21 @@
       "mysqlVerificationScript": "validation/mysql/kp07-01.sql",
       "primaryQuestionIds": [
         "q0078",
-        "q0079",
         "q0081",
         "q0082",
-        "q0083",
-        "q0088"
+        "q0083"
       ],
       "primaryFlashcardIds": [
         "fc0044",
         "fc0045",
         "fc0049"
-      ]
+      ],
+      "teaching": {
+        "problem": "将逐笔订单变成类别销售汇总。",
+        "codeExplanation": "GROUP BY 定义一个类别一组，SUM 在每组内累计 sales，最终按汇总额排序。",
+        "resultExplanation": "由订单粒度降为类别粒度，共三组。改分组键可得到按门店或按月份的同类报表。",
+        "checkpoints": []
+      }
     },
     {
       "id": "kp07-02",
@@ -415,7 +415,13 @@
       "primaryFlashcardIds": [
         "fc0046",
         "fc0047"
-      ]
+      ],
+      "teaching": {
+        "problem": "只在已经算好的类别总额中寻找超过阈值的类别。",
+        "codeExplanation": "日期等明细条件放 WHERE；金额阈值取决于 SUM，应写在 GROUP BY 之后的 HAVING。",
+        "resultExplanation": "合计 1500 和 1400 的两类保留，700 的类别被过滤。把阈值应用在单笔销售会丢掉共同达到门槛的小额记录。",
+        "checkpoints": []
+      }
     },
     {
       "id": "kp07-03",
@@ -539,11 +545,9 @@
       },
       "relatedQuestionIds": [
         "q0077",
-        "q0080",
         "q0085",
         "q0086",
-        "q0091",
-        "q0092"
+        "q0091"
       ],
       "relatedFlashcardIds": [
         "fc0048",
@@ -609,21 +613,25 @@
       "mysqlVerificationScript": "validation/mysql/kp07-03.sql",
       "primaryQuestionIds": [
         "q0077",
-        "q0080",
         "q0085",
         "q0086",
-        "q0091",
-        "q0092"
+        "q0091"
       ],
       "primaryFlashcardIds": [
         "fc0048",
         "fc0050"
-      ]
+      ],
+      "teaching": {
+        "problem": "同一类别在不同门店应分别统计，避免汇总粒度不明。",
+        "codeExplanation": "门店和类别共同构成组键；输出的普通列应属于这些键或由键唯一决定，度量列使用聚合。",
+        "resultExplanation": "结果一行是一个门店类别组合。加入月份会划分更细，直接删除一个键则合并对应分组。",
+        "checkpoints": []
+      }
     }
   ],
-  "plannedQuestionCount": 18,
+  "plannedQuestionCount": 14,
   "schemaVersion": 1,
-  "contentVersion": "1.0.0",
+  "contentVersion": "5.0.0",
   "dialect": "MySQL 8.4",
   "summary": "完成本章后：按组聚合并区分行筛选与组筛选。",
   "sources": [

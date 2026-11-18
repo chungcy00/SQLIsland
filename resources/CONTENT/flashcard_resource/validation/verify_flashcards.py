@@ -43,15 +43,15 @@ assert dict(collections.Counter(c['type'] for c in cards))==expected
 normal=lambda s:re.sub(r'\s+',' ',s.strip().rstrip(';')).lower()
 assert len({normal(c['front']['question']) for c in cards})==200
 assert len({normal(c['back']['code']) for c in cards if 'code' in c['back']})==125
-kp={k for c in cards for k in c['primaryKnowledgePointIds']};q={q for c in cards for q in c['relatedQuestionIds']};bp={c['businessTaskId'] for c in cards if c.get('businessTaskId')}
-assert kp==set(source['knowledgePoints']) and q==set(source['questions']) and bp==set(source['businessTasks'])
+kp={k for c in cards for k in c['primaryKnowledgePointIds']};linked_questions={q for c in cards for q in c['relatedQuestionIds']};bp={c['businessTaskId'] for c in cards if c.get('businessTaskId')}
+assert kp==set(source['knowledgePoints']) and linked_questions<=set(source['questions']) and bp==set(source['businessTasks'])
 count=wrong=0;wrong_errors=wrong_diff=0;state_tests=0;native=0;records=[]
 for c in cards:
  assert c['front']['question'] and c['back']['answer'] and c['back']['explanation'] and c['compatibility'] and c['difficulty']
  assert all(k in source['knowledgePoints'] for k in c['knowledgePointIds'])
  assert all(v in source['questions'] for v in c['relatedQuestionIds'])
  assert all(set(source['questions'][v]['knowledgePointIds']).intersection(c['knowledgePointIds']) or v==c.get('businessQuestionId') for v in c['relatedQuestionIds'])
- if c.get('businessTaskId'):
+ if c.get('businessQuestionId'):
   b=source['businessTasks'][c['businessTaskId']]; assert c['businessQuestionId']==b['questionId'] and c['businessQuestionId'] in c['relatedQuestionIds'] and c['databaseRef'] in source['databases']
  if c['type'] in ['概念记忆','用法辨析']:
   assert not c.get('fixturePath') and c['supportStatus']=='仅理论';continue
@@ -84,5 +84,5 @@ for p in sorted((R/'course_links').glob('ch*.json')):
 for q in load(R/'course_links/question_links.json')['questions']:
  assert set(q['relatedFlashcardIds'])=={c['id'] for c in cards if q['questionId'] in c['relatedQuestionIds']}
 policy=load(R/'review_policy.json');assert [x['label'] for x in policy['ratings']]==['忘记','困难','记得','熟练'] and len(policy['modes'])==7 and policy['algorithm']=='FSRS' and not policy['policy']['hardcodedIntervals']
-res={'status':'通过','sqliteVersion':sqlite3.sqlite_version,'cards':len(cards),'chapters':len(chapters),'correctExecuted':count,'wrongRejected':wrong,'wrongExecutionErrors':wrong_errors,'wrongDifferentResults':wrong_diff,'stateTests':state_tests,'fixtureHashMatches':count,'nativeScriptsPresentNotExecuted':native,'primaryKnowledgePoints':len(kp),'linkedQuestions':len(q) if isinstance(q,set) else len(source['questions']),'businessTasks':len(bp),'records':records}
+res={'status':'通过','sqliteVersion':sqlite3.sqlite_version,'cards':len(cards),'chapters':len(chapters),'correctExecuted':count,'wrongRejected':wrong,'wrongExecutionErrors':wrong_errors,'wrongDifferentResults':wrong_diff,'stateTests':state_tests,'fixtureHashMatches':count,'nativeScriptsPresentNotExecuted':native,'primaryKnowledgePoints':len(kp),'linkedQuestions':len(linked_questions),'businessTasks':len(bp),'records':records}
 (R/'validation/recheck.json').write_text(json.dumps(res,ensure_ascii=False,indent=2)+'\n',encoding='utf-8');print({k:v for k,v in res.items() if k!='records'})

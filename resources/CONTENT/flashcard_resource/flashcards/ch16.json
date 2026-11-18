@@ -446,8 +446,7 @@
       "relatedKnowledgePointIds": [],
       "relatedQuestionIds": [
         "q0221",
-        "q0227",
-        "q0228"
+        "q0227"
       ],
       "questionLinkPolicy": "通过共享课程知识点关联正式题库；业务卡额外保留对应BP任务编号。关联不表示题目与卡片完全相同。",
       "type": "结果预测",
@@ -579,8 +578,7 @@
       "relatedKnowledgePointIds": [],
       "relatedQuestionIds": [
         "q0222",
-        "q0223",
-        "q0225"
+        "q0223"
       ],
       "questionLinkPolicy": "通过共享课程知识点关联正式题库；业务卡额外保留对应BP任务编号。关联不表示题目与卡片完全相同。",
       "type": "错误纠正",

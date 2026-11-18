@@ -13,9 +13,7 @@
       "chapterId": "ch11",
       "title": "CONCAT 字符串拼接",
       "learningObjective": "能够运用本节知识完成：生成报表展示名称",
-      "prerequisites": [
-        "ch10"
-      ],
+      "prerequisites": [],
       "concept": "将多个字符串按给定次序连接，MySQL CONCAT 任一参数为 NULL 时返回 NULL。",
       "syntax": "CONCAT(str1,str2,...)",
       "parameters": {
@@ -124,7 +122,6 @@
         "detail": "需要明确转换或原生环境验证。"
       },
       "relatedQuestionIds": [
-        "q0157",
         "q0158"
       ],
       "relatedFlashcardIds": [
@@ -171,12 +168,17 @@
       },
       "mysqlVerificationScript": "validation/mysql/kp11-01.sql",
       "primaryQuestionIds": [
-        "q0157",
         "q0158"
       ],
       "primaryFlashcardIds": [
         "fc0080"
-      ]
+      ],
+      "teaching": {
+        "problem": "报表需要把类别与商品名组合成可读标签。",
+        "codeExplanation": "CONCAT 显式插入分隔符，顺序决定标签结构。MySQL 中空值会传递，需保留部分文本时先约定 COALESCE 的备用值。",
+        "resultExplanation": "得到如“护肤品 - Mask”的新列，仍是一商品一行。也能用于码表显示，原始键应单独保留供连接。",
+        "checkpoints": []
+      }
     },
     {
       "id": "kp11-02",
@@ -184,7 +186,8 @@
       "title": "SUBSTRING 截取文本",
       "learningObjective": "能够运用本节知识完成：提取商品编码前缀",
       "prerequisites": [
-        "kp11-01"
+        "kp11-01",
+        "kp11-03"
       ],
       "concept": "从指定字符位置开始截取，位置从1开始；长度表示截取字符数。",
       "syntax": "SUBSTRING(str,pos,len)",
@@ -294,11 +297,13 @@
         "detail": "仅在本示例数据与语义范围验证；不代表全部 MySQL 语法兼容。"
       },
       "relatedQuestionIds": [
-        "q0153",
-        "q0155"
+        "q0155",
+        "q0156"
       ],
       "relatedFlashcardIds": [
-        "fc0081"
+        "fc0079",
+        "fc0081",
+        "fc0084"
       ],
       "relatedKnowledgePointIds": [
         "kp02-01",
@@ -341,12 +346,26 @@
       },
       "mysqlVerificationScript": "validation/mysql/kp11-02.sql",
       "primaryQuestionIds": [
-        "q0153",
-        "q0155"
+        "q0155",
+        "q0156"
       ],
       "primaryFlashcardIds": [
-        "fc0081"
-      ]
+        "fc0079",
+        "fc0081",
+        "fc0084"
+      ],
+      "mergedFrom": [
+        {
+          "id": "kp11-04",
+          "title": "CHAR_LENGTH 与 LENGTH"
+        }
+      ],
+      "teaching": {
+        "problem": "编码前缀要按字符位置提取，不能凭样例结果硬截固定字节。",
+        "codeExplanation": "SUBSTRING 从第一个字符起取三个字符，适合固定长度前缀；分隔符位置变化时先定位再截取。CHAR_LENGTH 计算字符数，LENGTH 在 MySQL 中计算字节数；多字节商品名应按字符截取。",
+        "resultExplanation": "Mask 取 Mas，Serum 取 Ser。分组使用前缀前应检查是否把不同业务含义的编码误合并。",
+        "checkpoints": []
+      }
     },
     {
       "id": "kp11-03",
@@ -525,88 +544,23 @@
         "fc0082",
         "fc0083",
         "fc0085"
-      ]
-    },
-    {
-      "id": "kp11-04",
-      "chapterId": "ch11",
-      "title": "CHAR_LENGTH 与 LENGTH",
-      "learningObjective": "能够运用本节知识完成：验证文本字段长度",
-      "prerequisites": [
-        "kp11-03"
       ],
-      "concept": "MySQL CHAR_LENGTH 统计字符数量，LENGTH 统计字节数。UTF-8 中文字符通常占3字节。",
-      "syntax": "CHAR_LENGTH(str); LENGTH(str)",
-      "parameters": {
-        "str": "文本表达式"
-      },
-      "fixtureIds": [],
-      "sourceTables": [],
-      "mysqlSql": "SELECT CHAR_LENGTH('古晋') AS chars, LENGTH('古晋') AS bytes;",
-      "sqliteSql": "SELECT length('古晋') AS chars, length(CAST('古晋' AS BLOB)) AS bytes;",
-      "executionSteps": [
-        "按字符计数得到2",
-        "按 UTF-8 字节计数得到6"
-      ],
-      "useCase": "验证文本字段长度",
-      "comparison": "SQLite length(text) 统计字符，length(blob) 统计字节。",
-      "commonError": {
-        "example": "把 LENGTH 当作显示字符数",
-        "correction": "使用 CHAR_LENGTH"
-      },
-      "notes": "MySQL 连接字符集须为 utf8mb4；SQLite转换示例使用 UTF-8。",
-      "compatibility": {
-        "status": "转换执行",
-        "detail": "需要明确转换或原生环境验证。"
-      },
-      "relatedQuestionIds": [
-        "q0152",
-        "q0156",
-        "q0160"
-      ],
-      "relatedFlashcardIds": [
-        "fc0079",
-        "fc0084"
-      ],
-      "relatedKnowledgePointIds": [
-        "kp02-01",
-        "kp05-01"
-      ],
-      "mysqlVerification": "未运行原生 MySQL 8.4",
-      "result": {
-        "columns": [
-          "chars",
-          "bytes"
-        ],
-        "rows": [
-          [
-            2,
-            6
-          ]
-        ],
-        "status": "SQLite实际执行",
-        "orderGuaranteed": false
-      },
-      "mysqlVerificationScript": "validation/mysql/kp11-04.sql",
-      "primaryQuestionIds": [
-        "q0152",
-        "q0156",
-        "q0160"
-      ],
-      "primaryFlashcardIds": [
-        "fc0079",
-        "fc0084"
-      ]
+      "teaching": {
+        "problem": "来源系统书写不一致时，在匹配前先统一清洗规则。",
+        "codeExplanation": "TRIM 删边缘空白，LOWER 归一大小写，REPLACE 按明确的字符替换；每者处理不同问题。",
+        "resultExplanation": "前两行清洗后名字和类别相同，为后续重复审查提供候选。空白可能有业务含义，不能无条件删除所有内部空格。",
+        "checkpoints": []
+      }
     }
   ],
-  "plannedQuestionCount": 10,
+  "plannedQuestionCount": 6,
   "schemaVersion": 1,
-  "contentVersion": "1.0.0",
+  "contentVersion": "5.0.0",
   "dialect": "MySQL 8.4",
   "summary": "完成本章后：掌握文本提取、拼接、清洗及长度计算。",
   "sources": [
     "https://dev.mysql.com/doc/refman/8.4/en/",
     "https://dev.mysql.com/doc/refman/8.4/en/functions.html"
   ],
-  "knowledgePointCount": 4
+  "knowledgePointCount": 3
 }

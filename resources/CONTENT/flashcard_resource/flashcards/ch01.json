@@ -16,7 +16,6 @@
       ],
       "relatedKnowledgePointIds": [],
       "relatedQuestionIds": [
-        "q0001",
         "q0006"
       ],
       "questionLinkPolicy": "通过共享课程知识点关联正式题库；业务卡额外保留对应BP任务编号。关联不表示题目与卡片完全相同。",
@@ -60,7 +59,6 @@
       "relatedKnowledgePointIds": [],
       "relatedQuestionIds": [
         "q0003",
-        "q0004",
         "q0005"
       ],
       "questionLinkPolicy": "通过共享课程知识点关联正式题库；业务卡额外保留对应BP任务编号。关联不表示题目与卡片完全相同。",
@@ -103,7 +101,6 @@
       ],
       "relatedKnowledgePointIds": [],
       "relatedQuestionIds": [
-        "q0007",
         "q0008"
       ],
       "questionLinkPolicy": "通过共享课程知识点关联正式题库；业务卡额外保留对应BP任务编号。关联不表示题目与卡片完全相同。",
@@ -174,7 +171,6 @@
       ],
       "relatedKnowledgePointIds": [],
       "relatedQuestionIds": [
-        "q0007",
         "q0008"
       ],
       "questionLinkPolicy": "通过共享课程知识点关联正式题库；业务卡额外保留对应BP任务编号。关联不表示题目与卡片完全相同。",
@@ -210,15 +206,13 @@
       "id": "fc0005",
       "chapterId": "ch01",
       "knowledgePointIds": [
-        "kp01-04"
+        "kp05-01"
       ],
       "primaryKnowledgePointIds": [
-        "kp01-04"
+        "kp05-01"
       ],
       "relatedKnowledgePointIds": [],
-      "relatedQuestionIds": [
-        "q0002"
-      ],
+      "relatedQuestionIds": [],
       "questionLinkPolicy": "通过共享课程知识点关联正式题库；业务卡额外保留对应BP任务编号。关联不表示题目与卡片完全相同。",
       "type": "用法辨析",
       "difficulty": "入门",
@@ -259,7 +253,6 @@
       ],
       "relatedKnowledgePointIds": [],
       "relatedQuestionIds": [
-        "q0001",
         "q0006"
       ],
       "questionLinkPolicy": "通过共享课程知识点关联正式题库；业务卡额外保留对应BP任务编号。关联不表示题目与卡片完全相同。",
@@ -418,16 +411,14 @@
       "chapterId": "ch01",
       "knowledgePointIds": [
         "kp01-01",
-        "kp01-04"
+        "kp05-01"
       ],
       "primaryKnowledgePointIds": [
         "kp01-01",
-        "kp01-04"
+        "kp05-01"
       ],
       "relatedKnowledgePointIds": [],
       "relatedQuestionIds": [
-        "q0001",
-        "q0002",
         "q0006"
       ],
       "questionLinkPolicy": "通过共享课程知识点关联正式题库；业务卡额外保留对应BP任务编号。关联不表示题目与卡片完全相同。",

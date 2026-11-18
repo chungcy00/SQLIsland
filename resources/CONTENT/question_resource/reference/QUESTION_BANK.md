@@ -1,17 +1,16 @@
 # 题库生成及判题内容规范
 
 ## 题量（同一题库的不同维度）
-CURRICULUM各章题量合计300；第19章30个实战任务包含在内。题型：选择30、代码填空35、独立编写120、代码纠错30、结果预测25、业务情景60。难度：入门60、简单90、中等90、困难45、挑战15。业务项目的30个任务归入业务情景60；其余30为普通情景练习。先建立三维分配表校验每一维边际总数，再生成实际内容；不重复计数。
+CURRICULUM各章题量合计300；第19章30个实战任务包含在内。题型：选择30、代码填空35、独立编写145、代码纠错30、业务情景60。难度：入门60、简单90、中等90、困难45、挑战15。业务项目的30个任务归入业务情景60；其余30为普通情景练习。先建立三维分配表校验每一维边际总数，再生成实际内容；不重复计数。
 
 ## 数据结构
 每题稳定 id、chapterId、knowledgePointIds、type、difficulty、title、context、requirements、datasetId或专用fixtureId、schemaVersion、initialCode、options（选择）、acceptedBlanks（填空，说明等价形式）、expectedOutput、referenceSolutions、hints（三层，非编程可缩减）、explanation、commonErrors、testFixtureIds、orderPolicy、columnPolicy、numericTolerance、requiredAstFeatures（可选）、supportStatus、interviewTag、projectId/taskId（可选）、contentVersion。明确输入表、输出列/别名/顺序、排序/并列、NULL与精度、计量单位、时间范围、是否含边界。不要求题目未给的条件。
 
-## 六题型
+## 五题型
 - 选择：4个合理选项，单选一个正确项，答案及每个干扰项原因；不使用歧义或多个合理答案。
 - 填空：代码保留上下文，允许键盘输入；可运行则对完整代码进行语义/结果验证，非执行型才按明确可接受答案比较。
 - 独立编写：从需求写完整SQL；除非专项约束，等价写法均可通过。
 - 纠错：给出真正错误代码，修改全文；解析错误所在及业务后果。
-- 预测：原始数据+代码+明确要求，提交前不开放执行或答案；可选择结果（表格）或填写规定值，按题设校验。
 - 情景：用真实业务描述设定指标、业务粒度、表关系、时间/币种，避免缺失定义；查询结果比对。
 
 ## 三层提示及反馈

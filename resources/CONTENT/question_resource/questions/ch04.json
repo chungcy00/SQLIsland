@@ -1,9 +1,9 @@
 {
   "chapterId": "ch04",
   "title": "排序与分页",
-  "count": 8,
+  "count": 6,
   "schemaVersion": 3,
-  "contentVersion": "3.0.0",
+  "contentVersion": "5.0.0",
   "questions": [
     {
       "id": "q0043",
@@ -609,398 +609,6 @@
       ]
     },
     {
-      "id": "q0046",
-      "chapterId": "ch04",
-      "knowledgePointIds": [
-        "kp04-02"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp04-02"
-      ],
-      "difficulty": "入门",
-      "type": "独立编写",
-      "title": "最便宜的两件商品",
-      "context": "使用课程中小型商品数据练习最便宜的两件商品。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "输出 product_id、price，售价升序、编号升序，取前2条。\n输出列名称及顺序：product_id, price。按题设排序；参考排序键：price,product_id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
-      "datasetId": "q0046-lesson",
-      "schemaVersion": 3,
-      "contentVersion": "3.0.0",
-      "sourceTables": [
-        "products"
-      ],
-      "initialCode": "",
-      "options": [],
-      "acceptedBlanks": [],
-      "expectedOutput": {
-        "kind": "query",
-        "columns": [
-          "product_id",
-          "price"
-        ],
-        "rows": [
-          [
-            1,
-            15
-          ],
-          [
-            6,
-            15
-          ]
-        ],
-        "rowCount": 2
-      },
-      "referenceSolutions": [
-        {
-          "kind": "reference",
-          "mysqlSql": "SELECT product_id,price FROM products ORDER BY price,product_id LIMIT 2",
-          "sqliteSql": "SELECT product_id,price FROM products ORDER BY price,product_id LIMIT 2"
-        },
-        {
-          "kind": "关系结构等价",
-          "mysqlSql": "WITH ranked_input AS (SELECT *,ROW_NUMBER() OVER(ORDER BY price,product_id) AS row_pos FROM products ) SELECT product_id,price FROM ranked_input WHERE row_pos>0 AND row_pos<=2 ORDER BY row_pos",
-          "sqliteSql": "WITH ranked_input AS (SELECT *,ROW_NUMBER() OVER(ORDER BY price,product_id) AS row_pos FROM products ) SELECT product_id,price FROM ranked_input WHERE row_pos>0 AND row_pos<=2 ORDER BY row_pos",
-          "explanation": "使用相同排序生成行号，再映射分页起止行。"
-        }
-      ],
-      "hints": [
-        "先确定主排序键和并列决胜键，再考虑需要保留的行段。",
-        "结合《LIMIT 与 OFFSET》：LIMIT 控制最多返回多少行；OFFSET 跳过前几行。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT product_id,price FROM products □□□product_id LIMIT 2"
-      ],
-      "explanation": "先稳定排序再截取，否则不是最便宜的商品。\n执行思路：确认products的输入记录；输出product_id、price列；遵循题设排序和并列规则；按指定范围截取记录。\n公开夹具实际返回 2 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：使用相同排序生成行号，再映射分页起止行。",
-      "commonErrors": [
-        {
-          "sql": "SELECT product_id,price FROM products ORDER BY price DESC,product_id LIMIT 2",
-          "reason": "先稳定排序再截取，否则不是最便宜的商品。",
-          "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
-        }
-      ],
-      "testFixtureIds": [
-        "q0046-public",
-        "q0046-boundary",
-        "q0046-empty"
-      ],
-      "testFixtures": [
-        {
-          "id": "q0046-public",
-          "visibility": "public",
-          "variant": "public",
-          "path": "fixtures/q0046/q0046-public.json",
-          "sha256": "160dae3c865df8b6e1ea5723305d8345e446fcabcf1d046718276d800922c5f3"
-        },
-        {
-          "id": "q0046-boundary",
-          "visibility": "hidden",
-          "variant": "boundary",
-          "path": "fixtures/q0046/q0046-boundary.json",
-          "sha256": "b4530448b61ae54108ef8db6e50288e9cfba5bc039d9b7a326073da640e222fc"
-        },
-        {
-          "id": "q0046-empty",
-          "visibility": "hidden",
-          "variant": "empty",
-          "path": "fixtures/q0046/q0046-empty.json",
-          "sha256": "291b23741cd929bb93f4635caf371f95d0a3a0b9b7de994c80e2032d73430437"
-        }
-      ],
-      "orderPolicy": "ordered",
-      "columnPolicy": "exact_names_in_order",
-      "numericTolerance": {
-        "absolute": 1e-06,
-        "integerExact": true,
-        "textExact": true,
-        "nullDistinct": true
-      },
-      "requiredAstFeatures": [],
-      "supportStatus": "直接兼容",
-      "compatibility": "当前SQLite真实执行；MySQL 8.4原生验证未执行，词法、类型、排序及严格模式差异需复验。",
-      "executionMode": "query_result",
-      "runAllowedBeforeSubmit": true,
-      "hiddenFixturePolicy": "用户代码独立执行公开与隐藏夹具",
-      "interviewTag": "LIMIT 与 OFFSET",
-      "validationStatus": "SQLite参考、等价、错误解内容测试通过；非原生或手机验收",
-      "mysqlVerification": "未运行 MySQL 8.4",
-      "validation": {
-        "kind": "query",
-        "equivalentKind": "关系结构等价",
-        "fixtures": [
-          {
-            "fixtureId": "q0046-public",
-            "reference": {
-              "ran": true,
-              "match": true,
-              "resultHash": "4ccedb443d23523bea4bef1f02cf96f4207735dfe1107d7a3ab5cbf998553a02",
-              "rowCount": 2
-            },
-            "equivalent": {
-              "ran": true,
-              "match": true,
-              "resultHash": "4ccedb443d23523bea4bef1f02cf96f4207735dfe1107d7a3ab5cbf998553a02",
-              "rows": 2
-            },
-            "wrong": {
-              "ran": true,
-              "match": false,
-              "resultHash": "8aeeab47bca3a3d8d1260636185987a07b1d0c849b694c3d6af043a5c79946b5",
-              "rows": 2
-            }
-          },
-          {
-            "fixtureId": "q0046-boundary",
-            "reference": {
-              "ran": true,
-              "match": true,
-              "resultHash": "045bc0bf28176c0edfaf3adb88c7a5fd0836e04df8cd8fb6698919a482117b72",
-              "rowCount": 2
-            },
-            "equivalent": {
-              "ran": true,
-              "match": true,
-              "resultHash": "045bc0bf28176c0edfaf3adb88c7a5fd0836e04df8cd8fb6698919a482117b72",
-              "rows": 2
-            },
-            "wrong": {
-              "ran": true,
-              "match": false,
-              "resultHash": "41cce364d1c2064b2029565b81c0f69afa25457801e473c6a7e0fe6b15e3e150",
-              "rows": 2
-            }
-          },
-          {
-            "fixtureId": "q0046-empty",
-            "reference": {
-              "ran": true,
-              "match": true,
-              "resultHash": "a3cda5741886735fb72bf4de410e6e9b87ef5254c2ff9a8a4e68cf8741b576d9",
-              "rowCount": 0
-            },
-            "equivalent": {
-              "ran": true,
-              "match": true,
-              "resultHash": "a3cda5741886735fb72bf4de410e6e9b87ef5254c2ff9a8a4e68cf8741b576d9",
-              "rows": 0
-            },
-            "wrong": {
-              "ran": true,
-              "match": true,
-              "resultHash": "a3cda5741886735fb72bf4de410e6e9b87ef5254c2ff9a8a4e68cf8741b576d9",
-              "rows": 0
-            }
-          }
-        ],
-        "source": "https://dev.mysql.com/doc/refman/8.4/en/limit-optimization.html",
-        "independentPythonAssertions": []
-      },
-      "relatedFlashcardIds": [
-        "fc0025"
-      ]
-    },
-    {
-      "id": "q0047",
-      "chapterId": "ch04",
-      "knowledgePointIds": [
-        "kp04-01"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp04-01"
-      ],
-      "difficulty": "入门",
-      "type": "代码纠错",
-      "title": "按售价从低到高",
-      "context": "使用课程中小型商品数据练习按售价从低到高。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "下面提供的初始代码存在逻辑、语法或结构错误。请修改整段代码，使其满足以下要求。\n输出 products 的 product_id、price，售价升序，价格相同按商品编号降序。\n输出列名称及顺序：product_id, price。按题设排序；参考排序键：price ASC,product_id DESC。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
-      "datasetId": "q0047-lesson",
-      "schemaVersion": 3,
-      "contentVersion": "3.0.0",
-      "sourceTables": [
-        "products"
-      ],
-      "initialCode": "SELECT product_id,price FROM products ORDER BY price ASC,product_id ASC",
-      "options": [],
-      "acceptedBlanks": [],
-      "expectedOutput": {
-        "kind": "query",
-        "columns": [
-          "product_id",
-          "price"
-        ],
-        "rows": [
-          [
-            6,
-            15
-          ],
-          [
-            1,
-            15
-          ],
-          [
-            3,
-            35
-          ],
-          [
-            5,
-            45
-          ],
-          [
-            4,
-            65
-          ],
-          [
-            2,
-            89
-          ]
-        ],
-        "rowCount": 6
-      },
-      "referenceSolutions": [
-        {
-          "kind": "reference",
-          "mysqlSql": "SELECT product_id,price FROM products ORDER BY price ASC,product_id DESC",
-          "sqliteSql": "SELECT product_id,price FROM products ORDER BY price ASC,product_id DESC"
-        },
-        {
-          "kind": "关系结构等价",
-          "mysqlSql": "SELECT product_id,price FROM (SELECT * FROM products) AS products ORDER BY price ASC,product_id DESC",
-          "sqliteSql": "SELECT product_id,price FROM (SELECT * FROM products) AS products ORDER BY price ASC,product_id DESC",
-          "explanation": "先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。"
-        }
-      ],
-      "hints": [
-        "先确定主排序键和并列决胜键，再考虑需要保留的行段。",
-        "结合《ORDER BY 多列排序》：先按第一排序键排序，同值再按后续键；ASC 升序，DESC 降序。",
-        "检查初始代码的 product_id DESC 对应的业务规则。第二排序键明确并列价格的顺序。"
-      ],
-      "explanation": "第二排序键明确并列价格的顺序。\n执行思路：确认products的输入记录；输出product_id、price列；遵循题设排序和并列规则。\n公开夹具实际返回 6 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
-      "commonErrors": [
-        {
-          "sql": "SELECT product_id,price FROM products ORDER BY price ASC,product_id ASC",
-          "reason": "第二排序键明确并列价格的顺序。",
-          "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
-        }
-      ],
-      "testFixtureIds": [
-        "q0047-public",
-        "q0047-boundary",
-        "q0047-empty"
-      ],
-      "testFixtures": [
-        {
-          "id": "q0047-public",
-          "visibility": "public",
-          "variant": "public",
-          "path": "fixtures/q0047/q0047-public.json",
-          "sha256": "4842b23ab2a23d2a7e530f1913c81942ed03b5e7fecf198e8ecb9ea8a91e299e"
-        },
-        {
-          "id": "q0047-boundary",
-          "visibility": "hidden",
-          "variant": "boundary",
-          "path": "fixtures/q0047/q0047-boundary.json",
-          "sha256": "ba37eca48ad17289cf32c808bc642e6c4de3ef2c9b04b671496129430612d25a"
-        },
-        {
-          "id": "q0047-empty",
-          "visibility": "hidden",
-          "variant": "empty",
-          "path": "fixtures/q0047/q0047-empty.json",
-          "sha256": "8d47f09840872a9cff79441d780234c4a956c929c49493887cc3a917a641b7b7"
-        }
-      ],
-      "orderPolicy": "ordered",
-      "columnPolicy": "exact_names_in_order",
-      "numericTolerance": {
-        "absolute": 1e-06,
-        "integerExact": true,
-        "textExact": true,
-        "nullDistinct": true
-      },
-      "requiredAstFeatures": [],
-      "supportStatus": "直接兼容",
-      "compatibility": "当前SQLite真实执行；MySQL 8.4原生验证未执行，词法、类型、排序及严格模式差异需复验。",
-      "executionMode": "query_result",
-      "runAllowedBeforeSubmit": true,
-      "hiddenFixturePolicy": "用户代码独立执行公开与隐藏夹具",
-      "interviewTag": "ORDER BY 多列排序",
-      "validationStatus": "SQLite参考、等价、错误解内容测试通过；非原生或手机验收",
-      "mysqlVerification": "未运行 MySQL 8.4",
-      "validation": {
-        "kind": "query",
-        "equivalentKind": "关系结构等价",
-        "fixtures": [
-          {
-            "fixtureId": "q0047-public",
-            "reference": {
-              "ran": true,
-              "match": true,
-              "resultHash": "83ba179722acb65cb8d6a3543bd85c678f2db7978c5f34eac750980fcf2c6931",
-              "rowCount": 6
-            },
-            "equivalent": {
-              "ran": true,
-              "match": true,
-              "resultHash": "83ba179722acb65cb8d6a3543bd85c678f2db7978c5f34eac750980fcf2c6931",
-              "rows": 6
-            },
-            "wrong": {
-              "ran": true,
-              "match": false,
-              "resultHash": "24d02f928a4d77a6df1b60560eeca3bf98f882a4cd58174093e7a3aa508fecee",
-              "rows": 6
-            }
-          },
-          {
-            "fixtureId": "q0047-boundary",
-            "reference": {
-              "ran": true,
-              "match": true,
-              "resultHash": "4fb6babff42fe461ed517d1e1803a031450f107e07a3f95cdee834fedbe4a484",
-              "rowCount": 21
-            },
-            "equivalent": {
-              "ran": true,
-              "match": true,
-              "resultHash": "4fb6babff42fe461ed517d1e1803a031450f107e07a3f95cdee834fedbe4a484",
-              "rows": 21
-            },
-            "wrong": {
-              "ran": true,
-              "match": false,
-              "resultHash": "f803368fe71ab3a1851d4d2bdf411a5bacd3e984d9ee56e5046ead13a727c53d",
-              "rows": 21
-            }
-          },
-          {
-            "fixtureId": "q0047-empty",
-            "reference": {
-              "ran": true,
-              "match": true,
-              "resultHash": "a3cda5741886735fb72bf4de410e6e9b87ef5254c2ff9a8a4e68cf8741b576d9",
-              "rowCount": 0
-            },
-            "equivalent": {
-              "ran": true,
-              "match": true,
-              "resultHash": "a3cda5741886735fb72bf4de410e6e9b87ef5254c2ff9a8a4e68cf8741b576d9",
-              "rows": 0
-            },
-            "wrong": {
-              "ran": true,
-              "match": true,
-              "resultHash": "a3cda5741886735fb72bf4de410e6e9b87ef5254c2ff9a8a4e68cf8741b576d9",
-              "rows": 0
-            }
-          }
-        ],
-        "source": "https://dev.mysql.com/doc/refman/8.4/en/limit-optimization.html",
-        "independentPythonAssertions": []
-      },
-      "relatedFlashcardIds": [
-        "fc0024",
-        "fc0026",
-        "fc0027"
-      ]
-    },
-    {
       "id": "q0048",
       "chapterId": "ch04",
       "knowledgePointIds": [
@@ -1010,17 +618,17 @@
         "kp04-01"
       ],
       "difficulty": "简单",
-      "type": "结果预测",
+      "type": "独立编写",
       "title": "按门店后按日期排列",
       "context": "使用课程中小型订单数据练习按门店后按日期排列。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "不运行下方SQL，手工推算其在公开夹具中的完整返回结果。保留列名和重复行；明确区分NULL、空字符串和数值。\n输出 orders 的 store_id、order_date、id，按门店升序、日期降序、编号升序。\n输出列名称及顺序：store_id, order_date, id。按题设排序；参考排序键：store_id,order_date DESC,id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "requirements": "编写 SQL，完成以下查询要求。\n输出 orders 的 store_id、order_date、id，按门店升序、日期降序、编号升序。\n输出列名称及顺序：store_id, order_date, id。按题设排序；参考排序键：store_id,order_date DESC,id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
       "datasetId": "q0048-lesson",
       "schemaVersion": 3,
-      "contentVersion": "3.0.0",
+      "contentVersion": "4.2.2",
       "sourceTables": [
         "orders"
       ],
-      "initialCode": "SELECT store_id,order_date,id FROM orders ORDER BY store_id,order_date DESC,id",
+      "initialCode": "",
       "options": [],
       "acceptedBlanks": [],
       "expectedOutput": {
@@ -1075,7 +683,7 @@
       "hints": [
         "先确定主排序键和并列决胜键，再考虑需要保留的行段。",
         "结合《ORDER BY 多列排序》：先按第一排序键排序，同值再按后续键；ASC 升序，DESC 降序。",
-        "逐行标记输入是否命中条件，再根据查询的分组、窗口或投影阶段逐一计算；最后按题设顺序整理结果。"
+        "按题设编写投影、筛选及分组，使用运行检查列名、NULL、重复记录和排序。"
       ],
       "explanation": "多列排序是先按门店分区，再在排序组内按日期比较。\n执行思路：确认orders的输入记录；输出store_id、order_date、id列；遵循题设排序和并列规则。\n公开夹具实际返回 5 行、3 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
       "commonErrors": [
@@ -1124,9 +732,9 @@
       "requiredAstFeatures": [],
       "supportStatus": "直接兼容",
       "compatibility": "当前SQLite真实执行；MySQL 8.4原生验证未执行，词法、类型、排序及严格模式差异需复验。",
-      "executionMode": "predict_public_result",
-      "runAllowedBeforeSubmit": false,
-      "hiddenFixturePolicy": "参考逻辑验证；用户只预测公开结果",
+      "executionMode": "query_result",
+      "runAllowedBeforeSubmit": true,
+      "hiddenFixturePolicy": "公开与隐藏场景均通过实际执行判题，核对完整列、行、NULL、重复记录、顺序及精度。",
       "interviewTag": "ORDER BY 多列排序",
       "validationStatus": "SQLite参考、等价、错误解内容测试通过；非原生或手机验收",
       "mysqlVerification": "未运行 MySQL 8.4",
@@ -1203,7 +811,8 @@
       },
       "relatedFlashcardIds": [
         "fc0024"
-      ]
+      ],
+      "previousExecutionMode": "predict_public_result"
     },
     {
       "id": "q0049",

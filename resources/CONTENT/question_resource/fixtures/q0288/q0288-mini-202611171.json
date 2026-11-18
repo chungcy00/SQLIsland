@@ -10,43 +10,28 @@
     "columns": [
       "store_id",
       "net_cents",
-      "cost_cents",
-      "expense_cents",
-      "contribution_cents",
-      "contribution_pct"
+      "sales_pct"
     ],
     "rows": [
       [
-        4,
-        0,
-        0,
-        0,
-        0,
-        null
+        1,
+        1202020,
+        44.53
       ],
       [
         3,
         786700,
-        514522,
-        319600,
-        -47422,
-        -6.03
-      ],
-      [
-        1,
-        1202020,
-        824825,
-        430300,
-        -53105,
-        -4.42
+        29.14
       ],
       [
         2,
         710700,
-        472415,
-        345300,
-        -107015,
-        -15.06
+        26.33
+      ],
+      [
+        4,
+        0,
+        0.0
       ]
     ]
   },
@@ -58,5 +43,5 @@
     "nullDistinct": true
   },
   "columnPolicy": "exact_names_in_order",
-  "contentVersion": "4.2.1"
+  "contentVersion": "5.0.0"
 }

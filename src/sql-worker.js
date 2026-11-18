@@ -62,17 +62,16 @@ self.onmessage = async ({ data }) => {
           .values[0][0],
       };
     if (action === "lesson") {
-      const db = initializeFixture(SQL, { tables: payload.tables });
+      const db = initializeFixture(SQL, { tables: payload.tables }, payload.path ? await bytes(payload.path) : undefined);
       try {
-        result = query(db, payload.sql);
+        if (payload.setupSql) db.run(payload.setupSql);
+        result = query(db, payload.sql, 50000);
       } finally {
         db.close();
       }
     }
     if (action === "exercise") {
       const { question: q, sql, submit } = payload;
-      if (q.executionMode === "predict_public_result")
-        throw new Error("结果预测题请手工填写结果后提交。");
       const structure = checkStructure(
         sql,
         submit ? q.requiredAstFeatures : [],
@@ -147,6 +146,12 @@ self.onmessage = async ({ data }) => {
       const opened = source
         ? new SQL.Database(source)
         : initializeFixture(SQL, { tables: payload.tables });
+      try {
+        if (payload.setupSql) opened.run(payload.setupSql);
+      } catch (error) {
+        opened.close();
+        throw error;
+      }
       if (generation !== labGeneration) {
         opened.close();
         throw new Error("数据库切换已取消");
@@ -156,6 +161,24 @@ self.onmessage = async ({ data }) => {
       registerFunctions(lab);
       lab.run("PRAGMA foreign_keys=ON");
       result = labSchema(lab);
+    }
+    if (action === "questionTables") {
+      const fixture = await readJson(payload.path);
+      if (fixture.visibility !== "public") throw new Error("只能预览公开题目数据");
+      const db = initializeFixture(SQL, fixture, fixture.baseDatabase ? await bytes(fixture.baseDatabase) : undefined);
+      try {
+        const schema = labSchema(db);
+        const available = new Set(schema.tables.map(([name]) => name));
+        const names = payload.names.length ? [...new Set(payload.names)] : [...available];
+        const tables = names.map((name) => {
+          if (!available.has(name)) throw new Error("本题数据表不存在 " + name);
+          const quoted = '"' + name.replace(/"/g, '""') + '"';
+          const preview = query(db, "SELECT * FROM " + quoted + " LIMIT 20");
+          const count = query(db, "SELECT COUNT(*) AS total FROM " + quoted).rows[0][0];
+          return { name, columns: preview.columns, rows: preview.rows, rowCount: count };
+        });
+        result = { tables, fields: schema.fields.filter((field) => names.includes(field.name)) };
+      } finally { db.close(); }
     }
     if (action === "fixtureSchema") {
       const fixture = payload.fixture;

@@ -14,7 +14,7 @@
       "title": "IS NULL 与三值逻辑",
       "learningObjective": "能够运用本节知识完成：筛选明确不等于指定值的记录",
       "prerequisites": [
-        "ch04"
+        "kp01-03"
       ],
       "concept": "比较未知值通常返回 UNKNOWN，WHERE 只保留 TRUE；IS NULL 专门检测缺失。",
       "syntax": "WHERE col IS NULL; WHERE col IS NOT NULL;",
@@ -93,11 +93,12 @@
         "q0051",
         "q0052",
         "q0053",
-        "q0055",
         "q0056",
         "q0059"
       ],
       "relatedFlashcardIds": [
+        "fc0005",
+        "fc0007",
         "fc0030",
         "fc0033",
         "fc0035"
@@ -123,15 +124,28 @@
         "q0051",
         "q0052",
         "q0053",
-        "q0055",
         "q0056",
         "q0059"
       ],
       "primaryFlashcardIds": [
+        "fc0005",
+        "fc0007",
         "fc0030",
         "fc0033",
         "fc0035"
-      ]
+      ],
+      "mergedFrom": [
+        {
+          "id": "kp01-04",
+          "title": "NULL 与缺失记录"
+        }
+      ],
+      "teaching": {
+        "problem": "判断已知数值与筛出缺失是两件不同的工作，质量报表要分别统计。",
+        "codeExplanation": "与 NULL 做普通比较时得到 UNKNOWN，WHERE 只留下 TRUE。要显式选缺失写 IS NULL，要确认存在用 IS NOT NULL。",
+        "resultExplanation": "示例 value <> 10 只留下 0；缺失行没有留下。可用 IS NULL 单独审计，别把 NULL 当作 0 或空字符串。",
+        "checkpoints": []
+      }
     },
     {
       "id": "kp05-02",
@@ -216,7 +230,6 @@
       },
       "relatedQuestionIds": [
         "q0054",
-        "q0057",
         "q0058",
         "q0060"
       ],
@@ -261,7 +274,6 @@
       "mysqlVerificationScript": "validation/mysql/kp05-02.sql",
       "primaryQuestionIds": [
         "q0054",
-        "q0057",
         "q0058",
         "q0060"
       ],
@@ -269,12 +281,18 @@
         "fc0031",
         "fc0032",
         "fc0034"
-      ]
+      ],
+      "teaching": {
+        "problem": "展示缺失值时可以设备用值，仍需保留有含义的零和空字符串。",
+        "codeExplanation": "IFNULL 只有两个候选；COALESCE 依次取首个非 NULL 的值。仅在 SELECT 输出处理，避免把缺失误写回源表。",
+        "resultExplanation": "第二行的 0 和空文本都保留。若业务认为空文本也缺失，先用 NULLIF 把它转换为 NULL。",
+        "checkpoints": []
+      }
     }
   ],
-  "plannedQuestionCount": 10,
+  "plannedQuestionCount": 8,
   "schemaVersion": 1,
-  "contentVersion": "1.0.0",
+  "contentVersion": "5.0.0",
   "dialect": "MySQL 8.4",
   "summary": "完成本章后：区分缺失与零并正确处理三值逻辑。",
   "sources": [

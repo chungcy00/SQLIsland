@@ -1,63 +1,51 @@
 {
   "coverage": {
-    "all": 152,
-    "direct": 118,
-    "related": 152,
+    "all": 80,
+    "direct": 80,
+    "related": 80,
     "unlinked": []
   },
   "links": {
     "kp01-01": {
       "relatedQuestionIds": [
-        "q0001",
         "q0006"
       ],
       "primaryQuestionIds": [
-        "q0001",
         "q0006"
       ]
     },
     "kp01-02": {
       "relatedQuestionIds": [
         "q0003",
-        "q0004",
         "q0005"
       ],
       "primaryQuestionIds": [
         "q0003",
-        "q0004",
         "q0005"
       ]
     },
     "kp01-03": {
       "relatedQuestionIds": [
-        "q0007",
         "q0008"
       ],
       "primaryQuestionIds": [
-        "q0007",
         "q0008"
-      ]
-    },
-    "kp01-04": {
-      "relatedQuestionIds": [
-        "q0002"
-      ],
-      "primaryQuestionIds": [
-        "q0002"
       ]
     },
     "kp02-01": {
       "relatedQuestionIds": [
         "q0011",
-        "q0013",
         "q0014",
-        "q0015"
+        "q0017",
+        "q0018",
+        "q0019"
       ],
       "primaryQuestionIds": [
         "q0011",
-        "q0013",
         "q0014",
-        "q0015"
+        "q0017",
+        "q0018",
+        "q0019"
       ]
     },
     "kp02-02": {
@@ -72,36 +60,14 @@
         "q0016"
       ]
     },
-    "kp02-03": {
-      "relatedQuestionIds": [
-        "q0010",
-        "q0017",
-        "q0018",
-        "q0019",
-        "q0020"
-      ],
-      "primaryQuestionIds": [
-        "q0010",
-        "q0017",
-        "q0018",
-        "q0019",
-        "q0020"
-      ]
-    },
     "kp03-01": {
       "relatedQuestionIds": [
-        "q0021",
         "q0024",
-        "q0025",
-        "q0028",
-        "q0030"
+        "q0028"
       ],
       "primaryQuestionIds": [
-        "q0021",
         "q0024",
-        "q0025",
-        "q0028",
-        "q0030"
+        "q0028"
       ]
     },
     "kp03-02": {
@@ -109,33 +75,25 @@
         "q0027",
         "q0029",
         "q0031",
-        "q0035",
-        "q0038",
         "q0040"
       ],
       "primaryQuestionIds": [
         "q0027",
         "q0029",
         "q0031",
-        "q0035",
-        "q0038",
         "q0040"
       ]
     },
     "kp03-03": {
       "relatedQuestionIds": [
-        "q0022",
         "q0034",
         "q0037",
-        "q0039",
-        "q0042"
+        "q0039"
       ],
       "primaryQuestionIds": [
-        "q0022",
         "q0034",
         "q0037",
-        "q0039",
-        "q0042"
+        "q0039"
       ]
     },
     "kp03-04": {
@@ -144,7 +102,6 @@
         "q0026",
         "q0032",
         "q0033",
-        "q0036",
         "q0041"
       ],
       "primaryQuestionIds": [
@@ -152,19 +109,16 @@
         "q0026",
         "q0032",
         "q0033",
-        "q0036",
         "q0041"
       ]
     },
     "kp04-01": {
       "relatedQuestionIds": [
         "q0045",
-        "q0047",
         "q0048"
       ],
       "primaryQuestionIds": [
         "q0045",
-        "q0047",
         "q0048"
       ]
     },
@@ -172,14 +126,12 @@
       "relatedQuestionIds": [
         "q0043",
         "q0044",
-        "q0046",
         "q0049",
         "q0050"
       ],
       "primaryQuestionIds": [
         "q0043",
         "q0044",
-        "q0046",
         "q0049",
         "q0050"
       ]
@@ -189,7 +141,6 @@
         "q0051",
         "q0052",
         "q0053",
-        "q0055",
         "q0056",
         "q0059"
       ],
@@ -197,7 +148,6 @@
         "q0051",
         "q0052",
         "q0053",
-        "q0055",
         "q0056",
         "q0059"
       ]
@@ -205,13 +155,11 @@
     "kp05-02": {
       "relatedQuestionIds": [
         "q0054",
-        "q0057",
         "q0058",
         "q0060"
       ],
       "primaryQuestionIds": [
         "q0054",
-        "q0057",
         "q0058",
         "q0060"
       ]
@@ -235,17 +183,13 @@
     "kp06-02": {
       "relatedQuestionIds": [
         "q0062",
-        "q0066",
         "q0068",
-        "q0071",
         "q0072",
         "q0075"
       ],
       "primaryQuestionIds": [
         "q0062",
-        "q0066",
         "q0068",
-        "q0071",
         "q0072",
         "q0075"
       ]
@@ -254,32 +198,26 @@
       "relatedQuestionIds": [
         "q0063",
         "q0064",
-        "q0067",
-        "q0073"
+        "q0067"
       ],
       "primaryQuestionIds": [
         "q0063",
         "q0064",
-        "q0067",
-        "q0073"
+        "q0067"
       ]
     },
     "kp07-01": {
       "relatedQuestionIds": [
         "q0078",
-        "q0079",
         "q0081",
         "q0082",
-        "q0083",
-        "q0088"
+        "q0083"
       ],
       "primaryQuestionIds": [
         "q0078",
-        "q0079",
         "q0081",
         "q0082",
-        "q0083",
-        "q0088"
+        "q0083"
       ]
     },
     "kp07-02": {
@@ -303,32 +241,26 @@
     "kp07-03": {
       "relatedQuestionIds": [
         "q0077",
-        "q0080",
         "q0085",
         "q0086",
-        "q0091",
-        "q0092"
+        "q0091"
       ],
       "primaryQuestionIds": [
         "q0077",
-        "q0080",
         "q0085",
         "q0086",
-        "q0091",
-        "q0092"
+        "q0091"
       ]
     },
     "kp08-01": {
       "relatedQuestionIds": [
         "q0097",
         "q0098",
-        "q0105",
         "q0106"
       ],
       "primaryQuestionIds": [
         "q0097",
         "q0098",
-        "q0105",
         "q0106"
       ]
     },
@@ -337,6 +269,7 @@
         "q0094",
         "q0099",
         "q0101",
+        "q0102",
         "q0107",
         "q0109"
       ],
@@ -344,6 +277,7 @@
         "q0094",
         "q0099",
         "q0101",
+        "q0102",
         "q0107",
         "q0109"
       ]
@@ -362,13 +296,15 @@
     },
     "kp08-04": {
       "relatedQuestionIds": [
+        "q0096",
+        "q0103",
         "q0108",
-        "q0110",
         "q0111"
       ],
       "primaryQuestionIds": [
+        "q0096",
+        "q0103",
         "q0108",
-        "q0110",
         "q0111"
       ]
     },
@@ -388,51 +324,29 @@
         "q0118"
       ]
     },
-    "kp08-06": {
-      "relatedQuestionIds": [
-        "q0102",
-        "q0104"
-      ],
-      "primaryQuestionIds": [
-        "q0102",
-        "q0104"
-      ]
-    },
-    "kp08-07": {
-      "relatedQuestionIds": [
-        "q0096",
-        "q0100",
-        "q0103"
-      ],
-      "primaryQuestionIds": [
-        "q0096",
-        "q0100",
-        "q0103"
-      ]
-    },
     "kp09-01": {
       "relatedQuestionIds": [
         "q0120",
         "q0123",
         "q0125",
-        "q0128",
-        "q0129"
+        "q0128"
       ],
       "primaryQuestionIds": [
         "q0120",
         "q0123",
         "q0125",
-        "q0128",
-        "q0129"
+        "q0128"
       ]
     },
     "kp09-02": {
       "relatedQuestionIds": [
+        "q0122",
         "q0126",
         "q0127",
         "q0130"
       ],
       "primaryQuestionIds": [
+        "q0122",
         "q0126",
         "q0127",
         "q0130"
@@ -448,44 +362,26 @@
         "q0121"
       ]
     },
-    "kp09-04": {
-      "relatedQuestionIds": [
-        "q0122",
-        "q0124"
-      ],
-      "primaryQuestionIds": [
-        "q0122",
-        "q0124"
-      ]
-    },
     "kp10-01": {
       "relatedQuestionIds": [
         "q0132",
-        "q0133",
-        "q0134",
-        "q0135"
+        "q0134"
       ],
       "primaryQuestionIds": [
         "q0132",
-        "q0133",
-        "q0134",
-        "q0135"
+        "q0134"
       ]
     },
     "kp10-02": {
       "relatedQuestionIds": [
         "q0136",
-        "q0137",
         "q0138",
-        "q0141",
-        "q0143"
+        "q0141"
       ],
       "primaryQuestionIds": [
         "q0136",
-        "q0137",
         "q0138",
-        "q0141",
-        "q0143"
+        "q0141"
       ]
     },
     "kp10-03": {
@@ -493,14 +389,12 @@
         "q0139",
         "q0140",
         "q0142",
-        "q0147",
         "q0149"
       ],
       "primaryQuestionIds": [
         "q0139",
         "q0140",
         "q0142",
-        "q0147",
         "q0149"
       ]
     },
@@ -524,22 +418,20 @@
     },
     "kp11-01": {
       "relatedQuestionIds": [
-        "q0157",
         "q0158"
       ],
       "primaryQuestionIds": [
-        "q0157",
         "q0158"
       ]
     },
     "kp11-02": {
       "relatedQuestionIds": [
-        "q0153",
-        "q0155"
+        "q0155",
+        "q0156"
       ],
       "primaryQuestionIds": [
-        "q0153",
-        "q0155"
+        "q0155",
+        "q0156"
       ]
     },
     "kp11-03": {
@@ -554,38 +446,26 @@
         "q0159"
       ]
     },
-    "kp11-04": {
-      "relatedQuestionIds": [
-        "q0152",
-        "q0156",
-        "q0160"
-      ],
-      "primaryQuestionIds": [
-        "q0152",
-        "q0156",
-        "q0160"
-      ]
-    },
     "kp12-01": {
       "relatedQuestionIds": [
         "q0163",
+        "q0165",
         "q0166",
-        "q0167"
+        "q0174"
       ],
       "primaryQuestionIds": [
         "q0163",
+        "q0165",
         "q0166",
-        "q0167"
+        "q0174"
       ]
     },
     "kp12-02": {
       "relatedQuestionIds": [
-        "q0161",
         "q0162",
         "q0171"
       ],
       "primaryQuestionIds": [
-        "q0161",
         "q0162",
         "q0171"
       ]
@@ -604,66 +484,34 @@
     },
     "kp12-04": {
       "relatedQuestionIds": [
-        "q0164",
-        "q0172",
-        "q0173"
+        "q0172"
       ],
       "primaryQuestionIds": [
-        "q0164",
-        "q0172",
-        "q0173"
-      ]
-    },
-    "kp12-05": {
-      "relatedQuestionIds": [
-        "q0165",
-        "q0168",
-        "q0174"
-      ],
-      "primaryQuestionIds": [
-        "q0165",
-        "q0168",
-        "q0174"
+        "q0172"
       ]
     },
     "kp13-01": {
       "relatedQuestionIds": [
         "q0176",
         "q0179",
+        "q0181",
         "q0182"
       ],
       "primaryQuestionIds": [
         "q0176",
         "q0179",
+        "q0181",
         "q0182"
       ]
     },
     "kp13-02": {
       "relatedQuestionIds": [
         "q0177",
-        "q0180"
+        "q0178"
       ],
       "primaryQuestionIds": [
         "q0177",
-        "q0180"
-      ]
-    },
-    "kp13-03": {
-      "relatedQuestionIds": [
-        "q0178",
-        "q0183"
-      ],
-      "primaryQuestionIds": [
-        "q0178",
-        "q0183"
-      ]
-    },
-    "kp13-04": {
-      "relatedQuestionIds": [
-        "q0181"
-      ],
-      "primaryQuestionIds": [
-        "q0181"
+        "q0178"
       ]
     },
     "kp14-01": {
@@ -682,24 +530,6 @@
         "q0192",
         "q0194",
         "q0195"
-      ]
-    },
-    "kp14-02": {
-      "relatedQuestionIds": [
-        "q0184",
-        "q0185",
-        "q0186",
-        "q0187",
-        "q0191",
-        "q0193"
-      ],
-      "primaryQuestionIds": [
-        "q0184",
-        "q0185",
-        "q0186",
-        "q0187",
-        "q0191",
-        "q0193"
       ]
     },
     "kp15-01": {
@@ -738,13 +568,11 @@
     },
     "kp15-03": {
       "relatedQuestionIds": [
-        "q0197",
         "q0198",
         "q0202",
         "q0209"
       ],
       "primaryQuestionIds": [
-        "q0197",
         "q0198",
         "q0202",
         "q0209"
@@ -752,66 +580,46 @@
     },
     "kp15-04": {
       "relatedQuestionIds": [
-        "q0205",
-        "q0208",
-        "q0210",
-        "q0211"
+        "q0211",
+        "q0212"
       ],
       "primaryQuestionIds": [
-        "q0205",
-        "q0208",
-        "q0210",
-        "q0211"
+        "q0211",
+        "q0212"
       ]
     },
     "kp15-05": {
       "relatedQuestionIds": [
         "q0203",
         "q0214",
-        "q0215",
         "q0220"
       ],
       "primaryQuestionIds": [
         "q0203",
         "q0214",
-        "q0215",
         "q0220"
-      ]
-    },
-    "kp15-06": {
-      "relatedQuestionIds": [
-        "q0212",
-        "q0213"
-      ],
-      "primaryQuestionIds": [
-        "q0212",
-        "q0213"
       ]
     },
     "kp16-01": {
       "relatedQuestionIds": [
         "q0221",
         "q0227",
-        "q0228",
         "q0229"
       ],
       "primaryQuestionIds": [
         "q0221",
         "q0227",
-        "q0228",
         "q0229"
       ]
     },
     "kp16-02": {
       "relatedQuestionIds": [
         "q0222",
-        "q0223",
-        "q0225"
+        "q0223"
       ],
       "primaryQuestionIds": [
         "q0222",
-        "q0223",
-        "q0225"
+        "q0223"
       ]
     },
     "kp16-03": {
@@ -828,322 +636,66 @@
     },
     "kp17-01": {
       "relatedQuestionIds": [
-        "q0231",
-        "q0238"
+        "q0231"
       ],
       "primaryQuestionIds": [
-        "q0231",
-        "q0238"
+        "q0231"
       ]
     },
     "kp17-02": {
       "relatedQuestionIds": [
-        "q0234",
-        "q0235",
-        "q0236"
-      ],
-      "primaryQuestionIds": [
-        "q0234",
-        "q0235",
-        "q0236"
-      ]
-    },
-    "kp17-03": {
-      "relatedQuestionIds": [
-        "q0233",
-        "q0237"
-      ],
-      "primaryQuestionIds": [
-        "q0233",
-        "q0237"
-      ]
-    },
-    "kp17-04": {
-      "relatedQuestionIds": [
         "q0232",
-        "q0240"
+        "q0235"
       ],
       "primaryQuestionIds": [
         "q0232",
-        "q0240"
-      ]
-    },
-    "kp17-05": {
-      "relatedQuestionIds": [
-        "q0239"
-      ],
-      "primaryQuestionIds": [
-        "q0239"
+        "q0235"
       ]
     },
     "kp18-01": {
       "relatedQuestionIds": [
-        "q0242",
-        "q0244",
-        "q0246"
+        "q0241",
+        "q0244"
       ],
       "primaryQuestionIds": [
-        "q0242",
-        "q0244",
-        "q0246"
-      ]
-    },
-    "kp18-02": {
-      "relatedQuestionIds": [
-        "q0243",
-        "q0245",
-        "q0247",
-        "q0248",
-        "q0249",
-        "q0250"
-      ],
-      "primaryQuestionIds": [
-        "q0243",
-        "q0245",
-        "q0247",
-        "q0248",
-        "q0249",
-        "q0250"
-      ]
-    },
-    "kp18-03": {
-      "relatedQuestionIds": [
-        "q0241"
-      ],
-      "primaryQuestionIds": [
-        "q0241"
+        "q0241",
+        "q0244"
       ]
     },
     "kp19-01": {
       "relatedQuestionIds": [
         "q0251",
-        "q0254",
-        "q0288",
-        "q0296"
-      ],
-      "primaryQuestionIds": []
-    },
-    "kp19-02": {
-      "relatedQuestionIds": [
-        "q0257",
-        "q0284"
-      ],
-      "primaryQuestionIds": []
-    },
-    "kp19-03": {
-      "relatedQuestionIds": [
-        "q0261",
-        "q0263"
-      ],
-      "primaryQuestionIds": []
-    },
-    "kp19-04": {
-      "relatedQuestionIds": [
-        "q0267",
-        "q0268",
-        "q0289",
-        "q0291",
-        "q0293"
-      ],
-      "primaryQuestionIds": []
-    },
-    "kp19-05": {
-      "relatedQuestionIds": [
-        "q0271",
-        "q0297",
-        "q0298"
-      ],
-      "primaryQuestionIds": []
-    },
-    "kp19-06": {
-      "relatedQuestionIds": [
-        "q0278",
-        "q0286"
-      ],
-      "primaryQuestionIds": []
-    },
-    "kp19-07": {
-      "relatedQuestionIds": [
         "q0253",
         "q0282"
-      ],
-      "primaryQuestionIds": []
-    },
-    "kp19-08": {
-      "relatedQuestionIds": [
-        "q0252"
-      ],
-      "primaryQuestionIds": []
-    },
-    "kp19-09": {
-      "relatedQuestionIds": [
-        "q0253",
-        "q0255"
-      ],
-      "primaryQuestionIds": []
-    },
-    "kp19-10": {
-      "relatedQuestionIds": [
-        "q0282",
-        "q0284"
-      ],
-      "primaryQuestionIds": []
-    },
-    "kp19-11": {
-      "relatedQuestionIds": [
-        "q0256",
-        "q0259",
-        "q0281"
-      ],
-      "primaryQuestionIds": []
-    },
-    "kp19-12": {
-      "relatedQuestionIds": [
-        "q0258",
-        "q0260",
-        "q0281",
-        "q0283"
-      ],
-      "primaryQuestionIds": []
-    },
-    "kp19-13": {
-      "relatedQuestionIds": [
-        "q0256",
-        "q0260"
-      ],
-      "primaryQuestionIds": []
-    },
-    "kp19-14": {
-      "relatedQuestionIds": [
-        "q0256",
-        "q0257",
-        "q0259"
-      ],
-      "primaryQuestionIds": []
-    },
-    "kp19-15": {
-      "relatedQuestionIds": [
-        "q0261",
-        "q0264",
-        "q0294"
-      ],
-      "primaryQuestionIds": []
-    },
-    "kp19-16": {
-      "relatedQuestionIds": [
-        "q0262",
-        "q0265"
-      ],
-      "primaryQuestionIds": []
-    },
-    "kp19-17": {
-      "relatedQuestionIds": [
-        "q0263",
-        "q0295"
-      ],
-      "primaryQuestionIds": []
-    },
-    "kp19-18": {
-      "relatedQuestionIds": [
-        "q0262",
-        "q0265"
-      ],
-      "primaryQuestionIds": []
-    },
-    "kp19-19": {
-      "relatedQuestionIds": [
-        "q0266",
-        "q0269"
-      ],
-      "primaryQuestionIds": []
-    },
-    "kp19-20": {
-      "relatedQuestionIds": [
-        "q0252",
-        "q0290",
-        "q0299"
-      ],
-      "primaryQuestionIds": []
-    },
-    "kp19-21": {
-      "relatedQuestionIds": [
-        "q0270"
-      ],
-      "primaryQuestionIds": []
-    },
-    "kp19-22": {
-      "relatedQuestionIds": [
-        "q0266"
-      ],
-      "primaryQuestionIds": []
-    },
-    "kp19-23": {
-      "relatedQuestionIds": [
-        "q0273"
-      ],
-      "primaryQuestionIds": []
-    },
-    "kp19-24": {
-      "relatedQuestionIds": [
-        "q0272"
-      ],
-      "primaryQuestionIds": []
-    },
-    "kp19-25": {
-      "relatedQuestionIds": [
-        "q0273",
-        "q0274"
-      ],
-      "primaryQuestionIds": []
-    },
-    "kp19-26": {
-      "relatedQuestionIds": [
-        "q0275"
-      ],
-      "primaryQuestionIds": []
-    },
-    "kp19-27": {
-      "relatedQuestionIds": [
-        "q0276",
-        "q0279",
-        "q0291"
-      ],
-      "primaryQuestionIds": []
-    },
-    "kp19-28": {
-      "relatedQuestionIds": [
-        "q0277",
-        "q0280",
-        "q0293"
-      ],
-      "primaryQuestionIds": []
-    },
-    "kp19-29": {
-      "relatedQuestionIds": [
-        "q0277",
-        "q0285",
-        "q0287"
-      ],
-      "primaryQuestionIds": []
-    },
-    "kp19-30": {
-      "relatedQuestionIds": [
-        "q0278",
-        "q0292"
-      ],
-      "primaryQuestionIds": []
-    },
-    "kp19-31": {
-      "relatedQuestionIds": [
-        "q0251"
       ],
       "primaryQuestionIds": [
         "q0251"
       ]
     },
+    "kp19-02": {
+      "relatedQuestionIds": [
+        "q0256",
+        "q0257",
+        "q0284"
+      ],
+      "primaryQuestionIds": [
+        "q0257"
+      ]
+    },
+    "kp19-03": {
+      "relatedQuestionIds": [
+        "q0261",
+        "q0263",
+        "q0265"
+      ],
+      "primaryQuestionIds": [
+        "q0265"
+      ]
+    },
     "kp19-32": {
       "relatedQuestionIds": [
-        "q0252"
+        "q0252",
+        "q0299"
       ],
       "primaryQuestionIds": [
         "q0252"
@@ -1157,22 +709,6 @@
         "q0253"
       ]
     },
-    "kp19-34": {
-      "relatedQuestionIds": [
-        "q0254"
-      ],
-      "primaryQuestionIds": [
-        "q0254"
-      ]
-    },
-    "kp19-35": {
-      "relatedQuestionIds": [
-        "q0255"
-      ],
-      "primaryQuestionIds": [
-        "q0255"
-      ]
-    },
     "kp19-36": {
       "relatedQuestionIds": [
         "q0256"
@@ -1181,41 +717,10 @@
         "q0256"
       ]
     },
-    "kp19-37": {
-      "relatedQuestionIds": [
-        "q0257"
-      ],
-      "primaryQuestionIds": [
-        "q0257"
-      ]
-    },
-    "kp19-38": {
-      "relatedQuestionIds": [
-        "q0258"
-      ],
-      "primaryQuestionIds": [
-        "q0258"
-      ]
-    },
-    "kp19-39": {
-      "relatedQuestionIds": [
-        "q0259"
-      ],
-      "primaryQuestionIds": [
-        "q0259"
-      ]
-    },
-    "kp19-40": {
-      "relatedQuestionIds": [
-        "q0260"
-      ],
-      "primaryQuestionIds": [
-        "q0260"
-      ]
-    },
     "kp19-41": {
       "relatedQuestionIds": [
-        "q0261"
+        "q0261",
+        "q0294"
       ],
       "primaryQuestionIds": [
         "q0261"
@@ -1237,25 +742,10 @@
         "q0263"
       ]
     },
-    "kp19-44": {
-      "relatedQuestionIds": [
-        "q0264"
-      ],
-      "primaryQuestionIds": [
-        "q0264"
-      ]
-    },
-    "kp19-45": {
-      "relatedQuestionIds": [
-        "q0265"
-      ],
-      "primaryQuestionIds": [
-        "q0265"
-      ]
-    },
     "kp19-46": {
       "relatedQuestionIds": [
-        "q0266"
+        "q0266",
+        "q0269"
       ],
       "primaryQuestionIds": [
         "q0266"
@@ -1263,7 +753,8 @@
     },
     "kp19-47": {
       "relatedQuestionIds": [
-        "q0267"
+        "q0267",
+        "q0278"
       ],
       "primaryQuestionIds": [
         "q0267"
@@ -1271,7 +762,10 @@
     },
     "kp19-48": {
       "relatedQuestionIds": [
-        "q0268"
+        "q0267",
+        "q0268",
+        "q0289",
+        "q0291"
       ],
       "primaryQuestionIds": [
         "q0268"
@@ -1287,55 +781,27 @@
     },
     "kp19-50": {
       "relatedQuestionIds": [
-        "q0270"
+        "q0269",
+        "q0270",
+        "q0289"
       ],
       "primaryQuestionIds": [
         "q0270"
-      ]
-    },
-    "kp19-51": {
-      "relatedQuestionIds": [
-        "q0271"
-      ],
-      "primaryQuestionIds": [
-        "q0271"
       ]
     },
     "kp19-52": {
       "relatedQuestionIds": [
-        "q0272"
+        "q0272",
+        "q0297"
       ],
       "primaryQuestionIds": [
         "q0272"
-      ]
-    },
-    "kp19-53": {
-      "relatedQuestionIds": [
-        "q0273"
-      ],
-      "primaryQuestionIds": [
-        "q0273"
-      ]
-    },
-    "kp19-54": {
-      "relatedQuestionIds": [
-        "q0274"
-      ],
-      "primaryQuestionIds": [
-        "q0274"
-      ]
-    },
-    "kp19-55": {
-      "relatedQuestionIds": [
-        "q0275"
-      ],
-      "primaryQuestionIds": [
-        "q0275"
       ]
     },
     "kp19-56": {
       "relatedQuestionIds": [
-        "q0276"
+        "q0276",
+        "q0291"
       ],
       "primaryQuestionIds": [
         "q0276"
@@ -1343,7 +809,8 @@
     },
     "kp19-57": {
       "relatedQuestionIds": [
-        "q0277"
+        "q0277",
+        "q0278"
       ],
       "primaryQuestionIds": [
         "q0277"
@@ -1357,75 +824,37 @@
         "q0278"
       ]
     },
-    "kp19-59": {
-      "relatedQuestionIds": [
-        "q0279"
-      ],
-      "primaryQuestionIds": [
-        "q0279"
-      ]
-    },
-    "kp19-60": {
-      "relatedQuestionIds": [
-        "q0280"
-      ],
-      "primaryQuestionIds": [
-        "q0280"
-      ]
-    },
     "kp20-01": {
       "relatedQuestionIds": [
         "q0282",
-        "q0283",
         "q0284",
-        "q0287",
         "q0288",
         "q0291",
         "q0294",
         "q0297",
-        "q0299",
-        "q0300"
+        "q0299"
       ],
-      "primaryQuestionIds": []
+      "primaryQuestionIds": [
+        "q0288"
+      ]
     },
     "kp20-02": {
       "relatedQuestionIds": [
         "q0252",
         "q0290",
-        "q0295",
-        "q0298",
         "q0299"
       ],
-      "primaryQuestionIds": []
+      "primaryQuestionIds": [
+        "q0290"
+      ]
     },
     "kp20-03": {
       "relatedQuestionIds": [
-        "q0253"
-      ],
-      "primaryQuestionIds": []
-    },
-    "kp20-04": {
-      "relatedQuestionIds": [
-        "q0255",
-        "q0269",
-        "q0270",
-        "q0281",
-        "q0285",
-        "q0286",
-        "q0289",
-        "q0292",
-        "q0293",
-        "q0296",
-        "q0300"
-      ],
-      "primaryQuestionIds": []
-    },
-    "kp20-05": {
-      "relatedQuestionIds": [
-        "q0281"
+        "q0253",
+        "q0255"
       ],
       "primaryQuestionIds": [
-        "q0281"
+        "q0255"
       ]
     },
     "kp20-06": {
@@ -1436,52 +865,12 @@
         "q0282"
       ]
     },
-    "kp20-07": {
-      "relatedQuestionIds": [
-        "q0283"
-      ],
-      "primaryQuestionIds": [
-        "q0283"
-      ]
-    },
     "kp20-08": {
       "relatedQuestionIds": [
         "q0284"
       ],
       "primaryQuestionIds": [
         "q0284"
-      ]
-    },
-    "kp20-09": {
-      "relatedQuestionIds": [
-        "q0285"
-      ],
-      "primaryQuestionIds": [
-        "q0285"
-      ]
-    },
-    "kp20-10": {
-      "relatedQuestionIds": [
-        "q0286"
-      ],
-      "primaryQuestionIds": [
-        "q0286"
-      ]
-    },
-    "kp20-11": {
-      "relatedQuestionIds": [
-        "q0287"
-      ],
-      "primaryQuestionIds": [
-        "q0287"
-      ]
-    },
-    "kp20-12": {
-      "relatedQuestionIds": [
-        "q0288"
-      ],
-      "primaryQuestionIds": [
-        "q0288"
       ]
     },
     "kp20-13": {
@@ -1492,36 +881,12 @@
         "q0289"
       ]
     },
-    "kp20-14": {
-      "relatedQuestionIds": [
-        "q0290"
-      ],
-      "primaryQuestionIds": [
-        "q0290"
-      ]
-    },
     "kp20-15": {
       "relatedQuestionIds": [
         "q0291"
       ],
       "primaryQuestionIds": [
         "q0291"
-      ]
-    },
-    "kp20-16": {
-      "relatedQuestionIds": [
-        "q0292"
-      ],
-      "primaryQuestionIds": [
-        "q0292"
-      ]
-    },
-    "kp20-17": {
-      "relatedQuestionIds": [
-        "q0293"
-      ],
-      "primaryQuestionIds": [
-        "q0293"
       ]
     },
     "kp20-18": {
@@ -1532,22 +897,6 @@
         "q0294"
       ]
     },
-    "kp20-19": {
-      "relatedQuestionIds": [
-        "q0295"
-      ],
-      "primaryQuestionIds": [
-        "q0295"
-      ]
-    },
-    "kp20-20": {
-      "relatedQuestionIds": [
-        "q0296"
-      ],
-      "primaryQuestionIds": [
-        "q0296"
-      ]
-    },
     "kp20-21": {
       "relatedQuestionIds": [
         "q0297"
@@ -1556,28 +905,12 @@
         "q0297"
       ]
     },
-    "kp20-22": {
-      "relatedQuestionIds": [
-        "q0298"
-      ],
-      "primaryQuestionIds": [
-        "q0298"
-      ]
-    },
     "kp20-23": {
       "relatedQuestionIds": [
         "q0299"
       ],
       "primaryQuestionIds": [
         "q0299"
-      ]
-    },
-    "kp20-24": {
-      "relatedQuestionIds": [
-        "q0300"
-      ],
-      "primaryQuestionIds": [
-        "q0300"
       ]
     }
   }

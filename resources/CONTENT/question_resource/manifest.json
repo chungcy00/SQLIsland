@@ -1,28 +1,27 @@
 {
   "schemaVersion": 3,
-  "contentVersion": "4.2.1",
-  "questionCount": 300,
+  "contentVersion": "5.0.0",
+  "questionCount": 200,
   "chapterCount": 20,
   "questionTypeCounts": {
-    "选择": 30,
-    "代码填空": 35,
-    "独立编写": 120,
-    "代码纠错": 30,
-    "结果预测": 25,
-    "业务情景": 60
+    "选择": 26,
+    "独立编写": 93,
+    "代码填空": 27,
+    "代码纠错": 18,
+    "业务情景": 36
   },
   "difficultyCounts": {
-    "入门": 60,
-    "简单": 90,
-    "中等": 90,
-    "困难": 45,
-    "挑战": 15
+    "入门": 44,
+    "简单": 62,
+    "中等": 59,
+    "困难": 29,
+    "挑战": 6
   },
-  "businessTasks": 50,
+  "businessTasks": 28,
   "knowledgePointCoverage": {
-    "all": 152,
-    "direct": 118,
-    "related": 152,
+    "all": 80,
+    "direct": 80,
+    "related": 80,
     "unlinked": []
   },
   "resourcePolicy": "内置只读版本资源，按需加载；课程编号不改。",
@@ -30,122 +29,122 @@
     {
       "id": "ch01",
       "path": "questions/ch01.json",
-      "count": 8,
-      "sha256": "42204b93a9fb7fa4c58609e3aad6dae8c0571de2e84deecbc6636ad5ed82875c"
+      "count": 4,
+      "sha256": "1cb8eff4cab6d8eb6d0c8c08835fe78d2a12c852cced2378cab6d94e4f4d5fdc"
     },
     {
       "id": "ch02",
       "path": "questions/ch02.json",
-      "count": 12,
-      "sha256": "a041c1c07cbdaeea8c444c37ba363c4dfb964f176a3d5213fb06cfbf427b268d"
+      "count": 8,
+      "sha256": "aae1de68256e7add0671b160a1a0b4a5c8b6da12d7a73fbd50acd5e0786243c9"
     },
     {
       "id": "ch03",
       "path": "questions/ch03.json",
-      "count": 22,
-      "sha256": "8041ad88f736e351715838946ddf79f76e4dd4c60cf8775969d3eca0368c0c01"
+      "count": 14,
+      "sha256": "eb7ff369b3387c57011442d2c5b48a8a6f5bd33abab4f8f6ff1fceecfbb5cb13"
     },
     {
       "id": "ch04",
       "path": "questions/ch04.json",
-      "count": 8,
-      "sha256": "080c0835ec87eb4838b610ff94eec7c6fdd1838bc1361ef0f6b0a015db975065"
+      "count": 6,
+      "sha256": "7fa197aa34685326eb245c21eb54638cf868e49813bc9467e7daa3bdeed788bb"
     },
     {
       "id": "ch05",
       "path": "questions/ch05.json",
-      "count": 10,
-      "sha256": "ab9adf0b6bd12af009432ec10f03c446cbef91f4b56e4a6ee7839b111b308793"
+      "count": 8,
+      "sha256": "7af3202345dd94c534bb96f6b975ad8a2ed642c899ba63fc79b210050b57b005"
     },
     {
       "id": "ch06",
       "path": "questions/ch06.json",
-      "count": 15,
-      "sha256": "f1fd5ace7b4faf4518336fd8562405b556c8bda06a9b1b53664d858d052cfc08"
+      "count": 12,
+      "sha256": "b67eb4394cd23bbfe931f3da97b828fca93d45fdb385fa1a8f86c609b706cdab"
     },
     {
       "id": "ch07",
       "path": "questions/ch07.json",
-      "count": 18,
-      "sha256": "f346512788d4ea7ad2c92c25ff56bc491cbba798a378081e1e3ea5abd6f754d9"
+      "count": 14,
+      "sha256": "b4319abb73058a8018836088c706157f38aae7323b2442c91e55fade162c3c24"
     },
     {
       "id": "ch08",
       "path": "questions/ch08.json",
-      "count": 25,
-      "sha256": "5657891d47d500580ea731f7a129cfdabf9c86e4a6852ae614fce23ca4d512ef"
+      "count": 21,
+      "sha256": "d9f072e5a95359ef3e84854c8ad513d92f0ee882abcb8e521b38a37472a5d747"
     },
     {
       "id": "ch09",
       "path": "questions/ch09.json",
-      "count": 12,
-      "sha256": "9b61e5065d4a8879bc5ff951ba9cc2de93756f0cf89fdac9d650bed4b1f6931d"
+      "count": 10,
+      "sha256": "c7121ec894442f284d256e2388726d15efe9249b0642c9a8621794ec9f72d34f"
     },
     {
       "id": "ch10",
       "path": "questions/ch10.json",
-      "count": 20,
-      "sha256": "4b22bd2a03085f3fb309654252684a4de4a168d936583007d6eb86dc00ce322d"
+      "count": 15,
+      "sha256": "02a769231c188608be3257b37683af1ef0cd9d6f58482b103e63f09d2b16670e"
     },
     {
       "id": "ch11",
       "path": "questions/ch11.json",
-      "count": 10,
-      "sha256": "35350436969fa23950bf6e96f4cfbf15b5997ff7d180b9449a711e8cf07811c3"
+      "count": 6,
+      "sha256": "634d7338c8285ec80b1a909ae942fb37dd64e1824ba72fa825ad2b596c63cea4"
     },
     {
       "id": "ch12",
       "path": "questions/ch12.json",
-      "count": 15,
-      "sha256": "d409a68e639bc7891b8e13ea7ee9d99f128b70947b7059ca71db28b6fdd6c70d"
+      "count": 10,
+      "sha256": "29b8d9b9c202bbdad1757dac074e21f475a43265b7359a3447c1b1109668156f"
     },
     {
       "id": "ch13",
       "path": "questions/ch13.json",
-      "count": 8,
-      "sha256": "9cf5bf439852a8e05bca27a3ae537fb172130d864eaeed64d56f76f6f30f2b07"
+      "count": 6,
+      "sha256": "a6e86ced3a151bfb438266434f52a237427fe551ffad75020a202bc2020f0cd7"
     },
     {
       "id": "ch14",
       "path": "questions/ch14.json",
-      "count": 12,
-      "sha256": "93299aa8749f43247ec300bc79a5d8557984078c3d4e6ca4e86520b0a11a6837"
+      "count": 6,
+      "sha256": "b3063e1d9fa246476a4fc2899c2c75c49ab7ab83ebd87f0defa55af0b547cbfd"
     },
     {
       "id": "ch15",
       "path": "questions/ch15.json",
-      "count": 25,
-      "sha256": "e1c2875bcdc291277b94be74b07a93ec1d31dfd40169e29ab8d2ddd1eb4c15f3"
+      "count": 19,
+      "sha256": "d310e0aed8c7b2555684794ad0e2399970830c57426c3637bd0d8be9e17ffe59"
     },
     {
       "id": "ch16",
       "path": "questions/ch16.json",
-      "count": 10,
-      "sha256": "5867ce039fcb38f1f59d657c445a80d1cc7bf898ab90c35d6741c3535c8efe28"
+      "count": 8,
+      "sha256": "dafe99b369733ed467eaa4cf4d9cba2c1b37e4a201c3365d35fa33e3a1ee8606"
     },
     {
       "id": "ch17",
       "path": "questions/ch17.json",
-      "count": 10,
-      "sha256": "f66247184e3da448d86465dfcdb841cbb879fe1728020e51dfd0b076321e91f5"
+      "count": 3,
+      "sha256": "6bae836d255bb88ece6a5a22dec102c36e0d49ad4bf559e6b3752799cb0b36e2"
     },
     {
       "id": "ch18",
       "path": "questions/ch18.json",
-      "count": 10,
-      "sha256": "80e8644be793751fbca55ec8342470f58833c895aad44925f0cf02afb76d08c6"
+      "count": 2,
+      "sha256": "da2c571bc58772f495edd5ab6bc4d7e23586dfbae3dd6350d775167fe6095dd8"
     },
     {
       "id": "ch19",
       "path": "questions/ch19.json",
-      "count": 30,
-      "sha256": "d06e70f2205f6386dcd34de155374645202237fcaee30b07655346c11cb7b478"
+      "count": 18,
+      "sha256": "c311cb957a22e8b65962dff71b1e436af27dd615bd67da0c1b7a5fba82cf6ccc"
     },
     {
       "id": "ch20",
       "path": "questions/ch20.json",
-      "count": 20,
-      "sha256": "74a63860d3106ecae291f5708d3a5ed171facbc852105265a3de3303d62eabfb"
+      "count": 10,
+      "sha256": "dde446d5bbe46fe2e3ed14e178904845f0216c3de0e4131147cdb3765f1981bf"
     }
   ],
   "fixtures": {
@@ -156,9 +155,9 @@
   "datasetsManifest": "databases/manifest.json",
   "courseLinks": "course_links/knowledge_point_question_index.json",
   "validationReport": "validation/REPORT.md",
-  "releaseGate": "SQLite/WASM及独立计算已复验，原生MySQL8.4与实体手机性能待验收；q0212和q0240专项结构仍未评定",
-  "auditRelease": "4.2.1",
-  "testFixtureCount": 913,
+  "releaseGate": "SQLite、WASM 与独立边界计算复验。原生 MySQL 8.4 未执行；q0212 专项结构仍为未评定。",
+  "auditRelease": "5.0.0",
+  "testFixtureCount": 606,
   "sharedTestData": [
     {
       "path": "fixtures/shared/enterprise-mini-202611171.json",

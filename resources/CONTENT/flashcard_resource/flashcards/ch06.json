@@ -62,7 +62,6 @@
       "relatedKnowledgePointIds": [],
       "relatedQuestionIds": [
         "q0062",
-        "q0066",
         "q0068"
       ],
       "questionLinkPolicy": "通过共享课程知识点关联正式题库；业务卡额外保留对应BP任务编号。关联不表示题目与卡片完全相同。",
@@ -204,8 +203,7 @@
       "relatedQuestionIds": [
         "q0063",
         "q0064",
-        "q0067",
-        "q0073"
+        "q0067"
       ],
       "questionLinkPolicy": "通过共享课程知识点关联正式题库；业务卡额外保留对应BP任务编号。关联不表示题目与卡片完全相同。",
       "type": "语法结构",
@@ -345,8 +343,6 @@
       "relatedKnowledgePointIds": [],
       "relatedQuestionIds": [
         "q0062",
-        "q0066",
-        "q0071",
         "q0075"
       ],
       "questionLinkPolicy": "通过共享课程知识点关联正式题库；业务卡额外保留对应BP任务编号。关联不表示题目与卡片完全相同。",
@@ -544,7 +540,6 @@
       "relatedKnowledgePointIds": [],
       "relatedQuestionIds": [
         "q0062",
-        "q0066",
         "q0072"
       ],
       "questionLinkPolicy": "通过共享课程知识点关联正式题库；业务卡额外保留对应BP任务编号。关联不表示题目与卡片完全相同。",
@@ -773,8 +768,7 @@
       ],
       "relatedKnowledgePointIds": [],
       "relatedQuestionIds": [
-        "q0062",
-        "q0066"
+        "q0062"
       ],
       "questionLinkPolicy": "通过共享课程知识点关联正式题库；业务卡额外保留对应BP任务编号。关联不表示题目与卡片完全相同。",
       "type": "错误纠正",

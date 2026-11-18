@@ -1,14 +1,15 @@
 {
-  "versionCode": 9,
-  "versionName": "0.3.5",
-  "releaseDate": "2026-11-18",
-  "apkName": "ShuyuSQL-0.3.5.apk",
-  "apkUrl": "https://github.com/chungcy00/SQLIsland/releases/download/v0.3.5/ShuyuSQL-0.3.5.apk",
-  "sha256": "9a7b2a8e5fe5f980427847e70efe3757ba5f8850f3cec70bb909cc6e1fac2c48",
-  "bytes": 54260919,
+  "versionCode": 10,
+  "versionName": "0.3.6",
+  "releaseDate": "2026-11-19",
+  "apkName": "ShuyuSQL-0.3.6.apk",
+  "apkUrl": "https://github.com/chungcy00/SQLIsland/releases/download/v0.3.6/ShuyuSQL-0.3.6.apk",
+  "sha256": "d8230ac7706f83b2d4698f3c1c1332ca14ffcaa52b5a47f102371442a97ee28c",
+  "bytes": 53705752,
   "notes": [
-    "调整全部知识点的学习顺序，先理解概念与思路，再查看数据和SQL实操。",
-    "参考AI Studio优化标题层级和内容分组，统一学习目标句式，压紧执行步骤。",
-    "合并50个业务知识点中相同的语法与示例SQL展示。"
+    "正式课程精简为80节，覆盖20章和4个阶段；合并53节、直接移除19节，补充代码讲解、分步查询和结果解读。",
+    "正式题库保留200道，改编复购率、销售贡献率、月度趋势及门店商品前3名4题。200张闪卡的内容保留，更新课程与题目关联。",
+    "上一题和下一题放在题目内容末尾，随页面滚动显示。代码在题目下方编写和运行，数据表就地预览。",
+    "课程示例点击运行后显示结果，代码按屏幕宽度换行，支持手动保存笔记。保留历史作答和原笔记，合并课程按新版规则计算进度。"
   ]
 }

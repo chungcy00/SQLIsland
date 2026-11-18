@@ -73,7 +73,7 @@ test("all reference queries execute against their isolated fixtures", async () =
   let failures = [];
   let unsupported = [];
   for (const q of content.questions) {
-    if (["objective_choice", "predict_public_result"].includes(q.executionMode))
+    if (q.executionMode === "objective_choice")
       continue;
     const source = q.referenceSolutions[0].mysqlSql;
     const structure = checkStructure(source, q.requiredAstFeatures);
@@ -194,4 +194,77 @@ test("price tolerance does not relax percentage accuracy", () => {
     { columns: expected.columns, rows: [[1, 125.12, 10.235]] }, expected,
     "ordered", 1e-6, ["product_id"], priceTolerance,
   ).pass, false);
+});
+
+test("direct-column predicates accept negated inequality equivalents and reject arithmetic", () => {
+  const rules = [{kind:"sargable_predicate"}];
+  assert.equal(checkStructure("SELECT price FROM products WHERE NOT (price<>89)", rules).pass, true);
+  assert.equal(checkStructure("SELECT price FROM products WHERE 89=price", rules).pass, true);
+  assert.equal(checkStructure("SELECT price FROM products WHERE price+0=89", rules).pass, false);
+});
+
+test("flashcard blanks and abbreviated lesson SQL receive multiline formatting", () => {
+  const blank = formatSqlForDisplay('SELECT product_id,100.0*stock_value_cents/NULLIF(□,0) AS inventory_pct FROM share_mini');
+  assert.match(blank, /□/);
+  assert.match(blank, /\nFROM share_mini/);
+  const abbreviated = formatSqlForDisplay('WITH totals AS (...) SELECT total / NULLIF(SUM(total) OVER(),0) ...');
+  assert.match(abbreviated, /\.\.\./);
+  assert.match(abbreviated, /\nSELECT/);
+});
+
+test("redesigned business questions match independent fixtures with both solutions", async () => {
+  const content = JSON.parse(await readFile("dist/content.json"));
+  const redesigned = content.questions.filter(question => question.gradingRevision);
+  assert.equal(redesigned.length, 4);
+  for (const question of redesigned) {
+    let wrongRejected = false;
+    let hardcodedRejected = false;
+    const publicRows = question.expectedOutput.rows;
+    const serialize = value => value === null ? "NULL" :
+      typeof value === "number" ? String(value) : "'" + value.replaceAll("'", "''") + "'";
+    const hardcoded = publicRows.map(row => "SELECT " + row.map((value, index) =>
+      serialize(value) + ' AS "' + question.expectedColumns[index] + '"').join(", ")).join(" UNION ALL ");
+    for (const meta of question.testFixtures) {
+      const fixture = JSON.parse(await readFile("dist/" + meta.path));
+      const shared = fixture.sharedDataPath ? JSON.parse(await readFile("dist/" + fixture.sharedDataPath)) : {};
+      const bytes = fixture.baseDatabase ? await readFile("dist/" + fixture.baseDatabase) : undefined;
+      const db = initializeFixture(SQL, { ...shared, ...fixture }, bytes);
+      const matches = sql => compareResults(query(db, sql, 50000), fixture.expected, "ordered", 1e-6,
+        question.numericTolerance.exactColumns).pass;
+      try {
+        for (const solution of question.referenceSolutions) {
+          assert.ok(matches(solution.mysqlSql), question.id + " " + meta.id + " " + solution.kind);
+        }
+        wrongRejected ||= !matches(question.commonErrors[0].sql);
+        if (fixture.visibility === "hidden") hardcodedRejected ||= !matches(hardcoded);
+      } finally {
+        db.close();
+      }
+    }
+    assert.ok(wrongRejected && hardcodedRejected, question.id);
+  }
+});
+
+test("course checkpoints match their recorded results in SQLite WASM", async () => {
+  const content = JSON.parse(await readFile("dist/content.json"));
+  const datasets = JSON.parse(await readFile("dist/databases.json")).datasets;
+  let count = 0;
+  for (const lesson of content.chapters.flatMap(chapter => chapter.knowledgePoints)) {
+    const steps = lesson.teaching.checkpoints;
+    if (!steps.length) continue;
+    const dataset = datasets.find(item => item.id === lesson.datasetId);
+    const base = dataset ? await readFile("dist/" + dataset.path) : undefined;
+    const db = initializeFixture(SQL, { tables: dataset ? [] : lesson.sourceTables }, base);
+    try {
+      if (lesson.setupSql) db.run(lesson.setupSql);
+      for (const step of steps) {
+        assert.ok(compareResults(query(db, step.sql), step.result, "ordered").pass,
+          lesson.id + " " + step.name);
+        count++;
+      }
+    } finally {
+      db.close();
+    }
+  }
+  assert.equal(count, 73);
 });

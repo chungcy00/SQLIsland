@@ -1,47 +1,47 @@
 {
   "chapterId": "ch08",
-  "contentVersion": "3.0.0",
+  "contentVersion": "5.0.0",
   "knowledgePointUpdates": [
     {
       "id": "kp08-01",
-      "relatedQuestionIds": [
-        "q0097",
-        "q0098",
-        "q0105",
-        "q0106"
-      ],
       "primaryQuestionIds": [
         "q0097",
         "q0098",
-        "q0105",
+        "q0106"
+      ],
+      "relatedQuestionIds": [
+        "q0097",
+        "q0098",
         "q0106"
       ]
     },
     {
       "id": "kp08-02",
-      "relatedQuestionIds": [
-        "q0094",
-        "q0099",
-        "q0101",
-        "q0107",
-        "q0109"
-      ],
       "primaryQuestionIds": [
         "q0094",
         "q0099",
         "q0101",
+        "q0102",
+        "q0107",
+        "q0109"
+      ],
+      "relatedQuestionIds": [
+        "q0094",
+        "q0099",
+        "q0101",
+        "q0102",
         "q0107",
         "q0109"
       ]
     },
     {
       "id": "kp08-03",
-      "relatedQuestionIds": [
+      "primaryQuestionIds": [
         "q0112",
         "q0113",
         "q0115"
       ],
-      "primaryQuestionIds": [
+      "relatedQuestionIds": [
         "q0112",
         "q0113",
         "q0115"
@@ -49,56 +49,34 @@
     },
     {
       "id": "kp08-04",
-      "relatedQuestionIds": [
+      "primaryQuestionIds": [
+        "q0096",
+        "q0103",
         "q0108",
-        "q0110",
         "q0111"
       ],
-      "primaryQuestionIds": [
+      "relatedQuestionIds": [
+        "q0096",
+        "q0103",
         "q0108",
-        "q0110",
         "q0111"
       ]
     },
     {
       "id": "kp08-05",
-      "relatedQuestionIds": [
-        "q0095",
-        "q0114",
-        "q0116",
-        "q0117",
-        "q0118"
-      ],
       "primaryQuestionIds": [
         "q0095",
         "q0114",
         "q0116",
         "q0117",
         "q0118"
-      ]
-    },
-    {
-      "id": "kp08-06",
-      "relatedQuestionIds": [
-        "q0102",
-        "q0104"
       ],
-      "primaryQuestionIds": [
-        "q0102",
-        "q0104"
-      ]
-    },
-    {
-      "id": "kp08-07",
       "relatedQuestionIds": [
-        "q0096",
-        "q0100",
-        "q0103"
-      ],
-      "primaryQuestionIds": [
-        "q0096",
-        "q0100",
-        "q0103"
+        "q0095",
+        "q0114",
+        "q0116",
+        "q0117",
+        "q0118"
       ]
     }
   ]

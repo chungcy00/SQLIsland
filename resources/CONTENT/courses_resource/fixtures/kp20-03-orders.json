@@ -1,0 +1,158 @@
+{
+  "id": "kp20-03-orders",
+  "table": "orders",
+  "columns": [
+    {
+      "name": "order_id",
+      "sqliteType": "INTEGER",
+      "type": "INTEGER"
+    },
+    {
+      "name": "store_id",
+      "sqliteType": "INTEGER",
+      "type": "INTEGER"
+    },
+    {
+      "name": "customer_id",
+      "sqliteType": "INTEGER",
+      "type": "INTEGER"
+    },
+    {
+      "name": "session_id",
+      "sqliteType": "INTEGER",
+      "type": "INTEGER"
+    },
+    {
+      "name": "order_date",
+      "sqliteType": "TEXT",
+      "type": "TEXT"
+    },
+    {
+      "name": "channel",
+      "sqliteType": "TEXT",
+      "type": "TEXT"
+    },
+    {
+      "name": "status",
+      "sqliteType": "TEXT",
+      "type": "TEXT"
+    },
+    {
+      "name": "cancellation_reason",
+      "sqliteType": "TEXT",
+      "type": "TEXT"
+    }
+  ],
+  "rows": [
+    [
+      1,
+      1,
+      null,
+      null,
+      "2025-01-02",
+      "store",
+      "completed",
+      null
+    ],
+    [
+      2,
+      1,
+      null,
+      null,
+      "2025-03-02",
+      "store",
+      "completed",
+      null
+    ],
+    [
+      3,
+      2,
+      null,
+      null,
+      "2025-03-03",
+      "store",
+      "completed",
+      null
+    ],
+    [
+      4,
+      1,
+      null,
+      null,
+      "2024-12-31",
+      "store",
+      "completed",
+      null
+    ],
+    [
+      5,
+      null,
+      1,
+      5,
+      "2025-01-02",
+      "online",
+      "completed",
+      null
+    ],
+    [
+      6,
+      null,
+      1,
+      6,
+      "2025-03-02",
+      "online",
+      "completed",
+      null
+    ],
+    [
+      7,
+      null,
+      2,
+      7,
+      "2025-03-03",
+      "online",
+      "completed",
+      null
+    ],
+    [
+      8,
+      null,
+      2,
+      8,
+      "2025-04-03",
+      "online",
+      "completed",
+      null
+    ],
+    [
+      9,
+      null,
+      3,
+      9,
+      "2025-05-03",
+      "online",
+      "cancelled",
+      "客户取消"
+    ],
+    [
+      10,
+      null,
+      4,
+      10,
+      "2025-06-03",
+      "online",
+      "pending",
+      null
+    ],
+    [
+      11,
+      null,
+      3,
+      11,
+      "2026-01-01",
+      "online",
+      "completed",
+      null
+    ]
+  ]
+}

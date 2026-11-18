@@ -1,5 +1,7 @@
 # 第十一阶段第四部分：200张完整 SQL 闪卡
 
+当前课程关联以 5.0.0 的 course_links 为准。共 200 张闪卡，已更新和 80 节课程、200 道练习的关联。以下保留此前版本的资源说明。
+
 ## 使用方法
 - `flashcards/ch01.json` 至 `ch20.json` 为正式只读内容；`reading/` 为同一批数据生成的可阅读材料。`flashcard_schema.json` 为结构契约。固定卡号 fc0001—fc0200，版本1.0.0。更新内容不得重用卡号表示不同主题。
 - 解压至独立目录；最终整合时把 flashcards、fixtures（建议放到独立 flashcard_fixtures 命名空间，保持或重映射 fixturePath）、review_policy.json、关联文件合并到学习资源目录。不要覆盖题库同名 fixtures 或 manifest。课程采用企业升级版20章、题库采用第三部分300题。按 course_links 的知识点 id 追加闪卡关联字段，保留原题库关联。题号逆向索引可用于练习后推荐复习。

@@ -13,9 +13,7 @@
       "chapterId": "ch10",
       "title": "标量子查询",
       "learningObjective": "能够运用本节知识完成：筛选高于平均价格的商品",
-      "prerequisites": [
-        "ch09"
-      ],
+      "prerequisites": [],
       "concept": "标量子查询必须返回一列、至多一行；零行返回 NULL。MySQL 返回多行时会报错，不能用 SQLite 自动取首行的行为代替。",
       "syntax": "WHERE col > (SELECT AVG(col) FROM t)",
       "parameters": {
@@ -125,9 +123,7 @@
       },
       "relatedQuestionIds": [
         "q0132",
-        "q0133",
-        "q0134",
-        "q0135"
+        "q0134"
       ],
       "relatedFlashcardIds": [
         "fc0070",
@@ -164,14 +160,18 @@
       "mysqlVerificationScript": "validation/mysql/kp10-01.sql",
       "primaryQuestionIds": [
         "q0132",
-        "q0133",
-        "q0134",
-        "q0135"
+        "q0134"
       ],
       "primaryFlashcardIds": [
         "fc0070",
         "fc0075"
-      ]
+      ],
+      "teaching": {
+        "problem": "查找高于全表平均价格的商品，需要用数据自己算阈值。",
+        "codeExplanation": "AVG 产生一个数，外层每个商品都与同一结果比较。若子查询可能多行，应先聚合或改用集合语义。",
+        "resultExplanation": "价格 89 和 65 等高于平均的商品入选；阈值随数据变化。可加类别分组或写相关子查询改成类内比较。",
+        "checkpoints": []
+      }
     },
     {
       "id": "kp10-02",
@@ -329,10 +329,8 @@
       },
       "relatedQuestionIds": [
         "q0136",
-        "q0137",
         "q0138",
-        "q0141",
-        "q0143"
+        "q0141"
       ],
       "relatedFlashcardIds": [
         "fc0071",
@@ -365,15 +363,19 @@
       "mysqlVerificationScript": "validation/mysql/kp10-02.sql",
       "primaryQuestionIds": [
         "q0136",
-        "q0137",
         "q0138",
-        "q0141",
-        "q0143"
+        "q0141"
       ],
       "primaryFlashcardIds": [
         "fc0071",
         "fc0073"
-      ]
+      ],
+      "teaching": {
+        "problem": "寻找拥有至少一笔大额订单的客户，同时避免重复客户行。",
+        "codeExplanation": "内层返回满足金额条件的客户编号集合，外层 IN 做成员判断。即使内层同一编号出现多次，每位外层客户也只验证一次。",
+        "resultExplanation": "客户 1 和 3 入选。需要展示大额订单详情时才应改用连接并接受不同粒度。",
+        "checkpoints": []
+      }
     },
     {
       "id": "kp10-03",
@@ -533,7 +535,6 @@
         "q0139",
         "q0140",
         "q0142",
-        "q0147",
         "q0149"
       ],
       "relatedFlashcardIds": [
@@ -570,14 +571,19 @@
         "q0139",
         "q0140",
         "q0142",
-        "q0147",
         "q0149"
       ],
       "primaryFlashcardIds": [
         "fc0072",
         "fc0073",
         "fc0077"
-      ]
+      ],
+      "teaching": {
+        "problem": "仅判断订单是否存在，不需要搬运订单明细。",
+        "codeExplanation": "相关条件把 o.customer_id 与当前外层客户绑定。EXISTS 一旦找到任意符合行就成立，SELECT 1 只表达存在性。",
+        "resultExplanation": "有订单客户各保留一行，未下单的客户 4 被过滤。加上日期条件可筛指定期间活跃客户。",
+        "checkpoints": []
+      }
     },
     {
       "id": "kp10-04",
@@ -777,12 +783,18 @@
         "fc0074",
         "fc0076",
         "fc0078"
-      ]
+      ],
+      "teaching": {
+        "problem": "寻找未下单客户时，订单数据里可能含匿名客户编号。",
+        "codeExplanation": "NOT EXISTS 找不到匹配即为真。NOT IN 只要候选中有 NULL，未匹配比较就可能变成 UNKNOWN。",
+        "resultExplanation": "客户 4 被正确找出，匿名订单不干扰判断。采购核对同样可用反连接检测缺失收货。",
+        "checkpoints": []
+      }
     }
   ],
-  "plannedQuestionCount": 20,
+  "plannedQuestionCount": 15,
   "schemaVersion": 1,
-  "contentVersion": "1.0.0",
+  "contentVersion": "5.0.0",
   "dialect": "MySQL 8.4",
   "summary": "完成本章后：掌握标量、集合、相关查询及反连接。",
   "sources": [

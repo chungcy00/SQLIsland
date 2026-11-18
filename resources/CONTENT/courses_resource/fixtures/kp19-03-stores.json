@@ -1,0 +1,46 @@
+{
+  "id": "kp19-03-stores",
+  "table": "stores",
+  "columns": [
+    {
+      "name": "store_id",
+      "sqliteType": "INTEGER",
+      "type": "INTEGER"
+    },
+    {
+      "name": "store_name",
+      "sqliteType": "TEXT",
+      "type": "TEXT"
+    },
+    {
+      "name": "city",
+      "sqliteType": "TEXT",
+      "type": "TEXT"
+    },
+    {
+      "name": "fulfillment_warehouse_id",
+      "sqliteType": "INTEGER",
+      "type": "INTEGER"
+    }
+  ],
+  "rows": [
+    [
+      1,
+      "门店1",
+      "古晋",
+      1
+    ],
+    [
+      2,
+      "门店2",
+      "古晋",
+      1
+    ],
+    [
+      3,
+      "门店3",
+      "古晋",
+      1
+    ]
+  ]
+}

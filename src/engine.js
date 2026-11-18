@@ -276,7 +276,7 @@ export function checkStructure(sql, required = []) {
             walk(n.where, (x) => {
               if (
                 x.type === "binary_expr" &&
-                ["=", ">=", ">", "<", "<=", "BETWEEN"].includes(x.operator)
+                ["=", "<>", "!=", ">=", ">", "<", "<=", "BETWEEN"].includes(x.operator)
               )
                 predicates.push(x);
             });

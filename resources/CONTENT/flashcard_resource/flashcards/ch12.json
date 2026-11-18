@@ -9,17 +9,13 @@
       "id": "fc0086",
       "chapterId": "ch12",
       "knowledgePointIds": [
-        "kp12-05"
+        "kp12-01"
       ],
       "primaryKnowledgePointIds": [
-        "kp12-05"
+        "kp12-01"
       ],
       "relatedKnowledgePointIds": [],
-      "relatedQuestionIds": [
-        "q0165",
-        "q0168",
-        "q0174"
-      ],
+      "relatedQuestionIds": [],
       "questionLinkPolicy": "通过共享课程知识点关联正式题库；业务卡额外保留对应BP任务编号。关联不表示题目与卡片完全相同。",
       "type": "概念记忆",
       "difficulty": "中等",
@@ -61,8 +57,7 @@
       "relatedKnowledgePointIds": [],
       "relatedQuestionIds": [
         "q0163",
-        "q0166",
-        "q0167"
+        "q0166"
       ],
       "questionLinkPolicy": "通过共享课程知识点关联正式题库；业务卡额外保留对应BP任务编号。关联不表示题目与卡片完全相同。",
       "type": "语法结构",
@@ -128,7 +123,6 @@
       ],
       "relatedKnowledgePointIds": [],
       "relatedQuestionIds": [
-        "q0161",
         "q0162",
         "q0171"
       ],
@@ -283,9 +277,7 @@
       ],
       "relatedKnowledgePointIds": [],
       "relatedQuestionIds": [
-        "q0164",
-        "q0172",
-        "q0173"
+        "q0172"
       ],
       "questionLinkPolicy": "通过共享课程知识点关联正式题库；业务卡额外保留对应BP任务编号。关联不表示题目与卡片完全相同。",
       "type": "代码填空",
@@ -397,7 +389,6 @@
       ],
       "relatedKnowledgePointIds": [],
       "relatedQuestionIds": [
-        "q0161",
         "q0162"
       ],
       "questionLinkPolicy": "通过共享课程知识点关联正式题库；业务卡额外保留对应BP任务编号。关联不表示题目与卡片完全相同。",
@@ -589,16 +580,13 @@
       "id": "fc0093",
       "chapterId": "ch12",
       "knowledgePointIds": [
-        "kp12-05"
+        "kp12-01"
       ],
       "primaryKnowledgePointIds": [
-        "kp12-05"
+        "kp12-01"
       ],
       "relatedKnowledgePointIds": [],
-      "relatedQuestionIds": [
-        "q0165",
-        "q0168"
-      ],
+      "relatedQuestionIds": [],
       "questionLinkPolicy": "通过共享课程知识点关联正式题库；业务卡额外保留对应BP任务编号。关联不表示题目与卡片完全相同。",
       "type": "结果预测",
       "difficulty": "中等",
@@ -738,7 +726,6 @@
       ],
       "relatedKnowledgePointIds": [],
       "relatedQuestionIds": [
-        "q0164",
         "q0172"
       ],
       "questionLinkPolicy": "通过共享课程知识点关联正式题库；业务卡额外保留对应BP任务编号。关联不表示题目与卡片完全相同。",

@@ -22,10 +22,10 @@ def register(c):
 
 def make_conn(fix):
  c=register(sqlite3.connect(':memory:',isolation_level=None))
- if fix.get('setupSql'):c.executescript(fix['setupSql']);return c
  for t in fix.get('tables',[]):
   c.execute('CREATE TABLE "'+t['name']+'"('+','.join('"'+x['name']+'" '+x['sqliteType'] for x in t['columns'])+')')
   if t['rows']:c.executemany('INSERT INTO "'+t['name']+'" VALUES('+','.join('?' for _ in t['columns'])+')',t['rows'])
+ if fix.get('setupSql'):c.executescript(fix['setupSql'])
  return c
 
 def run(c,sql):
@@ -112,7 +112,7 @@ def main():
  m=D(ROOT/'manifest.json'); count=collections.Counter(); qs=[]
  for ch in m['chapters']:
   p=ROOT/ch['path'];assert sha(p)==ch['sha256'];data=D(p);assert len(data['questions'])==ch['count'];qs+=data['questions']
- assert len(qs)==300 and len({q['id'] for q in qs})==300
+ assert len(qs)==m['questionCount'] and len({q['id'] for q in qs})==m['questionCount']
  assert dict(collections.Counter(q['type'] for q in qs))==m['questionTypeCounts']
  assert dict(collections.Counter(q['difficulty'] for q in qs))==m['difficultyCounts']
  for d in D(ROOT/'databases/manifest.json')['datasets']:assert sha(ROOT/d['path'])==d['sha256'];count['databaseHashes']+=1
@@ -123,6 +123,7 @@ def main():
    rejected=False; pub=None; changed=False
    for meta in q['testFixtures']:
     p=ROOT/meta['path'];assert sha(p)==meta['sha256']; f=D(p);assert f['questionId']==q['id'];count['fixtureHashes']+=1
+    if f.get('sharedDataPath'):f={**D(ROOT/f['sharedDataPath']),**f}
     if f['kind']=='objective_choice':
      ids=[o['id'] for o in q['options']];a=f['expected']['correctOptionId'];assert len(set(ids))==4 and a in ids and a==q['correctOptionId'] and a==q['referenceSolutions'][0]['optionId'];assert len({o['text'] for o in q['options']})==4;count['objectiveKeys']+=1;continue
     state=f['kind']=='database_state'; ordered=f['orderPolicy']=='ordered'; expected=f['expected']

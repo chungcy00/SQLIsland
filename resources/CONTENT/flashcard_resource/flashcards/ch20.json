@@ -180,18 +180,16 @@
       "id": "fc0181",
       "chapterId": "ch20",
       "knowledgePointIds": [
-        "kp20-05",
-        "kp20-04"
+        "kp19-36",
+        "kp19-50"
       ],
       "primaryKnowledgePointIds": [
-        "kp20-05",
-        "kp20-04"
+        "kp19-36",
+        "kp19-50"
       ],
       "relatedKnowledgePointIds": [],
       "relatedQuestionIds": [
-        "q0255",
-        "q0269",
-        "q0281"
+        "q0269"
       ],
       "questionLinkPolicy": "通过共享课程知识点关联正式题库；业务卡额外保留对应BP任务编号。关联不表示题目与卡片完全相同。",
       "type": "概念记忆",
@@ -220,7 +218,6 @@
       },
       "businessTaskId": "BP31",
       "databaseRef": "enterprise",
-      "businessQuestionId": "q0281",
       "referenceTopicNames": [
         "畅销缺货与滞销积压双向筛查",
         "综合分析：异常识别与复核"
@@ -254,8 +251,7 @@
       ],
       "relatedKnowledgePointIds": [],
       "relatedQuestionIds": [
-        "q0282",
-        "q0283"
+        "q0282"
       ],
       "questionLinkPolicy": "通过共享课程知识点关联正式题库；业务卡额外保留对应BP任务编号。关联不表示题目与卡片完全相同。",
       "type": "代码填空",
@@ -382,16 +378,10 @@
     {
       "id": "fc0183",
       "chapterId": "ch20",
-      "knowledgePointIds": [
-        "kp20-07"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp20-07"
-      ],
+      "knowledgePointIds": [],
+      "primaryKnowledgePointIds": [],
       "relatedKnowledgePointIds": [],
-      "relatedQuestionIds": [
-        "q0283"
-      ],
+      "relatedQuestionIds": [],
       "questionLinkPolicy": "通过共享课程知识点关联正式题库；业务卡额外保留对应BP任务编号。关联不表示题目与卡片完全相同。",
       "type": "结果预测",
       "difficulty": "困难",
@@ -475,7 +465,6 @@
       },
       "businessTaskId": "BP33",
       "databaseRef": "enterprise",
-      "businessQuestionId": "q0283",
       "fixtureIds": [
         "fc0183-demo"
       ],
@@ -565,16 +554,10 @@
     {
       "id": "fc0185",
       "chapterId": "ch20",
-      "knowledgePointIds": [
-        "kp20-09"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp20-09"
-      ],
+      "knowledgePointIds": [],
+      "primaryKnowledgePointIds": [],
       "relatedKnowledgePointIds": [],
-      "relatedQuestionIds": [
-        "q0285"
-      ],
+      "relatedQuestionIds": [],
       "questionLinkPolicy": "通过共享课程知识点关联正式题库；业务卡额外保留对应BP任务编号。关联不表示题目与卡片完全相同。",
       "type": "概念记忆",
       "difficulty": "困难",
@@ -602,7 +585,6 @@
       },
       "businessTaskId": "BP35",
       "databaseRef": "enterprise",
-      "businessQuestionId": "q0285",
       "referenceTopicNames": [
         "逾期在途与缺货叠加"
       ],
@@ -626,15 +608,13 @@
       "id": "fc0186",
       "chapterId": "ch20",
       "knowledgePointIds": [
-        "kp20-10"
+        "kp19-58"
       ],
       "primaryKnowledgePointIds": [
-        "kp20-10"
+        "kp19-58"
       ],
       "relatedKnowledgePointIds": [],
-      "relatedQuestionIds": [
-        "q0286"
-      ],
+      "relatedQuestionIds": [],
       "questionLinkPolicy": "通过共享课程知识点关联正式题库；业务卡额外保留对应BP任务编号。关联不表示题目与卡片完全相同。",
       "type": "错误纠正",
       "difficulty": "困难",
@@ -758,7 +738,6 @@
       },
       "businessTaskId": "BP36",
       "databaseRef": "enterprise",
-      "businessQuestionId": "q0286",
       "fixtureIds": [
         "fc0186-demo"
       ],
@@ -785,16 +764,10 @@
     {
       "id": "fc0187",
       "chapterId": "ch20",
-      "knowledgePointIds": [
-        "kp20-11"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp20-11"
-      ],
+      "knowledgePointIds": [],
+      "primaryKnowledgePointIds": [],
       "relatedKnowledgePointIds": [],
-      "relatedQuestionIds": [
-        "q0287"
-      ],
+      "relatedQuestionIds": [],
       "questionLinkPolicy": "通过共享课程知识点关联正式题库；业务卡额外保留对应BP任务编号。关联不表示题目与卡片完全相同。",
       "type": "用法辨析",
       "difficulty": "挑战",
@@ -822,7 +795,6 @@
       },
       "businessTaskId": "BP37",
       "databaseRef": "enterprise",
-      "businessQuestionId": "q0287",
       "referenceTopicNames": [
         "供应商延迟与仓库资金压力"
       ],
@@ -845,15 +817,13 @@
       "id": "fc0188",
       "chapterId": "ch20",
       "knowledgePointIds": [
-        "kp20-12"
+        "kp20-23"
       ],
       "primaryKnowledgePointIds": [
-        "kp20-12"
+        "kp20-23"
       ],
       "relatedKnowledgePointIds": [],
-      "relatedQuestionIds": [
-        "q0288"
-      ],
+      "relatedQuestionIds": [],
       "questionLinkPolicy": "通过共享课程知识点关联正式题库；业务卡额外保留对应BP任务编号。关联不表示题目与卡片完全相同。",
       "type": "结果预测",
       "difficulty": "困难",
@@ -943,7 +913,6 @@
       },
       "businessTaskId": "BP38",
       "databaseRef": "enterprise",
-      "businessQuestionId": "q0288",
       "fixtureIds": [
         "fc0188-demo"
       ],
@@ -1143,15 +1112,13 @@
       "id": "fc0190",
       "chapterId": "ch20",
       "knowledgePointIds": [
-        "kp20-14"
+        "kp20-23"
       ],
       "primaryKnowledgePointIds": [
-        "kp20-14"
+        "kp20-23"
       ],
       "relatedKnowledgePointIds": [],
-      "relatedQuestionIds": [
-        "q0290"
-      ],
+      "relatedQuestionIds": [],
       "questionLinkPolicy": "通过共享课程知识点关联正式题库；业务卡额外保留对应BP任务编号。关联不表示题目与卡片完全相同。",
       "type": "语法结构",
       "difficulty": "挑战",
@@ -1252,7 +1219,6 @@
       },
       "businessTaskId": "BP40",
       "databaseRef": "enterprise",
-      "businessQuestionId": "q0290",
       "fixtureIds": [
         "fc0190-demo"
       ],
@@ -1342,15 +1308,13 @@
       "id": "fc0192",
       "chapterId": "ch20",
       "knowledgePointIds": [
-        "kp20-16"
+        "kp20-15"
       ],
       "primaryKnowledgePointIds": [
-        "kp20-16"
+        "kp20-15"
       ],
       "relatedKnowledgePointIds": [],
-      "relatedQuestionIds": [
-        "q0292"
-      ],
+      "relatedQuestionIds": [],
       "questionLinkPolicy": "通过共享课程知识点关联正式题库；业务卡额外保留对应BP任务编号。关联不表示题目与卡片完全相同。",
       "type": "错误纠正",
       "difficulty": "困难",
@@ -1460,7 +1424,6 @@
       },
       "businessTaskId": "BP42",
       "databaseRef": "enterprise",
-      "businessQuestionId": "q0292",
       "fixtureIds": [
         "fc0192-demo"
       ],
@@ -1490,16 +1453,10 @@
     {
       "id": "fc0193",
       "chapterId": "ch20",
-      "knowledgePointIds": [
-        "kp20-17"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp20-17"
-      ],
+      "knowledgePointIds": [],
+      "primaryKnowledgePointIds": [],
       "relatedKnowledgePointIds": [],
-      "relatedQuestionIds": [
-        "q0293"
-      ],
+      "relatedQuestionIds": [],
       "questionLinkPolicy": "通过共享课程知识点关联正式题库；业务卡额外保留对应BP任务编号。关联不表示题目与卡片完全相同。",
       "type": "代码填空",
       "difficulty": "困难",
@@ -1610,7 +1567,6 @@
       },
       "businessTaskId": "BP43",
       "databaseRef": "enterprise",
-      "businessQuestionId": "q0293",
       "fixtureIds": [
         "fc0193-demo"
       ],
@@ -1699,16 +1655,10 @@
     {
       "id": "fc0195",
       "chapterId": "ch20",
-      "knowledgePointIds": [
-        "kp20-19"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp20-19"
-      ],
+      "knowledgePointIds": [],
+      "primaryKnowledgePointIds": [],
       "relatedKnowledgePointIds": [],
-      "relatedQuestionIds": [
-        "q0295"
-      ],
+      "relatedQuestionIds": [],
       "questionLinkPolicy": "通过共享课程知识点关联正式题库；业务卡额外保留对应BP任务编号。关联不表示题目与卡片完全相同。",
       "type": "概念记忆",
       "difficulty": "挑战",
@@ -1736,7 +1686,6 @@
       },
       "businessTaskId": "BP45",
       "databaseRef": "enterprise",
-      "businessQuestionId": "q0295",
       "referenceTopicNames": [
         "首购客户90天毛利与获客成本"
       ],
@@ -1762,15 +1711,13 @@
       "id": "fc0196",
       "chapterId": "ch20",
       "knowledgePointIds": [
-        "kp20-20"
+        "kp20-18"
       ],
       "primaryKnowledgePointIds": [
-        "kp20-20"
+        "kp20-18"
       ],
       "relatedKnowledgePointIds": [],
-      "relatedQuestionIds": [
-        "q0296"
-      ],
+      "relatedQuestionIds": [],
       "questionLinkPolicy": "通过共享课程知识点关联正式题库；业务卡额外保留对应BP任务编号。关联不表示题目与卡片完全相同。",
       "type": "结果预测",
       "difficulty": "困难",
@@ -1872,7 +1819,6 @@
       },
       "businessTaskId": "BP46",
       "databaseRef": "enterprise",
-      "businessQuestionId": "q0296",
       "fixtureIds": [
         "fc0196-demo"
       ],
@@ -2038,16 +1984,10 @@
     {
       "id": "fc0198",
       "chapterId": "ch20",
-      "knowledgePointIds": [
-        "kp20-22"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp20-22"
-      ],
+      "knowledgePointIds": [],
+      "primaryKnowledgePointIds": [],
       "relatedKnowledgePointIds": [],
-      "relatedQuestionIds": [
-        "q0298"
-      ],
+      "relatedQuestionIds": [],
       "questionLinkPolicy": "通过共享课程知识点关联正式题库；业务卡额外保留对应BP任务编号。关联不表示题目与卡片完全相同。",
       "type": "用法辨析",
       "difficulty": "挑战",
@@ -2075,7 +2015,6 @@
       },
       "businessTaskId": "BP48",
       "databaseRef": "enterprise",
-      "businessQuestionId": "q0298",
       "referenceTopicNames": [
         "门店人员变化与销售变化诊断"
       ],
@@ -2246,16 +2185,10 @@
     {
       "id": "fc0200",
       "chapterId": "ch20",
-      "knowledgePointIds": [
-        "kp20-24"
-      ],
-      "primaryKnowledgePointIds": [
-        "kp20-24"
-      ],
+      "knowledgePointIds": [],
+      "primaryKnowledgePointIds": [],
       "relatedKnowledgePointIds": [],
-      "relatedQuestionIds": [
-        "q0300"
-      ],
+      "relatedQuestionIds": [],
       "questionLinkPolicy": "通过共享课程知识点关联正式题库；业务卡额外保留对应BP任务编号。关联不表示题目与卡片完全相同。",
       "type": "概念记忆",
       "difficulty": "挑战",
@@ -2283,7 +2216,6 @@
       },
       "businessTaskId": "BP50",
       "databaseRef": "enterprise",
-      "businessQuestionId": "q0300",
       "referenceTopicNames": [
         "跨域季度风险评分与经营报告"
       ],

@@ -1,0 +1,61 @@
+{
+  "id": "kp19-03-customers",
+  "table": "customers",
+  "columns": [
+    {
+      "name": "customer_id",
+      "sqliteType": "INTEGER",
+      "type": "INTEGER"
+    },
+    {
+      "name": "customer_name",
+      "sqliteType": "TEXT",
+      "type": "TEXT"
+    },
+    {
+      "name": "signup_date",
+      "sqliteType": "TEXT",
+      "type": "TEXT"
+    },
+    {
+      "name": "region",
+      "sqliteType": "TEXT",
+      "type": "TEXT"
+    },
+    {
+      "name": "member_since_date",
+      "sqliteType": "TEXT",
+      "type": "TEXT"
+    }
+  ],
+  "rows": [
+    [
+      1,
+      "客户1",
+      "2024-01-01",
+      null,
+      null
+    ],
+    [
+      2,
+      "客户2",
+      "2024-01-01",
+      null,
+      null
+    ],
+    [
+      3,
+      "客户3",
+      "2024-01-01",
+      null,
+      null
+    ],
+    [
+      4,
+      "客户4",
+      "2024-01-01",
+      null,
+      null
+    ]
+  ]
+}

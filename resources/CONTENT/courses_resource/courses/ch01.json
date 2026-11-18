@@ -125,7 +125,6 @@
         "detail": "仅在本示例数据与语义范围验证；不代表全部 MySQL 语法兼容。"
       },
       "relatedQuestionIds": [
-        "q0001",
         "q0006"
       ],
       "relatedFlashcardIds": [
@@ -173,14 +172,19 @@
       },
       "mysqlVerificationScript": "validation/mysql/kp01-01.sql",
       "primaryQuestionIds": [
-        "q0001",
         "q0006"
       ],
       "primaryFlashcardIds": [
         "fc0001",
         "fc0006",
         "fc0007"
-      ]
+      ],
+      "teaching": {
+        "problem": "读订单表前先决定报表的一行代表什么，避免把记录数当成客户数。",
+        "codeExplanation": "FROM 选定订单来源，SELECT 只保留订单编号、类别和金额，最后按编号定序，行粒度保持不变。",
+        "resultExplanation": "结果仍是一行一笔订单；1 和 3 可以属于同一位客户。若要计算客户数，要在订单表上按客户去重并约定匿名订单口径。",
+        "checkpoints": []
+      }
     },
     {
       "id": "kp01-02",
@@ -299,7 +303,6 @@
       },
       "relatedQuestionIds": [
         "q0003",
-        "q0004",
         "q0005"
       ],
       "relatedFlashcardIds": [
@@ -351,12 +354,17 @@
       "mysqlVerificationScript": "validation/mysql/kp01-02.sql",
       "primaryQuestionIds": [
         "q0003",
-        "q0004",
         "q0005"
       ],
       "primaryFlashcardIds": [
         "fc0002"
-      ]
+      ],
+      "teaching": {
+        "problem": "汇总前查数据字典，先确认类型、单位和允许缺失的字段。",
+        "codeExplanation": "product_id 用于标识，price 用于金额计算，stock 用于数量判断。直接展示三列可并排核对金额和数量的差别。",
+        "resultExplanation": "库存为 0 的商品有明确记录。实际导入时要分清零与缺失，金额列优先采用精确小数或整数分。",
+        "checkpoints": []
+      }
     },
     {
       "id": "kp01-03",
@@ -515,7 +523,6 @@
         "detail": "仅在本示例数据与语义范围验证；不代表全部 MySQL 语法兼容。"
       },
       "relatedQuestionIds": [
-        "q0007",
         "q0008"
       ],
       "relatedFlashcardIds": [
@@ -552,137 +559,28 @@
       },
       "mysqlVerificationScript": "validation/mysql/kp01-03.sql",
       "primaryQuestionIds": [
-        "q0007",
         "q0008"
       ],
       "primaryFlashcardIds": [
         "fc0003",
         "fc0004"
-      ]
-    },
-    {
-      "id": "kp01-04",
-      "chapterId": "ch01",
-      "title": "NULL 与缺失记录",
-      "learningObjective": "能够运用本节知识完成：识别缺失数据",
-      "prerequisites": [
-        "kp01-03"
       ],
-      "concept": "NULL 表示未知或缺失，并非零或空文本；外键为空可以表示访客订单。",
-      "syntax": "column IS NULL",
-      "parameters": {
-        "column": "待检测字段"
-      },
-      "fixtureIds": [
-        "lesson-nullable_values"
-      ],
-      "sourceTables": [
-        {
-          "name": "nullable_values",
-          "columns": [
-            {
-              "name": "id",
-              "type": "INTEGER",
-              "mysqlType": "INT",
-              "sqliteType": "INTEGER"
-            },
-            {
-              "name": "value",
-              "type": "INTEGER",
-              "mysqlType": "INT",
-              "sqliteType": "INTEGER"
-            },
-            {
-              "name": "note",
-              "type": "TEXT",
-              "mysqlType": "VARCHAR(160) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_bin",
-              "sqliteType": "TEXT"
-            }
-          ],
-          "rows": [
-            [
-              1,
-              null,
-              null
-            ],
-            [
-              2,
-              0,
-              ""
-            ],
-            [
-              3,
-              10,
-              "ok"
-            ],
-            [
-              4,
-              10,
-              "ok"
-            ]
-          ]
-        }
-      ],
-      "mysqlSql": "SELECT id, value, note FROM nullable_values WHERE value IS NULL ORDER BY id;",
-      "sqliteSql": "SELECT id, value, note FROM nullable_values WHERE value IS NULL ORDER BY id;",
-      "executionSteps": [
-        "检查每一行",
-        "保留值缺失的记录"
-      ],
-      "useCase": "识别缺失数据",
-      "comparison": "NULL、0、空字符串三者不同。",
-      "commonError": {
-        "example": "WHERE value = NULL",
-        "correction": "WHERE value IS NULL"
-      },
-      "notes": "NULL 的三值逻辑在第5章展开。",
-      "compatibility": {
-        "status": "直接兼容",
-        "detail": "仅在本示例数据与语义范围验证；不代表全部 MySQL 语法兼容。"
-      },
-      "relatedQuestionIds": [
-        "q0002"
-      ],
-      "relatedFlashcardIds": [
-        "fc0005",
-        "fc0007"
-      ],
-      "relatedKnowledgePointIds": [],
-      "mysqlVerification": "未运行原生 MySQL 8.4",
-      "result": {
-        "columns": [
-          "id",
-          "value",
-          "note"
-        ],
-        "rows": [
-          [
-            1,
-            null,
-            null
-          ]
-        ],
-        "status": "SQLite实际执行",
-        "orderGuaranteed": false
-      },
-      "mysqlVerificationScript": "validation/mysql/kp01-04.sql",
-      "primaryQuestionIds": [
-        "q0002"
-      ],
-      "primaryFlashcardIds": [
-        "fc0005",
-        "fc0007"
-      ]
+      "teaching": {
+        "problem": "统计每位客户的下单次数，同时保留还没下单的客户。",
+        "codeExplanation": "用主键与外键匹配。LEFT JOIN 保留客户主档，COUNT(o.id) 跳过未匹配形成的 NULL，GROUP BY 恢复到客户粒度。",
+        "resultExplanation": "客户 1 有两笔订单，客户 4 有零笔；同一连接适用于检查供应商是否供过货。",
+        "checkpoints": []
+      }
     }
   ],
-  "plannedQuestionCount": 8,
+  "plannedQuestionCount": 4,
   "schemaVersion": 1,
-  "contentVersion": "1.0.0",
+  "contentVersion": "5.0.0",
   "dialect": "MySQL 8.4",
   "summary": "完成本章后：认识关系数据库，读懂数据字典和表关系。",
   "sources": [
     "https://dev.mysql.com/doc/refman/8.4/en/",
     "https://dev.mysql.com/doc/refman/8.4/en/functions.html"
   ],
-  "knowledgePointCount": 4
+  "knowledgePointCount": 3
 }

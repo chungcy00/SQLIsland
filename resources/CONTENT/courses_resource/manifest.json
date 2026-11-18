@@ -1,254 +1,254 @@
 {
   "schemaVersion": 1,
-  "contentVersion": "4.2.1",
+  "contentVersion": "5.0.0",
   "chapters": [
     {
       "id": "ch01",
       "path": "courses/ch01.json",
       "title": "数据库基础",
-      "knowledgePointCount": 4,
-      "sha256": "2ee3bb9917aa6001835ce0cd783f8e27dada96ac8c8cbfb20a951fcfe8009ec4"
+      "knowledgePointCount": 3,
+      "sha256": "4c66487dfefe9ec92d072c35d685c97e21d705309c06f8a7a1e9a57102b15bdc"
     },
     {
       "id": "ch02",
       "path": "courses/ch02.json",
       "title": "基础查询",
-      "knowledgePointCount": 3,
-      "sha256": "b4af85ed2344f244b404c974e5a865169a4a8f443a52d870e73ca8aa377eeb97"
+      "knowledgePointCount": 2,
+      "sha256": "492cf9d17a6c3384066fe140edee4bb547218a488b30c3863bee4b10c603ef02"
     },
     {
       "id": "ch03",
       "path": "courses/ch03.json",
       "title": "条件筛选",
       "knowledgePointCount": 4,
-      "sha256": "b1b8ccca148a583eca5ef71ba99757ae38be3bc35f01daadf3d6552765bb6d72"
+      "sha256": "ad7867500d19cb6b694597bac60000bc84e2a64365f9004b1c896e0e63b4e029"
     },
     {
       "id": "ch04",
       "path": "courses/ch04.json",
       "title": "排序与分页",
       "knowledgePointCount": 2,
-      "sha256": "b0a33fd66a8ebab1af0df1f75960e9a972df542b05de41f9dfb14325a8f879fd"
+      "sha256": "2c1a44958a786c9335f8c9d0853a31e22244a7858b2528596c7250c6eca2f206"
     },
     {
       "id": "ch05",
       "path": "courses/ch05.json",
       "title": "空值处理",
       "knowledgePointCount": 2,
-      "sha256": "6ad866f558dfcd0391780b90562b75c6f78a5e14295f13e55891fea5d9ffce03"
+      "sha256": "c1c12eaceb521dcb86a2ecf0d9fa4b71e9386cd7986c921373cf8abb4c6be7ff"
     },
     {
       "id": "ch06",
       "path": "courses/ch06.json",
       "title": "聚合函数",
       "knowledgePointCount": 3,
-      "sha256": "85c47db714c7713007609a45c37ce39f2f06fcaed1e6d4a8a911ef8aafac9766"
+      "sha256": "656cb0e4b9a42cefafc41958fae9b10a33ca95bd47a0a9414d8924aa6be1d8ea"
     },
     {
       "id": "ch07",
       "path": "courses/ch07.json",
       "title": "分组统计",
       "knowledgePointCount": 3,
-      "sha256": "ad9a563505a6f04e7cfba649a549cd44c8315a6964b2be456d442318043aa5f6"
+      "sha256": "0e4f277c7c868e41877d0ab27d0902aa13c3b1748faa262efcd8a2c4c1de62a4"
     },
     {
       "id": "ch08",
       "path": "courses/ch08.json",
       "title": "多表连接",
-      "knowledgePointCount": 7,
-      "sha256": "b21fe60454ec7ff5929ba270bf4cf3771795b9c63c908176953cf34af5a30200"
+      "knowledgePointCount": 5,
+      "sha256": "382586b01e6d90f50579f5b2fdabb389d0c129bee3de4e0dc0d4fcfb3c91e3b1"
     },
     {
       "id": "ch09",
       "path": "courses/ch09.json",
       "title": "条件表达式",
-      "knowledgePointCount": 4,
-      "sha256": "636c93edf61a51016930039bfe94adce1376d286d3f75be8f72a811ddc8cc232"
+      "knowledgePointCount": 3,
+      "sha256": "eec561da2f72aa661ebce4d6bb94806ea2865dbbb8e90941043694754ba3e587"
     },
     {
       "id": "ch10",
       "path": "courses/ch10.json",
       "title": "子查询",
       "knowledgePointCount": 4,
-      "sha256": "b82f48261b3d3af36800716cbbf3abc83959b3cb02b3aca6f11784836b1e4d8e"
+      "sha256": "817a8fb1c2b503841cb22d8391fb56836774b54b8450c330b008add24e3d0312"
     },
     {
       "id": "ch11",
       "path": "courses/ch11.json",
       "title": "字符串处理",
-      "knowledgePointCount": 4,
-      "sha256": "76441f73f98be0bc804334311542e73094da9279ed92a2305ab8868243d0b851"
+      "knowledgePointCount": 3,
+      "sha256": "d58d44717f8e9b4d7603a986c1cb5e62857ae6bf4e0f4027cc735628ef6f6149"
     },
     {
       "id": "ch12",
       "path": "courses/ch12.json",
       "title": "数值及日期函数",
-      "knowledgePointCount": 5,
-      "sha256": "6eecca118c13d5e47c3d15dbd200ed751288e1625a14d96b0297841dd9d8c6eb"
+      "knowledgePointCount": 4,
+      "sha256": "2ff7916d473916c59c3bfd0c4d1eb396c1e59f15282609f69b7c2d93ff4542f6"
     },
     {
       "id": "ch13",
       "path": "courses/ch13.json",
       "title": "集合运算",
-      "knowledgePointCount": 4,
-      "sha256": "e5d173993cadcdbf89eecde0e21f670eaf5174fb48166458e0f111982a189dd1"
+      "knowledgePointCount": 2,
+      "sha256": "c952e1d77259a8c2486d852c11fe0780a0b0491a7ef8b3eabbbcd94c03605025"
     },
     {
       "id": "ch14",
       "path": "courses/ch14.json",
       "title": "公用表表达式",
-      "knowledgePointCount": 2,
-      "sha256": "34ca1b4973d0f6b3d9e70e1a8b62885a1d6737c7585774336b2bec707aaad831"
+      "knowledgePointCount": 1,
+      "sha256": "d7af1e5461889a775d9fef81bfcd3febfb1fb2a0a6340a4008ce50d93171cb18"
     },
     {
       "id": "ch15",
       "path": "courses/ch15.json",
       "title": "窗口函数",
-      "knowledgePointCount": 6,
-      "sha256": "7eb3e3be2accca2e4c2836b48e93c4704967a442dadc37acdabb04f17758552e"
+      "knowledgePointCount": 5,
+      "sha256": "461aaff631a10971fd0c65e6abfadaccaf44782ea2f56180a756b08de927bb73"
     },
     {
       "id": "ch16",
       "path": "courses/ch16.json",
       "title": "数据清洗",
       "knowledgePointCount": 3,
-      "sha256": "a9fe4da1c16ad0f523cdb4e41a21fd630353934a91ad54b2c944cd25b4a95669"
+      "sha256": "1353734a64c915850de9dafeeca3b9017d637859a6df893be4d325a84393a057"
     },
     {
       "id": "ch17",
       "path": "courses/ch17.json",
       "title": "数据表管理",
-      "knowledgePointCount": 5,
-      "sha256": "7ec03f4abc40259b2630580e9018afbda18c2d7c00a96152d33cbef2e2f03435"
+      "knowledgePointCount": 2,
+      "sha256": "d3ecf671880ffd4245547097fa9f5f3bf571eabdbb997f195fbd230c912d91ad"
     },
     {
       "id": "ch18",
       "path": "courses/ch18.json",
       "title": "查询优化",
-      "knowledgePointCount": 3,
-      "sha256": "c6370c164eecb962528ac984654ca50519a7298fef3a32f6e57dd569d0fa67f1"
+      "knowledgePointCount": 1,
+      "sha256": "38a29b524a7659dc12019dcebea94eac464379bfbe1773c5b7692497c1a5edb4"
     },
     {
       "id": "ch19",
       "path": "courses/ch19.json",
       "title": "业务数据分析",
-      "knowledgePointCount": 60,
-      "sha256": "ed252507e9514739b2f36c90b867edbbd16e4f6602fd96c8dba02e7acf058217"
+      "knowledgePointCount": 18,
+      "sha256": "98ccff40c47c64d31a3e74af78ef7ca765329999b9bf4a32c3debfa9ed52f6d4"
     },
     {
       "id": "ch20",
       "path": "courses/ch20.json",
       "title": "综合挑战",
-      "knowledgePointCount": 24,
-      "sha256": "357d8bba05fc52d240d82f1349719dcc206b7b7d7971344b84267bc685c267cd"
+      "knowledgePointCount": 10,
+      "sha256": "e96affcdcefabdbe735cc78e0e6c28dba96eb39b7db6c239ef24eb0e63fed5ad"
     }
   ],
-  "knowledgePointCount": 152,
+  "knowledgePointCount": 80,
   "files": [
     {
       "path": "README.md",
-      "bytes": 2750,
-      "sha256": "d428c7abc69fbe44930d9072d27514f3d6ebf0d270123b77431794298e7b6988"
+      "bytes": 2959,
+      "sha256": "29b8792b885bb19cbfe10967a69fbcecce45176337ea15a365ab7e00641cf103"
     },
     {
       "path": "courses/ch01.json",
-      "bytes": 18007,
-      "sha256": "2ee3bb9917aa6001835ce0cd783f8e27dada96ac8c8cbfb20a951fcfe8009ec4"
+      "bytes": 16367,
+      "sha256": "4c66487dfefe9ec92d072c35d685c97e21d705309c06f8a7a1e9a57102b15bdc"
     },
     {
       "path": "courses/ch02.json",
-      "bytes": 13597,
-      "sha256": "b4af85ed2344f244b404c974e5a865169a4a8f443a52d870e73ca8aa377eeb97"
+      "bytes": 10242,
+      "sha256": "492cf9d17a6c3384066fe140edee4bb547218a488b30c3863bee4b10c603ef02"
     },
     {
       "path": "courses/ch03.json",
-      "bytes": 17454,
-      "sha256": "b1b8ccca148a583eca5ef71ba99757ae38be3bc35f01daadf3d6552765bb6d72"
+      "bytes": 18938,
+      "sha256": "ad7867500d19cb6b694597bac60000bc84e2a64365f9004b1c896e0e63b4e029"
     },
     {
       "path": "courses/ch04.json",
-      "bytes": 9081,
-      "sha256": "b0a33fd66a8ebab1af0df1f75960e9a972df542b05de41f9dfb14325a8f879fd"
+      "bytes": 9861,
+      "sha256": "2c1a44958a786c9335f8c9d0853a31e22244a7858b2528596c7250c6eca2f206"
     },
     {
       "path": "courses/ch05.json",
-      "bytes": 7422,
-      "sha256": "6ad866f558dfcd0391780b90562b75c6f78a5e14295f13e55891fea5d9ffce03"
+      "bytes": 8508,
+      "sha256": "c1c12eaceb521dcb86a2ecf0d9fa4b71e9386cd7986c921373cf8abb4c6be7ff"
     },
     {
       "path": "courses/ch06.json",
-      "bytes": 11133,
-      "sha256": "85c47db714c7713007609a45c37ce39f2f06fcaed1e6d4a8a911ef8aafac9766"
+      "bytes": 12373,
+      "sha256": "656cb0e4b9a42cefafc41958fae9b10a33ca95bd47a0a9414d8924aa6be1d8ea"
     },
     {
       "path": "courses/ch07.json",
-      "bytes": 16209,
-      "sha256": "ad9a563505a6f04e7cfba649a549cd44c8315a6964b2be456d442318043aa5f6"
+      "bytes": 17334,
+      "sha256": "0e4f277c7c868e41877d0ab27d0902aa13c3b1748faa262efcd8a2c4c1de62a4"
     },
     {
       "path": "courses/ch08.json",
-      "bytes": 41119,
-      "sha256": "b21fe60454ec7ff5929ba270bf4cf3771795b9c63c908176953cf34af5a30200"
+      "bytes": 33039,
+      "sha256": "382586b01e6d90f50579f5b2fdabb389d0c129bee3de4e0dc0d4fcfb3c91e3b1"
     },
     {
       "path": "courses/ch09.json",
-      "bytes": 17356,
-      "sha256": "636c93edf61a51016930039bfe94adce1376d286d3f75be8f72a811ddc8cc232"
+      "bytes": 15359,
+      "sha256": "eec561da2f72aa661ebce4d6bb94806ea2865dbbb8e90941043694754ba3e587"
     },
     {
       "path": "courses/ch10.json",
-      "bytes": 20714,
-      "sha256": "b82f48261b3d3af36800716cbbf3abc83959b3cb02b3aca6f11784836b1e4d8e"
+      "bytes": 22374,
+      "sha256": "817a8fb1c2b503841cb22d8391fb56836774b54b8450c330b008add24e3d0312"
     },
     {
       "path": "courses/ch11.json",
-      "bytes": 16007,
-      "sha256": "76441f73f98be0bc804334311542e73094da9279ed92a2305ab8868243d0b851"
+      "bytes": 15579,
+      "sha256": "d58d44717f8e9b4d7603a986c1cb5e62857ae6bf4e0f4027cc735628ef6f6149"
     },
     {
       "path": "courses/ch12.json",
-      "bytes": 16397,
-      "sha256": "6eecca118c13d5e47c3d15dbd200ed751288e1625a14d96b0297841dd9d8c6eb"
+      "bytes": 16147,
+      "sha256": "2ff7916d473916c59c3bfd0c4d1eb396c1e59f15282609f69b7c2d93ff4542f6"
     },
     {
       "path": "courses/ch13.json",
-      "bytes": 13940,
-      "sha256": "e5d173993cadcdbf89eecde0e21f670eaf5174fb48166458e0f111982a189dd1"
+      "bytes": 8847,
+      "sha256": "c952e1d77259a8c2486d852c11fe0780a0b0491a7ef8b3eabbbcd94c03605025"
     },
     {
       "path": "courses/ch14.json",
-      "bytes": 10708,
-      "sha256": "34ca1b4973d0f6b3d9e70e1a8b62885a1d6737c7585774336b2bec707aaad831"
+      "bytes": 7547,
+      "sha256": "d7af1e5461889a775d9fef81bfcd3febfb1fb2a0a6340a4008ce50d93171cb18"
     },
     {
       "path": "courses/ch15.json",
-      "bytes": 29317,
-      "sha256": "7eb3e3be2accca2e4c2836b48e93c4704967a442dadc37acdabb04f17758552e"
+      "bytes": 27495,
+      "sha256": "461aaff631a10971fd0c65e6abfadaccaf44782ea2f56180a756b08de927bb73"
     },
     {
       "path": "courses/ch16.json",
-      "bytes": 14132,
-      "sha256": "a9fe4da1c16ad0f523cdb4e41a21fd630353934a91ad54b2c944cd25b4a95669"
+      "bytes": 15429,
+      "sha256": "1353734a64c915850de9dafeeca3b9017d637859a6df893be4d325a84393a057"
     },
     {
       "path": "courses/ch17.json",
-      "bytes": 13287,
-      "sha256": "7ec03f4abc40259b2630580e9018afbda18c2d7c00a96152d33cbef2e2f03435"
+      "bytes": 7078,
+      "sha256": "d3ecf671880ffd4245547097fa9f5f3bf571eabdbb997f195fbd230c912d91ad"
     },
     {
       "path": "courses/ch18.json",
-      "bytes": 13567,
-      "sha256": "c6370c164eecb962528ac984654ca50519a7298fef3a32f6e57dd569d0fa67f1"
+      "bytes": 5736,
+      "sha256": "38a29b524a7659dc12019dcebea94eac464379bfbe1773c5b7692497c1a5edb4"
     },
     {
       "path": "courses/ch19.json",
-      "bytes": 537289,
-      "sha256": "ed252507e9514739b2f36c90b867edbbd16e4f6602fd96c8dba02e7acf058217"
+      "bytes": 276349,
+      "sha256": "98ccff40c47c64d31a3e74af78ef7ca765329999b9bf4a32c3debfa9ed52f6d4"
     },
     {
       "path": "courses/ch20.json",
-      "bytes": 295541,
-      "sha256": "357d8bba05fc52d240d82f1349719dcc206b7b7d7971344b84267bc685c267cd"
+      "bytes": 183236,
+      "sha256": "e96affcdcefabdbe735cc78e0e6c28dba96eb39b7db6c239ef24eb0e63fed5ad"
     },
     {
       "path": "fixtures/lesson-accounts.json",
@@ -407,103 +407,103 @@
     },
     {
       "path": "reading/ch01.md",
-      "bytes": 6418,
-      "sha256": "43b722588d55cb0afa4d5d18ef729ce78c546446b24fe300bbe232d642c205df"
+      "bytes": 4893,
+      "sha256": "e5947ea03bf009815ef9a8dea0c5075f00751ed7722e6c59b62406dff09b20ba"
     },
     {
       "path": "reading/ch02.md",
-      "bytes": 4662,
-      "sha256": "4bcfe889bd61232fa80799b1957a29cff03b4245bc7dbac243f57924fa1c31e3"
+      "bytes": 2864,
+      "sha256": "d1c91db1c29f752c8d5bd174726dfad496680c627b0be5082f50dd30be8c7bc0"
     },
     {
       "path": "reading/ch03.md",
-      "bytes": 5954,
-      "sha256": "d0a7ddb356d13c6975d0748dd8a68c834735aa9ac4d48bc5e3bfce1a4273cf0e"
+      "bytes": 5318,
+      "sha256": "cdcfa1ac2791d8cd24ce314de12f3b9fdb276ecbe7fc9811c1efa5fe92aad94d"
     },
     {
       "path": "reading/ch04.md",
-      "bytes": 3099,
-      "sha256": "0eeb53f8385ee73d3b0302038b17176988c396185a3fc3257b55e9d65fa52685"
+      "bytes": 2697,
+      "sha256": "0cc9a223d3ca28c52c96a5a8fc99b47216ca92adaf017d3981d3f28c984a8b50"
     },
     {
       "path": "reading/ch05.md",
-      "bytes": 2779,
-      "sha256": "6aa7a0d1aa3aa4bffff69c10046dc188ad70c424f2c21f45cd8a9a756e0bd9c4"
+      "bytes": 2524,
+      "sha256": "cdb20cfb7941e1229f49d2e55adb3806dc1897072571367c63884f31faa2192a"
     },
     {
       "path": "reading/ch06.md",
-      "bytes": 3995,
-      "sha256": "00e65bb2a6523ea93ca16ac8a1cc43d3beab3d6f75f00283c55bcf66b748d198"
+      "bytes": 3642,
+      "sha256": "0a2b71fb1a73484e8bc9ead2d9a9ef0cc6362d00404980e1f83d4c6cf5924530"
     },
     {
       "path": "reading/ch07.md",
-      "bytes": 5116,
-      "sha256": "f6579699df400112a259b18e4bb9db1be92e2b7c8465e00256a9362bd31db7cc"
+      "bytes": 4648,
+      "sha256": "68f1d14070b0fc2c1d3b9019935d0f6091d84685d97acbe00cccfb37a737ca55"
     },
     {
       "path": "reading/ch08.md",
-      "bytes": 12273,
-      "sha256": "2fa9be4ab11790ee23ebf31af389406d41c4960dae274abfe15de164dabe8886"
+      "bytes": 8821,
+      "sha256": "0b388d6e9a452896fd86bc8a9a6bb295a341d7be147b4048aa15823e98effce4"
     },
     {
       "path": "reading/ch09.md",
-      "bytes": 6292,
-      "sha256": "a109780b6882212673293a01c58570d2f6819f58466f89f4e857305588a6d61c"
+      "bytes": 4398,
+      "sha256": "1c4f475f7f2270da5bfc6ba1147ce118e2b5e54b3ec68204a6f3f11abddc1370"
     },
     {
       "path": "reading/ch10.md",
-      "bytes": 6720,
-      "sha256": "75ca3448f20bdff8014e0d0dc6fb08b9e17b9c6317f3f142880706844ed29997"
+      "bytes": 6253,
+      "sha256": "0c3c526ce77c63776cf12b03b27ddbad32e22a2198041c2160f64433733b2aa0"
     },
     {
       "path": "reading/ch11.md",
-      "bytes": 6232,
-      "sha256": "7442632902aeb7a19074fd611eee5d83f01da0fe8cf61f72e4719d098f01ac2c"
+      "bytes": 4618,
+      "sha256": "2e0ebbdd9f0a8115c41fa91cd3e161237b99d09d1f81804f1ded789406cedb8a"
     },
     {
       "path": "reading/ch12.md",
-      "bytes": 7507,
-      "sha256": "4aadbd4a49370229381f64727fd8699a140c4e2ffd376c6747251746e4e78030"
+      "bytes": 5296,
+      "sha256": "82f6967fbd379d8b2f1a3aae6f5d097681c639a2f8d9983bf07572d109d04803"
     },
     {
       "path": "reading/ch13.md",
-      "bytes": 5497,
-      "sha256": "dcf26e017061b01029a01c26b376b5f72f0e63fdf7926f11ca95c10992b7e72a"
+      "bytes": 2748,
+      "sha256": "a72e4f50219ab37e5aeda38b6074f6a290289928efe872c05983da1f0df87231"
     },
     {
       "path": "reading/ch14.md",
-      "bytes": 3539,
-      "sha256": "4ae5893e9c2313c8804216f4f3abfe29e1be89450ae96f7b2a0327c583cfeab0"
+      "bytes": 2313,
+      "sha256": "e476c0c511d4a8adcf34a5095673afa22b8225d682a288872964cf08f62b7ab4"
     },
     {
       "path": "reading/ch15.md",
-      "bytes": 10281,
-      "sha256": "c0d97d274fbae5d7007ab33d6da2229bc04cbda2b58db9cc9a484eed240aafae"
+      "bytes": 8304,
+      "sha256": "2a78f231565ea3b12dca48b2f1f36160b4e41288a04fce235a8669d9d6ae45e2"
     },
     {
       "path": "reading/ch16.md",
-      "bytes": 5138,
-      "sha256": "d75ff627267841890da300da4aa989e396f5c38f5aa3c29b906cb5ea319c9fa3"
+      "bytes": 4725,
+      "sha256": "969e2c5f812aae127cd58e9846dc24d38de155a18b70685ca9447902b0d40d03"
     },
     {
       "path": "reading/ch17.md",
-      "bytes": 7664,
-      "sha256": "8ca411526be6d2f143e80a7a08e5916eebfb1f88587fae7260d0c23308b74b6c"
+      "bytes": 2553,
+      "sha256": "73b0444e5c18a9786b2eea497599d7ab5f8906ff41074c45f9e11ac390eb014d"
     },
     {
       "path": "reading/ch18.md",
-      "bytes": 5126,
-      "sha256": "0dd75b824ff5f2af227b3c407e144f9f89b781701faf7f4e6d70a1350e573d22"
+      "bytes": 1672,
+      "sha256": "c2700c33df9d1c93d0c97482c2c4391f27be686aa9ff2398e6362db6f1dac59f"
     },
     {
       "path": "reading/ch19.md",
-      "bytes": 128463,
-      "sha256": "7524a6910b59e4dff7a441cc7f4973aec5c3a28d83a8c56bdd58e9bb17abf4d4"
+      "bytes": 92608,
+      "sha256": "223f745c9a4a4c81b284473f304577e30b591f9294f31de26688faa4dabb932a"
     },
     {
       "path": "reading/ch20.md",
-      "bytes": 54609,
-      "sha256": "ba08ef4fa26e4a32ac1e02a6a23b8354ab01373be0cf2f638716a6431b28fa28"
+      "bytes": 54899,
+      "sha256": "9b7b6f9f6d4c9f33ca7e21b8ef3ba9c05f4f987e1d421356b98803d346f281af"
     },
     {
       "path": "reference/CURRICULUM.md",
@@ -892,8 +892,8 @@
     },
     {
       "path": "validation/mysql/kp19-03.sql",
-      "bytes": 946,
-      "sha256": "94ad646a20dee66dae55b5fcb4c43dfb44aee0ebd22ad018d0409eb1618cd382"
+      "bytes": 4468,
+      "sha256": "17edea54869abf47d6c7d8e08a59eaf1b52d27e6ec507080dc17fe420b91ec2f"
     },
     {
       "path": "validation/mysql/kp19-04.sql",
@@ -1032,18 +1032,18 @@
     },
     {
       "path": "validation/mysql/kp20-01.sql",
-      "bytes": 1159,
-      "sha256": "3b5549a18dce62c5a6b3bcf88665293cc03768396d873f263a0feca1f8e6b0b5"
+      "bytes": 4307,
+      "sha256": "5b6dc49b5d12606fc1e3617253f65a0769243abce40b666f72104e9c1b3111e3"
     },
     {
       "path": "validation/mysql/kp20-02.sql",
-      "bytes": 916,
-      "sha256": "4da1b27720e097a17c8d203139fb904212aeaef2ca234fde47921117571ab9d3"
+      "bytes": 4702,
+      "sha256": "10d441a087e33804d5daaaae11c9f7c9f26ec239831391557770f02abfca2c2d"
     },
     {
       "path": "validation/mysql/kp20-03.sql",
-      "bytes": 934,
-      "sha256": "3d167a31d6c0e752822c23cd01f3980ec7d8b76a0040277f5e9bf67e0a1b6917"
+      "bytes": 4407,
+      "sha256": "27aacab2f8c3b4f4c9831db988bc231a74134c09c06b7374349a17a9821dd50b"
     },
     {
       "path": "validation/mysql/kp20-04.sql",
@@ -1052,13 +1052,14 @@
     }
   ],
   "verification": {
-    "sqliteVersion": "3.46.1",
-    "executed": 151,
-    "theoryOnly": 1,
+    "sqliteVersion": "3.51.0",
+    "executed": 80,
+    "intermediateQueries": 73,
+    "theoryOnly": 0,
     "mysqlExecuted": 0
   },
-  "fixtureCount": 31,
-  "advancedTasks": 50,
+  "fixtureCount": 33,
+  "advancedTasks": 24,
   "enterpriseResourceRoot": "../enterprise_reference",
   "datasets": {
     "retail": {
@@ -1104,5 +1105,5 @@
       "sha256": "d47285cfecd67f2dfd37a0d41a2c8a2714a6ecbc8e1170c3e9c0052204106924"
     }
   },
-  "auditRelease": "4.2.1"
+  "auditRelease": "5.0.0"
 }

@@ -13,9 +13,7 @@
       "chapterId": "ch16",
       "title": "识别重复与去重规则",
       "learningObjective": "能够运用本节知识完成：发现重复导入数据",
-      "prerequisites": [
-        "ch15"
-      ],
+      "prerequisites": [],
       "concept": "重复记录由业务键决定，不是任意字段相同就删除；先报告重复，再确定保留规则。",
       "syntax": "GROUP BY business_key HAVING COUNT(*)>1",
       "parameters": {
@@ -114,7 +112,6 @@
       "relatedQuestionIds": [
         "q0221",
         "q0227",
-        "q0228",
         "q0229"
       ],
       "relatedFlashcardIds": [
@@ -151,14 +148,19 @@
       "primaryQuestionIds": [
         "q0221",
         "q0227",
-        "q0228",
         "q0229"
       ],
       "primaryFlashcardIds": [
         "fc0121",
         "fc0122",
         "fc0126"
-      ]
+      ],
+      "teaching": {
+        "problem": "先量化疑似重复，再决定哪些记录允许归并。",
+        "codeExplanation": "按清洗后的名称、金额及类别分组，HAVING 筛选计数超过一的组合。这样的组合是待复核的业务键。",
+        "resultExplanation": "两条 Mask 被归为一组。若同值交易确实可能多次发生，应加发票号等业务标识或人工复核。",
+        "checkpoints": []
+      }
     },
     {
       "id": "kp16-02",
@@ -265,8 +267,7 @@
       },
       "relatedQuestionIds": [
         "q0222",
-        "q0223",
-        "q0225"
+        "q0223"
       ],
       "relatedFlashcardIds": [
         "fc0123",
@@ -316,13 +317,18 @@
       "mysqlVerificationScript": "validation/mysql/kp16-02.sql",
       "primaryQuestionIds": [
         "q0222",
-        "q0223",
-        "q0225"
+        "q0223"
       ],
       "primaryFlashcardIds": [
         "fc0123",
         "fc0127"
-      ]
+      ],
+      "teaching": {
+        "problem": "数据质量报告要区分缺失、异常和通过的记录。",
+        "codeExplanation": "CASE 优先检查缺失和全空白文本，然后才比较转换后的金额。用稳定主键保留可回查线索。",
+        "resultExplanation": "同样的检查可批量汇总每种异常类型。存在非法数字字符串时应先验证可转换性，不能依赖数据库隐式转换。",
+        "checkpoints": []
+      }
     },
     {
       "id": "kp16-03",
@@ -493,12 +499,18 @@
       "primaryFlashcardIds": [
         "fc0124",
         "fc0125"
-      ]
+      ],
+      "teaching": {
+        "problem": "不同来源的金额文本及类别写法需要转成统一的对账口径。",
+        "codeExplanation": "CAST 为金额指定目标类型，TRIM 与 LOWER 归一类别后用 CASE 映射。建议保留原字段以便回溯。",
+        "resultExplanation": "两种写法可映射为同一数值和类别，行粒度保持不变。遇到无法识别的类别，应按明确规则标记。",
+        "checkpoints": []
+      }
     }
   ],
-  "plannedQuestionCount": 10,
+  "plannedQuestionCount": 8,
   "schemaVersion": 1,
-  "contentVersion": "1.0.0",
+  "contentVersion": "5.0.0",
   "dialect": "MySQL 8.4",
   "summary": "完成本章后：识别重复、缺失、异常和格式不一致。",
   "sources": [

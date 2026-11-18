@@ -9,18 +9,14 @@
       "id": "fc0128",
       "chapterId": "ch17",
       "knowledgePointIds": [
-        "kp17-01",
-        "kp17-05"
+        "kp17-01"
       ],
       "primaryKnowledgePointIds": [
-        "kp17-01",
-        "kp17-05"
+        "kp17-01"
       ],
       "relatedKnowledgePointIds": [],
       "relatedQuestionIds": [
-        "q0231",
-        "q0238",
-        "q0239"
+        "q0231"
       ],
       "questionLinkPolicy": "通过共享课程知识点关联正式题库；业务卡额外保留对应BP任务编号。关联不表示题目与卡片完全相同。",
       "type": "概念记忆",
@@ -56,16 +52,13 @@
       "id": "fc0129",
       "chapterId": "ch17",
       "knowledgePointIds": [
-        "kp17-04"
+        "kp17-02"
       ],
       "primaryKnowledgePointIds": [
-        "kp17-04"
+        "kp17-02"
       ],
       "relatedKnowledgePointIds": [],
-      "relatedQuestionIds": [
-        "q0232",
-        "q0240"
-      ],
+      "relatedQuestionIds": [],
       "questionLinkPolicy": "通过共享课程知识点关联正式题库；业务卡额外保留对应BP任务编号。关联不表示题目与卡片完全相同。",
       "type": "概念记忆",
       "difficulty": "困难",
@@ -106,8 +99,7 @@
       ],
       "relatedKnowledgePointIds": [],
       "relatedQuestionIds": [
-        "q0231",
-        "q0238"
+        "q0231"
       ],
       "questionLinkPolicy": "通过共享课程知识点关联正式题库；业务卡额外保留对应BP任务编号。关联不表示题目与卡片完全相同。",
       "type": "语法结构",
@@ -177,9 +169,7 @@
       ],
       "relatedKnowledgePointIds": [],
       "relatedQuestionIds": [
-        "q0234",
-        "q0235",
-        "q0236"
+        "q0235"
       ],
       "questionLinkPolicy": "通过共享课程知识点关联正式题库；业务卡额外保留对应BP任务编号。关联不表示题目与卡片完全相同。",
       "type": "语法结构",
@@ -279,16 +269,13 @@
       "id": "fc0132",
       "chapterId": "ch17",
       "knowledgePointIds": [
-        "kp17-03"
+        "kp17-01"
       ],
       "primaryKnowledgePointIds": [
-        "kp17-03"
+        "kp17-01"
       ],
       "relatedKnowledgePointIds": [],
-      "relatedQuestionIds": [
-        "q0233",
-        "q0237"
-      ],
+      "relatedQuestionIds": [],
       "questionLinkPolicy": "通过共享课程知识点关联正式题库；业务卡额外保留对应BP任务编号。关联不表示题目与卡片完全相同。",
       "type": "用法辨析",
       "difficulty": "困难",
@@ -329,7 +316,6 @@
       ],
       "relatedKnowledgePointIds": [],
       "relatedQuestionIds": [
-        "q0234",
         "q0235"
       ],
       "questionLinkPolicy": "通过共享课程知识点关联正式题库；业务卡额外保留对应BP任务编号。关联不表示题目与卡片完全相同。",
@@ -431,16 +417,13 @@
       "id": "fc0134",
       "chapterId": "ch17",
       "knowledgePointIds": [
-        "kp17-03"
+        "kp17-01"
       ],
       "primaryKnowledgePointIds": [
-        "kp17-03"
+        "kp17-01"
       ],
       "relatedKnowledgePointIds": [],
-      "relatedQuestionIds": [
-        "q0233",
-        "q0237"
-      ],
+      "relatedQuestionIds": [],
       "questionLinkPolicy": "通过共享课程知识点关联正式题库；业务卡额外保留对应BP任务编号。关联不表示题目与卡片完全相同。",
       "type": "代码填空",
       "difficulty": "困难",
@@ -544,16 +527,13 @@
       "id": "fc0135",
       "chapterId": "ch17",
       "knowledgePointIds": [
-        "kp17-04"
+        "kp17-02"
       ],
       "primaryKnowledgePointIds": [
-        "kp17-04"
+        "kp17-02"
       ],
       "relatedKnowledgePointIds": [],
-      "relatedQuestionIds": [
-        "q0232",
-        "q0240"
-      ],
+      "relatedQuestionIds": [],
       "questionLinkPolicy": "通过共享课程知识点关联正式题库；业务卡额外保留对应BP任务编号。关联不表示题目与卡片完全相同。",
       "type": "结果预测",
       "difficulty": "困难",

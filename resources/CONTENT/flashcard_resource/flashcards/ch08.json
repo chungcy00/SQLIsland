@@ -52,17 +52,13 @@
       "id": "fc0052",
       "chapterId": "ch08",
       "knowledgePointIds": [
-        "kp08-07"
+        "kp08-04"
       ],
       "primaryKnowledgePointIds": [
-        "kp08-07"
+        "kp08-04"
       ],
       "relatedKnowledgePointIds": [],
-      "relatedQuestionIds": [
-        "q0096",
-        "q0100",
-        "q0103"
-      ],
+      "relatedQuestionIds": [],
       "questionLinkPolicy": "通过共享课程知识点关联正式题库；业务卡额外保留对应BP任务编号。关联不表示题目与卡片完全相同。",
       "type": "概念记忆",
       "difficulty": "中等",
@@ -105,7 +101,6 @@
       "relatedQuestionIds": [
         "q0097",
         "q0098",
-        "q0105",
         "q0106"
       ],
       "questionLinkPolicy": "通过共享课程知识点关联正式题库；业务卡额外保留对应BP任务编号。关联不表示题目与卡片完全相同。",
@@ -589,16 +584,15 @@
       "id": "fc0057",
       "chapterId": "ch08",
       "knowledgePointIds": [
-        "kp08-06"
+        "kp08-02",
+        "kp08-04"
       ],
       "primaryKnowledgePointIds": [
-        "kp08-06"
+        "kp08-02",
+        "kp08-04"
       ],
       "relatedKnowledgePointIds": [],
-      "relatedQuestionIds": [
-        "q0102",
-        "q0104"
-      ],
+      "relatedQuestionIds": [],
       "questionLinkPolicy": "通过共享课程知识点关联正式题库；业务卡额外保留对应BP任务编号。关联不表示题目与卡片完全相同。",
       "type": "代码填空",
       "difficulty": "中等",
@@ -797,19 +791,15 @@
       "id": "fc0058",
       "chapterId": "ch08",
       "knowledgePointIds": [
-        "kp08-04",
-        "kp08-07"
+        "kp08-04"
       ],
       "primaryKnowledgePointIds": [
-        "kp08-04",
-        "kp08-07"
+        "kp08-04"
       ],
       "relatedKnowledgePointIds": [],
       "relatedQuestionIds": [
         "q0096",
-        "q0100",
-        "q0108",
-        "q0110"
+        "q0108"
       ],
       "questionLinkPolicy": "通过共享课程知识点关联正式题库；业务卡额外保留对应BP任务编号。关联不表示题目与卡片完全相同。",
       "type": "代码填空",
@@ -957,7 +947,6 @@
       "relatedKnowledgePointIds": [],
       "relatedQuestionIds": [
         "q0108",
-        "q0110",
         "q0111"
       ],
       "questionLinkPolicy": "通过共享课程知识点关联正式题库；业务卡额外保留对应BP任务编号。关联不表示题目与卡片完全相同。",

@@ -13,9 +13,7 @@
       "chapterId": "ch06",
       "title": "COUNT 的三个形式",
       "learningObjective": "能够运用本节知识完成：比较数据量、有效量及唯一值",
-      "prerequisites": [
-        "ch05"
-      ],
+      "prerequisites": [],
       "concept": "COUNT(*) 统计行；COUNT(col) 忽略该列 NULL；COUNT(DISTINCT col) 统计不同非空值。",
       "syntax": "COUNT(*); COUNT(col); COUNT(DISTINCT col)",
       "parameters": {
@@ -131,7 +129,13 @@
         "fc0036",
         "fc0040",
         "fc0042"
-      ]
+      ],
+      "teaching": {
+        "problem": "同一列可分别回答录入行数、填报数和不同取值数。",
+        "codeExplanation": "COUNT(*) 数全部行，COUNT(value) 数非空值，COUNT(DISTINCT value) 在非空值中去重后再数。",
+        "resultExplanation": "四行记录有三个非空值和两个不同取值。可用这三个统计量解释填报率和样本的重复程度。",
+        "checkpoints": []
+      }
     },
     {
       "id": "kp06-02",
@@ -216,9 +220,7 @@
       },
       "relatedQuestionIds": [
         "q0062",
-        "q0066",
         "q0068",
-        "q0071",
         "q0072",
         "q0075"
       ],
@@ -247,9 +249,7 @@
       "mysqlVerificationScript": "validation/mysql/kp06-02.sql",
       "primaryQuestionIds": [
         "q0062",
-        "q0066",
         "q0068",
-        "q0071",
         "q0072",
         "q0075"
       ],
@@ -258,7 +258,13 @@
         "fc0039",
         "fc0041",
         "fc0043"
-      ]
+      ],
+      "teaching": {
+        "problem": "在汇报均值前核对样本分母，避免把缺失记录默认为零。",
+        "codeExplanation": "SUM、AVG 忽略 NULL；均值相当于总和除以非空行数。若需要补零，要在聚合前明确写 COALESCE。",
+        "resultExplanation": "20 除以 3 得约 6.67，零参与计算，缺失不计。计算跨组均值时应合并各组的分子和分母。",
+        "checkpoints": []
+      }
     },
     {
       "id": "kp06-03",
@@ -377,8 +383,7 @@
       "relatedQuestionIds": [
         "q0063",
         "q0064",
-        "q0067",
-        "q0073"
+        "q0067"
       ],
       "relatedFlashcardIds": [
         "fc0038"
@@ -403,17 +408,22 @@
       "primaryQuestionIds": [
         "q0063",
         "q0064",
-        "q0067",
-        "q0073"
+        "q0067"
       ],
       "primaryFlashcardIds": [
         "fc0038"
-      ]
+      ],
+      "teaching": {
+        "problem": "获得价格范围用于检查跨度，再回原表寻找对应商品。",
+        "codeExplanation": "MIN 与 MAX 将非空价格压成一行，不保留对应商品编号。若需要商品明细，用子查询比较极值或使用排名。",
+        "resultExplanation": "区间是 15 到 89，最低价可能属于多件商品。把编号任意放进聚合输出不能证明它对应极值。",
+        "checkpoints": []
+      }
     }
   ],
-  "plannedQuestionCount": 15,
+  "plannedQuestionCount": 12,
   "schemaVersion": 1,
-  "contentVersion": "1.0.0",
+  "contentVersion": "5.0.0",
   "dialect": "MySQL 8.4",
   "summary": "完成本章后：计算计数、金额、平均值及极值。",
   "sources": [

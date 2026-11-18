@@ -39,7 +39,7 @@ function highlight(sql) {
   );
 }
 export function editorBody(id, value, settings, toolbar) {
-  return `<section class="sql-editor ${settings.editorDark ? "dark" : ""}" style="--editor-font:${settings.fontSize}px" data-editor="${escape(id)}"><div class="sql-editor-toolbar"><small>SQL <span id="editor-line-count">${value.split("\n").length}</span> 行</small><div class="editor-controls">${toolbar}</div></div><div class="editor-body"><div class="editor-gutter" aria-hidden="true"><div id="editor-lines"></div></div><div class="editor-content"><pre id="editor-highlight" aria-hidden="true"></pre><textarea id="sql-editor" class="code-input" data-id="${escape(id)}" inputmode="${settings.customKeyboard ? "none" : "text"}" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" wrap="off" aria-label="SQL 代码编辑器">${escape(value)}</textarea></div></div></section>`;
+  return `<section class="sql-editor ${settings.editorDark ? "dark" : ""}" style="--editor-font:${settings.fontSize}px" data-editor="${escape(id)}"><div class="sql-editor-toolbar"><small>SQL <span id="editor-line-count">${value.split("\n").length}</span> 行</small><div class="editor-controls">${toolbar}</div></div><div class="editor-body"><div class="editor-gutter" aria-hidden="true"><div id="editor-lines"></div></div><div class="editor-content"><pre id="editor-highlight" aria-hidden="true"></pre><textarea id="sql-editor" class="code-input" data-id="${escape(id)}" inputmode="${settings.customKeyboard ? "none" : "text"}" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" wrap="soft" aria-label="SQL 代码编辑器">${escape(value)}</textarea></div></div></section>`;
 }
 export function mountEditor(root, onChange) {
   const input = root.querySelector("#sql-editor");
@@ -66,13 +66,19 @@ export function mountEditor(root, onChange) {
   }
   function sync() {
     root.querySelector("#editor-highlight").innerHTML = highlight(input.value);
-    const count = input.value.split("\n").length;
-    root.querySelector(".editor-body").style.height =
-      Math.max(120, count * 24 + 28) + "px";
-    root.querySelector("#editor-lines").textContent = Array.from(
-      { length: count },
-      (_, i) => i + 1,
-    ).join("\n");
+    const lines = input.value.split("\n");
+    const count = lines.length;
+    const style = getComputedStyle(input);
+    const measure = document.createElement("div");
+    measure.className = "editor-line-measure";
+    measure.style.font = style.font;
+    measure.style.width = Math.max(1, input.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight)) + "px";
+    measure.innerHTML = lines.map((line) => `<div>${escape(line) || "<br>"}</div>`).join("");
+    root.append(measure);
+    const heights = [...measure.children].map((line) => line.getBoundingClientRect().height);
+    measure.remove();
+    root.querySelector(".editor-body").style.height = Math.max(120, heights.reduce((total, height) => total + height, 0) + 28) + "px";
+    root.querySelector("#editor-lines").innerHTML = heights.map((height, index) => `<div style="height:${height}px">${index + 1}</div>`).join("");
     root.querySelector("#editor-line-count").textContent = count;
     root.querySelector("[data-action=editorUndo]").disabled =
       !controller.undo.length;

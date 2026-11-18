@@ -1,3 +1,6 @@
+import { lessonComplete, lessonNote, lessonNoteKey, migrateLessonBookmarks } from "./curriculum-progress.js";
+import { isCurrentQuestionAttempt, questionDraft } from "./question-progress.js";
+import { actionIconPaths } from "./action-icons.js";
 import { fetchLatestUpdate, UPDATE_REPOSITORY } from "./updates.js";
 import release from "../release.json";
 import { editorBody, mountEditor, editorCommand } from "./editor.js";
@@ -16,7 +19,6 @@ import {
   deleteDataset,
   restoreAll,
 } from "./store.js";
-import { compareResults } from "./engine.js";
 const app = document.querySelector("#app");
 const e = (value) =>
   String(value ?? "").replace(
@@ -60,6 +62,7 @@ const paths = {
 };
 const icon = (name, cls = "") =>
   `<svg class="icon ${cls}" viewBox="0 0 24 24" aria-hidden="true"><path d="${paths[name] || paths.book}"/></svg>`;
+const actionIcon = (name) => `<svg class="icon material-icon" viewBox="0 0 24 24" aria-hidden="true">${actionIconPaths[name].map((path) => `<path d="${path}"/>`).join("")}</svg>`;
 const image = (path, cls = "", alt = "") =>
   `<img class="${cls}" src="assets/${path}.png" alt="${e(alt)}">`;
 const button = (label, action, arg = "", cls = "") =>
@@ -102,6 +105,9 @@ let search = "",
 const listPositions = new Map();
 let learningSearchView = null, practiceFilterView = null;
 let questionSequence = null;
+let questionKeyboard = false;
+let lessonExampleResult = null;
+const questionTableCache = new Map();
 const projectSchemas = new Map();
 let selectedOption = "",
   hints = 0,
@@ -179,8 +185,10 @@ async function markActivity() {
   await persist();
 }
 const getChapter = (id) => content.chapters.find((c) => c.id === id);
-const getKP = (id) =>
-  content.chapters.flatMap((c) => c.knowledgePoints).find((k) => k.id === id);
+const knowledgePoints = () => content.chapters.flatMap((c) => c.knowledgePoints);
+const getKP = (id) => knowledgePoints().find((k) => k.id === id);
+const completedLesson = (id) => lessonComplete(state, content.curriculumMigration, id);
+const completedKnowledgePoints = () => knowledgePoints().filter((k) => completedLesson(k.id)).length;
 const getQuestion = (id) => content.questions.find((q) => q.id === id);
 const allCards = () => [...content.cards, ...state.userCards];
 const favorite = (id) => state.favorites.includes(id);
@@ -191,7 +199,9 @@ const favButton = (id) =>
     id,
     "icon-button favorite " + (favorite(id) ? "selected" : ""),
   );
-const attempted = (id) => state.attempts.filter((a) => a.questionId === id);
+const currentAttempt = (attempt) => isCurrentQuestionAttempt(attempt, getQuestion(attempt.questionId));
+const attempted = (id) => state.attempts.filter((a) => a.questionId === id && currentAttempt(a));
+const draftForQuestion = (id) => questionDraft(state.drafts[id], getQuestion(id));
 const independentDone = (id) =>
   attempted(id).some((a) => a.pass && a.independent);
 function wrongQuestions() {
@@ -228,7 +238,7 @@ function shell(title, body, tab = "home", detail = false, extra = "") {
   app.innerHTML = `<header class="appbar">${detail ? button(icon("back"), "back", "", "icon-button") : image("brand/logo_d", "logo")}<h1>${e(title)}</h1>${extra || (!detail ? goButton(icon("settings"), "/settings", "icon-button") : "")}</header><main class="page ${detail ? "detail" : ""}">${body}</main>${detail ? "" : `<nav aria-label="主导航">${navigation.map(([key, label, path]) => goButton(`<span class="nav-icon">${image(`navigation/${key}_${tab === key ? "active" : "inactive"}`)}</span>${label}`, path, tab === key ? "active" : "")).join("")}</nav>`}`;
 }
 function completedChapter(c) {
-  return c.knowledgePoints.every((k) => state.completed.includes(k.id));
+  return c.knowledgePoints.every((k) => completedLesson(k.id));
 }
 function dueCards() {
   return allCards()
@@ -248,11 +258,11 @@ function studiedCards() {
 function summaryStats() {
   const ids = [
     ...new Set(
-      state.attempts.filter((a) => !a.ungraded).map((a) => a.questionId),
+      state.attempts.filter((a) => !a.ungraded && currentAttempt(a)).map((a) => a.questionId),
     ),
   ];
   const first = ids.map((id) =>
-    state.attempts.find((a) => a.questionId === id && !a.ungraded),
+    state.attempts.find((a) => a.questionId === id && !a.ungraded && currentAttempt(a)),
   );
   return {
     count: ids.length,
@@ -287,7 +297,7 @@ function home() {
     getKP(state.lastLesson) ||
     content.chapters
       .flatMap((c) => c.knowledgePoints)
-      .find((k) => !state.completed.includes(k.id)) ||
+      .find((k) => !completedLesson(k.id)) ||
     getKP("kp01-01");
   const stats = summaryStats();
   const minutes = Math.floor((state.studySeconds || 0) / 60);
@@ -300,21 +310,21 @@ function home() {
     ["代码实验室", "/lab", "code_lab", ""],
     ["业务实战", "/projects", "project", projects.length + " 个项目"],
     ["错题本", "/wrong", "wrongbook", wrongQuestions().length + " 道题"],
-    ["收藏夹", "/favorites", "favorites", state.favorites.length + " 项"],
+    ["收藏夹", "/favorites", "favorites", state.favorites.filter((id) => getKP(id) || getQuestion(id) || allCards().some((card) => card.id === id)).length + " 项"],
   ];
   shell(
     "数屿SQL",
     `<section class="panel continue learning-hero"><div class="study-badge">连续学习 ${studyStreak()} 天 · 累计 ${minutes} 分钟</div><div class="learning-hero-content"><div class="grow"><h2>${e(title)}</h2><p class="hero-summary">${summary}</p></div>${image("illustrations/states/state_home_learning", "learning-hero-art")}</div><div class="hero-actions">${goButton(icon("play") + " " + (state.lastLesson ? "继续学习" : "开始学习"), "/lesson/" + next.id, "primary")}${goButton("待复习 " + dueCards().length + " 卡", "/cards", "hero-review")}</div></section>
     <div class="section-heading"><h2>快捷入口</h2></div><div class="home-shortcuts">${shortcuts.map(([label, route, asset, count]) => goButton(`<span class="list-icon">${image("functions/" + asset, "asset-icon")}</span><span class="grow"><strong>${label}</strong>${count ? `<small>${count}</small>` : ""}</span>`, route, "shortcut-tile")).join("")}</div>
-    <div class="section-heading"><h2>学习路线</h2>${goButton("查看统计", "/stats")}</div><div class="stats home-progress"><div class="stat"><strong>${state.completed.length}<small> / 152</small></strong><small>学完知识点</small></div><div class="stat"><strong>${stats.done}<small> / 300</small></strong><small>独立完成题目</small></div><div class="stat"><strong>${studiedCards()}<small> / 200</small></strong><small>已学闪卡</small></div></div>
+    <div class="section-heading"><h2>学习路线</h2>${goButton("查看统计", "/stats")}</div><div class="stats home-progress"><div class="stat"><strong>${completedKnowledgePoints()}<small> / ${knowledgePoints().length}</small></strong><small>学完知识点</small></div><div class="stat"><strong>${stats.done}<small> / ${content.questions.length}</small></strong><small>独立完成题目</small></div><div class="stat"><strong>${studiedCards()}<small> / 200</small></strong><small>已学闪卡</small></div></div>
     <div class="home-stages">${stages.map((stage) => {
       const chapters = content.chapters.filter((c) => c.stage === stage);
       const points = chapters.flatMap((c) => c.knowledgePoints);
-      const done = points.filter((k) => state.completed.includes(k.id)).length;
+      const done = points.filter((k) => completedLesson(k.id)).length;
       return button(`<span class="row between"><strong>${stage}</strong>${icon("right", "chevron")}</span><small>${chapters.length} 章 · ${done} / ${points.length} 已学</small><span class="progress"><span style="width:${points.length ? done / points.length * 100 : 0}%"></span></span>`, "homeStage", stage, "home-stage");
     }).join("")}</div>
     <div class="section-heading"><h2>业务实战</h2>${goButton("全部项目", "/projects")}</div><div class="home-projects" aria-label="业务项目">${projects.map((p) => {
-      const tasks = content.questions.filter((q) => q.projectId === p[0]);
+      const tasks = content.questions.filter((q) => q.chapterId === "ch19" && q.projectId === p[0]);
       const done = tasks.filter((q) => independentDone(q.id)).length;
       return goButton(`${image("illustrations/business/business_" + p[3], "home-project-art")}<strong>${e(p[1])}</strong><small>${done} / ${tasks.length} 项任务已完成</small>`, "/projects/" + p[0], "home-project");
     }).join("")}</div><div class="notice">${icon("database")} 本地 SQLite 兼容执行 · MySQL 8.4 教学</div>`,
@@ -342,10 +352,10 @@ function learning() {
   const expansion = search ? learningSearchView : view;
   shell(
     "学习路线",
-    `<div class="row between route-summary"><h2>体系课程</h2>${tag(state.completed.length + " / 152 已学")}</div><div class="search">${icon("search")}<input id="search" value="${e(search)}" placeholder="搜索知识点或语法" aria-label="搜索章节或知识点"></div><div class="chips stage-filters">${stages.map((stage) => button(stage, "learningStage", stage, "chip " + (view.stage === stage ? "selected" : ""))).join("")}</div><div class="chapter-list">${matching
+    `<div class="row between route-summary"><h2>体系课程</h2>${tag(completedKnowledgePoints() + " / " + knowledgePoints().length + " 已学")}</div><div class="search">${icon("search")}<input id="search" value="${e(search)}" placeholder="搜索知识点或语法" aria-label="搜索章节或知识点"></div><div class="chips stage-filters">${stages.map((stage) => button(stage, "learningStage", stage, "chip " + (view.stage === stage ? "selected" : ""))).join("")}</div><div class="chapter-list">${matching
       .map((c) => {
         const learned = c.knowledgePoints.filter((k) =>
-          state.completed.includes(k.id),
+          completedLesson(k.id),
         ).length;
         const expanded = expansion.expanded.includes(c.id);
         const points =
@@ -358,7 +368,7 @@ function learning() {
             : c.knowledgePoints;
         const current = c.knowledgePoints.some((k) => k.id === state.lastLesson);
         const rows = points.map((k) => {
-          const done = state.completed.includes(k.id);
+          const done = completedLesson(k.id);
           const active = k.id === state.lastLesson;
           const status = done
             ? '<span class="point-check">' + icon("check") + '</span>'
@@ -388,17 +398,19 @@ function learning() {
 function chapterPage(id) {
   const c = getChapter(id);
   if (!c) return home();
-  const done = c.knowledgePoints.filter((k) => state.completed.includes(k.id)).length;
+  const done = c.knowledgePoints.filter((k) => completedLesson(k.id)).length;
   shell(c.title, `<div class="question-meta">${tag(c.stage)}<small>第 ${c.number} 章 · 已学 ${done} / ${c.knowledgePoints.length}</small></div><p class="chapter-objective">${e(c.objective)}</p><div class="progress" role="progressbar" aria-label="本章学习进度" aria-valuemin="0" aria-valuemax="${c.knowledgePoints.length}" aria-valuenow="${done}"><span style="width:${done / c.knowledgePoints.length * 100}%"></span></div><h2>本章知识点</h2>${c.knowledgePoints.map((k) => {
-    const completed = state.completed.includes(k.id);
+    const completed = completedLesson(k.id);
     return goButton(`${completed ? '<span class="point-check">' + icon("check") + '</span>' : '<span class="point-dot"></span>'}<span class="grow">${e(k.title)}</span>${k.id === state.lastLesson ? '<small class="learning-position">上次学到</small>' : ''}${icon("right", "chevron")}`, "/lesson/" + k.id, "knowledge-row" + (completed ? " completed" : "") + (k.id === state.lastLesson ? " current" : ""));
   }).join("")}`, "learn", true);
 }
-function renderTables(tables) {
+function renderTables(tables, expandable = true) {
   return (tables || []).map((t) => {
     const rows = t.rows || [];
+    const rowCount = t.rowCount ?? rows.length;
+    const displayedRows = expandable ? rows.length : Math.min(5, rows.length);
     const preview = table(t.columns, rows.slice(0, 5));
-    return `<section class="source-table"><div class="row between table-heading"><h3><span class="source-table-name" title="${e(t.name)}">${e(t.name)}</span></h3><small>${rows.length} 行</small></div>${preview}${rows.length > 5 ? `<details class="remaining-rows"><summary>查看其余 ${rows.length - 5} 行</summary>${table(t.columns, rows.slice(5), rows.length)}</details>` : ""}</section>`;
+    return `<section class="source-table"><div class="row between table-heading"><h3><span class="source-table-name" title="${e(t.name)}">${e(t.name)}</span></h3><small>${rowCount} 行</small></div>${preview}${expandable && rows.length > 5 ? `<details class="remaining-rows"><summary>查看其余 ${rows.length - 5} 行</summary>${table(t.columns, rows.slice(5), rows.length)}</details>` : ""}${rowCount > displayedRows ? `<small>预览前 ${displayedRows} 行</small>` : ""}</section>`;
   }).join("");
 }
 function lessonCode(sql) {
@@ -407,7 +419,7 @@ function lessonCode(sql) {
   return `<details class="long-code"><summary><span class="code-expand-label">展开完整 SQL</span><span class="code-collapse-label">收起 SQL</span></summary>${code(sql)}</details><div class="code-excerpt" aria-hidden="true">${code(formatted.split("\n").slice(0, 10).join("\n"))}</div>`;
 }
 function sequenceButtons(previous, next, kind) {
-  const item = (entry, direction) => `<button class="${direction === "next" ? "primary" : "outline"}" data-action="${kind === "lesson" ? "go" : "adjacentQuestion"}" data-arg="${entry ? (kind === "lesson" ? "/lesson/" : "/question/") + entry.id : ""}" ${!entry || busy ? "disabled" : ""}>${direction === "previous" ? icon("back") : ""}${kind === "lesson" ? (direction === "previous" ? "上一节" : "下一节") : (direction === "previous" ? "上一题" : "下一题")}${direction === "next" ? icon("right") : ""}</button>`;
+  const item = (entry, direction) => `<button class="${direction === "next" ? "primary" : "outline"}" data-action="${kind === "lesson" ? "go" : "adjacentQuestion"}" data-arg="${entry ? (kind === "lesson" ? "/lesson/" : "/question/") + entry.id : ""}" ${!entry || busy ? "disabled" : ""}>${direction === "previous" ? actionIcon("back") : ""}${kind === "lesson" ? (direction === "previous" ? "上一节" : "下一节") : (direction === "previous" ? "上一题" : "下一题")}${direction === "next" ? actionIcon("right") : ""}</button>`;
   return `<div class="actions sequence-actions" aria-label="${kind === "lesson" ? "知识点切换" : "题目切换"}">${item(previous, "previous")}${item(next, "next")}</div>`;
 }
 function rich(value) {
@@ -446,16 +458,30 @@ function rich(value) {
     })
     .join("");
 }
+function lessonTeaching(k) {
+  if (!k.teaching) return "";
+  const { problem, codeExplanation, checkpoints } = k.teaching;
+  return `<p>${e(problem)}</p><p>${e(codeExplanation)}</p>${checkpoints.map((step) =>
+    `<details class="lesson-checkpoint"><summary>${e(step.label)} · <code>${e(step.name)}</code></summary>${lessonCode(step.sql)}${table(step.result.columns, step.result.rows)}</details>`
+  ).join("")}`;
+}
+function lessonResult(k, result) {
+  const shown = result.rows.slice(0, 20);
+  return `<small>本次 SQLite 兼容执行结果 · ${result.rowCount} 行${result.rowCount > shown.length ? ` · 展示前 ${shown.length} 行` : ""}</small>${table(result.columns, shown)}${k.teaching?.resultExplanation ? `<p>${e(k.teaching.resultExplanation)}</p>` : ""}`;
+}
 function lessonPage(id) {
   const k = getKP(id);
-  if (!k) return home();
+  if (!k) {
+    const target = content.curriculumMigration.historyTargets[id] || content.curriculumMigration.targets[id]?.[0];
+    if (target) return navigate("/lesson/" + target);
+    return learning();
+  }
   const chapter = getChapter(k.chapterId);
   const allPoints = content.chapters.flatMap((c) => c.knowledgePoints);
   const index = allPoints.findIndex((point) => point.id === id);
   const position = chapter.knowledgePoints.findIndex((point) => point.id === id) + 1;
   const related = (k.relatedQuestionIds || []).map(getQuestion).filter(Boolean);
   const sharedExample = formatSqlForDisplay(k.syntax) === formatSqlForDisplay(k.mysqlSql);
-  const businessLesson = chapter.number >= 19;
   const goal = (k.learningObjective || k.useCase || "").replace(/^(能够运用本节知识完成|在统一企业数据库中独立完成)[：:]\s*/, "");
   const scenario = k.useCase && k.useCase !== goal ? k.useCase : "";
   const parameters = k.parameters ? `<ul class="parameter-list">${Object.entries(k.parameters).map(([name, description]) => `<li><strong>${e(name)}</strong><span>${e(description)}</span></li>`).join("")}</ul>` : "";
@@ -464,15 +490,15 @@ function lessonPage(id) {
   persist().catch((err) => toast(err.message));
   shell("知识点详情", `<div class="lesson-details">
     <header class="lesson-intro"><div class="question-meta">${tag(chapter.title)}${tag(k.compatibility?.status || "MySQL 教学")}<small>${position} / ${chapter.knowledgePoints.length}</small></div><h1 class="lesson-title">${e(k.title)}</h1>${goal ? `<section class="lesson-purpose" data-lesson-section="purpose"><p>能够运用本节知识完成：${e(goal)}</p></section>` : ""}</header>
-    <div class="lesson-foundation"><section class="lesson-section" data-lesson-section="concept"><h2>${businessLesson ? "业务口径" : "核心概念"}</h2>${scenario ? `<p class="lesson-scenario">${e(scenario)}</p>` : ""}<div class="lesson-concept">${readingChunks(k.concept).map((chunk) => `<p>${e(chunk)}</p>`).join("")}</div>${sharedExample ? parameters : ""}</section>
+    <div class="lesson-foundation"><section class="lesson-section" data-lesson-section="concept"><h2>核心概念</h2>${scenario ? `<p class="lesson-scenario">${e(scenario)}</p>` : ""}<div class="lesson-concept">${readingChunks(k.concept).map((chunk) => `<p>${e(chunk)}</p>`).join("")}</div>${sharedExample ? parameters : ""}</section>
     ${!sharedExample ? `<section class="lesson-section" data-lesson-section="syntax"><h2>语法</h2>${lessonCode(k.syntax)}${parameters}</section>` : ""}</div>
     ${(k.executionSteps || []).length ? `<section class="lesson-section" data-lesson-section="steps"><h2>执行思路</h2><ol class="steps">${k.executionSteps.map((step, i) => `<li class="step"><b>${i + 1}</b><span>${e(step)}</span></li>`).join("")}</ol></section>` : ""}
     <section class="lesson-section" data-lesson-section="data"><h2>示例数据</h2>${renderTables(k.sourceTables)}</section>
-    <section class="lesson-section" data-lesson-section="example"><div class="section-heading example-heading"><h2>SQL 示例</h2>${button(icon("code") + " 去实验室", "lessonLab", id, "small-button")}</div>${lessonCode(k.mysqlSql)}${button(icon("play") + " 运行兼容示例", "lessonRun", id, "primary full")}<div id="lesson-result">${k.result?.columns && k.result?.rows ? `<small>课程示例结果</small>${table(k.result.columns, k.result.rows)}` : ""}</div></section>
+    <section class="lesson-section" data-lesson-section="example"><div class="section-heading example-heading"><h2>SQL 示例</h2>${button(icon("code") + " 去实验室", "lessonLab", id, "small-button")}</div>${lessonTeaching(k)}${lessonCode(k.mysqlSql)}${k.sqliteSql ? button(actionIcon("play") + " 运行兼容示例", "lessonRun", id, "primary full") : ""}<div id="lesson-result">${lessonExampleResult?.id === id ? lessonResult(k, lessonExampleResult.result) : ""}</div></section>
     <section class="lesson-section lesson-cautions"><h2>辨析与易错点</h2><p>${e(k.comparison)}</p>${k.commonError ? `<dl class="mistake-comparison"><div><dt>易错</dt><dd>${e(k.commonError.example)}</dd></div><div><dt>修正</dt><dd>${e(k.commonError.correction)}</dd></div></dl>` : ""}<p>${e(k.notes)}</p></section>
     ${related.length ? `<section class="lesson-section related-questions"><div class="section-heading"><h2>关联练习</h2>${goButton("全部 " + related.length + " 题", "/practice/kp/" + id, "small-button")}</div>${questionList(related, true)}</section>` : ""}
-    <section class="lesson-section"><label class="form-field">我的笔记<textarea id="note" data-id="${id}" aria-label="我的笔记">${e(state.notes[id] || "")}</textarea></label></section>
-    <div class="lesson-completion">${button(state.completed.includes(id) ? icon("check") + " 已完成学习" : "完成学习", "completeLesson", id, "primary full")}${(k.relatedFlashcardIds || []).length ? button("复习相关闪卡", "relatedCards", id, "tonal full") : ""}</div>
+    <section class="lesson-section"><label class="form-field">我的笔记<textarea id="note" data-id="${id}" aria-label="我的笔记">${e(lessonNote(state, content.curriculumMigration, id))}</textarea></label><div class="note-controls"><small id="note-status" role="status"></small>${button(actionIcon("save") + " 保存笔记", "saveLessonNote", id, "primary")}</div></section>
+    <div class="lesson-completion">${button(completedLesson(id) ? actionIcon("check") + " 已完成学习" : actionIcon("check") + " 完成学习", "completeLesson", id, "primary full")}</div>
     ${sequenceButtons(allPoints[index - 1], allPoints[index + 1], "lesson")}
   </div>`, "learn", true, favButton(id));
 }
@@ -570,7 +596,7 @@ async function publicFixture(q) {
   const f = q.testFixtures.find((f) => f.visibility === "public");
   return f ? fetch(f.path).then((r) => r.json()) : null;
 }
-function editor(id, value) {
+function editor(id, value, keyboardVisible = state.settings.customKeyboard) {
   const control = (name, action, label) =>
     button(
       icon(name) + '<span class="sr-only">' + label + "</span>",
@@ -588,7 +614,7 @@ function editor(id, value) {
     '<div class="editor-workspace">' +
     editorBody(id, value, state.settings, toolbar) +
     '<div class="keyboard-wrap ' +
-    (state.settings.customKeyboard ? "" : "hidden") +
+    (keyboardVisible ? "" : "hidden") +
     '"><div class="keyboard-resize" role="separator" tabindex="0" aria-label="调整SQL键盘高度" aria-orientation="horizontal" aria-valuemin="150" aria-valuemax="520"></div><div class="keyboard-modes">' +
     ["语法", "字段", "符号", "字母"]
       .map((mode, i) =>
@@ -672,56 +698,80 @@ function choiceExplanation(q) {
 function questionRequirements(q) {
   return `<div class="requirement-sections">${requirementSections(q.requirements).map((section) => `<section><h2>${e(section.label)}</h2><div class="requirement-text">${readingChunks(section.text, true).map((chunk) => `<p>${e(chunk)}</p>`).join("")}</div></section>`).join("")}</div>`;
 }
-async function questionPage(id) {
+async function questionFields(q) {
+  if (questionFieldCache.has(q.id)) return questionFieldCache.get(q.id);
+  const dataset = dbManifest.datasets.find((item) => item.id === q.datasetId);
+  let fields = [];
+  if (dataset) {
+    if (!projectSchemas.has(dataset.id)) {
+      const response = await fetch(dataset.schemaPath);
+      if (!response.ok) throw new Error("无法读取本题数据字典");
+      projectSchemas.set(dataset.id, businessErdDictionary(await response.json()));
+    }
+    const dictionary = projectSchemas.get(dataset.id);
+    const names = q.sourceTables?.length ? q.sourceTables : Object.keys(dictionary.tables || {});
+    fields = names.map((name) => ({ name, columns: dictionary.tables?.[name]?.columns || [] }));
+  } else {
+    const fixture = await publicFixture(q);
+    fields = (fixture?.tables || []).map((t) => ({ name: t.name, columns: t.columns.map((c) => typeof c === "string" ? { name: c } : c) }));
+  }
+  questionFieldCache.set(q.id, fields);
+  return fields;
+}
+async function questionTables(q) {
+  if (questionTableCache.has(q.id)) return questionTableCache.get(q.id);
+  const fixture = q.testFixtures.find((f) => f.visibility === "public");
+  if (!fixture) return [];
+  const result = await rpc("questionTables", { path: fixture.path, names: q.sourceTables || [] }, 60000);
+  questionTableCache.set(q.id, result.tables);
+  questionFieldCache.set(q.id, result.fields);
+  return result.tables;
+}
+async function questionPage(id, renderVersion = revision) {
   const q = getQuestion(id);
   if (!q) return practice("/practice");
   if (loadedQuestionId !== id) {
     loadedQuestionId = id;
     quizTab = "题目";
+    questionKeyboard = false;
     feedback = null;
     lastResult = null;
     selectedOption = state.drafts[id]?.option || "";
-    hints = state.drafts[id]?.hints || 0;
-    answerShown = state.drafts[id]?.answerShown || false;
+    hints = draftForQuestion(id).hints || 0;
+    answerShown = draftForQuestion(id).answerShown || false;
   }
   const chapter = getChapter(q.chapterId);
   const chapterQuestions = content.questions.filter((item) => item.chapterId === q.chapterId);
   const sequence = questionSequence?.includes(id) ? questionSequence.map(getQuestion).filter(Boolean) : chapterQuestions;
   const position = sequence.findIndex((item) => item.id === id);
   const submitted = attempted(id).length > 0;
-  const predictionLocked = q.type === "结果预测" && !submitted;
-  if (predictionLocked) answerShown = false;
-  if (quizTab === "代码" && q.type !== "选择") {
-    if (!questionFieldCache.has(q.id)) {
-      const fixture = await publicFixture(q);
-      const schema = fixture ? await rpc("fixtureSchema", { fixture }) : { fields: [] };
-      questionFieldCache.set(q.id, schema.fields);
-    }
-    editorFields = questionFieldCache.get(q.id);
-  }
+  if (q.type !== "选择") editorFields = await questionFields(q);
   let body = `<div class="quiz-details"><div class="question-meta">${tag(q.type)}${tag(q.difficulty)}<small>${q.id.toUpperCase()}</small></div><h1 class="quiz-title">${e(q.title.split(" · ")[0])}</h1><p class="question-location">第 ${chapter.number} 章 · ${e(chapter.title)}<span>${chapterQuestions.findIndex((item) => item.id === id) + 1} / ${chapterQuestions.length}</span></p>`;
   if (q.type === "选择") {
     body += `<p class="choice-requirements">${e(q.requirements)}</p><div class="choice-options" role="radiogroup" aria-label="答案选项">${q.options.map((o) => `<div class="choice-item">${`<button class="option ${selectedOption === o.id ? "selected" : ""}" data-action="option" data-arg="${e(o.id)}" role="radio" aria-checked="${selectedOption === o.id}"><b>${e(o.id)}</b><span>${e(o.text)}</span>${selectedOption === o.id ? icon("check") : ""}</button>`}${submitted && o.explanation ? `<p class="option-explanation ${o.id === q.correctOptionId ? "correct" : ""}">${o.id === q.correctOptionId ? icon("check") : ""}${e(o.explanation)}</p>` : ""}</div>`).join("")}</div>`;
   } else {
-    body += `<div class="tabs">${["题目", "数据表", "代码", "结果"].map((t) => button(t, "quizTab", t, quizTab === t ? "selected" : "")).join("")}</div>`;
-    if (quizTab === "题目") body += `${q.context ? `<p class="question-context">${e(q.context)}</p>` : ""}${questionRequirements(q)}${q.initialCode ? `<section class="initial-sql">${q.type === "代码纠错" ? "<h2>待修正代码</h2>" : ""}${lessonCode(q.initialCode)}</section>` : ""}${q.type === "结果预测" ? '<p class="input-guidance">提交前无法运行此题 SQL。</p>' : ""}${button(q.type === "结果预测" ? "查看原始数据" : q.type === "代码纠错" ? "开始纠错" : "开始编写", "quizTab", q.type === "结果预测" ? "数据表" : "代码", "primary full")}`;
+    body += `<div class="tabs">${["题目", "数据表"].map((t) => button(t, "quizTab", t, quizTab === t ? "selected" : "")).join("")}</div>`;
     if (quizTab === "数据表") {
-      const f = await publicFixture(q);
-      body += f?.tables ? renderTables(f.tables) : `<p>本题使用 ${e(q.datasetId)} 数据库。</p>${button("在实验室查看数据结构", "questionLab", q.id, "tonal full")}`;
+      try {
+        const tables = await questionTables(q);
+        body += tables.length ? renderTables(tables, false) : empty("暂无公开数据表");
+      } catch (error) {
+        body += `<div class="notice error">${e(error.message)}</div>${button("重新加载数据表", "quizTab", "数据表", "outline")}`;
+      }
+    } else {
+      body += `${q.context ? `<p class="question-context">${e(q.context)}</p>` : ""}${questionRequirements(q)}`;
+        body += `<section class="question-code"><h2>${q.type === "代码纠错" ? "修正代码" : q.type === "代码填空" ? "补全代码" : "编写 SQL"}</h2>${q.type === "代码填空" ? `<p class="input-guidance">补全 ${e([...new Set((q.initialCode || "").match(/\{\{[^}]+\}\}/g) || [])].join("、") || "代码中的空位")}，可编辑完整 SQL。</p>` : ""}${editor(q.id, draftForQuestion(id).code ?? formatSqlForDisplay(q.initialCode ?? ""), questionKeyboard && state.settings.customKeyboard)}</section>`;
     }
-    if (quizTab === "代码") {
-      if (q.type === "结果预测") body += `<section class="prediction-workspace"><h2>待推演 SQL</h2>${lessonCode(q.initialCode)}<label class="form-field">填写预测结果<textarea id="prediction" aria-describedby="prediction-format" placeholder='{"columns":["id"],"rows":[[1],[2]]}'>${e(state.drafts[id]?.prediction || "")}</textarea></label><p class="input-guidance" id="prediction-format">使用 JSON 对象填写 columns 和 rows，NULL 写作 null，文本用双引号。</p></section>`;
-      else body += `${q.type === "代码填空" ? `<p class="input-guidance">补全 ${e([...new Set((q.initialCode || "").match(/\{\{[^}]+\}\}/g) || [])].join("、") || "代码中的空位")}，可编辑完整 SQL。</p>` : ""}${q.type === "代码纠错" ? '<h2 class="editor-heading">修正代码</h2>' : ""}${editor(q.id, state.drafts[id]?.code ?? formatSqlForDisplay(q.initialCode ?? ""))}`;
-    }
-    if (quizTab === "结果") body += lastResult ? `<section class="query-output"><div class="row between table-heading"><h2>运行结果</h2><small>${lastResult.rowCount} 行${lastResult.elapsedMs ? " · " + lastResult.elapsedMs + " ms" : ""}</small></div>${table(lastResult.columns, lastResult.rows)}</section>` : empty("暂无运行结果");
   }
+  body += `<section class="question-execution"><div class="actions">${q.type !== "选择" ? button(actionIcon(busy ? "stop" : "play") + (busy ? " 停止" : " 运行"), busy ? "stop" : "runQuestion", q.id, "outline") : ""}<button class="primary" data-action="submitQuestion" data-arg="${id}" ${busy ? "disabled" : ""}>${actionIcon("send")}${busy ? "执行中…" : "提交答案"}</button></div></section>`;
+  if (lastResult) body += `<section class="query-output"><div class="row between table-heading"><h2>运行结果</h2><small>${lastResult.rowCount} 行${lastResult.elapsedMs ? " · " + lastResult.elapsedMs + " ms" : ""}</small></div>${table(lastResult.columns, lastResult.rows)}</section>`;
   if (feedback) {
     const title = feedback.unsupported ? "未评定" : feedback.submitted === false ? (feedback.pass ? "运行完成" : "执行失败") : feedback.pass ? "回答正确" : "答案不符";
-    body += `<section class="judge-feedback" aria-live="polite"><div class="notice ${feedback.unsupported ? "warning" : feedback.pass ? "success" : "error"}"><strong>${title}</strong>${feedback.message && !(q.type === "选择" && q.options.some((option) => option.explanation === feedback.message)) ? `<p>${e(feedback.message)}</p>` : ""}${feedback.fixtures ? `<small>已检查 ${feedback.fixtures} 组独立夹具</small>` : ""}</div>${feedback.publicComparison ? `<details><summary>公开数据结果对比</summary><h3>你的结果${feedback.publicComparison.actual.rowCount != null ? ' · ' + feedback.publicComparison.actual.rowCount + ' 行' : ''}</h3>${table(feedback.publicComparison.actual.columns, feedback.publicComparison.actual.rows)}<h3>预期结果${feedback.publicComparison.expected.rowCount != null ? ' · ' + feedback.publicComparison.expected.rowCount + ' 行' : ''}</h3>${table(feedback.publicComparison.expected.columns, feedback.publicComparison.expected.rows)}${Math.max(feedback.publicComparison.actual.rowCount || 0, feedback.publicComparison.expected.rowCount || 0) > 40 ? '<small>各展示前 40 行</small>' : ''}</details>` : ""}${!answerShown && (feedback.submitted || q.type === "选择" || q.type === "结果预测") ? `<details open><summary>答案解析</summary><p>${e(q.type === "选择" ? choiceExplanation(q) : q.explanation)}</p></details>` : ""}</section>`;
+    body += `<section class="judge-feedback" aria-live="polite"><div class="notice ${feedback.unsupported ? "warning" : feedback.pass ? "success" : "error"}"><strong>${title}</strong>${feedback.message && !(q.type === "选择" && q.options.some((option) => option.explanation === feedback.message)) ? `<p>${e(feedback.message)}</p>` : ""}${feedback.fixtures ? `<small>已检查 ${feedback.fixtures} 组独立夹具</small>` : ""}</div>${feedback.publicComparison ? `<details><summary>公开数据结果对比</summary><h3>你的结果${feedback.publicComparison.actual.rowCount != null ? ' · ' + feedback.publicComparison.actual.rowCount + ' 行' : ''}</h3>${table(feedback.publicComparison.actual.columns, feedback.publicComparison.actual.rows)}<h3>预期结果${feedback.publicComparison.expected.rowCount != null ? ' · ' + feedback.publicComparison.expected.rowCount + ' 行' : ''}</h3>${table(feedback.publicComparison.expected.columns, feedback.publicComparison.expected.rows)}${Math.max(feedback.publicComparison.actual.rowCount || 0, feedback.publicComparison.expected.rowCount || 0) > 40 ? '<small>各展示前 40 行</small>' : ''}</details>` : ""}${!answerShown && (feedback.submitted || q.type === "选择") ? `<details open><summary>答案解析</summary><p>${e(q.type === "选择" ? choiceExplanation(q) : q.explanation)}</p></details>` : ""}</section>`;
   }
-  body += `<section class="answer-support"><div class="actions"><button class="outline" data-action="hint" data-arg="${id}" ${hints >= Math.min(q.hints.length, 3) ? "disabled" : ""}>提示 ${Math.min(hints, 3)}/${Math.min(q.hints.length, 3)}</button><button class="outline" data-action="showAnswer" data-arg="${id}" ${predictionLocked || answerShown ? "disabled" : ""}>${predictionLocked ? "提交后查看答案" : answerShown ? "已查看参考答案" : "查看参考答案"}</button></div>${hints ? `<ol class="hint-list">${q.hints.slice(0, hints).map((hint, index) => `<li><small>提示 ${index + 1}</small><p>${e(hint)}</p></li>`).join("")}</ol>` : ""}${answerShown ? `<details class="reference-answer" open><summary>参考答案</summary>${q.type === "选择" ? `<p>正确选项 ${e(q.correctOptionId)}</p>` : code(q.referenceSolutions[0]?.mysqlSql || q.initialCode)}<p>${e(q.type === "选择" ? choiceExplanation(q) : q.explanation)}</p>${q.type === "结果预测" ? table(q.expectedOutput.columns, q.expectedOutput.rows) : ""}</details>` : ""}</section>`;
-  body += `${sequenceButtons(sequence[position - 1], sequence[position + 1], "question")}<div class="bottom-actions"><div class="actions">${!["选择", "结果预测"].includes(q.type) ? button(busy ? "停止" : icon("play") + " 运行", busy ? "stop" : "runQuestion", q.id, "outline") : ""}<button class="primary" data-action="submitQuestion" data-arg="${id}" ${busy ? "disabled" : ""}>${busy ? "执行中…" : "提交答案"}</button></div></div></div>`;
-  if (route() !== "/question/" + id) return;
+  body += `<section class="answer-support"><div class="actions"><button class="outline" data-action="hint" data-arg="${id}" ${hints >= Math.min(q.hints.length, 3) ? "disabled" : ""}>${actionIcon("hint")}提示 ${Math.min(hints, 3)}/${Math.min(q.hints.length, 3)}</button><button class="outline" data-action="showAnswer" data-arg="${id}" ${answerShown ? "disabled" : ""}>${actionIcon("answer")}${answerShown ? "已查看参考答案" : "查看参考答案"}</button></div>${hints ? `<ol class="hint-list">${q.hints.slice(0, hints).map((hint, index) => `<li><small>提示 ${index + 1}</small><p>${e(hint)}</p></li>`).join("")}</ol>` : ""}${answerShown ? `<details class="reference-answer" open><summary>参考答案</summary>${q.type === "选择" ? `<p>正确选项 ${e(q.correctOptionId)}</p>` : code(q.referenceSolutions[0]?.mysqlSql || q.initialCode)}<p>${e(q.type === "选择" ? choiceExplanation(q) : q.explanation)}</p></details>` : ""}</section>`;
+  body += `${sequenceButtons(sequence[position - 1], sequence[position + 1], "question")}</div>`;
+  if (route() !== "/question/" + id || renderVersion !== revision) return;
   shell(q.type === "选择" ? "选择练习" : "SQL 练习", body, "practice", true, favButton(id));
 }
 function hydrate(card) {
@@ -871,7 +921,7 @@ const projects = [
 async function projectsPage(id) {
   const project = projects.find((p) => p[0] === id);
   if (project) {
-    const qs = content.questions.filter((q) => q.projectId === id);
+    const qs = content.questions.filter((q) => q.chapterId === "ch19" && q.projectId === id);
     const requestedRoute = route();
     const dataset = dbManifest.datasets.find((item) => item.id === id + "-v2");
     let schema, schemaError;
@@ -896,7 +946,7 @@ async function projectsPage(id) {
   }
   shell(
     "业务实战",
-    `<p class="page-meta">6 个项目 · 每项目 5 项任务</p>${projects.map((p) => goButton(`${image("illustrations/business/business_" + p[3], "project-img")}<div class="grow"><h3>${p[1]}</h3></div>${icon("right", "chevron")}`, "/projects/" + p[0], "link-row")).join("")}${goButton("第 20 章 · 跨业务综合练习", "/chapter/ch20", "tonal full")}`,
+    `<p class="page-meta">${projects.length} 个项目 · ${content.questions.filter((q) => q.chapterId === "ch19").length} 项任务</p>${projects.map((p) => goButton(`${image("illustrations/business/business_" + p[3], "project-img")}<div class="grow"><h3>${p[1]}</h3></div>${icon("right", "chevron")}`, "/projects/" + p[0], "link-row")).join("")}${goButton("第 20 章 · 跨业务综合练习", "/chapter/ch20", "tonal full")}`,
     "home",
     true,
   );
@@ -916,7 +966,7 @@ async function openLab(id = "lesson") {
       ? { bytes: custom.bytes }
       : builtin
         ? { path: builtin.path }
-        : { tables: (example || getKP("kp01-01")).sourceTables },
+        : { tables: (example || getKP("kp01-01")).sourceTables, setupSql: example?.setupSql },
   );
   if (opening === labOpenRevision && currentLab === id) labInfo = info;
 }
@@ -1044,8 +1094,8 @@ function mine() {
   const resourceStatus = state.resourceCheck ? (state.resourceCheck.pass ? "校验通过" : "发现异常") : "未检查";
   shell(
     "我的",
-    `<div class="row personal-heading">${image("brand/app_icon_5_192", "personal-logo")}<h1>学习手记</h1></div><div class="stats personal-stats"><div class="stat"><strong>${state.completed.length}</strong><small>学完知识点</small></div><div class="stat"><strong>${stats.done}</strong><small>独立完成题目</small></div><div class="stat"><strong>${state.reviewEvents.length}</strong><small>闪卡复习次数</small></div></div>
-    <section class="mine-group" aria-label="学习记录">${row("学习统计", "", "/stats", "stats")}${row("错题本", wrongQuestions().length + " 道题", "/wrong", "wrongbook")}${row("收藏夹", state.favorites.length + " 项", "/favorites", "favorites")}${row("个人闪卡", state.userCards.length + " 张", "/my-cards", "cards", false)}</section>
+    `<div class="row personal-heading">${image("brand/app_icon_5_192", "personal-logo")}<h1>学习手记</h1></div><div class="stats personal-stats"><div class="stat"><strong>${completedKnowledgePoints()}</strong><small>学完知识点</small></div><div class="stat"><strong>${stats.done}</strong><small>独立完成题目</small></div><div class="stat"><strong>${state.reviewEvents.length}</strong><small>闪卡复习次数</small></div></div>
+    <section class="mine-group" aria-label="学习记录">${row("学习统计", "", "/stats", "stats")}${row("错题本", wrongQuestions().length + " 道题", "/wrong", "wrongbook")}${row("收藏夹", state.favorites.filter((id) => getKP(id) || getQuestion(id) || allCards().some((card) => card.id === id)).length + " 项", "/favorites", "favorites")}${row("个人闪卡", state.userCards.length + " 张", "/my-cards", "cards", false)}</section>
     <section class="mine-group" aria-label="数据管理">${row("数据集管理", "", "/datasets", "dataset")}${row("备份与恢复", state.lastBackupExportAt ? "已发起导出" : "尚未导出", "/backup", "backup")}${row("离线资源", resourceStatus, "/resources", "offline")}</section>
     <section class="mine-group" aria-label="应用设置">${row("版本更新", "", "/updates", "download", false)}${row("软件设置", "", "/settings", "settings")}</section>
     <p class="app-version">数屿SQL ${release.version} · 内容资源 ${content.contentVersion}<br>Android 10 及以上</p>`,
@@ -1068,7 +1118,7 @@ function statsPage() {
   const max = Math.max(...days.map((d) => d.count), 1);
   shell(
     "学习统计",
-    `<div class="stats"><div class="stat"><strong>${state.completed.length}<small> / 152</small></strong><small>累计学完知识点</small></div><div class="stat"><strong>${stats.count}<small> / 300</small></strong><small>累计作答题目</small></div><div class="stat"><strong>${streak}</strong><small>连续学习天数</small></div></div><h2>最近 7 天</h2><small>学习操作次数</small><div class="bar-chart">${days.map((d) => `<div class="bar-day"><div>${d.count}</div><div class="bar" style="height:${Math.max(2, (d.count / max) * 88)}px"></div>${d.label}</div>`).join("")}</div><h2>练习表现</h2><div class="panel"><div class="setting-row"><span>首次独立正确率</span><strong>${stats.rate === null ? "暂无数据" : stats.rate + "%"}</strong></div><div class="setting-row"><span>已独立完成</span><strong>${stats.done} 题</strong></div><div class="setting-row"><span>已完成章节</span><strong>${completed} / 20</strong></div></div><details><summary>统计口径</summary><p class="muted">学习操作包括完成知识点、提交练习和闪卡评级。学习天数包含有效阅读，学习时长从 0.2.0 版本起记录。首次独立正确率按每道已提交题目的首次作答计算，使用提示或参考答案的作答计入辅助学习。</p></details><h2>各章进度</h2>${content.chapters.map((c) => `<div style="margin-bottom:18px"><div class="row between"><small>${c.number}. ${e(c.title)}</small><small>${c.knowledgePoints.filter((k) => state.completed.includes(k.id)).length}/${c.knowledgePoints.length}</small></div><div class="progress" style="margin:7px 0"><span style="width:${(c.knowledgePoints.filter((k) => state.completed.includes(k.id)).length / c.knowledgePoints.length) * 100}%"></span></div></div>`).join("")}`,
+    `<div class="stats"><div class="stat"><strong>${completedKnowledgePoints()}<small> / ${knowledgePoints().length}</small></strong><small>累计学完知识点</small></div><div class="stat"><strong>${stats.count}<small> / ${content.questions.length}</small></strong><small>累计作答题目</small></div><div class="stat"><strong>${streak}</strong><small>连续学习天数</small></div></div><h2>最近 7 天</h2><small>学习操作次数</small><div class="bar-chart">${days.map((d) => `<div class="bar-day"><div>${d.count}</div><div class="bar" style="height:${Math.max(2, (d.count / max) * 88)}px"></div>${d.label}</div>`).join("")}</div><h2>练习表现</h2><div class="panel"><div class="setting-row"><span>首次独立正确率</span><strong>${stats.rate === null ? "暂无数据" : stats.rate + "%"}</strong></div><div class="setting-row"><span>已独立完成</span><strong>${stats.done} 题</strong></div><div class="setting-row"><span>已完成章节</span><strong>${completed} / 20</strong></div></div><details><summary>统计口径</summary><p class="muted">学习操作包括完成知识点、提交练习和闪卡评级。学习天数包含有效阅读，学习时长从 0.2.0 版本起记录。首次独立正确率按每道已提交题目的首次作答计算，使用提示或参考答案的作答计入辅助学习。</p></details><h2>各章进度</h2>${content.chapters.map((c) => `<div style="margin-bottom:18px"><div class="row between"><small>${c.number}. ${e(c.title)}</small><small>${c.knowledgePoints.filter((k) => completedLesson(k.id)).length}/${c.knowledgePoints.length}</small></div><div class="progress" style="margin:7px 0"><span style="width:${(c.knowledgePoints.filter((k) => completedLesson(k.id)).length / c.knowledgePoints.length) * 100}%"></span></div></div>`).join("")}`,
     "mine",
     true,
   );
@@ -1341,6 +1391,8 @@ async function recordAttempt(q, input, result, assistance = { hints, answerShown
       : Date.now() + "-" + Math.random(),
     questionId: q.id,
     contentVersion: q.contentVersion,
+    executionMode: q.executionMode,
+    gradingRevision: q.gradingRevision,
     time: now().toISOString(),
     input,
     pass: !!result.pass,
@@ -1366,7 +1418,7 @@ async function evaluateQuestion(id, submit) {
   const q = getQuestion(id);
   const assistance = { hints, answerShown };
   let result;
-  const draft = state.drafts[id] || {};
+  const draft = draftForQuestion(id);
   let input = "";
   if (q.type === "选择") {
     if (!selectedOption) {
@@ -1382,49 +1434,17 @@ async function evaluateQuestion(id, submit) {
           ? ""
           : q.options.find((o) => o.id === selectedOption)?.explanation,
     };
-  } else if (q.type === "结果预测") {
-    input = draft.prediction || "";
-    if (!input) {
-      quizTab = "代码";
-      render();
-      toast("请填写预测结果。");
-      return;
-    }
-    let predicted;
-    try {
-      predicted = JSON.parse(input);
-      if (
-        !Array.isArray(predicted.columns) ||
-        !Array.isArray(predicted.rows) ||
-        predicted.rows.some(
-          (r) => !Array.isArray(r) || r.length !== predicted.columns.length,
-        )
-      )
-        throw new Error();
-    } catch {
-      toast("请按示例填写有效的 columns 和 rows JSON。");
-      return;
-    }
-    result = {
-      ...compareResults(
-        predicted,
-        q.expectedOutput,
-        q.orderPolicy,
-        q.numericTolerance?.absolute,
-        q.numericTolerance?.exactColumns,
-        q.numericTolerance?.columnAbsolute,
-      ),
-      submitted: true,
-    };
   } else {
     input = draft.code ?? q.initialCode ?? "";
     if (!input.trim()) {
-      quizTab = "代码";
+      quizTab = "题目";
       render();
       toast("先写一条 SQL。");
       return;
     }
     busy = true;
+    questionKeyboard = false;
+    quizTab = "题目";
     render();
     try {
       result = await rpc(
@@ -1439,17 +1459,16 @@ async function evaluateQuestion(id, submit) {
     }
   }
   result.submitted = submit;
-  if (submit && q.type === "结果预测" && !result.pass) {
-    result.publicComparison = { actual: JSON.parse(input), expected: q.expectedOutput };
-  }
   if (submit) await recordAttempt(q, input, result, assistance);
   if (route() !== "/question/" + id || loadedQuestionId !== id) return;
   if (result.result) {
     lastResult = result.result;
-    quizTab = "结果";
+    quizTab = "题目";
   }
+  questionKeyboard = false;
   feedback = result;
-  render();
+  await render();
+  if (route() === "/question/" + id) document.querySelector(".query-output, .judge-feedback")?.scrollIntoView({ block: "nearest" });
   if (!submit && !result.result && result.pass) toast("SQL 执行完成。");
 }
 async function exportFile(name, text, mime = "application/json") {
@@ -1505,11 +1524,11 @@ function validateState(value) {
   )
     throw new Error("备份记录结构或版本不受支持。");
   const known = new Set(
-    content.chapters.flatMap((c) => c.knowledgePoints).map((k) => k.id),
+    [...knowledgePoints().map((k) => k.id), ...Object.keys(content.curriculumMigration.targets), ...content.curriculumMigration.removed],
   );
   if (value.completed.some((id) => !known.has(id)))
     throw new Error("备份包含无法识别的知识点 ID。");
-  const qIds = new Set(content.questions.map((q) => q.id));
+  const qIds = new Set([...content.questions.map((q) => q.id), ...content.curriculumMigration.removedQuestions]);
   if (
     value.attempts.some(
       (a) =>
@@ -1539,8 +1558,8 @@ function mergeState(existing, incoming) {
     ...b.filter((x) => !a.some((y) => y.id === x.id)),
     ...a,
   ];
-  for (const key of ["completed", "favorites"])
-    result[key] = [...new Set([...existing[key], ...incoming[key]])];
+  for (const key of ["completed", "favorites", "consolidatedCompleted"])
+    result[key] = [...new Set([...(existing[key] || []), ...(incoming[key] || [])])];
   for (const key of ["attempts", "reviewEvents", "userCards"])
     result[key] = mergeById(existing[key], incoming[key]);
   result.attempts.sort((a, b) => Date.parse(a.time) - Date.parse(b.time));
@@ -1672,8 +1691,9 @@ async function handleAction(action, arg, element) {
       toast(favorite(arg) ? "已收藏" : "已取消收藏");
       break;
     case "completeLesson":
-      if (!state.completed.includes(arg)) {
-        state.completed.push(arg);
+      if (!completedLesson(arg)) {
+        if (lessonNoteKey(content.curriculumMigration, arg) === arg) state.completed.push(arg);
+        else (state.consolidatedCompleted ??= []).push(arg);
         await markActivity();
         toast("已记录学习进度。");
       }
@@ -1681,7 +1701,7 @@ async function handleAction(action, arg, element) {
       break;
     case "lessonLab": {
       const k = getKP(arg);
-      const dataset = "example-" + arg;
+      const dataset = k.datasetId || "example-" + arg;
       await openLab(dataset);
       const workspace = labWorkspace();
       const tabId = "query" + ++workspace.counter;
@@ -1694,24 +1714,37 @@ async function handleAction(action, arg, element) {
       navigate("/lab/" + dataset);
       break;
     }
+    case "saveLessonNote": {
+      const note = document.querySelector("#note");
+      if (!note || note.dataset.id !== arg) break;
+      const savedValue = note.value;
+      state.notes[lessonNoteKey(content.curriculumMigration, arg)] = savedValue;
+      element.disabled = true;
+      try {
+        await persist();
+        if (document.querySelector("#note")?.dataset.id === arg && document.querySelector("#note").value === savedValue) document.querySelector("#note-status").textContent = "已保存";
+      } finally { element.disabled = false; }
+      break;
+    }
     case "lessonRun": {
       element.disabled = true;
       try {
         const k = getKP(arg);
         const r = await rpc("lesson", {
-          tables: k.sourceTables,
+          tables: k.datasetId ? undefined : k.sourceTables,
+          setupSql: k.setupSql,
+          path: dbManifest.datasets.find((dataset) => dataset.id === k.datasetId)?.path,
           sql: k.sqliteSql,
         });
+        if (route() !== "/lesson/" + arg) break;
+        lessonExampleResult = { id: arg, result: r };
         document.querySelector("#lesson-result").innerHTML =
-          "<small>本次 SQLite 兼容执行结果</small>" + table(r.columns, r.rows);
+          lessonResult(k, r);
       } finally {
         element.disabled = false;
       }
       break;
     }
-    case "relatedCards":
-      await startCards("关联", getKP(arg).relatedFlashcardIds);
-      break;
     case "randomQuestion": {
       const kp = route().startsWith("/practice/kp/") ? route().split("/").pop() : null;
       const list = filterQuestions(content.questions.filter((q) => !kp || q.knowledgePointIds.includes(kp)));
@@ -1734,19 +1767,19 @@ async function handleAction(action, arg, element) {
       await render();
       break;
     case "quizTab":
-      quizTab = arg;
+      quizTab = arg === "数据表" ? "数据表" : "题目";
+      questionKeyboard = false;
       await render();
       break;
     case "hint":
       hints = Math.min(3, hints + 1);
-      state.drafts[arg] = { ...state.drafts[arg], hints };
+      state.drafts[arg] = { ...draftForQuestion(arg), executionMode: getQuestion(arg).executionMode, gradingRevision: getQuestion(arg).gradingRevision, hints, answerShown };
       await persist();
       await render();
       break;
     case "showAnswer":
-      if (getQuestion(arg).type === "结果预测" && !attempted(arg).length) break;
       answerShown = true;
-      state.drafts[arg] = { ...state.drafts[arg], answerShown: true };
+      state.drafts[arg] = { ...draftForQuestion(arg), executionMode: getQuestion(arg).executionMode, gradingRevision: getQuestion(arg).gradingRevision, hints, answerShown: true };
       await persist();
       await render();
       break;
@@ -1762,6 +1795,12 @@ async function handleAction(action, arg, element) {
       toast("执行已停止。");
       break;
     case "keyboard":
+      if (arg === "字段" && route().startsWith("/question/")) {
+        const id = loadedQuestionId;
+        await questionTables(getQuestion(id));
+        if (route() !== "/question/" + id || !element.isConnected) break;
+        editorFields = questionFieldCache.get(id) || [];
+      }
       document.querySelector("#keypad").innerHTML = keys(arg);
       element.parentElement
         .querySelectorAll("button")
@@ -1823,6 +1862,7 @@ async function handleAction(action, arg, element) {
       break;
     case "editorKeyboard": {
       state.settings.customKeyboard = !state.settings.customKeyboard;
+      if (route().startsWith("/question/")) questionKeyboard = state.settings.customKeyboard;
       const keyboard = document.querySelector(".keyboard-wrap");
       keyboard.classList.toggle("hidden", !state.settings.customKeyboard);
       document.body.classList.toggle(
@@ -1850,6 +1890,7 @@ async function handleAction(action, arg, element) {
         (fullscreen ? "退出全屏" : "全屏编辑") +
         "</span>";
       applyKeyboardHeight();
+      document.querySelector("#sql-editor")?._editor?.sync();
       break;
     }
     case "editorTheme":
@@ -2214,6 +2255,7 @@ async function handleAction(action, arg, element) {
         !confirm("覆盖当前学习记录？个人数据集按 ID 合并。请先导出当前备份。")
       )
         break;
+      migrateLessonBookmarks(pendingBackup.state, content.curriculumMigration);
       const candidate =
         arg === "replace"
           ? pendingBackup.state
@@ -2312,6 +2354,7 @@ function saveEditorDraft(input) {
     ...state.drafts[input.dataset.id],
     code: input.value,
     cursor: input.selectionStart,
+    ...(getQuestion(input.dataset.id) ? { executionMode: getQuestion(input.dataset.id).executionMode, gradingRevision: getQuestion(input.dataset.id).gradingRevision, hints, answerShown } : {}),
   };
   clearTimeout(saveTimer);
   saveTimer = setTimeout(
@@ -2319,6 +2362,13 @@ function saveEditorDraft(input) {
     150,
   );
 }
+app.addEventListener("focusin", (event) => {
+  if (event.target.id !== "sql-editor" || !route().startsWith("/question/") || !state.settings.customKeyboard) return;
+  questionKeyboard = true;
+  document.querySelector(".keyboard-wrap")?.classList.remove("hidden");
+  document.body.classList.add("has-sql-keyboard");
+  applyKeyboardHeight();
+});
 app.addEventListener("editorchange", (event) => saveEditorDraft(event.target));
 app.addEventListener("input", (event) => {
   const input = event.target;
@@ -2326,12 +2376,11 @@ app.addEventListener("input", (event) => {
   if (input.dataset.setting) updateSettingsPreview();
   if (input.id === "sql-editor") {
     return;
-  } else if (input.id === "prediction") {
-    state.drafts[loadedQuestionId] = {
-      ...state.drafts[loadedQuestionId],
-      prediction: input.value,
-    };
-  } else if (input.id === "note") state.notes[input.dataset.id] = input.value;
+  } else if (input.id === "note") {
+    state.notes[lessonNoteKey(content.curriculumMigration, input.dataset.id)] = input.value;
+    const status = document.querySelector("#note-status");
+    if (status) status.textContent = "";
+  }
   else if (input.id === "search" || input.id === "card-search") {
     if (input.id === "card-search") {
       cardSearch = input.value;
@@ -2543,12 +2592,13 @@ window.addEventListener("hashchange", async () => {
   await render();
   if (route() === path) window.scrollTo(0, position?.scroll || 0);
 });
-window.addEventListener("resize", () => { resizeTextFields(); applyKeyboardHeight(); });
+window.addEventListener("resize", () => { resizeTextFields(); applyKeyboardHeight(); document.querySelector("#sql-editor")?._editor?.sync(); });
 const textFieldObserver = new ResizeObserver((entries) => {
   const width = entries[0].contentRect.width;
   if (textFieldObserver.lastWidth === width) return;
   textFieldObserver.lastWidth = width;
   resizeTextFields();
+  document.querySelector("#sql-editor")?._editor?.sync();
 });
 textFieldObserver.observe(app);
 window.addEventListener("pagehide", () => persist());
@@ -2605,7 +2655,8 @@ async function boot() {
       fetch("databases.json").then((r) => r.json()),
       openStore(),
     ]);
-    if (state.contentVersion !== content.contentVersion) {
+    const migrated = migrateLessonBookmarks(state, content.curriculumMigration);
+    if (state.contentVersion !== content.contentVersion || migrated) {
       state.contentVersion = content.contentVersion;
       state.resourceCheck = null;
       await persist();

@@ -46,7 +46,7 @@ export function formatSqlForDisplay(value) {
       linesBetweenQueries: 1,
       denseOperators: false,
       newlineBeforeSemicolon: false,
-      paramTypes: { custom: [{ regex: String.raw`\{\{\w+\}\}` }] },
+      paramTypes: { custom: [{ regex: String.raw`\{\{\w+\}\}|□|…|\.\.\.` }] },
     }));
     const meaningful = tokens(formatted).filter(
       (token) => token.type !== "space" && token.type !== "comment",

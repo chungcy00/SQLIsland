@@ -2105,7 +2105,7 @@ textarea:not(#sql-editor) {
 .requirement-sections h2 {font-size: .9375rem; margin: 0 0 8px;}
 .requirement-sections p {margin: 0; line-height: 1.85;}
 .input-guidance {font-size: .8125rem; color: var(--muted); margin: 10px 0 14px; line-height: 1.7;}
-.prediction-workspace h2, .editor-heading {font-size: .9375rem; margin: 16px 0 10px;}
+.editor-heading {font-size: .9375rem; margin: 16px 0 10px;}
 .judge-feedback {margin: 18px 0;}
 .judge-feedback .notice p {margin: 6px 0;}
 .judge-feedback .notice small {display: block; margin-top: 6px;}
@@ -2163,3 +2163,39 @@ textarea:not(#sql-editor) {
 
 .lesson-details [data-lesson-section="data"] > h2 {margin-bottom: 4px;}
 .lesson-details [data-lesson-section="data"] .source-table:first-of-type {margin-top: 4px;}
+
+.material-icon {fill: currentColor; stroke: none; width: 18px; height: 18px; flex: none;}
+.quiz-details .answer-support .actions > button,
+.quiz-details .question-execution .actions > button,
+.quiz-details .sequence-actions > button,
+.lesson-details .lesson-completion > button,
+.lesson-details .sequence-actions > button,
+.lesson-details .note-controls > button,
+.lesson-details [data-action="lessonRun"],
+.lesson-details [data-action="lessonLab"] {
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 44px;
+}
+.note-controls {display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 8px;}
+.note-controls > button {padding: 10px 18px;}
+#note-status {color: var(--green);}
+.question-code, .question-execution, .query-output {margin: 18px 0;}
+.question-code > h2 {font-size: 1rem; margin: 0 0 10px;}
+.quiz-details .query-output > .table-heading {margin-bottom: 8px;}
+
+pre, .code-input {white-space: pre-wrap; overflow-wrap: anywhere; overflow-x: hidden;}
+#editor-highlight, .sql-editor #sql-editor {white-space: pre-wrap; overflow-wrap: anywhere; word-break: normal;}
+#editor-highlight {width: 100%; min-width: 0;}
+.sql-editor #sql-editor {overflow-x: hidden;}
+.editor-line-measure {position: absolute; visibility: hidden; pointer-events: none; white-space: pre-wrap; overflow-wrap: anywhere; word-break: normal; padding: 0; border: 0; tab-size: 2; letter-spacing: 0;}
+
+.quiz-details > .sequence-actions {
+  margin-top: 24px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+.editor-is-fullscreen .quiz-details > .sequence-actions {display: none;}

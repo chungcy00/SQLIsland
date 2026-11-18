@@ -13,9 +13,7 @@
       "chapterId": "ch09",
       "title": "CASE WHEN 分类",
       "learningObjective": "能够运用本节知识完成：生成库存状态标签",
-      "prerequisites": [
-        "ch08"
-      ],
+      "prerequisites": [],
       "concept": "按顺序检查 WHEN，返回首个为真的分支；ELSE 提供默认结果。",
       "syntax": "CASE WHEN condition THEN value ELSE other END",
       "parameters": {
@@ -128,8 +126,7 @@
         "q0120",
         "q0123",
         "q0125",
-        "q0128",
-        "q0129"
+        "q0128"
       ],
       "relatedFlashcardIds": [
         "fc0062",
@@ -182,15 +179,20 @@
         "q0120",
         "q0123",
         "q0125",
-        "q0128",
-        "q0129"
+        "q0128"
       ],
       "primaryFlashcardIds": [
         "fc0062",
         "fc0063",
         "fc0068",
         "fc0069"
-      ]
+      ],
+      "teaching": {
+        "problem": "库存标签要求互斥分类，缺货优先于低库存。",
+        "codeExplanation": "CASE 按写下的顺序判断，首个真条件决定值。先判 stock=0，再判 stock<50，否则归正常。",
+        "resultExplanation": "库存 40 为低库存，0 为缺货。若库存允许 NULL，增加缺失分支，避免默认归正常。",
+        "checkpoints": []
+      }
     },
     {
       "id": "kp09-02",
@@ -198,7 +200,8 @@
       "title": "IF 与条件聚合",
       "learningObjective": "能够运用本节知识完成：同时统计不同库存区间",
       "prerequisites": [
-        "kp09-01"
+        "kp09-01",
+        "kp09-03"
       ],
       "concept": "MySQL IF(condition,a,b) 可用于简单二选一；CASE 更通用。SUM(CASE...) 可在同一查询统计不同子集。",
       "syntax": "SUM(CASE WHEN p THEN 1 ELSE 0 END)",
@@ -307,11 +310,13 @@
         "detail": "仅在本示例数据与语义范围验证；不代表全部 MySQL 语法兼容。"
       },
       "relatedQuestionIds": [
+        "q0122",
         "q0126",
         "q0127",
         "q0130"
       ],
       "relatedFlashcardIds": [
+        "fc0064",
         "fc0065",
         "fc0066"
       ],
@@ -337,14 +342,28 @@
       },
       "mysqlVerificationScript": "validation/mysql/kp09-02.sql",
       "primaryQuestionIds": [
+        "q0122",
         "q0126",
         "q0127",
         "q0130"
       ],
       "primaryFlashcardIds": [
+        "fc0064",
         "fc0065",
         "fc0066"
-      ]
+      ],
+      "mergedFrom": [
+        {
+          "id": "kp09-04",
+          "title": "IF 二选一"
+        }
+      ],
+      "teaching": {
+        "problem": "一趟扫描同时统计低库存和正常库存商品。",
+        "codeExplanation": "CASE 将每个条件转换成当前行的 1 或 0，SUM 按类别累计。可改用 COUNT(CASE WHEN 条件 THEN 1 END)，不满足时返回 NULL。MySQL 的 IF(条件,真值,假值) 适合生成单列二选一；需要多分支或跨库兼容时使用 CASE。",
+        "resultExplanation": "本例低库存 2，正常 4。分组后同样可以按门店生成多个状态计数，注意同一行可能符合非互斥条件。",
+        "checkpoints": []
+      }
     },
     {
       "id": "kp09-03",
@@ -515,148 +534,23 @@
       ],
       "primaryFlashcardIds": [
         "fc0067"
-      ]
-    },
-    {
-      "id": "kp09-04",
-      "chapterId": "ch09",
-      "title": "IF 二选一",
-      "learningObjective": "能够运用本节知识完成：生成简单二分类标签",
-      "prerequisites": [
-        "kp09-03"
       ],
-      "concept": "MySQL IF(expr,a,b) 在 expr 为真时返回 a，否则返回 b；未知条件也走否定分支。",
-      "syntax": "IF(condition,true_value,false_value)",
-      "parameters": {
-        "condition": "判断条件",
-        "true_value": "成立时的值",
-        "false_value": "不成立或未知时的值"
-      },
-      "fixtureIds": [
-        "lesson-nullable_values"
-      ],
-      "sourceTables": [
-        {
-          "name": "nullable_values",
-          "columns": [
-            {
-              "name": "id",
-              "type": "INTEGER",
-              "mysqlType": "INT",
-              "sqliteType": "INTEGER"
-            },
-            {
-              "name": "value",
-              "type": "INTEGER",
-              "mysqlType": "INT",
-              "sqliteType": "INTEGER"
-            },
-            {
-              "name": "note",
-              "type": "TEXT",
-              "mysqlType": "VARCHAR(160) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_bin",
-              "sqliteType": "TEXT"
-            }
-          ],
-          "rows": [
-            [
-              1,
-              null,
-              null
-            ],
-            [
-              2,
-              0,
-              ""
-            ],
-            [
-              3,
-              10,
-              "ok"
-            ],
-            [
-              4,
-              10,
-              "ok"
-            ]
-          ]
-        }
-      ],
-      "mysqlSql": "SELECT id,IF(value>0,'正值','非正值或缺失') AS label FROM nullable_values ORDER BY id;",
-      "sqliteSql": "SELECT id,CASE WHEN value>0 THEN '正值' ELSE '非正值或缺失' END AS label FROM nullable_values ORDER BY id;",
-      "executionSteps": [
-        "对每行判断 value>0",
-        "空值条件未知",
-        "零值和空值均走第二分支"
-      ],
-      "useCase": "生成简单二分类标签",
-      "comparison": "IF 适用于二选一；CASE 可处理多分支，并具备更广泛的可移植性。",
-      "commonError": {
-        "example": "IF(value>0,'正值','零值') 把NULL误归为零",
-        "correction": "使用 CASE WHEN value IS NULL THEN ... 明确缺失类别"
-      },
-      "notes": "本例采用文本输出，避免两分支混合类型导致引擎推断差异。",
-      "compatibility": {
-        "status": "转换执行",
-        "detail": "需要明确转换或原生环境验证。"
-      },
-      "relatedQuestionIds": [
-        "q0122",
-        "q0124"
-      ],
-      "relatedFlashcardIds": [
-        "fc0064"
-      ],
-      "relatedKnowledgePointIds": [
-        "kp03-01",
-        "kp05-01",
-        "kp06-01"
-      ],
-      "mysqlVerification": "未运行原生 MySQL 8.4",
-      "result": {
-        "columns": [
-          "id",
-          "label"
-        ],
-        "rows": [
-          [
-            1,
-            "非正值或缺失"
-          ],
-          [
-            2,
-            "非正值或缺失"
-          ],
-          [
-            3,
-            "正值"
-          ],
-          [
-            4,
-            "正值"
-          ]
-        ],
-        "status": "SQLite实际执行",
-        "orderGuaranteed": false
-      },
-      "mysqlVerificationScript": "validation/mysql/kp09-04.sql",
-      "primaryQuestionIds": [
-        "q0122",
-        "q0124"
-      ],
-      "primaryFlashcardIds": [
-        "fc0064"
-      ]
+      "teaching": {
+        "problem": "指标包含除法时，分母 0 表示无法定义，应留给业务解释。",
+        "codeExplanation": "NULLIF(stock,0) 将零分母转换为 NULL。先乘 1.0 以保留小数运算，再由 ROUND 处理展示精度。",
+        "resultExplanation": "库存为零的商品结果是 NULL。规则可以复用于毛利率、转化率和环比。",
+        "checkpoints": []
+      }
     }
   ],
-  "plannedQuestionCount": 12,
+  "plannedQuestionCount": 10,
   "schemaVersion": 1,
-  "contentVersion": "1.0.0",
+  "contentVersion": "5.0.0",
   "dialect": "MySQL 8.4",
   "summary": "完成本章后：分类、条件计数以及安全处理分母。",
   "sources": [
     "https://dev.mysql.com/doc/refman/8.4/en/",
     "https://dev.mysql.com/doc/refman/8.4/en/functions.html"
   ],
-  "knowledgePointCount": 4
+  "knowledgePointCount": 3
 }

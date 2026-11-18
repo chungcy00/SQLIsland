@@ -16,7 +16,6 @@
       ],
       "relatedKnowledgePointIds": [],
       "relatedQuestionIds": [
-        "q0242",
         "q0244"
       ],
       "questionLinkPolicy": "通过共享课程知识点关联正式题库；业务卡额外保留对应BP任务编号。关联不表示题目与卡片完全相同。",
@@ -52,15 +51,13 @@
       "id": "fc0137",
       "chapterId": "ch18",
       "knowledgePointIds": [
-        "kp18-03"
+        "kp18-01"
       ],
       "primaryKnowledgePointIds": [
-        "kp18-03"
+        "kp18-01"
       ],
       "relatedKnowledgePointIds": [],
-      "relatedQuestionIds": [
-        "q0241"
-      ],
+      "relatedQuestionIds": [],
       "questionLinkPolicy": "通过共享课程知识点关联正式题库；业务卡额外保留对应BP任务编号。关联不表示题目与卡片完全相同。",
       "type": "概念记忆",
       "difficulty": "困难",
@@ -101,9 +98,7 @@
       ],
       "relatedKnowledgePointIds": [],
       "relatedQuestionIds": [
-        "q0242",
-        "q0244",
-        "q0246"
+        "q0244"
       ],
       "questionLinkPolicy": "通过共享课程知识点关联正式题库；业务卡额外保留对应BP任务编号。关联不表示题目与卡片完全相同。",
       "type": "语法结构",
@@ -248,18 +243,13 @@
       "id": "fc0139",
       "chapterId": "ch18",
       "knowledgePointIds": [
-        "kp18-02"
+        "kp18-01"
       ],
       "primaryKnowledgePointIds": [
-        "kp18-02"
+        "kp18-01"
       ],
       "relatedKnowledgePointIds": [],
-      "relatedQuestionIds": [
-        "q0243",
-        "q0245",
-        "q0247",
-        "q0249"
-      ],
+      "relatedQuestionIds": [],
       "questionLinkPolicy": "通过共享课程知识点关联正式题库；业务卡额外保留对应BP任务编号。关联不表示题目与卡片完全相同。",
       "type": "用法辨析",
       "difficulty": "困难",
@@ -293,18 +283,13 @@
       "id": "fc0140",
       "chapterId": "ch18",
       "knowledgePointIds": [
-        "kp18-02"
+        "kp18-01"
       ],
       "primaryKnowledgePointIds": [
-        "kp18-02"
+        "kp18-01"
       ],
       "relatedKnowledgePointIds": [],
-      "relatedQuestionIds": [
-        "q0243",
-        "q0245",
-        "q0248",
-        "q0250"
-      ],
+      "relatedQuestionIds": [],
       "questionLinkPolicy": "通过共享课程知识点关联正式题库；业务卡额外保留对应BP任务编号。关联不表示题目与卡片完全相同。",
       "type": "代码填空",
       "difficulty": "困难",

@@ -5,7 +5,7 @@ import {
   readFile,
   writeFile,
   readdir,
-  stat,
+  rm,
 } from "node:fs/promises";
 import { createHash } from "node:crypto";
 import path from "node:path";
@@ -74,13 +74,27 @@ await writeFile(
   JSON.stringify({
     contentVersion: contentManifest.auditRelease,
     chapters,
+    curriculumMigration: JSON.parse(await readFile(contentSource + "/courses_resource/curriculum-migration.json")),
     questions,
     cards,
   }),
 );
-await cp(contentSource + "/question_resource/fixtures", "dist/fixtures", {
-  recursive: true,
-});
+const fixtures = path.join(contentSource, "question_resource/fixtures");
+const activeIds = new Set(questions.map(question => question.id));
+for (const root of ["dist", "android/app/src/main/assets"]) {
+  const destination = path.join(root, "fixtures");
+  await mkdir(destination, { recursive: true });
+  for (const entry of await readdir(destination, { withFileTypes: true })) {
+    if (entry.isDirectory() && /^q\d{4}$/.test(entry.name) && !activeIds.has(entry.name)) {
+      await rm(path.join(destination, entry.name), { recursive: true });
+    }
+  }
+}
+for (const entry of await readdir(fixtures, { withFileTypes: true })) {
+  if (!/^q\d{4}$/.test(entry.name) || activeIds.has(entry.name)) {
+    await cp(path.join(fixtures, entry.name), path.join("dist/fixtures", entry.name), { recursive: true });
+  }
+}
 const databases = JSON.parse(
   await readFile(contentSource + "/question_resource/databases/manifest.json"),
 );

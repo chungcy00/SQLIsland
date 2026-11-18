@@ -1,25 +1,4 @@
 {
-  "q0001": {
-    "exactColumns": [
-      "id"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0001/q0001-public.json": "24715e13d002a54d48b062a51c4dee2040351a4d9489f683d30e4fb9aa6f0081",
-      "fixtures/q0001/q0001-boundary.json": "f8bc9ac76827b28d223afe06be37011ce181560c255878409c313cb6027171b9",
-      "fixtures/q0001/q0001-empty.json": "b883b53d1db9c791305a459c72a30c3329bc37bcb6c3f67f58ddc9fbfd17cc32"
-    }
-  },
-  "q0004": {
-    "exactColumns": [
-      "product_id",
-      "stock"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0004/q0004-public.json": "7c3bd8dff0b4643853c836d4cd6cbe22e2e3e2345bea0337751bef1ab833c57d",
-      "fixtures/q0004/q0004-boundary.json": "80bfefd073a0b7b6947593834a1dd10c6e35785f375c6bc14a446f1b36feab8e",
-      "fixtures/q0004/q0004-empty.json": "fd15caf25a92d6620a869d6f81915f5407d439fde961a4e00a6e8fb96d7476c7"
-    }
-  },
   "q0009": {
     "exactColumns": [
       "price"
@@ -28,17 +7,6 @@
       "fixtures/q0009/q0009-public.json": "013640edb2e763685c484c5007f2f510f899382a40d5af5ad6c52230f2b21d76",
       "fixtures/q0009/q0009-boundary.json": "98f182a77b65bf659ced937cae7e63c793e02f7d687938c22ea446d4ff3950eb",
       "fixtures/q0009/q0009-empty.json": "af03453fce21fa61bff71fbb09004a91f3770e0a77a029de383f72f4855df68c"
-    }
-  },
-  "q0010": {
-    "exactColumns": [
-      "id",
-      "billed"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0010/q0010-public.json": "56c22a137d46134b9eb79fd5a23d00dafecb49d794a3f3cf817cf5f9dcd2557f",
-      "fixtures/q0010/q0010-boundary.json": "4cf2259fe85b7f7222d39e18e2a29604cf15fa9ed9969cf979e4213ebf421520",
-      "fixtures/q0010/q0010-empty.json": "f9f4eae0567dddd643971e85662a0fc49841dbfdd059c0d0c4247b36d3779429"
     }
   },
   "q0011": {
@@ -50,16 +18,6 @@
       "fixtures/q0011/q0011-public.json": "cf8a37eaa10be46a6bfb13d723bcf200d73e7dfe187c0db0032b311dfb75756c",
       "fixtures/q0011/q0011-boundary.json": "79c09b90f542121e9d747067c63b78dd1bde71348e420f6d8faf34a7377dd876",
       "fixtures/q0011/q0011-empty.json": "d9dad8bb1f40a8ea7d7049f4d9018ac689232481b527d1490ebabb534e9c3b8e"
-    }
-  },
-  "q0015": {
-    "exactColumns": [
-      "employee_id"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0015/q0015-public.json": "df8edf31dd2fdf95880380780c0722440aca50aa6b2b17c2264381ede3fcb879",
-      "fixtures/q0015/q0015-boundary.json": "71e12307e21d94b724d03bef92952d1e71c8fbaec206aef42f17be41016882d8",
-      "fixtures/q0015/q0015-empty.json": "c0f3eb5d115c33fff07e02ca9942f14bccf85f4700504cee8e7bf57802442a22"
     }
   },
   "q0016": {
@@ -94,40 +52,6 @@
       "fixtures/q0018/q0018-empty.json": "e5d312c68c21d5e6c2b20f3d62985066ae112c68aedcd4e8cf01520e19955d93"
     }
   },
-  "q0020": {
-    "exactColumns": [
-      "product_id",
-      "boxes",
-      "loose"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0020/q0020-public.json": "6f131d992517032d537097f7a0e0f3527c3d0f0b4332d8891ce3c8306504890b",
-      "fixtures/q0020/q0020-boundary.json": "28b11ce334e503842ede86d1afccda1c175608a179e0267457e6446b8ac2db46",
-      "fixtures/q0020/q0020-empty.json": "7f8698573c8b6fca7d3d0c94dfeafc9f8c7ef83d1778ca168d5fcb1f6b2b3e98"
-    }
-  },
-  "q0021": {
-    "exactColumns": [
-      "id",
-      "store_id"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0021/q0021-public.json": "1f4b3cdc4632883c3432ed095bc7b93c4481c724815c110bf6b1adefd46ab24f",
-      "fixtures/q0021/q0021-boundary.json": "46d3a5ca1bec01645f17701a8131c537e3977d8ba5b020e25cd5a8d42fa95ca6",
-      "fixtures/q0021/q0021-empty.json": "b0fe2808324e9a79afa04c50ef44e08436534aaf395f3d57341cea7a524b16ee"
-    }
-  },
-  "q0022": {
-    "exactColumns": [
-      "id",
-      "sales"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0022/q0022-public.json": "0c2c9a88cd72293ad6be9eb5c9a0dbf3f3953ff848f04297351377f8ab08f462",
-      "fixtures/q0022/q0022-boundary.json": "5ef680a7223324918c97fdfaac4e27b7b776e344b3c99b9a1fa7bc5a533255bb",
-      "fixtures/q0022/q0022-empty.json": "5aff52960e634b915c730ab770c425047c84f828bbdbfd24fdc156e2818372bb"
-    }
-  },
   "q0024": {
     "exactColumns": [
       "product_id",
@@ -137,17 +61,6 @@
       "fixtures/q0024/q0024-public.json": "dfe8e657a863ed657ba7422051dda2927686a3856b6bfde99b2dbb2447850244",
       "fixtures/q0024/q0024-boundary.json": "de1909b1ddb062a2cccbd9dcc4ca7743f91d41293f401220be41413f496834c1",
       "fixtures/q0024/q0024-empty.json": "05b605db192bb82b38a43b28673c5b899167922ef9d5f77ff429a9ae3a34ef64"
-    }
-  },
-  "q0025": {
-    "exactColumns": [
-      "product_id",
-      "stock"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0025/q0025-public.json": "21ab8c8b8f47eaf30d9a0e32ecd4034c7a98983c85e096703d55dd35af314a4e",
-      "fixtures/q0025/q0025-boundary.json": "e6cd979488bf1c8ceaa1db95a8480f656c2c3ad2c8ea82201bf2e357c49930cd",
-      "fixtures/q0025/q0025-empty.json": "6ea184c0c13256b04a92d204fdf181f72485bfce5cac106d264645f51a5c0d86"
     }
   },
   "q0026": {
@@ -180,16 +93,6 @@
       "fixtures/q0029/q0029-empty.json": "97cb5bc35490737b1feae616a955ab9e1ea89639bab569838c71f2cf46bb0c30"
     }
   },
-  "q0030": {
-    "exactColumns": [
-      "product_id"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0030/q0030-public.json": "89c857354bb1c1bef49bc986e2530c3641b01df48bf35d96cf843548c41e9903",
-      "fixtures/q0030/q0030-boundary.json": "267e1a85048d2b1d3c9c71429219cce3f0d0f5a24463961503db2db1b0941b96",
-      "fixtures/q0030/q0030-empty.json": "4fb15627ff4e42177cb38ef9b97505cf6e505589dc167f4836a49c21553065ef"
-    }
-  },
   "q0031": {
     "exactColumns": [
       "product_id"
@@ -211,28 +114,6 @@
       "fixtures/q0034/q0034-empty.json": "6f75fbcf419069567303cf27008e6c93650a317cc649617c9dd6aef22d091ce7"
     }
   },
-  "q0035": {
-    "exactColumns": [
-      "product_id",
-      "price",
-      "stock"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0035/q0035-public.json": "83968cf52d74815b85f6e8f73ccec745f7c03b7252e36ad229408199ef04e181",
-      "fixtures/q0035/q0035-boundary.json": "cec634608c47c8982b2d1d2ec6b022c9e5b9d7a920458c65cc1f8ca217154ea8",
-      "fixtures/q0035/q0035-empty.json": "b682c7ee357a086c2bc423bc59a02f8aad20571d9dd91ef055e8b55d78fa8b2c"
-    }
-  },
-  "q0036": {
-    "exactColumns": [
-      "product_id"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0036/q0036-public.json": "587a61fe1a4be71df92d2f65eb0fd1b048835c7b3b3a9ff34ca9559ffc077ccf",
-      "fixtures/q0036/q0036-boundary.json": "e357727ed33b7f1f8ebad520c6af10441385d592b7a62927f7a69f075b9b1b3a",
-      "fixtures/q0036/q0036-empty.json": "5f4f63e97b9285cdba8a1790cfa3c8e44911cb79f8d76b65f03471f12578538e"
-    }
-  },
   "q0037": {
     "exactColumns": [
       "product_id"
@@ -241,16 +122,6 @@
       "fixtures/q0037/q0037-public.json": "0476f64ea41c75fae9329668d5a280413fd741d7e7a820d9e26867bcc6344ab1",
       "fixtures/q0037/q0037-boundary.json": "d464b8be4e8b06eb06f96a256609c1becb4a756e1a3f3963e97110cc72fe5734",
       "fixtures/q0037/q0037-empty.json": "28a9a08b0163ec30cef37ec95231e6fa78d8ba88354c7c7767cd4853326b954c"
-    }
-  },
-  "q0038": {
-    "exactColumns": [
-      "id"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0038/q0038-public.json": "a617d2fe63196cb5f928bb68015e63312839d4919e733b1546b5073719eb2d9f",
-      "fixtures/q0038/q0038-boundary.json": "b5d5feaa056f74cf3ab64cb9d49c115a13d9de97d5a4992b3db3eeed3905d315",
-      "fixtures/q0038/q0038-empty.json": "7b564138f77072a733bf648a8fd2327f888e8ce13ef8193794573498534052db"
     }
   },
   "q0039": {
@@ -281,16 +152,6 @@
       "fixtures/q0041/q0041-public.json": "d11515bcbbab8b0463727bb598dc3de0e3a65fa97b71e2c2f66c4c651a8ff066",
       "fixtures/q0041/q0041-boundary.json": "20595e55d9742436a1aa4ecb23939cd1077ddcdc898ff51f5061ab28808f56fa",
       "fixtures/q0041/q0041-empty.json": "cc4c7b4aab21a27e74f9d4f976288d65206b04ea8d78ab511842553b50e7ef47"
-    }
-  },
-  "q0042": {
-    "exactColumns": [
-      "id"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0042/q0042-public.json": "ee924ed5334f23b7cc4556a3f560ec49bd0003f944046515308bd4f844c8c3e0",
-      "fixtures/q0042/q0042-boundary.json": "a26144501a2dc93f81e4838a6154dec17623e5b70c434cc88287634cb98379b5",
-      "fixtures/q0042/q0042-empty.json": "35cef907ed36f09108ed1d0a1be4d8785cb5a87b24e8385e5ea34489e5e54891"
     }
   },
   "q0043": {
@@ -324,28 +185,6 @@
       "fixtures/q0045/q0045-public.json": "46ad5a86c645f22b25f7f5a3b1c3ac1f16e285decd7946bf696bbf8d85953b80",
       "fixtures/q0045/q0045-boundary.json": "f88ac5557d2112b52c2537729ef456b7301e390d5595d533cff22edfc2b0c634",
       "fixtures/q0045/q0045-empty.json": "1ad272ca9044d112a0992a2f411155632fde195c23a1233b7783c24be80e06c2"
-    }
-  },
-  "q0046": {
-    "exactColumns": [
-      "product_id",
-      "price"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0046/q0046-public.json": "160dae3c865df8b6e1ea5723305d8345e446fcabcf1d046718276d800922c5f3",
-      "fixtures/q0046/q0046-boundary.json": "b4530448b61ae54108ef8db6e50288e9cfba5bc039d9b7a326073da640e222fc",
-      "fixtures/q0046/q0046-empty.json": "291b23741cd929bb93f4635caf371f95d0a3a0b9b7de994c80e2032d73430437"
-    }
-  },
-  "q0047": {
-    "exactColumns": [
-      "product_id",
-      "price"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0047/q0047-public.json": "4842b23ab2a23d2a7e530f1913c81942ed03b5e7fecf198e8ecb9ea8a91e299e",
-      "fixtures/q0047/q0047-boundary.json": "ba37eca48ad17289cf32c808bc642e6c4de3ef2c9b04b671496129430612d25a",
-      "fixtures/q0047/q0047-empty.json": "8d47f09840872a9cff79441d780234c4a956c929c49493887cc3a917a641b7b7"
     }
   },
   "q0048": {
@@ -401,17 +240,6 @@
       "fixtures/q0054/q0054-empty.json": "3333fadb3deb178672a4880b7203588aedfc15350fb14074b6868cbc29958895"
     }
   },
-  "q0055": {
-    "exactColumns": [
-      "id",
-      "customer_id"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0055/q0055-public.json": "9d18caed02fc752b6c93f4d5563038ef577460f65de29aa4b09f22d1aa1ce87f",
-      "fixtures/q0055/q0055-boundary.json": "b8e7fa423d9ea0c9d495cef9e606bef7c3363e357104f3f01e7334063e3ee931",
-      "fixtures/q0055/q0055-empty.json": "decd88b597bd38d52f71d91b140d76568f684755a90ce4b743e381d18bc7aa48"
-    }
-  },
   "q0056": {
     "exactColumns": [
       "id"
@@ -420,16 +248,6 @@
       "fixtures/q0056/q0056-public.json": "b9df846e70f7f02591f16b3a4b2f16b3df522ef56a1586fa358b7cdb5956d03d",
       "fixtures/q0056/q0056-boundary.json": "07eb1a21a5f3dc9e0cebf2b60b8c930a39cf84a2715684c9e00282e5e7a315a5",
       "fixtures/q0056/q0056-empty.json": "deb8d3c77c2cb7254271c0252cd3642df23ea84ef099f6f86e9ccdbeb13e5d4a"
-    }
-  },
-  "q0057": {
-    "exactColumns": [
-      "id"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0057/q0057-public.json": "2e8df0824ed3d042f169d125b69228494cd5509e4a999c972e40f5cc3be17567",
-      "fixtures/q0057/q0057-boundary.json": "3b38c3f1777d54b2d94ef5e863b4f454f8aafade56cb112e4ceea6741428822d",
-      "fixtures/q0057/q0057-empty.json": "2e8a96ffcbbe39f20745362eb1e2f385caf3edebf0ae44ebd263b60aa4bb42bb"
     }
   },
   "q0058": {
@@ -504,16 +322,6 @@
       "fixtures/q0065/q0065-empty.json": "b40acac03899d1cf7e1490e80b7653772b22dc32b08c9619a60e4a0a30e2d2ca"
     }
   },
-  "q0066": {
-    "exactColumns": [
-      "stock_units"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0066/q0066-public.json": "4b038abb95927b5b8e3088b65f554f85f671e1f9b3e8b699b391fbd19a56f795",
-      "fixtures/q0066/q0066-boundary.json": "982ef11a2781cc2f71ea65a5653ef6bbcc4adecc14999fedb225c23a5ebcf7f4",
-      "fixtures/q0066/q0066-empty.json": "7461c7d858e23c462660504d05a60ab0ff353d76c8038efbf42ccde3b87d4898"
-    }
-  },
   "q0067": {
     "exactColumns": [
       "price_spread"
@@ -544,28 +352,6 @@
       "fixtures/q0070/q0070-empty.json": "f0aef3b6f948c336ea3ca4783fd09fe9184ce0d90933662f97455f7d97bbe1d1"
     }
   },
-  "q0071": {
-    "exactColumns": [
-      "net_sales"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0071/q0071-public.json": "ebc8d751651b99a94b7a356045df1bffdf0ec4b5e865c31c778fe848e32c18a4",
-      "fixtures/q0071/q0071-boundary.json": "16bf1804e91f6d7246380ef5fa57e48082952ba0bbd525ffc84cddd9505872f9",
-      "fixtures/q0071/q0071-empty.json": "38a6ce9b557d2516b039302b0588900d56bd6e7264c180b3de086c53f1cc1de6"
-    }
-  },
-  "q0073": {
-    "exactColumns": [
-      "min_sales",
-      "max_sales",
-      "n"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0073/q0073-public.json": "cbd903139981f2cf9c229f1951f7e25cc3f8b99e849641b5f456bb2290dcedf6",
-      "fixtures/q0073/q0073-boundary.json": "dc124eeed04e1d3e984c65b4cf7961f11f7753541cd41a20e52d323d5ad7ca1e",
-      "fixtures/q0073/q0073-empty.json": "77f5999d0510d832873a2ca821a9383866e8e31bc74f28dcc007f47f0a135ba5"
-    }
-  },
   "q0076": {
     "exactColumns": [
       "total"
@@ -585,27 +371,6 @@
       "fixtures/q0078/q0078-public.json": "f152b1bf4913dd03531261bf84083c19f11ea2a223c099ec135e6b3b964b6bf5",
       "fixtures/q0078/q0078-boundary.json": "da849920b024023a9e4992364b7b1f5456ff73262c6a83ae8edd47cfc6669d12",
       "fixtures/q0078/q0078-empty.json": "7da142e8069f35320610d032748fde91aa6ab9610a54088a2503410646e71a0c"
-    }
-  },
-  "q0079": {
-    "exactColumns": [
-      "max_stock"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0079/q0079-public.json": "794e2a9f6f833e7a7794b17f3972c5d4268c9e2077f4115fbe633e9ab642e72a",
-      "fixtures/q0079/q0079-boundary.json": "b41dac9f19ac16bcb70aa68979f552004959504a59270eab31278f37a914cc7d",
-      "fixtures/q0079/q0079-empty.json": "3ec735513647f523c209159c2d0ed5afae151c28ef99c24ed684243cd347bff7"
-    }
-  },
-  "q0080": {
-    "exactColumns": [
-      "price",
-      "n"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0080/q0080-public.json": "f13ddace4bf87af00c4ddc9c0e32b4ed50af2443b80787cf4fcf06177d7873a9",
-      "fixtures/q0080/q0080-boundary.json": "012b2ed66c66ff8631ab8087b11c5dcfd84a39a5cc22928bb683f5a6c856dac0",
-      "fixtures/q0080/q0080-empty.json": "f732a2ceefa996b663a8ad16af6a878b9a7e89ac37628b7a39ec8f8edfe4c14d"
     }
   },
   "q0082": {
@@ -672,17 +437,6 @@
       "fixtures/q0087/q0087-empty.json": "5a9deaa0cdf93ae7bb61f15f8f4636e306a2a79c51773c6c809cfb9131cd5640"
     }
   },
-  "q0088": {
-    "exactColumns": [
-      "customer_id",
-      "total_sales"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0088/q0088-public.json": "ea34c1575f74acb78d490891bbc8d236f6b4b1146dd8cfb2397a46fc95f58d61",
-      "fixtures/q0088/q0088-boundary.json": "3b0a650471d46ea52d4e071696c2e13d8f00790486d0bdae8de04d4282e6f11f",
-      "fixtures/q0088/q0088-empty.json": "749c435ae5a4a5818979dcb4c544e60707218524cefed711a8424d23e4df36c0"
-    }
-  },
   "q0090": {
     "exactColumns": [
       "total"
@@ -702,17 +456,6 @@
       "fixtures/q0091/q0091-public.json": "2b201f2344ec510c0d261a94a8a4427e8ab48a0f17c5fb517070636e6b41e4a8",
       "fixtures/q0091/q0091-boundary.json": "3098aaa7c99be058d676ea101d82c16837b8542ff7b8df092cecce3d6db0ec24",
       "fixtures/q0091/q0091-empty.json": "121de591a4d839cb6907dac6cc66e992b7d80fe7faa8e9fad470e73a60849f93"
-    }
-  },
-  "q0092": {
-    "exactColumns": [
-      "customer_id",
-      "max_sales"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0092/q0092-public.json": "07710ca6dd2d6af45bfcd8a49a655314b93baca6408aa77defff296363bd8214",
-      "fixtures/q0092/q0092-boundary.json": "5bf8f46922cb00e082824925840b175ab472b23b921a44148d0d451ad5340349",
-      "fixtures/q0092/q0092-empty.json": "92a283937be686a829e60d04ef8d2ae67d63d46b84a51d614635915cb98284fa"
     }
   },
   "q0093": {
@@ -765,17 +508,6 @@
       "fixtures/q0099/q0099-empty.json": "dd3656fcb6d8f655e56fb971687acccc0efd00703ac83660cdd140cb2f01db99"
     }
   },
-  "q0100": {
-    "exactColumns": [
-      "supplier_id",
-      "product_id"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0100/q0100-public.json": "a645ed07cc95b1d8cd2e85d0bb9e2db0e487f894fb0f5dea05ef16c23537d802",
-      "fixtures/q0100/q0100-boundary.json": "c472e6c2e2024977fb4134c0ef452e555bfb5c48a8931374817c8049945a1c71",
-      "fixtures/q0100/q0100-empty.json": "c6b3553a75967280aaac6dd596b2433bb2692179fc8321ef2e9deee018e29be1"
-    }
-  },
   "q0101": {
     "exactColumns": [
       "store_id",
@@ -806,28 +538,6 @@
       "fixtures/q0103/q0103-public.json": "c1a7bd8d972ee081c8ed8827e740a65e818f0f63b9ba8543b80595725ff5fb14",
       "fixtures/q0103/q0103-boundary.json": "5ecb0f4c7ee42f667ecde4a58a5ceb605e2a80f14fc978efc49746adf2e219f3",
       "fixtures/q0103/q0103-empty.json": "1369048babefe27006694cf2e098125bb9d5f44b91ce3babc5edcdbac7df94d3"
-    }
-  },
-  "q0104": {
-    "exactColumns": [
-      "invoice_id",
-      "payment_id"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0104/q0104-public.json": "6c25ef5ac186edaed40d75881430eada770db8f9692737b5227af76e6fe85a01",
-      "fixtures/q0104/q0104-boundary.json": "a43876e4f8cdb15a5d65508fa0d4dbd3acea4e33412a5e25605031ea8b623fcd",
-      "fixtures/q0104/q0104-empty.json": "137aaf7f5be0bc185c81611ba5351b4f630884eb66ef754c8d2817b22065a7d8"
-    }
-  },
-  "q0105": {
-    "exactColumns": [
-      "salary_id",
-      "base_salary"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0105/q0105-public.json": "964126439cffabd87e0b28019cd13ba926e5bdadc148f49fd50dfdcaa7d61257",
-      "fixtures/q0105/q0105-boundary.json": "9557b0b408801dd12a08625bc08edd2ec8366b59497037e0909a8aae86a83bed",
-      "fixtures/q0105/q0105-empty.json": "d3ae835bd12ec9aa79386d4d2d581573cf9c6d6f8c93f9321c226695d6c9b44d"
     }
   },
   "q0106": {
@@ -874,17 +584,6 @@
       "fixtures/q0109/q0109-public.json": "3478c334384942a43a715a11a31eea82abf709567c5bf6969a57e826242b741d",
       "fixtures/q0109/q0109-boundary.json": "698b1eb239207fa0a49eab5a740de2928f670afafabb64defbd2d061f9a7c497",
       "fixtures/q0109/q0109-empty.json": "94988c7089618c1039233deec6d113419a6c80196a5c9449c8e82c9c01f4d86b"
-    }
-  },
-  "q0110": {
-    "exactColumns": [
-      "left_id",
-      "right_id"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0110/q0110-public.json": "b59a8b286eef40f773164a2412d9c04b2ffe9eb320498cfef49242f3dcef3a60",
-      "fixtures/q0110/q0110-boundary.json": "ac411adcf3b923790c69cbc37d0e5d03a4bce7ddf5398c0425bd4a9ff301b7f1",
-      "fixtures/q0110/q0110-empty.json": "a1ab2718885a268f0c0d4581ef43ab43dbf65c5abd821e9b1af2fff3e9a341f7"
     }
   },
   "q0112": {
@@ -1009,16 +708,6 @@
       "fixtures/q0123/q0123-empty.json": "523f3b3d34e1a130c9bf483247cc5e260cf37217a7e90a2fe429c81095471cdc"
     }
   },
-  "q0124": {
-    "exactColumns": [
-      "id"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0124/q0124-public.json": "390e7821d353aa7b8d99379a159105163ff64f096e3d7c99743563d2e120fecf",
-      "fixtures/q0124/q0124-boundary.json": "839984cf24fd88a7af70476c67ecf31493615bc18c2d85829c423c15f51af85d",
-      "fixtures/q0124/q0124-empty.json": "ecd4af283c4f17c923926f2f419921dc0a7c62976542df7469a66c7d26416cd6"
-    }
-  },
   "q0125": {
     "exactColumns": [
       "id"
@@ -1050,16 +739,6 @@
       "fixtures/q0128/q0128-empty.json": "cce403157c34eba36b475e477a5127acdbf98222a5401a76fd81ab3904f0182c"
     }
   },
-  "q0129": {
-    "exactColumns": [
-      "product_id"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0129/q0129-public.json": "a53d828b2d54678e6a50863e12e61129cee7f37a221b9490296f816f7cc8715e",
-      "fixtures/q0129/q0129-boundary.json": "38d18cb21d2488b594222dd799a3d09a78913c5708f509dab3ba4011a71a2e76",
-      "fixtures/q0129/q0129-empty.json": "94d0d6c050a3a462f491ddf0639b731db25463cd31962256a6b9b3153764eefc"
-    }
-  },
   "q0130": {
     "exactColumns": [
       "store_id",
@@ -1083,17 +762,6 @@
       "fixtures/q0132/q0132-empty.json": "70061ccf47e4bc48061ebcabad068dfdd3dd58b21b225dcec23a5535b5d2796f"
     }
   },
-  "q0133": {
-    "exactColumns": [
-      "product_id",
-      "price"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0133/q0133-public.json": "e03c9776a4181e01e381626f9547088a603d50eb4053bbac16cf026ddf7b26a8",
-      "fixtures/q0133/q0133-boundary.json": "3ec0abc8442d5a68ef5d48aead5c20b4cfb7fded915f6ba2e068eb92462fce61",
-      "fixtures/q0133/q0133-empty.json": "0453f365c35d1934ea800dac998101e2cf048e3764477277ceff2e8f70479e53"
-    }
-  },
   "q0134": {
     "exactColumns": [
       "product_id",
@@ -1105,17 +773,6 @@
       "fixtures/q0134/q0134-empty.json": "bfd43eeb90b5742699e41f46ac74bc467c6d11ef2a9f61daeb8715e56745cac6"
     }
   },
-  "q0135": {
-    "exactColumns": [
-      "employee_id",
-      "salary"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0135/q0135-public.json": "861e4ce74c45faea98736bcdef133f85e98e81f9ba2733dabfae9dc842c22542",
-      "fixtures/q0135/q0135-boundary.json": "555609b61bcc32ffd3f13d888f0c74fc8809e5fb89b43cc356a33252060cd958",
-      "fixtures/q0135/q0135-empty.json": "eec7884f4de9f4f5269690ce2a129f3ac7b90805a60046f088077868d318cca6"
-    }
-  },
   "q0136": {
     "exactColumns": [
       "store_id"
@@ -1124,16 +781,6 @@
       "fixtures/q0136/q0136-public.json": "79cb30f6bfba2c61ebf1c56822734b8620b83a3c47513af37431575620720b7a",
       "fixtures/q0136/q0136-boundary.json": "d5565fbca7a76615d7ec126695f4aeb4d1d0b34ea46977cf70f39e9e7c3e303a",
       "fixtures/q0136/q0136-empty.json": "ba3bdd25af236c10f7ca3f6935a954608e63a7599e69fca8804236fc7727a069"
-    }
-  },
-  "q0137": {
-    "exactColumns": [
-      "product_id"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0137/q0137-public.json": "9a4af361c353ab72e529c91c70b20e3d0fa370ba2887cf3eea2b5bce58415270",
-      "fixtures/q0137/q0137-boundary.json": "8efcdc52bc63d3971a292fa3c92a2ef07c09d3c114be45edd4b00c065e2ee272",
-      "fixtures/q0137/q0137-empty.json": "d119cff5bf2eddf2d3bc8408e311b72ddb59af18385e7820ac3c95d133c825a4"
     }
   },
   "q0138": {
@@ -1190,16 +837,6 @@
       "fixtures/q0142/q0142-empty.json": "dd5d6f27d7c6f25a17ce40fa7465586b34030c4a0f4573aeb0a44c935ec5f2be"
     }
   },
-  "q0143": {
-    "exactColumns": [
-      "customer_id"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0143/q0143-public.json": "f98ef458f137518318b7601a9cee945dfad1537a285651ae6e4bbe38b450a2d2",
-      "fixtures/q0143/q0143-boundary.json": "5cf09216eb57cf6f4d0e49816c009809d0be09021dfcc336ddcb745262fd5bb1",
-      "fixtures/q0143/q0143-empty.json": "d06ebdcb4b18f3abf8be94ff7aeaa354fe0a47d6f9571a7261066a70aff3bdb9"
-    }
-  },
   "q0144": {
     "exactColumns": [
       "customer_id"
@@ -1229,16 +866,6 @@
       "fixtures/q0146/q0146-public.json": "953fbea578f52e88fdb3efce91c3dd6ffb84831721308ccdb016d1d06071e985",
       "fixtures/q0146/q0146-boundary.json": "bf6addbd2490c39d231337a5e8dff5c9f905ffd8382a9e2ffe9db20d4a333124",
       "fixtures/q0146/q0146-empty.json": "1e35d3d202c41813d283fd4c6fedf8260cbaa354c0a08df289adb33cd9a01a13"
-    }
-  },
-  "q0147": {
-    "exactColumns": [
-      "store_id"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0147/q0147-public.json": "f943df0ab2216e53a960acbff3668190870f25232198739f8ef4194629fdea82",
-      "fixtures/q0147/q0147-boundary.json": "6db233ff67f9a482da1caa0ef4163f9f734ccc9eed6347d6051ae62d33e02acd",
-      "fixtures/q0147/q0147-empty.json": "19fef4be2e2fc4620f33dca269a5dba801247a831a7fe2c4edbd24e82c2f397f"
     }
   },
   "q0148": {
@@ -1282,27 +909,6 @@
       "fixtures/q0151/q0151-empty.json": "d8daa2d141abed173f9c793abc4600b69addc25528c1a4875418afcf9da4f7db"
     }
   },
-  "q0152": {
-    "exactColumns": [
-      "id",
-      "name_chars"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0152/q0152-public.json": "502dfd496c4cb2fc7eb7ea0161a58788f799df3c5368a2fecfb0866efe2d0637",
-      "fixtures/q0152/q0152-boundary.json": "38cd7951da48ff6c1e772c44ebdc79f53f10cfb3d7eed2415011d58dd993f3d6",
-      "fixtures/q0152/q0152-empty.json": "5bf39118d006d33a08456ce7c49f54355accd0b5c4d6e23a2171fe10579d9d8b"
-    }
-  },
-  "q0153": {
-    "exactColumns": [
-      "id"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0153/q0153-public.json": "788650068cffa7937629bf49aa2f26ece9ffc39a2bea0e91dbdecf29d4095f66",
-      "fixtures/q0153/q0153-boundary.json": "eebdbf5236dd90886876580fe7e8c3be519f1be85dfcf0a3123f8d942cd7f8ff",
-      "fixtures/q0153/q0153-empty.json": "956aa5b5471d2d8d83cfe01378d8a96d871a8462ca0cc01119d1fc153558dbfc"
-    }
-  },
   "q0154": {
     "exactColumns": [
       "id"
@@ -1323,16 +929,6 @@
       "fixtures/q0155/q0155-empty.json": "6ffe50d55c5699dc5f038af2015ffcb5ca249dc97eeb460a254f947820d355c9"
     }
   },
-  "q0157": {
-    "exactColumns": [
-      "id"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0157/q0157-public.json": "8cddea9941b532b3239fd018738e3c1135c03793e2321f337248d64b04e5ce59",
-      "fixtures/q0157/q0157-boundary.json": "75560ebd78af1f99f8a68f62868809aa278c8acdb62970bebfc127dff53e80f0",
-      "fixtures/q0157/q0157-empty.json": "f8dddd2b2e95e315028d4082e2aea22d9a2be707aa24374e111619cdb5853702"
-    }
-  },
   "q0158": {
     "exactColumns": [
       "product_id"
@@ -1351,29 +947,6 @@
       "fixtures/q0159/q0159-public.json": "78649f94badc9f9424454b9ca034f8b759f981b440be7ff294348f5ca9c15d0f",
       "fixtures/q0159/q0159-boundary.json": "33145ba43b047a00e6fb2c3b2c7aac83829918fb9a41a6fe3f85716eac610ff3",
       "fixtures/q0159/q0159-empty.json": "3f1b4df8abf04f66bc6eefbf7788598e6a8a26e6b2b754db7273805aeadb7de2"
-    }
-  },
-  "q0160": {
-    "exactColumns": [
-      "product_id",
-      "chars",
-      "bytes"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0160/q0160-public.json": "92e226af4facc78c86b752fad260a64e9233c330f9f27cbf67c8c4e80dca8b62",
-      "fixtures/q0160/q0160-boundary.json": "795f54a8dd644c15bd781ad938d7caee8401f745f933e7a205a9502a9b5e7b0f",
-      "fixtures/q0160/q0160-empty.json": "ad72fdef788d6d2f8196a489ca358dde0b1ee8e4d49a7b8b8dd778572f72971c"
-    }
-  },
-  "q0161": {
-    "exactColumns": [
-      "id",
-      "year_no"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0161/q0161-public.json": "9ee152c9bf0d7d6376fb0f587d11b9c0ad666ce25c6ef63adfb1cb5caaa2200e",
-      "fixtures/q0161/q0161-boundary.json": "c18db065a7489ab5aa134fcacb8c67f20c3ab374c4f978545ca468e4b4184093",
-      "fixtures/q0161/q0161-empty.json": "78d5a9548433fa39bea412ec872c7575db3269ec41990f48cf94effc86ea643b"
     }
   },
   "q0162": {
@@ -1397,16 +970,6 @@
       "fixtures/q0163/q0163-empty.json": "834441bcf38e1a131b25797e5aa2e7e48aded18973d9fbad9e87c6f201420077"
     }
   },
-  "q0164": {
-    "exactColumns": [
-      "total"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0164/q0164-public.json": "b660280cd94ced2128aeb1a23b43560b55bed6a02d5672426c31c35cbc77d560",
-      "fixtures/q0164/q0164-boundary.json": "10ea16c6b80e645ffb1f59edc6ad7085b3ad8d3317928ea2d9a78a85c97e48bf",
-      "fixtures/q0164/q0164-empty.json": "d049067f61bb93e850eb2a3ca21ac6578167fd4ad5e543fca9fc2ea379a6cfac"
-    }
-  },
   "q0166": {
     "exactColumns": [
       "product_id",
@@ -1416,27 +979,6 @@
       "fixtures/q0166/q0166-public.json": "27ed9ccc9d70552cc283f5d0075ec50714e9bc9a0dd91a112859b2fc03af108e",
       "fixtures/q0166/q0166-boundary.json": "98742c43bb7384711f7a6f0e9c14f8560bc09947eb9708475a349d7285b791b8",
       "fixtures/q0166/q0166-empty.json": "e8d34ead8149af874a8da652d1e779bf597574138bf952f5031bd0e8cce6f7e3"
-    }
-  },
-  "q0167": {
-    "exactColumns": [
-      "product_id"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0167/q0167-public.json": "d8d1fd73cd3994278c04a2dc2c4ac19e351383b2f0e3008a5e61d1e6a8e58d2d",
-      "fixtures/q0167/q0167-boundary.json": "53767a156e66f4e343adc61519ed15c20eda6574bb42b790bb14c02114574784",
-      "fixtures/q0167/q0167-empty.json": "6b01256a7b69038a115456bc0564e09ef425d048863414940967635f5301ac1a"
-    }
-  },
-  "q0168": {
-    "exactColumns": [
-      "po_item_id",
-      "boxes"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0168/q0168-public.json": "098d3b709179d8851f78f87d7262a359b63aa760cb97f9e342a88a45d9aba616",
-      "fixtures/q0168/q0168-boundary.json": "d8fe7074e2c603684cede165e84cbcf775f63d18e913c083eeb477051025a7b6",
-      "fixtures/q0168/q0168-empty.json": "8781dcb7a5b4b0cf790df1d7d938df870b4ef77d114ece61fcd26243b5489cc9"
     }
   },
   "q0169": {
@@ -1479,16 +1021,6 @@
       "fixtures/q0172/q0172-public.json": "6720b92cd59adfc89d80a631883e71848f2f28b84b30068043f8986ce4601afc",
       "fixtures/q0172/q0172-boundary.json": "077d90cbadb6b9b228ebe2486f761a690a333e55b72b99b7877c4d2194f2a41b",
       "fixtures/q0172/q0172-empty.json": "ada464fc2d050287c174e13891cc69abc21b50ade52a741efbe831a8fe3d9f70"
-    }
-  },
-  "q0173": {
-    "exactColumns": [
-      "employee_id"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0173/q0173-public.json": "c4165e7673ba50a0d495dfbc9120e2d2cde5bb1d60699af7221ed7cf128011d3",
-      "fixtures/q0173/q0173-boundary.json": "6ab61f00c940d8f0bb8e79641280a46a6446d8124853f748ccbd3f8ddbf73e60",
-      "fixtures/q0173/q0173-empty.json": "a7b571eff11a2b5160b6e819501789bb4a10cddab2fc4bcf5abb3690db1180bf"
     }
   },
   "q0174": {
@@ -1542,16 +1074,6 @@
       "fixtures/q0179/q0179-empty.json": "363f6158901bfe25543745a69bc789e537435ec5ae35469f989aa2c27bc5ec40"
     }
   },
-  "q0180": {
-    "exactColumns": [
-      "customer_id"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0180/q0180-public.json": "0b7529484e477a0428f2b8e73ddf1687ecba2645ff53e15f1c0d137eb6756c30",
-      "fixtures/q0180/q0180-boundary.json": "cfd2f0c0a60f8bc02c3558c32bfcfb52b77a6ea7b4fabe69811873bc3b49f755",
-      "fixtures/q0180/q0180-empty.json": "5f7ccd6e2f332ab3650517212da0912412444da820fed70779b714b5ea11d47e"
-    }
-  },
   "q0181": {
     "exactColumns": [
       "n"
@@ -1570,42 +1092,6 @@
       "fixtures/q0182/q0182-public.json": "4af054a6cff5e2ee0289b781f00a12a141d30723cb58e5bb855726abd1c5dd3b",
       "fixtures/q0182/q0182-boundary.json": "3d9d4c8124aeb60de97a658112e7ee2ca595b7e0d1a1b4a8666165f5880a3429",
       "fixtures/q0182/q0182-empty.json": "99879105aa7db4a95a726bda3de4c5454a398592ac0c637af58a0b989be1968f"
-    }
-  },
-  "q0183": {
-    "exactColumns": [
-      "customer_id"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0183/q0183-public.json": "45e692275ee2ba2a125d58bb41613dadafe7d1b93a4b6984a3787ef9515614bd",
-      "fixtures/q0183/q0183-boundary.json": "7d82ce5940488ab64030cac3aacd83025d9814595b6d37a2afc378792e64332a",
-      "fixtures/q0183/q0183-empty.json": "652135b71c6afd83db707448cf40fe903d8b1b918a21a3e8ca90c2df4cc07ecf"
-    }
-  },
-  "q0185": {
-    "exactColumns": [
-      "n"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0185/q0185-public.json": "ed091cd51033d110a733a5400a4a4259790503d16be191b0b665cacdc79a37a5"
-    }
-  },
-  "q0186": {
-    "exactColumns": [
-      "n"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0186/q0186-public.json": "9ff813db25009040506e694183185564dc5c80bedfc28d121073e0d4143c81f9",
-      "fixtures/q0186/q0186-boundary.json": "8d5d3dc65117aabdd97f40eb7b8fda4b818a28254691d85dfe7ab9b1687c2031"
-    }
-  },
-  "q0187": {
-    "exactColumns": [
-      "n",
-      "factorial"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0187/q0187-public.json": "c21f7887cc7b7b1c279b8e05b6a2d2e8b50939601124ce491651b852a1160c9f"
     }
   },
   "q0188": {
@@ -1639,17 +1125,6 @@
       "fixtures/q0190/q0190-empty.json": "0d6b095e998fb727fcdcff23ef28b5402e2a3a6cffdb6e4467264d7052d10b01"
     }
   },
-  "q0191": {
-    "exactColumns": [
-      "employee_id",
-      "depth"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0191/q0191-public.json": "41c9d8716d3a93fac6c3acd0363a24d2dbb5e3bf09752744b42f86b1cd4b9a1d",
-      "fixtures/q0191/q0191-boundary.json": "371973bdf595b724694a43c8081193f07f09d8062fc6a67123b6220ce96ee86c",
-      "fixtures/q0191/q0191-empty.json": "06513bb60edf056f5375512dbda28e5282dff3b623912f0147353327cbe84d85"
-    }
-  },
   "q0192": {
     "exactColumns": [
       "id",
@@ -1660,18 +1135,6 @@
       "fixtures/q0192/q0192-public.json": "eb4ade326314786e0429ff507132c7f5f8d9f41eaedcbca10b5880ad13323529",
       "fixtures/q0192/q0192-boundary.json": "eb6bb469ebfe7de78488242d3e3edca788486cc0e6a76f970490c3005aa56209",
       "fixtures/q0192/q0192-empty.json": "aba53210a884561b0740b67e0240c5be5225227b55734b14bd45469cbf1336bb"
-    }
-  },
-  "q0193": {
-    "exactColumns": [
-      "employee_id",
-      "root_id",
-      "depth"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0193/q0193-public.json": "70a1a3749e2a92315cec6504f2be0864a29efe198d410e9fcd9795d93bfdcfe1",
-      "fixtures/q0193/q0193-boundary.json": "ea8acb123ed5f7424504c6e824d54ed3e5c3d981d0d5dd79fe737e3449b9f234",
-      "fixtures/q0193/q0193-empty.json": "b22e5b027bb777028ec6e67a395dd7442bdce6954b7782c66c5fd752397bf46e"
     }
   },
   "q0194": {
@@ -1694,17 +1157,6 @@
       "fixtures/q0195/q0195-public.json": "a3c071a6c9c718cabe97544bb1912f2e58dc1d88cd8e3bcd12fda0e04f6c554f",
       "fixtures/q0195/q0195-boundary.json": "d96b0fb5d4b5f54b2b75800e3db09056a956c5c4f3337a658e76d63c8ad79340",
       "fixtures/q0195/q0195-empty.json": "7e866d32d805368e1df68e0d117ecfff85a691ca6e0bf1165dd4bbec7859d847"
-    }
-  },
-  "q0197": {
-    "exactColumns": [
-      "sales",
-      "prior_two"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0197/q0197-public.json": "5f37f546b6154c34f319dcbb77caedd31dad9e9083181234a081d510efdc13fe",
-      "fixtures/q0197/q0197-boundary.json": "67dfb12a6ddc49d9fbe6ea8c4cb77a8d183b1f211055ecf99c6da0af4108a07e",
-      "fixtures/q0197/q0197-empty.json": "252a6c6bdd692142043488c695d7f70ebc34dee390b443c34f8bfdbee221aa21"
     }
   },
   "q0198": {
@@ -1775,16 +1227,6 @@
       "fixtures/q0204/q0204-empty.json": "cbf4fe99d57fec871d07a13c382c92b8d755559715d62d69211dafb4ede9b223"
     }
   },
-  "q0205": {
-    "exactColumns": [
-      "neighborhood_sales"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0205/q0205-public.json": "bea488ecf48a435b28f6370981547e88e76324e56b3f5ee02b95ef666e8bd97d",
-      "fixtures/q0205/q0205-boundary.json": "65a0f9f3bd472ed84c904dac3b3b598171a0f2f66ee010faed8fbb995b646649",
-      "fixtures/q0205/q0205-empty.json": "cd8ff0e88ce43c7e0fe1071e4b426af6c2c6b4b0e951b8d7d0d82e07a0bbd5ed"
-    }
-  },
   "q0206": {
     "exactColumns": [
       "employee_id",
@@ -1809,16 +1251,6 @@
       "fixtures/q0207/q0207-empty.json": "114f9a882b8607bedc9c0237e194e157f556a537cc7b05f9610a5e59f3a2bf5d"
     }
   },
-  "q0208": {
-    "exactColumns": [
-      "remaining_sales"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0208/q0208-public.json": "b5e533d790d0ec1330ffefe2dae4414b460bf71c80b254981c4353e13cee5ab3",
-      "fixtures/q0208/q0208-boundary.json": "0c8b4fe1271e88760fdcbe5cb119123f53acd36c263a16031dc5e074ca6b9109",
-      "fixtures/q0208/q0208-empty.json": "9d07cc3bc71a80d4ef76873d36e70a5c1d284830347ce7ec7bfee9877b229d42"
-    }
-  },
   "q0209": {
     "exactColumns": [
       "id",
@@ -1828,17 +1260,6 @@
       "fixtures/q0209/q0209-public.json": "7bd5906d32fc615f68990eec5cd37b456e04499c6d278f0e91ce131351f90987",
       "fixtures/q0209/q0209-boundary.json": "10c58e35b799e6209c2f51f34e4883f44d09d2c510f6cfaa677214e022da82eb",
       "fixtures/q0209/q0209-empty.json": "d3f2bbc52b8b5cffe2a54b8bd15088797441ddcb37a9e747f381523bfc8d95d6"
-    }
-  },
-  "q0210": {
-    "exactColumns": [
-      "product_id",
-      "running_stock"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0210/q0210-public.json": "a5182d63fc0e8ffbf2427b661b7906cf7a0fce1bf185163fcb93bf92d2fc6ef5",
-      "fixtures/q0210/q0210-boundary.json": "d6b06d0ab12901deda79b968a3d586c0a1f28e358ceba9cc0962557a07c58f5e",
-      "fixtures/q0210/q0210-empty.json": "bced1bcca95c1c62f1fd728b86ca47343b020c3f78e14625ef1a7e45e524284c"
     }
   },
   "q0211": {
@@ -1863,29 +1284,6 @@
       "fixtures/q0212/q0212-public.json": "1773c2111b3ecb325e3a3f4c9e3a6f7f8ba7f5b89fda5082857040afbcf2b55c",
       "fixtures/q0212/q0212-boundary.json": "c29c9f66c5405cec26d62709a2b0030f5ccf124b0719b94c97a43582a08dc53c",
       "fixtures/q0212/q0212-empty.json": "432f2f9005918bd987451750a6025d1d8b9ec6378a04988411cf61dc714556e4"
-    }
-  },
-  "q0213": {
-    "exactColumns": [
-      "employee_id",
-      "salary",
-      "running_salary"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0213/q0213-public.json": "51027e8a65f14411586161ee38571628a8af45dc2bdfedc528d457182d6888df",
-      "fixtures/q0213/q0213-boundary.json": "eb5dce192d15fce1f415c68e17f604080b7060bf4d77abf94add26857255473b",
-      "fixtures/q0213/q0213-empty.json": "3c6752ade6e33ee1610ecada3e1ef1334e180d9dfea17eaa21be7304d1f54603"
-    }
-  },
-  "q0215": {
-    "exactColumns": [
-      "id",
-      "store_id"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0215/q0215-public.json": "fcba1bfdc9d6aeb458fb0537cc22cd83ebeffe2d760dbb012ce628d47523e0cf",
-      "fixtures/q0215/q0215-boundary.json": "849b9713d1e985fbc3b1874111ed0a04bd242cf1b99c8f84f8df65d35cfcb5f0",
-      "fixtures/q0215/q0215-empty.json": "aedfcafa76cc90335d9c7840f2b1085b9e6079ec0591e647cb73263907c779de"
     }
   },
   "q0216": {
@@ -1964,17 +1362,6 @@
       "fixtures/q0224/q0224-empty.json": "00063871deb5a2044daac844f12bbeb0393e57c4d5bc5d858c07238ef405878e"
     }
   },
-  "q0225": {
-    "exactColumns": [
-      "id",
-      "missing_flag"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0225/q0225-public.json": "f434877862fb8a7fc07e6ed0227a7f30b76d3ee366e5e8b34837cae07da22591",
-      "fixtures/q0225/q0225-boundary.json": "9adaa6c0d14e2fb47bba99d38865b11cfbadde77d8542d2e19f559785c2ea29e",
-      "fixtures/q0225/q0225-empty.json": "652d60259a96c89799cb47c3fc6ff60325f4d58b7202807dfd8b511b53be7b53"
-    }
-  },
   "q0227": {
     "exactColumns": [
       "n"
@@ -1983,16 +1370,6 @@
       "fixtures/q0227/q0227-public.json": "f45daa0e60d54769e6d44d48cf9bf81dc1340d29b7e833e88370c956c51e462a",
       "fixtures/q0227/q0227-boundary.json": "7d28d87f5e64704ea054fb5a2404cb30d0d706aecd3bdefce0bef5c99ee8079b",
       "fixtures/q0227/q0227-empty.json": "421532fbbc0ab3813b6bf6435493609851f51ec4007c4b03573d57d193df11e3"
-    }
-  },
-  "q0228": {
-    "exactColumns": [
-      "n"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0228/q0228-public.json": "5fefc541697ca729b8cfd0a92116f73fde847b0bb4d82fb4fbcf81328dea045b",
-      "fixtures/q0228/q0228-boundary.json": "aec7c8b31288dd144ff58c83848520517efff6d5ea1246384c3e156083ca1459",
-      "fixtures/q0228/q0228-empty.json": "6084b55029c6773f716c1a2246ea66c70790899c944b98615b22e2629a140212"
     }
   },
   "q0229": {
@@ -2013,70 +1390,6 @@
       "fixtures/q0230/q0230-public.json": "0d8f93c666e5aaff75c2bbde56ffc259442c22b9db502d8faf6f96521dedb9a6",
       "fixtures/q0230/q0230-boundary.json": "0548f03f084cbea1436948e593485f074c0650223e51b63beaa90d2a6243dc66",
       "fixtures/q0230/q0230-empty.json": "d9a4252265d18af542068ab8d9b8cf7b67ce6948cf7bbfca579d14eaa83af68a"
-    }
-  },
-  "q0242": {
-    "exactColumns": [
-      "product_id",
-      "price"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0242/q0242-public.json": "44cc95390f78a0b48069d50e1b41c09e01d2f6d79315afcad3608c70c8a08062",
-      "fixtures/q0242/q0242-boundary.json": "43dbfb98e9e63c34321ca2791753538dcffda076a172d2703bb747c0d0f61b48",
-      "fixtures/q0242/q0242-empty.json": "71cd892c381776ca7b51c831437ff060ad138c98d2d4bd02d743c6910d6c6b3b"
-    }
-  },
-  "q0243": {
-    "exactColumns": [
-      "product_id",
-      "stock"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0243/q0243-public.json": "b86a5084c632d191189a4bf272f355a6914fac487ce9249bdd2c63e2131394de",
-      "fixtures/q0243/q0243-boundary.json": "61cfe3f021ecfbce13f640f172066c54bfeb51e47bc8ca257172f7722c41a35c",
-      "fixtures/q0243/q0243-empty.json": "3542aab806faa8767944ef7d4b3107f754814810ac6a9808d87d0c1e16fd759b"
-    }
-  },
-  "q0246": {
-    "exactColumns": [
-      "product_id",
-      "stock"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0246/q0246-public.json": "5c258e78ecbef4fc134919c4165c38a29df67dfd3a452bbff532dd1a04e41935",
-      "fixtures/q0246/q0246-boundary.json": "22a2a1e29a0973b36bce44a74ade9bbc65e3a71c3c624725ad4d0bd628ca7615",
-      "fixtures/q0246/q0246-empty.json": "01b17dc26a5477a8abdb3d5e2e609a5ce382a5d0fd8c3b005058443d1d45bbc2"
-    }
-  },
-  "q0247": {
-    "exactColumns": [
-      "id",
-      "sales"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0247/q0247-public.json": "4d68e0e632f690b94f639abd13907b8db58c700edc6a9669c1ea5901a4ef751e",
-      "fixtures/q0247/q0247-boundary.json": "b2f4b76d17318c94288fb9706913fc6e05c1149ea8a6a4056b193512db05b9b6",
-      "fixtures/q0247/q0247-empty.json": "18f4853d14de13f194ad098f66066cded855b44bc15a6466fbc9578d2acd865f"
-    }
-  },
-  "q0248": {
-    "exactColumns": [
-      "id"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0248/q0248-public.json": "e98c1205ac51d0d19451dc739bc1067d91dc647fc78787c4b3c4cb7c4d705973",
-      "fixtures/q0248/q0248-boundary.json": "6cada4c588e3524f3bd8c6fc0079b7dfd5896f9ce75f75c9f1d9f110fcb91ab2",
-      "fixtures/q0248/q0248-empty.json": "9ee275bd5dd93089e4aa0b376b3b240b72c140d8f2b01c5ea0b1efff2f63f4fd"
-    }
-  },
-  "q0250": {
-    "exactColumns": [
-      "customer_id"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0250/q0250-public.json": "1f75c90fbaa88a635db6499fe45915639676030a369d74bbb1e03e0e5af7597c",
-      "fixtures/q0250/q0250-boundary.json": "573f39bfa6e8aaa3c56e03cfaa3860600e0846d6415e86aa1e0e6987bd9af0a6",
-      "fixtures/q0250/q0250-empty.json": "858f4debeba3172dcdc34761e8b40cff28148fde3aa92dad36e0539436ec666d"
     }
   },
   "q0251": {
@@ -2123,34 +1436,6 @@
       "fixtures/q0253/q0253-review-multiple-partial-returns.json": "e789ba4aa6db8532965980bbaef59021fe26a733fb6307531818983ab2c19a09"
     }
   },
-  "q0254": {
-    "exactColumns": [
-      "promo",
-      "days"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0254/q0254-public.json": "a494d9c5f5342d915847a0e0298d87ce561862763970749784ad37015bae97fe",
-      "fixtures/q0254/q0254-boundary.json": "9651022af027f4eaeffb1a1990312637895c456912f1a55e201506bcc2d2e253",
-      "fixtures/q0254/q0254-mini-202611171.json": "27298d9272b187a94ed4de1ae8f9fd7b79c5dfac6f836e85e014ef42b7e90f8d",
-      "fixtures/q0254/q0254-mini-202611179.json": "48cf2c7d8dad606614aa4fbddf6dbdf0068ce8e82ef92b5b13e6e88388538757",
-      "fixtures/q0254/q0254-review-multiple-partial-returns.json": "e0ce2048f08aa56de8d89d5cbcf367cfbd5a28aaf23e8afc2feb88fbc682abad"
-    }
-  },
-  "q0255": {
-    "exactColumns": [
-      "store_id",
-      "net_cents",
-      "flags",
-      "sales_rank"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0255/q0255-public.json": "2bc2bcd9d584d8aacc3cbeae1eb2e329e27a70517175eb5b7da745d51f7810a2",
-      "fixtures/q0255/q0255-boundary.json": "e09acf8fca126be950b422d8f8e90f45027c9341cc21c6c0b629574ae68d9e50",
-      "fixtures/q0255/q0255-mini-202611171.json": "fc532b8789bbef05696affbe6d21f161c476b18c28e425ebf8734ca24d2acc82",
-      "fixtures/q0255/q0255-mini-202611179.json": "e8df02655f4e0dd119b7d301a49cbb495b3a3ae8855a92de54ddfa39ae012405",
-      "fixtures/q0255/q0255-review-multiple-partial-returns.json": "0c1c758c39fa02f0630dc1d98e311f8b739c577da6bfb203faff64aa385dcee2"
-    }
-  },
   "q0256": {
     "exactColumns": [
       "warehouse_id",
@@ -2178,52 +1463,6 @@
       "fixtures/q0257/q0257-missing-snapshot.json": "20d4fe6438b6df2b7c8eb88fce46fa2f895f723d55a46b4ea7ce457911af37b7",
       "fixtures/q0257/q0257-mini-202611171.json": "c0999c492fab02c5b1591b3137fca92a331636b021f94868532b6f7f9404dd54",
       "fixtures/q0257/q0257-mini-202611179.json": "92ce849aa01317819a97a60e447e3b04f4cde2c97664f100087ff5fe7fb9c32f"
-    }
-  },
-  "q0258": {
-    "exactColumns": [
-      "warehouse_id",
-      "product_id",
-      "quantity",
-      "sold"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0258/q0258-public.json": "d813184281d74b2d6d54a8f5be9458a3598c4c2dbe83b22164e099002642ff9b",
-      "fixtures/q0258/q0258-boundary.json": "75567c227c4ae91509e26bfe405581fb5ebadff1ab3d57240f30a3361e679625",
-      "fixtures/q0258/q0258-mini-202611171.json": "39e4ed433c8da2c2f90246d5513b6dd192dad74a61048aee856bc7e6574b63b1",
-      "fixtures/q0258/q0258-mini-202611179.json": "32dc00b045f60e0337945e488de7ba0afc78f8b82de1f57a44e28baee318a065"
-    }
-  },
-  "q0259": {
-    "exactColumns": [
-      "warehouse_id",
-      "product_id",
-      "aged_units",
-      "aged_value_cents"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0259/q0259-public.json": "e870b0a7dc65b80c9ff60560c38a0abeb804325b0fa68a00ea7b0c19d1fc604f",
-      "fixtures/q0259/q0259-boundary.json": "a91251fcebebe78d3e653daa26a0dc2569e3d22938616fa5f2568d9a2557a715",
-      "fixtures/q0259/q0259-mini-202611171.json": "d0b93ce017ff53fce66235e29d2409796741455dd57c6ea087f64019d8775ae3",
-      "fixtures/q0259/q0259-mini-202611179.json": "0b8a93cfa3756ba5aacff7beb1a69fd5a15834a8841da4219d8e58bbcc28c142"
-    }
-  },
-  "q0260": {
-    "exactColumns": [
-      "warehouse_id",
-      "product_id",
-      "quantity",
-      "stock_value_cents",
-      "demand",
-      "inbound",
-      "shortage"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0260/q0260-public.json": "f6ba148daefa9cf333cc7a3fb4ec80565149b923103c2cf0065805471af53f53",
-      "fixtures/q0260/q0260-boundary.json": "0c86e3aedb3ef3beebad7bffc312a529b7cecd73658a931e8684a96386ae5a95",
-      "fixtures/q0260/q0260-distant-inbound.json": "0c50d22617a6d57ad2a418b074f635fcfa6ba29b4426fbd1eb6822f0b04d4a19",
-      "fixtures/q0260/q0260-mini-202611171.json": "21b1ff444fed1c9e7fad612b22936872dc990bc00b5383ec992392a1b6c7bb51",
-      "fixtures/q0260/q0260-mini-202611179.json": "f21ab7affa3eb203f2a83b4f4ae9c25af42c3fc96ecbcfda41d4a088ea8dbf08"
     }
   },
   "q0261": {
@@ -2272,38 +1511,19 @@
       "fixtures/q0263/q0263-review-multiple-partial-returns.json": "db060296a688857682ce201f34350037bf9ff06ce6af04abfefd1811cc608098"
     }
   },
-  "q0264": {
-    "exactColumns": [
-      "source_id",
-      "sessions",
-      "converted",
-      "new_customers",
-      "spend_cents"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0264/q0264-public.json": "1500e456263fd91782d1b38cec8f32e0571890bb1dffa9bda086606722700d35",
-      "fixtures/q0264/q0264-boundary.json": "b1a020e7278263fd254874edb0c9afdaac8d83bb9a42845c716a6c3d5d85fa88",
-      "fixtures/q0264/q0264-mini-202611171.json": "5b0d431b19da583a67579bfdaeb4bc89328c5efbcf8f9accc1f65767d21c08eb",
-      "fixtures/q0264/q0264-mini-202611179.json": "6a034317a8a5a623aecce9c36a532642e2cd1b469c573c5c7315eed5b540c062",
-      "fixtures/q0264/q0264-review-cross-year-session.json": "676fee33e77d2e488ea09fc87f824c1fce14ca6a7af238246984fb58df06d84e",
-      "fixtures/q0264/q0264-review-no-sessions.json": "43580b36c29dd66755e2b3d1fa6b9f51a98fcf03155e0cf84b594b5ed9d1dcd9",
-      "fixtures/q0264/q0264-review-multiple-partial-returns.json": "bb3fe39da1eb2d4777e6989a6ba6eb86e5d5cf2fdbac81c6575285f2ef9abb55"
-    }
-  },
   "q0265": {
     "exactColumns": [
-      "customer_id",
-      "freq",
-      "net_cents",
-      "gross_cents",
-      "recency_days"
+      "purchasing_customers",
+      "repeat_customers"
     ],
     "fixtureHashes": {
-      "fixtures/q0265/q0265-public.json": "19aebed3300e4fa445c6282df80752f3a045a9238f3288f1d39acea13f8dc0dd",
-      "fixtures/q0265/q0265-boundary.json": "d2c4f7f7342c797b11193f094cf963f9974c75b873c19dac7f955e2be9face43",
-      "fixtures/q0265/q0265-mini-202611171.json": "e48c78c314161b0f5ce7cbaf03d4776f66fb2646f51398b586970542d0d2133f",
-      "fixtures/q0265/q0265-mini-202611179.json": "1868b1163d67cd1f7eb918e2d1d2ee675b509d3e1e794fb90e8d8377172b9bad",
-      "fixtures/q0265/q0265-review-multiple-partial-returns.json": "93689f4b910fddd034c2d854f6677fd2b24de85a4032cf694c224a9220862c00"
+      "fixtures/q0265/q0265-public.json": "ea9765925504ead439a88c303797255134274cf95d3b0da34ed2edee5cca5951",
+      "fixtures/q0265/q0265-boundary.json": "68fe9c18eb3145eb5fdda7150d1743de1e15a9ac833028b750c172e801788c61",
+      "fixtures/q0265/q0265-mini-202611171.json": "96874f1c0b1b179e818746e7779a6a2b11d43a58a02b265b6f29e2e4b2e82d3b",
+      "fixtures/q0265/q0265-mini-202611179.json": "f161a63d38999b3e052862196a77119f720650e4a4998dd7fe0ae4affebc6e3e",
+      "fixtures/q0265/q0265-review-multiple-partial-returns.json": "4c1925166371e5f6c5a942fefedb4b77adbd45e35b3716b0a99479c787c56b56",
+      "fixtures/q0265/q0265-directed-edge.json": "da8ebbd87f19d28bdcc93907f906467666218bcb15f475eff7215ac636fbeba7",
+      "fixtures/q0265/q0265-directed-empty.json": "3113c943f7bfa8e926e4bcb96cf5bb99f4513af387e88a8807327af4492e5649"
     }
   },
   "q0266": {
@@ -2384,19 +1604,6 @@
       "fixtures/q0270/q0270-review-split-invoice.json": "de8d9c14373931cbf0ee44fb1dcef0256b734d8896b2b48e05355f394305fe58"
     }
   },
-  "q0271": {
-    "exactColumns": [
-      "department_id",
-      "headcount",
-      "net_change"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0271/q0271-public.json": "093ff27c125b70b5459d11c88b5c00c90a5b2087b3a090684c286b1485715712",
-      "fixtures/q0271/q0271-boundary.json": "91bc17fbb548d8f735e68149f06284867c38ee23e957accd4c436e2fc7b9e97c",
-      "fixtures/q0271/q0271-mini-202611171.json": "81e1435aca1f76d1f96852cafb3bf9fe1a98480e2b9f346795bb0d1a71e260cd",
-      "fixtures/q0271/q0271-mini-202611179.json": "13e3d353ac158d8caf58958342a2d7996440b9f030d7b9fce18d0e1174851a3a"
-    }
-  },
   "q0272": {
     "exactColumns": [
       "department_id",
@@ -2409,48 +1616,6 @@
       "fixtures/q0272/q0272-boundary.json": "8dbe030258b43f29c5af97827953dee4da2918121902be559498dd4bea84efb0",
       "fixtures/q0272/q0272-mini-202611171.json": "056815371cf35c610e5f7d5972c0880fa5796487cfef797c3f28b71345dd816a",
       "fixtures/q0272/q0272-mini-202611179.json": "e76fe62ec4c8fb89bda92db8ea59049ce3f419ca9124b76b20f4ee74e97c3dc8"
-    }
-  },
-  "q0273": {
-    "exactColumns": [
-      "employee_id",
-      "department_id",
-      "position_id",
-      "base_cents",
-      "salary_rank"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0273/q0273-public.json": "a9932c9025618c1dbeca79bd244aad0c47d06748f4faeb1f3be5bdaa659e93aa",
-      "fixtures/q0273/q0273-boundary.json": "fed4164e15c1a3a69a0f04e797ae6430eaaf7f10655b847806c2f14eea9cb596",
-      "fixtures/q0273/q0273-mini-202611171.json": "33b395fe1060a5ef81aab052520c0b35c4ae2157bc76a642a84720a4c74262bc",
-      "fixtures/q0273/q0273-mini-202611179.json": "6797739400749d92abdc395a6db2f572c79f83c68678f3240cd5c6cdb4f9205c"
-    }
-  },
-  "q0274": {
-    "exactColumns": [
-      "department_id",
-      "base_cents",
-      "bonus_cents",
-      "overtime_minutes"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0274/q0274-public.json": "c360c92a10bba4dd1fceb1b83b0b6c3b49adf787f21347256b76c4fd211d6001",
-      "fixtures/q0274/q0274-boundary.json": "0ace3ad56fd7975b320db7b76075f02782f0bf71de84024f90bb6287069c5f01",
-      "fixtures/q0274/q0274-mini-202611171.json": "6276c3600e00ad0299774d4e271df802610652550eb89f6576c1246adcc06942",
-      "fixtures/q0274/q0274-mini-202611179.json": "a8b1a3f85d8d61bc1d228ec5f6a129fa538f610f408be678b3ac3f2e2366bc05"
-    }
-  },
-  "q0275": {
-    "exactColumns": [
-      "department_id",
-      "n90",
-      "n180"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0275/q0275-public.json": "ee83b35cc26100e4399121c62ee276af4006b1f7262c561b47d05c66c9ad0445",
-      "fixtures/q0275/q0275-boundary.json": "2c7f1ee6a3904c8f647299129713397985de99a06ed11d1132052e31f772731c",
-      "fixtures/q0275/q0275-mini-202611171.json": "9ce60f2589f3155ca9eb7abae3bf42e1ca4fe3b1e5f387bc75bb61bbc25c3a59",
-      "fixtures/q0275/q0275-mini-202611179.json": "68abcaee8163a949d903f6c937dbd9af3d1d4111443075d7274f4e6429829c3b"
     }
   },
   "q0276": {
@@ -2504,43 +1669,21 @@
       "fixtures/q0278/q0278-review-future-invoice.json": "e460881da42d265900c7fd3c5e58e6d41699216144d5e45684fd40ba3f4b51ce"
     }
   },
-  "q0279": {
+  "q0255": {
     "exactColumns": [
+      "store_id",
       "product_id",
-      "supplier_id"
+      "net_cents",
+      "sales_rank"
     ],
     "fixtureHashes": {
-      "fixtures/q0279/q0279-public.json": "e31b5432725d0270a1784d4a3b169ca6846a461a0e00779687550e8a72d1dfc7",
-      "fixtures/q0279/q0279-boundary.json": "551ce137d712efbd3281397de28698bf30db4fff22737094ea901906bd29cb67",
-      "fixtures/q0279/q0279-mini-202611171.json": "2429e9648f5e7b7a7c5bfe817766a6af08156bd67ec56646c46dd14afa36c34c",
-      "fixtures/q0279/q0279-mini-202611179.json": "5b4d1f61bbb47d3b26448e6de857f90bbd127df23088ffa12c6f9744756d41ae"
-    }
-  },
-  "q0280": {
-    "exactColumns": [
-      "supplier_id",
-      "due_lines"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0280/q0280-public.json": "952d5c69a2f52c5e2d6820cfde2c0cc5a8e05a3237205afacffd460aa2e74520",
-      "fixtures/q0280/q0280-boundary.json": "02e96a1402d8eda1656205b464d9369cdd9b8c0c53c0ce123d43275ec3491c2f",
-      "fixtures/q0280/q0280-mini-202611171.json": "521f87894f61ca707af91e1da0b13a621f9e1b5b9a28998327c09b31f41aabcf",
-      "fixtures/q0280/q0280-mini-202611179.json": "c2c236afcee35348900e8b300ecefb4882e9c3a8bc2c28f0e48c2818c1779c2a"
-    }
-  },
-  "q0281": {
-    "exactColumns": [
-      "warehouse_id",
-      "product_id",
-      "quantity",
-      "sold",
-      "value_cents"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0281/q0281-public.json": "d5c21d9d4c2c86875fd70048bf3c78b1f11136a5dfdb9acb84bc01573a7fdd03",
-      "fixtures/q0281/q0281-boundary.json": "d6d80b77849e18109dcb5f8844c9c5fff0332fc02ffe90a2b4d2a32b40ef72ad",
-      "fixtures/q0281/q0281-mini-202611171.json": "45176d392e27d325ca63f5f8e6f697403ba0fed39b4a3b379cf71d28a953d620",
-      "fixtures/q0281/q0281-mini-202611179.json": "df456d64a23e4cef124e9e14bda5ba6eba39dcca618afe59123289ff7cfa41a2"
+      "fixtures/q0255/q0255-public.json": "b7634d4e6b99c0e8ff8fdd1dd96db9b272fa1ef915ebe64f0150874a096b7099",
+      "fixtures/q0255/q0255-boundary.json": "e1a7b38551f0f7ec7853a53c0f3e751f11b7036caefb3401ad2c6bc494539b70",
+      "fixtures/q0255/q0255-mini-202611171.json": "3524d970cd3c0116f6e79f788b724f833f19428fc589279d4cd9fc4b6a46ffee",
+      "fixtures/q0255/q0255-mini-202611179.json": "27ebe5dee94893827fc8058c814484bb2741f4f109a29771dbeb360c5b424b89",
+      "fixtures/q0255/q0255-review-multiple-partial-returns.json": "cd4c69ec16d29852f3c9413a51c686991de8240ed805df7270419e2d3df1d032",
+      "fixtures/q0255/q0255-directed-edge.json": "ab4cde00ca6d6bc7d72e2416f09cec9c543ed92660354d3833021d7ca1cb6995",
+      "fixtures/q0255/q0255-directed-empty.json": "86fe495ec1187e470362af8acf662a1037a0aed86d5e80352e8878557036e629"
     }
   },
   "q0282": {
@@ -2557,20 +1700,6 @@
       "fixtures/q0282/q0282-review-multiple-partial-returns.json": "f52b31781127c3357d3eca3ad17fb7ba35b06f114fc5595618a22883f0ab98f9"
     }
   },
-  "q0283": {
-    "exactColumns": [
-      "product_id",
-      "from_warehouse",
-      "to_warehouse",
-      "proposed_units"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0283/q0283-public.json": "4f00039457af00b7db6335452b9a46b2038c1787a5501205216df542370f4bd6",
-      "fixtures/q0283/q0283-boundary.json": "c3409c798ad7854332bc96c2d81c975d6b3cdb922bbb5eaa4d90e75d350b1f08",
-      "fixtures/q0283/q0283-mini-202611171.json": "07aaab6dbf0b1a5a372ee8f4aea625420a374a2c1906ffa8ae8fb04c2bc526d3",
-      "fixtures/q0283/q0283-mini-202611179.json": "46d776bbd4cc30341338d6b3c08efc8e8c95c1e36710825efc0d48b571f03996"
-    }
-  },
   "q0284": {
     "exactColumns": [
       "category_id",
@@ -2585,66 +1714,19 @@
       "fixtures/q0284/q0284-review-multiple-partial-returns.json": "ffb79a20cbf3a2d08bd58ed998e829e46ffc73a2309bfea33ef89f3fbaf92cfa"
     }
   },
-  "q0285": {
-    "exactColumns": [
-      "warehouse_id",
-      "product_id",
-      "quantity",
-      "demand",
-      "overdue_units",
-      "shortage"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0285/q0285-public.json": "03182cc913489864f5374fe87af40d01746b0e7a4bcb7e505366599e874ba5f4",
-      "fixtures/q0285/q0285-boundary.json": "ebb40384d21c271b14876e346817b525acc9853c6bcac568622239387a046509",
-      "fixtures/q0285/q0285-mini-202611171.json": "18f3430914731bff8720bd1d622df82a60736c1d2733f306f26cf5e013130ec0",
-      "fixtures/q0285/q0285-mini-202611179.json": "f6d43079ccdc50af927a597e96fe6a518caeba9d931f8324b3cf917d15ca9c5e"
-    }
-  },
-  "q0286": {
-    "exactColumns": [
-      "receipt_id",
-      "po_item_id",
-      "expected_units",
-      "posted_units",
-      "difference"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0286/q0286-public.json": "0493a93859f1b05a7f14174644ed2311e7b5152f51da201978280c6ef49458d8",
-      "fixtures/q0286/q0286-boundary.json": "7c7dd7ce42e1ede307b87b08b23ea4741c6f1b25be87ced7b3f8731f582b4a97",
-      "fixtures/q0286/q0286-mini-202611171.json": "23efa0336d80d1020fa541f774db2efef3292723f3550024fc39a1f343a95870",
-      "fixtures/q0286/q0286-mini-202611179.json": "ea0b40c98f14ae84a2a04377961c439bc7d356378d4c3e0fd3b0b82a4768a5ba"
-    }
-  },
-  "q0287": {
-    "exactColumns": [
-      "supplier_id",
-      "affected_pairs",
-      "overdue_cents",
-      "exposed_stock_cents"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0287/q0287-public.json": "4553fc120acb2f5749a1d53234c5b67344598e865cd7088f1eef2ce4532b5a3f",
-      "fixtures/q0287/q0287-boundary.json": "e1d8cdf4e85c4dd4a810c34c4d54462ac78ec47ef3e444895982f5c5504afc38",
-      "fixtures/q0287/q0287-mini-202611171.json": "f838135a495be5896c5b38d4aaa5061231504b8fb7e79fba35f52620f1a50e23",
-      "fixtures/q0287/q0287-mini-202611179.json": "93c5edfb80048cb50206b8e76e078809301437554fe704c43ec82bc41902509d",
-      "fixtures/q0287/q0287-review-missing-risk-snapshot.json": "ef62d25eb1e2e2eb42fdbd36bf5af62889cd9b0dacd3649a73f858530c9a0500"
-    }
-  },
   "q0288": {
     "exactColumns": [
       "store_id",
-      "net_cents",
-      "cost_cents",
-      "expense_cents",
-      "contribution_cents"
+      "net_cents"
     ],
     "fixtureHashes": {
-      "fixtures/q0288/q0288-public.json": "1987f9f7c812f80ebd240cdb7172acf28eac2e41ba4a324c5aad4519be2fdd9f",
-      "fixtures/q0288/q0288-boundary.json": "f2bc9cbe7f60892f3bfbe7123d00d9c8fd4a86e2893dfc47a79b27f44414d564",
-      "fixtures/q0288/q0288-mini-202611171.json": "f023c0e9cd262bc857572fa2c5e60fe7cabc28d2a8731f21a7d4ec8c0408b777",
-      "fixtures/q0288/q0288-mini-202611179.json": "ff43cb7cf3742c9964a8c630591a7bc3e137665171fa5680f4c9e96c3691989c",
-      "fixtures/q0288/q0288-review-multiple-partial-returns.json": "e0b7ee748550c3e5943fe4ea3cefc866d6e2b41f6e659e233e3644aefb3da6e7"
+      "fixtures/q0288/q0288-public.json": "2917f9a04db2173f03e075cfa9c938d98bd78532e874bbc947f8f88144c51d4a",
+      "fixtures/q0288/q0288-boundary.json": "7e7d6be607d0bbc127478f6cb17100039f0c4537e2a8ab01166faf36a1610b0e",
+      "fixtures/q0288/q0288-mini-202611171.json": "24952a0d264fc3934af5c78e0f2112fed5ce125ef224916f5a0e193e37b7a1c9",
+      "fixtures/q0288/q0288-mini-202611179.json": "620ae0239e6c96398048cbc55fa8509d18c125869cb2dff8b6c4d77770c14d0f",
+      "fixtures/q0288/q0288-review-multiple-partial-returns.json": "170e9d1ec40da97cc357406bdcf36cfc07e34511c47139322e034bf98ba17fc5",
+      "fixtures/q0288/q0288-directed-edge.json": "99b0fae5cd70418d507473798fdbe6750984d447288f40e5f241167bc2621f57",
+      "fixtures/q0288/q0288-directed-empty.json": "69845e4aa0f04971ef83463e50e13c9f8a3770a8b6fbf03998438895a9d3e2e0"
     }
   },
   "q0289": {
@@ -2664,16 +1746,18 @@
   },
   "q0290": {
     "exactColumns": [
-      "store_id",
       "net_cents",
-      "expense_cents"
+      "previous_net_cents",
+      "change_cents"
     ],
     "fixtureHashes": {
-      "fixtures/q0290/q0290-public.json": "37b4451eff08d559466ecf20a44804480b0d9afcb32475b88b4e457db10019de",
-      "fixtures/q0290/q0290-boundary.json": "5ab2e8ad603dda0ba0717208f8ac8fad98a3251c16f7a7a828097102ad1081d3",
-      "fixtures/q0290/q0290-mini-202611171.json": "6d5212f14be7d17de2a9bad8f9df62bac18b78caf9b49e9c4ac07a43374f3e79",
-      "fixtures/q0290/q0290-mini-202611179.json": "fa3227797fed3deb719f406a306f1fc3ae8382cd187c6e394a265411ed5cbaab",
-      "fixtures/q0290/q0290-review-multiple-partial-returns.json": "d9272a5106f04faa916fc7df5d2a2f60f40888fca565e5c5b208e5d85d2ebbe9"
+      "fixtures/q0290/q0290-public.json": "2b5587e406ca195e228692b28ec9d38e62eceffaa36ce64f9f7098183487b734",
+      "fixtures/q0290/q0290-boundary.json": "d3ba7fcd23013e2a530b975e4c7985657e1b42379d37072b077b560e5a14efe9",
+      "fixtures/q0290/q0290-mini-202611171.json": "830d68c83c885421614f604abb0b41b8d0579797e92a19a45f055c167ed444d6",
+      "fixtures/q0290/q0290-mini-202611179.json": "aafffdd31f82faa2ffd472599e3be49f9e708451844c1052625046988d7fa9a6",
+      "fixtures/q0290/q0290-review-multiple-partial-returns.json": "5cf7aa03657d8f74b3e75ee4a7062194bd4d213cbcbf08c84ea1dc7db17926cb",
+      "fixtures/q0290/q0290-directed-edge.json": "637b735f653ba1b713bf406eedaf160ac6f320c4279fab7bd5a4796c500d2b2a",
+      "fixtures/q0290/q0290-directed-empty.json": "3dfd8768b1ff1494fac686e50e8073c62c17702ef96e1840ed3d222c71d03821"
     }
   },
   "q0291": {
@@ -2692,38 +1776,6 @@
       "fixtures/q0291/q0291-mini-202611179.json": "0fe65a23007654a0accbd2c0b6d0501c1d7af4ae1c69c5897311a352925fe1aa"
     }
   },
-  "q0292": {
-    "exactColumns": [
-      "supplier_invoice_id",
-      "po_id",
-      "billed_cents",
-      "paid_cents",
-      "received_cents",
-      "bill_difference_cents",
-      "paid_difference_cents"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0292/q0292-public.json": "966997da841c618f7858de500a1bee9075ce1dd65709c8bfaf4fcf3cda0dee37",
-      "fixtures/q0292/q0292-boundary.json": "467cf05554e8bfbf29b4bcdb9f5f9a846e5b1ade9abf355f1e6f2f5219c9869a",
-      "fixtures/q0292/q0292-mini-202611171.json": "2d2d507c98614d588aea92c0fcc1997a91ec66bc36adbfa32e8b424e178d3b2b",
-      "fixtures/q0292/q0292-mini-202611179.json": "882d28fa4010593bd3c0a58083fac8ce8d47f4d5f397271ecbc68b81c5775f78",
-      "fixtures/q0292/q0292-review-split-invoice.json": "e0920574da583beb5880d2df384cbb8d7c8a9ae603ef40fd5823c2fe066b0985"
-    }
-  },
-  "q0293": {
-    "exactColumns": [
-      "supplier_id",
-      "outstanding_cents",
-      "overdue_cents",
-      "due_lines"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0293/q0293-public.json": "fe3249e73a4ea9fc37c77cd2ca2918f495a48d13a7e142704d530e08cfd09aeb",
-      "fixtures/q0293/q0293-boundary.json": "041d29818b573fc0af30c9cc6e822cf2c1690906a089dcf81ed3a2f991e161a9",
-      "fixtures/q0293/q0293-mini-202611171.json": "4a4180dd37f6ee032d0400c058f66ccf327617335bf336ad06389ef9c7ceded3",
-      "fixtures/q0293/q0293-mini-202611179.json": "a59367a12401b9d8441ae732f11bb717101b832e9da2882c2acb627e94bc4f15"
-    }
-  },
   "q0294": {
     "exactColumns": [
       "source_id",
@@ -2740,37 +1792,6 @@
       "fixtures/q0294/q0294-review-multiple-partial-returns.json": "3e0443e49ff514765797022f48dcc6d30fb1aa253ed582876039bd586a59145f"
     }
   },
-  "q0295": {
-    "exactColumns": [
-      "source_id",
-      "mature",
-      "new_customers"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0295/q0295-public.json": "6d2a5f9421b843b6c1122e296aebafb782f1757845b8dec0168b4e8e24987c44",
-      "fixtures/q0295/q0295-boundary.json": "0dbb04f13593782257c5f3ce0d7fdba759294a5d572ee5a59912bda9b4ea591b",
-      "fixtures/q0295/q0295-mini-202611171.json": "e9a51b65e5350ef08a0d916f9852c01fab1460c97caae164b210fdabd7c8b6b5",
-      "fixtures/q0295/q0295-mini-202611179.json": "e69b70bc6fd893458a0b5f74f76bcc434716f3d731bc59c1df911877f30fc60b",
-      "fixtures/q0295/q0295-review-missing-ad-budget.json": "1b8489d7cbf3b68c3223c8840b0a69bf1a7f78ab2007b825564836623e5462d6",
-      "fixtures/q0295/q0295-review-multiple-partial-returns.json": "60542281f65b53e08007cc81449361e242523e158d0bc06419fdb92c606dcc15"
-    }
-  },
-  "q0296": {
-    "exactColumns": [
-      "source_id",
-      "before_refund_cents",
-      "refund_cents",
-      "before_gross_cents",
-      "after_gross_cents"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0296/q0296-public.json": "784da1ef69172df0eadcf35a9d8fedca1fd14a2b114bee7908549e5d8f5cfcf1",
-      "fixtures/q0296/q0296-boundary.json": "24bd282208b231ce762781ff24ebfcfe66f031d38f185e35f3844da0240565e4",
-      "fixtures/q0296/q0296-mini-202611171.json": "a8a57911af83e4832a1eb8fc38395c96d82fec1ff52f9d8d0d459661fca1e2b0",
-      "fixtures/q0296/q0296-mini-202611179.json": "d3a41227e2999a6bf1d1a8bb7a70edfba64d2c4d2a71d1196d5ebc60832761b1",
-      "fixtures/q0296/q0296-review-multiple-partial-returns.json": "61749aa7c8293a1f489ed743fef519821d50447cb78d1b40b6ffbeb07a31021f"
-    }
-  },
   "q0297": {
     "exactColumns": [
       "store_id",
@@ -2782,21 +1803,6 @@
       "fixtures/q0297/q0297-mini-202611171.json": "59806b59095fbe9a26dbb94bf849a23e463a26c4350b9c0291b4acc07b40583c",
       "fixtures/q0297/q0297-mini-202611179.json": "076a1760e061b1eb5c5751ad4463cba83c46fed9b366390e07885e6d51522b6c",
       "fixtures/q0297/q0297-review-multiple-partial-returns.json": "22d4a98e50d43849c7792c6f17e1d9431125447b6b96a84a51bb6197f2bc20b7"
-    }
-  },
-  "q0298": {
-    "exactColumns": [
-      "store_id",
-      "headcount",
-      "net_cents",
-      "review_flag"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0298/q0298-public.json": "aadf13d0bc11f54ae10401c5c62ad1e3e018722f63288b2b1d6b88529bef5879",
-      "fixtures/q0298/q0298-boundary.json": "51caca76c6c29a6e74457fd776f39c19da7e0904ae8cbf255c56865dd5d71fc1",
-      "fixtures/q0298/q0298-mini-202611171.json": "9cb682cecd978d7ed4b87488a03b220372250cd2fbbda3af1888a7923af73065",
-      "fixtures/q0298/q0298-mini-202611179.json": "c03fbedcaa85ac45cd12c6b860cecebb384a9c6e16f477c171975d1ecd147088",
-      "fixtures/q0298/q0298-review-multiple-partial-returns.json": "456eb076fa97f420869aa597765d1f475700c52e59767f3fd3692bf695996f6b"
     }
   },
   "q0299": {
@@ -2813,23 +1819,6 @@
       "fixtures/q0299/q0299-mini-202611171.json": "d55bc66167312ba160b513e9608038782e8e25fd1bab2fa1e2718c2a2c9ac7dc",
       "fixtures/q0299/q0299-mini-202611179.json": "e022dbad223f7b0f5fa29fce725663f8a0d95b424d79cd33544f4ef4126d90a2",
       "fixtures/q0299/q0299-review-multiple-partial-returns.json": "5ca8bcdfb68558a1cd827f878b1c40b8568d90525a7b492ac13d9fafaea69a07"
-    }
-  },
-  "q0300": {
-    "exactColumns": [
-      "net_cents",
-      "stock_cents",
-      "risk_count",
-      "missing_count"
-    ],
-    "fixtureHashes": {
-      "fixtures/q0300/q0300-public.json": "e41c74ebe8b55480cc6c23e8eb8123cfd7a5a9b349e1d3185df0c051a2a5f8f7",
-      "fixtures/q0300/q0300-boundary.json": "6a91214a30f257c1a47d645a28fbec1de799503ed8ddef05f13f2c33d0371aa8",
-      "fixtures/q0300/q0300-mini-202611171.json": "6a634f81b0932805b48d5d7ec2674c966dde9d60cb1c7239eff902a8566f6aa0",
-      "fixtures/q0300/q0300-mini-202611179.json": "7d904be4fd9328638f9be3918e22c37086fbf1706ebc6546b1fbd7ec38445bfe",
-      "fixtures/q0300/q0300-review-missing-quarter-stock.json": "bf022e3d4fad872a78ab20b7f518e58a717b99ff7454b0d1ca45ce2b530bf245",
-      "fixtures/q0300/q0300-review-interim-snapshot.json": "419f734bab1d4b6ee425f88ded64c939b72092e205d751ff0332eb0bc47699b3",
-      "fixtures/q0300/q0300-review-multiple-partial-returns.json": "3a8cb9e49fd61f029eb62351c16e2d2634b356c70cda612da87e1c27dd3d6648"
     }
   }
 }

@@ -13,9 +13,7 @@
       "chapterId": "ch04",
       "title": "ORDER BY 多列排序",
       "learningObjective": "能够运用本节知识完成：生成价格排行榜",
-      "prerequisites": [
-        "ch03"
-      ],
+      "prerequisites": [],
       "concept": "先按第一排序键排序，同值再按后续键；ASC 升序，DESC 降序。",
       "syntax": "ORDER BY col1 DESC, col2 ASC",
       "parameters": {
@@ -125,7 +123,6 @@
       },
       "relatedQuestionIds": [
         "q0045",
-        "q0047",
         "q0048"
       ],
       "relatedFlashcardIds": [
@@ -172,14 +169,19 @@
       "mysqlVerificationScript": "validation/mysql/kp04-01.sql",
       "primaryQuestionIds": [
         "q0045",
-        "q0047",
         "q0048"
       ],
       "primaryFlashcardIds": [
         "fc0024",
         "fc0026",
         "fc0027"
-      ]
+      ],
+      "teaching": {
+        "problem": "展示价格榜时，相同价格也要能在两次查询中按同一顺序显示。",
+        "codeExplanation": "先按 price DESC 定主顺序，再以唯一 product_id ASC 决胜；后一列只比较前一列同值的记录。",
+        "resultExplanation": "相同价格的两个商品按编号排列。稳定排序也是分页、取首条和可复现导出的前提。",
+        "checkpoints": []
+      }
     },
     {
       "id": "kp04-02",
@@ -300,7 +302,6 @@
       "relatedQuestionIds": [
         "q0043",
         "q0044",
-        "q0046",
         "q0049",
         "q0050"
       ],
@@ -333,7 +334,6 @@
       "primaryQuestionIds": [
         "q0043",
         "q0044",
-        "q0046",
         "q0049",
         "q0050"
       ],
@@ -341,12 +341,18 @@
         "fc0025",
         "fc0028",
         "fc0029"
-      ]
+      ],
+      "teaching": {
+        "problem": "读取固定大小的第二页，并沿用第一页的稳定排序。",
+        "codeExplanation": "先 ORDER BY 建立全序，再由 OFFSET 跳过前两行，由 LIMIT 读取随后的两行。",
+        "resultExplanation": "第二页返还价格 45 和 35 的商品。高频大页码场景可用上一页的价格和编号作为起点。",
+        "checkpoints": []
+      }
     }
   ],
-  "plannedQuestionCount": 8,
+  "plannedQuestionCount": 6,
   "schemaVersion": 1,
-  "contentVersion": "1.0.0",
+  "contentVersion": "5.0.0",
   "dialect": "MySQL 8.4",
   "summary": "完成本章后：控制确定性顺序、并列及分页边界。",
   "sources": [

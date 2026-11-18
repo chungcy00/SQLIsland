@@ -1,0 +1,47 @@
+{
+  "id": "kp20-02-returns",
+  "table": "returns",
+  "columns": [
+    {
+      "name": "return_id",
+      "sqliteType": "INTEGER",
+      "type": "INTEGER"
+    },
+    {
+      "name": "order_item_id",
+      "sqliteType": "INTEGER",
+      "type": "INTEGER"
+    },
+    {
+      "name": "return_date",
+      "sqliteType": "TEXT",
+      "type": "TEXT"
+    },
+    {
+      "name": "quantity",
+      "sqliteType": "INTEGER",
+      "type": "INTEGER"
+    },
+    {
+      "name": "refund_cents",
+      "sqliteType": "INTEGER",
+      "type": "INTEGER"
+    }
+  ],
+  "rows": [
+    [
+      1,
+      1,
+      "2025-02-01",
+      1,
+      100
+    ],
+    [
+      2,
+      12,
+      "2025-04-05",
+      1,
+      20
+    ]
+  ]
+}

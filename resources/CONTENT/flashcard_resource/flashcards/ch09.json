@@ -61,8 +61,7 @@
       "relatedQuestionIds": [
         "q0120",
         "q0123",
-        "q0125",
-        "q0129"
+        "q0125"
       ],
       "questionLinkPolicy": "通过共享课程知识点关联正式题库；业务卡额外保留对应BP任务编号。关联不表示题目与卡片完全相同。",
       "type": "语法结构",
@@ -214,16 +213,13 @@
       "id": "fc0064",
       "chapterId": "ch09",
       "knowledgePointIds": [
-        "kp09-04"
+        "kp09-02"
       ],
       "primaryKnowledgePointIds": [
-        "kp09-04"
+        "kp09-02"
       ],
       "relatedKnowledgePointIds": [],
-      "relatedQuestionIds": [
-        "q0122",
-        "q0124"
-      ],
+      "relatedQuestionIds": [],
       "questionLinkPolicy": "通过共享课程知识点关联正式题库；业务卡额外保留对应BP任务编号。关联不表示题目与卡片完全相同。",
       "type": "语法结构",
       "difficulty": "中等",
