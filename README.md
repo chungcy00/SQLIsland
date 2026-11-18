@@ -64,6 +64,8 @@
 
 整数输出列按公开及隐藏夹具的原始类型精确比较。246道题接入整数列策略，216条小数偏移错误查询全部拒绝。派生小数指标保留原有容差，13项自动测试及775次参考执行通过。详情见[判题复验记录](artifacts/enterprise-audit/0.3.1判题修复.md)。
 
+Android 16模拟器已从公开0.3.0下载并覆盖安装0.3.1，安装文件哈希与Release一致，新建回归记录的九类状态保留通过。断网查询与七库ERD全部加载通过。
+
 修改夹具后执行`python3 scripts/generate-integer-policy.py`，随后重新构建并运行`node scripts/check-integer-policy.mjs`及全量测试。
 
 ## 0.3.0 企业审计与 ERD
