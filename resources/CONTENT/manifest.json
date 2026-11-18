@@ -9004,7 +9004,7 @@
     {
       "path": "question_resource/manifest.json",
       "bytes": 4913,
-      "sha256": "924e486bfa00a70d78c1f251a10c7edde9771d4bc7aabdfaf10d0dacc24b38d9"
+      "sha256": "02cb9dff8b9af5e810ffc82ec50f923dd32058b26772a67764d5801e8c3d78c1"
     },
     {
       "path": "question_resource/questions/ch01.json",

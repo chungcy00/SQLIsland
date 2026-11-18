@@ -155,7 +155,7 @@
   "datasetsManifest": "databases/manifest.json",
   "courseLinks": "course_links/knowledge_point_question_index.json",
   "validationReport": "validation/REPORT.md",
-  "releaseGate": "SQLite、WASM 与独立边界计算复验。原生 MySQL 8.4 未执行；q0212 专项结构仍为未评定。",
+  "releaseGate": "SQLite、WASM 与独立边界计算复验。原生 MySQL 8.4 未执行，q0212 RANGE 结构判定已完成。",
   "auditRelease": "5.0.0",
   "testFixtureCount": 606,
   "sharedTestData": [

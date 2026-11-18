@@ -1,4 +1,6 @@
 import parserModule from "node-sql-parser/build/mysql.js";
+import windowParserModule from "node-sql-parser/build/bigquery.js";
+const windowParser = new windowParserModule.Parser();
 const parser = new parserModule.Parser();
 const quoted = (s) => '"' + String(s).replace(/"/g, '""') + '"';
 
@@ -224,7 +226,35 @@ function walk(value, fn) {
   for (const child of Object.values(value))
     if (typeof child === "object") walk(child, fn);
 }
+function checkRangeFrame(sql) {
+  let ast;
+  try {
+    ast = windowParser.astify(sql, { database: "BigQuery" });
+  } catch {
+    return { pass: false, unsupported: true, message: "该写法的窗口结构暂无法解析。" };
+  }
+  const nodes = [];
+  walk(ast, node => nodes.push(node));
+  const windows = new Map(nodes.filter(node => node.name && node.as_window_specification)
+    .map(node => [node.name, node.as_window_specification.window_specification]));
+  const pass = nodes.some(node => {
+    if (node.type !== "aggr_func" || node.name?.toUpperCase() !== "SUM" || !node.over) return false;
+    const definition = node.over.as_window_specification;
+    const specification = typeof definition === "string" ? windows.get(definition) : definition?.window_specification;
+    const frame = specification?.window_frame_clause;
+    const column = node.args?.expr?.column?.expr?.value;
+    const ordering = specification?.orderby;
+    return column === "salary" && ordering?.length === 1 &&
+      ordering[0].expr?.column?.expr?.value === "salary" && ordering[0].type !== "DESC" &&
+      !specification.partitionby?.length &&
+      frame?.left?.value?.toUpperCase() === "RANGE" &&
+      frame.right?.value?.[0]?.value?.toUpperCase() === "UNBOUNDED PRECEDING" &&
+      frame.right?.value?.[1]?.value?.toUpperCase() === "CURRENT ROW";
+  });
+  return { pass, message: pass ? undefined : "请按薪资升序使用 RANGE 从开头累计到当前值。" };
+}
 export function checkStructure(sql, required = []) {
+  if (required.length === 1 && required[0].kind === "range_frame") return checkRangeFrame(sql);
   let ast;
   try {
     ast = parser.astify(sql, { database: "MySQL" });

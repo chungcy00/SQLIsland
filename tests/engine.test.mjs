@@ -268,3 +268,13 @@ test("course checkpoints match their recorded results in SQLite WASM", async () 
   }
   assert.equal(count, 85);
 });
+
+test("salary RANGE frames accept both answers and reject ROWS and literal spoofing", async () => {
+  const content = JSON.parse(await readFile('dist/content.json'));
+  const q = content.questions.find(question => question.id === 'q0212');
+  for (const solution of q.referenceSolutions) {
+    assert.equal(checkStructure(solution.mysqlSql, q.requiredAstFeatures).pass, true);
+    assert.equal(checkStructure(solution.mysqlSql.replace('RANGE BETWEEN', 'ROWS BETWEEN'), q.requiredAstFeatures).pass, false);
+  }
+  assert.equal(checkStructure("SELECT 'RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW' FROM employees",q.requiredAstFeatures).pass,false);
+});
