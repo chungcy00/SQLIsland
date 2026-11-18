@@ -29,7 +29,7 @@
   "datasetId": "enterprise-v2",
   "type": "业务情景",
   "schemaVersion": 2,
-  "contentVersion": "4.2.0",
+  "contentVersion": "4.2.1",
   "expectedOutputPath": "business_tasks/results/BP34.json",
   "expectedRowCount": 15,
   "expectedColumns": [
@@ -42,7 +42,8 @@
     "categories",
     "inventory_snapshots",
     "products",
-    "v_sales_lines"
+    "v_sales_lines",
+    "warehouses"
   ],
   "dependencyTables": [
     "categories",
@@ -61,8 +62,10 @@
   ],
   "orderPolicy": "ordered",
   "numericTolerance": {
-    "integerCents": 0,
-    "decimalAbsolute": 1e-06
+    "absolute": 1e-06,
+    "integerExact": true,
+    "textExact": true,
+    "nullDistinct": true
   },
   "referenceSolutions": [
     {
@@ -71,28 +74,30 @@
       "sqliteSql": "WITH a AS (SELECT p.category_id,SUM(s.net_cents-s.cost_cents) gross FROM v_sales_lines s JOIN products p ON p.product_id=s.product_id WHERE s.order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY p.category_id), b AS (SELECT p.category_id,CASE WHEN COUNT(i.snapshot_id)=2*COUNT(DISTINCT p.product_id)*(SELECT COUNT(*) FROM warehouses) THEN SUM(i.quantity*i.unit_cost_cents)/2.0 ELSE NULL END avg_stock FROM products p CROSS JOIN warehouses w LEFT JOIN inventory_snapshots i ON i.product_id=p.product_id AND i.warehouse_id=w.warehouse_id AND i.snapshot_date IN ('2024-12-31','2025-12-31') GROUP BY p.category_id) SELECT c.category_id,COALESCE(a.gross,0) gross_cents,b.avg_stock avg_stock_cents,ROUND(COALESCE(a.gross,0)/NULLIF(b.avg_stock,0),4) gmroi FROM categories c LEFT JOIN a ON a.category_id=c.category_id LEFT JOIN b ON b.category_id=c.category_id ORDER BY gmroi DESC,c.category_id"
     },
     {
-      "kind": "algebraic equivalent",
+      "kind": "equivalent",
       "mysqlSql": "WITH a AS (SELECT p.category_id,SUM(s.net_cents-s.cost_cents) gross FROM v_sales_lines s JOIN products p ON p.product_id=s.product_id WHERE (s.order_date>='2025-01-01' AND s.order_date<='2025-12-31') GROUP BY p.category_id), b AS (SELECT p.category_id,CASE WHEN COUNT(i.snapshot_id)=2*COUNT(DISTINCT p.product_id)*(SELECT COUNT(*) FROM warehouses) THEN SUM(i.quantity*i.unit_cost_cents)/2.0 ELSE NULL END avg_stock FROM products p CROSS JOIN warehouses w LEFT JOIN inventory_snapshots i ON i.product_id=p.product_id AND i.warehouse_id=w.warehouse_id AND i.snapshot_date IN ('2024-12-31','2025-12-31') GROUP BY p.category_id) SELECT c.category_id,COALESCE(a.gross,0) gross_cents,b.avg_stock avg_stock_cents,ROUND(COALESCE(a.gross,0)/NULLIF(b.avg_stock,0),4) gmroi FROM categories c LEFT JOIN a ON a.category_id=c.category_id LEFT JOIN b ON b.category_id=c.category_id ORDER BY gmroi DESC,c.category_id",
       "sqliteSql": "WITH a AS (SELECT p.category_id,SUM(s.net_cents-s.cost_cents) gross FROM v_sales_lines s JOIN products p ON p.product_id=s.product_id WHERE (s.order_date>='2025-01-01' AND s.order_date<='2025-12-31') GROUP BY p.category_id), b AS (SELECT p.category_id,CASE WHEN COUNT(i.snapshot_id)=2*COUNT(DISTINCT p.product_id)*(SELECT COUNT(*) FROM warehouses) THEN SUM(i.quantity*i.unit_cost_cents)/2.0 ELSE NULL END avg_stock FROM products p CROSS JOIN warehouses w LEFT JOIN inventory_snapshots i ON i.product_id=p.product_id AND i.warehouse_id=w.warehouse_id AND i.snapshot_date IN ('2024-12-31','2025-12-31') GROUP BY p.category_id) SELECT c.category_id,COALESCE(a.gross,0) gross_cents,b.avg_stock avg_stock_cents,ROUND(COALESCE(a.gross,0)/NULLIF(b.avg_stock,0),4) gmroi FROM categories c LEFT JOIN a ON a.category_id=c.category_id LEFT JOIN b ON b.category_id=c.category_id ORDER BY gmroi DESC,c.category_id"
     }
   ],
   "hints": [
     "汇总类别毛利",
-    "汇总类别毛利；汇总两端库存",
-    "重点核对输出粒度：类别"
+    "汇总两端库存；计算回报并标明估算口径",
+    "用销售收入替代毛利会变成另一个指标。"
   ],
-  "explanation": "汇总类别毛利；汇总两端库存；计算回报并标明估算口径。用销售收入替代毛利会变成另一个指标。\n审计口径：先核定日期范围、输出粒度、退款和贷项，再在各事实表中独立聚合，防止连接放大。",
+  "explanation": "汇总类别毛利。汇总两端库存。计算回报并标明估算口径。用销售收入替代毛利会变成另一个指标。",
   "testFixtureIds": [
     "q0284-public",
     "q0284-boundary",
     "q0284-missing-snapshot",
     "q0284-mini-202611171",
-    "q0284-mini-202611179"
+    "q0284-mini-202611179",
+    "q0284-review-multiple-partial-returns"
   ],
   "validationStatus": {
     "independentPython": true,
+    "sqliteNative": true,
     "sqliteWasm": true,
     "mysql84Native": false
   },
-  "elapsedMs": 40.004
+  "elapsedMs": 36.613
 }

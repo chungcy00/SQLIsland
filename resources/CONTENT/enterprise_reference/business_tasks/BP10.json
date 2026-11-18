@@ -1,8 +1,8 @@
 {
   "projectId": "inventory",
-  "title": "补货优先级与供应商风险",
+  "title": "补货优先级与商品历史履约风险",
   "context": "库存主管需要同时考虑销售速度、在途量与采购履约。",
-  "requirements": "期末，未来30天需求=近30天实际销售出库量；在途=未取消且承诺日在2026-01-01至2026-01-30内、且未完成采购的剩余数量；履约风险用对应商品历史采购准时足量率（承诺日已到且非取消），缺失NULL；对有效商品计算缺口、库存金额、供应商风险，按缺口降序。 更远承诺日期的在途不用于抵扣当前30日补货缺口。",
+  "requirements": "期末，未来30天需求=近30天实际销售出库量；在途=未取消且承诺日在2026-01-01至2026-01-30内、且未完成采购的剩余数量；履约风险用对应商品历史采购准时足量率（承诺日已到且非取消），缺失NULL；对有效商品计算缺口、库存金额、供应商风险，按缺口降序。 更远承诺日期的在途不用于抵扣当前30日补货缺口。 履约率按同一仓库、同一商品的全部历史到期非取消采购行等权计算，可能包含多个供应商；该指标用于商品供给风险复核，不代表某一家供应商评分。",
   "grain": "仓库×商品",
   "commonError": "将已逾期未到货全部当作确定在途会掩盖风险。",
   "executionSteps": [
@@ -33,7 +33,7 @@
   "datasetId": "inventory-v2",
   "type": "业务情景",
   "schemaVersion": 2,
-  "contentVersion": "4.2.0",
+  "contentVersion": "4.2.1",
   "expectedOutputPath": "business_tasks/results/BP10.json",
   "expectedRowCount": 69,
   "expectedColumns": [
@@ -64,7 +64,10 @@
     "promotions",
     "purchase_order_items",
     "purchase_orders",
+    "returns",
+    "stock_adjustments",
     "stock_movements",
+    "stock_transfers",
     "stores",
     "supplier_contracts",
     "supplier_invoice_items",
@@ -76,8 +79,10 @@
   ],
   "orderPolicy": "ordered",
   "numericTolerance": {
-    "integerCents": 0,
-    "decimalAbsolute": 1e-06
+    "absolute": 1e-06,
+    "integerExact": true,
+    "textExact": true,
+    "nullDistinct": true
   },
   "referenceSolutions": [
     {
@@ -86,17 +91,17 @@
       "sqliteSql": "WITH s AS (SELECT warehouse_id,product_id,SUM(-quantity_delta) sold FROM stock_movements WHERE movement_type='sale' AND movement_date BETWEEN '2025-12-02' AND '2025-12-31' GROUP BY warehouse_id,product_id), p AS (SELECT warehouse_id,product_id,SUM(CASE WHEN promised_date>'2025-12-31' AND promised_date<='2026-01-30' AND quantity_ordered>accepted THEN quantity_ordered-accepted ELSE 0 END) inbound,SUM(CASE WHEN promised_date<='2025-12-31' AND on_time>=quantity_ordered THEN 1 ELSE 0 END) good,SUM(CASE WHEN promised_date<='2025-12-31' THEN 1 ELSE 0 END) due FROM v_po_lines GROUP BY warehouse_id,product_id), z AS (SELECT i.warehouse_id,i.product_id,i.quantity,i.quantity*i.unit_cost_cents stock_value_cents,COALESCE(s.sold,0) demand,COALESCE(p.inbound,0) inbound,100.0*p.good/NULLIF(p.due,0) reliability FROM inventory_snapshots i JOIN products a ON a.product_id=i.product_id LEFT JOIN s ON s.warehouse_id=i.warehouse_id AND s.product_id=i.product_id LEFT JOIN p ON p.warehouse_id=i.warehouse_id AND p.product_id=i.product_id WHERE i.snapshot_date='2025-12-31' AND a.active=1) SELECT warehouse_id,product_id,quantity,stock_value_cents,demand,inbound,demand-quantity-inbound shortage,ROUND(reliability,2) reliability_pct FROM z WHERE demand>quantity+inbound ORDER BY shortage DESC,warehouse_id,product_id"
     },
     {
-      "kind": "algebraic equivalent",
+      "kind": "equivalent",
       "mysqlSql": "WITH s AS (SELECT warehouse_id,product_id,SUM(-quantity_delta) sold FROM stock_movements WHERE movement_type='sale' AND (movement_date>='2025-12-02' AND movement_date<='2025-12-31') GROUP BY warehouse_id,product_id), p AS (SELECT warehouse_id,product_id,SUM(CASE WHEN promised_date>'2025-12-31' AND promised_date<='2026-01-30' AND quantity_ordered>accepted THEN quantity_ordered-accepted ELSE 0 END) inbound,SUM(CASE WHEN promised_date<='2025-12-31' AND on_time>=quantity_ordered THEN 1 ELSE 0 END) good,SUM(CASE WHEN promised_date<='2025-12-31' THEN 1 ELSE 0 END) due FROM v_po_lines GROUP BY warehouse_id,product_id), z AS (SELECT i.warehouse_id,i.product_id,i.quantity,i.quantity*i.unit_cost_cents stock_value_cents,COALESCE(s.sold,0) demand,COALESCE(p.inbound,0) inbound,100.0*p.good/NULLIF(p.due,0) reliability FROM inventory_snapshots i JOIN products a ON a.product_id=i.product_id LEFT JOIN s ON s.warehouse_id=i.warehouse_id AND s.product_id=i.product_id LEFT JOIN p ON p.warehouse_id=i.warehouse_id AND p.product_id=i.product_id WHERE i.snapshot_date='2025-12-31' AND a.active=1) SELECT warehouse_id,product_id,quantity,stock_value_cents,demand,inbound,demand-quantity-inbound shortage,ROUND(reliability,2) reliability_pct FROM z WHERE demand>quantity+inbound ORDER BY shortage DESC,warehouse_id,product_id",
       "sqliteSql": "WITH s AS (SELECT warehouse_id,product_id,SUM(-quantity_delta) sold FROM stock_movements WHERE movement_type='sale' AND (movement_date>='2025-12-02' AND movement_date<='2025-12-31') GROUP BY warehouse_id,product_id), p AS (SELECT warehouse_id,product_id,SUM(CASE WHEN promised_date>'2025-12-31' AND promised_date<='2026-01-30' AND quantity_ordered>accepted THEN quantity_ordered-accepted ELSE 0 END) inbound,SUM(CASE WHEN promised_date<='2025-12-31' AND on_time>=quantity_ordered THEN 1 ELSE 0 END) good,SUM(CASE WHEN promised_date<='2025-12-31' THEN 1 ELSE 0 END) due FROM v_po_lines GROUP BY warehouse_id,product_id), z AS (SELECT i.warehouse_id,i.product_id,i.quantity,i.quantity*i.unit_cost_cents stock_value_cents,COALESCE(s.sold,0) demand,COALESCE(p.inbound,0) inbound,100.0*p.good/NULLIF(p.due,0) reliability FROM inventory_snapshots i JOIN products a ON a.product_id=i.product_id LEFT JOIN s ON s.warehouse_id=i.warehouse_id AND s.product_id=i.product_id LEFT JOIN p ON p.warehouse_id=i.warehouse_id AND p.product_id=i.product_id WHERE i.snapshot_date='2025-12-31' AND a.active=1) SELECT warehouse_id,product_id,quantity,stock_value_cents,demand,inbound,demand-quantity-inbound shortage,ROUND(reliability,2) reliability_pct FROM z WHERE demand>quantity+inbound ORDER BY shortage DESC,warehouse_id,product_id"
     }
   ],
   "hints": [
     "分别统计销售和采购履约",
-    "分别统计销售和采购履约；筛选未来承诺在途",
-    "重点核对输出粒度：仓库×商品"
+    "筛选未来承诺在途；连接期末",
+    "将已逾期未到货全部当作确定在途会掩盖风险。"
   ],
-  "explanation": "分别统计销售和采购履约；筛选未来承诺在途；连接期末；排名缺口。将已逾期未到货全部当作确定在途会掩盖风险。\n审计口径：先核定日期范围、输出粒度、退款和贷项，再在各事实表中独立聚合，防止连接放大。",
+  "explanation": "分别统计销售和采购履约。筛选未来承诺在途。连接期末。排名缺口。将已逾期未到货全部当作确定在途会掩盖风险。",
   "testFixtureIds": [
     "q0260-public",
     "q0260-boundary",
@@ -106,8 +111,9 @@
   ],
   "validationStatus": {
     "independentPython": true,
+    "sqliteNative": true,
     "sqliteWasm": true,
     "mysql84Native": false
   },
-  "elapsedMs": 25.865
+  "elapsedMs": 25.843
 }

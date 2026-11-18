@@ -3,7 +3,7 @@
   "title": "业务数据分析",
   "count": 38,
   "schemaVersion": 1,
-  "contentVersion": "4.2.0",
+  "contentVersion": "4.2.1",
   "cards": [
     {
       "id": "fc0141",
@@ -805,7 +805,7 @@
       ],
       "supportStatus": "直接兼容",
       "compatibility": "本示例在SQLite实际通过；MySQL 8.4原生尚未执行，类型、排序、严格模式仍需复验。",
-      "contentVersion": "4.2.0",
+      "contentVersion": "4.2.1",
       "schemaVersion": 1,
       "dialect": "MySQL 8.4",
       "validation": {
@@ -840,7 +840,7 @@
           "stores",
           "v_sales_lines"
         ],
-        "note": "关联审计版企业资源4.2.0；本卡使用独立微型教学数据，不能当作企业主库结果。"
+        "note": "关联逐题复审资源4.2.1；本卡微型示例保持独立，不代表企业主库结果。"
       },
       "supportStatusLabel": "本示例直接执行",
       "mysqlVerificationScript": "validation/mysql/fc0149.sql"
@@ -947,7 +947,7 @@
       ],
       "supportStatus": "直接兼容",
       "compatibility": "本示例在SQLite实际通过；MySQL 8.4原生尚未执行，类型、排序、严格模式仍需复验。",
-      "contentVersion": "4.2.0",
+      "contentVersion": "4.2.1",
       "schemaVersion": 1,
       "dialect": "MySQL 8.4",
       "validation": {
@@ -982,7 +982,7 @@
           "stores",
           "v_sales_lines"
         ],
-        "note": "关联审计版企业资源4.2.0；本卡使用独立微型教学数据，不能当作企业主库结果。"
+        "note": "关联逐题复审资源4.2.1；本卡微型示例保持独立，不代表企业主库结果。"
       },
       "supportStatusLabel": "本示例直接执行",
       "mysqlVerificationScript": "validation/mysql/fc0150.sql"
@@ -1126,7 +1126,7 @@
       ],
       "supportStatus": "直接兼容",
       "compatibility": "本示例在SQLite实际通过；MySQL 8.4原生尚未执行，类型、排序、严格模式仍需复验。",
-      "contentVersion": "4.2.0",
+      "contentVersion": "4.2.1",
       "schemaVersion": 1,
       "dialect": "MySQL 8.4",
       "validation": {
@@ -1158,7 +1158,7 @@
         "sourceTables": [
           "v_sales_lines"
         ],
-        "note": "关联审计版企业资源4.2.0；本卡使用独立微型教学数据，不能当作企业主库结果。"
+        "note": "关联逐题复审资源4.2.1；本卡微型示例保持独立，不代表企业主库结果。"
       },
       "supportStatusLabel": "本示例直接执行",
       "mysqlVerificationScript": "validation/mysql/fc0151.sql"
@@ -1193,7 +1193,7 @@
       ],
       "supportStatus": "仅理论",
       "compatibility": "MySQL 8.4 教学口径；若涉及本地执行，须按兼容层验证。",
-      "contentVersion": "4.2.0",
+      "contentVersion": "4.2.1",
       "schemaVersion": 1,
       "dialect": "MySQL 8.4",
       "validation": {
@@ -1219,7 +1219,7 @@
           "promotions",
           "v_sales_lines"
         ],
-        "note": "关联审计版企业资源4.2.0；本卡使用独立微型教学数据，不能当作企业主库结果。"
+        "note": "关联逐题复审资源4.2.1；本卡微型示例保持独立，不代表企业主库结果。"
       },
       "supportStatusLabel": "概念或业务口径；无需执行"
     },
@@ -1245,7 +1245,7 @@
       },
       "back": {
         "answer": "三个指标使用不同分母，分别反映售后、计划达成及销售盈利质量。",
-        "explanation": "退款率分母为退款前折后销售；目标达成率分母为目标；毛利率分母为净销售。零分母为NULL，不虚构正常或异常分值。"
+        "explanation": "退款率分母为退款前折后销售；目标达成率分母为目标；毛利率分母为净销售。零分母为NULL，不虚构正常或异常分值。\n企业任务使用全体汇总后的加权指标作为基准，分别比较毛利率下降1个百分点、达成率低于基准80%及退款率高于基准125%；不能简单平均比率。"
       },
       "tags": [
         "门店综合经营异常看板",
@@ -1253,7 +1253,7 @@
       ],
       "supportStatus": "仅理论",
       "compatibility": "MySQL 8.4 教学口径；若涉及本地执行，须按兼容层验证。",
-      "contentVersion": "4.2.0",
+      "contentVersion": "4.2.1",
       "schemaVersion": 1,
       "dialect": "MySQL 8.4",
       "validation": {
@@ -1279,7 +1279,7 @@
           "stores",
           "v_sales_lines"
         ],
-        "note": "关联审计版企业资源4.2.0；本卡使用独立微型教学数据，不能当作企业主库结果。"
+        "note": "关联逐题复审资源4.2.1；本卡微型示例保持独立，不代表企业主库结果。"
       },
       "supportStatusLabel": "概念或业务口径；无需执行"
     },
@@ -1419,7 +1419,7 @@
       ],
       "supportStatus": "直接兼容",
       "compatibility": "本示例在SQLite实际通过；MySQL 8.4原生尚未执行，类型、排序、严格模式仍需复验。",
-      "contentVersion": "4.2.0",
+      "contentVersion": "4.2.1",
       "schemaVersion": 1,
       "dialect": "MySQL 8.4",
       "validation": {
@@ -1454,7 +1454,7 @@
           "products",
           "stock_movements"
         ],
-        "note": "关联审计版企业资源4.2.0；本卡使用独立微型教学数据，不能当作企业主库结果。"
+        "note": "关联逐题复审资源4.2.1；本卡微型示例保持独立，不代表企业主库结果。"
       },
       "supportStatusLabel": "本示例直接执行",
       "mysqlVerificationScript": "validation/mysql/fc0154.sql"
@@ -1553,7 +1553,7 @@
       ],
       "supportStatus": "直接兼容",
       "compatibility": "本示例在SQLite实际通过；MySQL 8.4原生尚未执行，类型、排序、严格模式仍需复验。",
-      "contentVersion": "4.2.0",
+      "contentVersion": "4.2.1",
       "schemaVersion": 1,
       "dialect": "MySQL 8.4",
       "validation": {
@@ -1584,11 +1584,13 @@
         "taskQuestionId": "q0257",
         "taskDifficulty": "困难",
         "sourceTables": [
+          "categories",
           "inventory_snapshots",
           "products",
-          "stock_movements"
+          "stock_movements",
+          "warehouses"
         ],
-        "note": "关联审计版企业资源4.2.0；本卡使用独立微型教学数据，不能当作企业主库结果。"
+        "note": "关联逐题复审资源4.2.1；本卡微型示例保持独立，不代表企业主库结果。"
       },
       "supportStatusLabel": "本示例直接执行",
       "mysqlVerificationScript": "validation/mysql/fc0155.sql"
@@ -1626,7 +1628,7 @@
       ],
       "supportStatus": "仅理论",
       "compatibility": "MySQL 8.4 教学口径；若涉及本地执行，须按兼容层验证。",
-      "contentVersion": "4.2.0",
+      "contentVersion": "4.2.1",
       "schemaVersion": 1,
       "dialect": "MySQL 8.4",
       "validation": {
@@ -1657,7 +1659,7 @@
           "purchase_orders",
           "stock_movements"
         ],
-        "note": "关联审计版企业资源4.2.0；本卡使用独立微型教学数据，不能当作企业主库结果。"
+        "note": "关联逐题复审资源4.2.1；本卡微型示例保持独立，不代表企业主库结果。"
       },
       "supportStatusLabel": "概念或业务口径；无需执行"
     },
@@ -1691,7 +1693,7 @@
       ],
       "supportStatus": "仅理论",
       "compatibility": "MySQL 8.4 教学口径；若涉及本地执行，须按兼容层验证。",
-      "contentVersion": "4.2.0",
+      "contentVersion": "4.2.1",
       "schemaVersion": 1,
       "dialect": "MySQL 8.4",
       "validation": {
@@ -1717,7 +1719,7 @@
           "inventory_snapshots",
           "stock_movements"
         ],
-        "note": "关联审计版企业资源4.2.0；本卡使用独立微型教学数据，不能当作企业主库结果。"
+        "note": "关联逐题复审资源4.2.1；本卡微型示例保持独立，不代表企业主库结果。"
       },
       "supportStatusLabel": "概念或业务口径；无需执行"
     },
@@ -1751,15 +1753,15 @@
       },
       "back": {
         "answer": "不应。按任务口径，未到期在途30纳入，已逾期20单独反映供应风险。",
-        "explanation": "有效库存与可预期到货分别核算，缺口还应结合商品历史准时足量率。\n30日缺口只抵扣承诺未来30日内的在途；更远日期与逾期量均不能自动视为按期可用。"
+        "explanation": "有效库存与可预期到货分别核算，缺口还应结合商品历史准时足量率。\n30日缺口只抵扣承诺未来30日内的在途；更远日期与逾期量均不能自动视为按期可用。\n履约率汇总同仓同商品的全部供应商采购行，按行等权，不表示某一家供应商评分。"
       },
       "tags": [
-        "补货优先级与供应商风险",
+        "补货优先级与商品历史履约风险",
         "用法辨析"
       ],
       "supportStatus": "仅理论",
       "compatibility": "MySQL 8.4 教学口径；若涉及本地执行，须按兼容层验证。",
-      "contentVersion": "4.2.0",
+      "contentVersion": "4.2.1",
       "schemaVersion": 1,
       "dialect": "MySQL 8.4",
       "validation": {
@@ -1771,11 +1773,11 @@
       "databaseRef": "inventory",
       "businessQuestionId": "q0260",
       "referenceTopicNames": [
-        "补货优先级与供应商风险"
+        "补货优先级与商品历史履约风险"
       ],
       "businessResource": {
         "id": "BP10",
-        "title": "补货优先级与供应商风险",
+        "title": "补货优先级与商品历史履约风险",
         "projectId": "inventory",
         "datasetId": "inventory-v2",
         "taskQuestionId": "q0260",
@@ -1786,7 +1788,7 @@
           "stock_movements",
           "v_po_lines"
         ],
-        "note": "关联审计版企业资源4.2.0；本卡使用独立微型教学数据，不能当作企业主库结果。"
+        "note": "关联逐题复审资源4.2.1；本卡微型示例保持独立，不代表企业主库结果。"
       },
       "supportStatusLabel": "概念或业务口径；无需执行"
     },
@@ -1823,7 +1825,7 @@
       ],
       "supportStatus": "仅理论",
       "compatibility": "MySQL 8.4 教学口径；若涉及本地执行，须按兼容层验证。",
-      "contentVersion": "4.2.0",
+      "contentVersion": "4.2.1",
       "schemaVersion": 1,
       "dialect": "MySQL 8.4",
       "validation": {
@@ -1846,9 +1848,11 @@
         "taskQuestionId": "q0261",
         "taskDifficulty": "中等",
         "sourceTables": [
+          "customers",
+          "orders",
           "v_order_net"
         ],
-        "note": "关联审计版企业资源4.2.0；本卡使用独立微型教学数据，不能当作企业主库结果。"
+        "note": "关联逐题复审资源4.2.1；本卡微型示例保持独立，不代表企业主库结果。"
       },
       "supportStatusLabel": "概念或业务口径；无需执行"
     },
@@ -1972,7 +1976,7 @@
       ],
       "supportStatus": "直接兼容",
       "compatibility": "本示例在SQLite实际通过；MySQL 8.4原生尚未执行，类型、排序、严格模式仍需复验。",
-      "contentVersion": "4.2.0",
+      "contentVersion": "4.2.1",
       "schemaVersion": 1,
       "dialect": "MySQL 8.4",
       "validation": {
@@ -2006,7 +2010,7 @@
           "calendar_days",
           "v_order_net"
         ],
-        "note": "关联审计版企业资源4.2.0；本卡使用独立微型教学数据，不能当作企业主库结果。"
+        "note": "关联逐题复审资源4.2.1；本卡微型示例保持独立，不代表企业主库结果。"
       },
       "supportStatusLabel": "本示例直接执行",
       "mysqlVerificationScript": "validation/mysql/fc0160.sql"
@@ -2044,7 +2048,7 @@
       ],
       "supportStatus": "仅理论",
       "compatibility": "MySQL 8.4 教学口径；若涉及本地执行，须按兼容层验证。",
-      "contentVersion": "4.2.0",
+      "contentVersion": "4.2.1",
       "schemaVersion": 1,
       "dialect": "MySQL 8.4",
       "validation": {
@@ -2070,7 +2074,7 @@
           "calendar_days",
           "v_order_net"
         ],
-        "note": "关联审计版企业资源4.2.0；本卡使用独立微型教学数据，不能当作企业主库结果。"
+        "note": "关联逐题复审资源4.2.1；本卡微型示例保持独立，不代表企业主库结果。"
       },
       "supportStatusLabel": "概念或业务口径；无需执行"
     },
@@ -2141,7 +2145,7 @@
       },
       "back": {
         "answer": "sessions",
-        "explanation": "一个会话有多笔订单仍只算一个转化会话；获客成本另用广告支出除历史新客数。",
+        "explanation": "一个会话有多笔订单仍只算一个转化会话；获客成本另用广告支出除历史新客数。\n转化分子和分母必须属于同一期间访问会话总体，跨年访问不能仅凭下单日期进入当年转化分子。",
         "acceptedBlanks": [
           "sessions"
         ],
@@ -2172,7 +2176,7 @@
       ],
       "supportStatus": "直接兼容",
       "compatibility": "本示例在SQLite实际通过；MySQL 8.4原生尚未执行，类型、排序、严格模式仍需复验。",
-      "contentVersion": "4.2.0",
+      "contentVersion": "4.2.1",
       "schemaVersion": 1,
       "dialect": "MySQL 8.4",
       "validation": {
@@ -2207,7 +2211,7 @@
           "traffic_sources",
           "v_order_net"
         ],
-        "note": "关联审计版企业资源4.2.0；本卡使用独立微型教学数据，不能当作企业主库结果。"
+        "note": "关联逐题复审资源4.2.1；本卡微型示例保持独立，不代表企业主库结果。"
       },
       "supportStatusLabel": "本示例直接执行",
       "mysqlVerificationScript": "validation/mysql/fc0162.sql"
@@ -2245,7 +2249,7 @@
       ],
       "supportStatus": "仅理论",
       "compatibility": "MySQL 8.4 教学口径；若涉及本地执行，须按兼容层验证。",
-      "contentVersion": "4.2.0",
+      "contentVersion": "4.2.1",
       "schemaVersion": 1,
       "dialect": "MySQL 8.4",
       "validation": {
@@ -2271,7 +2275,7 @@
           "calendar_days",
           "v_order_net"
         ],
-        "note": "关联审计版企业资源4.2.0；本卡使用独立微型教学数据，不能当作企业主库结果。"
+        "note": "关联逐题复审资源4.2.1；本卡微型示例保持独立，不代表企业主库结果。"
       },
       "supportStatusLabel": "概念或业务口径；无需执行"
     },
@@ -2432,7 +2436,7 @@
       ],
       "supportStatus": "直接兼容",
       "compatibility": "本示例在SQLite实际通过；MySQL 8.4原生尚未执行，类型、排序、严格模式仍需复验。",
-      "contentVersion": "4.2.0",
+      "contentVersion": "4.2.1",
       "schemaVersion": 1,
       "dialect": "MySQL 8.4",
       "validation": {
@@ -2466,7 +2470,7 @@
           "budgets",
           "v_expenses"
         ],
-        "note": "关联审计版企业资源4.2.0；本卡使用独立微型教学数据，不能当作企业主库结果。"
+        "note": "关联逐题复审资源4.2.1；本卡微型示例保持独立，不代表企业主库结果。"
       },
       "supportStatusLabel": "本示例直接执行",
       "mysqlVerificationScript": "validation/mysql/fc0164.sql"
@@ -2593,7 +2597,7 @@
       ],
       "supportStatus": "直接兼容",
       "compatibility": "本示例在SQLite实际通过；MySQL 8.4原生尚未执行，类型、排序、严格模式仍需复验。",
-      "contentVersion": "4.2.0",
+      "contentVersion": "4.2.1",
       "schemaVersion": 1,
       "dialect": "MySQL 8.4",
       "validation": {
@@ -2626,7 +2630,7 @@
         "sourceTables": [
           "v_invoice_balance"
         ],
-        "note": "关联审计版企业资源4.2.0；本卡使用独立微型教学数据，不能当作企业主库结果。"
+        "note": "关联逐题复审资源4.2.1；本卡微型示例保持独立，不代表企业主库结果。"
       },
       "supportStatusLabel": "本示例直接执行",
       "mysqlVerificationScript": "validation/mysql/fc0165.sql"
@@ -2748,7 +2752,7 @@
       ],
       "supportStatus": "直接兼容",
       "compatibility": "本示例在SQLite实际通过；MySQL 8.4原生尚未执行，类型、排序、严格模式仍需复验。",
-      "contentVersion": "4.2.0",
+      "contentVersion": "4.2.1",
       "schemaVersion": 1,
       "dialect": "MySQL 8.4",
       "validation": {
@@ -2780,7 +2784,7 @@
         "sourceTables": [
           "v_invoice_balance"
         ],
-        "note": "关联审计版企业资源4.2.0；本卡使用独立微型教学数据，不能当作企业主库结果。"
+        "note": "关联逐题复审资源4.2.1；本卡微型示例保持独立，不代表企业主库结果。"
       },
       "supportStatusLabel": "本示例直接执行",
       "mysqlVerificationScript": "validation/mysql/fc0166.sql"
@@ -2807,7 +2811,7 @@
       },
       "back": {
         "answer": "会遗漏仅存在于银行侧的记录。",
-        "explanation": "分别按参考号汇总，使用两侧完整键集合再关联；空参考号要保留独立交易键，不能将未知键视为同一个业务事件。"
+        "explanation": "分别按参考号汇总，使用两侧完整键集合再关联；空参考号要保留独立交易键，不能将未知键视为同一个业务事件。\n银行净支出使用有符号金额的负和，正向冲回不能逐行取绝对值。无参考号使用类型和编号复合键，防止与真实参考号碰撞。"
       },
       "tags": [
         "银行流水与凭证全量对账",
@@ -2815,7 +2819,7 @@
       ],
       "supportStatus": "仅理论",
       "compatibility": "MySQL 8.4 教学口径；若涉及本地执行，须按兼容层验证。",
-      "contentVersion": "4.2.0",
+      "contentVersion": "4.2.1",
       "schemaVersion": 1,
       "dialect": "MySQL 8.4",
       "validation": {
@@ -2840,7 +2844,7 @@
           "bank_transactions",
           "v_expenses"
         ],
-        "note": "关联审计版企业资源4.2.0；本卡使用独立微型教学数据，不能当作企业主库结果。"
+        "note": "关联逐题复审资源4.2.1；本卡微型示例保持独立，不代表企业主库结果。"
       },
       "supportStatusLabel": "概念或业务口径；无需执行"
     },
@@ -2868,7 +2872,7 @@
       },
       "back": {
         "answer": "不能，只表示命中多个复核规则。",
-        "explanation": "同供应商同编号重复可能是导入问题；阈值偏差需结合审批、合同与凭证核实，输出标志及异常数。"
+        "explanation": "同供应商同编号重复可能是导入问题；阈值偏差需结合审批、合同与凭证核实，输出标志及异常数。\n价格差异按本张发票数量乘采购行单价核对；部分发票不能与整张采购单收货额比较，批准贷项也不应当作开票单价错误。"
       },
       "tags": [
         "多规则异常交易筛查",
@@ -2876,7 +2880,7 @@
       ],
       "supportStatus": "仅理论",
       "compatibility": "MySQL 8.4 教学口径；若涉及本地执行，须按兼容层验证。",
-      "contentVersion": "4.2.0",
+      "contentVersion": "4.2.1",
       "schemaVersion": 1,
       "dialect": "MySQL 8.4",
       "validation": {
@@ -2899,10 +2903,11 @@
         "taskQuestionId": "q0270",
         "taskDifficulty": "挑战",
         "sourceTables": [
-          "v_invoice_balance",
-          "v_po_lines"
+          "purchase_order_items",
+          "supplier_invoice_items",
+          "v_invoice_balance"
         ],
-        "note": "关联审计版企业资源4.2.0；本卡使用独立微型教学数据，不能当作企业主库结果。"
+        "note": "关联逐题复审资源4.2.1；本卡微型示例保持独立，不代表企业主库结果。"
       },
       "supportStatusLabel": "概念或业务口径；无需执行"
     },
@@ -3013,7 +3018,7 @@
       ],
       "supportStatus": "直接兼容",
       "compatibility": "本示例在SQLite实际通过；MySQL 8.4原生尚未执行，类型、排序、严格模式仍需复验。",
-      "contentVersion": "4.2.0",
+      "contentVersion": "4.2.1",
       "schemaVersion": 1,
       "dialect": "MySQL 8.4",
       "validation": {
@@ -3048,7 +3053,7 @@
           "departments",
           "employment_history"
         ],
-        "note": "关联审计版企业资源4.2.0；本卡使用独立微型教学数据，不能当作企业主库结果。"
+        "note": "关联逐题复审资源4.2.1；本卡微型示例保持独立，不代表企业主库结果。"
       },
       "supportStatusLabel": "本示例直接执行",
       "mysqlVerificationScript": "validation/mysql/fc0169.sql"
@@ -3085,7 +3090,7 @@
       ],
       "supportStatus": "仅理论",
       "compatibility": "MySQL 8.4 教学口径；若涉及本地执行，须按兼容层验证。",
-      "contentVersion": "4.2.0",
+      "contentVersion": "4.2.1",
       "schemaVersion": 1,
       "dialect": "MySQL 8.4",
       "validation": {
@@ -3113,7 +3118,7 @@
           "employees",
           "employment_history"
         ],
-        "note": "关联审计版企业资源4.2.0；本卡使用独立微型教学数据，不能当作企业主库结果。"
+        "note": "关联逐题复审资源4.2.1；本卡微型示例保持独立，不代表企业主库结果。"
       },
       "supportStatusLabel": "概念或业务口径；无需执行"
     },
@@ -3222,7 +3227,7 @@
       ],
       "supportStatus": "直接兼容",
       "compatibility": "本示例在SQLite实际通过；MySQL 8.4原生尚未执行，类型、排序、严格模式仍需复验。",
-      "contentVersion": "4.2.0",
+      "contentVersion": "4.2.1",
       "schemaVersion": 1,
       "dialect": "MySQL 8.4",
       "validation": {
@@ -3255,7 +3260,7 @@
         "sourceTables": [
           "v_staff_month"
         ],
-        "note": "关联审计版企业资源4.2.0；本卡使用独立微型教学数据，不能当作企业主库结果。"
+        "note": "关联逐题复审资源4.2.1；本卡微型示例保持独立，不代表企业主库结果。"
       },
       "supportStatusLabel": "本示例直接执行",
       "mysqlVerificationScript": "validation/mysql/fc0171.sql"
@@ -3290,7 +3295,7 @@
       ],
       "supportStatus": "仅理论",
       "compatibility": "MySQL 8.4 教学口径；若涉及本地执行，须按兼容层验证。",
-      "contentVersion": "4.2.0",
+      "contentVersion": "4.2.1",
       "schemaVersion": 1,
       "dialect": "MySQL 8.4",
       "validation": {
@@ -3314,7 +3319,7 @@
         "sourceTables": [
           "v_staff_month"
         ],
-        "note": "关联审计版企业资源4.2.0；本卡使用独立微型教学数据，不能当作企业主库结果。",
+        "note": "关联逐题复审资源4.2.1；本卡微型示例保持独立，不代表企业主库结果。",
         "analysisPeriod": "2025年第四季度"
       },
       "supportStatusLabel": "概念或业务口径；无需执行"
@@ -3352,7 +3357,7 @@
       ],
       "supportStatus": "仅理论",
       "compatibility": "MySQL 8.4 教学口径；若涉及本地执行，须按兼容层验证。",
-      "contentVersion": "4.2.0",
+      "contentVersion": "4.2.1",
       "schemaVersion": 1,
       "dialect": "MySQL 8.4",
       "validation": {
@@ -3378,7 +3383,7 @@
           "employees",
           "employment_history"
         ],
-        "note": "关联审计版企业资源4.2.0；本卡使用独立微型教学数据，不能当作企业主库结果。"
+        "note": "关联逐题复审资源4.2.1；本卡微型示例保持独立，不代表企业主库结果。"
       },
       "supportStatusLabel": "概念或业务口径；无需执行"
     },
@@ -3509,7 +3514,7 @@
       ],
       "supportStatus": "直接兼容",
       "compatibility": "本示例在SQLite实际通过；MySQL 8.4原生尚未执行，类型、排序、严格模式仍需复验。",
-      "contentVersion": "4.2.0",
+      "contentVersion": "4.2.1",
       "schemaVersion": 1,
       "dialect": "MySQL 8.4",
       "validation": {
@@ -3543,7 +3548,7 @@
           "purchase_orders",
           "supplier_contracts"
         ],
-        "note": "关联审计版企业资源4.2.0；本卡使用独立微型教学数据，不能当作企业主库结果。"
+        "note": "关联逐题复审资源4.2.1；本卡微型示例保持独立，不代表企业主库结果。"
       },
       "supportStatusLabel": "本示例直接执行",
       "mysqlVerificationScript": "validation/mysql/fc0174.sql"
@@ -3584,7 +3589,7 @@
       ],
       "supportStatus": "仅理论",
       "compatibility": "MySQL 8.4 教学口径；若涉及本地执行，须按兼容层验证。",
-      "contentVersion": "4.2.0",
+      "contentVersion": "4.2.1",
       "schemaVersion": 1,
       "dialect": "MySQL 8.4",
       "validation": {
@@ -3610,7 +3615,7 @@
         "sourceTables": [
           "v_po_lines"
         ],
-        "note": "关联审计版企业资源4.2.0；本卡使用独立微型教学数据，不能当作企业主库结果。"
+        "note": "关联逐题复审资源4.2.1；本卡微型示例保持独立，不代表企业主库结果。"
       },
       "supportStatusLabel": "概念或业务口径；无需执行"
     },
@@ -3759,7 +3764,7 @@
       },
       "back": {
         "answer": "改用背面的修正语句。",
-        "explanation": "收货和开票均为一对多，先按采购行独立汇总。数量一致仍需核对金额：示例行1发票价格有差异。",
+        "explanation": "收货和开票均为一对多，先按采购行独立汇总。数量一致仍需核对金额：示例行1发票价格有差异。\n完整企业题按发票日期筛选截止日已开票记录，不能把未来开票带入期末核对。本微例只说明明细预聚合。",
         "code": "WITH r AS (SELECT po_item_id,SUM(quantity_received-quantity_rejected) AS accepted FROM delivery_mini GROUP BY po_item_id),b AS (SELECT po_item_id,SUM(quantity_billed) AS billed FROM bill_mini GROUP BY po_item_id) SELECT p.po_item_id,COALESCE(r.accepted,0) AS accepted,COALESCE(b.billed,0) AS billed FROM po_mini p LEFT JOIN r ON r.po_item_id=p.po_item_id LEFT JOIN b ON b.po_item_id=p.po_item_id ORDER BY p.po_item_id",
         "sqliteCode": "WITH r AS (SELECT po_item_id,SUM(quantity_received-quantity_rejected) AS accepted FROM delivery_mini GROUP BY po_item_id),b AS (SELECT po_item_id,SUM(quantity_billed) AS billed FROM bill_mini GROUP BY po_item_id) SELECT p.po_item_id,COALESCE(r.accepted,0) AS accepted,COALESCE(b.billed,0) AS billed FROM po_mini p LEFT JOIN r ON r.po_item_id=p.po_item_id LEFT JOIN b ON b.po_item_id=p.po_item_id ORDER BY p.po_item_id",
         "result": {
@@ -3810,7 +3815,7 @@
       ],
       "supportStatus": "直接兼容",
       "compatibility": "本示例在SQLite实际通过；MySQL 8.4原生尚未执行，类型、排序、严格模式仍需复验。",
-      "contentVersion": "4.2.0",
+      "contentVersion": "4.2.1",
       "schemaVersion": 1,
       "dialect": "MySQL 8.4",
       "validation": {
@@ -3842,9 +3847,11 @@
         "taskQuestionId": "q0278",
         "taskDifficulty": "困难",
         "sourceTables": [
+          "supplier_invoice_items",
+          "supplier_invoices",
           "v_po_lines"
         ],
-        "note": "关联审计版企业资源4.2.0；本卡使用独立微型教学数据，不能当作企业主库结果。"
+        "note": "关联逐题复审资源4.2.1；本卡微型示例保持独立，不代表企业主库结果。"
       },
       "supportStatusLabel": "本示例直接执行",
       "mysqlVerificationScript": "validation/mysql/fc0176.sql"
@@ -3871,7 +3878,7 @@
       },
       "back": {
         "answer": "不应；采购数量加权平均为(1×100+9×80)/10=82。",
-        "explanation": "实际采购金额除订购数量才反映总体单价。仅比较同商品至少两家供应商，并以最低加权价为基准。\n在同一非空行集上AVG金额/AVG数量与SUM金额/SUM数量等价，但AVG单价通常不是加权均价。"
+        "explanation": "实际采购金额除订购数量才反映总体单价。仅比较同商品至少两家供应商，并以最低加权价为基准。\n在同一非空行集上AVG金额/AVG数量与SUM金额/SUM数量等价，但AVG单价通常不是加权均价。\n完整企业题只有两列派生价格允许0.0100001分误差，溢价百分比仍按0.000001个百分点核对，编号精确。"
       },
       "tags": [
         "同商品跨供应商采购价差",
@@ -3879,7 +3886,7 @@
       ],
       "supportStatus": "仅理论",
       "compatibility": "MySQL 8.4 教学口径；若涉及本地执行，须按兼容层验证。",
-      "contentVersion": "4.2.0",
+      "contentVersion": "4.2.1",
       "schemaVersion": 1,
       "dialect": "MySQL 8.4",
       "validation": {
@@ -3903,7 +3910,7 @@
         "sourceTables": [
           "v_po_lines"
         ],
-        "note": "关联审计版企业资源4.2.0；本卡使用独立微型教学数据，不能当作企业主库结果。"
+        "note": "关联逐题复审资源4.2.1；本卡微型示例保持独立，不代表企业主库结果。"
       },
       "supportStatusLabel": "概念或业务口径；无需执行"
     },
@@ -3937,7 +3944,7 @@
       ],
       "supportStatus": "仅理论",
       "compatibility": "MySQL 8.4 教学口径；若涉及本地执行，须按兼容层验证。",
-      "contentVersion": "4.2.0",
+      "contentVersion": "4.2.1",
       "schemaVersion": 1,
       "dialect": "MySQL 8.4",
       "validation": {
@@ -3963,7 +3970,7 @@
           "supplier_contracts",
           "v_po_lines"
         ],
-        "note": "关联审计版企业资源4.2.0；本卡使用独立微型教学数据，不能当作企业主库结果。"
+        "note": "关联逐题复审资源4.2.1；本卡微型示例保持独立，不代表企业主库结果。"
       },
       "supportStatusLabel": "概念或业务口径；无需执行"
     }

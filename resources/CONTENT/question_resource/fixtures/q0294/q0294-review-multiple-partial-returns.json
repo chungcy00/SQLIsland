@@ -1,0 +1,88 @@
+{
+  "id": "q0294-review-multiple-partial-returns",
+  "questionId": "q0294",
+  "visibility": "hidden",
+  "variant": "multiple-partial-returns",
+  "kind": "database_delta",
+  "datasetId": "enterprise-v2",
+  "baseDatabase": "databases/enterprise/enterprise.sqlite",
+  "baseSha256": "d47285cfecd67f2dfd37a0d41a2c8a2714a6ecbc8e1170c3e9c0052204106924",
+  "patchSql": [
+    "INSERT INTO returns VALUES(5064,82259,'2025-10-04',2,1660)",
+    "UPDATE returns SET quantity=1,refund_cents=830 WHERE return_id=4185",
+    "INSERT INTO stock_movements(warehouse_id,product_id,movement_date,movement_type,quantity_delta,unit_cost_cents,order_item_id,return_id) SELECT warehouse_id,product_id,movement_date,'return',quantity_delta-1,unit_cost_cents,order_item_id,5064 FROM stock_movements WHERE return_id=4185",
+    "UPDATE stock_movements SET quantity_delta=1 WHERE return_id=4185",
+    "INSERT INTO returns VALUES(5065,55743,'2025-10-10',1,4180)",
+    "UPDATE returns SET quantity=1,refund_cents=4180 WHERE return_id=4192",
+    "INSERT INTO stock_movements(warehouse_id,product_id,movement_date,movement_type,quantity_delta,unit_cost_cents,order_item_id,return_id) SELECT warehouse_id,product_id,movement_date,'return',quantity_delta-1,unit_cost_cents,order_item_id,5065 FROM stock_movements WHERE return_id=4192",
+    "UPDATE stock_movements SET quantity_delta=1 WHERE return_id=4192",
+    "INSERT INTO returns VALUES(5066,11004,'2025-01-28',1,3170)",
+    "UPDATE returns SET quantity=1,refund_cents=3170 WHERE return_id=2477",
+    "INSERT INTO stock_movements(warehouse_id,product_id,movement_date,movement_type,quantity_delta,unit_cost_cents,order_item_id,return_id) SELECT warehouse_id,product_id,movement_date,'return',quantity_delta-1,unit_cost_cents,order_item_id,5066 FROM stock_movements WHERE return_id=2477",
+    "UPDATE stock_movements SET quantity_delta=1 WHERE return_id=2477"
+  ],
+  "patchDescription": "同一原销售行拆成多次部分退货，累计数量金额与原业务一致，库存流水同步拆分",
+  "patchRowChanges": 0,
+  "testIsolation": "每次使用全新数据库副本；夹具可故意引入对账差异或改变业务记录，仅用于判题，绝不可写入基准库",
+  "expected": {
+    "columns": [
+      "source_id",
+      "net_cents",
+      "gross_cents",
+      "spend_cents",
+      "contribution_cents",
+      "contribution_pct"
+    ],
+    "rows": [
+      [
+        1,
+        27221835,
+        10543653,
+        0,
+        10543653,
+        38.73
+      ],
+      [
+        4,
+        9277495,
+        3535735,
+        435753,
+        3099982,
+        33.41
+      ],
+      [
+        2,
+        14170254,
+        5427044,
+        2877981,
+        2549063,
+        17.99
+      ],
+      [
+        3,
+        9027392,
+        3475284,
+        2608823,
+        866461,
+        9.6
+      ],
+      [
+        5,
+        3621116,
+        1396494,
+        1247280,
+        149214,
+        4.12
+      ]
+    ]
+  },
+  "orderPolicy": "ordered",
+  "columnPolicy": "exact_names_in_order",
+  "numericTolerance": {
+    "absolute": 1e-06,
+    "integerExact": true,
+    "textExact": true,
+    "nullDistinct": true
+  },
+  "contentVersion": "4.2.1"
+}

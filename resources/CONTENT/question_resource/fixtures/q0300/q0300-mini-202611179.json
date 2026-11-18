@@ -15,6 +15,9 @@
       "labor_pct",
       "delivery_pct",
       "stock_cents",
+      "margin_change_points",
+      "expense_change_points",
+      "labor_change_points",
       "risk_count",
       "missing_count"
     ],
@@ -27,7 +30,10 @@
         438.22,
         13.33,
         145111963,
-        2,
+        -6.52,
+        24.16,
+        -1104.15,
+        3,
         0
       ],
       [
@@ -38,6 +44,9 @@
         null,
         0.0,
         148451443,
+        null,
+        null,
+        null,
         1,
         3
       ],
@@ -49,7 +58,10 @@
         1034.95,
         6.67,
         150725508,
-        3,
+        0.44,
+        70.6,
+        -452.67,
+        2,
         0
       ],
       [
@@ -60,7 +72,10 @@
         585.32,
         7.14,
         154826811,
-        2,
+        -8.34,
+        21.35,
+        -746.18,
+        3,
         0
       ]
     ]
@@ -73,5 +88,5 @@
     "nullDistinct": true
   },
   "columnPolicy": "exact_names_in_order",
-  "contentVersion": "4.2.0"
+  "contentVersion": "4.2.1"
 }

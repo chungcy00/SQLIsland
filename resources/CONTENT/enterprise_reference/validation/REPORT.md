@@ -1,3 +1,5 @@
+> 本文件保留历史审核时点；最新50题复审为题目资源4.2.1，入口见CONTENT/TASK_REAUDIT.md及artifacts/task-reaudit-20261118。
+
 > 历史验证记录，当前审计版4.1.0结论见CONTENT/AUDIT_REPORT.md及工作区artifacts/enterprise-audit。
 
 > 历史阶段报告：最新整合审核见上级统一资源包 AUDIT_REPORT.md 与 audit_results.json。

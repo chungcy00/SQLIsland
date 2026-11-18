@@ -31,7 +31,7 @@
   "datasetId": "enterprise-v2",
   "type": "业务情景",
   "schemaVersion": 2,
-  "contentVersion": "4.2.0",
+  "contentVersion": "4.2.1",
   "expectedOutputPath": "business_tasks/results/BP36.json",
   "expectedRowCount": 0,
   "expectedColumns": [
@@ -56,7 +56,10 @@
     "promotions",
     "purchase_order_items",
     "purchase_orders",
+    "returns",
+    "stock_adjustments",
     "stock_movements",
+    "stock_transfers",
     "stores",
     "supplier_contracts",
     "suppliers",
@@ -65,8 +68,10 @@
   ],
   "orderPolicy": "ordered",
   "numericTolerance": {
-    "integerCents": 0,
-    "decimalAbsolute": 1e-06
+    "absolute": 1e-06,
+    "integerExact": true,
+    "textExact": true,
+    "nullDistinct": true
   },
   "referenceSolutions": [
     {
@@ -75,17 +80,17 @@
       "sqliteSql": "WITH a AS (SELECT receipt_id,SUM(quantity_delta) qty FROM stock_movements WHERE movement_type='receipt' GROUP BY receipt_id) SELECT g.receipt_id,g.po_item_id,g.quantity_received-g.quantity_rejected expected_units,COALESCE(a.qty,0) posted_units,COALESCE(a.qty,0)-(g.quantity_received-g.quantity_rejected) difference FROM goods_receipts g LEFT JOIN a ON a.receipt_id=g.receipt_id WHERE COALESCE(a.qty,0)<>g.quantity_received-g.quantity_rejected ORDER BY g.receipt_id"
     },
     {
-      "kind": "algebraic equivalent",
+      "kind": "equivalent",
       "mysqlSql": "WITH a AS (SELECT receipt_id,SUM(quantity_delta) qty FROM stock_movements WHERE movement_type='receipt' GROUP BY receipt_id) SELECT g.receipt_id,g.po_item_id,g.quantity_received-g.quantity_rejected expected_units,IFNULL(a.qty,0) posted_units,IFNULL(a.qty,0)-(g.quantity_received-g.quantity_rejected) difference FROM goods_receipts g LEFT JOIN a ON a.receipt_id=g.receipt_id WHERE IFNULL(a.qty,0)<>g.quantity_received-g.quantity_rejected ORDER BY g.receipt_id",
       "sqliteSql": "WITH a AS (SELECT receipt_id,SUM(quantity_delta) qty FROM stock_movements WHERE movement_type='receipt' GROUP BY receipt_id) SELECT g.receipt_id,g.po_item_id,g.quantity_received-g.quantity_rejected expected_units,IFNULL(a.qty,0) posted_units,IFNULL(a.qty,0)-(g.quantity_received-g.quantity_rejected) difference FROM goods_receipts g LEFT JOIN a ON a.receipt_id=g.receipt_id WHERE IFNULL(a.qty,0)<>g.quantity_received-g.quantity_rejected ORDER BY g.receipt_id"
     }
   ],
   "hints": [
     "先聚合库存流水",
-    "先聚合库存流水；与质检收货匹配",
-    "重点核对输出粒度：收货记录"
+    "与质检收货匹配；筛选差额",
+    "内连接会漏掉应入库但未记账的记录。"
   ],
-  "explanation": "先聚合库存流水；与质检收货匹配；筛选差额；空结果也是成功。内连接会漏掉应入库但未记账的记录。\n审计口径：先核定日期范围、输出粒度、退款和贷项，再在各事实表中独立聚合，防止连接放大。",
+  "explanation": "先聚合库存流水。与质检收货匹配。筛选差额。空结果也是成功。内连接会漏掉应入库但未记账的记录。",
   "testFixtureIds": [
     "q0286-public",
     "q0286-boundary",
@@ -94,8 +99,9 @@
   ],
   "validationStatus": {
     "independentPython": true,
+    "sqliteNative": true,
     "sqliteWasm": true,
     "mysql84Native": false
   },
-  "elapsedMs": 11.612
+  "elapsedMs": 11.702
 }

@@ -1324,6 +1324,7 @@ async function evaluateQuestion(id, submit) {
         q.orderPolicy,
         q.numericTolerance?.absolute,
         q.numericTolerance?.exactColumns,
+        q.numericTolerance?.columnAbsolute,
       ),
       submitted: true,
     };

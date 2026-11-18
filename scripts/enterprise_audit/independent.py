@@ -288,6 +288,13 @@ class Model:
         return result
 
     def result(self, n):
+        from reaudit_metrics import REVISED, result
+
+        if n in REVISED:
+            return result(self, n)
+        return self._standard_result(n)
+
+    def _standard_result(self, n):
         t = self.t
         out = []
         sg = groups(

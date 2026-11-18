@@ -1,0 +1,89 @@
+{
+  "id": "q0264-review-cross-year-session",
+  "questionId": "q0264",
+  "visibility": "hidden",
+  "variant": "cross-year-session",
+  "kind": "database_delta",
+  "datasetId": "ecommerce-v2",
+  "baseDatabase": "databases/ecommerce/ecommerce.sqlite",
+  "baseSha256": "31b1767d0e2b774e5cb7395ed186be7c92d534a96e90fc8576780875a69c8ff3",
+  "patchSql": [
+    "UPDATE customer_sessions SET session_date='2024-12-31' WHERE session_id=10594"
+  ],
+  "patchDescription": "跨年访问会话的订单不应进入当年访问总体的转化分子",
+  "patchRowChanges": 0,
+  "testIsolation": "每次使用全新数据库副本；夹具可故意引入对账差异或改变业务记录，仅用于判题，绝不可写入基准库",
+  "expected": {
+    "columns": [
+      "source_id",
+      "sessions",
+      "converted",
+      "conversion_pct",
+      "new_customers",
+      "spend_cents",
+      "cac_cents",
+      "roas"
+    ],
+    "rows": [
+      [
+        1,
+        12952,
+        2948,
+        22.76,
+        598,
+        0,
+        0.0,
+        null
+      ],
+      [
+        2,
+        8130,
+        1568,
+        19.29,
+        289,
+        2877981,
+        9958.41,
+        4.9237
+      ],
+      [
+        3,
+        6740,
+        977,
+        14.5,
+        181,
+        2608823,
+        14413.39,
+        3.4603
+      ],
+      [
+        4,
+        2771,
+        983,
+        35.47,
+        135,
+        435753,
+        3227.8,
+        21.2907
+      ],
+      [
+        5,
+        2642,
+        405,
+        15.33,
+        69,
+        1247280,
+        18076.52,
+        2.9032
+      ]
+    ]
+  },
+  "orderPolicy": "ordered",
+  "columnPolicy": "exact_names_in_order",
+  "numericTolerance": {
+    "absolute": 1e-06,
+    "integerExact": true,
+    "textExact": true,
+    "nullDistinct": true
+  },
+  "contentVersion": "4.2.1"
+}

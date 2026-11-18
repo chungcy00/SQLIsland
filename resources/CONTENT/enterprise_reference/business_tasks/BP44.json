@@ -31,7 +31,7 @@
   "datasetId": "enterprise-v2",
   "type": "业务情景",
   "schemaVersion": 2,
-  "contentVersion": "4.2.0",
+  "contentVersion": "4.2.1",
   "expectedOutputPath": "business_tasks/results/BP44.json",
   "expectedRowCount": 5,
   "expectedColumns": [
@@ -61,12 +61,15 @@
     "stores",
     "traffic_sources",
     "v_order_net",
-    "v_sales_lines"
+    "v_sales_lines",
+    "warehouses"
   ],
   "orderPolicy": "ordered",
   "numericTolerance": {
-    "integerCents": 0,
-    "decimalAbsolute": 1e-06
+    "absolute": 1e-06,
+    "integerExact": true,
+    "textExact": true,
+    "nullDistinct": true
   },
   "referenceSolutions": [
     {
@@ -75,27 +78,29 @@
       "sqliteSql": "WITH a AS (SELECT s.source_id,SUM(o.net_cents) net,SUM(o.net_cents-o.cost_cents) gross FROM v_order_net o JOIN customer_sessions s ON s.session_id=o.session_id WHERE o.channel='online' AND o.order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY s.source_id), b AS (SELECT source_id,SUM(spend_cents) spend FROM marketing_campaigns WHERE month_key BETWEEN '2025-01' AND '2025-12' GROUP BY source_id) SELECT t.source_id,COALESCE(a.net,0) net_cents,COALESCE(a.gross,0) gross_cents,COALESCE(b.spend,0) spend_cents,COALESCE(a.gross,0)-COALESCE(b.spend,0) contribution_cents,ROUND(100.0*(COALESCE(a.gross,0)-COALESCE(b.spend,0))/NULLIF(a.net,0),2) contribution_pct FROM traffic_sources t LEFT JOIN a ON a.source_id=t.source_id LEFT JOIN b ON b.source_id=t.source_id ORDER BY contribution_cents DESC,t.source_id"
     },
     {
-      "kind": "algebraic equivalent",
+      "kind": "equivalent",
       "mysqlSql": "WITH a AS (SELECT s.source_id,SUM(o.net_cents) net,SUM(o.net_cents-o.cost_cents) gross FROM v_order_net o JOIN customer_sessions s ON s.session_id=o.session_id WHERE o.channel='online' AND (o.order_date>='2025-01-01' AND o.order_date<='2025-12-31') GROUP BY s.source_id), b AS (SELECT source_id,SUM(spend_cents) spend FROM marketing_campaigns WHERE (month_key>='2025-01' AND month_key<='2025-12') GROUP BY source_id) SELECT t.source_id,COALESCE(a.net,0) net_cents,COALESCE(a.gross,0) gross_cents,COALESCE(b.spend,0) spend_cents,COALESCE(a.gross,0)-COALESCE(b.spend,0) contribution_cents,ROUND(100.0*(COALESCE(a.gross,0)-COALESCE(b.spend,0))/NULLIF(a.net,0),2) contribution_pct FROM traffic_sources t LEFT JOIN a ON a.source_id=t.source_id LEFT JOIN b ON b.source_id=t.source_id ORDER BY contribution_cents DESC,t.source_id",
       "sqliteSql": "WITH a AS (SELECT s.source_id,SUM(o.net_cents) net,SUM(o.net_cents-o.cost_cents) gross FROM v_order_net o JOIN customer_sessions s ON s.session_id=o.session_id WHERE o.channel='online' AND (o.order_date>='2025-01-01' AND o.order_date<='2025-12-31') GROUP BY s.source_id), b AS (SELECT source_id,SUM(spend_cents) spend FROM marketing_campaigns WHERE (month_key>='2025-01' AND month_key<='2025-12') GROUP BY source_id) SELECT t.source_id,COALESCE(a.net,0) net_cents,COALESCE(a.gross,0) gross_cents,COALESCE(b.spend,0) spend_cents,COALESCE(a.gross,0)-COALESCE(b.spend,0) contribution_cents,ROUND(100.0*(COALESCE(a.gross,0)-COALESCE(b.spend,0))/NULLIF(a.net,0),2) contribution_pct FROM traffic_sources t LEFT JOIN a ON a.source_id=t.source_id LEFT JOIN b ON b.source_id=t.source_id ORDER BY contribution_cents DESC,t.source_id"
     }
   ],
   "hints": [
     "独立归因毛利与支出",
-    "独立归因毛利与支出；连接渠道",
-    "重点核对输出粒度：渠道"
+    "连接渠道；计算贡献",
+    "广告后毛利不等于公司净利润。"
   ],
-  "explanation": "独立归因毛利与支出；连接渠道；计算贡献。广告后毛利不等于公司净利润。\n审计口径：先核定日期范围、输出粒度、退款和贷项，再在各事实表中独立聚合，防止连接放大。",
+  "explanation": "独立归因毛利与支出。连接渠道。计算贡献。广告后毛利不等于公司净利润。",
   "testFixtureIds": [
     "q0294-public",
     "q0294-boundary",
     "q0294-mini-202611171",
-    "q0294-mini-202611179"
+    "q0294-mini-202611179",
+    "q0294-review-multiple-partial-returns"
   ],
   "validationStatus": {
     "independentPython": true,
+    "sqliteNative": true,
     "sqliteWasm": true,
     "mysql84Native": false
   },
-  "elapsedMs": 32.793
+  "elapsedMs": 30.775
 }

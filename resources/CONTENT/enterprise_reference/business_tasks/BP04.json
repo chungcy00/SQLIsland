@@ -30,7 +30,7 @@
   "datasetId": "retail-v2",
   "type": "业务情景",
   "schemaVersion": 2,
-  "contentVersion": "4.2.0",
+  "contentVersion": "4.2.1",
   "expectedOutputPath": "business_tasks/results/BP04.json",
   "expectedRowCount": 2,
   "expectedColumns": [
@@ -57,12 +57,15 @@
     "returns",
     "stores",
     "traffic_sources",
-    "v_sales_lines"
+    "v_sales_lines",
+    "warehouses"
   ],
   "orderPolicy": "ordered",
   "numericTolerance": {
-    "integerCents": 0,
-    "decimalAbsolute": 1e-06
+    "absolute": 1e-06,
+    "integerExact": true,
+    "textExact": true,
+    "nullDistinct": true
   },
   "referenceSolutions": [
     {
@@ -71,27 +74,29 @@
       "sqliteSql": "WITH d AS (SELECT day,CASE WHEN EXISTS(SELECT 1 FROM promotions p WHERE day BETWEEN p.start_date AND p.end_date AND p.channel_scope IN ('all','store')) THEN 1 ELSE 0 END promo FROM calendar_days WHERE day BETWEEN '2025-01-01' AND '2025-12-31'), a AS (SELECT order_date,SUM(net_cents) net,SUM(net_qty) qty,SUM(cost_cents) cost FROM v_sales_lines WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY order_date) SELECT d.promo,COUNT(*) days,ROUND(1.0*SUM(COALESCE(a.net,0))/COUNT(*),2) daily_net_cents,ROUND(1.0*SUM(COALESCE(a.qty,0))/COUNT(*),2) daily_units,ROUND(100.0*SUM(a.net-a.cost)/NULLIF(SUM(a.net),0),2) margin_pct FROM d LEFT JOIN a ON a.order_date=d.day GROUP BY d.promo ORDER BY d.promo"
     },
     {
-      "kind": "algebraic equivalent",
+      "kind": "equivalent",
       "mysqlSql": "WITH d AS (SELECT day,CASE WHEN EXISTS(SELECT 1 FROM promotions p WHERE day BETWEEN p.start_date AND p.end_date AND p.channel_scope IN ('all','store')) THEN 1 ELSE 0 END promo FROM calendar_days WHERE (day>='2025-01-01' AND day<='2025-12-31')), a AS (SELECT order_date,SUM(net_cents) net,SUM(net_qty) qty,SUM(cost_cents) cost FROM v_sales_lines WHERE channel='store' AND (order_date>='2025-01-01' AND order_date<='2025-12-31') GROUP BY order_date) SELECT d.promo,COUNT(*) days,ROUND(1.0*SUM(COALESCE(a.net,0))/COUNT(*),2) daily_net_cents,ROUND(1.0*SUM(COALESCE(a.qty,0))/COUNT(*),2) daily_units,ROUND(100.0*SUM(a.net-a.cost)/NULLIF(SUM(a.net),0),2) margin_pct FROM d LEFT JOIN a ON a.order_date=d.day GROUP BY d.promo ORDER BY d.promo",
       "sqliteSql": "WITH d AS (SELECT day,CASE WHEN EXISTS(SELECT 1 FROM promotions p WHERE day BETWEEN p.start_date AND p.end_date AND p.channel_scope IN ('all','store')) THEN 1 ELSE 0 END promo FROM calendar_days WHERE (day>='2025-01-01' AND day<='2025-12-31')), a AS (SELECT order_date,SUM(net_cents) net,SUM(net_qty) qty,SUM(cost_cents) cost FROM v_sales_lines WHERE channel='store' AND (order_date>='2025-01-01' AND order_date<='2025-12-31') GROUP BY order_date) SELECT d.promo,COUNT(*) days,ROUND(1.0*SUM(COALESCE(a.net,0))/COUNT(*),2) daily_net_cents,ROUND(1.0*SUM(COALESCE(a.qty,0))/COUNT(*),2) daily_units,ROUND(100.0*SUM(a.net-a.cost)/NULLIF(SUM(a.net),0),2) margin_pct FROM d LEFT JOIN a ON a.order_date=d.day GROUP BY d.promo ORDER BY d.promo"
     }
   ],
   "hints": [
     "日历标记促销日",
-    "日历标记促销日；独立日级汇总",
-    "重点核对输出粒度：促销状态"
+    "独立日级汇总；补全日历",
+    "按活动日期直接连接销售，重叠活动使同一明细被重复累加；把存在活动误当成每笔交易均适用。"
   ],
-  "explanation": "日历标记促销日；独立日级汇总；补全日历；计算日均及加权毛利率。按订单数除总额得到客单价而不是日均。\n审计口径：先核定日期范围、输出粒度、退款和贷项，再在各事实表中独立聚合，防止连接放大。",
+  "explanation": "日历标记促销日。独立日级汇总。补全日历。计算日均及加权毛利率。按活动日期直接连接销售，重叠活动使同一明细被重复累加；把存在活动误当成每笔交易均适用。",
   "testFixtureIds": [
     "q0254-public",
     "q0254-boundary",
     "q0254-mini-202611171",
-    "q0254-mini-202611179"
+    "q0254-mini-202611179",
+    "q0254-review-multiple-partial-returns"
   ],
   "validationStatus": {
     "independentPython": true,
+    "sqliteNative": true,
     "sqliteWasm": true,
     "mysql84Native": false
   },
-  "elapsedMs": 23.339
+  "elapsedMs": 19.852
 }

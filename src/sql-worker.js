@@ -112,6 +112,7 @@ self.onmessage = async ({ data }) => {
                     q.orderPolicy,
                     q.numericTolerance?.absolute,
                     q.numericTolerance?.exactColumns,
+                    q.numericTolerance?.columnAbsolute,
                   )
                 : { pass: true };
             } finally {

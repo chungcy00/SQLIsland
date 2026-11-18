@@ -29,7 +29,7 @@
   "datasetId": "procurement-v2",
   "type": "业务情景",
   "schemaVersion": 2,
-  "contentVersion": "4.2.0",
+  "contentVersion": "4.2.1",
   "expectedOutputPath": "business_tasks/results/BP27.json",
   "expectedRowCount": 55,
   "expectedColumns": [
@@ -57,8 +57,10 @@
   ],
   "orderPolicy": "ordered",
   "numericTolerance": {
-    "integerCents": 0,
-    "decimalAbsolute": 1e-06
+    "absolute": 1e-06,
+    "integerExact": true,
+    "textExact": true,
+    "nullDistinct": true
   },
   "referenceSolutions": [
     {
@@ -67,17 +69,17 @@
       "sqliteSql": "SELECT supplier_id,COUNT(*) due_lines,ROUND(100.0*SUM(CASE WHEN on_time>=quantity_ordered THEN 1 ELSE 0 END)/COUNT(*),2) ontime_pct,ROUND(100.0*SUM(CASE WHEN accepted>=quantity_ordered THEN 1 ELSE 0 END)/COUNT(*),2) complete_pct,ROUND(100.0*SUM(accepted)/NULLIF(SUM(received),0),2) quality_pct FROM v_po_lines WHERE promised_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY supplier_id ORDER BY supplier_id"
     },
     {
-      "kind": "algebraic equivalent",
+      "kind": "equivalent",
       "mysqlSql": "SELECT supplier_id,COUNT(*) due_lines,ROUND(100.0*SUM(CASE WHEN on_time>=quantity_ordered THEN 1 ELSE 0 END)/COUNT(*),2) ontime_pct,ROUND(100.0*SUM(CASE WHEN accepted>=quantity_ordered THEN 1 ELSE 0 END)/COUNT(*),2) complete_pct,ROUND(100.0*SUM(accepted)/NULLIF(SUM(received),0),2) quality_pct FROM v_po_lines WHERE (promised_date>='2025-01-01' AND promised_date<='2025-12-31') GROUP BY supplier_id ORDER BY supplier_id",
       "sqliteSql": "SELECT supplier_id,COUNT(*) due_lines,ROUND(100.0*SUM(CASE WHEN on_time>=quantity_ordered THEN 1 ELSE 0 END)/COUNT(*),2) ontime_pct,ROUND(100.0*SUM(CASE WHEN accepted>=quantity_ordered THEN 1 ELSE 0 END)/COUNT(*),2) complete_pct,ROUND(100.0*SUM(accepted)/NULLIF(SUM(received),0),2) quality_pct FROM v_po_lines WHERE (promised_date>='2025-01-01' AND promised_date<='2025-12-31') GROUP BY supplier_id ORDER BY supplier_id"
     }
   ],
   "hints": [
     "按采购行预聚合收货",
-    "按采购行预聚合收货；筛已到期",
-    "重点核对输出粒度：供应商"
+    "筛已到期；分别计算两种件数履约和质量指标",
+    "有任意一批准时到货并不等于整行准时足量。"
   ],
-  "explanation": "按采购行预聚合收货；筛已到期；分别计算两种件数履约和质量指标。有任意一批准时到货并不等于整行准时足量。\n审计口径：先核定日期范围、输出粒度、退款和贷项，再在各事实表中独立聚合，防止连接放大。",
+  "explanation": "按采购行预聚合收货。筛已到期。分别计算两种件数履约和质量指标。有任意一批准时到货并不等于整行准时足量。",
   "testFixtureIds": [
     "q0277-public",
     "q0277-boundary",
@@ -86,8 +88,9 @@
   ],
   "validationStatus": {
     "independentPython": true,
+    "sqliteNative": true,
     "sqliteWasm": true,
     "mysql84Native": false
   },
-  "elapsedMs": 16.371
+  "elapsedMs": 16.083
 }

@@ -12,7 +12,8 @@
       "ledger_cents",
       "bank_cents",
       "difference_cents",
-      "issue"
+      "issue",
+      "reference_kind"
     ],
     "rows": [
       [
@@ -20,126 +21,144 @@
         null,
         14300,
         14300,
-        "bank_only"
+        "bank_only",
+        "unreferenced_bank"
       ],
       [
         "BANK-2",
         null,
         35900,
         35900,
-        "bank_only"
+        "bank_only",
+        "unreferenced_bank"
       ],
       [
         "BANK-25",
         null,
         37200,
         37200,
-        "bank_only"
+        "bank_only",
+        "unreferenced_bank"
       ],
       [
         "BANK-37",
         null,
         17500,
         17500,
-        "bank_only"
+        "bank_only",
+        "unreferenced_bank"
       ],
       [
         "BANK-48",
         null,
         9800,
         9800,
-        "bank_only"
+        "bank_only",
+        "unreferenced_bank"
       ],
       [
         "BANK-51",
         null,
         24400,
         24400,
-        "bank_only"
+        "bank_only",
+        "unreferenced_bank"
       ],
       [
         "BANK-9",
         null,
         25900,
         25900,
-        "bank_only"
+        "bank_only",
+        "unreferenced_bank"
       ],
       [
         "ISOJ-15",
         14300,
         null,
         -14300,
-        "ledger_only"
+        "ledger_only",
+        "reference"
       ],
       [
         "ISOJ-2",
         35900,
         null,
         -35900,
-        "ledger_only"
+        "ledger_only",
+        "reference"
       ],
       [
         "ISOJ-25",
         37200,
         null,
         -37200,
-        "ledger_only"
+        "ledger_only",
+        "reference"
       ],
       [
         "ISOJ-29",
         18800,
         null,
         -18800,
-        "ledger_only"
+        "ledger_only",
+        "reference"
       ],
       [
         "ISOJ-38",
         17500,
         null,
         -17500,
-        "ledger_only"
+        "ledger_only",
+        "reference"
       ],
       [
         "ISOJ-44",
         43500,
         null,
         -43500,
-        "ledger_only"
+        "ledger_only",
+        "reference"
       ],
       [
         "ISOJ-5",
         5900,
         5800,
         -100,
-        "difference"
+        "difference",
+        "reference"
       ],
       [
         "ISOJ-50",
         9800,
         null,
         -9800,
-        "ledger_only"
+        "ledger_only",
+        "reference"
       ],
       [
         "ISOJ-51",
         49400,
         null,
         -49400,
-        "ledger_only"
+        "ledger_only",
+        "reference"
       ],
       [
         "ISOJ-54",
         24400,
         null,
         -24400,
-        "ledger_only"
+        "ledger_only",
+        "reference"
       ],
       [
         "ISOJ-9",
         25900,
         null,
         -25900,
-        "ledger_only"
+        "ledger_only",
+        "reference"
       ]
     ]
   },
@@ -151,5 +170,5 @@
     "nullDistinct": true
   },
   "columnPolicy": "exact_names_in_order",
-  "contentVersion": "4.2.0"
+  "contentVersion": "4.2.1"
 }

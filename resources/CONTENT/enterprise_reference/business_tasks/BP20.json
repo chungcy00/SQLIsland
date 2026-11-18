@@ -2,18 +2,18 @@
   "projectId": "finance",
   "title": "多规则异常交易筛查",
   "context": "审计部门需要异常线索，不用于认定违规。",
-  "requirements": "发票粒度；同一供应商同编号重复、金额超过供应商平均发票金额2倍、超额付款、账单金额与对应采购行按收货计价相差超过100分；每条发票计算异常数，至少一个标记。发票单价或数量差异需复核。 本库v_invoice_balance的billed_cents为发票面额减截至截止日已批准贷项后的净应付，paid_cents仅计截止日前付款；原始发票面额保留在supplier_invoice_items。",
-  "grain": "发票（本模拟每采购单至多一张正常发票；重复异常专用）",
-  "commonError": "对每张发票使用整个采购单金额只有本模拟的一单一正常发票假设成立。",
+  "requirements": "截至2025-12-31的每张发票计算四个复核标记：同供应商同invoice_no存在多张发票；原始发票面额超过该供应商全部期间内发票面额均值的2倍；净应付减实付余额为负；原始发票面额与本张发票已开票数量按对应采购行单价重算金额相差超过100分。面额及采购重算金额均在本张发票行内汇总，不能使用整张采购单总收货金额，不冲减贷项；超额付款标记使用截止日已批准贷项后的净应付。数量是否超收或超开票由三方核对题检查，本题第四项专门识别开票价格差异。输出净应付billed_cents和四个标记，至少一个标记才返回，按标记数降序、发票编号升序。大额及价格标记使用未舍入值，标记只代表复核候选。",
+  "grain": "发票",
+  "commonError": "分批发票不能与整单收货金额比较；已批准贷项不应自动变成发票单价错误。",
   "executionSteps": [
-    "窗口计算供应商基准",
-    "独立汇总收货金额",
-    "构造四个标志",
-    "输出候选"
+    "按发票汇总原始面额和采购价重算金额",
+    "在供应商内计算面额基准与重复号码",
+    "独立取截止日贷项和付款余额",
+    "累计四项标记"
   ],
   "difficulty": "挑战",
-  "mysqlSql": "WITH a AS (SELECT v.*,COUNT(*) OVER(PARTITION BY supplier_id,invoice_no) copies,AVG(billed_cents) OVER(PARTITION BY supplier_id) avg_bill FROM v_invoice_balance v), b AS (SELECT po_id,SUM(accepted*unit_price_cents) expected FROM v_po_lines GROUP BY po_id), z AS (SELECT a.*,CASE WHEN copies>1 THEN 1 ELSE 0 END duplicate_flag,CASE WHEN billed_cents>2*avg_bill THEN 1 ELSE 0 END large_flag,CASE WHEN balance_cents<0 THEN 1 ELSE 0 END overpay_flag,CASE WHEN ABS(billed_cents-COALESCE(b.expected,0))>100 THEN 1 ELSE 0 END mismatch_flag FROM a LEFT JOIN b ON b.po_id=a.po_id) SELECT supplier_invoice_id,supplier_id,billed_cents,duplicate_flag,large_flag,overpay_flag,mismatch_flag,duplicate_flag+large_flag+overpay_flag+mismatch_flag flags FROM z WHERE duplicate_flag+large_flag+overpay_flag+mismatch_flag>0 ORDER BY flags DESC,supplier_invoice_id",
-  "sqliteSql": "WITH a AS (SELECT v.*,COUNT(*) OVER(PARTITION BY supplier_id,invoice_no) copies,AVG(billed_cents) OVER(PARTITION BY supplier_id) avg_bill FROM v_invoice_balance v), b AS (SELECT po_id,SUM(accepted*unit_price_cents) expected FROM v_po_lines GROUP BY po_id), z AS (SELECT a.*,CASE WHEN copies>1 THEN 1 ELSE 0 END duplicate_flag,CASE WHEN billed_cents>2*avg_bill THEN 1 ELSE 0 END large_flag,CASE WHEN balance_cents<0 THEN 1 ELSE 0 END overpay_flag,CASE WHEN ABS(billed_cents-COALESCE(b.expected,0))>100 THEN 1 ELSE 0 END mismatch_flag FROM a LEFT JOIN b ON b.po_id=a.po_id) SELECT supplier_invoice_id,supplier_id,billed_cents,duplicate_flag,large_flag,overpay_flag,mismatch_flag,duplicate_flag+large_flag+overpay_flag+mismatch_flag flags FROM z WHERE duplicate_flag+large_flag+overpay_flag+mismatch_flag>0 ORDER BY flags DESC,supplier_invoice_id",
+  "mysqlSql": "WITH f AS (\n  SELECT x.supplier_invoice_id,SUM(x.quantity_billed*x.unit_price_cents) face,\n    SUM(x.quantity_billed*p.unit_price_cents) expected\n  FROM supplier_invoice_items x JOIN purchase_order_items p ON p.po_item_id=x.po_item_id\n  GROUP BY x.supplier_invoice_id\n), a AS (\n  SELECT v.*,f.face,f.expected,COUNT(*) OVER(PARTITION BY supplier_id,invoice_no) copies,\n    AVG(f.face) OVER(PARTITION BY supplier_id) avg_bill\n  FROM v_invoice_balance v JOIN f ON f.supplier_invoice_id=v.supplier_invoice_id\n), z AS (\n  SELECT a.*,CASE WHEN copies>1 THEN 1 ELSE 0 END duplicate_flag,\n    CASE WHEN face>2*avg_bill THEN 1 ELSE 0 END large_flag,\n    CASE WHEN balance_cents<0 THEN 1 ELSE 0 END overpay_flag,\n    CASE WHEN ABS(face-expected)>100 THEN 1 ELSE 0 END mismatch_flag FROM a\n)\nSELECT supplier_invoice_id,supplier_id,billed_cents,duplicate_flag,large_flag,overpay_flag,mismatch_flag,\n  duplicate_flag+large_flag+overpay_flag+mismatch_flag flags FROM z\nWHERE duplicate_flag+large_flag+overpay_flag+mismatch_flag>0 ORDER BY flags DESC,supplier_invoice_id",
+  "sqliteSql": "WITH f AS (\n  SELECT x.supplier_invoice_id,SUM(x.quantity_billed*x.unit_price_cents) face,\n    SUM(x.quantity_billed*p.unit_price_cents) expected\n  FROM supplier_invoice_items x JOIN purchase_order_items p ON p.po_item_id=x.po_item_id\n  GROUP BY x.supplier_invoice_id\n), a AS (\n  SELECT v.*,f.face,f.expected,COUNT(*) OVER(PARTITION BY supplier_id,invoice_no) copies,\n    AVG(f.face) OVER(PARTITION BY supplier_id) avg_bill\n  FROM v_invoice_balance v JOIN f ON f.supplier_invoice_id=v.supplier_invoice_id\n), z AS (\n  SELECT a.*,CASE WHEN copies>1 THEN 1 ELSE 0 END duplicate_flag,\n    CASE WHEN face>2*avg_bill THEN 1 ELSE 0 END large_flag,\n    CASE WHEN balance_cents<0 THEN 1 ELSE 0 END overpay_flag,\n    CASE WHEN ABS(face-expected)>100 THEN 1 ELSE 0 END mismatch_flag FROM a\n)\nSELECT supplier_invoice_id,supplier_id,billed_cents,duplicate_flag,large_flag,overpay_flag,mismatch_flag,\n  duplicate_flag+large_flag+overpay_flag+mismatch_flag flags FROM z\nWHERE duplicate_flag+large_flag+overpay_flag+mismatch_flag>0 ORDER BY flags DESC,supplier_invoice_id",
   "compatibility": "直接兼容（原生待验证）",
   "columns": [
     "supplier_invoice_id",
@@ -33,9 +33,9 @@
   "datasetId": "finance-v2",
   "type": "业务情景",
   "schemaVersion": 2,
-  "contentVersion": "4.2.0",
+  "contentVersion": "4.2.1",
   "expectedOutputPath": "business_tasks/results/BP20.json",
-  "expectedRowCount": 1434,
+  "expectedRowCount": 984,
   "expectedColumns": [
     "supplier_invoice_id",
     "supplier_id",
@@ -47,57 +47,61 @@
     "flags"
   ],
   "sourceTables": [
-    "v_invoice_balance",
-    "v_po_lines"
+    "purchase_order_items",
+    "supplier_invoice_items",
+    "v_invoice_balance"
   ],
   "dependencyTables": [
     "categories",
-    "goods_receipts",
     "products",
     "purchase_order_items",
     "purchase_orders",
     "supplier_contracts",
+    "supplier_credit_notes",
     "supplier_invoice_items",
     "supplier_invoices",
     "supplier_payments",
     "suppliers",
     "v_invoice_balance",
-    "v_po_lines",
     "warehouses"
   ],
   "orderPolicy": "ordered",
   "numericTolerance": {
-    "integerCents": 0,
-    "decimalAbsolute": 1e-06
+    "absolute": 1e-06,
+    "integerExact": true,
+    "textExact": true,
+    "nullDistinct": true
   },
   "referenceSolutions": [
     {
       "kind": "reference",
-      "mysqlSql": "WITH a AS (SELECT v.*,COUNT(*) OVER(PARTITION BY supplier_id,invoice_no) copies,AVG(billed_cents) OVER(PARTITION BY supplier_id) avg_bill FROM v_invoice_balance v), b AS (SELECT po_id,SUM(accepted*unit_price_cents) expected FROM v_po_lines GROUP BY po_id), z AS (SELECT a.*,CASE WHEN copies>1 THEN 1 ELSE 0 END duplicate_flag,CASE WHEN billed_cents>2*avg_bill THEN 1 ELSE 0 END large_flag,CASE WHEN balance_cents<0 THEN 1 ELSE 0 END overpay_flag,CASE WHEN ABS(billed_cents-COALESCE(b.expected,0))>100 THEN 1 ELSE 0 END mismatch_flag FROM a LEFT JOIN b ON b.po_id=a.po_id) SELECT supplier_invoice_id,supplier_id,billed_cents,duplicate_flag,large_flag,overpay_flag,mismatch_flag,duplicate_flag+large_flag+overpay_flag+mismatch_flag flags FROM z WHERE duplicate_flag+large_flag+overpay_flag+mismatch_flag>0 ORDER BY flags DESC,supplier_invoice_id",
-      "sqliteSql": "WITH a AS (SELECT v.*,COUNT(*) OVER(PARTITION BY supplier_id,invoice_no) copies,AVG(billed_cents) OVER(PARTITION BY supplier_id) avg_bill FROM v_invoice_balance v), b AS (SELECT po_id,SUM(accepted*unit_price_cents) expected FROM v_po_lines GROUP BY po_id), z AS (SELECT a.*,CASE WHEN copies>1 THEN 1 ELSE 0 END duplicate_flag,CASE WHEN billed_cents>2*avg_bill THEN 1 ELSE 0 END large_flag,CASE WHEN balance_cents<0 THEN 1 ELSE 0 END overpay_flag,CASE WHEN ABS(billed_cents-COALESCE(b.expected,0))>100 THEN 1 ELSE 0 END mismatch_flag FROM a LEFT JOIN b ON b.po_id=a.po_id) SELECT supplier_invoice_id,supplier_id,billed_cents,duplicate_flag,large_flag,overpay_flag,mismatch_flag,duplicate_flag+large_flag+overpay_flag+mismatch_flag flags FROM z WHERE duplicate_flag+large_flag+overpay_flag+mismatch_flag>0 ORDER BY flags DESC,supplier_invoice_id"
+      "mysqlSql": "WITH f AS (\n  SELECT x.supplier_invoice_id,SUM(x.quantity_billed*x.unit_price_cents) face,\n    SUM(x.quantity_billed*p.unit_price_cents) expected\n  FROM supplier_invoice_items x JOIN purchase_order_items p ON p.po_item_id=x.po_item_id\n  GROUP BY x.supplier_invoice_id\n), a AS (\n  SELECT v.*,f.face,f.expected,COUNT(*) OVER(PARTITION BY supplier_id,invoice_no) copies,\n    AVG(f.face) OVER(PARTITION BY supplier_id) avg_bill\n  FROM v_invoice_balance v JOIN f ON f.supplier_invoice_id=v.supplier_invoice_id\n), z AS (\n  SELECT a.*,CASE WHEN copies>1 THEN 1 ELSE 0 END duplicate_flag,\n    CASE WHEN face>2*avg_bill THEN 1 ELSE 0 END large_flag,\n    CASE WHEN balance_cents<0 THEN 1 ELSE 0 END overpay_flag,\n    CASE WHEN ABS(face-expected)>100 THEN 1 ELSE 0 END mismatch_flag FROM a\n)\nSELECT supplier_invoice_id,supplier_id,billed_cents,duplicate_flag,large_flag,overpay_flag,mismatch_flag,\n  duplicate_flag+large_flag+overpay_flag+mismatch_flag flags FROM z\nWHERE duplicate_flag+large_flag+overpay_flag+mismatch_flag>0 ORDER BY flags DESC,supplier_invoice_id",
+      "sqliteSql": "WITH f AS (\n  SELECT x.supplier_invoice_id,SUM(x.quantity_billed*x.unit_price_cents) face,\n    SUM(x.quantity_billed*p.unit_price_cents) expected\n  FROM supplier_invoice_items x JOIN purchase_order_items p ON p.po_item_id=x.po_item_id\n  GROUP BY x.supplier_invoice_id\n), a AS (\n  SELECT v.*,f.face,f.expected,COUNT(*) OVER(PARTITION BY supplier_id,invoice_no) copies,\n    AVG(f.face) OVER(PARTITION BY supplier_id) avg_bill\n  FROM v_invoice_balance v JOIN f ON f.supplier_invoice_id=v.supplier_invoice_id\n), z AS (\n  SELECT a.*,CASE WHEN copies>1 THEN 1 ELSE 0 END duplicate_flag,\n    CASE WHEN face>2*avg_bill THEN 1 ELSE 0 END large_flag,\n    CASE WHEN balance_cents<0 THEN 1 ELSE 0 END overpay_flag,\n    CASE WHEN ABS(face-expected)>100 THEN 1 ELSE 0 END mismatch_flag FROM a\n)\nSELECT supplier_invoice_id,supplier_id,billed_cents,duplicate_flag,large_flag,overpay_flag,mismatch_flag,\n  duplicate_flag+large_flag+overpay_flag+mismatch_flag flags FROM z\nWHERE duplicate_flag+large_flag+overpay_flag+mismatch_flag>0 ORDER BY flags DESC,supplier_invoice_id"
     },
     {
-      "kind": "algebraic equivalent",
-      "mysqlSql": "WITH a AS (SELECT v.*,COUNT(*) OVER(PARTITION BY supplier_id,invoice_no) copies,AVG(billed_cents) OVER(PARTITION BY supplier_id) avg_bill FROM v_invoice_balance v), b AS (SELECT po_id,SUM(accepted*unit_price_cents) expected FROM v_po_lines GROUP BY po_id), z AS (SELECT a.*,CASE WHEN copies>1 THEN 1 ELSE 0 END duplicate_flag,CASE WHEN billed_cents>2*avg_bill THEN 1 ELSE 0 END large_flag,CASE WHEN balance_cents<0 THEN 1 ELSE 0 END overpay_flag,CASE WHEN ABS(billed_cents-IFNULL(b.expected,0))>100 THEN 1 ELSE 0 END mismatch_flag FROM a LEFT JOIN b ON b.po_id=a.po_id) SELECT supplier_invoice_id,supplier_id,billed_cents,duplicate_flag,large_flag,overpay_flag,mismatch_flag,duplicate_flag+large_flag+overpay_flag+mismatch_flag flags FROM z WHERE duplicate_flag+large_flag+overpay_flag+mismatch_flag>0 ORDER BY flags DESC,supplier_invoice_id",
-      "sqliteSql": "WITH a AS (SELECT v.*,COUNT(*) OVER(PARTITION BY supplier_id,invoice_no) copies,AVG(billed_cents) OVER(PARTITION BY supplier_id) avg_bill FROM v_invoice_balance v), b AS (SELECT po_id,SUM(accepted*unit_price_cents) expected FROM v_po_lines GROUP BY po_id), z AS (SELECT a.*,CASE WHEN copies>1 THEN 1 ELSE 0 END duplicate_flag,CASE WHEN billed_cents>2*avg_bill THEN 1 ELSE 0 END large_flag,CASE WHEN balance_cents<0 THEN 1 ELSE 0 END overpay_flag,CASE WHEN ABS(billed_cents-IFNULL(b.expected,0))>100 THEN 1 ELSE 0 END mismatch_flag FROM a LEFT JOIN b ON b.po_id=a.po_id) SELECT supplier_invoice_id,supplier_id,billed_cents,duplicate_flag,large_flag,overpay_flag,mismatch_flag,duplicate_flag+large_flag+overpay_flag+mismatch_flag flags FROM z WHERE duplicate_flag+large_flag+overpay_flag+mismatch_flag>0 ORDER BY flags DESC,supplier_invoice_id"
+      "kind": "equivalent",
+      "mysqlSql": "WITH f AS (\n  SELECT x.supplier_invoice_id,SUM(x.quantity_billed*x.unit_price_cents) face,\n    SUM(x.quantity_billed*p.unit_price_cents) expected\n  FROM supplier_invoice_items x JOIN purchase_order_items p ON p.po_item_id=x.po_item_id\n  GROUP BY x.supplier_invoice_id\n), a AS (\n  SELECT v.*,f.face,f.expected,SUM(1) OVER(PARTITION BY supplier_id,invoice_no) copies,\n    AVG(f.face) OVER(PARTITION BY supplier_id) avg_bill\n  FROM v_invoice_balance v JOIN f ON f.supplier_invoice_id=v.supplier_invoice_id\n), z AS (\n  SELECT a.*,CASE WHEN copies>1 THEN 1 ELSE 0 END duplicate_flag,\n    CASE WHEN face>2*avg_bill THEN 1 ELSE 0 END large_flag,\n    CASE WHEN balance_cents<0 THEN 1 ELSE 0 END overpay_flag,\n    CASE WHEN ABS(face-expected)>100 THEN 1 ELSE 0 END mismatch_flag FROM a\n)\nSELECT supplier_invoice_id,supplier_id,billed_cents,duplicate_flag,large_flag,overpay_flag,mismatch_flag,\n  duplicate_flag+large_flag+overpay_flag+mismatch_flag flags FROM z\nWHERE duplicate_flag+large_flag+overpay_flag+mismatch_flag>0 ORDER BY flags DESC,supplier_invoice_id",
+      "sqliteSql": "WITH f AS (\n  SELECT x.supplier_invoice_id,SUM(x.quantity_billed*x.unit_price_cents) face,\n    SUM(x.quantity_billed*p.unit_price_cents) expected\n  FROM supplier_invoice_items x JOIN purchase_order_items p ON p.po_item_id=x.po_item_id\n  GROUP BY x.supplier_invoice_id\n), a AS (\n  SELECT v.*,f.face,f.expected,SUM(1) OVER(PARTITION BY supplier_id,invoice_no) copies,\n    AVG(f.face) OVER(PARTITION BY supplier_id) avg_bill\n  FROM v_invoice_balance v JOIN f ON f.supplier_invoice_id=v.supplier_invoice_id\n), z AS (\n  SELECT a.*,CASE WHEN copies>1 THEN 1 ELSE 0 END duplicate_flag,\n    CASE WHEN face>2*avg_bill THEN 1 ELSE 0 END large_flag,\n    CASE WHEN balance_cents<0 THEN 1 ELSE 0 END overpay_flag,\n    CASE WHEN ABS(face-expected)>100 THEN 1 ELSE 0 END mismatch_flag FROM a\n)\nSELECT supplier_invoice_id,supplier_id,billed_cents,duplicate_flag,large_flag,overpay_flag,mismatch_flag,\n  duplicate_flag+large_flag+overpay_flag+mismatch_flag flags FROM z\nWHERE duplicate_flag+large_flag+overpay_flag+mismatch_flag>0 ORDER BY flags DESC,supplier_invoice_id"
     }
   ],
   "hints": [
-    "窗口计算供应商基准",
-    "窗口计算供应商基准；独立汇总收货金额",
-    "重点核对输出粒度：发票（本模拟每采购单至多一张正常发票；重复异常专用）"
+    "按发票汇总原始面额和采购价重算金额",
+    "在供应商内计算面额基准与重复号码；独立取截止日贷项和付款余额",
+    "分批发票不能与整单收货金额比较；已批准贷项不应自动变成发票单价错误。"
   ],
-  "explanation": "窗口计算供应商基准；独立汇总收货金额；构造四个标志；输出候选。对每张发票使用整个采购单金额只有本模拟的一单一正常发票假设成立。\n审计口径：先核定日期范围、输出粒度、退款和贷项，再在各事实表中独立聚合，防止连接放大。",
+  "explanation": "按发票汇总原始面额和采购价重算金额。在供应商内计算面额基准与重复号码。独立取截止日贷项和付款余额。累计四项标记。分批发票不能与整单收货金额比较；已批准贷项不应自动变成发票单价错误。",
   "testFixtureIds": [
     "q0270-public",
     "q0270-boundary",
     "q0270-mini-202611171",
-    "q0270-mini-202611179"
+    "q0270-mini-202611179",
+    "q0270-review-split-invoice"
   ],
   "validationStatus": {
     "independentPython": true,
+    "sqliteNative": true,
     "sqliteWasm": true,
     "mysql84Native": false
   },
-  "elapsedMs": 34.672
+  "elapsedMs": 16.973
 }

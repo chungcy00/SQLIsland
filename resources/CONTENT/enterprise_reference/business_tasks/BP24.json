@@ -31,7 +31,7 @@
   "datasetId": "hr-v2",
   "type": "业务情景",
   "schemaVersion": 2,
-  "contentVersion": "4.2.0",
+  "contentVersion": "4.2.1",
   "expectedOutputPath": "business_tasks/results/BP24.json",
   "expectedRowCount": 21,
   "expectedColumns": [
@@ -54,12 +54,15 @@
     "positions",
     "salary_history",
     "stores",
-    "v_staff_month"
+    "v_staff_month",
+    "warehouses"
   ],
   "orderPolicy": "ordered",
   "numericTolerance": {
-    "integerCents": 0,
-    "decimalAbsolute": 1e-06
+    "absolute": 1e-06,
+    "integerExact": true,
+    "textExact": true,
+    "nullDistinct": true
   },
   "referenceSolutions": [
     {
@@ -68,17 +71,17 @@
       "sqliteSql": "SELECT department_id,month_key,SUM(base_cents) base_cents,SUM(bonus_cents) bonus_cents,SUM(overtime_minutes) overtime_minutes,SUM(labor_cents) labor_cents,ROUND(60.0*SUM(labor_cents)/NULLIF(SUM(worked_minutes+overtime_minutes),0),2) cost_per_hour_cents FROM v_staff_month WHERE month_key BETWEEN '2025-10' AND '2025-12' GROUP BY department_id,month_key ORDER BY department_id,month_key"
     },
     {
-      "kind": "algebraic equivalent",
+      "kind": "equivalent",
       "mysqlSql": "SELECT department_id,month_key,SUM(base_cents) base_cents,SUM(bonus_cents) bonus_cents,SUM(overtime_minutes) overtime_minutes,SUM(labor_cents) labor_cents,ROUND(60.0*SUM(labor_cents)/NULLIF(SUM(worked_minutes+overtime_minutes),0),2) cost_per_hour_cents FROM v_staff_month WHERE (month_key>='2025-10' AND month_key<='2025-12') GROUP BY department_id,month_key ORDER BY department_id,month_key",
       "sqliteSql": "SELECT department_id,month_key,SUM(base_cents) base_cents,SUM(bonus_cents) bonus_cents,SUM(overtime_minutes) overtime_minutes,SUM(labor_cents) labor_cents,ROUND(60.0*SUM(labor_cents)/NULLIF(SUM(worked_minutes+overtime_minutes),0),2) cost_per_hour_cents FROM v_staff_month WHERE (month_key>='2025-10' AND month_key<='2025-12') GROUP BY department_id,month_key ORDER BY department_id,month_key"
     }
   ],
   "hints": [
     "从员工月成本视图核对计算规则",
-    "从员工月成本视图核对计算规则；汇总部門及月份",
-    "重点核对输出粒度：部门×月"
+    "汇总部門及月份；按总工时计算成本",
+    "连接每日考勤后直接求月薪会重复累计；估算工资不代表实际法定工资。"
   ],
-  "explanation": "从员工月成本视图核对计算规则；汇总部門及月份；按总工时计算成本。连接每日考勤后直接求月薪会重复累计；估算工资不代表实际法定工资。\n审计口径：先核定日期范围、输出粒度、退款和贷项，再在各事实表中独立聚合，防止连接放大。",
+  "explanation": "从员工月成本视图核对计算规则。汇总部門及月份。按总工时计算成本。连接每日考勤后直接求月薪会重复累计；估算工资不代表实际法定工资。",
   "testFixtureIds": [
     "q0274-public",
     "q0274-boundary",
@@ -87,8 +90,9 @@
   ],
   "validationStatus": {
     "independentPython": true,
+    "sqliteNative": true,
     "sqliteWasm": true,
     "mysql84Native": false
   },
-  "elapsedMs": 22.623
+  "elapsedMs": 21.929
 }

@@ -31,7 +31,7 @@
   "datasetId": "enterprise-v2",
   "type": "业务情景",
   "schemaVersion": 2,
-  "contentVersion": "4.2.0",
+  "contentVersion": "4.2.1",
   "expectedOutputPath": "business_tasks/results/BP47.json",
   "expectedRowCount": 12,
   "expectedColumns": [
@@ -65,12 +65,15 @@
     "stores",
     "traffic_sources",
     "v_sales_lines",
-    "v_staff_month"
+    "v_staff_month",
+    "warehouses"
   ],
   "orderPolicy": "ordered",
   "numericTolerance": {
-    "integerCents": 0,
-    "decimalAbsolute": 1e-06
+    "absolute": 1e-06,
+    "integerExact": true,
+    "textExact": true,
+    "nullDistinct": true
   },
   "referenceSolutions": [
     {
@@ -79,27 +82,29 @@
       "sqliteSql": "WITH a AS (SELECT store_id,SUM(net_cents) net FROM v_sales_lines WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY store_id), b AS (SELECT store_id,SUM(labor_cents) labor,SUM(worked_minutes+overtime_minutes) minutes_worked FROM v_staff_month WHERE month_key BETWEEN '2025-01' AND '2025-12' AND store_id IS NOT NULL GROUP BY store_id) SELECT s.store_id,COALESCE(a.net,0) net_cents,COALESCE(b.labor,0) labor_cents,ROUND(1.0*COALESCE(b.minutes_worked,0)/60,2) worked_hours,ROUND(60.0*COALESCE(a.net,0)/NULLIF(b.minutes_worked,0),2) sales_per_hour_cents,ROUND(100.0*COALESCE(b.labor,0)/NULLIF(a.net,0),2) labor_pct FROM stores s LEFT JOIN a ON a.store_id=s.store_id LEFT JOIN b ON b.store_id=s.store_id ORDER BY s.store_id"
     },
     {
-      "kind": "algebraic equivalent",
+      "kind": "equivalent",
       "mysqlSql": "WITH a AS (SELECT store_id,SUM(net_cents) net FROM v_sales_lines WHERE channel='store' AND (order_date>='2025-01-01' AND order_date<='2025-12-31') GROUP BY store_id), b AS (SELECT store_id,SUM(labor_cents) labor,SUM(worked_minutes+overtime_minutes) minutes_worked FROM v_staff_month WHERE (month_key>='2025-01' AND month_key<='2025-12') AND store_id IS NOT NULL GROUP BY store_id) SELECT s.store_id,COALESCE(a.net,0) net_cents,COALESCE(b.labor,0) labor_cents,ROUND(1.0*COALESCE(b.minutes_worked,0)/60,2) worked_hours,ROUND(60.0*COALESCE(a.net,0)/NULLIF(b.minutes_worked,0),2) sales_per_hour_cents,ROUND(100.0*COALESCE(b.labor,0)/NULLIF(a.net,0),2) labor_pct FROM stores s LEFT JOIN a ON a.store_id=s.store_id LEFT JOIN b ON b.store_id=s.store_id ORDER BY s.store_id",
       "sqliteSql": "WITH a AS (SELECT store_id,SUM(net_cents) net FROM v_sales_lines WHERE channel='store' AND (order_date>='2025-01-01' AND order_date<='2025-12-31') GROUP BY store_id), b AS (SELECT store_id,SUM(labor_cents) labor,SUM(worked_minutes+overtime_minutes) minutes_worked FROM v_staff_month WHERE (month_key>='2025-01' AND month_key<='2025-12') AND store_id IS NOT NULL GROUP BY store_id) SELECT s.store_id,COALESCE(a.net,0) net_cents,COALESCE(b.labor,0) labor_cents,ROUND(1.0*COALESCE(b.minutes_worked,0)/60,2) worked_hours,ROUND(60.0*COALESCE(a.net,0)/NULLIF(b.minutes_worked,0),2) sales_per_hour_cents,ROUND(100.0*COALESCE(b.labor,0)/NULLIF(a.net,0),2) labor_pct FROM stores s LEFT JOIN a ON a.store_id=s.store_id LEFT JOIN b ON b.store_id=s.store_id ORDER BY s.store_id"
     }
   ],
   "hints": [
     "聚合历史岗位月成本",
-    "聚合历史岗位月成本；汇总销售",
-    "重点核对输出粒度：门店"
+    "汇总销售；合并计算人效",
+    "不得使用当前归属替代历史岗位或重复累加月薪。"
   ],
-  "explanation": "聚合历史岗位月成本；汇总销售；合并计算人效。不得使用当前归属替代历史岗位或重复累加月薪。\n审计口径：先核定日期范围、输出粒度、退款和贷项，再在各事实表中独立聚合，防止连接放大。",
+  "explanation": "聚合历史岗位月成本。汇总销售。合并计算人效。不得使用当前归属替代历史岗位或重复累加月薪。",
   "testFixtureIds": [
     "q0297-public",
     "q0297-boundary",
     "q0297-mini-202611171",
-    "q0297-mini-202611179"
+    "q0297-mini-202611179",
+    "q0297-review-multiple-partial-returns"
   ],
   "validationStatus": {
     "independentPython": true,
+    "sqliteNative": true,
     "sqliteWasm": true,
     "mysql84Native": false
   },
-  "elapsedMs": 40.817
+  "elapsedMs": 37.035
 }

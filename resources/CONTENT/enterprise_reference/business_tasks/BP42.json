@@ -2,18 +2,19 @@
   "projectId": "enterprise",
   "title": "三方不一致且已经付款的发票",
   "context": "采购＋财务联合分析：管理层要求以同一企业口径核对业务数据。",
-  "requirements": "每采购单（本模拟正常一单一发票），实际接受数量按采购价计价，比较发票金额；找出金额差超过100分且已经付款的发票，并返回超付于合格收货金额的差值。 本库v_invoice_balance的billed_cents为发票面额减截至截止日已批准贷项后的净应付，paid_cents仅计截止日前付款；原始发票面额保留在supplier_invoice_items。",
+  "requirements": "截至2025-12-31，筛选已发生付款且净应付与可分配合格收货计价金额差的绝对值超过100分的发票。先按采购行汇总截止日合格收货量，再按发票日期、发票编号、发票行编号依次将该采购行收货量分配给已开票数量，每行分配量=min(本行开票量,max(合格收货总量-更早发票行累计开票量,0))，同一收货量只能分配一次。每张发票received_cents为分配量乘原采购行单价之和。净应付billed_cents扣截至截止日批准贷项，paid_cents仅计截止日前实付。返回净应付减可分配金额以及实付减可分配金额，差额可为正或负；不能把所有差额都称为超付。按账单差额绝对值降序、发票编号升序。分配是期末复核口径，包含截至年底的后续收货，不代表付款日当时已收货，也不自动判定欺诈。",
   "grain": "发票",
-  "commonError": "已付款不代表货物、价格、发票均一致。",
+  "commonError": "一张采购单可有多张部分或重复发票，不能为每张发票重复分配整单收货。",
   "executionSteps": [
-    "聚合合格收货金额",
-    "关联付款余额",
-    "筛选差异"
+    "按采购行汇总合格收货",
+    "按发票行时间顺序计算累计开票量",
+    "分配不会重复使用的合格收货价值",
+    "关联净应付与实付并筛选差额"
   ],
   "difficulty": "困难",
   "crossGroup": "采购＋财务",
-  "mysqlSql": "WITH a AS (SELECT po_id,SUM(accepted*unit_price_cents) received FROM v_po_lines GROUP BY po_id) SELECT b.supplier_invoice_id,b.po_id,b.billed_cents,b.paid_cents,a.received received_cents,b.billed_cents-a.received bill_difference_cents,b.paid_cents-a.received paid_difference_cents FROM v_invoice_balance b JOIN a ON a.po_id=b.po_id WHERE b.paid_cents>0 AND ABS(b.billed_cents-a.received)>100 ORDER BY ABS(b.billed_cents-a.received) DESC,b.supplier_invoice_id",
-  "sqliteSql": "WITH a AS (SELECT po_id,SUM(accepted*unit_price_cents) received FROM v_po_lines GROUP BY po_id) SELECT b.supplier_invoice_id,b.po_id,b.billed_cents,b.paid_cents,a.received received_cents,b.billed_cents-a.received bill_difference_cents,b.paid_cents-a.received paid_difference_cents FROM v_invoice_balance b JOIN a ON a.po_id=b.po_id WHERE b.paid_cents>0 AND ABS(b.billed_cents-a.received)>100 ORDER BY ABS(b.billed_cents-a.received) DESC,b.supplier_invoice_id",
+  "mysqlSql": "WITH receipts AS (\n  SELECT po_item_id,SUM(quantity_received-quantity_rejected) accepted\n  FROM goods_receipts WHERE receipt_date<='2025-12-31' GROUP BY po_item_id\n), lines AS (\n  SELECT x.*,p.unit_price_cents po_price,COALESCE(r.accepted,0) accepted,\n    COALESCE(SUM(x.quantity_billed) OVER(PARTITION BY x.po_item_id\n      ORDER BY f.invoice_date,f.supplier_invoice_id,x.supplier_invoice_item_id\n      ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING),0) prior_billed\n  FROM supplier_invoice_items x JOIN supplier_invoices f ON f.supplier_invoice_id=x.supplier_invoice_id\n  JOIN purchase_order_items p ON p.po_item_id=x.po_item_id LEFT JOIN receipts r ON r.po_item_id=x.po_item_id\n  WHERE f.invoice_date<='2025-12-31'\n), allocated AS (\n  SELECT supplier_invoice_id,SUM(CASE WHEN accepted<=prior_billed THEN 0\n    WHEN accepted-prior_billed>=quantity_billed THEN quantity_billed\n    ELSE accepted-prior_billed END*po_price) received FROM lines GROUP BY supplier_invoice_id\n)\nSELECT b.supplier_invoice_id,b.po_id,b.billed_cents,b.paid_cents,a.received received_cents,\n  b.billed_cents-a.received bill_difference_cents,b.paid_cents-a.received paid_difference_cents\nFROM v_invoice_balance b JOIN allocated a ON a.supplier_invoice_id=b.supplier_invoice_id\nWHERE b.paid_cents>0 AND ABS(b.billed_cents-a.received)>100\nORDER BY ABS(b.billed_cents-a.received) DESC,b.supplier_invoice_id",
+  "sqliteSql": "WITH receipts AS (\n  SELECT po_item_id,SUM(quantity_received-quantity_rejected) accepted\n  FROM goods_receipts WHERE receipt_date<='2025-12-31' GROUP BY po_item_id\n), lines AS (\n  SELECT x.*,p.unit_price_cents po_price,COALESCE(r.accepted,0) accepted,\n    COALESCE(SUM(x.quantity_billed) OVER(PARTITION BY x.po_item_id\n      ORDER BY f.invoice_date,f.supplier_invoice_id,x.supplier_invoice_item_id\n      ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING),0) prior_billed\n  FROM supplier_invoice_items x JOIN supplier_invoices f ON f.supplier_invoice_id=x.supplier_invoice_id\n  JOIN purchase_order_items p ON p.po_item_id=x.po_item_id LEFT JOIN receipts r ON r.po_item_id=x.po_item_id\n  WHERE f.invoice_date<='2025-12-31'\n), allocated AS (\n  SELECT supplier_invoice_id,SUM(CASE WHEN accepted<=prior_billed THEN 0\n    WHEN accepted-prior_billed>=quantity_billed THEN quantity_billed\n    ELSE accepted-prior_billed END*po_price) received FROM lines GROUP BY supplier_invoice_id\n)\nSELECT b.supplier_invoice_id,b.po_id,b.billed_cents,b.paid_cents,a.received received_cents,\n  b.billed_cents-a.received bill_difference_cents,b.paid_cents-a.received paid_difference_cents\nFROM v_invoice_balance b JOIN allocated a ON a.supplier_invoice_id=b.supplier_invoice_id\nWHERE b.paid_cents>0 AND ABS(b.billed_cents-a.received)>100\nORDER BY ABS(b.billed_cents-a.received) DESC,b.supplier_invoice_id",
   "compatibility": "直接兼容（原生待验证）",
   "columns": [
     "supplier_invoice_id",
@@ -32,7 +33,7 @@
   "datasetId": "enterprise-v2",
   "type": "业务情景",
   "schemaVersion": 2,
-  "contentVersion": "4.2.0",
+  "contentVersion": "4.2.1",
   "expectedOutputPath": "business_tasks/results/BP42.json",
   "expectedRowCount": 721,
   "expectedColumns": [
@@ -45,8 +46,11 @@
     "paid_difference_cents"
   ],
   "sourceTables": [
-    "v_invoice_balance",
-    "v_po_lines"
+    "goods_receipts",
+    "purchase_order_items",
+    "supplier_invoice_items",
+    "supplier_invoices",
+    "v_invoice_balance"
   ],
   "dependencyTables": [
     "categories",
@@ -55,47 +59,51 @@
     "purchase_order_items",
     "purchase_orders",
     "supplier_contracts",
+    "supplier_credit_notes",
     "supplier_invoice_items",
     "supplier_invoices",
     "supplier_payments",
     "suppliers",
     "v_invoice_balance",
-    "v_po_lines",
     "warehouses"
   ],
   "orderPolicy": "ordered",
   "numericTolerance": {
-    "integerCents": 0,
-    "decimalAbsolute": 1e-06
+    "absolute": 1e-06,
+    "integerExact": true,
+    "textExact": true,
+    "nullDistinct": true
   },
   "referenceSolutions": [
     {
       "kind": "reference",
-      "mysqlSql": "WITH a AS (SELECT po_id,SUM(accepted*unit_price_cents) received FROM v_po_lines GROUP BY po_id) SELECT b.supplier_invoice_id,b.po_id,b.billed_cents,b.paid_cents,a.received received_cents,b.billed_cents-a.received bill_difference_cents,b.paid_cents-a.received paid_difference_cents FROM v_invoice_balance b JOIN a ON a.po_id=b.po_id WHERE b.paid_cents>0 AND ABS(b.billed_cents-a.received)>100 ORDER BY ABS(b.billed_cents-a.received) DESC,b.supplier_invoice_id",
-      "sqliteSql": "WITH a AS (SELECT po_id,SUM(accepted*unit_price_cents) received FROM v_po_lines GROUP BY po_id) SELECT b.supplier_invoice_id,b.po_id,b.billed_cents,b.paid_cents,a.received received_cents,b.billed_cents-a.received bill_difference_cents,b.paid_cents-a.received paid_difference_cents FROM v_invoice_balance b JOIN a ON a.po_id=b.po_id WHERE b.paid_cents>0 AND ABS(b.billed_cents-a.received)>100 ORDER BY ABS(b.billed_cents-a.received) DESC,b.supplier_invoice_id"
+      "mysqlSql": "WITH receipts AS (\n  SELECT po_item_id,SUM(quantity_received-quantity_rejected) accepted\n  FROM goods_receipts WHERE receipt_date<='2025-12-31' GROUP BY po_item_id\n), lines AS (\n  SELECT x.*,p.unit_price_cents po_price,COALESCE(r.accepted,0) accepted,\n    COALESCE(SUM(x.quantity_billed) OVER(PARTITION BY x.po_item_id\n      ORDER BY f.invoice_date,f.supplier_invoice_id,x.supplier_invoice_item_id\n      ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING),0) prior_billed\n  FROM supplier_invoice_items x JOIN supplier_invoices f ON f.supplier_invoice_id=x.supplier_invoice_id\n  JOIN purchase_order_items p ON p.po_item_id=x.po_item_id LEFT JOIN receipts r ON r.po_item_id=x.po_item_id\n  WHERE f.invoice_date<='2025-12-31'\n), allocated AS (\n  SELECT supplier_invoice_id,SUM(CASE WHEN accepted<=prior_billed THEN 0\n    WHEN accepted-prior_billed>=quantity_billed THEN quantity_billed\n    ELSE accepted-prior_billed END*po_price) received FROM lines GROUP BY supplier_invoice_id\n)\nSELECT b.supplier_invoice_id,b.po_id,b.billed_cents,b.paid_cents,a.received received_cents,\n  b.billed_cents-a.received bill_difference_cents,b.paid_cents-a.received paid_difference_cents\nFROM v_invoice_balance b JOIN allocated a ON a.supplier_invoice_id=b.supplier_invoice_id\nWHERE b.paid_cents>0 AND ABS(b.billed_cents-a.received)>100\nORDER BY ABS(b.billed_cents-a.received) DESC,b.supplier_invoice_id",
+      "sqliteSql": "WITH receipts AS (\n  SELECT po_item_id,SUM(quantity_received-quantity_rejected) accepted\n  FROM goods_receipts WHERE receipt_date<='2025-12-31' GROUP BY po_item_id\n), lines AS (\n  SELECT x.*,p.unit_price_cents po_price,COALESCE(r.accepted,0) accepted,\n    COALESCE(SUM(x.quantity_billed) OVER(PARTITION BY x.po_item_id\n      ORDER BY f.invoice_date,f.supplier_invoice_id,x.supplier_invoice_item_id\n      ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING),0) prior_billed\n  FROM supplier_invoice_items x JOIN supplier_invoices f ON f.supplier_invoice_id=x.supplier_invoice_id\n  JOIN purchase_order_items p ON p.po_item_id=x.po_item_id LEFT JOIN receipts r ON r.po_item_id=x.po_item_id\n  WHERE f.invoice_date<='2025-12-31'\n), allocated AS (\n  SELECT supplier_invoice_id,SUM(CASE WHEN accepted<=prior_billed THEN 0\n    WHEN accepted-prior_billed>=quantity_billed THEN quantity_billed\n    ELSE accepted-prior_billed END*po_price) received FROM lines GROUP BY supplier_invoice_id\n)\nSELECT b.supplier_invoice_id,b.po_id,b.billed_cents,b.paid_cents,a.received received_cents,\n  b.billed_cents-a.received bill_difference_cents,b.paid_cents-a.received paid_difference_cents\nFROM v_invoice_balance b JOIN allocated a ON a.supplier_invoice_id=b.supplier_invoice_id\nWHERE b.paid_cents>0 AND ABS(b.billed_cents-a.received)>100\nORDER BY ABS(b.billed_cents-a.received) DESC,b.supplier_invoice_id"
     },
     {
-      "kind": "algebraic equivalent",
-      "mysqlSql": "WITH a AS (SELECT po_id,SUM(accepted*unit_price_cents) received FROM v_po_lines GROUP BY po_id) SELECT b.supplier_invoice_id,b.po_id,b.billed_cents,b.paid_cents,a.received received_cents,b.billed_cents-a.received bill_difference_cents,b.paid_cents-a.received paid_difference_cents FROM v_invoice_balance b JOIN a ON a.po_id=b.po_id WHERE b.paid_cents>0 AND (b.billed_cents-a.received < -100 OR b.billed_cents-a.received > 100) ORDER BY ABS(b.billed_cents-a.received) DESC,b.supplier_invoice_id",
-      "sqliteSql": "WITH a AS (SELECT po_id,SUM(accepted*unit_price_cents) received FROM v_po_lines GROUP BY po_id) SELECT b.supplier_invoice_id,b.po_id,b.billed_cents,b.paid_cents,a.received received_cents,b.billed_cents-a.received bill_difference_cents,b.paid_cents-a.received paid_difference_cents FROM v_invoice_balance b JOIN a ON a.po_id=b.po_id WHERE b.paid_cents>0 AND (b.billed_cents-a.received < -100 OR b.billed_cents-a.received > 100) ORDER BY ABS(b.billed_cents-a.received) DESC,b.supplier_invoice_id"
+      "kind": "equivalent",
+      "mysqlSql": "WITH receipts AS (\n  SELECT po_item_id,SUM(quantity_received-quantity_rejected) accepted\n  FROM goods_receipts WHERE receipt_date<='2025-12-31' GROUP BY po_item_id\n), lines AS (\n  SELECT x.*,p.unit_price_cents po_price,IFNULL(r.accepted,0) accepted,\n    IFNULL(SUM(x.quantity_billed) OVER(PARTITION BY x.po_item_id\n      ORDER BY f.invoice_date,f.supplier_invoice_id,x.supplier_invoice_item_id\n      ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING),0) prior_billed\n  FROM supplier_invoice_items x JOIN supplier_invoices f ON f.supplier_invoice_id=x.supplier_invoice_id\n  JOIN purchase_order_items p ON p.po_item_id=x.po_item_id LEFT JOIN receipts r ON r.po_item_id=x.po_item_id\n  WHERE f.invoice_date<='2025-12-31'\n), allocated AS (\n  SELECT supplier_invoice_id,SUM(CASE WHEN accepted<=prior_billed THEN 0\n    WHEN accepted-prior_billed>=quantity_billed THEN quantity_billed\n    ELSE accepted-prior_billed END*po_price) received FROM lines GROUP BY supplier_invoice_id\n)\nSELECT b.supplier_invoice_id,b.po_id,b.billed_cents,b.paid_cents,a.received received_cents,\n  b.billed_cents-a.received bill_difference_cents,b.paid_cents-a.received paid_difference_cents\nFROM v_invoice_balance b JOIN allocated a ON a.supplier_invoice_id=b.supplier_invoice_id\nWHERE b.paid_cents>0 AND ABS(b.billed_cents-a.received)>100\nORDER BY ABS(b.billed_cents-a.received) DESC,b.supplier_invoice_id",
+      "sqliteSql": "WITH receipts AS (\n  SELECT po_item_id,SUM(quantity_received-quantity_rejected) accepted\n  FROM goods_receipts WHERE receipt_date<='2025-12-31' GROUP BY po_item_id\n), lines AS (\n  SELECT x.*,p.unit_price_cents po_price,IFNULL(r.accepted,0) accepted,\n    IFNULL(SUM(x.quantity_billed) OVER(PARTITION BY x.po_item_id\n      ORDER BY f.invoice_date,f.supplier_invoice_id,x.supplier_invoice_item_id\n      ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING),0) prior_billed\n  FROM supplier_invoice_items x JOIN supplier_invoices f ON f.supplier_invoice_id=x.supplier_invoice_id\n  JOIN purchase_order_items p ON p.po_item_id=x.po_item_id LEFT JOIN receipts r ON r.po_item_id=x.po_item_id\n  WHERE f.invoice_date<='2025-12-31'\n), allocated AS (\n  SELECT supplier_invoice_id,SUM(CASE WHEN accepted<=prior_billed THEN 0\n    WHEN accepted-prior_billed>=quantity_billed THEN quantity_billed\n    ELSE accepted-prior_billed END*po_price) received FROM lines GROUP BY supplier_invoice_id\n)\nSELECT b.supplier_invoice_id,b.po_id,b.billed_cents,b.paid_cents,a.received received_cents,\n  b.billed_cents-a.received bill_difference_cents,b.paid_cents-a.received paid_difference_cents\nFROM v_invoice_balance b JOIN allocated a ON a.supplier_invoice_id=b.supplier_invoice_id\nWHERE b.paid_cents>0 AND ABS(b.billed_cents-a.received)>100\nORDER BY ABS(b.billed_cents-a.received) DESC,b.supplier_invoice_id"
     }
   ],
   "hints": [
-    "聚合合格收货金额",
-    "聚合合格收货金额；关联付款余额",
-    "重点核对输出粒度：发票"
+    "按采购行汇总合格收货",
+    "按发票行时间顺序计算累计开票量；分配不会重复使用的合格收货价值",
+    "一张采购单可有多张部分或重复发票，不能为每张发票重复分配整单收货。"
   ],
-  "explanation": "聚合合格收货金额；关联付款余额；筛选差异。已付款不代表货物、价格、发票均一致。\n审计口径：先核定日期范围、输出粒度、退款和贷项，再在各事实表中独立聚合，防止连接放大。",
+  "explanation": "按采购行汇总合格收货。按发票行时间顺序计算累计开票量。分配不会重复使用的合格收货价值。关联净应付与实付并筛选差额。一张采购单可有多张部分或重复发票，不能为每张发票重复分配整单收货。",
   "testFixtureIds": [
     "q0292-public",
     "q0292-boundary",
     "q0292-mini-202611171",
-    "q0292-mini-202611179"
+    "q0292-mini-202611179",
+    "q0292-review-split-invoice"
   ],
   "validationStatus": {
     "independentPython": true,
+    "sqliteNative": true,
     "sqliteWasm": true,
     "mysql84Native": false
   },
-  "elapsedMs": 24.744
+  "elapsedMs": 21.784
 }

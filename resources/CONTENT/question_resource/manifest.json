@@ -1,6 +1,6 @@
 {
   "schemaVersion": 3,
-  "contentVersion": "4.2.0",
+  "contentVersion": "4.2.1",
   "questionCount": 300,
   "chapterCount": 20,
   "questionTypeCounts": {
@@ -139,13 +139,13 @@
       "id": "ch19",
       "path": "questions/ch19.json",
       "count": 30,
-      "sha256": "b177782e348158d6aca634d0b6a7febacf2b58e069e54090c4296fad0703df77"
+      "sha256": "d06e70f2205f6386dcd34de155374645202237fcaee30b07655346c11cb7b478"
     },
     {
       "id": "ch20",
       "path": "questions/ch20.json",
       "count": 20,
-      "sha256": "54f3d3ace9ebe70c57f19fa69b0b1f516ec967143d5c2fc608ced3c142634fe7"
+      "sha256": "74a63860d3106ecae291f5708d3a5ed171facbc852105265a3de3303d62eabfb"
     }
   ],
   "fixtures": {
@@ -157,8 +157,8 @@
   "courseLinks": "course_links/knowledge_point_question_index.json",
   "validationReport": "validation/REPORT.md",
   "releaseGate": "SQLite/WASM及独立计算已复验，原生MySQL8.4与实体手机性能待验收；q0212和q0240专项结构仍未评定",
-  "auditRelease": "4.2.0",
-  "testFixtureCount": 880,
+  "auditRelease": "4.2.1",
+  "testFixtureCount": 913,
   "sharedTestData": [
     {
       "path": "fixtures/shared/enterprise-mini-202611171.json",

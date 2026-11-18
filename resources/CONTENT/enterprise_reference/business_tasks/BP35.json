@@ -31,7 +31,7 @@
   "datasetId": "enterprise-v2",
   "type": "业务情景",
   "schemaVersion": 2,
-  "contentVersion": "4.2.0",
+  "contentVersion": "4.2.1",
   "expectedOutputPath": "business_tasks/results/BP35.json",
   "expectedRowCount": 23,
   "expectedColumns": [
@@ -59,7 +59,10 @@
     "promotions",
     "purchase_order_items",
     "purchase_orders",
+    "returns",
+    "stock_adjustments",
     "stock_movements",
+    "stock_transfers",
     "stores",
     "supplier_contracts",
     "supplier_invoice_items",
@@ -71,8 +74,10 @@
   ],
   "orderPolicy": "ordered",
   "numericTolerance": {
-    "integerCents": 0,
-    "decimalAbsolute": 1e-06
+    "absolute": 1e-06,
+    "integerExact": true,
+    "textExact": true,
+    "nullDistinct": true
   },
   "referenceSolutions": [
     {
@@ -81,17 +86,17 @@
       "sqliteSql": "WITH p AS (SELECT warehouse_id,product_id,SUM(quantity_ordered-accepted) overdue FROM v_po_lines WHERE promised_date<='2025-12-31' AND accepted<quantity_ordered GROUP BY warehouse_id,product_id), s AS (SELECT warehouse_id,product_id,SUM(-quantity_delta) sold FROM stock_movements WHERE movement_type='sale' AND movement_date BETWEEN '2025-12-02' AND '2025-12-31' GROUP BY warehouse_id,product_id) SELECT i.warehouse_id,i.product_id,i.quantity,s.sold demand,p.overdue overdue_units,s.sold-i.quantity shortage FROM inventory_snapshots i JOIN p ON p.warehouse_id=i.warehouse_id AND p.product_id=i.product_id JOIN s ON s.warehouse_id=i.warehouse_id AND s.product_id=i.product_id WHERE i.snapshot_date='2025-12-31' AND i.quantity<s.sold ORDER BY shortage DESC,i.warehouse_id,i.product_id"
     },
     {
-      "kind": "algebraic equivalent",
+      "kind": "equivalent",
       "mysqlSql": "WITH p AS (SELECT warehouse_id,product_id,SUM(quantity_ordered-accepted) overdue FROM v_po_lines WHERE promised_date<='2025-12-31' AND accepted<quantity_ordered GROUP BY warehouse_id,product_id), s AS (SELECT warehouse_id,product_id,SUM(-quantity_delta) sold FROM stock_movements WHERE movement_type='sale' AND (movement_date>='2025-12-02' AND movement_date<='2025-12-31') GROUP BY warehouse_id,product_id) SELECT i.warehouse_id,i.product_id,i.quantity,s.sold demand,p.overdue overdue_units,s.sold-i.quantity shortage FROM inventory_snapshots i JOIN p ON p.warehouse_id=i.warehouse_id AND p.product_id=i.product_id JOIN s ON s.warehouse_id=i.warehouse_id AND s.product_id=i.product_id WHERE i.snapshot_date='2025-12-31' AND i.quantity<s.sold ORDER BY shortage DESC,i.warehouse_id,i.product_id",
       "sqliteSql": "WITH p AS (SELECT warehouse_id,product_id,SUM(quantity_ordered-accepted) overdue FROM v_po_lines WHERE promised_date<='2025-12-31' AND accepted<quantity_ordered GROUP BY warehouse_id,product_id), s AS (SELECT warehouse_id,product_id,SUM(-quantity_delta) sold FROM stock_movements WHERE movement_type='sale' AND (movement_date>='2025-12-02' AND movement_date<='2025-12-31') GROUP BY warehouse_id,product_id) SELECT i.warehouse_id,i.product_id,i.quantity,s.sold demand,p.overdue overdue_units,s.sold-i.quantity shortage FROM inventory_snapshots i JOIN p ON p.warehouse_id=i.warehouse_id AND p.product_id=i.product_id JOIN s ON s.warehouse_id=i.warehouse_id AND s.product_id=i.product_id WHERE i.snapshot_date='2025-12-31' AND i.quantity<s.sold ORDER BY shortage DESC,i.warehouse_id,i.product_id"
     }
   ],
   "hints": [
     "汇总逾期缺口",
-    "汇总逾期缺口；汇总销售",
-    "重点核对输出粒度：仓库×商品"
+    "汇总销售；匹配期末并排序",
+    "将拒收库存算作可售库存会低估缺口。"
   ],
-  "explanation": "汇总逾期缺口；汇总销售；匹配期末并排序。将拒收库存算作可售库存会低估缺口。\n审计口径：先核定日期范围、输出粒度、退款和贷项，再在各事实表中独立聚合，防止连接放大。",
+  "explanation": "汇总逾期缺口。汇总销售。匹配期末并排序。将拒收库存算作可售库存会低估缺口。",
   "testFixtureIds": [
     "q0285-public",
     "q0285-boundary",
@@ -100,8 +105,9 @@
   ],
   "validationStatus": {
     "independentPython": true,
+    "sqliteNative": true,
     "sqliteWasm": true,
     "mysql84Native": false
   },
-  "elapsedMs": 20.708
+  "elapsedMs": 20.35
 }

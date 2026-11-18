@@ -15,6 +15,7 @@ const bases = new Map();
 const shared = new Map();
 const report = { pass: true, contentVersion: content.contentVersion, sqliteVersion: null, environment: '本机Node.js sql.js WASM，完整取数，不能代表实体手机耗时', databaseHashes: {}, semanticInputs: [], questions: [] };
 report.integerPolicySha256 = createHash('sha256').update(await readFile('src/integer-column-policy.json')).digest('hex');
+report.numericPolicies = Object.fromEntries(questions.map(q => [q.id, q.numericTolerance]));
 for (const dataset of manifest.datasets) {
   const bytes = await readFile('dist/' + dataset.path);
   const hash = createHash('sha256').update(bytes).digest('hex');
@@ -42,7 +43,7 @@ for (const q of questions) {
         const queryStart = performance.now();
         const actual = query(db, reference.mysqlSql, 50000);
         const elapsedMs = performance.now() - queryStart;
-        const comparison = compareResults(actual, fixture.expected, q.orderPolicy, q.numericTolerance.absolute, q.numericTolerance.exactColumns);
+        const comparison = compareResults(actual, fixture.expected, q.orderPolicy, q.numericTolerance.absolute, q.numericTolerance.exactColumns, q.numericTolerance.columnAbsolute);
         assert.ok(comparison.pass, q.id + ' ' + entry.id + ' ' + comparison.message);
         caseResult.references.push({ kind: reference.kind, pass: true, rows: actual.rows.length, elapsedMs: Number(elapsedMs.toFixed(3)) });
       }
@@ -53,5 +54,5 @@ for (const q of questions) {
   report.questions.push(record);
 }
 report.correctExecutions = report.questions.reduce((total, q) => total + q.fixtures.reduce((sum, f) => sum + f.references.length, 0), 0);
-await writeFile('artifacts/enterprise-audit/wasm-validation.json', JSON.stringify(report, null, 2));
+await writeFile(process.env.SQL_AUDIT_OUTPUT || 'artifacts/enterprise-audit/wasm-validation.json', JSON.stringify(report, null, 2));
 console.log(`WASM passed for ${questions.length} enterprise questions, ${report.correctExecutions} reference/equivalent executions.`);

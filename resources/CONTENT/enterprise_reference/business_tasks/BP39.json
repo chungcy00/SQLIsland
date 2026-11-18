@@ -30,7 +30,7 @@
   "datasetId": "enterprise-v2",
   "type": "业务情景",
   "schemaVersion": 2,
-  "contentVersion": "4.2.0",
+  "contentVersion": "4.2.1",
   "expectedOutputPath": "business_tasks/results/BP39.json",
   "expectedRowCount": 0,
   "expectedColumns": [
@@ -58,12 +58,15 @@
     "stores",
     "traffic_sources",
     "v_order_net",
-    "v_sales_lines"
+    "v_sales_lines",
+    "warehouses"
   ],
   "orderPolicy": "ordered",
   "numericTolerance": {
-    "integerCents": 0,
-    "decimalAbsolute": 1e-06
+    "absolute": 1e-06,
+    "integerExact": true,
+    "textExact": true,
+    "nullDistinct": true
   },
   "referenceSolutions": [
     {
@@ -72,27 +75,29 @@
       "sqliteSql": "WITH a AS (SELECT order_id,SUM(amount_cents) paid FROM payments WHERE status='settled' AND payment_date<='2025-12-31' GROUP BY order_id), b AS (SELECT i.order_id,SUM(r.refund_cents) refunded FROM returns r JOIN order_items i ON i.order_item_id=r.order_item_id WHERE r.return_date<='2025-12-31' GROUP BY i.order_id) SELECT o.order_id,o.net_cents,COALESCE(a.paid,0)-COALESCE(b.refunded,0) cash_net_cents,COALESCE(a.paid,0)-COALESCE(b.refunded,0)-o.net_cents difference_cents FROM v_order_net o LEFT JOIN a ON a.order_id=o.order_id LEFT JOIN b ON b.order_id=o.order_id WHERE o.order_date BETWEEN '2025-01-01' AND '2025-12-31' AND COALESCE(a.paid,0)-COALESCE(b.refunded,0)<>o.net_cents ORDER BY o.order_id"
     },
     {
-      "kind": "algebraic equivalent",
+      "kind": "equivalent",
       "mysqlSql": "WITH a AS (SELECT order_id,SUM(amount_cents) paid FROM payments WHERE status='settled' AND payment_date<='2025-12-31' GROUP BY order_id), b AS (SELECT i.order_id,SUM(r.refund_cents) refunded FROM returns r JOIN order_items i ON i.order_item_id=r.order_item_id WHERE r.return_date<='2025-12-31' GROUP BY i.order_id) SELECT o.order_id,o.net_cents,COALESCE(a.paid,0)-COALESCE(b.refunded,0) cash_net_cents,COALESCE(a.paid,0)-COALESCE(b.refunded,0)-o.net_cents difference_cents FROM v_order_net o LEFT JOIN a ON a.order_id=o.order_id LEFT JOIN b ON b.order_id=o.order_id WHERE (o.order_date>='2025-01-01' AND o.order_date<='2025-12-31') AND COALESCE(a.paid,0)-COALESCE(b.refunded,0)<>o.net_cents ORDER BY o.order_id",
       "sqliteSql": "WITH a AS (SELECT order_id,SUM(amount_cents) paid FROM payments WHERE status='settled' AND payment_date<='2025-12-31' GROUP BY order_id), b AS (SELECT i.order_id,SUM(r.refund_cents) refunded FROM returns r JOIN order_items i ON i.order_item_id=r.order_item_id WHERE r.return_date<='2025-12-31' GROUP BY i.order_id) SELECT o.order_id,o.net_cents,COALESCE(a.paid,0)-COALESCE(b.refunded,0) cash_net_cents,COALESCE(a.paid,0)-COALESCE(b.refunded,0)-o.net_cents difference_cents FROM v_order_net o LEFT JOIN a ON a.order_id=o.order_id LEFT JOIN b ON b.order_id=o.order_id WHERE (o.order_date>='2025-01-01' AND o.order_date<='2025-12-31') AND COALESCE(a.paid,0)-COALESCE(b.refunded,0)<>o.net_cents ORDER BY o.order_id"
     }
   ],
   "hints": [
     "聚合订单付款",
-    "聚合订单付款；聚合退款",
-    "重点核对输出粒度：订单"
+    "聚合退款；对照订单净额",
+    "使用所有付款状态或连接拆分付款导致重复。"
   ],
-  "explanation": "聚合订单付款；聚合退款；对照订单净额；允许空结果。使用所有付款状态或连接拆分付款导致重复。\n审计口径：先核定日期范围、输出粒度、退款和贷项，再在各事实表中独立聚合，防止连接放大。",
+  "explanation": "聚合订单付款。聚合退款。对照订单净额。允许空结果。使用所有付款状态或连接拆分付款导致重复。",
   "testFixtureIds": [
     "q0289-public",
     "q0289-boundary",
     "q0289-mini-202611171",
-    "q0289-mini-202611179"
+    "q0289-mini-202611179",
+    "q0289-review-multiple-partial-returns"
   ],
   "validationStatus": {
     "independentPython": true,
+    "sqliteNative": true,
     "sqliteWasm": true,
     "mysql84Native": false
   },
-  "elapsedMs": 87.733
+  "elapsedMs": 53.527
 }

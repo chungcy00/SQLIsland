@@ -3863,10 +3863,14 @@
   "orderPolicy": "ordered",
   "columnPolicy": "exact_names_in_order",
   "numericTolerance": {
-    "absolute": 0.0100001,
+    "absolute": 1e-06,
     "integerExact": true,
     "textExact": true,
-    "nullDistinct": true
+    "nullDistinct": true,
+    "columnAbsolute": {
+      "weighted_price_cents": 0.0100001,
+      "low_price_cents": 0.0100001
+    }
   },
-  "contentVersion": "4.2.0"
+  "contentVersion": "4.2.1"
 }

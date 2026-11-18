@@ -2,25 +2,26 @@
   "projectId": "finance",
   "title": "银行流水与凭证全量对账",
   "context": "审计人员需要同时寻找银行端和账簿端的未匹配。",
-  "requirements": "2025年费用凭证（按reference_no）与银行支出绝对值（按reference_no）分别汇总；采用全量键集合；空银行参考号使用每笔流水独立键；输出存在缺失或差异的记录及差额（银行-账簿）。",
+  "requirements": "2025年费用凭证按真实reference_no汇总费用净额；银行按真实reference_no汇总净支出，净支出=-SUM(amount_cents)，正向冲回或收入作为负支出，不能逐行取ABS。采用两端全量键集合，每条NULL银行参考号单独对账，并用reference_kind区分reference与unreferenced_bank，防止合成显示名BANK-编号与真实参考号碰撞。返回有缺失或金额差异的记录，差额=银行净支出-账簿费用；缺失端输出NULL。显示ref为真实参考号或BANK-银行编号。按ref升序、reference_kind升序。",
   "grain": "对账参考号",
-  "commonError": "内连接无法找出缺失记录；NULL参考号不可合并成一笔。",
+  "commonError": "逐行ABS会掩盖银行冲回；只用BANK-编号作为键可能与真实参考号合并。",
   "executionSteps": [
-    "按两端参考号汇总",
-    "构造全量键",
-    "左连接两端",
-    "筛选差异"
+    "按真实参考号分别汇总有符号金额",
+    "给无参考号流水独立类型及编号键",
+    "合并两端完整键集合",
+    "筛选缺失与金额差异"
   ],
   "difficulty": "困难",
-  "mysqlSql": "WITH a AS (SELECT reference_no ref,SUM(expense_cents) ledger FROM v_expenses WHERE entry_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY reference_no), b AS (SELECT COALESCE(reference_no,CONCAT('BANK-',bank_id)) ref,SUM(-amount_cents) bank FROM bank_transactions WHERE transaction_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY COALESCE(reference_no,CONCAT('BANK-',bank_id))), k AS (SELECT ref FROM a UNION SELECT ref FROM b) SELECT k.ref,a.ledger ledger_cents,b.bank bank_cents,COALESCE(b.bank,0)-COALESCE(a.ledger,0) difference_cents,CASE WHEN a.ref IS NULL THEN 'bank_only' WHEN b.ref IS NULL THEN 'ledger_only' ELSE 'difference' END issue FROM k LEFT JOIN a ON a.ref=k.ref LEFT JOIN b ON b.ref=k.ref WHERE a.ref IS NULL OR b.ref IS NULL OR a.ledger<>b.bank ORDER BY k.ref",
-  "sqliteSql": "WITH a AS (SELECT reference_no ref,SUM(expense_cents) ledger FROM v_expenses WHERE entry_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY reference_no), b AS (SELECT COALESCE(reference_no,CONCAT('BANK-',bank_id)) ref,SUM(-amount_cents) bank FROM bank_transactions WHERE transaction_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY COALESCE(reference_no,CONCAT('BANK-',bank_id))), k AS (SELECT ref FROM a UNION SELECT ref FROM b) SELECT k.ref,a.ledger ledger_cents,b.bank bank_cents,COALESCE(b.bank,0)-COALESCE(a.ledger,0) difference_cents,CASE WHEN a.ref IS NULL THEN 'bank_only' WHEN b.ref IS NULL THEN 'ledger_only' ELSE 'difference' END issue FROM k LEFT JOIN a ON a.ref=k.ref LEFT JOIN b ON b.ref=k.ref WHERE a.ref IS NULL OR b.ref IS NULL OR a.ledger<>b.bank ORDER BY k.ref",
+  "mysqlSql": "WITH a AS (\n  SELECT 0 unreferenced, reference_no ref, SUM(expense_cents) ledger\n  FROM v_expenses WHERE entry_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY reference_no\n), b AS (\n  SELECT CASE WHEN reference_no IS NULL THEN 1 ELSE 0 END unreferenced,\n    COALESCE(reference_no,CAST(bank_id AS CHAR)) ref, SUM(-amount_cents) bank\n  FROM bank_transactions WHERE transaction_date BETWEEN '2025-01-01' AND '2025-12-31'\n  GROUP BY CASE WHEN reference_no IS NULL THEN 1 ELSE 0 END,COALESCE(reference_no,CAST(bank_id AS CHAR))\n), k AS (\n  SELECT unreferenced,ref FROM a UNION SELECT unreferenced,ref FROM b\n)\nSELECT CASE WHEN k.unreferenced=1 THEN CONCAT('BANK-',k.ref) ELSE k.ref END ref,\n  a.ledger ledger_cents,b.bank bank_cents,COALESCE(b.bank,0)-COALESCE(a.ledger,0) difference_cents,\n  CASE WHEN a.ref IS NULL THEN 'bank_only' WHEN b.ref IS NULL THEN 'ledger_only' ELSE 'difference' END issue,\n  CASE WHEN k.unreferenced=1 THEN 'unreferenced_bank' ELSE 'reference' END reference_kind\nFROM k LEFT JOIN a ON a.ref=k.ref AND a.unreferenced=k.unreferenced\nLEFT JOIN b ON b.ref=k.ref AND b.unreferenced=k.unreferenced\nWHERE a.ref IS NULL OR b.ref IS NULL OR a.ledger<>b.bank ORDER BY ref,reference_kind",
+  "sqliteSql": "WITH a AS (\n  SELECT 0 unreferenced, reference_no ref, SUM(expense_cents) ledger\n  FROM v_expenses WHERE entry_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY reference_no\n), b AS (\n  SELECT CASE WHEN reference_no IS NULL THEN 1 ELSE 0 END unreferenced,\n    COALESCE(reference_no,CAST(bank_id AS CHAR)) ref, SUM(-amount_cents) bank\n  FROM bank_transactions WHERE transaction_date BETWEEN '2025-01-01' AND '2025-12-31'\n  GROUP BY CASE WHEN reference_no IS NULL THEN 1 ELSE 0 END,COALESCE(reference_no,CAST(bank_id AS CHAR))\n), k AS (\n  SELECT unreferenced,ref FROM a UNION SELECT unreferenced,ref FROM b\n)\nSELECT CASE WHEN k.unreferenced=1 THEN CONCAT('BANK-',k.ref) ELSE k.ref END ref,\n  a.ledger ledger_cents,b.bank bank_cents,COALESCE(b.bank,0)-COALESCE(a.ledger,0) difference_cents,\n  CASE WHEN a.ref IS NULL THEN 'bank_only' WHEN b.ref IS NULL THEN 'ledger_only' ELSE 'difference' END issue,\n  CASE WHEN k.unreferenced=1 THEN 'unreferenced_bank' ELSE 'reference' END reference_kind\nFROM k LEFT JOIN a ON a.ref=k.ref AND a.unreferenced=k.unreferenced\nLEFT JOIN b ON b.ref=k.ref AND b.unreferenced=k.unreferenced\nWHERE a.ref IS NULL OR b.ref IS NULL OR a.ledger<>b.bank ORDER BY ref,reference_kind",
   "compatibility": "转换执行",
   "columns": [
     "ref",
     "ledger_cents",
     "bank_cents",
     "difference_cents",
-    "issue"
+    "issue",
+    "reference_kind"
   ],
   "id": "BP19",
   "chapterId": "ch19",
@@ -30,7 +31,7 @@
   "datasetId": "finance-v2",
   "type": "业务情景",
   "schemaVersion": 2,
-  "contentVersion": "4.2.0",
+  "contentVersion": "4.2.1",
   "expectedOutputPath": "business_tasks/results/BP19.json",
   "expectedRowCount": 1182,
   "expectedColumns": [
@@ -38,7 +39,8 @@
     "ledger_cents",
     "bank_cents",
     "difference_cents",
-    "issue"
+    "issue",
+    "reference_kind"
   ],
   "sourceTables": [
     "bank_transactions",
@@ -51,41 +53,46 @@
     "journal_entries",
     "journal_lines",
     "stores",
-    "v_expenses"
+    "v_expenses",
+    "warehouses"
   ],
   "orderPolicy": "ordered",
   "numericTolerance": {
-    "integerCents": 0,
-    "decimalAbsolute": 1e-06
+    "absolute": 1e-06,
+    "integerExact": true,
+    "textExact": true,
+    "nullDistinct": true
   },
   "referenceSolutions": [
     {
       "kind": "reference",
-      "mysqlSql": "WITH a AS (SELECT reference_no ref,SUM(expense_cents) ledger FROM v_expenses WHERE entry_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY reference_no), b AS (SELECT COALESCE(reference_no,CONCAT('BANK-',bank_id)) ref,SUM(-amount_cents) bank FROM bank_transactions WHERE transaction_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY COALESCE(reference_no,CONCAT('BANK-',bank_id))), k AS (SELECT ref FROM a UNION SELECT ref FROM b) SELECT k.ref,a.ledger ledger_cents,b.bank bank_cents,COALESCE(b.bank,0)-COALESCE(a.ledger,0) difference_cents,CASE WHEN a.ref IS NULL THEN 'bank_only' WHEN b.ref IS NULL THEN 'ledger_only' ELSE 'difference' END issue FROM k LEFT JOIN a ON a.ref=k.ref LEFT JOIN b ON b.ref=k.ref WHERE a.ref IS NULL OR b.ref IS NULL OR a.ledger<>b.bank ORDER BY k.ref",
-      "sqliteSql": "WITH a AS (SELECT reference_no ref,SUM(expense_cents) ledger FROM v_expenses WHERE entry_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY reference_no), b AS (SELECT COALESCE(reference_no,CONCAT('BANK-',bank_id)) ref,SUM(-amount_cents) bank FROM bank_transactions WHERE transaction_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY COALESCE(reference_no,CONCAT('BANK-',bank_id))), k AS (SELECT ref FROM a UNION SELECT ref FROM b) SELECT k.ref,a.ledger ledger_cents,b.bank bank_cents,COALESCE(b.bank,0)-COALESCE(a.ledger,0) difference_cents,CASE WHEN a.ref IS NULL THEN 'bank_only' WHEN b.ref IS NULL THEN 'ledger_only' ELSE 'difference' END issue FROM k LEFT JOIN a ON a.ref=k.ref LEFT JOIN b ON b.ref=k.ref WHERE a.ref IS NULL OR b.ref IS NULL OR a.ledger<>b.bank ORDER BY k.ref"
+      "mysqlSql": "WITH a AS (\n  SELECT 0 unreferenced, reference_no ref, SUM(expense_cents) ledger\n  FROM v_expenses WHERE entry_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY reference_no\n), b AS (\n  SELECT CASE WHEN reference_no IS NULL THEN 1 ELSE 0 END unreferenced,\n    COALESCE(reference_no,CAST(bank_id AS CHAR)) ref, SUM(-amount_cents) bank\n  FROM bank_transactions WHERE transaction_date BETWEEN '2025-01-01' AND '2025-12-31'\n  GROUP BY CASE WHEN reference_no IS NULL THEN 1 ELSE 0 END,COALESCE(reference_no,CAST(bank_id AS CHAR))\n), k AS (\n  SELECT unreferenced,ref FROM a UNION SELECT unreferenced,ref FROM b\n)\nSELECT CASE WHEN k.unreferenced=1 THEN CONCAT('BANK-',k.ref) ELSE k.ref END ref,\n  a.ledger ledger_cents,b.bank bank_cents,COALESCE(b.bank,0)-COALESCE(a.ledger,0) difference_cents,\n  CASE WHEN a.ref IS NULL THEN 'bank_only' WHEN b.ref IS NULL THEN 'ledger_only' ELSE 'difference' END issue,\n  CASE WHEN k.unreferenced=1 THEN 'unreferenced_bank' ELSE 'reference' END reference_kind\nFROM k LEFT JOIN a ON a.ref=k.ref AND a.unreferenced=k.unreferenced\nLEFT JOIN b ON b.ref=k.ref AND b.unreferenced=k.unreferenced\nWHERE a.ref IS NULL OR b.ref IS NULL OR a.ledger<>b.bank ORDER BY ref,reference_kind",
+      "sqliteSql": "WITH a AS (\n  SELECT 0 unreferenced, reference_no ref, SUM(expense_cents) ledger\n  FROM v_expenses WHERE entry_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY reference_no\n), b AS (\n  SELECT CASE WHEN reference_no IS NULL THEN 1 ELSE 0 END unreferenced,\n    COALESCE(reference_no,CAST(bank_id AS CHAR)) ref, SUM(-amount_cents) bank\n  FROM bank_transactions WHERE transaction_date BETWEEN '2025-01-01' AND '2025-12-31'\n  GROUP BY CASE WHEN reference_no IS NULL THEN 1 ELSE 0 END,COALESCE(reference_no,CAST(bank_id AS CHAR))\n), k AS (\n  SELECT unreferenced,ref FROM a UNION SELECT unreferenced,ref FROM b\n)\nSELECT CASE WHEN k.unreferenced=1 THEN CONCAT('BANK-',k.ref) ELSE k.ref END ref,\n  a.ledger ledger_cents,b.bank bank_cents,COALESCE(b.bank,0)-COALESCE(a.ledger,0) difference_cents,\n  CASE WHEN a.ref IS NULL THEN 'bank_only' WHEN b.ref IS NULL THEN 'ledger_only' ELSE 'difference' END issue,\n  CASE WHEN k.unreferenced=1 THEN 'unreferenced_bank' ELSE 'reference' END reference_kind\nFROM k LEFT JOIN a ON a.ref=k.ref AND a.unreferenced=k.unreferenced\nLEFT JOIN b ON b.ref=k.ref AND b.unreferenced=k.unreferenced\nWHERE a.ref IS NULL OR b.ref IS NULL OR a.ledger<>b.bank ORDER BY ref,reference_kind"
     },
     {
-      "kind": "algebraic equivalent",
-      "mysqlSql": "WITH a AS (SELECT reference_no ref,SUM(expense_cents) ledger FROM v_expenses WHERE (entry_date>='2025-01-01' AND entry_date<='2025-12-31') GROUP BY reference_no), b AS (SELECT COALESCE(reference_no,CONCAT('BANK-',bank_id)) ref,SUM(-amount_cents) bank FROM bank_transactions WHERE (transaction_date>='2025-01-01' AND transaction_date<='2025-12-31') GROUP BY COALESCE(reference_no,CONCAT('BANK-',bank_id))), k AS (SELECT ref FROM a UNION SELECT ref FROM b) SELECT k.ref,a.ledger ledger_cents,b.bank bank_cents,COALESCE(b.bank,0)-COALESCE(a.ledger,0) difference_cents,CASE WHEN a.ref IS NULL THEN 'bank_only' WHEN b.ref IS NULL THEN 'ledger_only' ELSE 'difference' END issue FROM k LEFT JOIN a ON a.ref=k.ref LEFT JOIN b ON b.ref=k.ref WHERE a.ref IS NULL OR b.ref IS NULL OR a.ledger<>b.bank ORDER BY k.ref",
-      "sqliteSql": "WITH a AS (SELECT reference_no ref,SUM(expense_cents) ledger FROM v_expenses WHERE (entry_date>='2025-01-01' AND entry_date<='2025-12-31') GROUP BY reference_no), b AS (SELECT COALESCE(reference_no,CONCAT('BANK-',bank_id)) ref,SUM(-amount_cents) bank FROM bank_transactions WHERE (transaction_date>='2025-01-01' AND transaction_date<='2025-12-31') GROUP BY COALESCE(reference_no,CONCAT('BANK-',bank_id))), k AS (SELECT ref FROM a UNION SELECT ref FROM b) SELECT k.ref,a.ledger ledger_cents,b.bank bank_cents,COALESCE(b.bank,0)-COALESCE(a.ledger,0) difference_cents,CASE WHEN a.ref IS NULL THEN 'bank_only' WHEN b.ref IS NULL THEN 'ledger_only' ELSE 'difference' END issue FROM k LEFT JOIN a ON a.ref=k.ref LEFT JOIN b ON b.ref=k.ref WHERE a.ref IS NULL OR b.ref IS NULL OR a.ledger<>b.bank ORDER BY k.ref"
+      "kind": "equivalent",
+      "mysqlSql": "WITH a AS (\n  SELECT 0 unreferenced, reference_no ref, SUM(expense_cents) ledger\n  FROM v_expenses WHERE (entry_date>='2025-01-01' AND entry_date<='2025-12-31') GROUP BY reference_no\n), b AS (\n  SELECT CASE WHEN reference_no IS NULL THEN 1 ELSE 0 END unreferenced,\n    COALESCE(reference_no,CAST(bank_id AS CHAR)) ref, SUM(-amount_cents) bank\n  FROM bank_transactions WHERE (transaction_date>='2025-01-01' AND transaction_date<='2025-12-31')\n  GROUP BY CASE WHEN reference_no IS NULL THEN 1 ELSE 0 END,COALESCE(reference_no,CAST(bank_id AS CHAR))\n), k AS (\n  SELECT unreferenced,ref FROM a UNION SELECT unreferenced,ref FROM b\n)\nSELECT CASE WHEN k.unreferenced=1 THEN CONCAT('BANK-',k.ref) ELSE k.ref END ref,\n  a.ledger ledger_cents,b.bank bank_cents,COALESCE(b.bank,0)-COALESCE(a.ledger,0) difference_cents,\n  CASE WHEN a.ref IS NULL THEN 'bank_only' WHEN b.ref IS NULL THEN 'ledger_only' ELSE 'difference' END issue,\n  CASE WHEN k.unreferenced=1 THEN 'unreferenced_bank' ELSE 'reference' END reference_kind\nFROM k LEFT JOIN a ON a.ref=k.ref AND a.unreferenced=k.unreferenced\nLEFT JOIN b ON b.ref=k.ref AND b.unreferenced=k.unreferenced\nWHERE a.ref IS NULL OR b.ref IS NULL OR a.ledger<>b.bank ORDER BY ref,reference_kind",
+      "sqliteSql": "WITH a AS (\n  SELECT 0 unreferenced, reference_no ref, SUM(expense_cents) ledger\n  FROM v_expenses WHERE (entry_date>='2025-01-01' AND entry_date<='2025-12-31') GROUP BY reference_no\n), b AS (\n  SELECT CASE WHEN reference_no IS NULL THEN 1 ELSE 0 END unreferenced,\n    COALESCE(reference_no,CAST(bank_id AS CHAR)) ref, SUM(-amount_cents) bank\n  FROM bank_transactions WHERE (transaction_date>='2025-01-01' AND transaction_date<='2025-12-31')\n  GROUP BY CASE WHEN reference_no IS NULL THEN 1 ELSE 0 END,COALESCE(reference_no,CAST(bank_id AS CHAR))\n), k AS (\n  SELECT unreferenced,ref FROM a UNION SELECT unreferenced,ref FROM b\n)\nSELECT CASE WHEN k.unreferenced=1 THEN CONCAT('BANK-',k.ref) ELSE k.ref END ref,\n  a.ledger ledger_cents,b.bank bank_cents,COALESCE(b.bank,0)-COALESCE(a.ledger,0) difference_cents,\n  CASE WHEN a.ref IS NULL THEN 'bank_only' WHEN b.ref IS NULL THEN 'ledger_only' ELSE 'difference' END issue,\n  CASE WHEN k.unreferenced=1 THEN 'unreferenced_bank' ELSE 'reference' END reference_kind\nFROM k LEFT JOIN a ON a.ref=k.ref AND a.unreferenced=k.unreferenced\nLEFT JOIN b ON b.ref=k.ref AND b.unreferenced=k.unreferenced\nWHERE a.ref IS NULL OR b.ref IS NULL OR a.ledger<>b.bank ORDER BY ref,reference_kind"
     }
   ],
   "hints": [
-    "按两端参考号汇总",
-    "按两端参考号汇总；构造全量键",
-    "重点核对输出粒度：对账参考号"
+    "按真实参考号分别汇总有符号金额",
+    "给无参考号流水独立类型及编号键；合并两端完整键集合",
+    "逐行ABS会掩盖银行冲回；只用BANK-编号作为键可能与真实参考号合并。"
   ],
-  "explanation": "按两端参考号汇总；构造全量键；左连接两端；筛选差异。内连接无法找出缺失记录；NULL参考号不可合并成一笔。\n审计口径：先核定日期范围、输出粒度、退款和贷项，再在各事实表中独立聚合，防止连接放大。",
+  "explanation": "按真实参考号分别汇总有符号金额。给无参考号流水独立类型及编号键。合并两端完整键集合。筛选缺失与金额差异。逐行ABS会掩盖银行冲回；只用BANK-编号作为键可能与真实参考号合并。",
   "testFixtureIds": [
     "q0269-public",
     "q0269-boundary",
     "q0269-mini-202611171",
-    "q0269-mini-202611179"
+    "q0269-mini-202611179",
+    "q0269-review-reference-collision"
   ],
   "validationStatus": {
     "independentPython": true,
+    "sqliteNative": true,
     "sqliteWasm": true,
     "mysql84Native": false
   },
-  "elapsedMs": 19.001
+  "elapsedMs": 20.329
 }

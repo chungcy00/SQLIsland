@@ -70,7 +70,7 @@
       ],
       [
         6,
-        null,
+        0,
         0,
         null,
         0,
@@ -88,5 +88,5 @@
     "nullDistinct": true
   },
   "columnPolicy": "exact_names_in_order",
-  "contentVersion": "4.2.0"
+  "contentVersion": "4.2.1"
 }

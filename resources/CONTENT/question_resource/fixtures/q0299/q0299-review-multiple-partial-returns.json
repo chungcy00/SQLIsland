@@ -1,0 +1,170 @@
+{
+  "id": "q0299-review-multiple-partial-returns",
+  "questionId": "q0299",
+  "visibility": "hidden",
+  "variant": "multiple-partial-returns",
+  "kind": "database_delta",
+  "datasetId": "enterprise-v2",
+  "baseDatabase": "databases/enterprise/enterprise.sqlite",
+  "baseSha256": "d47285cfecd67f2dfd37a0d41a2c8a2714a6ecbc8e1170c3e9c0052204106924",
+  "patchSql": [
+    "INSERT INTO returns VALUES(5064,82259,'2025-10-04',2,1660)",
+    "UPDATE returns SET quantity=1,refund_cents=830 WHERE return_id=4185",
+    "INSERT INTO stock_movements(warehouse_id,product_id,movement_date,movement_type,quantity_delta,unit_cost_cents,order_item_id,return_id) SELECT warehouse_id,product_id,movement_date,'return',quantity_delta-1,unit_cost_cents,order_item_id,5064 FROM stock_movements WHERE return_id=4185",
+    "UPDATE stock_movements SET quantity_delta=1 WHERE return_id=4185",
+    "INSERT INTO returns VALUES(5065,55743,'2025-10-10',1,4180)",
+    "UPDATE returns SET quantity=1,refund_cents=4180 WHERE return_id=4192",
+    "INSERT INTO stock_movements(warehouse_id,product_id,movement_date,movement_type,quantity_delta,unit_cost_cents,order_item_id,return_id) SELECT warehouse_id,product_id,movement_date,'return',quantity_delta-1,unit_cost_cents,order_item_id,5065 FROM stock_movements WHERE return_id=4192",
+    "UPDATE stock_movements SET quantity_delta=1 WHERE return_id=4192",
+    "INSERT INTO returns VALUES(5066,11004,'2025-01-28',1,3170)",
+    "UPDATE returns SET quantity=1,refund_cents=3170 WHERE return_id=2477",
+    "INSERT INTO stock_movements(warehouse_id,product_id,movement_date,movement_type,quantity_delta,unit_cost_cents,order_item_id,return_id) SELECT warehouse_id,product_id,movement_date,'return',quantity_delta-1,unit_cost_cents,order_item_id,5066 FROM stock_movements WHERE return_id=2477",
+    "UPDATE stock_movements SET quantity_delta=1 WHERE return_id=2477"
+  ],
+  "patchDescription": "同一原销售行拆成多次部分退货，累计数量金额与原业务一致，库存流水同步拆分",
+  "patchRowChanges": 0,
+  "testIsolation": "每次使用全新数据库副本；夹具可故意引入对账差异或改变业务记录，仅用于判题，绝不可写入基准库",
+  "expected": {
+    "columns": [
+      "month_key",
+      "net_cents",
+      "gross_cents",
+      "expense_cents",
+      "labor_cents",
+      "advertising_cents",
+      "committed_purchase_cents",
+      "operating_contribution_cents"
+    ],
+    "rows": [
+      [
+        "2025-01",
+        7319364,
+        2944637,
+        65219277,
+        51797482.0,
+        455218,
+        12292884,
+        -114072122.0
+      ],
+      [
+        "2025-02",
+        6319792,
+        2559341,
+        50068683,
+        53576806.0,
+        502934,
+        10624899,
+        -101086148.0
+      ],
+      [
+        "2025-03",
+        5983145,
+        2345290,
+        46414677,
+        55046371.0,
+        715550,
+        8019078,
+        -99115758.0
+      ],
+      [
+        "2025-04",
+        5728525,
+        2263242,
+        54802773,
+        57256858.0,
+        939859,
+        8520654,
+        -109796389.0
+      ],
+      [
+        "2025-05",
+        6956339,
+        2768367,
+        53026540,
+        58710014.0,
+        799309,
+        10474014,
+        -108968187.0
+      ],
+      [
+        "2025-06",
+        8553271,
+        3377914,
+        65223969,
+        60637218.0,
+        483204,
+        9659026,
+        -122483273.0
+      ],
+      [
+        "2025-07",
+        7858249,
+        3109121,
+        50096599,
+        63637967.0,
+        617601,
+        8595682,
+        -110625445.0
+      ],
+      [
+        "2025-08",
+        7643890,
+        2694891,
+        51633603,
+        65088108.0,
+        564993,
+        10262977,
+        -114026820.0
+      ],
+      [
+        "2025-09",
+        9189483,
+        3544956,
+        48384240,
+        67387802.0,
+        337652,
+        12356553,
+        -112227086.0
+      ],
+      [
+        "2025-10",
+        9833767,
+        3784558,
+        49335627,
+        70602677.0,
+        528850,
+        10258478,
+        -116153746.0
+      ],
+      [
+        "2025-11",
+        12092618,
+        4599815,
+        69111137,
+        74354009.0,
+        515079,
+        13392434,
+        -138865331.0
+      ],
+      [
+        "2025-12",
+        22256209,
+        8569877,
+        73162846,
+        76835554.0,
+        709588,
+        12108094,
+        -141428523.0
+      ]
+    ]
+  },
+  "orderPolicy": "ordered",
+  "columnPolicy": "exact_names_in_order",
+  "numericTolerance": {
+    "absolute": 1e-06,
+    "integerExact": true,
+    "textExact": true,
+    "nullDistinct": true
+  },
+  "contentVersion": "4.2.1"
+}

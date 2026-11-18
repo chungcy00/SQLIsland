@@ -525,5 +525,5 @@
     "description": "无采购新供应商金额列全部为0",
     "passed": true
   },
-  "contentVersion": "4.2.0"
+  "contentVersion": "4.2.1"
 }

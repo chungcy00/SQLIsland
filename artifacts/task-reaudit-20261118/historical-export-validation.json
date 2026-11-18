@@ -1,0 +1,432 @@
+[
+  {
+    "task": "BP01",
+    "recordedRows": 12,
+    "newRows": 12,
+    "sql": "WITH a AS (SELECT store_id,SUM(net_cents) net,SUM(cost_cents) cost FROM v_sales_lines WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY store_id), b AS (SELECT store_id,SUM(target_cents) target FROM sales_targets WHERE month_key BETWEEN '2025-01' AND '2025-12' GROUP BY store_id) SELECT s.store_id,COALESCE(a.net,0) net_cents,COALESCE(a.net-a.cost,0) gross_cents,ROUND(100.0*(a.net-a.cost)/NULLIF(a.net,0),2) margin_pct,b.target target_cents,ROUND(100.0*COALESCE(a.net,0)/NULLIF(b.target,0),2) achievement_pct FROM stores s LEFT JOIN a ON a.store_id=s.store_id LEFT JOIN b ON b.store_id=s.store_id ORDER BY s.store_id",
+    "counterexample": null
+  },
+  {
+    "task": "BP02",
+    "recordedRows": 144,
+    "newRows": 144,
+    "sql": "WITH m AS (SELECT DISTINCT month_key FROM calendar_days), a AS (SELECT store_id,SUBSTR(order_date,1,7) m,SUM(net_cents) net FROM v_sales_lines WHERE channel='store' GROUP BY store_id,SUBSTR(order_date,1,7)), b AS (SELECT s.store_id,m.month_key,COALESCE(a.net,0) net FROM stores s CROSS JOIN m LEFT JOIN a ON a.store_id=s.store_id AND a.m=m.month_key), p AS (SELECT *,LAG(net) OVER(PARTITION BY store_id ORDER BY month_key) prev,LAG(net,12) OVER(PARTITION BY store_id ORDER BY month_key) prior_year FROM b), q AS (SELECT *,CASE WHEN prev>0 AND net<prev THEN 1 ELSE 0 END falling FROM p), z AS (SELECT *,SUM(falling) OVER(PARTITION BY store_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) fall3 FROM q) SELECT store_id,month_key,net net_cents,ROUND(100.0*(net-prev)/NULLIF(prev,0),2) mom_pct,ROUND(100.0*(net-prior_year)/NULLIF(prior_year,0),2) yoy_pct,CASE WHEN fall3=3 THEN 1 ELSE 0 END three_declines FROM z WHERE month_key>='2025-01' ORDER BY store_id,month_key",
+    "counterexample": null
+  },
+  {
+    "task": "BP03",
+    "recordedRows": 3,
+    "newRows": 23,
+    "sql": "WITH a AS (SELECT product_id,SUM(net_cents) net,SUM(cost_cents) cost,SUM(discount_cents) discount,SUM(refund_cents) refund FROM v_sales_lines WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY product_id), b AS (SELECT *,NTILE(4) OVER(ORDER BY net DESC,product_id) bucket FROM a) SELECT product_id,net net_cents,ROUND(100.0*(net-cost)/NULLIF(net,0),2) margin_pct,discount discount_cents,refund refund_cents FROM b WHERE bucket=1 AND 100.0*(net-cost)/NULLIF(net,0)<30 ORDER BY net DESC,product_id",
+    "counterexample": null
+  },
+  {
+    "task": "BP04",
+    "recordedRows": 2,
+    "newRows": 2,
+    "sql": "WITH d AS (SELECT day,CASE WHEN EXISTS(SELECT 1 FROM promotions p WHERE day BETWEEN p.start_date AND p.end_date) THEN 1 ELSE 0 END promo FROM calendar_days WHERE day BETWEEN '2025-01-01' AND '2025-12-31'), a AS (SELECT order_date,SUM(net_cents) net,SUM(net_qty) qty,SUM(cost_cents) cost FROM v_sales_lines WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY order_date) SELECT d.promo,COUNT(*) days,ROUND(1.0*SUM(COALESCE(a.net,0))/COUNT(*),2) daily_net_cents,ROUND(1.0*SUM(COALESCE(a.qty,0))/COUNT(*),2) daily_units,ROUND(100.0*SUM(a.net-a.cost)/NULLIF(SUM(a.net),0),2) margin_pct FROM d LEFT JOIN a ON a.order_date=d.day GROUP BY d.promo ORDER BY d.promo",
+    "counterexample": null
+  },
+  {
+    "task": "BP05",
+    "recordedRows": 12,
+    "newRows": 12,
+    "sql": "WITH a AS (SELECT store_id,SUM(net_cents) net,SUM(cost_cents) cost,SUM(refund_cents) refund FROM v_sales_lines WHERE channel='store' AND order_date BETWEEN '2025-10-01' AND '2025-12-31' GROUP BY store_id), b AS (SELECT store_id,SUM(target_cents) target FROM sales_targets WHERE month_key BETWEEN '2025-10' AND '2025-12' GROUP BY store_id), p AS (SELECT s.store_id,COALESCE(a.net,0) net,100.0*(a.net-a.cost)/NULLIF(a.net,0) margin,100.0*COALESCE(a.net,0)/NULLIF(b.target,0) attainment,100.0*a.refund/NULLIF(a.net+a.refund,0) refund_rate FROM stores s LEFT JOIN a ON a.store_id=s.store_id LEFT JOIN b ON b.store_id=s.store_id), z AS (SELECT *,CASE WHEN margin<30 THEN 1 ELSE 0 END+CASE WHEN attainment<90 THEN 1 ELSE 0 END+CASE WHEN refund_rate>8 THEN 1 ELSE 0 END flags,RANK() OVER(ORDER BY net DESC) sales_rank FROM p) SELECT store_id,net net_cents,ROUND(margin,2) margin_pct,ROUND(attainment,2) achievement_pct,ROUND(refund_rate,2) refund_pct,flags,sales_rank FROM z ORDER BY flags DESC,store_id",
+    "counterexample": {
+      "fixture": "q0255-public",
+      "executed": true,
+      "rows": 12,
+      "expectedRows": 12
+    }
+  },
+  {
+    "task": "BP06",
+    "recordedRows": 823,
+    "newRows": 54,
+    "sql": "WITH s AS (SELECT warehouse_id,product_id,SUM(-quantity_delta) sold FROM stock_movements WHERE movement_type='sale' AND movement_date BETWEEN '2025-10-03' AND '2025-12-31' GROUP BY warehouse_id,product_id) SELECT i.warehouse_id,i.product_id,i.quantity,COALESCE(s.sold,0) sold_units,i.quantity*i.unit_cost_cents stock_value_cents,ROUND(90.0*i.quantity/NULLIF(s.sold,0),2) cover_days FROM inventory_snapshots i JOIN products p ON p.product_id=i.product_id LEFT JOIN s ON s.warehouse_id=i.warehouse_id AND s.product_id=i.product_id WHERE p.active=1 AND i.snapshot_date='2025-12-31' AND i.quantity*i.unit_cost_cents>500000 AND COALESCE(s.sold,0)<20 ORDER BY stock_value_cents DESC,i.warehouse_id,i.product_id",
+    "counterexample": null
+  },
+  {
+    "task": "BP07",
+    "recordedRows": 45,
+    "newRows": 45,
+    "sql": "WITH a AS (SELECT warehouse_id,p.category_id,SUM(CASE WHEN movement_type='sale' THEN -quantity_delta*unit_cost_cents WHEN movement_type='return' THEN -quantity_delta*unit_cost_cents ELSE 0 END) cogs FROM stock_movements m JOIN products p ON p.product_id=m.product_id WHERE movement_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY warehouse_id,p.category_id), b AS (SELECT warehouse_id,p.category_id,SUM(quantity*unit_cost_cents)/2.0 avg_stock FROM inventory_snapshots i JOIN products p ON p.product_id=i.product_id WHERE snapshot_date IN ('2024-12-31','2025-12-31') GROUP BY warehouse_id,p.category_id) SELECT b.warehouse_id,b.category_id,COALESCE(a.cogs,0) cogs_cents,b.avg_stock avg_stock_cents,ROUND(COALESCE(a.cogs,0)/NULLIF(b.avg_stock,0),4) turnover,CASE WHEN a.cogs>0 THEN ROUND(365.0*b.avg_stock/a.cogs,2) ELSE NULL END turnover_days FROM b LEFT JOIN a ON a.warehouse_id=b.warehouse_id AND a.category_id=b.category_id ORDER BY b.warehouse_id,b.category_id",
+    "counterexample": {
+      "fixture": "q0257-missing-snapshot",
+      "executed": true,
+      "rows": 45,
+      "expectedRows": 45
+    }
+  },
+  {
+    "task": "BP08",
+    "recordedRows": 41,
+    "newRows": 52,
+    "sql": "WITH s AS (SELECT warehouse_id,product_id,SUM(-quantity_delta) sold FROM stock_movements WHERE movement_type='sale' AND movement_date BETWEEN '2025-12-02' AND '2025-12-31' GROUP BY warehouse_id,product_id), l AS (SELECT p.warehouse_id,i.product_id,SUM((b.day_index-a.day_index)*(g.quantity_received-g.quantity_rejected))*1.0/NULLIF(SUM(g.quantity_received-g.quantity_rejected),0) lead_days FROM goods_receipts g JOIN purchase_order_items i ON i.po_item_id=g.po_item_id JOIN purchase_orders p ON p.po_id=i.po_id JOIN calendar_days a ON a.day=p.order_date JOIN calendar_days b ON b.day=g.receipt_date WHERE g.receipt_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY p.warehouse_id,i.product_id), z AS (SELECT i.warehouse_id,i.product_id,i.quantity,COALESCE(s.sold,0) sold,COALESCE(l.lead_days,14) lead_days FROM inventory_snapshots i JOIN products p ON p.product_id=i.product_id LEFT JOIN s ON s.warehouse_id=i.warehouse_id AND s.product_id=i.product_id LEFT JOIN l ON l.warehouse_id=i.warehouse_id AND l.product_id=i.product_id WHERE i.snapshot_date='2025-12-31' AND p.active=1) SELECT warehouse_id,product_id,quantity,sold,ROUND(lead_days,2) lead_days,ROUND(sold*lead_days/30.0-quantity,2) expected_shortage FROM z WHERE sold*lead_days/30.0>quantity ORDER BY expected_shortage DESC,warehouse_id,product_id",
+    "counterexample": null
+  },
+  {
+    "task": "BP09",
+    "recordedRows": 1392,
+    "newRows": 1148,
+    "sql": "WITH a AS (SELECT warehouse_id,product_id,'2023-01-01' d,0 seq,quantity q FROM inventory_opening WHERE quantity>0 UNION ALL SELECT warehouse_id,product_id,movement_date,movement_id,quantity_delta FROM stock_movements WHERE quantity_delta>0), b AS (SELECT *,SUM(q) OVER(PARTITION BY warehouse_id,product_id ORDER BY d,seq ROWS UNBOUNDED PRECEDING) cum FROM a), s AS (SELECT warehouse_id,product_id,SUM(-quantity_delta) sold FROM stock_movements WHERE movement_type='sale' GROUP BY warehouse_id,product_id), z AS (SELECT b.*,CASE WHEN b.cum<=COALESCE(s.sold,0) THEN 0 WHEN b.cum-b.q>=COALESCE(s.sold,0) THEN b.q ELSE b.cum-COALESCE(s.sold,0) END remain FROM b LEFT JOIN s ON s.warehouse_id=b.warehouse_id AND s.product_id=b.product_id), g AS (SELECT warehouse_id,product_id,SUM(CASE WHEN d<='2025-07-04' THEN remain ELSE 0 END) aged,SUM(remain) total FROM z GROUP BY warehouse_id,product_id) SELECT g.warehouse_id,g.product_id,g.aged aged_units,g.aged*i.unit_cost_cents aged_value_cents,ROUND(100.0*g.aged/NULLIF(g.total,0),2) aged_pct FROM g JOIN inventory_snapshots i ON i.warehouse_id=g.warehouse_id AND i.product_id=g.product_id AND i.snapshot_date='2025-12-31' WHERE g.aged>0 ORDER BY aged_value_cents DESC,g.warehouse_id,g.product_id",
+    "counterexample": {
+      "fixture": "q0259-public",
+      "executed": true,
+      "rows": 1195,
+      "expectedRows": 1148
+    }
+  },
+  {
+    "task": "BP10",
+    "recordedRows": 68,
+    "newRows": 69,
+    "sql": "WITH s AS (SELECT warehouse_id,product_id,SUM(-quantity_delta) sold FROM stock_movements WHERE movement_type='sale' AND movement_date BETWEEN '2025-12-02' AND '2025-12-31' GROUP BY warehouse_id,product_id), p AS (SELECT warehouse_id,product_id,SUM(CASE WHEN promised_date>'2025-12-31' AND quantity_ordered>accepted THEN quantity_ordered-accepted ELSE 0 END) inbound,SUM(CASE WHEN promised_date<='2025-12-31' AND on_time>=quantity_ordered THEN 1 ELSE 0 END) good,SUM(CASE WHEN promised_date<='2025-12-31' THEN 1 ELSE 0 END) due FROM v_po_lines GROUP BY warehouse_id,product_id), z AS (SELECT i.warehouse_id,i.product_id,i.quantity,i.quantity*i.unit_cost_cents stock_value_cents,COALESCE(s.sold,0) demand,COALESCE(p.inbound,0) inbound,100.0*p.good/NULLIF(p.due,0) reliability FROM inventory_snapshots i JOIN products a ON a.product_id=i.product_id LEFT JOIN s ON s.warehouse_id=i.warehouse_id AND s.product_id=i.product_id LEFT JOIN p ON p.warehouse_id=i.warehouse_id AND p.product_id=i.product_id WHERE i.snapshot_date='2025-12-31' AND a.active=1) SELECT warehouse_id,product_id,quantity,stock_value_cents,demand,inbound,demand-quantity-inbound shortage,ROUND(reliability,2) reliability_pct FROM z WHERE demand>quantity+inbound ORDER BY shortage DESC,warehouse_id,product_id",
+    "counterexample": {
+      "fixture": "q0260-public",
+      "executed": true,
+      "rows": 68,
+      "expectedRows": 69
+    }
+  },
+  {
+    "task": "BP11",
+    "recordedRows": 2,
+    "newRows": 2,
+    "sql": "WITH a AS (SELECT *,ROW_NUMBER() OVER(PARTITION BY customer_id ORDER BY order_date,order_id) rn FROM v_order_net WHERE channel='online') SELECT CASE WHEN rn=1 THEN 'new' ELSE 'returning' END segment,COUNT(DISTINCT customer_id) customers,COUNT(*) orders,SUM(net_cents) net_cents,ROUND(1.0*SUM(net_cents)/COUNT(*),2) avg_order_cents FROM a WHERE order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY CASE WHEN rn=1 THEN 'new' ELSE 'returning' END ORDER BY segment",
+    "counterexample": null
+  },
+  {
+    "task": "BP12",
+    "recordedRows": 2889,
+    "newRows": 1794,
+    "sql": "WITH a AS (SELECT customer_id,MAX(order_date) last_day,COUNT(*) freq,SUM(net_cents) money FROM v_order_net WHERE channel='online' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY customer_id), b AS (SELECT *,6-NTILE(5) OVER(ORDER BY last_day DESC,customer_id) r_score,6-NTILE(5) OVER(ORDER BY freq DESC,customer_id) f_score,6-NTILE(5) OVER(ORDER BY money DESC,customer_id) m_score FROM a) SELECT b.customer_id,1095-d.day_index recency_days,freq,money net_cents,r_score,f_score,m_score,CASE WHEN r_score+f_score+m_score>=13 THEN 'high_value' WHEN r_score+f_score+m_score<=6 THEN 'low_activity' ELSE 'regular' END segment FROM b JOIN calendar_days d ON d.day=b.last_day ORDER BY b.customer_id",
+    "counterexample": null
+  },
+  {
+    "task": "BP13",
+    "recordedRows": 231,
+    "newRows": 231,
+    "sql": "WITH a AS (SELECT customer_id,MIN(SUBSTR(order_date,1,7)) cohort FROM v_order_net WHERE channel='online' GROUP BY customer_id), b AS (SELECT cohort,COUNT(*) n FROM a GROUP BY cohort), m AS (SELECT DISTINCT month_key FROM calendar_days), x AS (SELECT b.cohort,m.month_key,b.n,(CAST(SUBSTR(m.month_key,1,4) AS SIGNED)-CAST(SUBSTR(b.cohort,1,4) AS SIGNED))*12+CAST(SUBSTR(m.month_key,6,2) AS SIGNED)-CAST(SUBSTR(b.cohort,6,2) AS SIGNED) k FROM b CROSS JOIN m WHERE m.month_key>=b.cohort), y AS (SELECT a.cohort,SUBSTR(o.order_date,1,7) m,COUNT(DISTINCT o.customer_id) active FROM a JOIN v_order_net o ON o.customer_id=a.customer_id AND o.channel='online' GROUP BY a.cohort,SUBSTR(o.order_date,1,7)) SELECT x.cohort,x.k month_offset,x.n cohort_size,COALESCE(y.active,0) active_customers,ROUND(100.0*COALESCE(y.active,0)/x.n,2) retention_pct FROM x LEFT JOIN y ON y.cohort=x.cohort AND y.m=x.month_key WHERE x.k BETWEEN 0 AND 6 ORDER BY x.cohort,x.k",
+    "counterexample": null
+  },
+  {
+    "task": "BP14",
+    "recordedRows": 5,
+    "newRows": 5,
+    "sql": "WITH s AS (SELECT source_id,COUNT(*) sessions FROM customer_sessions WHERE session_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY source_id), o AS (SELECT *,ROW_NUMBER() OVER(PARTITION BY customer_id ORDER BY order_date,order_id) rn FROM v_order_net WHERE channel='online'), a AS (SELECT t.source_id,COUNT(DISTINCT o.session_id) converted,SUM(CASE WHEN rn=1 THEN 1 ELSE 0 END) new_customers,SUM(net_cents) net FROM o JOIN customer_sessions t ON t.session_id=o.session_id WHERE o.order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY t.source_id), p AS (SELECT source_id,SUM(spend_cents) spend FROM marketing_campaigns WHERE month_key BETWEEN '2025-01' AND '2025-12' GROUP BY source_id) SELECT t.source_id,s.sessions,COALESCE(a.converted,0) converted,ROUND(100.0*COALESCE(a.converted,0)/NULLIF(s.sessions,0),2) conversion_pct,COALESCE(a.new_customers,0) new_customers,p.spend spend_cents,ROUND(1.0*p.spend/NULLIF(a.new_customers,0),2) cac_cents,ROUND(1.0*a.net/NULLIF(p.spend,0),4) roas FROM traffic_sources t LEFT JOIN s ON s.source_id=t.source_id LEFT JOIN a ON a.source_id=t.source_id LEFT JOIN p ON p.source_id=t.source_id ORDER BY t.source_id",
+    "counterexample": {
+      "fixture": "q0264-mini-202611171",
+      "executed": true,
+      "rows": 6,
+      "expectedRows": 6
+    }
+  },
+  {
+    "task": "BP15",
+    "recordedRows": 547,
+    "newRows": 106,
+    "sql": "WITH a AS (SELECT customer_id,COUNT(*) freq,MAX(order_date) last_day,SUM(net_cents) net,SUM(net_cents-cost_cents) gross FROM v_order_net WHERE channel='online' GROUP BY customer_id), b AS (SELECT *,NTILE(5) OVER(ORDER BY net DESC,customer_id) bucket FROM a) SELECT b.customer_id,freq,net net_cents,gross gross_cents,1095-d.day_index recency_days FROM b JOIN calendar_days d ON d.day=b.last_day WHERE bucket=1 AND freq>=3 AND 1095-d.day_index>=90 ORDER BY gross DESC,b.customer_id",
+    "counterexample": null
+  },
+  {
+    "task": "BP16",
+    "recordedRows": 35,
+    "newRows": 35,
+    "sql": "WITH b AS (SELECT department_id,account_id,SUM(budget_cents) budget FROM budgets WHERE month_key BETWEEN '2025-01' AND '2025-12' GROUP BY department_id,account_id), a AS (SELECT department_id,account_id,SUM(expense_cents) actual FROM v_expenses WHERE entry_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY department_id,account_id) SELECT b.department_id,b.account_id,b.budget budget_cents,COALESCE(a.actual,0) actual_cents,COALESCE(a.actual,0)-b.budget variance_cents,ROUND(100.0*(COALESCE(a.actual,0)-b.budget)/NULLIF(b.budget,0),2) variance_pct,CASE WHEN COALESCE(a.actual,0)>b.budget*1.1 THEN 1 ELSE 0 END over_budget FROM b LEFT JOIN a ON a.department_id=b.department_id AND a.account_id=b.account_id ORDER BY b.department_id,b.account_id",
+    "counterexample": null
+  },
+  {
+    "task": "BP17",
+    "recordedRows": 4658,
+    "newRows": 4739,
+    "sql": "SELECT supplier_invoice_id,supplier_id,billed_cents,paid_cents,balance_cents,CASE WHEN paid_cents=0 THEN 'unpaid' WHEN balance_cents>0 THEN 'partial' WHEN balance_cents=0 THEN 'paid' ELSE 'overpaid' END payment_state FROM v_invoice_balance ORDER BY balance_cents DESC,supplier_invoice_id",
+    "counterexample": {
+      "fixture": "q0267-full-credit",
+      "executed": true,
+      "rows": 4739,
+      "expectedRows": 4739
+    }
+  },
+  {
+    "task": "BP18",
+    "recordedRows": 197,
+    "newRows": 153,
+    "sql": "WITH a AS (SELECT v.*,CASE WHEN due_date>='2025-12-31' THEN 'current' WHEN due_date>='2025-12-01' THEN '01-30' WHEN due_date>='2025-11-01' THEN '31-60' WHEN due_date>='2025-10-02' THEN '61-90' ELSE '90+' END bucket FROM v_invoice_balance v WHERE balance_cents>0) SELECT supplier_id,bucket,COUNT(*) invoices,SUM(balance_cents) outstanding_cents FROM a GROUP BY supplier_id,bucket ORDER BY supplier_id,bucket",
+    "counterexample": null
+  },
+  {
+    "task": "BP19",
+    "recordedRows": 656,
+    "newRows": 1182,
+    "sql": "WITH a AS (SELECT reference_no ref,SUM(expense_cents) ledger FROM v_expenses WHERE entry_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY reference_no), b AS (SELECT COALESCE(reference_no,CONCAT('BANK-',bank_id)) ref,SUM(-amount_cents) bank FROM bank_transactions WHERE transaction_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY COALESCE(reference_no,CONCAT('BANK-',bank_id))), k AS (SELECT ref FROM a UNION SELECT ref FROM b) SELECT k.ref,a.ledger ledger_cents,b.bank bank_cents,COALESCE(b.bank,0)-COALESCE(a.ledger,0) difference_cents,CASE WHEN a.ref IS NULL THEN 'bank_only' WHEN b.ref IS NULL THEN 'ledger_only' ELSE 'difference' END issue FROM k LEFT JOIN a ON a.ref=k.ref LEFT JOIN b ON b.ref=k.ref WHERE a.ref IS NULL OR b.ref IS NULL OR a.ledger<>b.bank ORDER BY k.ref",
+    "counterexample": {
+      "fixture": "q0269-public",
+      "executed": true,
+      "rows": 1182,
+      "expectedRows": 1182
+    }
+  },
+  {
+    "task": "BP20",
+    "recordedRows": 1090,
+    "newRows": 984,
+    "sql": "WITH a AS (SELECT v.*,COUNT(*) OVER(PARTITION BY supplier_id,invoice_no) copies,AVG(billed_cents) OVER(PARTITION BY supplier_id) avg_bill FROM v_invoice_balance v), b AS (SELECT po_id,SUM(accepted*unit_price_cents) expected FROM v_po_lines GROUP BY po_id), z AS (SELECT a.*,CASE WHEN copies>1 THEN 1 ELSE 0 END duplicate_flag,CASE WHEN billed_cents>2*avg_bill THEN 1 ELSE 0 END large_flag,CASE WHEN balance_cents<0 THEN 1 ELSE 0 END overpay_flag,CASE WHEN ABS(billed_cents-COALESCE(b.expected,0))>100 THEN 1 ELSE 0 END mismatch_flag FROM a LEFT JOIN b ON b.po_id=a.po_id) SELECT supplier_invoice_id,supplier_id,billed_cents,duplicate_flag,large_flag,overpay_flag,mismatch_flag,duplicate_flag+large_flag+overpay_flag+mismatch_flag flags FROM z WHERE duplicate_flag+large_flag+overpay_flag+mismatch_flag>0 ORDER BY flags DESC,supplier_invoice_id",
+    "counterexample": {
+      "fixture": "q0270-public",
+      "executed": true,
+      "rows": 1434,
+      "expectedRows": 984
+    }
+  },
+  {
+    "task": "BP21",
+    "recordedRows": 84,
+    "newRows": 84,
+    "sql": "WITH m AS (SELECT month_key,MAX(day) last_day FROM calendar_days WHERE month_key>='2024-12' GROUP BY month_key), a AS (SELECT d.department_id,m.month_key,COUNT(h.employee_id) headcount FROM departments d CROSS JOIN m LEFT JOIN employment_history h ON h.department_id=d.department_id AND h.start_date<=m.last_day AND (h.end_date IS NULL OR h.end_date>m.last_day) GROUP BY d.department_id,m.month_key), b AS (SELECT *,LAG(headcount) OVER(PARTITION BY department_id ORDER BY month_key) prev FROM a) SELECT department_id,month_key,headcount,headcount-prev net_change FROM b WHERE month_key>='2025-01' ORDER BY department_id,month_key",
+    "counterexample": null
+  },
+  {
+    "task": "BP22",
+    "recordedRows": 84,
+    "newRows": 84,
+    "sql": "WITH m AS (SELECT month_key,MIN(day) first_day,MAX(day) last_day,MIN(day_index) first_idx FROM calendar_days WHERE month_key>='2025-01' GROUP BY month_key), a AS (SELECT d.department_id,m.month_key,SUM(CASE WHEN h.start_date< m.first_day AND (h.end_date IS NULL OR h.end_date>=m.first_day) THEN 1 ELSE 0 END) opening,SUM(CASE WHEN h.start_date<=m.last_day AND (h.end_date IS NULL OR h.end_date>m.last_day) THEN 1 ELSE 0 END) closing,SUM(CASE WHEN e.termination_date BETWEEN m.first_day AND m.last_day AND h.end_date=e.termination_date THEN 1 ELSE 0 END) exits FROM departments d CROSS JOIN m LEFT JOIN employment_history h ON h.department_id=d.department_id LEFT JOIN employees e ON e.employee_id=h.employee_id GROUP BY d.department_id,m.month_key), b AS (SELECT *, (opening+closing)/2.0 avg_h FROM a), z AS (SELECT *,SUM(exits) OVER(PARTITION BY department_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) e3,SUM(avg_h) OVER(PARTITION BY department_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) h3,COUNT(*) OVER(PARTITION BY department_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) n3 FROM b) SELECT department_id,month_key,opening,closing,exits,ROUND(100.0*exits/NULLIF(avg_h,0),2) exit_pct,CASE WHEN n3=3 THEN ROUND(100.0*e3/NULLIF(h3,0),2) ELSE NULL END rolling_pct FROM z ORDER BY department_id,month_key",
+    "counterexample": {
+      "fixture": "q0272-public",
+      "executed": true,
+      "rows": 84,
+      "expectedRows": 84
+    }
+  },
+  {
+    "task": "BP23",
+    "recordedRows": 7,
+    "newRows": 62,
+    "sql": "WITH a AS (SELECT employee_id,department_id,position_id,base_cents,AVG(base_cents) OVER(PARTITION BY department_id,position_id) avg_base,COUNT(*) OVER(PARTITION BY department_id,position_id) n,RANK() OVER(PARTITION BY department_id,position_id ORDER BY base_cents DESC) salary_rank FROM v_staff_month WHERE month_key='2025-12') SELECT employee_id,department_id,position_id,base_cents,ROUND(avg_base,2) avg_base_cents,salary_rank,ROUND(100.0*(base_cents-avg_base)/NULLIF(avg_base,0),2) deviation_pct FROM a WHERE n>=3 AND ABS(base_cents-avg_base)>avg_base*.15 ORDER BY department_id,position_id,salary_rank,employee_id",
+    "counterexample": null
+  },
+  {
+    "task": "BP24",
+    "recordedRows": 21,
+    "newRows": 21,
+    "sql": "SELECT department_id,month_key,SUM(base_cents) base_cents,SUM(bonus_cents) bonus_cents,SUM(overtime_minutes) overtime_minutes,SUM(labor_cents) labor_cents,ROUND(60.0*SUM(labor_cents)/NULLIF(SUM(worked_minutes+overtime_minutes),0),2) cost_per_hour_cents FROM v_staff_month WHERE month_key BETWEEN '2025-10' AND '2025-12' GROUP BY department_id,month_key ORDER BY department_id,month_key",
+    "counterexample": null
+  },
+  {
+    "task": "BP25",
+    "recordedRows": 62,
+    "newRows": 73,
+    "sql": "WITH a AS (SELECT e.employee_id,h.department_id,e.hire_date,e.termination_date,d.day_index hire_idx,t.day_index term_idx,CONCAT(SUBSTR(e.hire_date,1,4),'-Q',CASE WHEN SUBSTR(e.hire_date,6,2)<='03' THEN '1' WHEN SUBSTR(e.hire_date,6,2)<='06' THEN '2' WHEN SUBSTR(e.hire_date,6,2)<='09' THEN '3' ELSE '4' END) cohort FROM employees e JOIN employment_history h ON h.employee_id=e.employee_id AND h.start_date=e.hire_date JOIN calendar_days d ON d.day=e.hire_date LEFT JOIN calendar_days t ON t.day=e.termination_date), b AS (SELECT department_id,cohort,SUM(CASE WHEN hire_idx+90<=1095 THEN 1 ELSE 0 END) n90,SUM(CASE WHEN hire_idx+90<=1095 AND (term_idx IS NULL OR term_idx>hire_idx+90) THEN 1 ELSE 0 END) r90,SUM(CASE WHEN hire_idx+180<=1095 THEN 1 ELSE 0 END) n180,SUM(CASE WHEN hire_idx+180<=1095 AND (term_idx IS NULL OR term_idx>hire_idx+180) THEN 1 ELSE 0 END) r180 FROM a GROUP BY department_id,cohort) SELECT department_id,cohort,n90,ROUND(100.0*r90/NULLIF(n90,0),2) retention90_pct,n180,ROUND(100.0*r180/NULLIF(n180,0),2) retention180_pct FROM b ORDER BY department_id,cohort",
+    "counterexample": null
+  },
+  {
+    "task": "BP26",
+    "recordedRows": 3129,
+    "newRows": 3469,
+    "sql": "WITH a AS (SELECT i.po_item_id,p.supplier_id,i.product_id,p.order_date,i.unit_price_cents,c.unit_price_cents contract_cents,LAG(i.unit_price_cents) OVER(PARTITION BY p.supplier_id,i.product_id ORDER BY p.order_date,i.po_item_id) previous_cents FROM purchase_order_items i JOIN purchase_orders p ON p.po_id=i.po_id JOIN supplier_contracts c ON c.contract_id=i.contract_id WHERE p.status<>'cancelled') SELECT po_item_id,supplier_id,product_id,unit_price_cents,contract_cents,unit_price_cents-contract_cents contract_variance_cents,previous_cents,ROUND(100.0*(unit_price_cents-previous_cents)/NULLIF(previous_cents,0),2) change_pct FROM a WHERE order_date BETWEEN '2025-01-01' AND '2025-12-31' ORDER BY po_item_id",
+    "counterexample": null
+  },
+  {
+    "task": "BP27",
+    "recordedRows": 60,
+    "newRows": 55,
+    "sql": "SELECT supplier_id,COUNT(*) due_lines,ROUND(100.0*SUM(CASE WHEN on_time>=quantity_ordered THEN 1 ELSE 0 END)/COUNT(*),2) ontime_pct,ROUND(100.0*SUM(CASE WHEN accepted>=quantity_ordered THEN 1 ELSE 0 END)/COUNT(*),2) complete_pct,ROUND(100.0*SUM(accepted)/NULLIF(SUM(received),0),2) quality_pct FROM v_po_lines WHERE promised_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY supplier_id ORDER BY supplier_id",
+    "counterexample": null
+  },
+  {
+    "task": "BP28",
+    "recordedRows": 876,
+    "newRows": 928,
+    "sql": "SELECT po_item_id,po_id,supplier_id,product_id,quantity_ordered,accepted,billed,billed_cents,accepted*unit_price_cents expected_cents,billed_cents-accepted*unit_price_cents variance_cents FROM v_po_lines WHERE order_date BETWEEN '2025-01-01' AND '2025-12-31' AND (quantity_ordered<>accepted OR accepted<>billed OR billed_cents<>accepted*unit_price_cents) ORDER BY po_item_id",
+    "counterexample": {
+      "fixture": "q0278-review-future-invoice",
+      "executed": true,
+      "rows": 929,
+      "expectedRows": 928
+    }
+  },
+  {
+    "task": "BP29",
+    "recordedRows": 900,
+    "newRows": 548,
+    "sql": "WITH a AS (SELECT product_id,supplier_id,SUM(ordered_cents)*1.0/SUM(quantity_ordered) avg_price FROM v_po_lines WHERE order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY product_id,supplier_id), b AS (SELECT *,MIN(avg_price) OVER(PARTITION BY product_id) low,COUNT(*) OVER(PARTITION BY product_id) n FROM a) SELECT product_id,supplier_id,ROUND(avg_price,2) weighted_price_cents,ROUND(low,2) low_price_cents,ROUND(100.0*(avg_price-low)/NULLIF(low,0),2) premium_pct FROM b WHERE n>=2 ORDER BY product_id,premium_pct,supplier_id",
+    "counterexample": null
+  },
+  {
+    "task": "BP30",
+    "recordedRows": 60,
+    "newRows": 37,
+    "sql": "WITH a AS (SELECT v.supplier_id,COUNT(*) n,100.0*SUM(CASE WHEN v.on_time>=v.quantity_ordered THEN 1 ELSE 0 END)/COUNT(*) ot,100.0*SUM(CASE WHEN v.accepted>=v.quantity_ordered THEN 1 ELSE 0 END)/COUNT(*) fill,100.0*SUM(accepted)/NULLIF(SUM(received),0) quality,100.0*SUM(CASE WHEN v.unit_price_cents<=c.unit_price_cents THEN 1 ELSE 0 END)/COUNT(*) price_ok FROM v_po_lines v JOIN purchase_order_items i ON i.po_item_id=v.po_item_id JOIN supplier_contracts c ON c.contract_id=i.contract_id WHERE v.promised_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY v.supplier_id) SELECT supplier_id,n due_lines,ROUND(ot,2) ontime_pct,ROUND(fill,2) complete_pct,ROUND(quality,2) quality_pct,ROUND(price_ok,2) contract_pct,ROUND(.4*ot+.25*fill+.2*quality+.15*price_ok,2) score FROM a WHERE n>=10 ORDER BY score DESC,supplier_id",
+    "counterexample": null
+  },
+  {
+    "task": "BP31",
+    "recordedRows": 698,
+    "newRows": 68,
+    "sql": "WITH s AS (SELECT warehouse_id,product_id,SUM(-quantity_delta) sold FROM stock_movements WHERE movement_type='sale' AND movement_date BETWEEN '2025-12-02' AND '2025-12-31' GROUP BY warehouse_id,product_id), a AS (SELECT i.warehouse_id,i.product_id,i.quantity,i.quantity*i.unit_cost_cents value_cents,COALESCE(s.sold,0) sold FROM inventory_snapshots i JOIN products p ON p.product_id=i.product_id LEFT JOIN s ON s.warehouse_id=i.warehouse_id AND s.product_id=i.product_id WHERE i.snapshot_date='2025-12-31' AND p.active=1) SELECT warehouse_id,product_id,quantity,sold,value_cents,CASE WHEN sold>=30 AND quantity<sold*.5 THEN 'fast_shortage' ELSE 'slow_excess' END issue FROM a WHERE (sold>=30 AND quantity<sold*.5) OR (sold<=3 AND value_cents>=300000) ORDER BY issue,value_cents DESC,warehouse_id,product_id",
+    "counterexample": null
+  },
+  {
+    "task": "BP32",
+    "recordedRows": 500,
+    "newRows": 500,
+    "sql": "WITH a AS (SELECT product_id,SUM(net_cents) net FROM v_sales_lines WHERE order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY product_id), b AS (SELECT product_id,SUM(quantity*unit_cost_cents) stock FROM inventory_snapshots WHERE snapshot_date='2025-12-31' GROUP BY product_id), z AS (SELECT p.product_id,COALESCE(a.net,0) net,COALESCE(b.stock,0) stock FROM products p LEFT JOIN a ON a.product_id=p.product_id LEFT JOIN b ON b.product_id=p.product_id), q AS (SELECT *,100.0*net/NULLIF(SUM(net) OVER(),0) sales_share,100.0*stock/NULLIF(SUM(stock) OVER(),0) stock_share FROM z) SELECT product_id,net net_cents,stock stock_cents,ROUND(sales_share,4) sales_pct,ROUND(stock_share,4) stock_pct,ROUND(stock_share-sales_share,4) gap_points FROM q ORDER BY gap_points DESC,product_id",
+    "counterexample": null
+  },
+  {
+    "task": "BP33",
+    "recordedRows": 116,
+    "newRows": 99,
+    "sql": "WITH s AS (SELECT warehouse_id,product_id,SUM(-quantity_delta) sold FROM stock_movements WHERE movement_type='sale' AND movement_date BETWEEN '2025-12-02' AND '2025-12-31' GROUP BY warehouse_id,product_id), a AS (SELECT i.warehouse_id,i.product_id,i.quantity,COALESCE(s.sold,0) sold FROM inventory_snapshots i JOIN products p ON p.product_id=i.product_id LEFT JOIN s ON s.warehouse_id=i.warehouse_id AND s.product_id=i.product_id WHERE i.snapshot_date='2025-12-31' AND p.active=1), b AS (SELECT *,quantity-2*sold surplus,sold-quantity shortage FROM a) SELECT x.product_id,x.warehouse_id from_warehouse,y.warehouse_id to_warehouse,CASE WHEN x.surplus<y.shortage THEN x.surplus ELSE y.shortage END proposed_units FROM b x JOIN b y ON y.product_id=x.product_id AND y.warehouse_id<>x.warehouse_id WHERE x.surplus>=10 AND y.shortage>0 ORDER BY x.product_id,x.warehouse_id,y.warehouse_id",
+    "counterexample": null
+  },
+  {
+    "task": "BP34",
+    "recordedRows": 15,
+    "newRows": 15,
+    "sql": "WITH a AS (SELECT p.category_id,SUM(s.net_cents-s.cost_cents) gross FROM v_sales_lines s JOIN products p ON p.product_id=s.product_id WHERE s.order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY p.category_id), b AS (SELECT p.category_id,SUM(i.quantity*i.unit_cost_cents)/2.0 avg_stock FROM inventory_snapshots i JOIN products p ON p.product_id=i.product_id WHERE i.snapshot_date IN ('2024-12-31','2025-12-31') GROUP BY p.category_id) SELECT c.category_id,COALESCE(a.gross,0) gross_cents,b.avg_stock avg_stock_cents,ROUND(COALESCE(a.gross,0)/NULLIF(b.avg_stock,0),4) gmroi FROM categories c LEFT JOIN a ON a.category_id=c.category_id LEFT JOIN b ON b.category_id=c.category_id ORDER BY gmroi DESC,c.category_id",
+    "counterexample": {
+      "fixture": "q0284-missing-snapshot",
+      "executed": true,
+      "rows": 15,
+      "expectedRows": 15
+    }
+  },
+  {
+    "task": "BP35",
+    "recordedRows": 32,
+    "newRows": 23,
+    "sql": "WITH p AS (SELECT warehouse_id,product_id,SUM(quantity_ordered-accepted) overdue FROM v_po_lines WHERE promised_date<='2025-12-31' AND accepted<quantity_ordered GROUP BY warehouse_id,product_id), s AS (SELECT warehouse_id,product_id,SUM(-quantity_delta) sold FROM stock_movements WHERE movement_type='sale' AND movement_date BETWEEN '2025-12-02' AND '2025-12-31' GROUP BY warehouse_id,product_id) SELECT i.warehouse_id,i.product_id,i.quantity,s.sold demand,p.overdue overdue_units,s.sold-i.quantity shortage FROM inventory_snapshots i JOIN p ON p.warehouse_id=i.warehouse_id AND p.product_id=i.product_id JOIN s ON s.warehouse_id=i.warehouse_id AND s.product_id=i.product_id WHERE i.snapshot_date='2025-12-31' AND i.quantity<s.sold ORDER BY shortage DESC,i.warehouse_id,i.product_id",
+    "counterexample": null
+  },
+  {
+    "task": "BP36",
+    "recordedRows": 0,
+    "newRows": 0,
+    "sql": "WITH a AS (SELECT receipt_id,SUM(quantity_delta) qty FROM stock_movements WHERE movement_type='receipt' GROUP BY receipt_id) SELECT g.receipt_id,g.po_item_id,g.quantity_received-g.quantity_rejected expected_units,COALESCE(a.qty,0) posted_units,COALESCE(a.qty,0)-(g.quantity_received-g.quantity_rejected) difference FROM goods_receipts g LEFT JOIN a ON a.receipt_id=g.receipt_id WHERE COALESCE(a.qty,0)<>g.quantity_received-g.quantity_rejected ORDER BY g.receipt_id",
+    "counterexample": null
+  },
+  {
+    "task": "BP37",
+    "recordedRows": 60,
+    "newRows": 45,
+    "sql": "WITH a AS (SELECT supplier_id,warehouse_id,product_id,SUM((quantity_ordered-accepted)*unit_price_cents) overdue_value FROM v_po_lines WHERE promised_date BETWEEN '2025-01-01' AND '2025-12-31' AND quantity_ordered>accepted GROUP BY supplier_id,warehouse_id,product_id) SELECT a.supplier_id,COUNT(*) affected_pairs,SUM(a.overdue_value) overdue_cents,SUM(i.quantity*i.unit_cost_cents) exposed_stock_cents FROM a JOIN inventory_snapshots i ON i.warehouse_id=a.warehouse_id AND i.product_id=a.product_id AND i.snapshot_date='2025-12-31' GROUP BY a.supplier_id ORDER BY overdue_cents DESC,a.supplier_id",
+    "counterexample": {
+      "fixture": "q0287-review-missing-risk-snapshot",
+      "executed": true,
+      "rows": 45,
+      "expectedRows": 45
+    }
+  },
+  {
+    "task": "BP38",
+    "recordedRows": 12,
+    "newRows": 12,
+    "sql": "WITH a AS (SELECT store_id,SUM(net_cents) net,SUM(cost_cents) cost FROM v_sales_lines WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY store_id), b AS (SELECT store_id,SUM(expense_cents) expense FROM v_expenses WHERE entry_date BETWEEN '2025-01-01' AND '2025-12-31' AND store_id IS NOT NULL GROUP BY store_id) SELECT s.store_id,COALESCE(a.net,0) net_cents,COALESCE(a.cost,0) cost_cents,COALESCE(b.expense,0) expense_cents,COALESCE(a.net-a.cost,0)-COALESCE(b.expense,0) contribution_cents,ROUND(100.0*(COALESCE(a.net-a.cost,0)-COALESCE(b.expense,0))/NULLIF(a.net,0),2) contribution_pct FROM stores s LEFT JOIN a ON a.store_id=s.store_id LEFT JOIN b ON b.store_id=s.store_id ORDER BY contribution_cents DESC,s.store_id",
+    "counterexample": null
+  },
+  {
+    "task": "BP39",
+    "recordedRows": 0,
+    "newRows": 0,
+    "sql": "WITH a AS (SELECT order_id,SUM(amount_cents) paid FROM payments WHERE status='settled' AND payment_date<='2025-12-31' GROUP BY order_id), b AS (SELECT i.order_id,SUM(r.refund_cents) refunded FROM returns r JOIN order_items i ON i.order_item_id=r.order_item_id WHERE r.return_date<='2025-12-31' GROUP BY i.order_id) SELECT o.order_id,o.net_cents,COALESCE(a.paid,0)-COALESCE(b.refunded,0) cash_net_cents,COALESCE(a.paid,0)-COALESCE(b.refunded,0)-o.net_cents difference_cents FROM v_order_net o LEFT JOIN a ON a.order_id=o.order_id LEFT JOIN b ON b.order_id=o.order_id WHERE o.order_date BETWEEN '2025-01-01' AND '2025-12-31' AND COALESCE(a.paid,0)-COALESCE(b.refunded,0)<>o.net_cents ORDER BY o.order_id",
+    "counterexample": null
+  },
+  {
+    "task": "BP40",
+    "recordedRows": 144,
+    "newRows": 144,
+    "sql": "WITH m AS (SELECT DISTINCT month_key FROM calendar_days WHERE month_key>='2025-01'), a AS (SELECT store_id,SUBSTR(order_date,1,7) m,SUM(net_cents) net FROM v_sales_lines WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY store_id,SUBSTR(order_date,1,7)), b AS (SELECT store_id,SUBSTR(entry_date,1,7) m,SUM(expense_cents) expense FROM v_expenses WHERE entry_date BETWEEN '2025-01-01' AND '2025-12-31' AND store_id IS NOT NULL GROUP BY store_id,SUBSTR(entry_date,1,7)), z AS (SELECT s.store_id,m.month_key,COALESCE(a.net,0) net,COALESCE(b.expense,0) expense FROM stores s CROSS JOIN m LEFT JOIN a ON a.store_id=s.store_id AND a.m=m.month_key LEFT JOIN b ON b.store_id=s.store_id AND b.m=m.month_key), p AS (SELECT *,SUM(net) OVER(PARTITION BY store_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) n3,SUM(expense) OVER(PARTITION BY store_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) e3,COUNT(*) OVER(PARTITION BY store_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) k FROM z) SELECT store_id,month_key,net net_cents,expense expense_cents,ROUND(100.0*expense/NULLIF(net,0),2) expense_pct,CASE WHEN k=3 THEN ROUND(100.0*e3/NULLIF(n3,0),2) ELSE NULL END rolling_pct FROM p ORDER BY store_id,month_key",
+    "counterexample": {
+      "fixture": "q0290-public",
+      "executed": true,
+      "rows": 144,
+      "expectedRows": 144
+    }
+  },
+  {
+    "task": "BP41",
+    "recordedRows": 60,
+    "newRows": 60,
+    "sql": "WITH a AS (SELECT supplier_id,SUM(ordered_cents) ordered,SUM(accepted*unit_price_cents) received FROM v_po_lines GROUP BY supplier_id), b AS (SELECT supplier_id,SUM(billed_cents) billed,SUM(paid_cents) paid,SUM(balance_cents) balance FROM v_invoice_balance GROUP BY supplier_id) SELECT s.supplier_id,COALESCE(a.ordered,0) ordered_cents,COALESCE(a.received,0) received_cents,COALESCE(b.billed,0) billed_cents,COALESCE(b.paid,0) paid_cents,COALESCE(b.balance,0) balance_cents FROM suppliers s LEFT JOIN a ON a.supplier_id=s.supplier_id LEFT JOIN b ON b.supplier_id=s.supplier_id ORDER BY balance_cents DESC,s.supplier_id",
+    "counterexample": null
+  },
+  {
+    "task": "BP42",
+    "recordedRows": 598,
+    "newRows": 721,
+    "sql": "WITH a AS (SELECT po_id,SUM(accepted*unit_price_cents) received FROM v_po_lines GROUP BY po_id) SELECT b.supplier_invoice_id,b.po_id,b.billed_cents,b.paid_cents,a.received received_cents,b.billed_cents-a.received bill_difference_cents,b.paid_cents-a.received paid_difference_cents FROM v_invoice_balance b JOIN a ON a.po_id=b.po_id WHERE b.paid_cents>0 AND ABS(b.billed_cents-a.received)>100 ORDER BY ABS(b.billed_cents-a.received) DESC,b.supplier_invoice_id",
+    "counterexample": {
+      "fixture": "q0292-review-split-invoice",
+      "executed": true,
+      "rows": 722,
+      "expectedRows": 721
+    }
+  },
+  {
+    "task": "BP43",
+    "recordedRows": 60,
+    "newRows": 38,
+    "sql": "WITH a AS (SELECT supplier_id,SUM(CASE WHEN balance_cents>0 THEN balance_cents ELSE 0 END) outstanding,SUM(CASE WHEN balance_cents>0 AND due_date<'2025-12-31' THEN balance_cents ELSE 0 END) overdue FROM v_invoice_balance GROUP BY supplier_id), b AS (SELECT supplier_id,COUNT(*) n,SUM(CASE WHEN on_time>=quantity_ordered THEN 1 ELSE 0 END) good FROM v_po_lines WHERE promised_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY supplier_id), z AS (SELECT s.supplier_id,COALESCE(a.outstanding,0) outstanding,COALESCE(a.overdue,0) overdue,100.0*a.overdue/NULLIF(a.outstanding,0) overdue_pct,COALESCE(b.n,0) due_lines,100.0*b.good/NULLIF(b.n,0) ontime_pct FROM suppliers s LEFT JOIN a ON a.supplier_id=s.supplier_id LEFT JOIN b ON b.supplier_id=s.supplier_id) SELECT supplier_id,outstanding outstanding_cents,overdue overdue_cents,ROUND(overdue_pct,2) overdue_pct,due_lines,ROUND(ontime_pct,2) ontime_pct FROM z WHERE (overdue>=500000 AND overdue_pct>40) OR (due_lines>=10 AND ontime_pct<60) ORDER BY outstanding DESC,supplier_id",
+    "counterexample": null
+  },
+  {
+    "task": "BP44",
+    "recordedRows": 5,
+    "newRows": 5,
+    "sql": "WITH a AS (SELECT s.source_id,SUM(o.net_cents) net,SUM(o.net_cents-o.cost_cents) gross FROM v_order_net o JOIN customer_sessions s ON s.session_id=o.session_id WHERE o.channel='online' AND o.order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY s.source_id), b AS (SELECT source_id,SUM(spend_cents) spend FROM marketing_campaigns WHERE month_key BETWEEN '2025-01' AND '2025-12' GROUP BY source_id) SELECT t.source_id,COALESCE(a.net,0) net_cents,COALESCE(a.gross,0) gross_cents,COALESCE(b.spend,0) spend_cents,COALESCE(a.gross,0)-COALESCE(b.spend,0) contribution_cents,ROUND(100.0*(COALESCE(a.gross,0)-COALESCE(b.spend,0))/NULLIF(a.net,0),2) contribution_pct FROM traffic_sources t LEFT JOIN a ON a.source_id=t.source_id LEFT JOIN b ON b.source_id=t.source_id ORDER BY contribution_cents DESC,t.source_id",
+    "counterexample": null
+  },
+  {
+    "task": "BP45",
+    "recordedRows": 169,
+    "newRows": 165,
+    "sql": "WITH f AS (SELECT o.*,ROW_NUMBER() OVER(PARTITION BY customer_id ORDER BY order_date,order_id) rn FROM v_order_net o WHERE channel='online'), a AS (SELECT f.customer_id,f.order_date,d.day_index idx,s.source_id,SUBSTR(f.order_date,1,7) m FROM f JOIN customer_sessions s ON s.session_id=f.session_id JOIN calendar_days d ON d.day=f.order_date WHERE f.rn=1), n AS (SELECT source_id,m,COUNT(*) customers FROM a GROUP BY source_id,m), g AS (SELECT a.source_id,a.m,a.customer_id,SUM(o.net_cents-o.cost_cents) gross FROM a JOIN f o ON o.customer_id=a.customer_id JOIN calendar_days d ON d.day=o.order_date AND d.day_index BETWEEN a.idx AND a.idx+89 WHERE a.idx+89<=1095 GROUP BY a.source_id,a.m,a.customer_id), z AS (SELECT source_id,m,COUNT(*) mature,AVG(gross) avg_gross FROM g GROUP BY source_id,m) SELECT z.source_id,z.m cohort,z.mature,n.customers new_customers,ROUND(z.avg_gross,2) gross90_per_customer_cents,ROUND(1.0*p.spend_cents/n.customers,2) cac_cents,ROUND(z.avg_gross-1.0*p.spend_cents/n.customers,2) difference_cents FROM z JOIN n ON n.source_id=z.source_id AND n.m=z.m JOIN marketing_campaigns p ON p.source_id=z.source_id AND p.month_key=z.m ORDER BY z.source_id,z.m",
+    "counterexample": {
+      "fixture": "q0295-review-missing-ad-budget",
+      "executed": true,
+      "rows": 164,
+      "expectedRows": 165
+    }
+  },
+  {
+    "task": "BP46",
+    "recordedRows": 5,
+    "newRows": 5,
+    "sql": "WITH a AS (SELECT o.session_id,SUM(i.quantity*i.unit_price_cents-i.discount_cents) gross_revenue,SUM(i.quantity*i.unit_cost_cents) original_cost FROM orders o JOIN order_items i ON i.order_id=o.order_id WHERE o.channel='online' AND o.status='completed' AND o.order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY o.session_id), b AS (SELECT session_id,SUM(net_cents) net,SUM(cost_cents) cost,SUM(refund_cents) refund FROM v_sales_lines WHERE channel='online' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY session_id) SELECT s.source_id,SUM(a.gross_revenue) before_refund_cents,SUM(b.refund) refund_cents,ROUND(100.0*SUM(b.refund)/NULLIF(SUM(a.gross_revenue),0),2) refund_pct,SUM(a.gross_revenue-a.original_cost) before_gross_cents,SUM(b.net-b.cost) after_gross_cents FROM customer_sessions s JOIN a ON a.session_id=s.session_id JOIN b ON b.session_id=s.session_id GROUP BY s.source_id ORDER BY refund_pct DESC,s.source_id",
+    "counterexample": null
+  },
+  {
+    "task": "BP47",
+    "recordedRows": 12,
+    "newRows": 12,
+    "sql": "WITH a AS (SELECT store_id,SUM(net_cents) net FROM v_sales_lines WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY store_id), b AS (SELECT store_id,SUM(labor_cents) labor,SUM(worked_minutes+overtime_minutes) minutes_worked FROM v_staff_month WHERE month_key BETWEEN '2025-01' AND '2025-12' AND store_id IS NOT NULL GROUP BY store_id) SELECT s.store_id,COALESCE(a.net,0) net_cents,COALESCE(b.labor,0) labor_cents,ROUND(1.0*COALESCE(b.minutes_worked,0)/60,2) worked_hours,ROUND(60.0*COALESCE(a.net,0)/NULLIF(b.minutes_worked,0),2) sales_per_hour_cents,ROUND(100.0*COALESCE(b.labor,0)/NULLIF(a.net,0),2) labor_pct FROM stores s LEFT JOIN a ON a.store_id=s.store_id LEFT JOIN b ON b.store_id=s.store_id ORDER BY s.store_id",
+    "counterexample": null
+  },
+  {
+    "task": "BP48",
+    "recordedRows": 144,
+    "newRows": 144,
+    "sql": "WITH m AS (SELECT month_key,MAX(day) last_day FROM calendar_days WHERE month_key>='2024-12' GROUP BY month_key), h AS (SELECT s.store_id,m.month_key,COUNT(e.employee_id) headcount FROM stores s CROSS JOIN m LEFT JOIN employment_history e ON e.store_id=s.store_id AND e.start_date<=m.last_day AND (e.end_date IS NULL OR e.end_date>m.last_day) GROUP BY s.store_id,m.month_key), a AS (SELECT store_id,SUBSTR(order_date,1,7) m,SUM(net_cents) net FROM v_sales_lines WHERE channel='store' AND order_date>='2024-12-01' GROUP BY store_id,SUBSTR(order_date,1,7)), z AS (SELECT h.*,COALESCE(a.net,0) net FROM h LEFT JOIN a ON a.store_id=h.store_id AND a.m=h.month_key), p AS (SELECT *,LAG(headcount) OVER(PARTITION BY store_id ORDER BY month_key) prev_h,LAG(net) OVER(PARTITION BY store_id ORDER BY month_key) prev_net FROM z) SELECT store_id,month_key,headcount,net net_cents,ROUND(100.0*(headcount-prev_h)/NULLIF(prev_h,0),2) headcount_change_pct,ROUND(100.0*(net-prev_net)/NULLIF(prev_net,0),2) sales_change_pct,CASE WHEN headcount>prev_h AND net<prev_net THEN 1 ELSE 0 END review_flag FROM p WHERE month_key>='2025-01' ORDER BY store_id,month_key",
+    "counterexample": null
+  },
+  {
+    "task": "BP49",
+    "recordedRows": 12,
+    "newRows": 12,
+    "sql": "WITH m AS (SELECT DISTINCT month_key FROM calendar_days WHERE month_key>='2025-01'), s AS (SELECT SUBSTR(order_date,1,7) m,SUM(net_cents) net,SUM(net_cents-cost_cents) gross FROM v_sales_lines WHERE order_date>='2025-01-01' GROUP BY SUBSTR(order_date,1,7)), f AS (SELECT SUBSTR(entry_date,1,7) m,SUM(expense_cents) expense FROM v_expenses WHERE entry_date>='2025-01-01' GROUP BY SUBSTR(entry_date,1,7)), h AS (SELECT month_key,SUM(labor_cents) labor FROM v_staff_month WHERE month_key>='2025-01' GROUP BY month_key), p AS (SELECT SUBSTR(order_date,1,7) m,SUM(ordered_cents) procurement FROM v_po_lines WHERE order_date>='2025-01-01' GROUP BY SUBSTR(order_date,1,7)), a AS (SELECT month_key,SUM(spend_cents) spend FROM marketing_campaigns WHERE month_key>='2025-01' GROUP BY month_key) SELECT m.month_key,COALESCE(s.net,0) net_cents,COALESCE(s.gross,0) gross_cents,COALESCE(f.expense,0) expense_cents,COALESCE(h.labor,0) labor_cents,COALESCE(a.spend,0) advertising_cents,COALESCE(p.procurement,0) committed_purchase_cents,COALESCE(s.gross,0)-COALESCE(f.expense,0)-COALESCE(h.labor,0) operating_contribution_cents FROM m LEFT JOIN s ON s.m=m.month_key LEFT JOIN f ON f.m=m.month_key LEFT JOIN h ON h.month_key=m.month_key LEFT JOIN p ON p.m=m.month_key LEFT JOIN a ON a.month_key=m.month_key ORDER BY m.month_key",
+    "counterexample": null
+  },
+  {
+    "task": "BP50",
+    "recordedRows": 4,
+    "newRows": 4,
+    "sql": "WITH qm AS (SELECT DISTINCT month_key,CONCAT(SUBSTR(month_key,1,4),'-Q',CASE WHEN SUBSTR(month_key,6,2)<='03' THEN '1' WHEN SUBSTR(month_key,6,2)<='06' THEN '2' WHEN SUBSTR(month_key,6,2)<='09' THEN '3' ELSE '4' END) q FROM calendar_days WHERE month_key>='2025-01'), qs AS (SELECT q,MAX(month_key) end_m FROM qm GROUP BY q), s AS (SELECT qm.q,SUM(v.net_cents) net,SUM(v.net_cents-v.cost_cents) gross FROM v_sales_lines v JOIN qm ON qm.month_key=SUBSTR(v.order_date,1,7) GROUP BY qm.q), f AS (SELECT qm.q,SUM(v.expense_cents) expense FROM v_expenses v JOIN qm ON qm.month_key=SUBSTR(v.entry_date,1,7) GROUP BY qm.q), h AS (SELECT qm.q,SUM(v.labor_cents) labor FROM v_staff_month v JOIN qm ON qm.month_key=v.month_key GROUP BY qm.q), p AS (SELECT qm.q,COUNT(*) n,SUM(CASE WHEN v.on_time>=v.quantity_ordered THEN 1 ELSE 0 END) good FROM v_po_lines v JOIN qm ON qm.month_key=SUBSTR(v.promised_date,1,7) GROUP BY qm.q), i AS (SELECT SUBSTR(snapshot_date,1,7) m,SUM(quantity*unit_cost_cents) stock FROM inventory_snapshots GROUP BY SUBSTR(snapshot_date,1,7)), z AS (SELECT qs.q,s.net,100.0*s.gross/NULLIF(s.net,0) margin,100.0*COALESCE(f.expense,0)/NULLIF(s.net,0) expense_pct,100.0*COALESCE(h.labor,0)/NULLIF(s.net,0) labor_pct,100.0*p.good/NULLIF(p.n,0) delivery,i.stock FROM qs LEFT JOIN s ON s.q=qs.q LEFT JOIN f ON f.q=qs.q LEFT JOIN h ON h.q=qs.q LEFT JOIN p ON p.q=qs.q LEFT JOIN i ON i.m=qs.end_m) SELECT q,net net_cents,ROUND(margin,2) margin_pct,ROUND(expense_pct,2) expense_pct,ROUND(labor_pct,2) labor_pct,ROUND(delivery,2) delivery_pct,stock stock_cents,CASE WHEN margin<30 THEN 1 ELSE 0 END+CASE WHEN expense_pct>50 THEN 1 ELSE 0 END+CASE WHEN labor_pct>20 THEN 1 ELSE 0 END+CASE WHEN delivery<60 THEN 1 ELSE 0 END risk_count,CASE WHEN margin IS NULL THEN 1 ELSE 0 END+CASE WHEN expense_pct IS NULL THEN 1 ELSE 0 END+CASE WHEN labor_pct IS NULL THEN 1 ELSE 0 END+CASE WHEN delivery IS NULL THEN 1 ELSE 0 END missing_count FROM z ORDER BY q",
+    "counterexample": {
+      "fixture": "q0300-public",
+      "executed": true,
+      "rows": 4,
+      "expectedRows": 4
+    }
+  }
+]

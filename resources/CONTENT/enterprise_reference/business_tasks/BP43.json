@@ -31,7 +31,7 @@
   "datasetId": "enterprise-v2",
   "type": "业务情景",
   "schemaVersion": 2,
-  "contentVersion": "4.2.0",
+  "contentVersion": "4.2.1",
   "expectedOutputPath": "business_tasks/results/BP43.json",
   "expectedRowCount": 38,
   "expectedColumns": [
@@ -54,6 +54,7 @@
     "purchase_order_items",
     "purchase_orders",
     "supplier_contracts",
+    "supplier_credit_notes",
     "supplier_invoice_items",
     "supplier_invoices",
     "supplier_payments",
@@ -64,8 +65,10 @@
   ],
   "orderPolicy": "ordered",
   "numericTolerance": {
-    "integerCents": 0,
-    "decimalAbsolute": 1e-06
+    "absolute": 1e-06,
+    "integerExact": true,
+    "textExact": true,
+    "nullDistinct": true
   },
   "referenceSolutions": [
     {
@@ -74,17 +77,17 @@
       "sqliteSql": "WITH a AS (SELECT supplier_id,SUM(CASE WHEN balance_cents>0 THEN balance_cents ELSE 0 END) outstanding,SUM(CASE WHEN balance_cents>0 AND due_date<'2025-12-31' THEN balance_cents ELSE 0 END) overdue FROM v_invoice_balance GROUP BY supplier_id), b AS (SELECT supplier_id,COUNT(*) n,SUM(CASE WHEN on_time>=quantity_ordered THEN 1 ELSE 0 END) good FROM v_po_lines WHERE promised_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY supplier_id), z AS (SELECT s.supplier_id,COALESCE(a.outstanding,0) outstanding,COALESCE(a.overdue,0) overdue,100.0*a.overdue/NULLIF(a.outstanding,0) overdue_pct,COALESCE(b.n,0) due_lines,100.0*b.good/NULLIF(b.n,0) ontime_pct FROM suppliers s LEFT JOIN a ON a.supplier_id=s.supplier_id LEFT JOIN b ON b.supplier_id=s.supplier_id) SELECT supplier_id,outstanding outstanding_cents,overdue overdue_cents,ROUND(overdue_pct,2) overdue_pct,due_lines,ROUND(ontime_pct,2) ontime_pct FROM z WHERE (overdue>=500000 AND overdue_pct>40) OR (due_lines>=10 AND ontime_pct<60) ORDER BY outstanding DESC,supplier_id"
     },
     {
-      "kind": "algebraic equivalent",
+      "kind": "equivalent",
       "mysqlSql": "WITH a AS (SELECT supplier_id,SUM(CASE WHEN balance_cents>0 THEN balance_cents ELSE 0 END) outstanding,SUM(CASE WHEN balance_cents>0 AND due_date<'2025-12-31' THEN balance_cents ELSE 0 END) overdue FROM v_invoice_balance GROUP BY supplier_id), b AS (SELECT supplier_id,COUNT(*) n,SUM(CASE WHEN on_time>=quantity_ordered THEN 1 ELSE 0 END) good FROM v_po_lines WHERE (promised_date>='2025-01-01' AND promised_date<='2025-12-31') GROUP BY supplier_id), z AS (SELECT s.supplier_id,COALESCE(a.outstanding,0) outstanding,COALESCE(a.overdue,0) overdue,100.0*a.overdue/NULLIF(a.outstanding,0) overdue_pct,COALESCE(b.n,0) due_lines,100.0*b.good/NULLIF(b.n,0) ontime_pct FROM suppliers s LEFT JOIN a ON a.supplier_id=s.supplier_id LEFT JOIN b ON b.supplier_id=s.supplier_id) SELECT supplier_id,outstanding outstanding_cents,overdue overdue_cents,ROUND(overdue_pct,2) overdue_pct,due_lines,ROUND(ontime_pct,2) ontime_pct FROM z WHERE (overdue>=500000 AND overdue_pct>40) OR (due_lines>=10 AND ontime_pct<60) ORDER BY outstanding DESC,supplier_id",
       "sqliteSql": "WITH a AS (SELECT supplier_id,SUM(CASE WHEN balance_cents>0 THEN balance_cents ELSE 0 END) outstanding,SUM(CASE WHEN balance_cents>0 AND due_date<'2025-12-31' THEN balance_cents ELSE 0 END) overdue FROM v_invoice_balance GROUP BY supplier_id), b AS (SELECT supplier_id,COUNT(*) n,SUM(CASE WHEN on_time>=quantity_ordered THEN 1 ELSE 0 END) good FROM v_po_lines WHERE (promised_date>='2025-01-01' AND promised_date<='2025-12-31') GROUP BY supplier_id), z AS (SELECT s.supplier_id,COALESCE(a.outstanding,0) outstanding,COALESCE(a.overdue,0) overdue,100.0*a.overdue/NULLIF(a.outstanding,0) overdue_pct,COALESCE(b.n,0) due_lines,100.0*b.good/NULLIF(b.n,0) ontime_pct FROM suppliers s LEFT JOIN a ON a.supplier_id=s.supplier_id LEFT JOIN b ON b.supplier_id=s.supplier_id) SELECT supplier_id,outstanding outstanding_cents,overdue overdue_cents,ROUND(overdue_pct,2) overdue_pct,due_lines,ROUND(ontime_pct,2) ontime_pct FROM z WHERE (overdue>=500000 AND overdue_pct>40) OR (due_lines>=10 AND ontime_pct<60) ORDER BY outstanding DESC,supplier_id"
     }
   ],
   "hints": [
     "独立计算账龄和履约",
-    "独立计算账龄和履约；合并供应商",
-    "重点核对输出粒度：供应商"
+    "合并供应商；组合风险条件",
+    "不能以未到期应付代替逾期应付，也不能用零代替无历史履约。"
   ],
-  "explanation": "独立计算账龄和履约；合并供应商；组合风险条件。不能以未到期应付代替逾期应付，也不能用零代替无历史履约。\n审计口径：先核定日期范围、输出粒度、退款和贷项，再在各事实表中独立聚合，防止连接放大。",
+  "explanation": "独立计算账龄和履约。合并供应商。组合风险条件。不能以未到期应付代替逾期应付，也不能用零代替无历史履约。",
   "testFixtureIds": [
     "q0293-public",
     "q0293-boundary",
@@ -93,8 +96,9 @@
   ],
   "validationStatus": {
     "independentPython": true,
+    "sqliteNative": true,
     "sqliteWasm": true,
     "mysql84Native": false
   },
-  "elapsedMs": 20.035
+  "elapsedMs": 19.992
 }

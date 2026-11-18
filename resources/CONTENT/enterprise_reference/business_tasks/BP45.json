@@ -4,17 +4,17 @@
   "context": "电商＋财务联合分析：管理层要求以同一企业口径核对业务数据。",
   "requirements": "按历史首次线上订单归因渠道及首购月份；只纳入截至年底有90日完整观察期客户；首购日起第0—89日的净毛利；对照该渠道该月广告支出/该月所有新客数（包括未成熟客户），求每人成熟期毛利和获客成本差额。 净毛利采用截至2025-12-31已发生退款按原订单日归属的统一口径。",
   "grain": "首购渠道×月",
-  "commonError": "将未满90天客户也进入90天价值分母会产生右删失偏差。",
+  "commonError": "没有预算行不是0成本，不能删除同期群，也不能把成熟客户数量当获客成本分母。",
   "executionSteps": [
-    "确定首次订单与渠道",
-    "建立完整观察窗口",
-    "计算客户毛利",
-    "独立获客成本"
+    "在完整历史中确定首购及渠道",
+    "按0至89日计算成熟客户毛利",
+    "保留有成熟客户的全部渠道月份",
+    "以全部新客分摊预算，缺失预算保留NULL"
   ],
   "difficulty": "挑战",
   "crossGroup": "电商＋财务",
-  "mysqlSql": "WITH f AS (SELECT o.*,ROW_NUMBER() OVER(PARTITION BY customer_id ORDER BY order_date,order_id) rn FROM v_order_net o WHERE channel='online'), a AS (SELECT f.customer_id,f.order_date,d.day_index idx,s.source_id,SUBSTR(f.order_date,1,7) m FROM f JOIN customer_sessions s ON s.session_id=f.session_id JOIN calendar_days d ON d.day=f.order_date WHERE f.rn=1), n AS (SELECT source_id,m,COUNT(*) customers FROM a GROUP BY source_id,m), g AS (SELECT a.source_id,a.m,a.customer_id,SUM(o.net_cents-o.cost_cents) gross FROM a JOIN f o ON o.customer_id=a.customer_id JOIN calendar_days d ON d.day=o.order_date AND d.day_index BETWEEN a.idx AND a.idx+89 WHERE a.idx+89<=(SELECT day_index FROM calendar_days WHERE day='2025-12-31') GROUP BY a.source_id,a.m,a.customer_id), z AS (SELECT source_id,m,COUNT(*) mature,AVG(gross) avg_gross FROM g GROUP BY source_id,m) SELECT z.source_id,z.m cohort,z.mature,n.customers new_customers,ROUND(z.avg_gross,2) gross90_per_customer_cents,ROUND(1.0*p.spend_cents/n.customers,2) cac_cents,ROUND(z.avg_gross-1.0*p.spend_cents/n.customers,2) difference_cents FROM z JOIN n ON n.source_id=z.source_id AND n.m=z.m JOIN marketing_campaigns p ON p.source_id=z.source_id AND p.month_key=z.m ORDER BY z.source_id,z.m",
-  "sqliteSql": "WITH f AS (SELECT o.*,ROW_NUMBER() OVER(PARTITION BY customer_id ORDER BY order_date,order_id) rn FROM v_order_net o WHERE channel='online'), a AS (SELECT f.customer_id,f.order_date,d.day_index idx,s.source_id,SUBSTR(f.order_date,1,7) m FROM f JOIN customer_sessions s ON s.session_id=f.session_id JOIN calendar_days d ON d.day=f.order_date WHERE f.rn=1), n AS (SELECT source_id,m,COUNT(*) customers FROM a GROUP BY source_id,m), g AS (SELECT a.source_id,a.m,a.customer_id,SUM(o.net_cents-o.cost_cents) gross FROM a JOIN f o ON o.customer_id=a.customer_id JOIN calendar_days d ON d.day=o.order_date AND d.day_index BETWEEN a.idx AND a.idx+89 WHERE a.idx+89<=(SELECT day_index FROM calendar_days WHERE day='2025-12-31') GROUP BY a.source_id,a.m,a.customer_id), z AS (SELECT source_id,m,COUNT(*) mature,AVG(gross) avg_gross FROM g GROUP BY source_id,m) SELECT z.source_id,z.m cohort,z.mature,n.customers new_customers,ROUND(z.avg_gross,2) gross90_per_customer_cents,ROUND(1.0*p.spend_cents/n.customers,2) cac_cents,ROUND(z.avg_gross-1.0*p.spend_cents/n.customers,2) difference_cents FROM z JOIN n ON n.source_id=z.source_id AND n.m=z.m JOIN marketing_campaigns p ON p.source_id=z.source_id AND p.month_key=z.m ORDER BY z.source_id,z.m",
+  "mysqlSql": "WITH f AS (SELECT o.*,ROW_NUMBER() OVER(PARTITION BY customer_id ORDER BY order_date,order_id) rn FROM v_order_net o WHERE channel='online'), a AS (SELECT f.customer_id,f.order_date,d.day_index idx,s.source_id,SUBSTR(f.order_date,1,7) m FROM f JOIN customer_sessions s ON s.session_id=f.session_id JOIN calendar_days d ON d.day=f.order_date WHERE f.rn=1), n AS (SELECT source_id,m,COUNT(*) customers FROM a GROUP BY source_id,m), g AS (SELECT a.source_id,a.m,a.customer_id,SUM(o.net_cents-o.cost_cents) gross FROM a JOIN f o ON o.customer_id=a.customer_id JOIN calendar_days d ON d.day=o.order_date AND d.day_index BETWEEN a.idx AND a.idx+89 WHERE a.idx+89<=(SELECT day_index FROM calendar_days WHERE day='2025-12-31') GROUP BY a.source_id,a.m,a.customer_id), z AS (SELECT source_id,m,COUNT(*) mature,AVG(gross) avg_gross FROM g GROUP BY source_id,m) SELECT z.source_id,z.m cohort,z.mature,n.customers new_customers,ROUND(z.avg_gross,2) gross90_per_customer_cents,ROUND(1.0*p.spend_cents/n.customers,2) cac_cents,ROUND(z.avg_gross-1.0*p.spend_cents/n.customers,2) difference_cents FROM z JOIN n ON n.source_id=z.source_id AND n.m=z.m LEFT JOIN marketing_campaigns p ON p.source_id=z.source_id AND p.month_key=z.m ORDER BY z.source_id,z.m",
+  "sqliteSql": "WITH f AS (SELECT o.*,ROW_NUMBER() OVER(PARTITION BY customer_id ORDER BY order_date,order_id) rn FROM v_order_net o WHERE channel='online'), a AS (SELECT f.customer_id,f.order_date,d.day_index idx,s.source_id,SUBSTR(f.order_date,1,7) m FROM f JOIN customer_sessions s ON s.session_id=f.session_id JOIN calendar_days d ON d.day=f.order_date WHERE f.rn=1), n AS (SELECT source_id,m,COUNT(*) customers FROM a GROUP BY source_id,m), g AS (SELECT a.source_id,a.m,a.customer_id,SUM(o.net_cents-o.cost_cents) gross FROM a JOIN f o ON o.customer_id=a.customer_id JOIN calendar_days d ON d.day=o.order_date AND d.day_index BETWEEN a.idx AND a.idx+89 WHERE a.idx+89<=(SELECT day_index FROM calendar_days WHERE day='2025-12-31') GROUP BY a.source_id,a.m,a.customer_id), z AS (SELECT source_id,m,COUNT(*) mature,AVG(gross) avg_gross FROM g GROUP BY source_id,m) SELECT z.source_id,z.m cohort,z.mature,n.customers new_customers,ROUND(z.avg_gross,2) gross90_per_customer_cents,ROUND(1.0*p.spend_cents/n.customers,2) cac_cents,ROUND(z.avg_gross-1.0*p.spend_cents/n.customers,2) difference_cents FROM z JOIN n ON n.source_id=z.source_id AND n.m=z.m LEFT JOIN marketing_campaigns p ON p.source_id=z.source_id AND p.month_key=z.m ORDER BY z.source_id,z.m",
   "compatibility": "直接兼容（原生待验证）",
   "columns": [
     "source_id",
@@ -33,7 +33,7 @@
   "datasetId": "enterprise-v2",
   "type": "业务情景",
   "schemaVersion": 2,
-  "contentVersion": "4.2.0",
+  "contentVersion": "4.2.1",
   "expectedOutputPath": "business_tasks/results/BP45.json",
   "expectedRowCount": 165,
   "expectedColumns": [
@@ -48,6 +48,7 @@
   "sourceTables": [
     "calendar_days",
     "customer_sessions",
+    "customers",
     "marketing_campaigns",
     "v_order_net"
   ],
@@ -65,41 +66,47 @@
     "stores",
     "traffic_sources",
     "v_order_net",
-    "v_sales_lines"
+    "v_sales_lines",
+    "warehouses"
   ],
   "orderPolicy": "ordered",
   "numericTolerance": {
-    "integerCents": 0,
-    "decimalAbsolute": 1e-06
+    "absolute": 1e-06,
+    "integerExact": true,
+    "textExact": true,
+    "nullDistinct": true
   },
   "referenceSolutions": [
     {
       "kind": "reference",
-      "mysqlSql": "WITH f AS (SELECT o.*,ROW_NUMBER() OVER(PARTITION BY customer_id ORDER BY order_date,order_id) rn FROM v_order_net o WHERE channel='online'), a AS (SELECT f.customer_id,f.order_date,d.day_index idx,s.source_id,SUBSTR(f.order_date,1,7) m FROM f JOIN customer_sessions s ON s.session_id=f.session_id JOIN calendar_days d ON d.day=f.order_date WHERE f.rn=1), n AS (SELECT source_id,m,COUNT(*) customers FROM a GROUP BY source_id,m), g AS (SELECT a.source_id,a.m,a.customer_id,SUM(o.net_cents-o.cost_cents) gross FROM a JOIN f o ON o.customer_id=a.customer_id JOIN calendar_days d ON d.day=o.order_date AND d.day_index BETWEEN a.idx AND a.idx+89 WHERE a.idx+89<=(SELECT day_index FROM calendar_days WHERE day='2025-12-31') GROUP BY a.source_id,a.m,a.customer_id), z AS (SELECT source_id,m,COUNT(*) mature,AVG(gross) avg_gross FROM g GROUP BY source_id,m) SELECT z.source_id,z.m cohort,z.mature,n.customers new_customers,ROUND(z.avg_gross,2) gross90_per_customer_cents,ROUND(1.0*p.spend_cents/n.customers,2) cac_cents,ROUND(z.avg_gross-1.0*p.spend_cents/n.customers,2) difference_cents FROM z JOIN n ON n.source_id=z.source_id AND n.m=z.m JOIN marketing_campaigns p ON p.source_id=z.source_id AND p.month_key=z.m ORDER BY z.source_id,z.m",
-      "sqliteSql": "WITH f AS (SELECT o.*,ROW_NUMBER() OVER(PARTITION BY customer_id ORDER BY order_date,order_id) rn FROM v_order_net o WHERE channel='online'), a AS (SELECT f.customer_id,f.order_date,d.day_index idx,s.source_id,SUBSTR(f.order_date,1,7) m FROM f JOIN customer_sessions s ON s.session_id=f.session_id JOIN calendar_days d ON d.day=f.order_date WHERE f.rn=1), n AS (SELECT source_id,m,COUNT(*) customers FROM a GROUP BY source_id,m), g AS (SELECT a.source_id,a.m,a.customer_id,SUM(o.net_cents-o.cost_cents) gross FROM a JOIN f o ON o.customer_id=a.customer_id JOIN calendar_days d ON d.day=o.order_date AND d.day_index BETWEEN a.idx AND a.idx+89 WHERE a.idx+89<=(SELECT day_index FROM calendar_days WHERE day='2025-12-31') GROUP BY a.source_id,a.m,a.customer_id), z AS (SELECT source_id,m,COUNT(*) mature,AVG(gross) avg_gross FROM g GROUP BY source_id,m) SELECT z.source_id,z.m cohort,z.mature,n.customers new_customers,ROUND(z.avg_gross,2) gross90_per_customer_cents,ROUND(1.0*p.spend_cents/n.customers,2) cac_cents,ROUND(z.avg_gross-1.0*p.spend_cents/n.customers,2) difference_cents FROM z JOIN n ON n.source_id=z.source_id AND n.m=z.m JOIN marketing_campaigns p ON p.source_id=z.source_id AND p.month_key=z.m ORDER BY z.source_id,z.m"
+      "mysqlSql": "WITH f AS (SELECT o.*,ROW_NUMBER() OVER(PARTITION BY customer_id ORDER BY order_date,order_id) rn FROM v_order_net o WHERE channel='online'), a AS (SELECT f.customer_id,f.order_date,d.day_index idx,s.source_id,SUBSTR(f.order_date,1,7) m FROM f JOIN customer_sessions s ON s.session_id=f.session_id JOIN calendar_days d ON d.day=f.order_date WHERE f.rn=1), n AS (SELECT source_id,m,COUNT(*) customers FROM a GROUP BY source_id,m), g AS (SELECT a.source_id,a.m,a.customer_id,SUM(o.net_cents-o.cost_cents) gross FROM a JOIN f o ON o.customer_id=a.customer_id JOIN calendar_days d ON d.day=o.order_date AND d.day_index BETWEEN a.idx AND a.idx+89 WHERE a.idx+89<=(SELECT day_index FROM calendar_days WHERE day='2025-12-31') GROUP BY a.source_id,a.m,a.customer_id), z AS (SELECT source_id,m,COUNT(*) mature,AVG(gross) avg_gross FROM g GROUP BY source_id,m) SELECT z.source_id,z.m cohort,z.mature,n.customers new_customers,ROUND(z.avg_gross,2) gross90_per_customer_cents,ROUND(1.0*p.spend_cents/n.customers,2) cac_cents,ROUND(z.avg_gross-1.0*p.spend_cents/n.customers,2) difference_cents FROM z JOIN n ON n.source_id=z.source_id AND n.m=z.m LEFT JOIN marketing_campaigns p ON p.source_id=z.source_id AND p.month_key=z.m ORDER BY z.source_id,z.m",
+      "sqliteSql": "WITH f AS (SELECT o.*,ROW_NUMBER() OVER(PARTITION BY customer_id ORDER BY order_date,order_id) rn FROM v_order_net o WHERE channel='online'), a AS (SELECT f.customer_id,f.order_date,d.day_index idx,s.source_id,SUBSTR(f.order_date,1,7) m FROM f JOIN customer_sessions s ON s.session_id=f.session_id JOIN calendar_days d ON d.day=f.order_date WHERE f.rn=1), n AS (SELECT source_id,m,COUNT(*) customers FROM a GROUP BY source_id,m), g AS (SELECT a.source_id,a.m,a.customer_id,SUM(o.net_cents-o.cost_cents) gross FROM a JOIN f o ON o.customer_id=a.customer_id JOIN calendar_days d ON d.day=o.order_date AND d.day_index BETWEEN a.idx AND a.idx+89 WHERE a.idx+89<=(SELECT day_index FROM calendar_days WHERE day='2025-12-31') GROUP BY a.source_id,a.m,a.customer_id), z AS (SELECT source_id,m,COUNT(*) mature,AVG(gross) avg_gross FROM g GROUP BY source_id,m) SELECT z.source_id,z.m cohort,z.mature,n.customers new_customers,ROUND(z.avg_gross,2) gross90_per_customer_cents,ROUND(1.0*p.spend_cents/n.customers,2) cac_cents,ROUND(z.avg_gross-1.0*p.spend_cents/n.customers,2) difference_cents FROM z JOIN n ON n.source_id=z.source_id AND n.m=z.m LEFT JOIN marketing_campaigns p ON p.source_id=z.source_id AND p.month_key=z.m ORDER BY z.source_id,z.m"
     },
     {
-      "kind": "algebraic equivalent",
-      "mysqlSql": "WITH f AS (SELECT o.*,ROW_NUMBER() OVER(PARTITION BY customer_id ORDER BY order_date,order_id) rn FROM v_order_net o WHERE channel='online'), a AS (SELECT f.customer_id,f.order_date,d.day_index idx,s.source_id,SUBSTR(f.order_date,1,7) m FROM f JOIN customer_sessions s ON s.session_id=f.session_id JOIN calendar_days d ON d.day=f.order_date WHERE f.rn=1), n AS (SELECT source_id,m,SUM(1) customers FROM a GROUP BY source_id,m), g AS (SELECT a.source_id,a.m,a.customer_id,SUM(o.net_cents-o.cost_cents) gross FROM a JOIN f o ON o.customer_id=a.customer_id JOIN calendar_days d ON d.day=o.order_date AND d.day_index BETWEEN a.idx AND a.idx+89 WHERE a.idx+89<=(SELECT day_index FROM calendar_days WHERE day='2025-12-31') GROUP BY a.source_id,a.m,a.customer_id), z AS (SELECT source_id,m,SUM(1) mature,AVG(gross) avg_gross FROM g GROUP BY source_id,m) SELECT z.source_id,z.m cohort,z.mature,n.customers new_customers,ROUND(z.avg_gross,2) gross90_per_customer_cents,ROUND(1.0*p.spend_cents/n.customers,2) cac_cents,ROUND(z.avg_gross-1.0*p.spend_cents/n.customers,2) difference_cents FROM z JOIN n ON n.source_id=z.source_id AND n.m=z.m JOIN marketing_campaigns p ON p.source_id=z.source_id AND p.month_key=z.m ORDER BY z.source_id,z.m",
-      "sqliteSql": "WITH f AS (SELECT o.*,ROW_NUMBER() OVER(PARTITION BY customer_id ORDER BY order_date,order_id) rn FROM v_order_net o WHERE channel='online'), a AS (SELECT f.customer_id,f.order_date,d.day_index idx,s.source_id,SUBSTR(f.order_date,1,7) m FROM f JOIN customer_sessions s ON s.session_id=f.session_id JOIN calendar_days d ON d.day=f.order_date WHERE f.rn=1), n AS (SELECT source_id,m,SUM(1) customers FROM a GROUP BY source_id,m), g AS (SELECT a.source_id,a.m,a.customer_id,SUM(o.net_cents-o.cost_cents) gross FROM a JOIN f o ON o.customer_id=a.customer_id JOIN calendar_days d ON d.day=o.order_date AND d.day_index BETWEEN a.idx AND a.idx+89 WHERE a.idx+89<=(SELECT day_index FROM calendar_days WHERE day='2025-12-31') GROUP BY a.source_id,a.m,a.customer_id), z AS (SELECT source_id,m,SUM(1) mature,AVG(gross) avg_gross FROM g GROUP BY source_id,m) SELECT z.source_id,z.m cohort,z.mature,n.customers new_customers,ROUND(z.avg_gross,2) gross90_per_customer_cents,ROUND(1.0*p.spend_cents/n.customers,2) cac_cents,ROUND(z.avg_gross-1.0*p.spend_cents/n.customers,2) difference_cents FROM z JOIN n ON n.source_id=z.source_id AND n.m=z.m JOIN marketing_campaigns p ON p.source_id=z.source_id AND p.month_key=z.m ORDER BY z.source_id,z.m"
+      "kind": "equivalent",
+      "mysqlSql": "WITH f AS (SELECT o.*,ROW_NUMBER() OVER(PARTITION BY customer_id ORDER BY order_date,order_id) rn FROM v_order_net o WHERE channel='online'), a AS (SELECT f.customer_id,f.order_date,d.day_index idx,s.source_id,SUBSTR(f.order_date,1,7) m FROM f JOIN customer_sessions s ON s.session_id=f.session_id JOIN calendar_days d ON d.day=f.order_date WHERE f.rn=1), n AS (SELECT source_id,m,SUM(1) customers FROM a GROUP BY source_id,m), g AS (SELECT a.source_id,a.m,a.customer_id,SUM(o.net_cents-o.cost_cents) gross FROM a JOIN f o ON o.customer_id=a.customer_id JOIN calendar_days d ON d.day=o.order_date AND d.day_index BETWEEN a.idx AND a.idx+89 WHERE a.idx+89<=(SELECT day_index FROM calendar_days WHERE day='2025-12-31') GROUP BY a.source_id,a.m,a.customer_id), z AS (SELECT source_id,m,SUM(1) mature,AVG(gross) avg_gross FROM g GROUP BY source_id,m) SELECT z.source_id,z.m cohort,z.mature,n.customers new_customers,ROUND(z.avg_gross,2) gross90_per_customer_cents,ROUND(1.0*p.spend_cents/n.customers,2) cac_cents,ROUND(z.avg_gross-1.0*p.spend_cents/n.customers,2) difference_cents FROM z JOIN n ON n.source_id=z.source_id AND n.m=z.m LEFT JOIN marketing_campaigns p ON p.source_id=z.source_id AND p.month_key=z.m ORDER BY z.source_id,z.m",
+      "sqliteSql": "WITH f AS (SELECT o.*,ROW_NUMBER() OVER(PARTITION BY customer_id ORDER BY order_date,order_id) rn FROM v_order_net o WHERE channel='online'), a AS (SELECT f.customer_id,f.order_date,d.day_index idx,s.source_id,SUBSTR(f.order_date,1,7) m FROM f JOIN customer_sessions s ON s.session_id=f.session_id JOIN calendar_days d ON d.day=f.order_date WHERE f.rn=1), n AS (SELECT source_id,m,SUM(1) customers FROM a GROUP BY source_id,m), g AS (SELECT a.source_id,a.m,a.customer_id,SUM(o.net_cents-o.cost_cents) gross FROM a JOIN f o ON o.customer_id=a.customer_id JOIN calendar_days d ON d.day=o.order_date AND d.day_index BETWEEN a.idx AND a.idx+89 WHERE a.idx+89<=(SELECT day_index FROM calendar_days WHERE day='2025-12-31') GROUP BY a.source_id,a.m,a.customer_id), z AS (SELECT source_id,m,SUM(1) mature,AVG(gross) avg_gross FROM g GROUP BY source_id,m) SELECT z.source_id,z.m cohort,z.mature,n.customers new_customers,ROUND(z.avg_gross,2) gross90_per_customer_cents,ROUND(1.0*p.spend_cents/n.customers,2) cac_cents,ROUND(z.avg_gross-1.0*p.spend_cents/n.customers,2) difference_cents FROM z JOIN n ON n.source_id=z.source_id AND n.m=z.m LEFT JOIN marketing_campaigns p ON p.source_id=z.source_id AND p.month_key=z.m ORDER BY z.source_id,z.m"
     }
   ],
   "hints": [
-    "确定首次订单与渠道",
-    "确定首次订单与渠道；建立完整观察窗口",
-    "重点核对输出粒度：首购渠道×月"
+    "在完整历史中确定首购及渠道",
+    "按0至89日计算成熟客户毛利；保留有成熟客户的全部渠道月份",
+    "没有预算行不是0成本，不能删除同期群，也不能把成熟客户数量当获客成本分母。"
   ],
-  "explanation": "确定首次订单与渠道；建立完整观察窗口；计算客户毛利；独立获客成本。将未满90天客户也进入90天价值分母会产生右删失偏差。\n审计口径：先核定日期范围、输出粒度、退款和贷项，再在各事实表中独立聚合，防止连接放大。",
+  "explanation": "在完整历史中确定首购及渠道。按0至89日计算成熟客户毛利。保留有成熟客户的全部渠道月份。以全部新客分摊预算，缺失预算保留NULL。没有预算行不是0成本，不能删除同期群，也不能把成熟客户数量当获客成本分母。",
   "testFixtureIds": [
     "q0295-public",
     "q0295-boundary",
     "q0295-mini-202611171",
-    "q0295-mini-202611179"
+    "q0295-mini-202611179",
+    "q0295-review-missing-ad-budget",
+    "q0295-review-multiple-partial-returns"
   ],
   "validationStatus": {
     "independentPython": true,
+    "sqliteNative": true,
     "sqliteWasm": true,
     "mysql84Native": false
   },
-  "elapsedMs": 44.884
+  "elapsedMs": 70.299
 }

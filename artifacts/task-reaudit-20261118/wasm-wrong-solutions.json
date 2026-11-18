@@ -1,0 +1,908 @@
+{
+  "pass": true,
+  "contentVersion": "4.2.1",
+  "cases": [
+    {
+      "question": "q0251",
+      "label": "退货明细未经聚合导致重复销售",
+      "fixture": "q0251-review-multiple-partial-returns",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 12,
+      "expectedRows": 12
+    },
+    {
+      "question": "q0251",
+      "label": "硬编码最新公开结果",
+      "fixture": "q0251-boundary",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 12,
+      "expectedRows": 12
+    },
+    {
+      "question": "q0252",
+      "label": "原典型错误：原典型错误：原典型错误：误用内连接，可能遗漏没有匹配记录的主体。",
+      "fixture": "q0252-boundary",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 143,
+      "expectedRows": 144
+    },
+    {
+      "question": "q0252",
+      "label": "硬编码最新公开结果",
+      "fixture": "q0252-boundary",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 144,
+      "expectedRows": 144
+    },
+    {
+      "question": "q0253",
+      "label": "原典型错误：原典型错误：原典型错误：把累加量错误计算成均值。",
+      "fixture": "q0253-public",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 119,
+      "expectedRows": 23
+    },
+    {
+      "question": "q0253",
+      "label": "硬编码最新公开结果",
+      "fixture": "q0253-boundary",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 23,
+      "expectedRows": 22
+    },
+    {
+      "question": "q0254",
+      "label": "重叠活动日期连接导致重复销售与日数",
+      "fixture": "q0254-public",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 2,
+      "expectedRows": 2
+    },
+    {
+      "question": "q0254",
+      "label": "硬编码最新公开结果",
+      "fixture": "q0254-boundary",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 2,
+      "expectedRows": 1
+    },
+    {
+      "question": "q0255",
+      "label": "原典型错误：原典型错误：原典型错误：把累加量错误计算成均值。",
+      "fixture": "q0255-public",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 12,
+      "expectedRows": 12
+    },
+    {
+      "question": "q0255",
+      "label": "硬编码最新公开结果",
+      "fixture": "q0255-boundary",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 12,
+      "expectedRows": 12
+    },
+    {
+      "question": "q0256",
+      "label": "原典型错误：原典型错误：原典型错误：误用内连接，可能遗漏没有匹配记录的主体。",
+      "fixture": "q0256-public",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 45,
+      "expectedRows": 54
+    },
+    {
+      "question": "q0256",
+      "label": "硬编码最新公开结果",
+      "fixture": "q0256-boundary",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 54,
+      "expectedRows": 53
+    },
+    {
+      "question": "q0257",
+      "label": "原典型错误：原典型错误：原典型错误：把累加量错误计算成均值。",
+      "fixture": "q0257-public",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 45,
+      "expectedRows": 45
+    },
+    {
+      "question": "q0257",
+      "label": "硬编码最新公开结果",
+      "fixture": "q0257-boundary",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 45,
+      "expectedRows": 45
+    },
+    {
+      "question": "q0258",
+      "label": "原典型错误：原典型错误：原典型错误：把累加量错误计算成均值。",
+      "fixture": "q0258-public",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 36,
+      "expectedRows": 52
+    },
+    {
+      "question": "q0258",
+      "label": "硬编码最新公开结果",
+      "fixture": "q0258-boundary",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 52,
+      "expectedRows": 51
+    },
+    {
+      "question": "q0259",
+      "label": "原典型错误：原典型错误：原典型错误：把累加量错误计算成均值。",
+      "fixture": "q0259-public",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 183,
+      "expectedRows": 1148
+    },
+    {
+      "question": "q0259",
+      "label": "硬编码最新公开结果",
+      "fixture": "q0259-boundary",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 1148,
+      "expectedRows": 1149
+    },
+    {
+      "question": "q0260",
+      "label": "原典型错误：原典型错误：原典型错误：把累加量错误计算成均值。",
+      "fixture": "q0260-public",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 45,
+      "expectedRows": 69
+    },
+    {
+      "question": "q0260",
+      "label": "硬编码最新公开结果",
+      "fixture": "q0260-boundary",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 69,
+      "expectedRows": 68
+    },
+    {
+      "question": "q0261",
+      "label": "原典型错误：原典型错误：原典型错误：遗漏去重，可能重复计数。",
+      "fixture": "q0261-public",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 2,
+      "expectedRows": 2
+    },
+    {
+      "question": "q0261",
+      "label": "硬编码最新公开结果",
+      "fixture": "q0261-boundary",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 2,
+      "expectedRows": 2
+    },
+    {
+      "question": "q0262",
+      "label": "原典型错误：原典型错误：原典型错误：把累加量错误计算成均值。",
+      "fixture": "q0262-public",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 1794,
+      "expectedRows": 1794
+    },
+    {
+      "question": "q0262",
+      "label": "硬编码最新公开结果",
+      "fixture": "q0262-boundary",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 1794,
+      "expectedRows": 1794
+    },
+    {
+      "question": "q0263",
+      "label": "原典型错误：原典型错误：原典型错误：误用内连接，可能遗漏没有匹配记录的主体。",
+      "fixture": "q0263-public",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 229,
+      "expectedRows": 231
+    },
+    {
+      "question": "q0263",
+      "label": "硬编码最新公开结果",
+      "fixture": "q0263-boundary",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 231,
+      "expectedRows": 230
+    },
+    {
+      "question": "q0264",
+      "label": "原典型错误：原典型错误：原典型错误：把累加量错误计算成均值。",
+      "fixture": "q0264-public",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 5,
+      "expectedRows": 5
+    },
+    {
+      "question": "q0264",
+      "label": "硬编码最新公开结果",
+      "fixture": "q0264-boundary",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 5,
+      "expectedRows": 5
+    },
+    {
+      "question": "q0265",
+      "label": "原典型错误：原典型错误：原典型错误：把累加量错误计算成均值。",
+      "fixture": "q0265-public",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 52,
+      "expectedRows": 106
+    },
+    {
+      "question": "q0265",
+      "label": "硬编码最新公开结果",
+      "fixture": "q0265-boundary",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 106,
+      "expectedRows": 105
+    },
+    {
+      "question": "q0266",
+      "label": "原典型错误：原典型错误：原典型错误：把累加量错误计算成均值。",
+      "fixture": "q0266-public",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 35,
+      "expectedRows": 35
+    },
+    {
+      "question": "q0266",
+      "label": "硬编码最新公开结果",
+      "fixture": "q0266-boundary",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 35,
+      "expectedRows": 35
+    },
+    {
+      "question": "q0267",
+      "label": "原典型错误：原典型错误：原典型错误：误包含严格阈值的边界记录。",
+      "fixture": "q0267-public",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 4739,
+      "expectedRows": 4739
+    },
+    {
+      "question": "q0267",
+      "label": "硬编码最新公开结果",
+      "fixture": "q0267-boundary",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 4739,
+      "expectedRows": 4739
+    },
+    {
+      "question": "q0268",
+      "label": "原典型错误：原典型错误：原典型错误：把累加量错误计算成均值。",
+      "fixture": "q0268-public",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 153,
+      "expectedRows": 153
+    },
+    {
+      "question": "q0268",
+      "label": "硬编码最新公开结果",
+      "fixture": "q0268-boundary",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 153,
+      "expectedRows": 154
+    },
+    {
+      "question": "q0269",
+      "label": "原典型错误：原典型错误：原典型错误：误用内连接，可能遗漏没有匹配记录的主体。",
+      "fixture": "q0269-public",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 804,
+      "expectedRows": 1182
+    },
+    {
+      "question": "q0269",
+      "label": "硬编码最新公开结果",
+      "fixture": "q0269-boundary",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 1182,
+      "expectedRows": 1184
+    },
+    {
+      "question": "q0270",
+      "label": "原典型错误：原典型错误：原典型错误：把累加量错误计算成均值。",
+      "fixture": "q0270-public",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 2853,
+      "expectedRows": 984
+    },
+    {
+      "question": "q0270",
+      "label": "硬编码最新公开结果",
+      "fixture": "q0270-boundary",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 984,
+      "expectedRows": 985
+    },
+    {
+      "question": "q0271",
+      "label": "原典型错误：原典型错误：原典型错误：最大值与最小值口径颠倒。",
+      "fixture": "q0271-public",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 84,
+      "expectedRows": 84
+    },
+    {
+      "question": "q0271",
+      "label": "硬编码最新公开结果",
+      "fixture": "q0271-boundary",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 84,
+      "expectedRows": 84
+    },
+    {
+      "question": "q0272",
+      "label": "原典型错误：原典型错误：原典型错误：把累加量错误计算成均值。",
+      "fixture": "q0272-public",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 84,
+      "expectedRows": 84
+    },
+    {
+      "question": "q0272",
+      "label": "硬编码最新公开结果",
+      "fixture": "q0272-boundary",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 84,
+      "expectedRows": 84
+    },
+    {
+      "question": "q0273",
+      "label": "原典型错误：原典型错误：原典型错误：把均值错误计算成总量。",
+      "fixture": "q0273-public",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 210,
+      "expectedRows": 62
+    },
+    {
+      "question": "q0273",
+      "label": "硬编码最新公开结果",
+      "fixture": "q0273-boundary",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 62,
+      "expectedRows": 63
+    },
+    {
+      "question": "q0274",
+      "label": "原典型错误：原典型错误：原典型错误：把累加量错误计算成均值。",
+      "fixture": "q0274-public",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 21,
+      "expectedRows": 21
+    },
+    {
+      "question": "q0274",
+      "label": "硬编码最新公开结果",
+      "fixture": "q0274-boundary",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 21,
+      "expectedRows": 21
+    },
+    {
+      "question": "q0275",
+      "label": "原典型错误：原典型错误：原典型错误：误用内连接，可能遗漏没有匹配记录的主体。",
+      "fixture": "q0275-public",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 41,
+      "expectedRows": 73
+    },
+    {
+      "question": "q0275",
+      "label": "硬编码最新公开结果",
+      "fixture": "q0275-boundary",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 73,
+      "expectedRows": 73
+    },
+    {
+      "question": "q0276",
+      "label": "原典型错误：原典型错误：原典型错误：把历史值误作后续值。",
+      "fixture": "q0276-public",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 3469,
+      "expectedRows": 3469
+    },
+    {
+      "question": "q0276",
+      "label": "硬编码最新公开结果",
+      "fixture": "q0276-boundary",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 3469,
+      "expectedRows": 3469
+    },
+    {
+      "question": "q0277",
+      "label": "原典型错误：原典型错误：原典型错误：把累加量错误计算成均值。",
+      "fixture": "q0277-public",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 55,
+      "expectedRows": 55
+    },
+    {
+      "question": "q0277",
+      "label": "硬编码最新公开结果",
+      "fixture": "q0277-boundary",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 55,
+      "expectedRows": 55
+    },
+    {
+      "question": "q0278",
+      "label": "原典型错误：原典型错误：原典型错误：错误改变统计期间起点。",
+      "fixture": "q0278-public",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 837,
+      "expectedRows": 928
+    },
+    {
+      "question": "q0278",
+      "label": "硬编码最新公开结果",
+      "fixture": "q0278-mini-202611171",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 928,
+      "expectedRows": 28
+    },
+    {
+      "question": "q0279",
+      "label": "原典型错误：原典型错误：原典型错误：把累加量错误计算成均值。",
+      "fixture": "q0279-public",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 548,
+      "expectedRows": 548
+    },
+    {
+      "question": "q0279",
+      "label": "硬编码最新公开结果",
+      "fixture": "q0279-mini-202611171",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 548,
+      "expectedRows": 33
+    },
+    {
+      "question": "q0280",
+      "label": "原典型错误：原典型错误：原典型错误：把累加量错误计算成均值。",
+      "fixture": "q0280-public",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 37,
+      "expectedRows": 37
+    },
+    {
+      "question": "q0280",
+      "label": "硬编码最新公开结果",
+      "fixture": "q0280-boundary",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 37,
+      "expectedRows": 37
+    },
+    {
+      "question": "q0281",
+      "label": "原典型错误：原典型错误：原典型错误：误用内连接，可能遗漏没有匹配记录的主体。",
+      "fixture": "q0281-public",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 40,
+      "expectedRows": 68
+    },
+    {
+      "question": "q0281",
+      "label": "硬编码最新公开结果",
+      "fixture": "q0281-boundary",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 68,
+      "expectedRows": 67
+    },
+    {
+      "question": "q0282",
+      "label": "原典型错误：原典型错误：原典型错误：把累加量错误计算成均值。",
+      "fixture": "q0282-public",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 500,
+      "expectedRows": 500
+    },
+    {
+      "question": "q0282",
+      "label": "硬编码最新公开结果",
+      "fixture": "q0282-boundary",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 500,
+      "expectedRows": 500
+    },
+    {
+      "question": "q0283",
+      "label": "原典型错误：原典型错误：原典型错误：误用内连接，可能遗漏没有匹配记录的主体。",
+      "fixture": "q0283-public",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 59,
+      "expectedRows": 99
+    },
+    {
+      "question": "q0283",
+      "label": "硬编码最新公开结果",
+      "fixture": "q0283-boundary",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 99,
+      "expectedRows": 98
+    },
+    {
+      "question": "q0284",
+      "label": "原典型错误：原典型错误：原典型错误：把累加量错误计算成均值。",
+      "fixture": "q0284-public",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 15,
+      "expectedRows": 15
+    },
+    {
+      "question": "q0284",
+      "label": "硬编码最新公开结果",
+      "fixture": "q0284-boundary",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 15,
+      "expectedRows": 15
+    },
+    {
+      "question": "q0285",
+      "label": "原典型错误：原典型错误：原典型错误：把累加量错误计算成均值。",
+      "fixture": "q0285-public",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 23,
+      "expectedRows": 23
+    },
+    {
+      "question": "q0285",
+      "label": "硬编码最新公开结果",
+      "fixture": "q0285-boundary",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 23,
+      "expectedRows": 22
+    },
+    {
+      "question": "q0286",
+      "label": "原典型错误：原典型错误：原典型错误：误用内连接，可能遗漏没有匹配记录的主体。",
+      "fixture": "q0286-boundary",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 0,
+      "expectedRows": 1
+    },
+    {
+      "question": "q0286",
+      "label": "硬编码最新公开结果",
+      "fixture": "q0286-boundary",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 0,
+      "expectedRows": 1
+    },
+    {
+      "question": "q0287",
+      "label": "原典型错误：原典型错误：原典型错误：把累加量错误计算成均值。",
+      "fixture": "q0287-public",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 45,
+      "expectedRows": 45
+    },
+    {
+      "question": "q0287",
+      "label": "硬编码最新公开结果",
+      "fixture": "q0287-boundary",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 45,
+      "expectedRows": 45
+    },
+    {
+      "question": "q0288",
+      "label": "原典型错误：原典型错误：原典型错误：把累加量错误计算成均值。",
+      "fixture": "q0288-public",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 12,
+      "expectedRows": 12
+    },
+    {
+      "question": "q0288",
+      "label": "硬编码最新公开结果",
+      "fixture": "q0288-boundary",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 12,
+      "expectedRows": 12
+    },
+    {
+      "question": "q0289",
+      "label": "原典型错误：原典型错误：原典型错误：把累加量错误计算成均值。",
+      "fixture": "q0289-public",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 1940,
+      "expectedRows": 0
+    },
+    {
+      "question": "q0289",
+      "label": "硬编码最新公开结果",
+      "fixture": "q0289-boundary",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 0,
+      "expectedRows": 1
+    },
+    {
+      "question": "q0290",
+      "label": "原典型错误：原典型错误：原典型错误：误用内连接，可能遗漏没有匹配记录的主体。",
+      "fixture": "q0290-public",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 144,
+      "expectedRows": 144
+    },
+    {
+      "question": "q0290",
+      "label": "硬编码最新公开结果",
+      "fixture": "q0290-boundary",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 144,
+      "expectedRows": 144
+    },
+    {
+      "question": "q0291",
+      "label": "原典型错误：原典型错误：原典型错误：误用内连接，可能遗漏没有匹配记录的主体。",
+      "fixture": "q0291-public",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 56,
+      "expectedRows": 60
+    },
+    {
+      "question": "q0291",
+      "label": "硬编码最新公开结果",
+      "fixture": "q0291-boundary",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 60,
+      "expectedRows": 61
+    },
+    {
+      "question": "q0292",
+      "label": "原典型错误：原典型错误：原典型错误：把累加量错误计算成均值。",
+      "fixture": "q0292-public",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 2223,
+      "expectedRows": 721
+    },
+    {
+      "question": "q0292",
+      "label": "硬编码最新公开结果",
+      "fixture": "q0292-boundary",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 721,
+      "expectedRows": 721
+    },
+    {
+      "question": "q0293",
+      "label": "原典型错误：原典型错误：原典型错误：把累加量错误计算成均值。",
+      "fixture": "q0293-public",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 38,
+      "expectedRows": 38
+    },
+    {
+      "question": "q0293",
+      "label": "硬编码最新公开结果",
+      "fixture": "q0293-boundary",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 38,
+      "expectedRows": 38
+    },
+    {
+      "question": "q0294",
+      "label": "原典型错误：原典型错误：原典型错误：把累加量错误计算成均值。",
+      "fixture": "q0294-public",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 5,
+      "expectedRows": 5
+    },
+    {
+      "question": "q0294",
+      "label": "硬编码最新公开结果",
+      "fixture": "q0294-boundary",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 5,
+      "expectedRows": 5
+    },
+    {
+      "question": "q0295",
+      "label": "原典型错误：原典型错误：原典型错误：把累加量错误计算成均值。",
+      "fixture": "q0295-public",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 165,
+      "expectedRows": 165
+    },
+    {
+      "question": "q0295",
+      "label": "硬编码最新公开结果",
+      "fixture": "q0295-boundary",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 165,
+      "expectedRows": 165
+    },
+    {
+      "question": "q0296",
+      "label": "原典型错误：原典型错误：原典型错误：把累加量错误计算成均值。",
+      "fixture": "q0296-public",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 5,
+      "expectedRows": 5
+    },
+    {
+      "question": "q0296",
+      "label": "硬编码最新公开结果",
+      "fixture": "q0296-boundary",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 5,
+      "expectedRows": 5
+    },
+    {
+      "question": "q0297",
+      "label": "原典型错误：原典型错误：原典型错误：把累加量错误计算成均值。",
+      "fixture": "q0297-public",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 12,
+      "expectedRows": 12
+    },
+    {
+      "question": "q0297",
+      "label": "硬编码最新公开结果",
+      "fixture": "q0297-boundary",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 12,
+      "expectedRows": 12
+    },
+    {
+      "question": "q0298",
+      "label": "原典型错误：原典型错误：原典型错误：把累加量错误计算成均值。",
+      "fixture": "q0298-public",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 144,
+      "expectedRows": 144
+    },
+    {
+      "question": "q0298",
+      "label": "硬编码最新公开结果",
+      "fixture": "q0298-boundary",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 144,
+      "expectedRows": 144
+    },
+    {
+      "question": "q0299",
+      "label": "原典型错误：原典型错误：原典型错误：把累加量错误计算成均值。",
+      "fixture": "q0299-public",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 12,
+      "expectedRows": 12
+    },
+    {
+      "question": "q0299",
+      "label": "硬编码最新公开结果",
+      "fixture": "q0299-boundary",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 12,
+      "expectedRows": 12
+    },
+    {
+      "question": "q0300",
+      "label": "原典型错误：原典型错误：原典型错误：把累加量错误计算成均值。",
+      "fixture": "q0300-public",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 4,
+      "expectedRows": 4
+    },
+    {
+      "question": "q0300",
+      "label": "硬编码最新公开结果",
+      "fixture": "q0300-boundary",
+      "executed": true,
+      "rejectedByResult": true,
+      "actualRows": 4,
+      "expectedRows": 4
+    }
+  ],
+  "questions": 50,
+  "resultRejections": 100
+}

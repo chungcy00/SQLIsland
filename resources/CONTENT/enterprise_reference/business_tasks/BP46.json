@@ -31,7 +31,7 @@
   "datasetId": "enterprise-v2",
   "type": "业务情景",
   "schemaVersion": 2,
-  "contentVersion": "4.2.0",
+  "contentVersion": "4.2.1",
   "expectedOutputPath": "business_tasks/results/BP46.json",
   "expectedRowCount": 5,
   "expectedColumns": [
@@ -59,12 +59,15 @@
     "returns",
     "stores",
     "traffic_sources",
-    "v_sales_lines"
+    "v_sales_lines",
+    "warehouses"
   ],
   "orderPolicy": "ordered",
   "numericTolerance": {
-    "integerCents": 0,
-    "decimalAbsolute": 1e-06
+    "absolute": 1e-06,
+    "integerExact": true,
+    "textExact": true,
+    "nullDistinct": true
   },
   "referenceSolutions": [
     {
@@ -73,27 +76,29 @@
       "sqliteSql": "WITH a AS (SELECT o.session_id,SUM(i.quantity*i.unit_price_cents-i.discount_cents) gross_revenue,SUM(i.quantity*i.unit_cost_cents) original_cost FROM orders o JOIN order_items i ON i.order_id=o.order_id WHERE o.channel='online' AND o.status='completed' AND o.order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY o.session_id), b AS (SELECT session_id,SUM(net_cents) net,SUM(cost_cents) cost,SUM(refund_cents) refund FROM v_sales_lines WHERE channel='online' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY session_id) SELECT s.source_id,SUM(a.gross_revenue) before_refund_cents,SUM(b.refund) refund_cents,ROUND(100.0*SUM(b.refund)/NULLIF(SUM(a.gross_revenue),0),2) refund_pct,SUM(a.gross_revenue-a.original_cost) before_gross_cents,SUM(b.net-b.cost) after_gross_cents FROM customer_sessions s JOIN a ON a.session_id=s.session_id JOIN b ON b.session_id=s.session_id GROUP BY s.source_id ORDER BY refund_pct DESC,s.source_id"
     },
     {
-      "kind": "algebraic equivalent",
+      "kind": "equivalent",
       "mysqlSql": "WITH a AS (SELECT o.session_id,SUM(i.quantity*i.unit_price_cents-i.discount_cents) gross_revenue,SUM(i.quantity*i.unit_cost_cents) original_cost FROM orders o JOIN order_items i ON i.order_id=o.order_id WHERE o.channel='online' AND o.status='completed' AND (o.order_date>='2025-01-01' AND o.order_date<='2025-12-31') GROUP BY o.session_id), b AS (SELECT session_id,SUM(net_cents) net,SUM(cost_cents) cost,SUM(refund_cents) refund FROM v_sales_lines WHERE channel='online' AND (order_date>='2025-01-01' AND order_date<='2025-12-31') GROUP BY session_id) SELECT s.source_id,SUM(a.gross_revenue) before_refund_cents,SUM(b.refund) refund_cents,ROUND(100.0*SUM(b.refund)/NULLIF(SUM(a.gross_revenue),0),2) refund_pct,SUM(a.gross_revenue-a.original_cost) before_gross_cents,SUM(b.net-b.cost) after_gross_cents FROM customer_sessions s JOIN a ON a.session_id=s.session_id JOIN b ON b.session_id=s.session_id GROUP BY s.source_id ORDER BY refund_pct DESC,s.source_id",
       "sqliteSql": "WITH a AS (SELECT o.session_id,SUM(i.quantity*i.unit_price_cents-i.discount_cents) gross_revenue,SUM(i.quantity*i.unit_cost_cents) original_cost FROM orders o JOIN order_items i ON i.order_id=o.order_id WHERE o.channel='online' AND o.status='completed' AND (o.order_date>='2025-01-01' AND o.order_date<='2025-12-31') GROUP BY o.session_id), b AS (SELECT session_id,SUM(net_cents) net,SUM(cost_cents) cost,SUM(refund_cents) refund FROM v_sales_lines WHERE channel='online' AND (order_date>='2025-01-01' AND order_date<='2025-12-31') GROUP BY session_id) SELECT s.source_id,SUM(a.gross_revenue) before_refund_cents,SUM(b.refund) refund_cents,ROUND(100.0*SUM(b.refund)/NULLIF(SUM(a.gross_revenue),0),2) refund_pct,SUM(a.gross_revenue-a.original_cost) before_gross_cents,SUM(b.net-b.cost) after_gross_cents FROM customer_sessions s JOIN a ON a.session_id=s.session_id JOIN b ON b.session_id=s.session_id GROUP BY s.source_id ORDER BY refund_pct DESC,s.source_id"
     }
   ],
   "hints": [
     "会话内分别汇总原销售与净销售",
-    "会话内分别汇总原销售与净销售；连接会话渠道",
-    "重点核对输出粒度：渠道"
+    "连接会话渠道；比较前后毛利",
+    "只减退款不冲回退货成本会误算毛利。"
   ],
-  "explanation": "会话内分别汇总原销售与净销售；连接会话渠道；比较前后毛利。只减退款不冲回退货成本会误算毛利。\n审计口径：先核定日期范围、输出粒度、退款和贷项，再在各事实表中独立聚合，防止连接放大。",
+  "explanation": "会话内分别汇总原销售与净销售。连接会话渠道。比较前后毛利。只减退款不冲回退货成本会误算毛利。",
   "testFixtureIds": [
     "q0296-public",
     "q0296-boundary",
     "q0296-mini-202611171",
-    "q0296-mini-202611179"
+    "q0296-mini-202611179",
+    "q0296-review-multiple-partial-returns"
   ],
   "validationStatus": {
     "independentPython": true,
+    "sqliteNative": true,
     "sqliteWasm": true,
     "mysql84Native": false
   },
-  "elapsedMs": 44.919
+  "elapsedMs": 41.933
 }

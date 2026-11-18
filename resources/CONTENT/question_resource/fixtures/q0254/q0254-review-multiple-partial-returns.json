@@ -1,0 +1,55 @@
+{
+  "id": "q0254-review-multiple-partial-returns",
+  "questionId": "q0254",
+  "visibility": "hidden",
+  "variant": "multiple-partial-returns",
+  "kind": "database_delta",
+  "datasetId": "retail-v2",
+  "baseDatabase": "databases/retail/retail.sqlite",
+  "baseSha256": "e80ec41c783e5763b0e482b4c30889bdaa313f53582d3d11ee0ea47d2366cd78",
+  "patchSql": [
+    "INSERT INTO returns VALUES(5064,82259,'2025-10-04',2,1660)",
+    "UPDATE returns SET quantity=1,refund_cents=830 WHERE return_id=4185",
+    "INSERT INTO returns VALUES(5065,55743,'2025-10-10',1,4180)",
+    "UPDATE returns SET quantity=1,refund_cents=4180 WHERE return_id=4192",
+    "INSERT INTO returns VALUES(5066,11004,'2025-01-28',1,3170)",
+    "UPDATE returns SET quantity=1,refund_cents=3170 WHERE return_id=2477"
+  ],
+  "patchDescription": "同一原销售行拆成多次部分退货，累计数量金额与原业务一致，库存流水同步拆分",
+  "patchRowChanges": 0,
+  "testIsolation": "每次使用全新数据库副本；夹具可故意引入对账差异或改变业务记录，仅用于判题，绝不可写入基准库",
+  "expected": {
+    "columns": [
+      "promo",
+      "days",
+      "daily_net_cents",
+      "daily_units",
+      "margin_pct"
+    ],
+    "rows": [
+      [
+        0,
+        190,
+        133885.17,
+        66.92,
+        39.65
+      ],
+      [
+        1,
+        175,
+        119876.45,
+        61.86,
+        38.6
+      ]
+    ]
+  },
+  "orderPolicy": "ordered",
+  "columnPolicy": "exact_names_in_order",
+  "numericTolerance": {
+    "absolute": 1e-06,
+    "integerExact": true,
+    "textExact": true,
+    "nullDistinct": true
+  },
+  "contentVersion": "4.2.1"
+}

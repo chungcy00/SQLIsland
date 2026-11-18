@@ -30,7 +30,7 @@
   "datasetId": "ecommerce-v2",
   "type": "业务情景",
   "schemaVersion": 2,
-  "contentVersion": "4.2.0",
+  "contentVersion": "4.2.1",
   "expectedOutputPath": "business_tasks/results/BP15.json",
   "expectedRowCount": 106,
   "expectedColumns": [
@@ -57,12 +57,15 @@
     "stores",
     "traffic_sources",
     "v_order_net",
-    "v_sales_lines"
+    "v_sales_lines",
+    "warehouses"
   ],
   "orderPolicy": "ordered",
   "numericTolerance": {
-    "integerCents": 0,
-    "decimalAbsolute": 1e-06
+    "absolute": 1e-06,
+    "integerExact": true,
+    "textExact": true,
+    "nullDistinct": true
   },
   "referenceSolutions": [
     {
@@ -71,27 +74,29 @@
       "sqliteSql": "WITH a AS (SELECT customer_id,COUNT(*) freq,MAX(order_date) last_day,SUM(net_cents) net,SUM(net_cents-cost_cents) gross FROM v_order_net WHERE channel='online' GROUP BY customer_id), b AS (SELECT *,NTILE(5) OVER(ORDER BY net DESC,customer_id) bucket FROM a) SELECT b.customer_id,freq,net net_cents,gross gross_cents,1095-d.day_index recency_days FROM b JOIN calendar_days d ON d.day=b.last_day WHERE bucket=1 AND freq>=3 AND 1095-d.day_index>=90 ORDER BY gross DESC,b.customer_id"
     },
     {
-      "kind": "algebraic equivalent",
+      "kind": "equivalent",
       "mysqlSql": "WITH a AS (SELECT customer_id,COUNT(*) freq,MAX(order_date) last_day,SUM(net_cents) net,SUM(net_cents-cost_cents) gross FROM v_order_net WHERE channel='online' GROUP BY customer_id), b AS (SELECT *,NTILE(5) OVER(ORDER BY net DESC,customer_id) bucket FROM a) SELECT b.customer_id,freq,net net_cents,gross gross_cents,1095-d.day_index recency_days FROM b JOIN calendar_days d ON d.day=b.last_day WHERE bucket=1 AND freq>2 AND 1095-d.day_index>=90 ORDER BY gross DESC,b.customer_id",
       "sqliteSql": "WITH a AS (SELECT customer_id,COUNT(*) freq,MAX(order_date) last_day,SUM(net_cents) net,SUM(net_cents-cost_cents) gross FROM v_order_net WHERE channel='online' GROUP BY customer_id), b AS (SELECT *,NTILE(5) OVER(ORDER BY net DESC,customer_id) bucket FROM a) SELECT b.customer_id,freq,net net_cents,gross gross_cents,1095-d.day_index recency_days FROM b JOIN calendar_days d ON d.day=b.last_day WHERE bucket=1 AND freq>2 AND 1095-d.day_index>=90 ORDER BY gross DESC,b.customer_id"
     }
   ],
   "hints": [
     "汇总历史价值",
-    "汇总历史价值；在全体客户上分位",
-    "重点核对输出粒度：客户"
+    "在全体客户上分位；计算距截止日天数",
+    "仅凭最后消费日期无法识别高价值，且流失风险不是已流失事实。"
   ],
-  "explanation": "汇总历史价值；在全体客户上分位；计算距截止日天数；筛风险名单。仅凭最后消费日期无法识别高价值，且流失风险不是已流失事实。\n审计口径：先核定日期范围、输出粒度、退款和贷项，再在各事实表中独立聚合，防止连接放大。",
+  "explanation": "汇总历史价值。在全体客户上分位。计算距截止日天数。筛风险名单。仅凭最后消费日期无法识别高价值，且流失风险不是已流失事实。",
   "testFixtureIds": [
     "q0265-public",
     "q0265-boundary",
     "q0265-mini-202611171",
-    "q0265-mini-202611179"
+    "q0265-mini-202611179",
+    "q0265-review-multiple-partial-returns"
   ],
   "validationStatus": {
     "independentPython": true,
+    "sqliteNative": true,
     "sqliteWasm": true,
     "mysql84Native": false
   },
-  "elapsedMs": 30.613
+  "elapsedMs": 29.82
 }

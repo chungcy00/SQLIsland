@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "contentVersion": "4.2.0",
+  "contentVersion": "4.2.1",
   "chapters": [
     {
       "id": "ch01",
@@ -133,14 +133,14 @@
       "path": "courses/ch19.json",
       "title": "业务数据分析",
       "knowledgePointCount": 60,
-      "sha256": "3d1990db4445abf9b6f7aacbf74ae4776299bb0a4fdce15bab02f89f05997803"
+      "sha256": "ed252507e9514739b2f36c90b867edbbd16e4f6602fd96c8dba02e7acf058217"
     },
     {
       "id": "ch20",
       "path": "courses/ch20.json",
       "title": "综合挑战",
       "knowledgePointCount": 24,
-      "sha256": "4e72fb58264d9e27d8f5ddddbebea9f5990c4126ea674edda7e3b53e1c0ac971"
+      "sha256": "357d8bba05fc52d240d82f1349719dcc206b7b7d7971344b84267bc685c267cd"
     }
   ],
   "knowledgePointCount": 152,
@@ -242,13 +242,13 @@
     },
     {
       "path": "courses/ch19.json",
-      "bytes": 522161,
-      "sha256": "3d1990db4445abf9b6f7aacbf74ae4776299bb0a4fdce15bab02f89f05997803"
+      "bytes": 537289,
+      "sha256": "ed252507e9514739b2f36c90b867edbbd16e4f6602fd96c8dba02e7acf058217"
     },
     {
       "path": "courses/ch20.json",
-      "bytes": 281607,
-      "sha256": "4e72fb58264d9e27d8f5ddddbebea9f5990c4126ea674edda7e3b53e1c0ac971"
+      "bytes": 295541,
+      "sha256": "357d8bba05fc52d240d82f1349719dcc206b7b7d7971344b84267bc685c267cd"
     },
     {
       "path": "fixtures/lesson-accounts.json",
@@ -497,18 +497,18 @@
     },
     {
       "path": "reading/ch19.md",
-      "bytes": 160319,
-      "sha256": "5c4dbfc034b3a3b33efb8d6739bd2b39d8c9192fc92c7a5b67a8aef73214575e"
+      "bytes": 128463,
+      "sha256": "7524a6910b59e4dff7a441cc7f4973aec5c3a28d83a8c56bdd58e9bb17abf4d4"
     },
     {
       "path": "reading/ch20.md",
-      "bytes": 85257,
-      "sha256": "5608f4cd2ed34236ad6d5e55466b94b2ee2e5dbab9c15ff86afec7ebfa540dcf"
+      "bytes": 54609,
+      "sha256": "ba08ef4fa26e4a32ac1e02a6a23b8354ab01373be0cf2f638716a6431b28fa28"
     },
     {
       "path": "reference/CURRICULUM.md",
-      "bytes": 8169,
-      "sha256": "c8e50142cdc40bd7a995991a0d77db5db3298eeed0dd0282accdb5621b270079"
+      "bytes": 8178,
+      "sha256": "0b7133bc97a6a3eaca99cb55bf81449735b3ef58029f307e77b677ff299f7b06"
     },
     {
       "path": "reference/DATABASE.md",
@@ -1104,5 +1104,5 @@
       "sha256": "d47285cfecd67f2dfd37a0d41a2c8a2714a6ecbc8e1170c3e9c0052204106924"
     }
   },
-  "auditRelease": "4.2.0"
+  "auditRelease": "4.2.1"
 }

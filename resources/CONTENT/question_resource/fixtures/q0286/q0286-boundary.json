@@ -43,5 +43,5 @@
     "description": "原库无差异、删除一条收货入库流水后产生唯一负差异",
     "passed": true
   },
-  "contentVersion": "4.2.0"
+  "contentVersion": "4.2.1"
 }

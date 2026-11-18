@@ -1,0 +1,33 @@
+{
+  "contentVersion": "4.2.1",
+  "databaseVersion": "4.2.0",
+  "questions": 50,
+  "categories": {
+    "A": 33,
+    "B": 9,
+    "C": 1,
+    "D": 5,
+    "E": 2
+  },
+  "fixtures": 237,
+  "sqliteCorrectExecutions": 474,
+  "wasmCorrectExecutions": 474,
+  "sqliteExecutableWrongQueriesRejected": 305,
+  "syntaxErrorsExcludedFromWrongResultProof": 2,
+  "validEquivalentCandidatesAccepted": [
+    {
+      "task": "BP29",
+      "label": "累加误用平均"
+    }
+  ],
+  "wasmExecutableWrongQueriesRejected": 100,
+  "businessInvariants": 28,
+  "databaseCount": 7,
+  "databaseBytes": 117534720,
+  "emptyPublicTasks": [
+    "BP36",
+    "BP39"
+  ],
+  "dataContentChanged": false,
+  "mysql84NativeVerified": false
+}

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 4,
-  "contentVersion": "4.2.0",
+  "contentVersion": "4.2.1",
   "cutoff": "2025-12-31",
   "period": [
     "2023-01-01",
@@ -158,7 +158,7 @@
     {
       "id": "BP20",
       "questionId": "q0270",
-      "rows": 1434
+      "rows": 984
     },
     {
       "id": "BP21",

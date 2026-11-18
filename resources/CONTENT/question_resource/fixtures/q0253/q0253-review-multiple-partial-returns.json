@@ -1,0 +1,202 @@
+{
+  "id": "q0253-review-multiple-partial-returns",
+  "questionId": "q0253",
+  "visibility": "hidden",
+  "variant": "multiple-partial-returns",
+  "kind": "database_delta",
+  "datasetId": "retail-v2",
+  "baseDatabase": "databases/retail/retail.sqlite",
+  "baseSha256": "e80ec41c783e5763b0e482b4c30889bdaa313f53582d3d11ee0ea47d2366cd78",
+  "patchSql": [
+    "INSERT INTO returns VALUES(5064,82259,'2025-10-04',2,1660)",
+    "UPDATE returns SET quantity=1,refund_cents=830 WHERE return_id=4185",
+    "INSERT INTO returns VALUES(5065,55743,'2025-10-10',1,4180)",
+    "UPDATE returns SET quantity=1,refund_cents=4180 WHERE return_id=4192",
+    "INSERT INTO returns VALUES(5066,11004,'2025-01-28',1,3170)",
+    "UPDATE returns SET quantity=1,refund_cents=3170 WHERE return_id=2477"
+  ],
+  "patchDescription": "同一原销售行拆成多次部分退货，累计数量金额与原业务一致，库存流水同步拆分",
+  "patchRowChanges": 0,
+  "testIsolation": "每次使用全新数据库副本；夹具可故意引入对账差异或改变业务记录，仅用于判题，绝不可写入基准库",
+  "expected": {
+    "columns": [
+      "product_id",
+      "net_cents",
+      "margin_pct",
+      "discount_cents",
+      "refund_cents"
+    ],
+    "rows": [
+      [
+        169,
+        1160554,
+        17.73,
+        26953,
+        50733
+      ],
+      [
+        264,
+        422666,
+        19.4,
+        634,
+        30600
+      ],
+      [
+        157,
+        364172,
+        25.3,
+        2401,
+        24737
+      ],
+      [
+        127,
+        359836,
+        25.94,
+        4884,
+        38800
+      ],
+      [
+        399,
+        304741,
+        26.73,
+        759,
+        0
+      ],
+      [
+        367,
+        269142,
+        12.68,
+        7068,
+        13640
+      ],
+      [
+        130,
+        225866,
+        15.99,
+        914,
+        0
+      ],
+      [
+        374,
+        215268,
+        26.51,
+        2869,
+        10123
+      ],
+      [
+        483,
+        213362,
+        15.73,
+        838,
+        14280
+      ],
+      [
+        229,
+        156607,
+        24.8,
+        533,
+        20370
+      ],
+      [
+        22,
+        151511,
+        28.39,
+        3019,
+        17170
+      ],
+      [
+        246,
+        135101,
+        22.39,
+        1659,
+        0
+      ],
+      [
+        193,
+        129663,
+        27.68,
+        1754,
+        9623
+      ],
+      [
+        331,
+        123750,
+        21.41,
+        0,
+        13750
+      ],
+      [
+        231,
+        123483,
+        12.83,
+        2097,
+        9660
+      ],
+      [
+        443,
+        122290,
+        29.07,
+        1080,
+        10140
+      ],
+      [
+        95,
+        120421,
+        22.39,
+        449,
+        0
+      ],
+      [
+        191,
+        116130,
+        21.29,
+        0,
+        5530
+      ],
+      [
+        290,
+        115879,
+        18.7,
+        371,
+        1550
+      ],
+      [
+        460,
+        108609,
+        27.72,
+        982,
+        5249
+      ],
+      [
+        409,
+        108356,
+        20.92,
+        284,
+        970
+      ],
+      [
+        487,
+        107800,
+        25.78,
+        0,
+        43120
+      ],
+      [
+        410,
+        96200,
+        23.09,
+        2600,
+        0
+      ]
+    ]
+  },
+  "orderPolicy": "ordered",
+  "columnPolicy": "exact_names_in_order",
+  "numericTolerance": {
+    "absolute": 1e-06,
+    "integerExact": true,
+    "textExact": true,
+    "nullDistinct": true
+  },
+  "contentVersion": "4.2.1"
+}

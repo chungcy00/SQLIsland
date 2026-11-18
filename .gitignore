@@ -12,3 +12,5 @@ __pycache__/
 artifacts/*
 !artifacts/enterprise-audit/
 !artifacts/update.json
+
+!artifacts/task-reaudit-20261118/

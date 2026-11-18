@@ -4,15 +4,15 @@
   "context": "采购控制人员识别数量、价格与金额差异。",
   "requirements": "2025年非取消采购行（截止年底）；输出订购、合格收货、开票数量，开票金额与合格收货按采购单价的金额差；仅数量不等或金额差不为0；未开票也需要呈现。 本题核对原始开票行，不冲减后续贷项；净应付与贷项的核对见财务题。",
   "grain": "采购行",
-  "commonError": "收货明细与发票明细未经聚合直接连接形成多对多膨胀。",
+  "commonError": "v_po_lines的开票汇总不含发票日期过滤；截至年底核对需重新汇总日期合格的发票行。",
   "executionSteps": [
-    "核对采购行预聚合定义",
-    "计算数量及金额差",
-    "保留未开票未收货"
+    "独立按发票日期汇总截止日开票行",
+    "连接已预聚合的采购和合格收货",
+    "比较订购收货开票数量与金额"
   ],
   "difficulty": "困难",
-  "mysqlSql": "SELECT po_item_id,po_id,supplier_id,product_id,quantity_ordered,accepted,billed,billed_cents,accepted*unit_price_cents expected_cents,billed_cents-accepted*unit_price_cents variance_cents FROM v_po_lines WHERE order_date BETWEEN '2025-01-01' AND '2025-12-31' AND (quantity_ordered<>accepted OR accepted<>billed OR billed_cents<>accepted*unit_price_cents) ORDER BY po_item_id",
-  "sqliteSql": "SELECT po_item_id,po_id,supplier_id,product_id,quantity_ordered,accepted,billed,billed_cents,accepted*unit_price_cents expected_cents,billed_cents-accepted*unit_price_cents variance_cents FROM v_po_lines WHERE order_date BETWEEN '2025-01-01' AND '2025-12-31' AND (quantity_ordered<>accepted OR accepted<>billed OR billed_cents<>accepted*unit_price_cents) ORDER BY po_item_id",
+  "mysqlSql": "WITH billed AS (\n  SELECT x.po_item_id,SUM(x.quantity_billed) billed,SUM(x.quantity_billed*x.unit_price_cents) billed_cents\n  FROM supplier_invoice_items x JOIN supplier_invoices f ON f.supplier_invoice_id=x.supplier_invoice_id\n  WHERE f.invoice_date<='2025-12-31' GROUP BY x.po_item_id\n), checked AS (\n  SELECT v.po_item_id,v.po_id,v.supplier_id,v.product_id,v.quantity_ordered,v.accepted,\n    COALESCE(b.billed,0) billed,COALESCE(b.billed_cents,0) billed_cents,v.accepted*v.unit_price_cents expected_cents\n  FROM v_po_lines v LEFT JOIN billed b ON b.po_item_id=v.po_item_id\n  WHERE v.order_date BETWEEN '2025-01-01' AND '2025-12-31'\n)\nSELECT po_item_id,po_id,supplier_id,product_id,quantity_ordered,accepted,billed,billed_cents,expected_cents,\n  billed_cents-expected_cents variance_cents FROM checked\nWHERE quantity_ordered<>accepted OR accepted<>billed OR billed_cents<>expected_cents ORDER BY po_item_id",
+  "sqliteSql": "WITH billed AS (\n  SELECT x.po_item_id,SUM(x.quantity_billed) billed,SUM(x.quantity_billed*x.unit_price_cents) billed_cents\n  FROM supplier_invoice_items x JOIN supplier_invoices f ON f.supplier_invoice_id=x.supplier_invoice_id\n  WHERE f.invoice_date<='2025-12-31' GROUP BY x.po_item_id\n), checked AS (\n  SELECT v.po_item_id,v.po_id,v.supplier_id,v.product_id,v.quantity_ordered,v.accepted,\n    COALESCE(b.billed,0) billed,COALESCE(b.billed_cents,0) billed_cents,v.accepted*v.unit_price_cents expected_cents\n  FROM v_po_lines v LEFT JOIN billed b ON b.po_item_id=v.po_item_id\n  WHERE v.order_date BETWEEN '2025-01-01' AND '2025-12-31'\n)\nSELECT po_item_id,po_id,supplier_id,product_id,quantity_ordered,accepted,billed,billed_cents,expected_cents,\n  billed_cents-expected_cents variance_cents FROM checked\nWHERE quantity_ordered<>accepted OR accepted<>billed OR billed_cents<>expected_cents ORDER BY po_item_id",
   "compatibility": "直接兼容（原生待验证）",
   "columns": [
     "po_item_id",
@@ -34,7 +34,7 @@
   "datasetId": "procurement-v2",
   "type": "业务情景",
   "schemaVersion": 2,
-  "contentVersion": "4.2.0",
+  "contentVersion": "4.2.1",
   "expectedOutputPath": "business_tasks/results/BP28.json",
   "expectedRowCount": 928,
   "expectedColumns": [
@@ -50,6 +50,8 @@
     "variance_cents"
   ],
   "sourceTables": [
+    "supplier_invoice_items",
+    "supplier_invoices",
     "v_po_lines"
   ],
   "dependencyTables": [
@@ -67,37 +69,42 @@
   ],
   "orderPolicy": "ordered",
   "numericTolerance": {
-    "integerCents": 0,
-    "decimalAbsolute": 1e-06
+    "absolute": 1e-06,
+    "integerExact": true,
+    "textExact": true,
+    "nullDistinct": true
   },
   "referenceSolutions": [
     {
       "kind": "reference",
-      "mysqlSql": "SELECT po_item_id,po_id,supplier_id,product_id,quantity_ordered,accepted,billed,billed_cents,accepted*unit_price_cents expected_cents,billed_cents-accepted*unit_price_cents variance_cents FROM v_po_lines WHERE order_date BETWEEN '2025-01-01' AND '2025-12-31' AND (quantity_ordered<>accepted OR accepted<>billed OR billed_cents<>accepted*unit_price_cents) ORDER BY po_item_id",
-      "sqliteSql": "SELECT po_item_id,po_id,supplier_id,product_id,quantity_ordered,accepted,billed,billed_cents,accepted*unit_price_cents expected_cents,billed_cents-accepted*unit_price_cents variance_cents FROM v_po_lines WHERE order_date BETWEEN '2025-01-01' AND '2025-12-31' AND (quantity_ordered<>accepted OR accepted<>billed OR billed_cents<>accepted*unit_price_cents) ORDER BY po_item_id"
+      "mysqlSql": "WITH billed AS (\n  SELECT x.po_item_id,SUM(x.quantity_billed) billed,SUM(x.quantity_billed*x.unit_price_cents) billed_cents\n  FROM supplier_invoice_items x JOIN supplier_invoices f ON f.supplier_invoice_id=x.supplier_invoice_id\n  WHERE f.invoice_date<='2025-12-31' GROUP BY x.po_item_id\n), checked AS (\n  SELECT v.po_item_id,v.po_id,v.supplier_id,v.product_id,v.quantity_ordered,v.accepted,\n    COALESCE(b.billed,0) billed,COALESCE(b.billed_cents,0) billed_cents,v.accepted*v.unit_price_cents expected_cents\n  FROM v_po_lines v LEFT JOIN billed b ON b.po_item_id=v.po_item_id\n  WHERE v.order_date BETWEEN '2025-01-01' AND '2025-12-31'\n)\nSELECT po_item_id,po_id,supplier_id,product_id,quantity_ordered,accepted,billed,billed_cents,expected_cents,\n  billed_cents-expected_cents variance_cents FROM checked\nWHERE quantity_ordered<>accepted OR accepted<>billed OR billed_cents<>expected_cents ORDER BY po_item_id",
+      "sqliteSql": "WITH billed AS (\n  SELECT x.po_item_id,SUM(x.quantity_billed) billed,SUM(x.quantity_billed*x.unit_price_cents) billed_cents\n  FROM supplier_invoice_items x JOIN supplier_invoices f ON f.supplier_invoice_id=x.supplier_invoice_id\n  WHERE f.invoice_date<='2025-12-31' GROUP BY x.po_item_id\n), checked AS (\n  SELECT v.po_item_id,v.po_id,v.supplier_id,v.product_id,v.quantity_ordered,v.accepted,\n    COALESCE(b.billed,0) billed,COALESCE(b.billed_cents,0) billed_cents,v.accepted*v.unit_price_cents expected_cents\n  FROM v_po_lines v LEFT JOIN billed b ON b.po_item_id=v.po_item_id\n  WHERE v.order_date BETWEEN '2025-01-01' AND '2025-12-31'\n)\nSELECT po_item_id,po_id,supplier_id,product_id,quantity_ordered,accepted,billed,billed_cents,expected_cents,\n  billed_cents-expected_cents variance_cents FROM checked\nWHERE quantity_ordered<>accepted OR accepted<>billed OR billed_cents<>expected_cents ORDER BY po_item_id"
     },
     {
-      "kind": "algebraic equivalent",
-      "mysqlSql": "SELECT po_item_id,po_id,supplier_id,product_id,quantity_ordered,accepted,billed,billed_cents,accepted*unit_price_cents expected_cents,billed_cents-accepted*unit_price_cents variance_cents FROM v_po_lines WHERE (order_date>='2025-01-01' AND order_date<='2025-12-31') AND (quantity_ordered<>accepted OR accepted<>billed OR billed_cents<>accepted*unit_price_cents) ORDER BY po_item_id",
-      "sqliteSql": "SELECT po_item_id,po_id,supplier_id,product_id,quantity_ordered,accepted,billed,billed_cents,accepted*unit_price_cents expected_cents,billed_cents-accepted*unit_price_cents variance_cents FROM v_po_lines WHERE (order_date>='2025-01-01' AND order_date<='2025-12-31') AND (quantity_ordered<>accepted OR accepted<>billed OR billed_cents<>accepted*unit_price_cents) ORDER BY po_item_id"
+      "kind": "equivalent",
+      "mysqlSql": "WITH billed AS (\n  SELECT x.po_item_id,SUM(x.quantity_billed) billed,SUM(x.quantity_billed*x.unit_price_cents) billed_cents\n  FROM supplier_invoice_items x JOIN supplier_invoices f ON f.supplier_invoice_id=x.supplier_invoice_id\n  WHERE f.invoice_date<='2025-12-31' GROUP BY x.po_item_id\n), checked AS (\n  SELECT v.po_item_id,v.po_id,v.supplier_id,v.product_id,v.quantity_ordered,v.accepted,\n    COALESCE(b.billed,0) billed,COALESCE(b.billed_cents,0) billed_cents,v.accepted*v.unit_price_cents expected_cents\n  FROM v_po_lines v LEFT JOIN billed b ON b.po_item_id=v.po_item_id\n  WHERE (v.order_date>='2025-01-01' AND v.order_date<='2025-12-31')\n)\nSELECT po_item_id,po_id,supplier_id,product_id,quantity_ordered,accepted,billed,billed_cents,expected_cents,\n  billed_cents-expected_cents variance_cents FROM checked\nWHERE quantity_ordered<>accepted OR accepted<>billed OR billed_cents<>expected_cents ORDER BY po_item_id",
+      "sqliteSql": "WITH billed AS (\n  SELECT x.po_item_id,SUM(x.quantity_billed) billed,SUM(x.quantity_billed*x.unit_price_cents) billed_cents\n  FROM supplier_invoice_items x JOIN supplier_invoices f ON f.supplier_invoice_id=x.supplier_invoice_id\n  WHERE f.invoice_date<='2025-12-31' GROUP BY x.po_item_id\n), checked AS (\n  SELECT v.po_item_id,v.po_id,v.supplier_id,v.product_id,v.quantity_ordered,v.accepted,\n    COALESCE(b.billed,0) billed,COALESCE(b.billed_cents,0) billed_cents,v.accepted*v.unit_price_cents expected_cents\n  FROM v_po_lines v LEFT JOIN billed b ON b.po_item_id=v.po_item_id\n  WHERE (v.order_date>='2025-01-01' AND v.order_date<='2025-12-31')\n)\nSELECT po_item_id,po_id,supplier_id,product_id,quantity_ordered,accepted,billed,billed_cents,expected_cents,\n  billed_cents-expected_cents variance_cents FROM checked\nWHERE quantity_ordered<>accepted OR accepted<>billed OR billed_cents<>expected_cents ORDER BY po_item_id"
     }
   ],
   "hints": [
-    "核对采购行预聚合定义",
-    "核对采购行预聚合定义；计算数量及金额差",
-    "重点核对输出粒度：采购行"
+    "独立按发票日期汇总截止日开票行",
+    "连接已预聚合的采购和合格收货；比较订购收货开票数量与金额",
+    "v_po_lines的开票汇总不含发票日期过滤；截至年底核对需重新汇总日期合格的发票行。"
   ],
-  "explanation": "核对采购行预聚合定义；计算数量及金额差；保留未开票未收货。收货明细与发票明细未经聚合直接连接形成多对多膨胀。\n审计口径：先核定日期范围、输出粒度、退款和贷项，再在各事实表中独立聚合，防止连接放大。",
+  "explanation": "独立按发票日期汇总截止日开票行。连接已预聚合的采购和合格收货。比较订购收货开票数量与金额。v_po_lines的开票汇总不含发票日期过滤；截至年底核对需重新汇总日期合格的发票行。",
   "testFixtureIds": [
     "q0278-public",
     "q0278-boundary",
     "q0278-mini-202611171",
-    "q0278-mini-202611179"
+    "q0278-mini-202611179",
+    "q0278-review-split-invoice",
+    "q0278-review-future-invoice"
   ],
   "validationStatus": {
     "independentPython": true,
+    "sqliteNative": true,
     "sqliteWasm": true,
     "mysql84Native": false
   },
-  "elapsedMs": 16.018
+  "elapsedMs": 23.46
 }

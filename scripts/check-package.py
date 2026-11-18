@@ -11,6 +11,7 @@ import zipfile
 ROOT = Path(__file__).resolve().parents[1]
 parser = argparse.ArgumentParser()
 parser.add_argument('--previous-apk', type=Path)
+parser.add_argument('--report', type=Path, default=ROOT / 'artifacts/enterprise-audit/package-validation.json')
 args = parser.parse_args()
 release = json.loads((ROOT / 'release.json').read_text())
 apk = ROOT / 'artifacts' / (release['appName'] + '-' + release['version'] + '.apk')
@@ -48,7 +49,7 @@ if args.previous_apk:
 with zipfile.ZipFile(apk) as archive:
     inventory = json.loads(archive.read('assets/resources.json'))
     assert inventory['version'] == release['version']
-    assert inventory['contentVersion'] == '4.2.0'
+    assert inventory['contentVersion'] == json.loads((ROOT / 'resources/CONTENT/manifest.json').read_text())['auditRelease']
     for entry in inventory['files']:
         data = archive.read('assets/' + entry['path'])
         assert len(data) == entry['bytes'], entry['path']
@@ -65,6 +66,7 @@ report = {
     'sameCertificateAsPrevious': True if args.previous_apk else None,
     'verifiedOfflineFiles': len(inventory['files']), 'databaseAndDictionaryPairs': len(datasets),
 }
-output = ROOT / 'artifacts/enterprise-audit/package-validation.json'
+output = args.report
+output.parent.mkdir(parents=True, exist_ok=True)
 output.write_text(json.dumps(report, indent=2) + '\n')
 print('APK, update manifest, signature and offline files verified', apk_hash)

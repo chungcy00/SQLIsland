@@ -31,7 +31,7 @@
   "datasetId": "enterprise-v2",
   "type": "业务情景",
   "schemaVersion": 2,
-  "contentVersion": "4.2.0",
+  "contentVersion": "4.2.1",
   "expectedOutputPath": "business_tasks/results/BP41.json",
   "expectedRowCount": 60,
   "expectedColumns": [
@@ -54,6 +54,7 @@
     "purchase_order_items",
     "purchase_orders",
     "supplier_contracts",
+    "supplier_credit_notes",
     "supplier_invoice_items",
     "supplier_invoices",
     "supplier_payments",
@@ -64,8 +65,10 @@
   ],
   "orderPolicy": "ordered",
   "numericTolerance": {
-    "integerCents": 0,
-    "decimalAbsolute": 1e-06
+    "absolute": 1e-06,
+    "integerExact": true,
+    "textExact": true,
+    "nullDistinct": true
   },
   "referenceSolutions": [
     {
@@ -74,17 +77,17 @@
       "sqliteSql": "WITH a AS (SELECT supplier_id,SUM(ordered_cents) ordered,SUM(accepted*unit_price_cents) received FROM v_po_lines GROUP BY supplier_id), b AS (SELECT supplier_id,SUM(billed_cents) billed,SUM(paid_cents) paid,SUM(balance_cents) balance FROM v_invoice_balance GROUP BY supplier_id) SELECT s.supplier_id,COALESCE(a.ordered,0) ordered_cents,COALESCE(a.received,0) received_cents,COALESCE(b.billed,0) billed_cents,COALESCE(b.paid,0) paid_cents,COALESCE(b.balance,0) balance_cents FROM suppliers s LEFT JOIN a ON a.supplier_id=s.supplier_id LEFT JOIN b ON b.supplier_id=s.supplier_id ORDER BY balance_cents DESC,s.supplier_id"
     },
     {
-      "kind": "algebraic equivalent",
+      "kind": "equivalent",
       "mysqlSql": "WITH a AS (SELECT supplier_id,SUM(ordered_cents) ordered,SUM(accepted*unit_price_cents) received FROM v_po_lines GROUP BY supplier_id), b AS (SELECT supplier_id,SUM(billed_cents) billed,SUM(paid_cents) paid,SUM(balance_cents) balance FROM v_invoice_balance GROUP BY supplier_id) SELECT s.supplier_id,IFNULL(a.ordered,0) ordered_cents,IFNULL(a.received,0) received_cents,IFNULL(b.billed,0) billed_cents,IFNULL(b.paid,0) paid_cents,IFNULL(b.balance,0) balance_cents FROM suppliers s LEFT JOIN a ON a.supplier_id=s.supplier_id LEFT JOIN b ON b.supplier_id=s.supplier_id ORDER BY balance_cents DESC,s.supplier_id",
       "sqliteSql": "WITH a AS (SELECT supplier_id,SUM(ordered_cents) ordered,SUM(accepted*unit_price_cents) received FROM v_po_lines GROUP BY supplier_id), b AS (SELECT supplier_id,SUM(billed_cents) billed,SUM(paid_cents) paid,SUM(balance_cents) balance FROM v_invoice_balance GROUP BY supplier_id) SELECT s.supplier_id,IFNULL(a.ordered,0) ordered_cents,IFNULL(a.received,0) received_cents,IFNULL(b.billed,0) billed_cents,IFNULL(b.paid,0) paid_cents,IFNULL(b.balance,0) balance_cents FROM suppliers s LEFT JOIN a ON a.supplier_id=s.supplier_id LEFT JOIN b ON b.supplier_id=s.supplier_id ORDER BY balance_cents DESC,s.supplier_id"
     }
   ],
   "hints": [
     "聚合采购行和发票余额",
-    "聚合采购行和发票余额；匹配供应商",
-    "重点核对输出粒度：供应商"
+    "匹配供应商；形成资金敞口",
+    "采购行和发票行直接连接会重复计入付款。"
   ],
-  "explanation": "聚合采购行和发票余额；匹配供应商；形成资金敞口。采购行和发票行直接连接会重复计入付款。\n审计口径：先核定日期范围、输出粒度、退款和贷项，再在各事实表中独立聚合，防止连接放大。",
+  "explanation": "聚合采购行和发票余额。匹配供应商。形成资金敞口。采购行和发票行直接连接会重复计入付款。",
   "testFixtureIds": [
     "q0291-public",
     "q0291-boundary",
@@ -93,8 +96,9 @@
   ],
   "validationStatus": {
     "independentPython": true,
+    "sqliteNative": true,
     "sqliteWasm": true,
     "mysql84Native": false
   },
-  "elapsedMs": 25.219
+  "elapsedMs": 24.861
 }

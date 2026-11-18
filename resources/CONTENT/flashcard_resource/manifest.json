@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "contentVersion": "4.2.0",
+  "contentVersion": "4.2.1",
   "cardCount": 200,
   "chapterCount": 20,
   "countsByType": {
@@ -156,13 +156,13 @@
       "chapterId": "ch19",
       "path": "flashcards/ch19.json",
       "count": 38,
-      "sha256": "f757c6be97c5f921b517fc06bf2d4eb68dcf9fff3c6b4a1f145224fd6580633c"
+      "sha256": "5037ddce14c5b1b0ca366bbe229d7bdf0e62accc427925eee0a72d1db899e8ae"
     },
     {
       "chapterId": "ch20",
       "path": "flashcards/ch20.json",
       "count": 22,
-      "sha256": "1baf852c9b57f8b584db75f73baef71ae9d22b56b9acccb3a03745f28225f1ef"
+      "sha256": "4a418f4d4b1bc5d473eb18b691be032c8704fb4e61377e9eb96d874e0119dc13"
     }
   ],
   "files": [
@@ -998,13 +998,13 @@
     },
     {
       "path": "flashcards/ch19.json",
-      "bytes": 135075,
-      "sha256": "f757c6be97c5f921b517fc06bf2d4eb68dcf9fff3c6b4a1f145224fd6580633c"
+      "bytes": 135987,
+      "sha256": "5037ddce14c5b1b0ca366bbe229d7bdf0e62accc427925eee0a72d1db899e8ae"
     },
     {
       "path": "flashcards/ch20.json",
-      "bytes": 80404,
-      "sha256": "1baf852c9b57f8b584db75f73baef71ae9d22b56b9acccb3a03745f28225f1ef"
+      "bytes": 80910,
+      "sha256": "4a418f4d4b1bc5d473eb18b691be032c8704fb4e61377e9eb96d874e0119dc13"
     },
     {
       "path": "reading/ch01.md",
@@ -1098,18 +1098,18 @@
     },
     {
       "path": "reading/ch19.md",
-      "bytes": 47396,
-      "sha256": "14888c77c2c1dff6784dad15aaad5fca76e45512f86a2bdd2acdf9ecc40f910a"
+      "bytes": 38346,
+      "sha256": "a70c6a88c0c2a4219c97620dfb6d6d18296dc5f52f857f8e563adde08cc5f44f"
     },
     {
       "path": "reading/ch20.md",
-      "bytes": 27911,
-      "sha256": "d7ae484db0bae5f9bf8413fb23607eefcae6294e781037e56522115a1f4e6d72"
+      "bytes": 21530,
+      "sha256": "36ee524df96ff7a48d5c7f0b0eb2b0e2ce8f55f2b72149d000943b02761410ed"
     },
     {
       "path": "reference/CURRICULUM.md",
-      "bytes": 8169,
-      "sha256": "c8e50142cdc40bd7a995991a0d77db5db3298eeed0dd0282accdb5621b270079"
+      "bytes": 8178,
+      "sha256": "0b7133bc97a6a3eaca99cb55bf81449735b3ef58029f307e77b677ff299f7b06"
     },
     {
       "path": "reference/DATABASE.md",
@@ -1138,8 +1138,8 @@
     },
     {
       "path": "reference/source_index.json",
-      "bytes": 119471,
-      "sha256": "2600bb26d247efeefb3ada033fc57725210c6ca5a641ef1a988fa76e3174c44d"
+      "bytes": 119480,
+      "sha256": "8671b80ef193fe917570c3493a129d6562787ab155bfb06939ddefc39442c5b1"
     },
     {
       "path": "review_policy.json",
@@ -1806,5 +1806,5 @@
   "validationReport": "validation/REPORT.md",
   "resourcePolicy": "独立闪卡内容包；原企业数据库不重复打包。",
   "releaseGate": "SQLite/WASM及独立计算已复验，原生MySQL8.4与实体手机性能待验收；q0212和q0240专项结构仍未评定",
-  "auditRelease": "4.2.0"
+  "auditRelease": "4.2.1"
 }

@@ -113,6 +113,7 @@ test("all reference queries execute against their isolated fixtures", async () =
               q.orderPolicy,
               q.numericTolerance?.absolute,
               q.numericTolerance?.exactColumns,
+              q.numericTolerance?.columnAbsolute,
             );
             if (!result.pass) throw Error(result.message);
           } finally {
@@ -180,4 +181,17 @@ test("integer output columns reject fractional offsets while derived metrics ret
       order, 0.0100001, ["product_id"],
     ).pass, false);
   }
+});
+
+test("price tolerance does not relax percentage accuracy", () => {
+  const expected = { columns: ["product_id", "weighted_price_cents", "premium_pct"], rows: [[1, 125.12, 10.23]] };
+  const priceTolerance = { weighted_price_cents: 0.0100001 };
+  assert.equal(compareResults(
+    { columns: expected.columns, rows: [[1, 125.13, 10.23]] }, expected,
+    "ordered", 1e-6, ["product_id"], priceTolerance,
+  ).pass, true);
+  assert.equal(compareResults(
+    { columns: expected.columns, rows: [[1, 125.12, 10.235]] }, expected,
+    "ordered", 1e-6, ["product_id"], priceTolerance,
+  ).pass, false);
 });

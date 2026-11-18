@@ -170,6 +170,7 @@ export function compareResults(
   policy = "ordered",
   tolerance = 1e-6,
   exactColumns = [],
+  columnTolerances = {},
 ) {
   if (JSON.stringify(actual.columns) !== JSON.stringify(expected.columns))
     return { pass: false, message: "输出列名或列顺序与题目要求不同。" };
@@ -186,7 +187,8 @@ export function compareResults(
       return Number.isInteger(a) && Number.isInteger(b) && a === b;
     }
     if (Number.isInteger(a) && Number.isInteger(b)) return a === b;
-    return Math.abs(a - b) <= tolerance;
+    const allowedDifference = columnTolerances[expected.columns[index]] ?? tolerance;
+    return Math.abs(a - b) <= allowedDifference;
   };
   const row = (a, b) =>
     a.length === b.length && a.every((v, i) => cell(v, b[i], i));

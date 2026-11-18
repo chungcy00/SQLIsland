@@ -2,7 +2,7 @@
   "projectId": "procurement",
   "title": "同商品跨供应商采购价差",
   "context": "管理层希望看到同品不同供应商的采购单价差异。",
-  "requirements": "2025年非取消采购行，同商品同供应商采购金额/订购量为加权单价；只比较有至少两家供应商商品；输出供应商加权价、最低价及相对最低价的溢价率。 派生加权均价允许末位1分的跨引擎浮点舍入差异；原始整数金额、件数及标识仍须精确。",
+  "requirements": "2025年非取消采购行，同商品同供应商采购金额/订购量为加权单价；只比较有至少两家供应商商品；输出供应商加权价、最低价及相对最低价的溢价率。 派生加权均价允许末位1分的跨引擎浮点舍入差异；原始整数金额、件数及标识仍须精确。 仅weighted_price_cents和low_price_cents允许0.0100001分绝对误差，premium_pct绝对误差上限为0.000001个百分点；商品和供应商编号精确比较。",
   "grain": "商品×供应商",
   "commonError": "对单位价格直接AVG没有反映采购数量权重。",
   "executionSteps": [
@@ -29,7 +29,7 @@
   "datasetId": "procurement-v2",
   "type": "业务情景",
   "schemaVersion": 2,
-  "contentVersion": "4.2.0",
+  "contentVersion": "4.2.1",
   "expectedOutputPath": "business_tasks/results/BP29.json",
   "expectedRowCount": 548,
   "expectedColumns": [
@@ -57,8 +57,14 @@
   ],
   "orderPolicy": "ordered",
   "numericTolerance": {
-    "integerCents": 0,
-    "decimalAbsolute": 1e-06
+    "absolute": 1e-06,
+    "integerExact": true,
+    "textExact": true,
+    "nullDistinct": true,
+    "columnAbsolute": {
+      "weighted_price_cents": 0.0100001,
+      "low_price_cents": 0.0100001
+    }
   },
   "referenceSolutions": [
     {
@@ -67,17 +73,17 @@
       "sqliteSql": "WITH a AS (SELECT product_id,supplier_id,SUM(ordered_cents)*1.0/SUM(quantity_ordered) avg_price FROM v_po_lines WHERE order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY product_id,supplier_id), b AS (SELECT *,MIN(avg_price) OVER(PARTITION BY product_id) low,COUNT(*) OVER(PARTITION BY product_id) n FROM a) SELECT product_id,supplier_id,ROUND(avg_price*100,0)/100.0 weighted_price_cents,ROUND(low*100,0)/100.0 low_price_cents,ROUND(100.0*(avg_price-low)/NULLIF(low,0),2) premium_pct FROM b WHERE n>=2 ORDER BY product_id,premium_pct,supplier_id"
     },
     {
-      "kind": "algebraic equivalent",
+      "kind": "equivalent",
       "mysqlSql": "WITH a AS (SELECT product_id,supplier_id,SUM(ordered_cents)*1.0/SUM(quantity_ordered) avg_price FROM v_po_lines WHERE (order_date>='2025-01-01' AND order_date<='2025-12-31') GROUP BY product_id,supplier_id), b AS (SELECT *,MIN(avg_price) OVER(PARTITION BY product_id) low,COUNT(*) OVER(PARTITION BY product_id) n FROM a) SELECT product_id,supplier_id,ROUND(avg_price*100,0)/100.0 weighted_price_cents,ROUND(low*100,0)/100.0 low_price_cents,ROUND(100.0*(avg_price-low)/NULLIF(low,0),2) premium_pct FROM b WHERE n>=2 ORDER BY product_id,premium_pct,supplier_id",
       "sqliteSql": "WITH a AS (SELECT product_id,supplier_id,SUM(ordered_cents)*1.0/SUM(quantity_ordered) avg_price FROM v_po_lines WHERE (order_date>='2025-01-01' AND order_date<='2025-12-31') GROUP BY product_id,supplier_id), b AS (SELECT *,MIN(avg_price) OVER(PARTITION BY product_id) low,COUNT(*) OVER(PARTITION BY product_id) n FROM a) SELECT product_id,supplier_id,ROUND(avg_price*100,0)/100.0 weighted_price_cents,ROUND(low*100,0)/100.0 low_price_cents,ROUND(100.0*(avg_price-low)/NULLIF(low,0),2) premium_pct FROM b WHERE n>=2 ORDER BY product_id,premium_pct,supplier_id"
     }
   ],
   "hints": [
     "按每商品供应商求加权价",
-    "按每商品供应商求加权价；窗口求最低与样本数",
-    "重点核对输出粒度：商品×供应商"
+    "窗口求最低与样本数；比较价差",
+    "对单位价格直接AVG没有反映采购数量权重。"
   ],
-  "explanation": "按每商品供应商求加权价；窗口求最低与样本数；比较价差。对单位价格直接AVG没有反映采购数量权重。\n审计口径：先核定日期范围、输出粒度、退款和贷项，再在各事实表中独立聚合，防止连接放大。",
+  "explanation": "按每商品供应商求加权价。窗口求最低与样本数。比较价差。对单位价格直接AVG没有反映采购数量权重。",
   "testFixtureIds": [
     "q0279-public",
     "q0279-boundary",
@@ -86,8 +92,9 @@
   ],
   "validationStatus": {
     "independentPython": true,
+    "sqliteNative": true,
     "sqliteWasm": true,
     "mysql84Native": false
   },
-  "elapsedMs": 18.908
+  "elapsedMs": 18.56
 }

@@ -1,0 +1,11 @@
+{
+  "environment": "本机Node.js sql.js WASM完整取数；实体手机耗时待验证",
+  "publicQueryMedianMs": 33.2505,
+  "publicQueryMaxMs": 167.541,
+  "fullSubmissionMedianMs": 554.375,
+  "fullSubmissionMaxMs": 2122.326,
+  "previousOfflineBytes": 148082693,
+  "offlineBytes": 149292089,
+  "offlineFiles": 1184,
+  "databaseBytes": 117534720
+}

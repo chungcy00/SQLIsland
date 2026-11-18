@@ -1,13 +1,15 @@
 {
-  "versionCode": 5,
-  "versionName": "0.3.1",
+  "versionCode": 6,
+  "versionName": "0.3.2",
   "releaseDate": "2026-11-18",
-  "apkName": "ShuyuSQL-0.3.1.apk",
-  "apkUrl": "https://github.com/chungcy00/SQLIsland/releases/download/v0.3.1/ShuyuSQL-0.3.1.apk",
-  "sha256": "34c5bce56e7697383007b77b9f47cbf650b7e667d2d37e027178332cdb56e918",
-  "bytes": 52819589,
+  "apkName": "ShuyuSQL-0.3.2.apk",
+  "apkUrl": "https://github.com/chungcy00/SQLIsland/releases/download/v0.3.2/ShuyuSQL-0.3.2.apk",
+  "sha256": "20028f54610206b74c367eeeb54a1cf30e1097da897eb9981d65bfdac4322ac2",
+  "bytes": 52986971,
   "notes": [
-    "修复整数编号、数量和整数金额可能被小数容差放过的判题问题。",
-    "保留加权价格、比例等派生小数指标的合理容差。"
+    "按最新七套数据库逐题复审50道企业实战题，题目资源升级至4.2.1。",
+    "修复分批开票、跨年会话、期末核对、缺失数据及银行参考号碰撞口径。",
+    "重新设计门店看板与季度风险基准，同步参考答案、课程、闪卡和隐藏测试。",
+    "派生价格与百分比使用独立容差。"
   ]
 }

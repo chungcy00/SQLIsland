@@ -1,6 +1,6 @@
 {
-  "courseVersion": "4.2.0",
-  "questionVersion": "4.2.0",
+  "courseVersion": "4.2.1",
+  "questionVersion": "4.2.1",
   "sourceFiles": {
     "courses_resource/courses/ch01.json": "2ee3bb9917aa6001835ce0cd783f8e27dada96ac8c8cbfb20a951fcfe8009ec4",
     "courses_resource/courses/ch02.json": "b4af85ed2344f244b404c974e5a865169a4a8f443a52d870e73ca8aa377eeb97",
@@ -20,8 +20,8 @@
     "courses_resource/courses/ch16.json": "a9fe4da1c16ad0f523cdb4e41a21fd630353934a91ad54b2c944cd25b4a95669",
     "courses_resource/courses/ch17.json": "7ec03f4abc40259b2630580e9018afbda18c2d7c00a96152d33cbef2e2f03435",
     "courses_resource/courses/ch18.json": "c6370c164eecb962528ac984654ca50519a7298fef3a32f6e57dd569d0fa67f1",
-    "courses_resource/courses/ch19.json": "3d1990db4445abf9b6f7aacbf74ae4776299bb0a4fdce15bab02f89f05997803",
-    "courses_resource/courses/ch20.json": "4e72fb58264d9e27d8f5ddddbebea9f5990c4126ea674edda7e3b53e1c0ac971",
+    "courses_resource/courses/ch19.json": "ed252507e9514739b2f36c90b867edbbd16e4f6602fd96c8dba02e7acf058217",
+    "courses_resource/courses/ch20.json": "357d8bba05fc52d240d82f1349719dcc206b7b7d7971344b84267bc685c267cd",
     "question_resource/questions/ch01.json": "42204b93a9fb7fa4c58609e3aad6dae8c0571de2e84deecbc6636ad5ed82875c",
     "question_resource/questions/ch02.json": "a041c1c07cbdaeea8c444c37ba363c4dfb964f176a3d5213fb06cfbf427b268d",
     "question_resource/questions/ch03.json": "8041ad88f736e351715838946ddf79f76e4dd4c60cf8775969d3eca0368c0c01",
@@ -40,8 +40,8 @@
     "question_resource/questions/ch16.json": "5867ce039fcb38f1f59d657c445a80d1cc7bf898ab90c35d6741c3535c8efe28",
     "question_resource/questions/ch17.json": "f66247184e3da448d86465dfcdb841cbb879fe1728020e51dfd0b076321e91f5",
     "question_resource/questions/ch18.json": "80e8644be793751fbca55ec8342470f58833c895aad44925f0cf02afb76d08c6",
-    "question_resource/questions/ch19.json": "b177782e348158d6aca634d0b6a7febacf2b58e069e54090c4296fad0703df77",
-    "question_resource/questions/ch20.json": "54f3d3ace9ebe70c57f19fa69b0b1f516ec967143d5c2fc608ced3c142634fe7"
+    "question_resource/questions/ch19.json": "d06e70f2205f6386dcd34de155374645202237fcaee30b07655346c11cb7b478",
+    "question_resource/questions/ch20.json": "74a63860d3106ecae291f5708d3a5ed171facbc852105265a3de3303d62eabfb"
   },
   "knowledgePoints": {
     "kp01-01": {
@@ -3760,7 +3760,7 @@
       "knowledgePointIds": [
         "kp19-31"
       ],
-      "sourceSha256": "4a58814a7f4604c79d649f9917416a7103b3464efb30f7afbc916f9564f5fe4f"
+      "sourceSha256": "48b738dd7f0429c97ba83206b944568c52acda9902adcc4292046a9a4c01a88e"
     },
     "BP02": {
       "title": "门店月度环比同比与持续下滑",
@@ -3770,7 +3770,7 @@
       "knowledgePointIds": [
         "kp19-32"
       ],
-      "sourceSha256": "0bd14f454b4ec850fe585a19c3d67df63dd4946d6837bf3ca4c6949dee94e70a"
+      "sourceSha256": "56d71675a90cd19ff98497c5c0c2268d5e84279c46dee6374f748f0f4b93def6"
     },
     "BP03": {
       "title": "高销售低毛利商品诊断",
@@ -3780,7 +3780,7 @@
       "knowledgePointIds": [
         "kp19-33"
       ],
-      "sourceSha256": "423e380c8c1d99adbec574c065911de1096441b8bbbb18db118b15acebfce64d"
+      "sourceSha256": "c48e015c8205ec388171e116e4c69aa444a5ba79914755938530d0bf8c8f7fa7"
     },
     "BP04": {
       "title": "促销与非促销的日均表现",
@@ -3790,7 +3790,7 @@
       "knowledgePointIds": [
         "kp19-34"
       ],
-      "sourceSha256": "3ae9b005337779d0ccdadf9e947b2f3cb753689cfec78809cf1894171b45bc73"
+      "sourceSha256": "2410757d33af40e4932e859f1f1db8f958e75375f25cdb5381c75bcb230b0d1e"
     },
     "BP05": {
       "title": "门店综合经营异常看板",
@@ -3800,7 +3800,7 @@
       "knowledgePointIds": [
         "kp19-35"
       ],
-      "sourceSha256": "7c9affb90e3bda588860381cdebeebd723a2705895f6516efeba2c16d9c772be"
+      "sourceSha256": "40253dd412d251fb5b62ef0f97ec134b0a6c77fcd4e58a81444d4e7f5784ad27"
     },
     "BP06": {
       "title": "低销量高库存诊断",
@@ -3810,7 +3810,7 @@
       "knowledgePointIds": [
         "kp19-36"
       ],
-      "sourceSha256": "8cd0dfb1c2597ee678b933b02b9dc8efc1da855aecfc0c26ac8675135c0941e4"
+      "sourceSha256": "fb490539f84ab75b48c2465c5de25704585f5b7b4fc845af98a0cb2ef22f8e25"
     },
     "BP07": {
       "title": "类别库存周转率及周转天数",
@@ -3820,7 +3820,7 @@
       "knowledgePointIds": [
         "kp19-37"
       ],
-      "sourceSha256": "4ee02c591d85eaf3071933750d37ca59db555788bb8c2acfa5b1e324c3bbfc2c"
+      "sourceSha256": "4b9905b356ff8d9835a81426f63998656e91953a8d77f4d5fe04e4c5eef2b21b"
     },
     "BP08": {
       "title": "销售速度与采购周期缺货风险",
@@ -3830,7 +3830,7 @@
       "knowledgePointIds": [
         "kp19-38"
       ],
-      "sourceSha256": "992f030a098d22979dd85064c5023292841ce0173b7d3ed099b6b773cae63ec2"
+      "sourceSha256": "bd01e60ce1151322311fe546423f61a4236b6a266348a4afbefc7a7a861828a6"
     },
     "BP09": {
       "title": "按先进先出假设推算库存库龄",
@@ -3840,17 +3840,17 @@
       "knowledgePointIds": [
         "kp19-39"
       ],
-      "sourceSha256": "50c4512f7354f23c3bc1794d68d9a732cb1609c9cf794b0f83c550b2fae16ab2"
+      "sourceSha256": "6c7b12f51f5f4c08e193b6c3969bb256b6e352a835f8829c2efc06af4063e161"
     },
     "BP10": {
-      "title": "补货优先级与供应商风险",
+      "title": "补货优先级与商品历史履约风险",
       "questionId": "q0260",
       "projectId": "inventory",
       "datasetId": "inventory-v2",
       "knowledgePointIds": [
         "kp19-40"
       ],
-      "sourceSha256": "c1588ba37e9c296088ff4258b1cb9a48f257cc75a4981b0b5f80a115eb4b01c5",
+      "sourceSha256": "0b9d13d9de5888dfdf9c9bfaf6ee117d2de4afa0477316494353e9327e1949f2",
       "auditedSourceSha256": "a5a996c05cb0e3b18d85710d9543e45b056b935896169a651d7fe9bee4d8116d"
     },
     "BP11": {
@@ -3861,7 +3861,7 @@
       "knowledgePointIds": [
         "kp19-41"
       ],
-      "sourceSha256": "c5966dff3318fe310a430aeb746106862ede5b198adc1930108c061b894636c7"
+      "sourceSha256": "50127b3e7a26f8ed317d74c28abd7961b84e652c64bdb2dfb4cdc3475f76c522"
     },
     "BP12": {
       "title": "最近消费、频率、金额客户分层",
@@ -3871,7 +3871,7 @@
       "knowledgePointIds": [
         "kp19-42"
       ],
-      "sourceSha256": "9f94a69af3ad598f41231c94d868b1e6cb57ca2d3f4a9da52bf90a03b20b5f57"
+      "sourceSha256": "5f742c866a4a203e99cab893b018358b56381e1ea93e58682882792bbc50ad28"
     },
     "BP13": {
       "title": "首购月份留存矩阵",
@@ -3881,7 +3881,7 @@
       "knowledgePointIds": [
         "kp19-43"
       ],
-      "sourceSha256": "299f248ae26a0ded139ee26b0d7b6d617e49d32871c5575943c1213f03d5256f"
+      "sourceSha256": "ab75809da16217dfa2d63f74eea6092a5aac0cb2e564eb1a377fe06de60dc3c7"
     },
     "BP14": {
       "title": "营销渠道转化与获客成本",
@@ -3891,7 +3891,7 @@
       "knowledgePointIds": [
         "kp19-44"
       ],
-      "sourceSha256": "640b3e27b10f3711f4ed7d6f13ed3b3061df0a05efbfc5beac4444fcc3a8b879"
+      "sourceSha256": "dfd2a97a1ed6d0be95e73d147da9daf1dc0f4c66272e7f62cf8b3a2cae3332b0"
     },
     "BP15": {
       "title": "高价值流失风险客户",
@@ -3901,7 +3901,7 @@
       "knowledgePointIds": [
         "kp19-45"
       ],
-      "sourceSha256": "6e3c00d887d901c6b0dd5ed343d2396ae7ad9c0d7a5a3a570def5bd0f7cdbe38"
+      "sourceSha256": "f408e47c20b907ad797c1cd735c09b94e9417507a44f5fc8ad9363c8f3d93acf"
     },
     "BP16": {
       "title": "预算与实际费用差异",
@@ -3911,7 +3911,7 @@
       "knowledgePointIds": [
         "kp19-46"
       ],
-      "sourceSha256": "8f85e39aa6b67ef4276ec69b380f791b9367b416f3ff4f08f745c752b07636a9"
+      "sourceSha256": "d3fae3848b03f901f5855318951d69b3d8ccabff49340c6d7f0949a32be24a2c"
     },
     "BP17": {
       "title": "供应商发票与付款核对",
@@ -3921,7 +3921,7 @@
       "knowledgePointIds": [
         "kp19-47"
       ],
-      "sourceSha256": "a28553c1ccec95b93f57f680ab1cc391cefcd657ad528fa62469157d9e720d3f"
+      "sourceSha256": "90b65e542981627a0fe68594f77676444a2e30f5683e07137986f787300ce580"
     },
     "BP18": {
       "title": "应付账款账龄",
@@ -3931,7 +3931,7 @@
       "knowledgePointIds": [
         "kp19-48"
       ],
-      "sourceSha256": "f79fafef96805afa8598fdec7eff020ed6fb7606364eed7f93e28590afd24298"
+      "sourceSha256": "7d6bef971dcf716fefb208b0061f2be37074ac628aced6231d2fb4bd724a6062"
     },
     "BP19": {
       "title": "银行流水与凭证全量对账",
@@ -3941,7 +3941,7 @@
       "knowledgePointIds": [
         "kp19-49"
       ],
-      "sourceSha256": "3654ceadf95b1c679db8ad481aa0bc222bf4289c9c9faf6586229c9c4371c4f1"
+      "sourceSha256": "f74ed8a3854ce6eee668d52d19f3e1d67f7b7e2106e6cdd85f7470fb2d80bcba"
     },
     "BP20": {
       "title": "多规则异常交易筛查",
@@ -3951,7 +3951,7 @@
       "knowledgePointIds": [
         "kp19-50"
       ],
-      "sourceSha256": "ba148e4e2d39b0a82f4949039ce37b8aedfed6b1a7fcdf67fe62254b6b626e4f"
+      "sourceSha256": "6e5afaf0426ff2f71285e42c4b43e2f58c0158a1854208d85dbe30562311071a"
     },
     "BP21": {
       "title": "月末人员规模与变动",
@@ -3961,7 +3961,7 @@
       "knowledgePointIds": [
         "kp19-51"
       ],
-      "sourceSha256": "ab5f9b4fe735b50085d5efe03fa5280b1f84dfc86f12d1e188f77915366f212d"
+      "sourceSha256": "df36574fbdec254faa058c0ffc71b189ca5dd28fab66887db754eb10cd29c2b9"
     },
     "BP22": {
       "title": "月度离职率与趋势",
@@ -3971,7 +3971,7 @@
       "knowledgePointIds": [
         "kp19-52"
       ],
-      "sourceSha256": "5207253b573a762853ffe6b8658b22b2a50650db17d0b3ef49aa0b028488fff2"
+      "sourceSha256": "fc614a7314ec05be4a8abc7344ebaa0dda0268d4a4b68b549204b4fa1447ca89"
     },
     "BP23": {
       "title": "同岗位薪资分布与异常",
@@ -3981,7 +3981,7 @@
       "knowledgePointIds": [
         "kp19-53"
       ],
-      "sourceSha256": "704cefbc3eaa842f4a6a8c805b23b3c690e9e4d549505e738070efcfce77ff3d"
+      "sourceSha256": "f6c5b539e25024fad280adfe12edc0ea9d7a2ddf559178defaa0f4a0b4690dbb"
     },
     "BP24": {
       "title": "部门人力成本与加班",
@@ -3991,7 +3991,7 @@
       "knowledgePointIds": [
         "kp19-54"
       ],
-      "sourceSha256": "b413fe3ed8323a2748c5c10eff23248357dc7f854e43c03da23eed0f1f1b6864"
+      "sourceSha256": "a7614257bc407e0ded465be8ebc50dcbfbde2b1bdaed006b07d6cc904cdca1c9"
     },
     "BP25": {
       "title": "入职同期群90及180日留任",
@@ -4001,7 +4001,7 @@
       "knowledgePointIds": [
         "kp19-55"
       ],
-      "sourceSha256": "1c14d0991dea23835b80789b1390d1ac175b48a5cfc3fcef80751463fb94ff23"
+      "sourceSha256": "06d62f4c5e72d54bbe009bd953cd6d2a396c4e008996a5bb06dc4c0e77029c43"
     },
     "BP26": {
       "title": "采购价格与合同、历史价格比较",
@@ -4011,7 +4011,7 @@
       "knowledgePointIds": [
         "kp19-56"
       ],
-      "sourceSha256": "47c439003c8b6a6040c1965b95910a24ac6fe9d6b1489b7e81a38a051bf52bad"
+      "sourceSha256": "56668666f0c6b3494b342fbb4e2eaf301b143a58fe9bdaf522589ca41c686eb3"
     },
     "BP27": {
       "title": "供应商准时、完整交付与质量",
@@ -4021,7 +4021,7 @@
       "knowledgePointIds": [
         "kp19-57"
       ],
-      "sourceSha256": "86705d36e839ab7015797209a9a029f6d6625bf750fc2e8404b97adb7e206f8e"
+      "sourceSha256": "6037d579cfecf1d6b3eab0cd6e008f8a673219e2fecf1c6690e9ae5ceaa4de10"
     },
     "BP28": {
       "title": "采购、收货、发票三方核对",
@@ -4031,7 +4031,7 @@
       "knowledgePointIds": [
         "kp19-58"
       ],
-      "sourceSha256": "bafd4aba0e7031172c8ea753e2cd37453b257bdb46b5c45edfccf81812924e16"
+      "sourceSha256": "acec877c89897289f69dec83f73137baae0a2a3acd389921f71daee49797fda7"
     },
     "BP29": {
       "title": "同商品跨供应商采购价差",
@@ -4041,7 +4041,7 @@
       "knowledgePointIds": [
         "kp19-59"
       ],
-      "sourceSha256": "0dc9e37b0e828ea1c6096c7b140e5da7c315ab8c1a1718309eafd4839b1a7234"
+      "sourceSha256": "128b586004ad739d503d9fafe16276baa40f7c1abd9964f5c5137c80711e9212"
     },
     "BP30": {
       "title": "供应商多指标综合评价",
@@ -4051,7 +4051,7 @@
       "knowledgePointIds": [
         "kp19-60"
       ],
-      "sourceSha256": "1f13973139e0a145f4882cdc77ed3a00b09b1a6c3e0eaccdc25e33a6c45ebb3a"
+      "sourceSha256": "2be2e2c523c39ea534d867fbb5a61c73cb4642b547279f1f02de66470c9638b9"
     },
     "BP31": {
       "title": "畅销缺货与滞销积压双向筛查",
@@ -4061,7 +4061,7 @@
       "knowledgePointIds": [
         "kp20-05"
       ],
-      "sourceSha256": "3ef0cc4ad23fce040101b2f0ad589492e487424c4a38ebc77ff1fbce36842af0"
+      "sourceSha256": "f39afb33a712cdd1a88f48b978857216bab7d1b4050036ae82577ec5b42012e4"
     },
     "BP32": {
       "title": "商品销售贡献与库存资金占用错配",
@@ -4071,7 +4071,7 @@
       "knowledgePointIds": [
         "kp20-06"
       ],
-      "sourceSha256": "a23d7877c857a71030d0d86732011c8668fec91efc84e4682640bc16e21ce50b"
+      "sourceSha256": "1bb9975f8b82ae714af077d354d2db7f094b50c5e9368abd18c1c98287a277bf"
     },
     "BP33": {
       "title": "跨仓库存调拨候选",
@@ -4081,7 +4081,7 @@
       "knowledgePointIds": [
         "kp20-07"
       ],
-      "sourceSha256": "4bbb641436031a519bd0ca1728be6f22808ce7e6d932f0d92161f0b422216001"
+      "sourceSha256": "65952b86f7f95fae83425ef79a964c398e40f8936fa4685dbfb1bf4c2617a298"
     },
     "BP34": {
       "title": "销售毛利与库存投资回报",
@@ -4091,7 +4091,7 @@
       "knowledgePointIds": [
         "kp20-08"
       ],
-      "sourceSha256": "32f3dc1708a438f7aa8a6e8bc0350a123fcb0345bf97eec6f3b4b0f244bcb098"
+      "sourceSha256": "9c6d75c1fa4f98bd697fe60434a89a9b9ea802ea09a7029d814c00aea0db0e5c"
     },
     "BP35": {
       "title": "逾期在途与缺货叠加",
@@ -4101,7 +4101,7 @@
       "knowledgePointIds": [
         "kp20-09"
       ],
-      "sourceSha256": "b3bebfbf3f98d006a503407ffbde6b8ce94ccb5e983f1fd6d5482117183377ed"
+      "sourceSha256": "56005e1d8d514efc82c04c6a21c2d466de59c4a30a7b555613b46951540aba8f"
     },
     "BP36": {
       "title": "收货入库完整性核对",
@@ -4111,7 +4111,7 @@
       "knowledgePointIds": [
         "kp20-10"
       ],
-      "sourceSha256": "ecac9aed1c226a95c64d5172718c254ce47d7560eec0105ea417312398999b54"
+      "sourceSha256": "46ab71e55f9f7a2e47cfdc0393a4fc58a8e20caeb8464e4a0cdc600a2d01df34"
     },
     "BP37": {
       "title": "供应商延迟与仓库资金压力",
@@ -4121,7 +4121,7 @@
       "knowledgePointIds": [
         "kp20-11"
       ],
-      "sourceSha256": "d1a1d05f5153076623cbb142e53f01b98bac2becca661af41bee2282d9a2b82b"
+      "sourceSha256": "f674919412018874020c5bd6884dd9661d6cf2f24cced59dff13664d2635b724"
     },
     "BP38": {
       "title": "门店贡献利润与费用",
@@ -4131,7 +4131,7 @@
       "knowledgePointIds": [
         "kp20-12"
       ],
-      "sourceSha256": "d021f9a488fed141cff816c83bf45a4db19a9c45663317a1b897016c487db15c"
+      "sourceSha256": "a18febd28eb9a7f3b061a0c497356f788e23c0273e068577fc42d567c75356e3"
     },
     "BP39": {
       "title": "订单结算与收入核对",
@@ -4141,7 +4141,7 @@
       "knowledgePointIds": [
         "kp20-13"
       ],
-      "sourceSha256": "d084ed8149279682fce196b5a3384bde074b68e168f22d13a062f4a5d57b3513"
+      "sourceSha256": "fe69a792d9006eb85f20d9e80dad9718a2e5e4bd28dabec2fa3963f49092fcce"
     },
     "BP40": {
       "title": "门店月度收入与费用偏离",
@@ -4151,7 +4151,7 @@
       "knowledgePointIds": [
         "kp20-14"
       ],
-      "sourceSha256": "72bc3e8702a4e6cbf135d04370b9fa27cf66adf51473afca108c52f3504da60b"
+      "sourceSha256": "625a75df49b3e52b602fe8347e7db878cd9cae1fa0c3b6c0684a2c7a13487fcd"
     },
     "BP41": {
       "title": "采购承诺、收货、开票及付款敞口",
@@ -4161,7 +4161,7 @@
       "knowledgePointIds": [
         "kp20-15"
       ],
-      "sourceSha256": "fecbcd70a88fa0b1bc0eb3fe7573affc465513b3e4a503d00baa16d415c647bb"
+      "sourceSha256": "06eaa7f73f6bc01e23729b4185172e544d074a75c7f63aab3e2d097eef8d4e6e"
     },
     "BP42": {
       "title": "三方不一致且已经付款的发票",
@@ -4171,7 +4171,7 @@
       "knowledgePointIds": [
         "kp20-16"
       ],
-      "sourceSha256": "c62fca955c2462fe3b6be190b2185d7fdc05d60cbb9df22d6ce82681d26bdb18"
+      "sourceSha256": "94ebf892468969473506661f7814be257621520d0ad657440a281c14e5e7c78d"
     },
     "BP43": {
       "title": "供应商资金风险分层",
@@ -4181,7 +4181,7 @@
       "knowledgePointIds": [
         "kp20-17"
       ],
-      "sourceSha256": "0e045ffefea7d19a7500891b1831f5030a9d04a819a41d8518b05763c185911f"
+      "sourceSha256": "f2ebaef19cfd4446963d448b5958482358d38f4543a6636a470b4b225b0975a3"
     },
     "BP44": {
       "title": "渠道广告后的贡献利润",
@@ -4191,7 +4191,7 @@
       "knowledgePointIds": [
         "kp20-18"
       ],
-      "sourceSha256": "3f80b9c380498204935e244b1db4e31604888ecc34d5bfd60750bdd69a51b3a5",
+      "sourceSha256": "ba23998bb1ee050f52481dfc430ca003c09fafa61f88a8165fe0063b5d533e94",
       "auditedSourceSha256": "7e2db65c964039b9642688aa941a64cc0cfbf03814306f015da6fc1636bcde38"
     },
     "BP45": {
@@ -4202,7 +4202,7 @@
       "knowledgePointIds": [
         "kp20-19"
       ],
-      "sourceSha256": "acfe2986dccfb2b3b1f5f744f0222cb2756f423539668dd500bc46ffc4f20230"
+      "sourceSha256": "cbdedb178a697e644ca63b32b0c001829b69d77c3db0fc56bb25415d5eed59f3"
     },
     "BP46": {
       "title": "退款影响与渠道利润风险",
@@ -4212,7 +4212,7 @@
       "knowledgePointIds": [
         "kp20-20"
       ],
-      "sourceSha256": "dae8e2edc01a8389eac81ff151a0234ff861c0c61b21c52ca50229fa5e114b61"
+      "sourceSha256": "0fd784f19fd6b8147e79cc6a980eecdfe50b6d0a275a5f448068132088639371"
     },
     "BP47": {
       "title": "门店人效及人工占比",
@@ -4222,7 +4222,7 @@
       "knowledgePointIds": [
         "kp20-21"
       ],
-      "sourceSha256": "2a1254eee3e233a2ae6de5e38d22ea8adce622244755755f214404b4a60e76a7"
+      "sourceSha256": "72ad49bb23aa402928c7a485e3bc577f1349c1f3b8f5ba70ac7c11c846a8ae39"
     },
     "BP48": {
       "title": "门店人员变化与销售变化诊断",
@@ -4232,7 +4232,7 @@
       "knowledgePointIds": [
         "kp20-22"
       ],
-      "sourceSha256": "1b47a3d625b0f58c015d69bbf4bc0c44d0607d969602a4f690314de8b9149651"
+      "sourceSha256": "9f9a152385553fb88f6e86b636242d5b4d9fca7153c570d4c0788db6dd63a984"
     },
     "BP49": {
       "title": "月度经营汇总表",
@@ -4242,7 +4242,7 @@
       "knowledgePointIds": [
         "kp20-23"
       ],
-      "sourceSha256": "9c8c23a733954d3de8c5d197440fb6f2910c7af2b614c85873863f5ece9bf077"
+      "sourceSha256": "d33f5cd92f63c0ab4825e013e05136b12befd6fc64bdd5f933d1166cdcdc09c3"
     },
     "BP50": {
       "title": "跨域季度风险评分与经营报告",
@@ -4252,7 +4252,7 @@
       "knowledgePointIds": [
         "kp20-24"
       ],
-      "sourceSha256": "9e9f12afde841623ce307e50ff061e3b0b6c46efb570e9bfabde6360acddb544"
+      "sourceSha256": "0dfcc948d7332756d5070117a39994062bbce6558eaa2772ab3fda32e98f8b83"
     }
   },
   "databases": {
@@ -4542,8 +4542,8 @@
     "courses_resource/courses/ch16.json": "a9fe4da1c16ad0f523cdb4e41a21fd630353934a91ad54b2c944cd25b4a95669",
     "courses_resource/courses/ch17.json": "7ec03f4abc40259b2630580e9018afbda18c2d7c00a96152d33cbef2e2f03435",
     "courses_resource/courses/ch18.json": "c6370c164eecb962528ac984654ca50519a7298fef3a32f6e57dd569d0fa67f1",
-    "courses_resource/courses/ch19.json": "3d1990db4445abf9b6f7aacbf74ae4776299bb0a4fdce15bab02f89f05997803",
-    "courses_resource/courses/ch20.json": "4e72fb58264d9e27d8f5ddddbebea9f5990c4126ea674edda7e3b53e1c0ac971",
+    "courses_resource/courses/ch19.json": "ed252507e9514739b2f36c90b867edbbd16e4f6602fd96c8dba02e7acf058217",
+    "courses_resource/courses/ch20.json": "357d8bba05fc52d240d82f1349719dcc206b7b7d7971344b84267bc685c267cd",
     "question_resource/questions/ch01.json": "42204b93a9fb7fa4c58609e3aad6dae8c0571de2e84deecbc6636ad5ed82875c",
     "question_resource/questions/ch02.json": "a041c1c07cbdaeea8c444c37ba363c4dfb964f176a3d5213fb06cfbf427b268d",
     "question_resource/questions/ch03.json": "8041ad88f736e351715838946ddf79f76e4dd4c60cf8775969d3eca0368c0c01",
@@ -4562,8 +4562,8 @@
     "question_resource/questions/ch16.json": "5867ce039fcb38f1f59d657c445a80d1cc7bf898ab90c35d6741c3535c8efe28",
     "question_resource/questions/ch17.json": "f66247184e3da448d86465dfcdb841cbb879fe1728020e51dfd0b076321e91f5",
     "question_resource/questions/ch18.json": "80e8644be793751fbca55ec8342470f58833c895aad44925f0cf02afb76d08c6",
-    "question_resource/questions/ch19.json": "b177782e348158d6aca634d0b6a7febacf2b58e069e54090c4296fad0703df77",
-    "question_resource/questions/ch20.json": "54f3d3ace9ebe70c57f19fa69b0b1f516ec967143d5c2fc608ced3c142634fe7"
+    "question_resource/questions/ch19.json": "d06e70f2205f6386dcd34de155374645202237fcaee30b07655346c11cb7b478",
+    "question_resource/questions/ch20.json": "74a63860d3106ecae291f5708d3a5ed171facbc852105265a3de3303d62eabfb"
   },
   "historicalSourceFiles": {
     "企业升级包/CONTENT/courses/ch01.json": "23a331ef0dc5872d3714911aceb2d4e24da1a3f821e7283da777144206e40fcf",

@@ -2,18 +2,18 @@
   "projectId": "retail",
   "title": "门店综合经营异常看板",
   "context": "管理层需要优先检查经营异常的门店。",
-  "requirements": "2025年第四季度，门店净销售、毛利率、目标达成率、退款率（退款/退款前折后销售额）、净销售排名；异常项：毛利率<30%、达成率<90%、退款率>8%；按异常数降序。",
+  "requirements": "2025年第四季度线下门店，保留全部门店。输出净销售、毛利率、目标达成率、退款率及净销售RANK排名。以所有门店汇总后的加权指标为比较基准，不能平均各店比率。三项复核标记分别为毛利率低于整体毛利率1个百分点、达成率低于整体达成率的80%、退款率高于整体退款率的125%。整体达成率仅纳入目标金额为正的门店，分子也使用这些门店的净销售。退款率=退款额/退款前折后销售额。基准或门店比率分母为0时为NULL，该项不计标记。标记使用未舍入值，输出比率保留2位小数。按标记数降序、门店编号升序，排名并列保留空位。该表是相对经营复核名单，不代表公司已达到年度预算。",
   "grain": "门店",
-  "commonError": "阈值用四舍五入后的比率可能误判边界。",
+  "commonError": "旧阈值使所有门店同分；简单平均门店比率或在筛风险后才排名均会改变比较总体。",
   "executionSteps": [
-    "按门店汇总经营指标",
-    "独立关联季度目标",
-    "用未舍入比率标记",
-    "窗口排名"
+    "分别汇总门店销售与季度目标",
+    "计算全体加权基准",
+    "比较未舍入比率并累计标记",
+    "对所有门店进行销售排名"
   ],
   "difficulty": "挑战",
-  "mysqlSql": "WITH a AS (SELECT store_id,SUM(net_cents) net,SUM(cost_cents) cost,SUM(refund_cents) refund FROM v_sales_lines WHERE channel='store' AND order_date BETWEEN '2025-10-01' AND '2025-12-31' GROUP BY store_id), b AS (SELECT store_id,SUM(target_cents) target FROM sales_targets WHERE month_key BETWEEN '2025-10' AND '2025-12' GROUP BY store_id), p AS (SELECT s.store_id,COALESCE(a.net,0) net,100.0*(a.net-a.cost)/NULLIF(a.net,0) margin,100.0*COALESCE(a.net,0)/NULLIF(b.target,0) attainment,100.0*a.refund/NULLIF(a.net+a.refund,0) refund_rate FROM stores s LEFT JOIN a ON a.store_id=s.store_id LEFT JOIN b ON b.store_id=s.store_id), z AS (SELECT *,CASE WHEN margin<30 THEN 1 ELSE 0 END+CASE WHEN attainment<90 THEN 1 ELSE 0 END+CASE WHEN refund_rate>8 THEN 1 ELSE 0 END flags,RANK() OVER(ORDER BY net DESC) sales_rank FROM p) SELECT store_id,net net_cents,ROUND(margin,2) margin_pct,ROUND(attainment,2) achievement_pct,ROUND(refund_rate,2) refund_pct,flags,sales_rank FROM z ORDER BY flags DESC,store_id",
-  "sqliteSql": "WITH a AS (SELECT store_id,SUM(net_cents) net,SUM(cost_cents) cost,SUM(refund_cents) refund FROM v_sales_lines WHERE channel='store' AND order_date BETWEEN '2025-10-01' AND '2025-12-31' GROUP BY store_id), b AS (SELECT store_id,SUM(target_cents) target FROM sales_targets WHERE month_key BETWEEN '2025-10' AND '2025-12' GROUP BY store_id), p AS (SELECT s.store_id,COALESCE(a.net,0) net,100.0*(a.net-a.cost)/NULLIF(a.net,0) margin,100.0*COALESCE(a.net,0)/NULLIF(b.target,0) attainment,100.0*a.refund/NULLIF(a.net+a.refund,0) refund_rate FROM stores s LEFT JOIN a ON a.store_id=s.store_id LEFT JOIN b ON b.store_id=s.store_id), z AS (SELECT *,CASE WHEN margin<30 THEN 1 ELSE 0 END+CASE WHEN attainment<90 THEN 1 ELSE 0 END+CASE WHEN refund_rate>8 THEN 1 ELSE 0 END flags,RANK() OVER(ORDER BY net DESC) sales_rank FROM p) SELECT store_id,net net_cents,ROUND(margin,2) margin_pct,ROUND(attainment,2) achievement_pct,ROUND(refund_rate,2) refund_pct,flags,sales_rank FROM z ORDER BY flags DESC,store_id",
+  "mysqlSql": "WITH a AS (\n  SELECT store_id, SUM(net_cents) net, SUM(cost_cents) cost, SUM(refund_cents) refund\n  FROM v_sales_lines\n  WHERE channel='store' AND order_date BETWEEN '2025-10-01' AND '2025-12-31'\n  GROUP BY store_id\n), b AS (\n  SELECT store_id, SUM(target_cents) target FROM sales_targets\n  WHERE month_key BETWEEN '2025-10' AND '2025-12' GROUP BY store_id\n), p AS (\n  SELECT s.store_id, COALESCE(a.net,0) net, COALESCE(a.cost,0) cost,\n    COALESCE(a.refund,0) refund, b.target,\n    100.0*(a.net-a.cost)/NULLIF(a.net,0) margin,\n    100.0*COALESCE(a.net,0)/NULLIF(b.target,0) attainment,\n    100.0*a.refund/NULLIF(a.net+a.refund,0) refund_rate\n  FROM stores s LEFT JOIN a ON a.store_id=s.store_id LEFT JOIN b ON b.store_id=s.store_id\n), benchmark AS (\n  SELECT 100.0*SUM(net-cost)/NULLIF(SUM(net),0) margin,\n    100.0*SUM(CASE WHEN target>0 THEN net ELSE 0 END)/NULLIF(SUM(CASE WHEN target>0 THEN target ELSE 0 END),0) attainment,\n    100.0*SUM(refund)/NULLIF(SUM(net+refund),0) refund_rate FROM p\n), z AS (\n  SELECT p.*,\n    CASE WHEN p.margin<benchmark.margin-1 THEN 1 ELSE 0 END\n    +CASE WHEN p.attainment<benchmark.attainment*.8 THEN 1 ELSE 0 END\n    +CASE WHEN p.refund_rate>benchmark.refund_rate*1.25 THEN 1 ELSE 0 END flags,\n    RANK() OVER(ORDER BY net DESC) sales_rank FROM p CROSS JOIN benchmark\n)\nSELECT store_id, net net_cents, ROUND(margin,2) margin_pct,\n  ROUND(attainment,2) achievement_pct, ROUND(refund_rate,2) refund_pct, flags, sales_rank\nFROM z ORDER BY flags DESC,store_id",
+  "sqliteSql": "WITH a AS (\n  SELECT store_id, SUM(net_cents) net, SUM(cost_cents) cost, SUM(refund_cents) refund\n  FROM v_sales_lines\n  WHERE channel='store' AND order_date BETWEEN '2025-10-01' AND '2025-12-31'\n  GROUP BY store_id\n), b AS (\n  SELECT store_id, SUM(target_cents) target FROM sales_targets\n  WHERE month_key BETWEEN '2025-10' AND '2025-12' GROUP BY store_id\n), p AS (\n  SELECT s.store_id, COALESCE(a.net,0) net, COALESCE(a.cost,0) cost,\n    COALESCE(a.refund,0) refund, b.target,\n    100.0*(a.net-a.cost)/NULLIF(a.net,0) margin,\n    100.0*COALESCE(a.net,0)/NULLIF(b.target,0) attainment,\n    100.0*a.refund/NULLIF(a.net+a.refund,0) refund_rate\n  FROM stores s LEFT JOIN a ON a.store_id=s.store_id LEFT JOIN b ON b.store_id=s.store_id\n), benchmark AS (\n  SELECT 100.0*SUM(net-cost)/NULLIF(SUM(net),0) margin,\n    100.0*SUM(CASE WHEN target>0 THEN net ELSE 0 END)/NULLIF(SUM(CASE WHEN target>0 THEN target ELSE 0 END),0) attainment,\n    100.0*SUM(refund)/NULLIF(SUM(net+refund),0) refund_rate FROM p\n), z AS (\n  SELECT p.*,\n    CASE WHEN p.margin<benchmark.margin-1 THEN 1 ELSE 0 END\n    +CASE WHEN p.attainment<benchmark.attainment*.8 THEN 1 ELSE 0 END\n    +CASE WHEN p.refund_rate>benchmark.refund_rate*1.25 THEN 1 ELSE 0 END flags,\n    RANK() OVER(ORDER BY net DESC) sales_rank FROM p CROSS JOIN benchmark\n)\nSELECT store_id, net net_cents, ROUND(margin,2) margin_pct,\n  ROUND(attainment,2) achievement_pct, ROUND(refund_rate,2) refund_pct, flags, sales_rank\nFROM z ORDER BY flags DESC,store_id",
   "compatibility": "直接兼容（原生待验证）",
   "columns": [
     "store_id",
@@ -32,7 +32,7 @@
   "datasetId": "retail-v2",
   "type": "业务情景",
   "schemaVersion": 2,
-  "contentVersion": "4.2.0",
+  "contentVersion": "4.2.1",
   "expectedOutputPath": "business_tasks/results/BP05.json",
   "expectedRowCount": 12,
   "expectedColumns": [
@@ -61,41 +61,46 @@
     "sales_targets",
     "stores",
     "traffic_sources",
-    "v_sales_lines"
+    "v_sales_lines",
+    "warehouses"
   ],
   "orderPolicy": "ordered",
   "numericTolerance": {
-    "integerCents": 0,
-    "decimalAbsolute": 1e-06
+    "absolute": 1e-06,
+    "integerExact": true,
+    "textExact": true,
+    "nullDistinct": true
   },
   "referenceSolutions": [
     {
       "kind": "reference",
-      "mysqlSql": "WITH a AS (SELECT store_id,SUM(net_cents) net,SUM(cost_cents) cost,SUM(refund_cents) refund FROM v_sales_lines WHERE channel='store' AND order_date BETWEEN '2025-10-01' AND '2025-12-31' GROUP BY store_id), b AS (SELECT store_id,SUM(target_cents) target FROM sales_targets WHERE month_key BETWEEN '2025-10' AND '2025-12' GROUP BY store_id), p AS (SELECT s.store_id,COALESCE(a.net,0) net,100.0*(a.net-a.cost)/NULLIF(a.net,0) margin,100.0*COALESCE(a.net,0)/NULLIF(b.target,0) attainment,100.0*a.refund/NULLIF(a.net+a.refund,0) refund_rate FROM stores s LEFT JOIN a ON a.store_id=s.store_id LEFT JOIN b ON b.store_id=s.store_id), z AS (SELECT *,CASE WHEN margin<30 THEN 1 ELSE 0 END+CASE WHEN attainment<90 THEN 1 ELSE 0 END+CASE WHEN refund_rate>8 THEN 1 ELSE 0 END flags,RANK() OVER(ORDER BY net DESC) sales_rank FROM p) SELECT store_id,net net_cents,ROUND(margin,2) margin_pct,ROUND(attainment,2) achievement_pct,ROUND(refund_rate,2) refund_pct,flags,sales_rank FROM z ORDER BY flags DESC,store_id",
-      "sqliteSql": "WITH a AS (SELECT store_id,SUM(net_cents) net,SUM(cost_cents) cost,SUM(refund_cents) refund FROM v_sales_lines WHERE channel='store' AND order_date BETWEEN '2025-10-01' AND '2025-12-31' GROUP BY store_id), b AS (SELECT store_id,SUM(target_cents) target FROM sales_targets WHERE month_key BETWEEN '2025-10' AND '2025-12' GROUP BY store_id), p AS (SELECT s.store_id,COALESCE(a.net,0) net,100.0*(a.net-a.cost)/NULLIF(a.net,0) margin,100.0*COALESCE(a.net,0)/NULLIF(b.target,0) attainment,100.0*a.refund/NULLIF(a.net+a.refund,0) refund_rate FROM stores s LEFT JOIN a ON a.store_id=s.store_id LEFT JOIN b ON b.store_id=s.store_id), z AS (SELECT *,CASE WHEN margin<30 THEN 1 ELSE 0 END+CASE WHEN attainment<90 THEN 1 ELSE 0 END+CASE WHEN refund_rate>8 THEN 1 ELSE 0 END flags,RANK() OVER(ORDER BY net DESC) sales_rank FROM p) SELECT store_id,net net_cents,ROUND(margin,2) margin_pct,ROUND(attainment,2) achievement_pct,ROUND(refund_rate,2) refund_pct,flags,sales_rank FROM z ORDER BY flags DESC,store_id"
+      "mysqlSql": "WITH a AS (\n  SELECT store_id, SUM(net_cents) net, SUM(cost_cents) cost, SUM(refund_cents) refund\n  FROM v_sales_lines\n  WHERE channel='store' AND order_date BETWEEN '2025-10-01' AND '2025-12-31'\n  GROUP BY store_id\n), b AS (\n  SELECT store_id, SUM(target_cents) target FROM sales_targets\n  WHERE month_key BETWEEN '2025-10' AND '2025-12' GROUP BY store_id\n), p AS (\n  SELECT s.store_id, COALESCE(a.net,0) net, COALESCE(a.cost,0) cost,\n    COALESCE(a.refund,0) refund, b.target,\n    100.0*(a.net-a.cost)/NULLIF(a.net,0) margin,\n    100.0*COALESCE(a.net,0)/NULLIF(b.target,0) attainment,\n    100.0*a.refund/NULLIF(a.net+a.refund,0) refund_rate\n  FROM stores s LEFT JOIN a ON a.store_id=s.store_id LEFT JOIN b ON b.store_id=s.store_id\n), benchmark AS (\n  SELECT 100.0*SUM(net-cost)/NULLIF(SUM(net),0) margin,\n    100.0*SUM(CASE WHEN target>0 THEN net ELSE 0 END)/NULLIF(SUM(CASE WHEN target>0 THEN target ELSE 0 END),0) attainment,\n    100.0*SUM(refund)/NULLIF(SUM(net+refund),0) refund_rate FROM p\n), z AS (\n  SELECT p.*,\n    CASE WHEN p.margin<benchmark.margin-1 THEN 1 ELSE 0 END\n    +CASE WHEN p.attainment<benchmark.attainment*.8 THEN 1 ELSE 0 END\n    +CASE WHEN p.refund_rate>benchmark.refund_rate*1.25 THEN 1 ELSE 0 END flags,\n    RANK() OVER(ORDER BY net DESC) sales_rank FROM p CROSS JOIN benchmark\n)\nSELECT store_id, net net_cents, ROUND(margin,2) margin_pct,\n  ROUND(attainment,2) achievement_pct, ROUND(refund_rate,2) refund_pct, flags, sales_rank\nFROM z ORDER BY flags DESC,store_id",
+      "sqliteSql": "WITH a AS (\n  SELECT store_id, SUM(net_cents) net, SUM(cost_cents) cost, SUM(refund_cents) refund\n  FROM v_sales_lines\n  WHERE channel='store' AND order_date BETWEEN '2025-10-01' AND '2025-12-31'\n  GROUP BY store_id\n), b AS (\n  SELECT store_id, SUM(target_cents) target FROM sales_targets\n  WHERE month_key BETWEEN '2025-10' AND '2025-12' GROUP BY store_id\n), p AS (\n  SELECT s.store_id, COALESCE(a.net,0) net, COALESCE(a.cost,0) cost,\n    COALESCE(a.refund,0) refund, b.target,\n    100.0*(a.net-a.cost)/NULLIF(a.net,0) margin,\n    100.0*COALESCE(a.net,0)/NULLIF(b.target,0) attainment,\n    100.0*a.refund/NULLIF(a.net+a.refund,0) refund_rate\n  FROM stores s LEFT JOIN a ON a.store_id=s.store_id LEFT JOIN b ON b.store_id=s.store_id\n), benchmark AS (\n  SELECT 100.0*SUM(net-cost)/NULLIF(SUM(net),0) margin,\n    100.0*SUM(CASE WHEN target>0 THEN net ELSE 0 END)/NULLIF(SUM(CASE WHEN target>0 THEN target ELSE 0 END),0) attainment,\n    100.0*SUM(refund)/NULLIF(SUM(net+refund),0) refund_rate FROM p\n), z AS (\n  SELECT p.*,\n    CASE WHEN p.margin<benchmark.margin-1 THEN 1 ELSE 0 END\n    +CASE WHEN p.attainment<benchmark.attainment*.8 THEN 1 ELSE 0 END\n    +CASE WHEN p.refund_rate>benchmark.refund_rate*1.25 THEN 1 ELSE 0 END flags,\n    RANK() OVER(ORDER BY net DESC) sales_rank FROM p CROSS JOIN benchmark\n)\nSELECT store_id, net net_cents, ROUND(margin,2) margin_pct,\n  ROUND(attainment,2) achievement_pct, ROUND(refund_rate,2) refund_pct, flags, sales_rank\nFROM z ORDER BY flags DESC,store_id"
     },
     {
-      "kind": "algebraic equivalent",
-      "mysqlSql": "WITH a AS (SELECT store_id,SUM(net_cents) net,SUM(cost_cents) cost,SUM(refund_cents) refund FROM v_sales_lines WHERE channel='store' AND (order_date>='2025-10-01' AND order_date<='2025-12-31') GROUP BY store_id), b AS (SELECT store_id,SUM(target_cents) target FROM sales_targets WHERE (month_key>='2025-10' AND month_key<='2025-12') GROUP BY store_id), p AS (SELECT s.store_id,COALESCE(a.net,0) net,100.0*(a.net-a.cost)/NULLIF(a.net,0) margin,100.0*COALESCE(a.net,0)/NULLIF(b.target,0) attainment,100.0*a.refund/NULLIF(a.net+a.refund,0) refund_rate FROM stores s LEFT JOIN a ON a.store_id=s.store_id LEFT JOIN b ON b.store_id=s.store_id), z AS (SELECT *,CASE WHEN margin<30 THEN 1 ELSE 0 END+CASE WHEN attainment<90 THEN 1 ELSE 0 END+CASE WHEN refund_rate>8 THEN 1 ELSE 0 END flags,RANK() OVER(ORDER BY net DESC) sales_rank FROM p) SELECT store_id,net net_cents,ROUND(margin,2) margin_pct,ROUND(attainment,2) achievement_pct,ROUND(refund_rate,2) refund_pct,flags,sales_rank FROM z ORDER BY flags DESC,store_id",
-      "sqliteSql": "WITH a AS (SELECT store_id,SUM(net_cents) net,SUM(cost_cents) cost,SUM(refund_cents) refund FROM v_sales_lines WHERE channel='store' AND (order_date>='2025-10-01' AND order_date<='2025-12-31') GROUP BY store_id), b AS (SELECT store_id,SUM(target_cents) target FROM sales_targets WHERE (month_key>='2025-10' AND month_key<='2025-12') GROUP BY store_id), p AS (SELECT s.store_id,COALESCE(a.net,0) net,100.0*(a.net-a.cost)/NULLIF(a.net,0) margin,100.0*COALESCE(a.net,0)/NULLIF(b.target,0) attainment,100.0*a.refund/NULLIF(a.net+a.refund,0) refund_rate FROM stores s LEFT JOIN a ON a.store_id=s.store_id LEFT JOIN b ON b.store_id=s.store_id), z AS (SELECT *,CASE WHEN margin<30 THEN 1 ELSE 0 END+CASE WHEN attainment<90 THEN 1 ELSE 0 END+CASE WHEN refund_rate>8 THEN 1 ELSE 0 END flags,RANK() OVER(ORDER BY net DESC) sales_rank FROM p) SELECT store_id,net net_cents,ROUND(margin,2) margin_pct,ROUND(attainment,2) achievement_pct,ROUND(refund_rate,2) refund_pct,flags,sales_rank FROM z ORDER BY flags DESC,store_id"
+      "kind": "equivalent",
+      "mysqlSql": "WITH a AS (\n  SELECT store_id, SUM(net_cents) net, SUM(cost_cents) cost, SUM(refund_cents) refund\n  FROM v_sales_lines\n  WHERE channel='store' AND (order_date>='2025-10-01' AND order_date<='2025-12-31')\n  GROUP BY store_id\n), b AS (\n  SELECT store_id, SUM(target_cents) target FROM sales_targets\n  WHERE (month_key>='2025-10' AND month_key<='2025-12') GROUP BY store_id\n), p AS (\n  SELECT s.store_id, COALESCE(a.net,0) net, COALESCE(a.cost,0) cost,\n    COALESCE(a.refund,0) refund, b.target,\n    100.0*(a.net-a.cost)/NULLIF(a.net,0) margin,\n    100.0*COALESCE(a.net,0)/NULLIF(b.target,0) attainment,\n    100.0*a.refund/NULLIF(a.net+a.refund,0) refund_rate\n  FROM stores s LEFT JOIN a ON a.store_id=s.store_id LEFT JOIN b ON b.store_id=s.store_id\n), benchmark AS (\n  SELECT 100.0*SUM(net-cost)/NULLIF(SUM(net),0) margin,\n    100.0*SUM(CASE WHEN target>0 THEN net ELSE 0 END)/NULLIF(SUM(CASE WHEN target>0 THEN target ELSE 0 END),0) attainment,\n    100.0*SUM(refund)/NULLIF(SUM(net+refund),0) refund_rate FROM p\n), z AS (\n  SELECT p.*,\n    CASE WHEN p.margin<benchmark.margin-1 THEN 1 ELSE 0 END\n    +CASE WHEN p.attainment<benchmark.attainment*.8 THEN 1 ELSE 0 END\n    +CASE WHEN p.refund_rate>benchmark.refund_rate*1.25 THEN 1 ELSE 0 END flags,\n    RANK() OVER(ORDER BY net DESC) sales_rank FROM p CROSS JOIN benchmark\n)\nSELECT store_id, net net_cents, ROUND(margin,2) margin_pct,\n  ROUND(attainment,2) achievement_pct, ROUND(refund_rate,2) refund_pct, flags, sales_rank\nFROM z ORDER BY flags DESC,store_id",
+      "sqliteSql": "WITH a AS (\n  SELECT store_id, SUM(net_cents) net, SUM(cost_cents) cost, SUM(refund_cents) refund\n  FROM v_sales_lines\n  WHERE channel='store' AND (order_date>='2025-10-01' AND order_date<='2025-12-31')\n  GROUP BY store_id\n), b AS (\n  SELECT store_id, SUM(target_cents) target FROM sales_targets\n  WHERE (month_key>='2025-10' AND month_key<='2025-12') GROUP BY store_id\n), p AS (\n  SELECT s.store_id, COALESCE(a.net,0) net, COALESCE(a.cost,0) cost,\n    COALESCE(a.refund,0) refund, b.target,\n    100.0*(a.net-a.cost)/NULLIF(a.net,0) margin,\n    100.0*COALESCE(a.net,0)/NULLIF(b.target,0) attainment,\n    100.0*a.refund/NULLIF(a.net+a.refund,0) refund_rate\n  FROM stores s LEFT JOIN a ON a.store_id=s.store_id LEFT JOIN b ON b.store_id=s.store_id\n), benchmark AS (\n  SELECT 100.0*SUM(net-cost)/NULLIF(SUM(net),0) margin,\n    100.0*SUM(CASE WHEN target>0 THEN net ELSE 0 END)/NULLIF(SUM(CASE WHEN target>0 THEN target ELSE 0 END),0) attainment,\n    100.0*SUM(refund)/NULLIF(SUM(net+refund),0) refund_rate FROM p\n), z AS (\n  SELECT p.*,\n    CASE WHEN p.margin<benchmark.margin-1 THEN 1 ELSE 0 END\n    +CASE WHEN p.attainment<benchmark.attainment*.8 THEN 1 ELSE 0 END\n    +CASE WHEN p.refund_rate>benchmark.refund_rate*1.25 THEN 1 ELSE 0 END flags,\n    RANK() OVER(ORDER BY net DESC) sales_rank FROM p CROSS JOIN benchmark\n)\nSELECT store_id, net net_cents, ROUND(margin,2) margin_pct,\n  ROUND(attainment,2) achievement_pct, ROUND(refund_rate,2) refund_pct, flags, sales_rank\nFROM z ORDER BY flags DESC,store_id"
     }
   ],
   "hints": [
-    "按门店汇总经营指标",
-    "按门店汇总经营指标；独立关联季度目标",
-    "重点核对输出粒度：门店"
+    "分别汇总门店销售与季度目标",
+    "计算全体加权基准；比较未舍入比率并累计标记",
+    "旧阈值使所有门店同分；简单平均门店比率或在筛风险后才排名均会改变比较总体。"
   ],
-  "explanation": "按门店汇总经营指标；独立关联季度目标；用未舍入比率标记；窗口排名。阈值用四舍五入后的比率可能误判边界。\n审计口径：先核定日期范围、输出粒度、退款和贷项，再在各事实表中独立聚合，防止连接放大。",
+  "explanation": "分别汇总门店销售与季度目标。计算全体加权基准。比较未舍入比率并累计标记。对所有门店进行销售排名。旧阈值使所有门店同分；简单平均门店比率或在筛风险后才排名均会改变比较总体。",
   "testFixtureIds": [
     "q0255-public",
     "q0255-boundary",
     "q0255-mini-202611171",
-    "q0255-mini-202611179"
+    "q0255-mini-202611179",
+    "q0255-review-multiple-partial-returns"
   ],
   "validationStatus": {
     "independentPython": true,
+    "sqliteNative": true,
     "sqliteWasm": true,
     "mysql84Native": false
   },
-  "elapsedMs": 10.922
+  "elapsedMs": 11.266
 }

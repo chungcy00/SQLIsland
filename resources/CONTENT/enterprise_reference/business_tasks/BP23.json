@@ -31,7 +31,7 @@
   "datasetId": "hr-v2",
   "type": "业务情景",
   "schemaVersion": 2,
-  "contentVersion": "4.2.0",
+  "contentVersion": "4.2.1",
   "expectedOutputPath": "business_tasks/results/BP23.json",
   "expectedRowCount": 62,
   "expectedColumns": [
@@ -54,12 +54,15 @@
     "positions",
     "salary_history",
     "stores",
-    "v_staff_month"
+    "v_staff_month",
+    "warehouses"
   ],
   "orderPolicy": "ordered",
   "numericTolerance": {
-    "integerCents": 0,
-    "decimalAbsolute": 1e-06
+    "absolute": 1e-06,
+    "integerExact": true,
+    "textExact": true,
+    "nullDistinct": true
   },
   "referenceSolutions": [
     {
@@ -68,17 +71,17 @@
       "sqliteSql": "WITH a AS (SELECT employee_id,department_id,position_id,base_cents,AVG(base_cents) OVER(PARTITION BY department_id,position_id) avg_base,COUNT(*) OVER(PARTITION BY department_id,position_id) n,RANK() OVER(PARTITION BY department_id,position_id ORDER BY base_cents DESC) salary_rank FROM v_staff_month WHERE month_key='2025-12') SELECT employee_id,department_id,position_id,base_cents,ROUND(avg_base,2) avg_base_cents,salary_rank,ROUND(100.0*(base_cents-avg_base)/NULLIF(avg_base,0),2) deviation_pct FROM a WHERE n>=3 AND ABS(base_cents-avg_base)>avg_base*.15 ORDER BY department_id,position_id,salary_rank,employee_id"
     },
     {
-      "kind": "algebraic equivalent",
+      "kind": "equivalent",
       "mysqlSql": "WITH a AS (SELECT employee_id,department_id,position_id,base_cents,AVG(base_cents) OVER(PARTITION BY department_id,position_id) avg_base,COUNT(*) OVER(PARTITION BY department_id,position_id) n,RANK() OVER(PARTITION BY department_id,position_id ORDER BY base_cents DESC) salary_rank FROM v_staff_month WHERE month_key='2025-12') SELECT employee_id,department_id,position_id,base_cents,ROUND(avg_base,2) avg_base_cents,salary_rank,ROUND(100.0*(base_cents-avg_base)/NULLIF(avg_base,0),2) deviation_pct FROM a WHERE n>2 AND ABS(base_cents-avg_base)>avg_base*.15 ORDER BY department_id,position_id,salary_rank,employee_id",
       "sqliteSql": "WITH a AS (SELECT employee_id,department_id,position_id,base_cents,AVG(base_cents) OVER(PARTITION BY department_id,position_id) avg_base,COUNT(*) OVER(PARTITION BY department_id,position_id) n,RANK() OVER(PARTITION BY department_id,position_id ORDER BY base_cents DESC) salary_rank FROM v_staff_month WHERE month_key='2025-12') SELECT employee_id,department_id,position_id,base_cents,ROUND(avg_base,2) avg_base_cents,salary_rank,ROUND(100.0*(base_cents-avg_base)/NULLIF(avg_base,0),2) deviation_pct FROM a WHERE n>2 AND ABS(base_cents-avg_base)>avg_base*.15 ORDER BY department_id,position_id,salary_rank,employee_id"
     }
   ],
   "hints": [
     "确定薪资期间",
-    "确定薪资期间；按可比组窗口计算",
-    "重点核对输出粒度：员工×月"
+    "按可比组窗口计算；筛选足够样本与偏差",
+    "比较全部员工薪资忽略岗位、职级和部门。"
   ],
-  "explanation": "确定薪资期间；按可比组窗口计算；筛选足够样本与偏差。比较全部员工薪资忽略岗位、职级和部门。\n审计口径：先核定日期范围、输出粒度、退款和贷项，再在各事实表中独立聚合，防止连接放大。",
+  "explanation": "确定薪资期间。按可比组窗口计算。筛选足够样本与偏差。比较全部员工薪资忽略岗位、职级和部门。",
   "testFixtureIds": [
     "q0273-public",
     "q0273-boundary",
@@ -87,8 +90,9 @@
   ],
   "validationStatus": {
     "independentPython": true,
+    "sqliteNative": true,
     "sqliteWasm": true,
     "mysql84Native": false
   },
-  "elapsedMs": 25.073
+  "elapsedMs": 22.174
 }
