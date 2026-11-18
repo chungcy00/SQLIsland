@@ -13,7 +13,7 @@ import time
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "scripts/enterprise_audit"))
 from independent import Model
-from sync_learning import equivalent, matches
+from sync_learning import equivalent
 from validate import fixture_db, wrong_solutions, hardcode, business_checks
 from sync_resources import query
 from changes import CHANGES

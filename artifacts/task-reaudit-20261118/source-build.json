@@ -1,0 +1,10 @@
+{
+  "pass": true,
+  "sourceCommit": "dd0568d",
+  "version": "0.3.2",
+  "cleanInstall": true,
+  "build": true,
+  "testsPassed": 14,
+  "offlineFilesMatchApk": 1184,
+  "contentManifestFilesVerified": 2514
+}

@@ -29,5 +29,9 @@
     "BP39"
   ],
   "dataContentChanged": false,
-  "mysql84NativeVerified": false
+  "mysql84NativeVerified": false,
+  "appRelease": "0.3.2",
+  "nativeAndroid16Verified": true,
+  "nativeGradingFixtureExecutions": 32,
+  "publicUpdateVerified": true
 }

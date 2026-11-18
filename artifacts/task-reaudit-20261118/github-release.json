@@ -1,0 +1,42 @@
+{
+  "pass": true,
+  "url": "https://github.com/chungcy00/SQLIsland/releases/tag/v0.3.2",
+  "tag": "v0.3.2",
+  "publicLatest": true,
+  "sourceCommit": "dd0568d",
+  "publicUpdateManifestMatches": true,
+  "apkDigest": "sha256:20028f54610206b74c367eeeb54a1cf30e1097da897eb9981d65bfdac4322ac2",
+  "apkBytes": 52986971,
+  "assets": [
+    {
+      "name": "enterprise-task-reaudit.md",
+      "bytes": 81218,
+      "digest": "sha256:29644e7ab30ec9d61265bbb5f385bbeb8bf87c13886b63c11d970678b8949628"
+    },
+    {
+      "name": "SHA256SUMS",
+      "bytes": 425,
+      "digest": "sha256:275c593bcecfb153c4f61f9dafbfce5d98e58f62d7e3429f7e7ece78d052a34e"
+    },
+    {
+      "name": "ShuyuSQL-0.3.2.apk",
+      "bytes": 52986971,
+      "digest": "sha256:20028f54610206b74c367eeeb54a1cf30e1097da897eb9981d65bfdac4322ac2"
+    },
+    {
+      "name": "summary.json",
+      "bytes": 835,
+      "digest": "sha256:09e11eb6195cd58b65a0c2dc1a12df2c3dc38a561d898ce080932c360a368294"
+    },
+    {
+      "name": "tasks-before-after.json",
+      "bytes": 774009,
+      "digest": "sha256:8eec7eea74eef36ac3d59a075d47ed5e9247700e7046c9c401266cabc7d51986"
+    },
+    {
+      "name": "update.json",
+      "bytes": 694,
+      "digest": "sha256:3c54089a6d863ccffbfa2821be63f07ca6f9ba109fdfa51dcc0d28445f76981e"
+    }
+  ]
+}

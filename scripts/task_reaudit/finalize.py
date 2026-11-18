@@ -6,6 +6,7 @@ import hashlib
 import json
 import tarfile
 import sys
+import subprocess
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -174,6 +175,31 @@ def resource_record():
             "resources": changes,
         },
     )
+    record_path = OUT / "resource-sync.json"
+    record = read(record_path)
+    baseline_commit = read(OUT / "backup.json")["sourceCommit"]
+    record["baselineSourceCommit"] = baseline_commit
+    record["codeChanges"] = []
+    for name in [
+        "src/engine.js",
+        "src/sql-worker.js",
+        "src/app.js",
+        "src/integer-column-policy.json",
+        "tests/engine.test.mjs",
+    ]:
+        try:
+            original = subprocess.check_output(
+                ["git", "show", baseline_commit + ":" + name],
+                cwd=ROOT,
+                stderr=subprocess.DEVNULL,
+            )
+            before_hash = hashlib.sha256(original).hexdigest()
+        except (subprocess.CalledProcessError, FileNotFoundError):
+            before_hash = None
+        record["codeChanges"].append(
+            {"path": name, "beforeSha256": before_hash, "afterSha256": sha(ROOT / name)}
+        )
+    write(record_path, record)
     current = read(CONTENT / "manifest.json")
     for entry in current["files"]:
         path = CONTENT / entry["path"]

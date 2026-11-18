@@ -4267,5 +4267,33 @@
         "sha256": "de48dba55b8773be41f137437bf3c822cf0308ea54303902d62b2507a6c79c94"
       }
     }
+  ],
+  "baselineSourceCommit": "9d1a4c5a7643c4984cea164e2cc0385956718387",
+  "codeChanges": [
+    {
+      "path": "src/engine.js",
+      "beforeSha256": "cc9fd25fd88e7a51cf6b74d23c2d166f37b27cf9f2edba2d26b472334c918932",
+      "afterSha256": "851fc57462fb95bd5f76cb7e198a723a13264cddb7055c91af8e3d77a8e79856"
+    },
+    {
+      "path": "src/sql-worker.js",
+      "beforeSha256": "b4771247936831681b658a8b16459078fcba0c3d90493c1fc24c69833efb5449",
+      "afterSha256": "163b03153fcc0f75b23f66e9e46df2e09aa6cfc783f2dbe11adeb2b044589f98"
+    },
+    {
+      "path": "src/app.js",
+      "beforeSha256": "36c4a89a67406964173d1cd882dca035373c0898d79c30fc032415ee5ce0c2c2",
+      "afterSha256": "5f6c725cb003b8624c89c9c397c2d7cab5adab364be11da124e7f39b64af85b0"
+    },
+    {
+      "path": "src/integer-column-policy.json",
+      "beforeSha256": "a06bf485c6f0c66e1331fd4d9f8afd63f7cbafd51e9f9223d0e0eee75f00de58",
+      "afterSha256": "f4223622200a2e985b603f861ce0fdcbf3105a81226153680207eefd45d3bf30"
+    },
+    {
+      "path": "tests/engine.test.mjs",
+      "beforeSha256": "1952039ef5cbc318bc7714ac83e34af57d4692fd911f8b119f69016768847106",
+      "afterSha256": "ee3fc26d9fea7e89b17852fd58d466348ad6a4f0d833cc6b4740bb2a7a3f9e4c"
+    }
   ]
 }

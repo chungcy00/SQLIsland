@@ -52,8 +52,6 @@ def exports():
     groups = defaultdict(list)
     for tid, t in tasks.items():
         groups[t["projectId"]].append(t)
-        qid = f"q{250+int(tid[2:]):04}"
-        references = "\n\n".join(sql(r["mysqlSql"]) for r in t["referenceSolutions"])
         (CONTENT / f"question_resource/validation/mysql_business/{tid}.sql").write_text(
             "-- "
             + t["title"]
