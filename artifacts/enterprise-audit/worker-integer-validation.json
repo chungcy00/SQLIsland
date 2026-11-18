@@ -1,0 +1,10 @@
+{
+  "pass": true,
+  "question": "q0279",
+  "correct": true,
+  "equivalent": true,
+  "wrongRejected": true,
+  "correctFixtures": 4,
+  "equivalentFixtures": 4,
+  "wrongMessage": "结果值或行顺序不同，请检查排序、NULL 和重复记录。"
+}

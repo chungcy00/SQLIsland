@@ -46,7 +46,7 @@
 - 实验室支持独立的查询标签与草稿保存，旧实验室草稿会接入第一个查询标签。
 - 闪卡可撤回上次评分，恢复之前的 FSRS 状态。
 - 更新源为 `chungcy00/SQLIsland` 的 GitHub Releases。只有点击检查更新才发起联网请求。学习、练习和 SQL 执行继续使用安装包内置资源。
-- `release.json` 维护本版说明。签名 APK 构建后执行 `node scripts/prepare-update.mjs` 生成 `artifacts/update.json`。公开 Release 标签与版本号一致，当前为 `v0.3.0`，同时附加 APK 与更新清单。
+- `release.json` 维护本版说明。签名 APK 构建后执行 `node scripts/prepare-update.mjs` 生成 `artifacts/update.json`。公开 Release 标签与版本号一致，当前为 `v0.3.1`，同时附加 APK 与更新清单。
 - 应用先核对 SHA-256、包名、递增版本号和签名，再调用安卓安装器。首次安装更新需在安卓设置中允许安装应用。
 - 已发布至 https://github.com/chungcy00/SQLIsland/releases 。已在 Android 16 模拟器完成真实版本检查、下载校验与安卓系统覆盖安装。实体手机仍待验收。
 
@@ -57,6 +57,14 @@
 后续发布时同步递增 `release.json`、`android/app/src/main/AndroidManifest.xml`、`android/app/build.gradle` 及构建脚本中的版本号与文件名。使用现有 `.tooling/sql-shouji.keystore` 签名，运行构建和清单生成后，将 APK 与 `update.json` 一起附加到新的 GitHub Release。清单里的 APK 名使用 ASCII 文件名。
 
 本地预览通过开发服务器读取 GitHub 更新信息。安卓安装版由原生更新模块直接检查与下载。已验证从公开 0.2.0 更新至更名后的 0.2.1，学习记录保持完整。
+
+## 0.3.1 判题修复
+
+[下载最新版](https://github.com/chungcy00/SQLIsland/releases/latest)。应用内打开“我的 → 版本更新”即可获取。
+
+整数输出列按公开及隐藏夹具的原始类型精确比较。246道题接入整数列策略，216条小数偏移错误查询全部拒绝。派生小数指标保留原有容差，13项自动测试及775次参考执行通过。详情见[判题复验记录](artifacts/enterprise-audit/0.3.1判题修复.md)。
+
+修改夹具后执行`python3 scripts/generate-integer-policy.py`，随后重新构建并运行`node scripts/check-integer-policy.mjs`及全量测试。
 
 ## 0.3.0 企业审计与 ERD
 

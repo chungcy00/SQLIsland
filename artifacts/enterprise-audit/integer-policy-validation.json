@@ -1,0 +1,1737 @@
+{
+  "version": "0.3.1",
+  "pass": true,
+  "checks": [
+    {
+      "question": "q0251",
+      "fixture": "q0251-public",
+      "column": "store_id",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0251",
+      "fixture": "q0251-public",
+      "column": "net_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0251",
+      "fixture": "q0251-public",
+      "column": "gross_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0251",
+      "fixture": "q0251-public",
+      "column": "target_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0252",
+      "fixture": "q0252-public",
+      "column": "store_id",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0252",
+      "fixture": "q0252-public",
+      "column": "net_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0252",
+      "fixture": "q0252-public",
+      "column": "three_declines",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0253",
+      "fixture": "q0253-public",
+      "column": "product_id",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0253",
+      "fixture": "q0253-public",
+      "column": "net_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0253",
+      "fixture": "q0253-public",
+      "column": "discount_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0253",
+      "fixture": "q0253-public",
+      "column": "refund_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0254",
+      "fixture": "q0254-public",
+      "column": "promo",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0254",
+      "fixture": "q0254-public",
+      "column": "days",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0255",
+      "fixture": "q0255-public",
+      "column": "store_id",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0255",
+      "fixture": "q0255-public",
+      "column": "net_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0255",
+      "fixture": "q0255-public",
+      "column": "flags",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0255",
+      "fixture": "q0255-public",
+      "column": "sales_rank",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0256",
+      "fixture": "q0256-public",
+      "column": "warehouse_id",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0256",
+      "fixture": "q0256-public",
+      "column": "product_id",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0256",
+      "fixture": "q0256-public",
+      "column": "quantity",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0256",
+      "fixture": "q0256-public",
+      "column": "sold_units",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0256",
+      "fixture": "q0256-public",
+      "column": "stock_value_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0257",
+      "fixture": "q0257-public",
+      "column": "warehouse_id",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0257",
+      "fixture": "q0257-public",
+      "column": "category_id",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0257",
+      "fixture": "q0257-public",
+      "column": "cogs_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0258",
+      "fixture": "q0258-public",
+      "column": "warehouse_id",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0258",
+      "fixture": "q0258-public",
+      "column": "product_id",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0258",
+      "fixture": "q0258-public",
+      "column": "quantity",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0258",
+      "fixture": "q0258-public",
+      "column": "sold",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0259",
+      "fixture": "q0259-public",
+      "column": "warehouse_id",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0259",
+      "fixture": "q0259-public",
+      "column": "product_id",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0259",
+      "fixture": "q0259-public",
+      "column": "aged_units",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0259",
+      "fixture": "q0259-public",
+      "column": "aged_value_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0260",
+      "fixture": "q0260-public",
+      "column": "warehouse_id",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0260",
+      "fixture": "q0260-public",
+      "column": "product_id",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0260",
+      "fixture": "q0260-public",
+      "column": "quantity",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0260",
+      "fixture": "q0260-public",
+      "column": "stock_value_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0260",
+      "fixture": "q0260-public",
+      "column": "demand",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0260",
+      "fixture": "q0260-public",
+      "column": "inbound",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0260",
+      "fixture": "q0260-public",
+      "column": "shortage",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0261",
+      "fixture": "q0261-public",
+      "column": "customers",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0261",
+      "fixture": "q0261-public",
+      "column": "orders",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0261",
+      "fixture": "q0261-public",
+      "column": "net_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0262",
+      "fixture": "q0262-public",
+      "column": "customer_id",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0262",
+      "fixture": "q0262-public",
+      "column": "recency_days",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0262",
+      "fixture": "q0262-public",
+      "column": "freq",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0262",
+      "fixture": "q0262-public",
+      "column": "net_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0262",
+      "fixture": "q0262-public",
+      "column": "r_score",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0262",
+      "fixture": "q0262-public",
+      "column": "f_score",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0262",
+      "fixture": "q0262-public",
+      "column": "m_score",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0263",
+      "fixture": "q0263-public",
+      "column": "month_offset",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0263",
+      "fixture": "q0263-public",
+      "column": "cohort_size",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0263",
+      "fixture": "q0263-public",
+      "column": "active_customers",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0264",
+      "fixture": "q0264-public",
+      "column": "source_id",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0264",
+      "fixture": "q0264-public",
+      "column": "sessions",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0264",
+      "fixture": "q0264-public",
+      "column": "converted",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0264",
+      "fixture": "q0264-public",
+      "column": "new_customers",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0264",
+      "fixture": "q0264-public",
+      "column": "spend_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0265",
+      "fixture": "q0265-public",
+      "column": "customer_id",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0265",
+      "fixture": "q0265-public",
+      "column": "freq",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0265",
+      "fixture": "q0265-public",
+      "column": "net_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0265",
+      "fixture": "q0265-public",
+      "column": "gross_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0265",
+      "fixture": "q0265-public",
+      "column": "recency_days",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0266",
+      "fixture": "q0266-public",
+      "column": "department_id",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0266",
+      "fixture": "q0266-public",
+      "column": "account_id",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0266",
+      "fixture": "q0266-public",
+      "column": "budget_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0266",
+      "fixture": "q0266-public",
+      "column": "actual_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0266",
+      "fixture": "q0266-public",
+      "column": "variance_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0266",
+      "fixture": "q0266-public",
+      "column": "over_budget",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0267",
+      "fixture": "q0267-public",
+      "column": "supplier_invoice_id",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0267",
+      "fixture": "q0267-public",
+      "column": "supplier_id",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0267",
+      "fixture": "q0267-public",
+      "column": "billed_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0267",
+      "fixture": "q0267-public",
+      "column": "paid_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0267",
+      "fixture": "q0267-public",
+      "column": "balance_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0268",
+      "fixture": "q0268-public",
+      "column": "supplier_id",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0268",
+      "fixture": "q0268-public",
+      "column": "invoices",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0268",
+      "fixture": "q0268-public",
+      "column": "outstanding_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0269",
+      "fixture": "q0269-public",
+      "column": "ledger_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0269",
+      "fixture": "q0269-public",
+      "column": "bank_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0269",
+      "fixture": "q0269-public",
+      "column": "difference_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0270",
+      "fixture": "q0270-public",
+      "column": "supplier_invoice_id",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0270",
+      "fixture": "q0270-public",
+      "column": "supplier_id",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0270",
+      "fixture": "q0270-public",
+      "column": "billed_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0270",
+      "fixture": "q0270-public",
+      "column": "duplicate_flag",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0270",
+      "fixture": "q0270-public",
+      "column": "large_flag",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0270",
+      "fixture": "q0270-public",
+      "column": "overpay_flag",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0270",
+      "fixture": "q0270-public",
+      "column": "mismatch_flag",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0270",
+      "fixture": "q0270-public",
+      "column": "flags",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0271",
+      "fixture": "q0271-public",
+      "column": "department_id",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0271",
+      "fixture": "q0271-public",
+      "column": "headcount",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0271",
+      "fixture": "q0271-public",
+      "column": "net_change",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0272",
+      "fixture": "q0272-public",
+      "column": "department_id",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0272",
+      "fixture": "q0272-public",
+      "column": "opening",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0272",
+      "fixture": "q0272-public",
+      "column": "closing",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0272",
+      "fixture": "q0272-public",
+      "column": "exits",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0273",
+      "fixture": "q0273-public",
+      "column": "employee_id",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0273",
+      "fixture": "q0273-public",
+      "column": "department_id",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0273",
+      "fixture": "q0273-public",
+      "column": "position_id",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0273",
+      "fixture": "q0273-public",
+      "column": "base_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0273",
+      "fixture": "q0273-public",
+      "column": "salary_rank",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0274",
+      "fixture": "q0274-public",
+      "column": "department_id",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0274",
+      "fixture": "q0274-public",
+      "column": "base_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0274",
+      "fixture": "q0274-public",
+      "column": "bonus_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0274",
+      "fixture": "q0274-public",
+      "column": "overtime_minutes",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0275",
+      "fixture": "q0275-public",
+      "column": "department_id",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0275",
+      "fixture": "q0275-public",
+      "column": "n90",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0275",
+      "fixture": "q0275-public",
+      "column": "n180",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0276",
+      "fixture": "q0276-public",
+      "column": "po_item_id",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0276",
+      "fixture": "q0276-public",
+      "column": "supplier_id",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0276",
+      "fixture": "q0276-public",
+      "column": "product_id",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0276",
+      "fixture": "q0276-public",
+      "column": "unit_price_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0276",
+      "fixture": "q0276-public",
+      "column": "contract_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0276",
+      "fixture": "q0276-public",
+      "column": "contract_variance_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0276",
+      "fixture": "q0276-public",
+      "column": "previous_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0277",
+      "fixture": "q0277-public",
+      "column": "supplier_id",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0277",
+      "fixture": "q0277-public",
+      "column": "due_lines",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0278",
+      "fixture": "q0278-public",
+      "column": "po_item_id",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0278",
+      "fixture": "q0278-public",
+      "column": "po_id",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0278",
+      "fixture": "q0278-public",
+      "column": "supplier_id",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0278",
+      "fixture": "q0278-public",
+      "column": "product_id",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0278",
+      "fixture": "q0278-public",
+      "column": "quantity_ordered",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0278",
+      "fixture": "q0278-public",
+      "column": "accepted",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0278",
+      "fixture": "q0278-public",
+      "column": "billed",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0278",
+      "fixture": "q0278-public",
+      "column": "billed_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0278",
+      "fixture": "q0278-public",
+      "column": "expected_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0278",
+      "fixture": "q0278-public",
+      "column": "variance_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0279",
+      "fixture": "q0279-public",
+      "column": "product_id",
+      "fractionalOffset": 0.00500005,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0279",
+      "fixture": "q0279-public",
+      "column": "supplier_id",
+      "fractionalOffset": 0.00500005,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0280",
+      "fixture": "q0280-public",
+      "column": "supplier_id",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0280",
+      "fixture": "q0280-public",
+      "column": "due_lines",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0281",
+      "fixture": "q0281-public",
+      "column": "warehouse_id",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0281",
+      "fixture": "q0281-public",
+      "column": "product_id",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0281",
+      "fixture": "q0281-public",
+      "column": "quantity",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0281",
+      "fixture": "q0281-public",
+      "column": "sold",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0281",
+      "fixture": "q0281-public",
+      "column": "value_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0282",
+      "fixture": "q0282-public",
+      "column": "product_id",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0282",
+      "fixture": "q0282-public",
+      "column": "net_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0282",
+      "fixture": "q0282-public",
+      "column": "stock_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0283",
+      "fixture": "q0283-public",
+      "column": "product_id",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0283",
+      "fixture": "q0283-public",
+      "column": "from_warehouse",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0283",
+      "fixture": "q0283-public",
+      "column": "to_warehouse",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0283",
+      "fixture": "q0283-public",
+      "column": "proposed_units",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0284",
+      "fixture": "q0284-public",
+      "column": "category_id",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0284",
+      "fixture": "q0284-public",
+      "column": "gross_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0285",
+      "fixture": "q0285-public",
+      "column": "warehouse_id",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0285",
+      "fixture": "q0285-public",
+      "column": "product_id",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0285",
+      "fixture": "q0285-public",
+      "column": "quantity",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0285",
+      "fixture": "q0285-public",
+      "column": "demand",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0285",
+      "fixture": "q0285-public",
+      "column": "overdue_units",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0285",
+      "fixture": "q0285-public",
+      "column": "shortage",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0286",
+      "fixture": "q0286-boundary",
+      "column": "receipt_id",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0286",
+      "fixture": "q0286-boundary",
+      "column": "po_item_id",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0286",
+      "fixture": "q0286-boundary",
+      "column": "expected_units",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0286",
+      "fixture": "q0286-boundary",
+      "column": "posted_units",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0286",
+      "fixture": "q0286-boundary",
+      "column": "difference",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0287",
+      "fixture": "q0287-public",
+      "column": "supplier_id",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0287",
+      "fixture": "q0287-public",
+      "column": "affected_pairs",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0287",
+      "fixture": "q0287-public",
+      "column": "overdue_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0287",
+      "fixture": "q0287-public",
+      "column": "exposed_stock_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0288",
+      "fixture": "q0288-public",
+      "column": "store_id",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0288",
+      "fixture": "q0288-public",
+      "column": "net_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0288",
+      "fixture": "q0288-public",
+      "column": "cost_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0288",
+      "fixture": "q0288-public",
+      "column": "expense_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0288",
+      "fixture": "q0288-public",
+      "column": "contribution_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0289",
+      "fixture": "q0289-boundary",
+      "column": "order_id",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0289",
+      "fixture": "q0289-boundary",
+      "column": "net_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0289",
+      "fixture": "q0289-boundary",
+      "column": "cash_net_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0289",
+      "fixture": "q0289-boundary",
+      "column": "difference_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0290",
+      "fixture": "q0290-public",
+      "column": "store_id",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0290",
+      "fixture": "q0290-public",
+      "column": "net_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0290",
+      "fixture": "q0290-public",
+      "column": "expense_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0291",
+      "fixture": "q0291-public",
+      "column": "supplier_id",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0291",
+      "fixture": "q0291-public",
+      "column": "ordered_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0291",
+      "fixture": "q0291-public",
+      "column": "received_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0291",
+      "fixture": "q0291-public",
+      "column": "billed_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0291",
+      "fixture": "q0291-public",
+      "column": "paid_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0291",
+      "fixture": "q0291-public",
+      "column": "balance_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0292",
+      "fixture": "q0292-public",
+      "column": "supplier_invoice_id",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0292",
+      "fixture": "q0292-public",
+      "column": "po_id",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0292",
+      "fixture": "q0292-public",
+      "column": "billed_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0292",
+      "fixture": "q0292-public",
+      "column": "paid_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0292",
+      "fixture": "q0292-public",
+      "column": "received_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0292",
+      "fixture": "q0292-public",
+      "column": "bill_difference_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0292",
+      "fixture": "q0292-public",
+      "column": "paid_difference_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0293",
+      "fixture": "q0293-public",
+      "column": "supplier_id",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0293",
+      "fixture": "q0293-public",
+      "column": "outstanding_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0293",
+      "fixture": "q0293-public",
+      "column": "overdue_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0293",
+      "fixture": "q0293-public",
+      "column": "due_lines",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0294",
+      "fixture": "q0294-public",
+      "column": "source_id",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0294",
+      "fixture": "q0294-public",
+      "column": "net_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0294",
+      "fixture": "q0294-public",
+      "column": "gross_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0294",
+      "fixture": "q0294-public",
+      "column": "spend_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0294",
+      "fixture": "q0294-public",
+      "column": "contribution_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0295",
+      "fixture": "q0295-public",
+      "column": "source_id",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0295",
+      "fixture": "q0295-public",
+      "column": "mature",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0295",
+      "fixture": "q0295-public",
+      "column": "new_customers",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0296",
+      "fixture": "q0296-public",
+      "column": "source_id",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0296",
+      "fixture": "q0296-public",
+      "column": "before_refund_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0296",
+      "fixture": "q0296-public",
+      "column": "refund_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0296",
+      "fixture": "q0296-public",
+      "column": "before_gross_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0296",
+      "fixture": "q0296-public",
+      "column": "after_gross_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0297",
+      "fixture": "q0297-public",
+      "column": "store_id",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0297",
+      "fixture": "q0297-public",
+      "column": "net_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0298",
+      "fixture": "q0298-public",
+      "column": "store_id",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0298",
+      "fixture": "q0298-public",
+      "column": "headcount",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0298",
+      "fixture": "q0298-public",
+      "column": "net_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0298",
+      "fixture": "q0298-public",
+      "column": "review_flag",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0299",
+      "fixture": "q0299-public",
+      "column": "net_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0299",
+      "fixture": "q0299-public",
+      "column": "gross_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0299",
+      "fixture": "q0299-public",
+      "column": "expense_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0299",
+      "fixture": "q0299-public",
+      "column": "advertising_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0299",
+      "fixture": "q0299-public",
+      "column": "committed_purchase_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0300",
+      "fixture": "q0300-public",
+      "column": "net_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0300",
+      "fixture": "q0300-public",
+      "column": "stock_cents",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0300",
+      "fixture": "q0300-public",
+      "column": "risk_count",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    },
+    {
+      "question": "q0300",
+      "fixture": "q0300-public",
+      "column": "missing_count",
+      "fractionalOffset": 5e-7,
+      "previouslyAccepted": true,
+      "nowRejected": true
+    }
+  ],
+  "policyQuestions": 246,
+  "rejectedFractionalQueries": 216,
+  "previouslyAcceptedQueries": 216
+}

@@ -13,7 +13,7 @@
   "singleExpandedTable": true,
   "questionTitleCompact": true,
   "sourceHashes": {
-    "src/app.js": "3e34a9e0dc8f560ba3b2dfc7ed90ea4f022911dfff269fa1028d63f2de81d57b",
+    "src/app.js": "36c4a89a67406964173d1cd882dca035373c0898d79c30fc032415ee5ce0c2c2",
     "src/style.css": "7dc73c1be71d172cf67bba0d35d3953c7e7d029f66e2447d34c4486f846a06bc",
     "src/store.js": "c20e144c2a662f586a18dde08f3f5cdd12816236bf415bd1088409332f9b2089"
   }

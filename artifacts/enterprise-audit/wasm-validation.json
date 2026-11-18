@@ -1343,13 +1343,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 12,
-              "elapsedMs": 37.681
+              "elapsedMs": 36.011
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 12,
-              "elapsedMs": 25.78
+              "elapsedMs": 24.689
             }
           ]
         },
@@ -1361,13 +1361,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 12,
-              "elapsedMs": 25.882
+              "elapsedMs": 24.586
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 12,
-              "elapsedMs": 25.183
+              "elapsedMs": 24.262
             }
           ]
         },
@@ -1379,13 +1379,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 4,
-              "elapsedMs": 0.826
+              "elapsedMs": 0.814
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 4,
-              "elapsedMs": 0.575
+              "elapsedMs": 0.529
             }
           ]
         },
@@ -1397,18 +1397,18 @@
               "kind": "reference",
               "pass": true,
               "rows": 4,
-              "elapsedMs": 1.132
+              "elapsedMs": 0.664
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 4,
-              "elapsedMs": 0.578
+              "elapsedMs": 0.439
             }
           ]
         }
       ],
-      "fullSubmissionMs": 552.728
+      "fullSubmissionMs": 550.453
     },
     {
       "id": "q0252",
@@ -1422,13 +1422,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 144,
-              "elapsedMs": 60.142
+              "elapsedMs": 59.116
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 144,
-              "elapsedMs": 57.731
+              "elapsedMs": 57.138
             }
           ]
         },
@@ -1440,13 +1440,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 144,
-              "elapsedMs": 57.592
+              "elapsedMs": 57.16
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 144,
-              "elapsedMs": 57.166
+              "elapsedMs": 56.633
             }
           ]
         },
@@ -1458,13 +1458,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 48,
-              "elapsedMs": 1.422
+              "elapsedMs": 1.332
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 48,
-              "elapsedMs": 1.533
+              "elapsedMs": 1.795
             }
           ]
         },
@@ -1476,18 +1476,18 @@
               "kind": "reference",
               "pass": true,
               "rows": 48,
-              "elapsedMs": 1.326
+              "elapsedMs": 1.253
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 48,
-              "elapsedMs": 1.847
+              "elapsedMs": 1.161
             }
           ]
         }
       ],
-      "fullSubmissionMs": 607.447
+      "fullSubmissionMs": 596.022
     },
     {
       "id": "q0253",
@@ -1501,13 +1501,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 23,
-              "elapsedMs": 82.957
+              "elapsedMs": 73.295
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 23,
-              "elapsedMs": 79.167
+              "elapsedMs": 97.991
             }
           ]
         },
@@ -1519,13 +1519,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 22,
-              "elapsedMs": 75.657
+              "elapsedMs": 79.839
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 22,
-              "elapsedMs": 75.686
+              "elapsedMs": 72.405
             }
           ]
         },
@@ -1537,13 +1537,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 2,
-              "elapsedMs": 0.528
+              "elapsedMs": 0.521
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 2,
-              "elapsedMs": 0.442
+              "elapsedMs": 0.429
             }
           ]
         },
@@ -1555,18 +1555,18 @@
               "kind": "reference",
               "pass": true,
               "rows": 1,
-              "elapsedMs": 0.533
+              "elapsedMs": 0.526
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 1,
-              "elapsedMs": 0.502
+              "elapsedMs": 0.477
             }
           ]
         }
       ],
-      "fullSubmissionMs": 697.074
+      "fullSubmissionMs": 694.588
     },
     {
       "id": "q0254",
@@ -1580,13 +1580,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 2,
-              "elapsedMs": 27.622
+              "elapsedMs": 26.922
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 2,
-              "elapsedMs": 33.935
+              "elapsedMs": 30.125
             }
           ]
         },
@@ -1598,13 +1598,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 1,
-              "elapsedMs": 27.021
+              "elapsedMs": 25.771
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 1,
-              "elapsedMs": 27.003
+              "elapsedMs": 25.086
             }
           ]
         },
@@ -1616,13 +1616,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 2,
-              "elapsedMs": 1.398
+              "elapsedMs": 0.917
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 2,
-              "elapsedMs": 0.983
+              "elapsedMs": 1.069
             }
           ]
         },
@@ -1634,18 +1634,18 @@
               "kind": "reference",
               "pass": true,
               "rows": 2,
-              "elapsedMs": 1.036
+              "elapsedMs": 0.937
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 2,
-              "elapsedMs": 0.841
+              "elapsedMs": 0.896
             }
           ]
         }
       ],
-      "fullSubmissionMs": 492.595
+      "fullSubmissionMs": 487.649
     },
     {
       "id": "q0255",
@@ -1659,13 +1659,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 12,
-              "elapsedMs": 17.351
+              "elapsedMs": 16.928
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 12,
-              "elapsedMs": 18.096
+              "elapsedMs": 16.579
             }
           ]
         },
@@ -1677,13 +1677,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 12,
-              "elapsedMs": 18.516
+              "elapsedMs": 17.888
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 12,
-              "elapsedMs": 16.501
+              "elapsedMs": 16.671
             }
           ]
         },
@@ -1695,13 +1695,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 4,
-              "elapsedMs": 0.663
+              "elapsedMs": 0.943
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 4,
-              "elapsedMs": 0.537
+              "elapsedMs": 0.609
             }
           ]
         },
@@ -1713,18 +1713,18 @@
               "kind": "reference",
               "pass": true,
               "rows": 4,
-              "elapsedMs": 0.662
+              "elapsedMs": 0.887
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 4,
-              "elapsedMs": 0.552
+              "elapsedMs": 0.603
             }
           ]
         }
       ],
-      "fullSubmissionMs": 436.723
+      "fullSubmissionMs": 415.435
     },
     {
       "id": "q0256",
@@ -1738,13 +1738,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 54,
-              "elapsedMs": 7.659
+              "elapsedMs": 7.65
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 54,
-              "elapsedMs": 7.323
+              "elapsedMs": 7.445
             }
           ]
         },
@@ -1756,13 +1756,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 53,
-              "elapsedMs": 7.442
+              "elapsedMs": 7.332
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 53,
-              "elapsedMs": 7.568
+              "elapsedMs": 7.26
             }
           ]
         },
@@ -1774,13 +1774,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 59,
-              "elapsedMs": 0.52
+              "elapsedMs": 0.463
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 59,
-              "elapsedMs": 0.427
+              "elapsedMs": 0.413
             }
           ]
         },
@@ -1792,18 +1792,18 @@
               "kind": "reference",
               "pass": true,
               "rows": 54,
-              "elapsedMs": 0.497
+              "elapsedMs": 0.483
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 54,
-              "elapsedMs": 0.454
+              "elapsedMs": 0.453
             }
           ]
         }
       ],
-      "fullSubmissionMs": 419.221
+      "fullSubmissionMs": 410.092
     },
     {
       "id": "q0257",
@@ -1817,13 +1817,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 45,
-              "elapsedMs": 31.508
+              "elapsedMs": 29.824
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 45,
-              "elapsedMs": 33.432
+              "elapsedMs": 31.811
             }
           ]
         },
@@ -1835,13 +1835,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 45,
-              "elapsedMs": 29.757
+              "elapsedMs": 29.184
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 45,
-              "elapsedMs": 30.002
+              "elapsedMs": 32.748
             }
           ]
         },
@@ -1853,13 +1853,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 45,
-              "elapsedMs": 29.981
+              "elapsedMs": 28.963
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 45,
-              "elapsedMs": 33.912
+              "elapsedMs": 29.259
             }
           ]
         },
@@ -1871,13 +1871,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 12,
-              "elapsedMs": 0.869
+              "elapsedMs": 0.873
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 12,
-              "elapsedMs": 1.396
+              "elapsedMs": 0.83
             }
           ]
         },
@@ -1889,18 +1889,18 @@
               "kind": "reference",
               "pass": true,
               "rows": 12,
-              "elapsedMs": 1.025
+              "elapsedMs": 0.829
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 12,
-              "elapsedMs": 0.808
+              "elapsedMs": 0.726
             }
           ]
         }
       ],
-      "fullSubmissionMs": 577.758
+      "fullSubmissionMs": 564.829
     },
     {
       "id": "q0258",
@@ -1914,13 +1914,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 52,
-              "elapsedMs": 11.596
+              "elapsedMs": 11.713
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 52,
-              "elapsedMs": 11.482
+              "elapsedMs": 11.486
             }
           ]
         },
@@ -1932,13 +1932,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 51,
-              "elapsedMs": 11.465
+              "elapsedMs": 11.252
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 51,
-              "elapsedMs": 11.921
+              "elapsedMs": 11.338
             }
           ]
         },
@@ -1950,13 +1950,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 0,
-              "elapsedMs": 1.13
+              "elapsedMs": 2.494
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 0,
-              "elapsedMs": 1.496
+              "elapsedMs": 2.457
             }
           ]
         },
@@ -1968,18 +1968,18 @@
               "kind": "reference",
               "pass": true,
               "rows": 0,
-              "elapsedMs": 1.175
+              "elapsedMs": 1.547
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 0,
-              "elapsedMs": 1.583
+              "elapsedMs": 1.215
             }
           ]
         }
       ],
-      "fullSubmissionMs": 426.761
+      "fullSubmissionMs": 417.222
     },
     {
       "id": "q0259",
@@ -1993,13 +1993,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 1148,
-              "elapsedMs": 91.374
+              "elapsedMs": 87.142
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 1148,
-              "elapsedMs": 85.756
+              "elapsedMs": 99.685
             }
           ]
         },
@@ -2011,13 +2011,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 1149,
-              "elapsedMs": 141.762
+              "elapsedMs": 90.133
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 1149,
-              "elapsedMs": 87.654
+              "elapsedMs": 84.268
             }
           ]
         },
@@ -2029,13 +2029,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 63,
-              "elapsedMs": 1.135
+              "elapsedMs": 1.136
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 63,
-              "elapsedMs": 1.704
+              "elapsedMs": 1.029
             }
           ]
         },
@@ -2047,18 +2047,18 @@
               "kind": "reference",
               "pass": true,
               "rows": 63,
-              "elapsedMs": 1.335
+              "elapsedMs": 1.059
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 63,
-              "elapsedMs": 2.351
+              "elapsedMs": 0.945
             }
           ]
         }
       ],
-      "fullSubmissionMs": 785.826
+      "fullSubmissionMs": 716.102
     },
     {
       "id": "q0260",
@@ -2072,13 +2072,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 69,
-              "elapsedMs": 40.894
+              "elapsedMs": 37.025
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 69,
-              "elapsedMs": 40.909
+              "elapsedMs": 36.754
             }
           ]
         },
@@ -2090,13 +2090,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 68,
-              "elapsedMs": 43.968
+              "elapsedMs": 37.245
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 68,
-              "elapsedMs": 46.142
+              "elapsedMs": 36.641
             }
           ]
         },
@@ -2108,13 +2108,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 69,
-              "elapsedMs": 45.639
+              "elapsedMs": 37.798
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 69,
-              "elapsedMs": 40.83
+              "elapsedMs": 40.168
             }
           ]
         },
@@ -2126,13 +2126,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 0,
-              "elapsedMs": 1.045
+              "elapsedMs": 0.916
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 0,
-              "elapsedMs": 1.271
+              "elapsedMs": 0.833
             }
           ]
         },
@@ -2144,18 +2144,18 @@
               "kind": "reference",
               "pass": true,
               "rows": 0,
-              "elapsedMs": 0.95
+              "elapsedMs": 0.911
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 0,
-              "elapsedMs": 0.853
+              "elapsedMs": 0.893
             }
           ]
         }
       ],
-      "fullSubmissionMs": 659.403
+      "fullSubmissionMs": 596.585
     },
     {
       "id": "q0261",
@@ -2169,13 +2169,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 2,
-              "elapsedMs": 48.437
+              "elapsedMs": 44.872
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 2,
-              "elapsedMs": 53.751
+              "elapsedMs": 46.811
             }
           ]
         },
@@ -2187,13 +2187,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 2,
-              "elapsedMs": 50.106
+              "elapsedMs": 42.525
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 2,
-              "elapsedMs": 44.984
+              "elapsedMs": 43.001
             }
           ]
         },
@@ -2205,13 +2205,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 2,
-              "elapsedMs": 0.901
+              "elapsedMs": 0.772
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 2,
-              "elapsedMs": 1.049
+              "elapsedMs": 0.655
             }
           ]
         },
@@ -2223,18 +2223,18 @@
               "kind": "reference",
               "pass": true,
               "rows": 2,
-              "elapsedMs": 0.778
+              "elapsedMs": 0.729
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 2,
-              "elapsedMs": 0.622
+              "elapsedMs": 0.565
             }
           ]
         }
       ],
-      "fullSubmissionMs": 579.373
+      "fullSubmissionMs": 557.846
     },
     {
       "id": "q0262",
@@ -2248,13 +2248,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 1794,
-              "elapsedMs": 54.277
+              "elapsedMs": 48.336
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 1794,
-              "elapsedMs": 46.646
+              "elapsedMs": 42.261
             }
           ]
         },
@@ -2266,13 +2266,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 1794,
-              "elapsedMs": 46.195
+              "elapsedMs": 41.483
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 1794,
-              "elapsedMs": 48.945
+              "elapsedMs": 43.307
             }
           ]
         },
@@ -2284,13 +2284,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 13,
-              "elapsedMs": 1.871
+              "elapsedMs": 1.218
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 13,
-              "elapsedMs": 0.948
+              "elapsedMs": 0.865
             }
           ]
         },
@@ -2302,18 +2302,18 @@
               "kind": "reference",
               "pass": true,
               "rows": 14,
-              "elapsedMs": 0.956
+              "elapsedMs": 0.994
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 14,
-              "elapsedMs": 0.924
+              "elapsedMs": 0.901
             }
           ]
         }
       ],
-      "fullSubmissionMs": 612.812
+      "fullSubmissionMs": 566.543
     },
     {
       "id": "q0263",
@@ -2327,13 +2327,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 231,
-              "elapsedMs": 82.187
+              "elapsedMs": 91.577
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 231,
-              "elapsedMs": 81.049
+              "elapsedMs": 81.563
             }
           ]
         },
@@ -2345,13 +2345,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 230,
-              "elapsedMs": 69.052
+              "elapsedMs": 67.024
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 230,
-              "elapsedMs": 69.672
+              "elapsedMs": 66.761
             }
           ]
         },
@@ -2363,13 +2363,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 59,
-              "elapsedMs": 1.615
+              "elapsedMs": 2.352
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 59,
-              "elapsedMs": 5.873
+              "elapsedMs": 2.123
             }
           ]
         },
@@ -2381,18 +2381,18 @@
               "kind": "reference",
               "pass": true,
               "rows": 58,
-              "elapsedMs": 2.662
+              "elapsedMs": 1.532
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 58,
-              "elapsedMs": 1.623
+              "elapsedMs": 1.525
             }
           ]
         }
       ],
-      "fullSubmissionMs": 834.169
+      "fullSubmissionMs": 689.419
     },
     {
       "id": "q0264",
@@ -2406,13 +2406,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 5,
-              "elapsedMs": 68.9
+              "elapsedMs": 67.198
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 5,
-              "elapsedMs": 64.523
+              "elapsedMs": 69.882
             }
           ]
         },
@@ -2424,13 +2424,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 5,
-              "elapsedMs": 66.261
+              "elapsedMs": 66.969
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 5,
-              "elapsedMs": 63.047
+              "elapsedMs": 63.253
             }
           ]
         },
@@ -2442,13 +2442,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 6,
-              "elapsedMs": 1.749
+              "elapsedMs": 1.133
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 6,
-              "elapsedMs": 1.901
+              "elapsedMs": 1.161
             }
           ]
         },
@@ -2460,18 +2460,18 @@
               "kind": "reference",
               "pass": true,
               "rows": 6,
-              "elapsedMs": 1.659
+              "elapsedMs": 1.051
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 6,
-              "elapsedMs": 1.261
+              "elapsedMs": 0.851
             }
           ]
         }
       ],
-      "fullSubmissionMs": 648.042
+      "fullSubmissionMs": 650.242
     },
     {
       "id": "q0265",
@@ -2485,13 +2485,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 106,
-              "elapsedMs": 38.702
+              "elapsedMs": 37.356
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 106,
-              "elapsedMs": 36.622
+              "elapsedMs": 37.025
             }
           ]
         },
@@ -2503,13 +2503,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 105,
-              "elapsedMs": 36.877
+              "elapsedMs": 36.063
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 105,
-              "elapsedMs": 40.377
+              "elapsedMs": 36.292
             }
           ]
         },
@@ -2521,13 +2521,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 0,
-              "elapsedMs": 1.162
+              "elapsedMs": 1.526
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 0,
-              "elapsedMs": 1.02
+              "elapsedMs": 1.231
             }
           ]
         },
@@ -2539,18 +2539,18 @@
               "kind": "reference",
               "pass": true,
               "rows": 0,
-              "elapsedMs": 0.98
+              "elapsedMs": 0.963
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 0,
-              "elapsedMs": 1.062
+              "elapsedMs": 0.86
             }
           ]
         }
       ],
-      "fullSubmissionMs": 561.738
+      "fullSubmissionMs": 512.762
     },
     {
       "id": "q0266",
@@ -2564,13 +2564,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 35,
-              "elapsedMs": 13.763
+              "elapsedMs": 13.252
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 35,
-              "elapsedMs": 12.544
+              "elapsedMs": 12.649
             }
           ]
         },
@@ -2582,13 +2582,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 35,
-              "elapsedMs": 13.429
+              "elapsedMs": 12.476
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 35,
-              "elapsedMs": 13.929
+              "elapsedMs": 13.066
             }
           ]
         },
@@ -2600,13 +2600,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 35,
-              "elapsedMs": 0.627
+              "elapsedMs": 0.621
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 35,
-              "elapsedMs": 0.581
+              "elapsedMs": 0.68
             }
           ]
         },
@@ -2618,18 +2618,18 @@
               "kind": "reference",
               "pass": true,
               "rows": 35,
-              "elapsedMs": 0.654
+              "elapsedMs": 0.662
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 35,
-              "elapsedMs": 0.567
+              "elapsedMs": 1.232
             }
           ]
         }
       ],
-      "fullSubmissionMs": 440.346
+      "fullSubmissionMs": 428.501
     },
     {
       "id": "q0267",
@@ -2643,13 +2643,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 4739,
-              "elapsedMs": 11.403
+              "elapsedMs": 9.985
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 4739,
-              "elapsedMs": 9.893
+              "elapsedMs": 9.837
             }
           ]
         },
@@ -2661,13 +2661,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 4739,
-              "elapsedMs": 9.132
+              "elapsedMs": 10.874
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 4739,
-              "elapsedMs": 9.742
+              "elapsedMs": 9.533
             }
           ]
         },
@@ -2679,13 +2679,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 4739,
-              "elapsedMs": 12.785
+              "elapsedMs": 9.033
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 4739,
-              "elapsedMs": 10.154
+              "elapsedMs": 9.201
             }
           ]
         },
@@ -2697,13 +2697,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 72,
-              "elapsedMs": 0.506
+              "elapsedMs": 0.981
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 72,
-              "elapsedMs": 0.713
+              "elapsedMs": 0.827
             }
           ]
         },
@@ -2715,18 +2715,18 @@
               "kind": "reference",
               "pass": true,
               "rows": 72,
-              "elapsedMs": 0.575
+              "elapsedMs": 0.885
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 72,
-              "elapsedMs": 0.339
+              "elapsedMs": 0.811
             }
           ]
         }
       ],
-      "fullSubmissionMs": 479.141
+      "fullSubmissionMs": 561.212
     },
     {
       "id": "q0268",
@@ -2740,13 +2740,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 153,
-              "elapsedMs": 7.38
+              "elapsedMs": 7.299
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 153,
-              "elapsedMs": 7.064
+              "elapsedMs": 7.345
             }
           ]
         },
@@ -2758,13 +2758,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 154,
-              "elapsedMs": 8.872
+              "elapsedMs": 6.927
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 154,
-              "elapsedMs": 8.246
+              "elapsedMs": 7.068
             }
           ]
         },
@@ -2776,13 +2776,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 12,
-              "elapsedMs": 0.553
+              "elapsedMs": 0.427
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 12,
-              "elapsedMs": 0.573
+              "elapsedMs": 0.316
             }
           ]
         },
@@ -2794,18 +2794,18 @@
               "kind": "reference",
               "pass": true,
               "rows": 10,
-              "elapsedMs": 0.474
+              "elapsedMs": 0.479
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 10,
-              "elapsedMs": 0.693
+              "elapsedMs": 0.4
             }
           ]
         }
       ],
-      "fullSubmissionMs": 423.861
+      "fullSubmissionMs": 394.692
     },
     {
       "id": "q0269",
@@ -2819,13 +2819,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 1182,
-              "elapsedMs": 28.869
+              "elapsedMs": 27.979
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 1182,
-              "elapsedMs": 29.689
+              "elapsedMs": 28.202
             }
           ]
         },
@@ -2837,13 +2837,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 1184,
-              "elapsedMs": 27.901
+              "elapsedMs": 27.2
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 1184,
-              "elapsedMs": 27.514
+              "elapsedMs": 28.315
             }
           ]
         },
@@ -2855,13 +2855,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 29,
-              "elapsedMs": 0.728
+              "elapsedMs": 0.886
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 29,
-              "elapsedMs": 1.162
+              "elapsedMs": 0.557
             }
           ]
         },
@@ -2873,18 +2873,18 @@
               "kind": "reference",
               "pass": true,
               "rows": 18,
-              "elapsedMs": 0.877
+              "elapsedMs": 0.571
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 18,
-              "elapsedMs": 0.623
+              "elapsedMs": 0.515
             }
           ]
         }
       ],
-      "fullSubmissionMs": 509.762
+      "fullSubmissionMs": 461.997
     },
     {
       "id": "q0270",
@@ -2898,13 +2898,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 1434,
-              "elapsedMs": 54.984
+              "elapsedMs": 54.281
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 1434,
-              "elapsedMs": 50.519
+              "elapsedMs": 51.931
             }
           ]
         },
@@ -2916,13 +2916,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 1435,
-              "elapsedMs": 50.531
+              "elapsedMs": 51.129
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 1435,
-              "elapsedMs": 54.641
+              "elapsedMs": 53.608
             }
           ]
         },
@@ -2934,13 +2934,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 39,
-              "elapsedMs": 1.366
+              "elapsedMs": 1.914
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 39,
-              "elapsedMs": 1.214
+              "elapsedMs": 2.127
             }
           ]
         },
@@ -2952,18 +2952,18 @@
               "kind": "reference",
               "pass": true,
               "rows": 42,
-              "elapsedMs": 1.571
+              "elapsedMs": 2.048
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 42,
-              "elapsedMs": 1.096
+              "elapsedMs": 1.703
             }
           ]
         }
       ],
-      "fullSubmissionMs": 602.301
+      "fullSubmissionMs": 621.466
     },
     {
       "id": "q0271",
@@ -2977,13 +2977,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 84,
-              "elapsedMs": 2.246
+              "elapsedMs": 2.139
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 84,
-              "elapsedMs": 2.007
+              "elapsedMs": 1.899
             }
           ]
         },
@@ -2995,13 +2995,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 84,
-              "elapsedMs": 2.201
+              "elapsedMs": 1.924
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 84,
-              "elapsedMs": 2.23
+              "elapsedMs": 1.891
             }
           ]
         },
@@ -3013,13 +3013,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 84,
-              "elapsedMs": 0.654
+              "elapsedMs": 0.667
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 84,
-              "elapsedMs": 1.309
+              "elapsedMs": 0.583
             }
           ]
         },
@@ -3031,18 +3031,18 @@
               "kind": "reference",
               "pass": true,
               "rows": 84,
-              "elapsedMs": 0.69
+              "elapsedMs": 0.643
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 84,
-              "elapsedMs": 0.633
+              "elapsedMs": 0.577
             }
           ]
         }
       ],
-      "fullSubmissionMs": 405.191
+      "fullSubmissionMs": 388.355
     },
     {
       "id": "q0272",
@@ -3056,13 +3056,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 84,
-              "elapsedMs": 5.258
+              "elapsedMs": 4.558
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 84,
-              "elapsedMs": 4.464
+              "elapsedMs": 4.338
             }
           ]
         },
@@ -3074,13 +3074,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 84,
-              "elapsedMs": 4.697
+              "elapsedMs": 4.268
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 84,
-              "elapsedMs": 4.597
+              "elapsedMs": 4.16
             }
           ]
         },
@@ -3092,13 +3092,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 84,
-              "elapsedMs": 1.276
+              "elapsedMs": 1.093
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 84,
-              "elapsedMs": 1.212
+              "elapsedMs": 0.961
             }
           ]
         },
@@ -3110,18 +3110,18 @@
               "kind": "reference",
               "pass": true,
               "rows": 84,
-              "elapsedMs": 1.061
+              "elapsedMs": 1.067
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 84,
-              "elapsedMs": 1.506
+              "elapsedMs": 1.713
             }
           ]
         }
       ],
-      "fullSubmissionMs": 440.11
+      "fullSubmissionMs": 382.996
     },
     {
       "id": "q0273",
@@ -3135,13 +3135,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 62,
-              "elapsedMs": 48.792
+              "elapsedMs": 45.418
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 62,
-              "elapsedMs": 51.844
+              "elapsedMs": 49.732
             }
           ]
         },
@@ -3153,13 +3153,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 63,
-              "elapsedMs": 45.358
+              "elapsedMs": 44.275
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 63,
-              "elapsedMs": 47.923
+              "elapsedMs": 44.538
             }
           ]
         },
@@ -3171,13 +3171,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 1,
-              "elapsedMs": 3.483
+              "elapsedMs": 3.139
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 1,
-              "elapsedMs": 3.166
+              "elapsedMs": 3.078
             }
           ]
         },
@@ -3189,18 +3189,18 @@
               "kind": "reference",
               "pass": true,
               "rows": 1,
-              "elapsedMs": 3.599
+              "elapsedMs": 3.026
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 1,
-              "elapsedMs": 3.192
+              "elapsedMs": 3.098
             }
           ]
         }
       ],
-      "fullSubmissionMs": 574.927
+      "fullSubmissionMs": 559.782
     },
     {
       "id": "q0274",
@@ -3214,13 +3214,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 21,
-              "elapsedMs": 51.012
+              "elapsedMs": 44.794
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 21,
-              "elapsedMs": 45.602
+              "elapsedMs": 48.559
             }
           ]
         },
@@ -3232,13 +3232,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 21,
-              "elapsedMs": 46.934
+              "elapsedMs": 43.932
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 21,
-              "elapsedMs": 44.858
+              "elapsedMs": 47.252
             }
           ]
         },
@@ -3250,13 +3250,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 6,
-              "elapsedMs": 3.24
+              "elapsedMs": 3.104
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 6,
-              "elapsedMs": 3.102
+              "elapsedMs": 3.877
             }
           ]
         },
@@ -3268,18 +3268,18 @@
               "kind": "reference",
               "pass": true,
               "rows": 6,
-              "elapsedMs": 3.338
+              "elapsedMs": 2.955
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 6,
-              "elapsedMs": 3.028
+              "elapsedMs": 3.031
             }
           ]
         }
       ],
-      "fullSubmissionMs": 615.191
+      "fullSubmissionMs": 575.282
     },
     {
       "id": "q0275",
@@ -3293,13 +3293,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 73,
-              "elapsedMs": 1.271
+              "elapsedMs": 1.202
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 73,
-              "elapsedMs": 2.008
+              "elapsedMs": 1.099
             }
           ]
         },
@@ -3311,13 +3311,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 73,
-              "elapsedMs": 1.679
+              "elapsedMs": 0.917
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 73,
-              "elapsedMs": 1.255
+              "elapsedMs": 0.812
             }
           ]
         },
@@ -3329,13 +3329,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 4,
-              "elapsedMs": 2.642
+              "elapsedMs": 0.817
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 4,
-              "elapsedMs": 1.289
+              "elapsedMs": 1.862
             }
           ]
         },
@@ -3347,18 +3347,18 @@
               "kind": "reference",
               "pass": true,
               "rows": 5,
-              "elapsedMs": 1.226
+              "elapsedMs": 0.808
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 5,
-              "elapsedMs": 0.933
+              "elapsedMs": 0.728
             }
           ]
         }
       ],
-      "fullSubmissionMs": 466.478
+      "fullSubmissionMs": 365.045
     },
     {
       "id": "q0276",
@@ -3372,13 +3372,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 3469,
-              "elapsedMs": 21.555
+              "elapsedMs": 19.818
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 3469,
-              "elapsedMs": 29.772
+              "elapsedMs": 20.869
             }
           ]
         },
@@ -3390,13 +3390,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 3469,
-              "elapsedMs": 29.954
+              "elapsedMs": 20.386
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 3469,
-              "elapsedMs": 20.669
+              "elapsedMs": 20.343
             }
           ]
         },
@@ -3408,13 +3408,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 60,
-              "elapsedMs": 1.083
+              "elapsedMs": 0.402
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 60,
-              "elapsedMs": 0.41
+              "elapsedMs": 0.337
             }
           ]
         },
@@ -3426,18 +3426,18 @@
               "kind": "reference",
               "pass": true,
               "rows": 60,
-              "elapsedMs": 0.713
+              "elapsedMs": 0.399
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 60,
-              "elapsedMs": 0.962
+              "elapsedMs": 0.347
             }
           ]
         }
       ],
-      "fullSubmissionMs": 543.244
+      "fullSubmissionMs": 425.029
     },
     {
       "id": "q0277",
@@ -3451,13 +3451,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 55,
-              "elapsedMs": 25.002
+              "elapsedMs": 22.523
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 55,
-              "elapsedMs": 26.707
+              "elapsedMs": 22.354
             }
           ]
         },
@@ -3469,13 +3469,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 55,
-              "elapsedMs": 33.102
+              "elapsedMs": 25.985
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 55,
-              "elapsedMs": 33.617
+              "elapsedMs": 22.584
             }
           ]
         },
@@ -3487,13 +3487,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 3,
-              "elapsedMs": 0.5
+              "elapsedMs": 0.454
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 3,
-              "elapsedMs": 0.412
+              "elapsedMs": 0.416
             }
           ]
         },
@@ -3505,18 +3505,18 @@
               "kind": "reference",
               "pass": true,
               "rows": 3,
-              "elapsedMs": 0.525
+              "elapsedMs": 0.451
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 3,
-              "elapsedMs": 0.611
+              "elapsedMs": 0.354
             }
           ]
         }
       ],
-      "fullSubmissionMs": 551.393
+      "fullSubmissionMs": 431.157
     },
     {
       "id": "q0278",
@@ -3530,13 +3530,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 928,
-              "elapsedMs": 40.695
+              "elapsedMs": 21.93
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 928,
-              "elapsedMs": 40.672
+              "elapsedMs": 21.477
             }
           ]
         },
@@ -3548,13 +3548,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 928,
-              "elapsedMs": 30.684
+              "elapsedMs": 21.822
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 928,
-              "elapsedMs": 25.644
+              "elapsedMs": 21.622
             }
           ]
         },
@@ -3566,13 +3566,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 28,
-              "elapsedMs": 0.521
+              "elapsedMs": 0.408
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 28,
-              "elapsedMs": 0.377
+              "elapsedMs": 0.322
             }
           ]
         },
@@ -3584,18 +3584,18 @@
               "kind": "reference",
               "pass": true,
               "rows": 32,
-              "elapsedMs": 0.867
+              "elapsedMs": 0.431
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 32,
-              "elapsedMs": 0.398
+              "elapsedMs": 0.394
             }
           ]
         }
       ],
-      "fullSubmissionMs": 609.189
+      "fullSubmissionMs": 420.408
     },
     {
       "id": "q0279",
@@ -3609,13 +3609,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 548,
-              "elapsedMs": 36.165
+              "elapsedMs": 25.538
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 548,
-              "elapsedMs": 39.215
+              "elapsedMs": 25.47
             }
           ]
         },
@@ -3627,13 +3627,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 548,
-              "elapsedMs": 33.618
+              "elapsedMs": 25.519
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 548,
-              "elapsedMs": 39.307
+              "elapsedMs": 25.572
             }
           ]
         },
@@ -3645,13 +3645,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 33,
-              "elapsedMs": 0.774
+              "elapsedMs": 0.637
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 33,
-              "elapsedMs": 1.472
+              "elapsedMs": 0.765
             }
           ]
         },
@@ -3663,18 +3663,18 @@
               "kind": "reference",
               "pass": true,
               "rows": 33,
-              "elapsedMs": 0.871
+              "elapsedMs": 0.616
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 33,
-              "elapsedMs": 0.534
+              "elapsedMs": 0.478
             }
           ]
         }
       ],
-      "fullSubmissionMs": 658.592
+      "fullSubmissionMs": 440.177
     },
     {
       "id": "q0280",
@@ -3688,13 +3688,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 37,
-              "elapsedMs": 28.438
+              "elapsedMs": 24.154
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 37,
-              "elapsedMs": 23.941
+              "elapsedMs": 23.651
             }
           ]
         },
@@ -3706,13 +3706,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 37,
-              "elapsedMs": 27.088
+              "elapsedMs": 23.568
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 37,
-              "elapsedMs": 26.343
+              "elapsedMs": 23.678
             }
           ]
         },
@@ -3724,13 +3724,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 3,
-              "elapsedMs": 0.795
+              "elapsedMs": 0.654
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 3,
-              "elapsedMs": 0.728
+              "elapsedMs": 0.532
             }
           ]
         },
@@ -3742,18 +3742,18 @@
               "kind": "reference",
               "pass": true,
               "rows": 3,
-              "elapsedMs": 1.159
+              "elapsedMs": 0.669
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 3,
-              "elapsedMs": 0.976
+              "elapsedMs": 0.567
             }
           ]
         }
       ],
-      "fullSubmissionMs": 514.479
+      "fullSubmissionMs": 436.288
     },
     {
       "id": "q0281",
@@ -3767,13 +3767,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 68,
-              "elapsedMs": 4.833
+              "elapsedMs": 4.82
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 68,
-              "elapsedMs": 4.378
+              "elapsedMs": 4.199
             }
           ]
         },
@@ -3785,13 +3785,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 67,
-              "elapsedMs": 4.717
+              "elapsedMs": 4.39
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 67,
-              "elapsedMs": 5.238
+              "elapsedMs": 4.17
             }
           ]
         },
@@ -3803,13 +3803,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 52,
-              "elapsedMs": 0.73
+              "elapsedMs": 0.504
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 52,
-              "elapsedMs": 0.494
+              "elapsedMs": 0.415
             }
           ]
         },
@@ -3821,18 +3821,18 @@
               "kind": "reference",
               "pass": true,
               "rows": 47,
-              "elapsedMs": 0.51
+              "elapsedMs": 0.741
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 47,
-              "elapsedMs": 1.195
+              "elapsedMs": 0.43
             }
           ]
         }
       ],
-      "fullSubmissionMs": 501.797
+      "fullSubmissionMs": 399.473
     },
     {
       "id": "q0282",
@@ -3846,13 +3846,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 500,
-              "elapsedMs": 94.336
+              "elapsedMs": 80.131
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 500,
-              "elapsedMs": 96.344
+              "elapsedMs": 75.379
             }
           ]
         },
@@ -3864,13 +3864,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 500,
-              "elapsedMs": 111.932
+              "elapsedMs": 73.999
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 500,
-              "elapsedMs": 86.784
+              "elapsedMs": 75.511
             }
           ]
         },
@@ -3882,13 +3882,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 21,
-              "elapsedMs": 1.321
+              "elapsedMs": 0.806
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 21,
-              "elapsedMs": 0.857
+              "elapsedMs": 0.708
             }
           ]
         },
@@ -3900,18 +3900,18 @@
               "kind": "reference",
               "pass": true,
               "rows": 21,
-              "elapsedMs": 1.394
+              "elapsedMs": 0.746
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 21,
-              "elapsedMs": 2.849
+              "elapsedMs": 0.8
             }
           ]
         }
       ],
-      "fullSubmissionMs": 897.539
+      "fullSubmissionMs": 690.665
     },
     {
       "id": "q0283",
@@ -3925,13 +3925,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 99,
-              "elapsedMs": 65.882
+              "elapsedMs": 46.988
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 99,
-              "elapsedMs": 65.637
+              "elapsedMs": 46.534
             }
           ]
         },
@@ -3943,13 +3943,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 98,
-              "elapsedMs": 49.86
+              "elapsedMs": 45.658
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 98,
-              "elapsedMs": 47.787
+              "elapsedMs": 46.948
             }
           ]
         },
@@ -3961,13 +3961,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 0,
-              "elapsedMs": 1.502
+              "elapsedMs": 0.752
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 0,
-              "elapsedMs": 0.827
+              "elapsedMs": 0.66
             }
           ]
         },
@@ -3979,18 +3979,18 @@
               "kind": "reference",
               "pass": true,
               "rows": 0,
-              "elapsedMs": 0.758
+              "elapsedMs": 0.76
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 0,
-              "elapsedMs": 1.115
+              "elapsedMs": 0.644
             }
           ]
         }
       ],
-      "fullSubmissionMs": 652.435
+      "fullSubmissionMs": 556.671
     },
     {
       "id": "q0284",
@@ -4004,13 +4004,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 15,
-              "elapsedMs": 61.771
+              "elapsedMs": 60.596
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 15,
-              "elapsedMs": 59.822
+              "elapsedMs": 54.367
             }
           ]
         },
@@ -4022,13 +4022,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 15,
-              "elapsedMs": 86.604
+              "elapsedMs": 56.213
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 15,
-              "elapsedMs": 66.051
+              "elapsedMs": 53.53
             }
           ]
         },
@@ -4040,13 +4040,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 15,
-              "elapsedMs": 112.564
+              "elapsedMs": 56.053
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 15,
-              "elapsedMs": 170.21
+              "elapsedMs": 55.362
             }
           ]
         },
@@ -4058,13 +4058,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 4,
-              "elapsedMs": 1.053
+              "elapsedMs": 1.132
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 4,
-              "elapsedMs": 1.848
+              "elapsedMs": 0.848
             }
           ]
         },
@@ -4076,18 +4076,18 @@
               "kind": "reference",
               "pass": true,
               "rows": 4,
-              "elapsedMs": 0.901
+              "elapsedMs": 0.874
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 4,
-              "elapsedMs": 0.903
+              "elapsedMs": 0.862
             }
           ]
         }
       ],
-      "fullSubmissionMs": 1131.298
+      "fullSubmissionMs": 718.588
     },
     {
       "id": "q0285",
@@ -4101,13 +4101,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 23,
-              "elapsedMs": 33.171
+              "elapsedMs": 29.464
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 23,
-              "elapsedMs": 34.857
+              "elapsedMs": 32.042
             }
           ]
         },
@@ -4119,13 +4119,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 22,
-              "elapsedMs": 31.464
+              "elapsedMs": 29.321
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 22,
-              "elapsedMs": 36.226
+              "elapsedMs": 32.275
             }
           ]
         },
@@ -4137,13 +4137,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 0,
-              "elapsedMs": 1
+              "elapsedMs": 0.714
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 0,
-              "elapsedMs": 1.102
+              "elapsedMs": 0.607
             }
           ]
         },
@@ -4155,18 +4155,18 @@
               "kind": "reference",
               "pass": true,
               "rows": 0,
-              "elapsedMs": 1.577
+              "elapsedMs": 1.47
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 0,
-              "elapsedMs": 1.117
+              "elapsedMs": 1.588
             }
           ]
         }
       ],
-      "fullSubmissionMs": 557.647
+      "fullSubmissionMs": 492.008
     },
     {
       "id": "q0286",
@@ -4180,13 +4180,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 0,
-              "elapsedMs": 21.117
+              "elapsedMs": 19.112
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 0,
-              "elapsedMs": 23.98
+              "elapsedMs": 19.261
             }
           ]
         },
@@ -4198,13 +4198,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 1,
-              "elapsedMs": 26.953
+              "elapsedMs": 18.843
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 1,
-              "elapsedMs": 23.037
+              "elapsedMs": 18.842
             }
           ]
         },
@@ -4216,13 +4216,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 0,
-              "elapsedMs": 0.336
+              "elapsedMs": 0.617
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 0,
-              "elapsedMs": 0.216
+              "elapsedMs": 0.225
             }
           ]
         },
@@ -4234,18 +4234,18 @@
               "kind": "reference",
               "pass": true,
               "rows": 1,
-              "elapsedMs": 0.283
+              "elapsedMs": 0.239
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 1,
-              "elapsedMs": 0.212
+              "elapsedMs": 0.195
             }
           ]
         }
       ],
-      "fullSubmissionMs": 521.922
+      "fullSubmissionMs": 469.679
     },
     {
       "id": "q0287",
@@ -4259,13 +4259,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 45,
-              "elapsedMs": 31.809
+              "elapsedMs": 22.441
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 45,
-              "elapsedMs": 22.439
+              "elapsedMs": 21.806
             }
           ]
         },
@@ -4277,13 +4277,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 45,
-              "elapsedMs": 24.272
+              "elapsedMs": 21.59
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 45,
-              "elapsedMs": 22.832
+              "elapsedMs": 21.467
             }
           ]
         },
@@ -4295,13 +4295,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 3,
-              "elapsedMs": 1.042
+              "elapsedMs": 0.613
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 3,
-              "elapsedMs": 0.749
+              "elapsedMs": 0.633
             }
           ]
         },
@@ -4313,18 +4313,18 @@
               "kind": "reference",
               "pass": true,
               "rows": 3,
-              "elapsedMs": 0.793
+              "elapsedMs": 0.658
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 3,
-              "elapsedMs": 1.044
+              "elapsedMs": 0.528
             }
           ]
         }
       ],
-      "fullSubmissionMs": 708.394
+      "fullSubmissionMs": 484.015
     },
     {
       "id": "q0288",
@@ -4338,13 +4338,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 12,
-              "elapsedMs": 50.313
+              "elapsedMs": 28.643
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 12,
-              "elapsedMs": 42.923
+              "elapsedMs": 31.175
             }
           ]
         },
@@ -4356,13 +4356,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 12,
-              "elapsedMs": 39.856
+              "elapsedMs": 27.717
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 12,
-              "elapsedMs": 44.201
+              "elapsedMs": 33.29
             }
           ]
         },
@@ -4374,13 +4374,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 4,
-              "elapsedMs": 0.743
+              "elapsedMs": 0.61
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 4,
-              "elapsedMs": 1.346
+              "elapsedMs": 0.521
             }
           ]
         },
@@ -4392,18 +4392,18 @@
               "kind": "reference",
               "pass": true,
               "rows": 4,
-              "elapsedMs": 1.283
+              "elapsedMs": 0.601
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 4,
-              "elapsedMs": 1.447
+              "elapsedMs": 0.697
             }
           ]
         }
       ],
-      "fullSubmissionMs": 717.731
+      "fullSubmissionMs": 495.42
     },
     {
       "id": "q0289",
@@ -4417,13 +4417,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 0,
-              "elapsedMs": 106.491
+              "elapsedMs": 82.47
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 0,
-              "elapsedMs": 128.338
+              "elapsedMs": 75.817
             }
           ]
         },
@@ -4435,13 +4435,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 1,
-              "elapsedMs": 83.102
+              "elapsedMs": 76.99
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 1,
-              "elapsedMs": 83.512
+              "elapsedMs": 75.903
             }
           ]
         },
@@ -4453,13 +4453,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 1,
-              "elapsedMs": 0.949
+              "elapsedMs": 0.901
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 1,
-              "elapsedMs": 0.957
+              "elapsedMs": 0.787
             }
           ]
         },
@@ -4471,18 +4471,18 @@
               "kind": "reference",
               "pass": true,
               "rows": 1,
-              "elapsedMs": 1.211
+              "elapsedMs": 1.043
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 1,
-              "elapsedMs": 1.139
+              "elapsedMs": 0.709
             }
           ]
         }
       ],
-      "fullSubmissionMs": 880.449
+      "fullSubmissionMs": 704.189
     },
     {
       "id": "q0290",
@@ -4496,13 +4496,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 144,
-              "elapsedMs": 49.416
+              "elapsedMs": 38.127
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 144,
-              "elapsedMs": 50.35
+              "elapsedMs": 39.646
             }
           ]
         },
@@ -4514,13 +4514,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 144,
-              "elapsedMs": 50.889
+              "elapsedMs": 37.582
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 144,
-              "elapsedMs": 83.178
+              "elapsedMs": 44.294
             }
           ]
         },
@@ -4532,13 +4532,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 48,
-              "elapsedMs": 1.242
+              "elapsedMs": 1.083
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 48,
-              "elapsedMs": 1.197
+              "elapsedMs": 1.02
             }
           ]
         },
@@ -4550,18 +4550,18 @@
               "kind": "reference",
               "pass": true,
               "rows": 48,
-              "elapsedMs": 2.022
+              "elapsedMs": 1.218
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 48,
-              "elapsedMs": 3.575
+              "elapsedMs": 1.063
             }
           ]
         }
       ],
-      "fullSubmissionMs": 776.017
+      "fullSubmissionMs": 539.949
     },
     {
       "id": "q0291",
@@ -4575,13 +4575,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 60,
-              "elapsedMs": 52.329
+              "elapsedMs": 36.343
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 60,
-              "elapsedMs": 49.952
+              "elapsedMs": 34.893
             }
           ]
         },
@@ -4593,13 +4593,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 61,
-              "elapsedMs": 51.415
+              "elapsedMs": 34.904
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 61,
-              "elapsedMs": 37.687
+              "elapsedMs": 35.102
             }
           ]
         },
@@ -4611,13 +4611,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 5,
-              "elapsedMs": 1.228
+              "elapsedMs": 0.703
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 5,
-              "elapsedMs": 1.127
+              "elapsedMs": 0.621
             }
           ]
         },
@@ -4629,18 +4629,18 @@
               "kind": "reference",
               "pass": true,
               "rows": 5,
-              "elapsedMs": 1.127
+              "elapsedMs": 1.313
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 5,
-              "elapsedMs": 1.263
+              "elapsedMs": 0.716
             }
           ]
         }
       ],
-      "fullSubmissionMs": 685.814
+      "fullSubmissionMs": 508.646
     },
     {
       "id": "q0292",
@@ -4654,13 +4654,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 721,
-              "elapsedMs": 39.722
+              "elapsedMs": 36.475
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 721,
-              "elapsedMs": 40.163
+              "elapsedMs": 35.425
             }
           ]
         },
@@ -4672,13 +4672,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 721,
-              "elapsedMs": 45.709
+              "elapsedMs": 35.955
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 721,
-              "elapsedMs": 36.194
+              "elapsedMs": 36.4
             }
           ]
         },
@@ -4690,13 +4690,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 18,
-              "elapsedMs": 1.889
+              "elapsedMs": 0.747
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 18,
-              "elapsedMs": 4.275
+              "elapsedMs": 0.583
             }
           ]
         },
@@ -4708,18 +4708,18 @@
               "kind": "reference",
               "pass": true,
               "rows": 14,
-              "elapsedMs": 0.817
+              "elapsedMs": 0.73
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 14,
-              "elapsedMs": 1.162
+              "elapsedMs": 0.602
             }
           ]
         }
       ],
-      "fullSubmissionMs": 671.202
+      "fullSubmissionMs": 516.432
     },
     {
       "id": "q0293",
@@ -4733,13 +4733,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 38,
-              "elapsedMs": 39.747
+              "elapsedMs": 30.598
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 38,
-              "elapsedMs": 34.339
+              "elapsedMs": 30.227
             }
           ]
         },
@@ -4751,13 +4751,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 38,
-              "elapsedMs": 55.242
+              "elapsedMs": 35.41
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 38,
-              "elapsedMs": 59.402
+              "elapsedMs": 30.59
             }
           ]
         },
@@ -4769,13 +4769,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 4,
-              "elapsedMs": 2.59
+              "elapsedMs": 0.89
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 4,
-              "elapsedMs": 3.434
+              "elapsedMs": 0.72
             }
           ]
         },
@@ -4787,18 +4787,18 @@
               "kind": "reference",
               "pass": true,
               "rows": 4,
-              "elapsedMs": 1.255
+              "elapsedMs": 0.916
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 4,
-              "elapsedMs": 1.114
+              "elapsedMs": 1.143
             }
           ]
         }
       ],
-      "fullSubmissionMs": 980.853
+      "fullSubmissionMs": 505.63
     },
     {
       "id": "q0294",
@@ -4812,13 +4812,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 5,
-              "elapsedMs": 120.795
+              "elapsedMs": 40.367
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 5,
-              "elapsedMs": 87.211
+              "elapsedMs": 44.876
             }
           ]
         },
@@ -4830,13 +4830,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 5,
-              "elapsedMs": 42.76
+              "elapsedMs": 39.168
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 5,
-              "elapsedMs": 46.988
+              "elapsedMs": 38.145
             }
           ]
         },
@@ -4848,13 +4848,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 6,
-              "elapsedMs": 1.445
+              "elapsedMs": 1.017
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 6,
-              "elapsedMs": 13.834
+              "elapsedMs": 0.644
             }
           ]
         },
@@ -4866,18 +4866,18 @@
               "kind": "reference",
               "pass": true,
               "rows": 6,
-              "elapsedMs": 0.731
+              "elapsedMs": 0.684
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 6,
-              "elapsedMs": 0.636
+              "elapsedMs": 0.573
             }
           ]
         }
       ],
-      "fullSubmissionMs": 1004.12
+      "fullSubmissionMs": 525.338
     },
     {
       "id": "q0295",
@@ -4891,13 +4891,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 165,
-              "elapsedMs": 71.275
+              "elapsedMs": 63.051
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 165,
-              "elapsedMs": 73.775
+              "elapsedMs": 59.251
             }
           ]
         },
@@ -4909,13 +4909,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 165,
-              "elapsedMs": 65.535
+              "elapsedMs": 59.944
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 165,
-              "elapsedMs": 60.552
+              "elapsedMs": 59.263
             }
           ]
         },
@@ -4927,13 +4927,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 12,
-              "elapsedMs": 2.179
+              "elapsedMs": 2.017
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 12,
-              "elapsedMs": 3.149
+              "elapsedMs": 1.916
             }
           ]
         },
@@ -4945,18 +4945,18 @@
               "kind": "reference",
               "pass": true,
               "rows": 12,
-              "elapsedMs": 1.948
+              "elapsedMs": 2.003
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 12,
-              "elapsedMs": 1.918
+              "elapsedMs": 1.827
             }
           ]
         }
       ],
-      "fullSubmissionMs": 653.781
+      "fullSubmissionMs": 594.82
     },
     {
       "id": "q0296",
@@ -4970,13 +4970,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 5,
-              "elapsedMs": 66.668
+              "elapsedMs": 69.282
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 5,
-              "elapsedMs": 65.858
+              "elapsedMs": 62.799
             }
           ]
         },
@@ -4988,13 +4988,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 5,
-              "elapsedMs": 73.495
+              "elapsedMs": 63.494
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 5,
-              "elapsedMs": 76.828
+              "elapsedMs": 63.679
             }
           ]
         },
@@ -5006,13 +5006,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 5,
-              "elapsedMs": 1.388
+              "elapsedMs": 1.052
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 5,
-              "elapsedMs": 1.022
+              "elapsedMs": 0.901
             }
           ]
         },
@@ -5024,18 +5024,18 @@
               "kind": "reference",
               "pass": true,
               "rows": 5,
-              "elapsedMs": 0.966
+              "elapsedMs": 0.857
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 5,
-              "elapsedMs": 1.855
+              "elapsedMs": 0.753
             }
           ]
         }
       ],
-      "fullSubmissionMs": 742.709
+      "fullSubmissionMs": 642.644
     },
     {
       "id": "q0297",
@@ -5049,13 +5049,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 12,
-              "elapsedMs": 77.656
+              "elapsedMs": 71.039
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 12,
-              "elapsedMs": 73.138
+              "elapsedMs": 67.922
             }
           ]
         },
@@ -5067,13 +5067,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 12,
-              "elapsedMs": 77.588
+              "elapsedMs": 72.173
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 12,
-              "elapsedMs": 71.332
+              "elapsedMs": 66.446
             }
           ]
         },
@@ -5085,13 +5085,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 4,
-              "elapsedMs": 4.502
+              "elapsedMs": 3.64
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 4,
-              "elapsedMs": 3.89
+              "elapsedMs": 3.521
             }
           ]
         },
@@ -5103,18 +5103,18 @@
               "kind": "reference",
               "pass": true,
               "rows": 4,
-              "elapsedMs": 5.278
+              "elapsedMs": 5.407
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 4,
-              "elapsedMs": 4.146
+              "elapsedMs": 3.515
             }
           ]
         }
       ],
-      "fullSubmissionMs": 742.49
+      "fullSubmissionMs": 663.367
     },
     {
       "id": "q0298",
@@ -5128,13 +5128,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 144,
-              "elapsedMs": 38.73
+              "elapsedMs": 33.272
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 144,
-              "elapsedMs": 35.284
+              "elapsedMs": 37.329
             }
           ]
         },
@@ -5146,13 +5146,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 144,
-              "elapsedMs": 34.776
+              "elapsedMs": 33.892
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 144,
-              "elapsedMs": 36.856
+              "elapsedMs": 36.181
             }
           ]
         },
@@ -5164,13 +5164,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 48,
-              "elapsedMs": 3.196
+              "elapsedMs": 1.042
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 48,
-              "elapsedMs": 1.981
+              "elapsedMs": 0.931
             }
           ]
         },
@@ -5182,18 +5182,18 @@
               "kind": "reference",
               "pass": true,
               "rows": 48,
-              "elapsedMs": 2.388
+              "elapsedMs": 1.039
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 48,
-              "elapsedMs": 4.43
+              "elapsedMs": 0.966
             }
           ]
         }
       ],
-      "fullSubmissionMs": 826.064
+      "fullSubmissionMs": 511.995
     },
     {
       "id": "q0299",
@@ -5207,13 +5207,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 12,
-              "elapsedMs": 200.136
+              "elapsedMs": 130.292
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 12,
-              "elapsedMs": 151.696
+              "elapsedMs": 147.253
             }
           ]
         },
@@ -5225,13 +5225,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 12,
-              "elapsedMs": 136.563
+              "elapsedMs": 131.528
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 12,
-              "elapsedMs": 139.164
+              "elapsedMs": 126.648
             }
           ]
         },
@@ -5243,13 +5243,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 12,
-              "elapsedMs": 7.24
+              "elapsedMs": 4.671
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 12,
-              "elapsedMs": 5.069
+              "elapsedMs": 5.129
             }
           ]
         },
@@ -5261,18 +5261,18 @@
               "kind": "reference",
               "pass": true,
               "rows": 12,
-              "elapsedMs": 4.762
+              "elapsedMs": 5.252
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 12,
-              "elapsedMs": 4.865
+              "elapsedMs": 4.348
             }
           ]
         }
       ],
-      "fullSubmissionMs": 1158.398
+      "fullSubmissionMs": 927.239
     },
     {
       "id": "q0300",
@@ -5286,13 +5286,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 4,
-              "elapsedMs": 361.525
+              "elapsedMs": 159.952
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 4,
-              "elapsedMs": 1407.368
+              "elapsedMs": 165.009
             }
           ]
         },
@@ -5304,13 +5304,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 4,
-              "elapsedMs": 450.724
+              "elapsedMs": 170.576
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 4,
-              "elapsedMs": 650.747
+              "elapsedMs": 191.3
             }
           ]
         },
@@ -5322,13 +5322,13 @@
               "kind": "reference",
               "pass": true,
               "rows": 4,
-              "elapsedMs": 16.596
+              "elapsedMs": 5.63
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 4,
-              "elapsedMs": 20.319
+              "elapsedMs": 7.397
             }
           ]
         },
@@ -5340,19 +5340,20 @@
               "kind": "reference",
               "pass": true,
               "rows": 4,
-              "elapsedMs": 27.897
+              "elapsedMs": 5.582
             },
             {
               "kind": "algebraic equivalent",
               "pass": true,
               "rows": 4,
-              "elapsedMs": 15.759
+              "elapsedMs": 5.921
             }
           ]
         }
       ],
-      "fullSubmissionMs": 4719.939
+      "fullSubmissionMs": 1079.772
     }
   ],
+  "integerPolicySha256": "a06bf485c6f0c66e1331fd4d9f8afd63f7cbafd51e9f9223d0e0eee75f00de58",
   "correctExecutions": 408
 }

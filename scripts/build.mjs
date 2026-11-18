@@ -53,6 +53,22 @@ for (let i = 1; i <= 20; i++) {
     ).cards,
   );
 }
+const integerPolicies = JSON.parse(await readFile("src/integer-column-policy.json"));
+for (const question of questions) {
+  const policy = integerPolicies[question.id];
+  if (!policy) continue;
+  for (const fixture of question.testFixtures) {
+    const bytes = await readFile(path.join(contentSource, "question_resource", fixture.path));
+    const hash = createHash("sha256").update(bytes).digest("hex");
+    if (hash !== policy.fixtureHashes[fixture.path]) {
+      throw new Error(`Integer policy requires regeneration for ${question.id}`);
+    }
+  }
+  question.numericTolerance = {
+    ...question.numericTolerance,
+    exactColumns: policy.exactColumns,
+  };
+}
 await writeFile(
   "dist/content.json",
   JSON.stringify({

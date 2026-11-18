@@ -14,6 +14,7 @@ assert.equal(content.cards.length, 200);
 const bases = new Map();
 const shared = new Map();
 const report = { pass: true, contentVersion: content.contentVersion, sqliteVersion: null, environment: '本机Node.js sql.js WASM，完整取数，不能代表实体手机耗时', databaseHashes: {}, semanticInputs: [], questions: [] };
+report.integerPolicySha256 = createHash('sha256').update(await readFile('src/integer-column-policy.json')).digest('hex');
 for (const dataset of manifest.datasets) {
   const bytes = await readFile('dist/' + dataset.path);
   const hash = createHash('sha256').update(bytes).digest('hex');
@@ -41,7 +42,7 @@ for (const q of questions) {
         const queryStart = performance.now();
         const actual = query(db, reference.mysqlSql, 50000);
         const elapsedMs = performance.now() - queryStart;
-        const comparison = compareResults(actual, fixture.expected, q.orderPolicy, q.numericTolerance.absolute);
+        const comparison = compareResults(actual, fixture.expected, q.orderPolicy, q.numericTolerance.absolute, q.numericTolerance.exactColumns);
         assert.ok(comparison.pass, q.id + ' ' + entry.id + ' ' + comparison.message);
         caseResult.references.push({ kind: reference.kind, pass: true, rows: actual.rows.length, elapsedMs: Number(elapsedMs.toFixed(3)) });
       }

@@ -169,6 +169,7 @@ export function compareResults(
   expected,
   policy = "ordered",
   tolerance = 1e-6,
+  exactColumns = [],
 ) {
   if (JSON.stringify(actual.columns) !== JSON.stringify(expected.columns))
     return { pass: false, message: "输出列名或列顺序与题目要求不同。" };
@@ -177,15 +178,18 @@ export function compareResults(
       pass: false,
       message: `返回 ${actual.rows.length} 行，预期 ${expected.rows.length} 行。`,
     };
-  const cell = (a, b) =>
-    typeof a === typeof b &&
-    (typeof a === "number"
-      ? Number.isInteger(a) && Number.isInteger(b)
-        ? a === b
-        : Math.abs(a - b) <= tolerance
-      : a === b);
+  const integerColumns = new Set(exactColumns);
+  const cell = (a, b, index) => {
+    if (typeof a !== typeof b) return false;
+    if (typeof a !== "number") return a === b;
+    if (integerColumns.has(expected.columns[index])) {
+      return Number.isInteger(a) && Number.isInteger(b) && a === b;
+    }
+    if (Number.isInteger(a) && Number.isInteger(b)) return a === b;
+    return Math.abs(a - b) <= tolerance;
+  };
   const row = (a, b) =>
-    a.length === b.length && a.every((v, i) => cell(v, b[i]));
+    a.length === b.length && a.every((v, i) => cell(v, b[i], i));
   if (policy === "ordered")
     return actual.rows.every((r, i) => row(r, expected.rows[i]))
       ? { pass: true }

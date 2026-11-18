@@ -1323,6 +1323,7 @@ async function evaluateQuestion(id, submit) {
         q.expectedOutput,
         q.orderPolicy,
         q.numericTolerance?.absolute,
+        q.numericTolerance?.exactColumns,
       ),
       submitted: true,
     };

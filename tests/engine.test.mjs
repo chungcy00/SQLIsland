@@ -112,6 +112,7 @@ test("all reference queries execute against their isolated fixtures", async () =
               fixture.expected,
               q.orderPolicy,
               q.numericTolerance?.absolute,
+              q.numericTolerance?.exactColumns,
             );
             if (!result.pass) throw Error(result.message);
           } finally {
@@ -161,4 +162,22 @@ test("SQL display keeps short queries compact and complex clauses readable", () 
   const comment = formatSqlForDisplay("SELECT 1 -- keep this comment\nFROM orders");
   assert.match(comment, /-- keep this comment\n/);
   assert.match(formatSqlForDisplay("SELECT 'line1\nline2' AS note"), /'line1\nline2'/);
+});
+
+test("integer output columns reject fractional offsets while derived metrics retain tolerance", () => {
+  const expected = { columns: ["product_id", "weighted_price"], rows: [[1, 125]] };
+  for (const order of ["ordered", "unordered"]) {
+    assert.equal(compareResults(
+      { columns: expected.columns, rows: [[1.005, 125]] }, expected,
+      order, 0.0100001, ["product_id"],
+    ).pass, false);
+    assert.equal(compareResults(
+      { columns: expected.columns, rows: [[1, 125.005]] }, expected,
+      order, 0.0100001, ["product_id"],
+    ).pass, true);
+    assert.equal(compareResults(
+      { columns: expected.columns, rows: [[1, 125.02]] }, expected,
+      order, 0.0100001, ["product_id"],
+    ).pass, false);
+  }
 });

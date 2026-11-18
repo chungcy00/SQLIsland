@@ -111,6 +111,7 @@ self.onmessage = async ({ data }) => {
                     fixture.expected,
                     q.orderPolicy,
                     q.numericTolerance?.absolute,
+                    q.numericTolerance?.exactColumns,
                   )
                 : { pass: true };
             } finally {
