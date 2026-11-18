@@ -1,0 +1,63 @@
+{
+  "pass": true,
+  "datasets": [
+    {
+      "id": "retail-v2",
+      "objects": 19,
+      "foreignKeys": 18,
+      "viewDependencies": 3
+    },
+    {
+      "id": "inventory-v2",
+      "objects": 28,
+      "foreignKeys": 43,
+      "viewDependencies": 4
+    },
+    {
+      "id": "ecommerce-v2",
+      "objects": 19,
+      "foreignKeys": 17,
+      "viewDependencies": 4
+    },
+    {
+      "id": "finance-v2",
+      "objects": 23,
+      "foreignKeys": 22,
+      "viewDependencies": 12
+    },
+    {
+      "id": "hr-v2",
+      "objects": 10,
+      "foreignKeys": 8,
+      "viewDependencies": 3
+    },
+    {
+      "id": "procurement-v2",
+      "objects": 11,
+      "foreignKeys": 12,
+      "viewDependencies": 4
+    },
+    {
+      "id": "enterprise-v2",
+      "objects": 51,
+      "foreignKeys": 62,
+      "viewDependencies": 19
+    }
+  ],
+  "errors": [],
+  "externalRequests": [],
+  "touchPan": true,
+  "touchPinch": true,
+  "fieldPorts": true,
+  "reset": true,
+  "personalSchemaRefresh": true,
+  "personalDataset": true,
+  "fullscreen": true,
+  "preview": true,
+  "buildHashes": {
+    "dist/app.js": "18dac71c4ca412d1e16efbfab3e15ffc93be4422a524af923abc3c3a33f0a867",
+    "dist/sql-worker.js": "961d077c3e93c40af6b2dfa8ffe3e5a2b1fa407322c9d0dfde2b61349668bb59",
+    "dist/style.css": "7dc73c1be71d172cf67bba0d35d3953c7e7d029f66e2447d34c4486f846a06bc",
+    "dist/databases.json": "787ba613b9cb30080151ed5360f5fbf4357b4c099043e78cddd59cb67bb22359"
+  }
+}

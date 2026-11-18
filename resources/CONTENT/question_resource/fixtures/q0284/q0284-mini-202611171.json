@@ -1,0 +1,52 @@
+{
+  "id": "q0284-mini-202611171",
+  "questionId": "q0284",
+  "visibility": "hidden",
+  "variant": "independent-enterprise",
+  "kind": "query",
+  "sharedDataPath": "fixtures/shared/enterprise-mini-202611171.json",
+  "sharedDataSha256": "14a558f253847a097a9452282012c1a9680ed0a5c496a573b9d42bc16885c57d",
+  "expected": {
+    "columns": [
+      "category_id",
+      "gross_cents",
+      "avg_stock_cents",
+      "gmroi"
+    ],
+    "rows": [
+      [
+        1,
+        1122730,
+        39562678.5,
+        0.0284
+      ],
+      [
+        3,
+        502801,
+        26553100.5,
+        0.0189
+      ],
+      [
+        2,
+        484928,
+        49202963.0,
+        0.0099
+      ],
+      [
+        4,
+        0,
+        5622000.0,
+        0.0
+      ]
+    ]
+  },
+  "orderPolicy": "ordered",
+  "numericTolerance": {
+    "absolute": 1e-06,
+    "integerExact": true,
+    "textExact": true,
+    "nullDistinct": true
+  },
+  "columnPolicy": "exact_names_in_order",
+  "contentVersion": "4.2.0"
+}

@@ -1,0 +1,88 @@
+{
+  "id": "q0268-mini-202611179",
+  "questionId": "q0268",
+  "visibility": "hidden",
+  "variant": "independent-enterprise",
+  "kind": "query",
+  "sharedDataPath": "fixtures/shared/enterprise-mini-202611179.json",
+  "sharedDataSha256": "f88591bb8a3ea3a748206eada73fe85ade1ec92ade7b41d510a02dc75dfd7e83",
+  "expected": {
+    "columns": [
+      "supplier_id",
+      "bucket",
+      "invoices",
+      "outstanding_cents"
+    ],
+    "rows": [
+      [
+        1,
+        "31-60",
+        1,
+        539496
+      ],
+      [
+        1,
+        "61-90",
+        1,
+        25650
+      ],
+      [
+        1,
+        "90+",
+        8,
+        1450153
+      ],
+      [
+        2,
+        "61-90",
+        3,
+        457882
+      ],
+      [
+        2,
+        "90+",
+        9,
+        2558490
+      ],
+      [
+        3,
+        "31-60",
+        2,
+        76925
+      ],
+      [
+        3,
+        "61-90",
+        2,
+        330588
+      ],
+      [
+        3,
+        "90+",
+        10,
+        2030087
+      ],
+      [
+        3,
+        "current",
+        3,
+        404100
+      ],
+      [
+        4,
+        "61-90",
+        1,
+        1000000
+      ]
+    ]
+  },
+  "orderPolicy": "ordered",
+  "numericTolerance": {
+    "absolute": 1e-06,
+    "integerExact": true,
+    "textExact": true,
+    "nullDistinct": true
+  },
+  "columnPolicy": "exact_names_in_order",
+  "contentVersion": "4.2.0"
+}

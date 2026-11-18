@@ -1,0 +1,51 @@
+{
+  "retail": {
+    "tables": 18,
+    "views": 1,
+    "rows": 214879,
+    "bytes": 13529088,
+    "sha256": "e80ec41c783e5763b0e482b4c30889bdaa313f53582d3d11ee0ea47d2366cd78"
+  },
+  "inventory": {
+    "tables": 27,
+    "views": 1,
+    "rows": 372857,
+    "bytes": 28377088,
+    "sha256": "8ffd03557cec269f31946f250002439e5c5722722962be17a86d7a86775c7eda"
+  },
+  "ecommerce": {
+    "tables": 17,
+    "views": 2,
+    "rows": 211356,
+    "bytes": 13312000,
+    "sha256": "31b1767d0e2b774e5cb7395ed186be7c92d534a96e90fc8576780875a69c8ff3"
+  },
+  "finance": {
+    "tables": 20,
+    "views": 3,
+    "rows": 142533,
+    "bytes": 8028160,
+    "sha256": "8ae00caa3958ac0db837a871916324d03061adfa81bbfa0ad3f2d127da1106ec"
+  },
+  "hr": {
+    "tables": 9,
+    "views": 1,
+    "rows": 96228,
+    "bytes": 8069120,
+    "sha256": "5806902531cf0f938bd5fea7cb2c92c8d77314e84bf55ef37bd14e8b3601a033"
+  },
+  "procurement": {
+    "tables": 10,
+    "views": 1,
+    "rows": 45120,
+    "bytes": 3108864,
+    "sha256": "32291e67b8888bba581f4e52fc4eeac482cc785ed9c75e5c89267998283637b7"
+  },
+  "enterprise": {
+    "tables": 45,
+    "views": 6,
+    "rows": 595196,
+    "bytes": 43110400,
+    "sha256": "d47285cfecd67f2dfd37a0d41a2c8a2714a6ecbc8e1170c3e9c0052204106924"
+  }
+}

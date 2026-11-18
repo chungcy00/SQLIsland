@@ -1,0 +1,68 @@
+{
+  "pass": true,
+  "datasets": [
+    {
+      "id": "retail-v2",
+      "sha256": "e80ec41c783e5763b0e482b4c30889bdaa313f53582d3d11ee0ea47d2366cd78",
+      "objects": 19,
+      "columns": 98,
+      "foreignKeys": 18,
+      "uniqueIndexes": 6,
+      "viewDependencies": 3
+    },
+    {
+      "id": "inventory-v2",
+      "sha256": "8ffd03557cec269f31946f250002439e5c5722722962be17a86d7a86775c7eda",
+      "objects": 28,
+      "columns": 160,
+      "foreignKeys": 43,
+      "uniqueIndexes": 8,
+      "viewDependencies": 4
+    },
+    {
+      "id": "ecommerce-v2",
+      "sha256": "31b1767d0e2b774e5cb7395ed186be7c92d534a96e90fc8576780875a69c8ff3",
+      "objects": 19,
+      "columns": 102,
+      "foreignKeys": 17,
+      "uniqueIndexes": 5,
+      "viewDependencies": 4
+    },
+    {
+      "id": "finance-v2",
+      "sha256": "8ae00caa3958ac0db837a871916324d03061adfa81bbfa0ad3f2d127da1106ec",
+      "objects": 23,
+      "columns": 122,
+      "foreignKeys": 22,
+      "uniqueIndexes": 3,
+      "viewDependencies": 12
+    },
+    {
+      "id": "hr-v2",
+      "sha256": "5806902531cf0f938bd5fea7cb2c92c8d77314e84bf55ef37bd14e8b3601a033",
+      "objects": 10,
+      "columns": 47,
+      "foreignKeys": 8,
+      "uniqueIndexes": 4,
+      "viewDependencies": 3
+    },
+    {
+      "id": "procurement-v2",
+      "sha256": "32291e67b8888bba581f4e52fc4eeac482cc785ed9c75e5c89267998283637b7",
+      "objects": 11,
+      "columns": 64,
+      "foreignKeys": 12,
+      "uniqueIndexes": 1,
+      "viewDependencies": 4
+    },
+    {
+      "id": "enterprise-v2",
+      "sha256": "d47285cfecd67f2dfd37a0d41a2c8a2714a6ecbc8e1170c3e9c0052204106924",
+      "objects": 51,
+      "columns": 290,
+      "foreignKeys": 62,
+      "uniqueIndexes": 14,
+      "viewDependencies": 19
+    }
+  ]
+}

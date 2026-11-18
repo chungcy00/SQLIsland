@@ -1,0 +1,50 @@
+{
+  "id": "q0277-mini-202611171",
+  "questionId": "q0277",
+  "visibility": "hidden",
+  "variant": "independent-enterprise",
+  "kind": "query",
+  "sharedDataPath": "fixtures/shared/enterprise-mini-202611171.json",
+  "sharedDataSha256": "14a558f253847a097a9452282012c1a9680ed0a5c496a573b9d42bc16885c57d",
+  "expected": {
+    "columns": [
+      "supplier_id",
+      "due_lines",
+      "ontime_pct",
+      "complete_pct",
+      "quality_pct"
+    ],
+    "rows": [
+      [
+        1,
+        21,
+        9.52,
+        71.43,
+        99.46
+      ],
+      [
+        2,
+        19,
+        10.53,
+        63.16,
+        99.52
+      ],
+      [
+        3,
+        18,
+        11.11,
+        38.89,
+        98.86
+      ]
+    ]
+  },
+  "orderPolicy": "ordered",
+  "numericTolerance": {
+    "absolute": 1e-06,
+    "integerExact": true,
+    "textExact": true,
+    "nullDistinct": true
+  },
+  "columnPolicy": "exact_names_in_order",
+  "contentVersion": "4.2.0"
+}

@@ -1,0 +1,1980 @@
+[
+  {
+    "task": "BP01",
+    "question": "q0251",
+    "title": "门店净销售、利润与目标达成",
+    "difficulty": "中等",
+    "rows": 12,
+    "elapsedMs": 31.123,
+    "independent": true,
+    "fixtures": [
+      {
+        "fixture": "q0251-public",
+        "rows": 12,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": false
+      },
+      {
+        "fixture": "q0251-boundary",
+        "rows": 12,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0251-mini-202611171",
+        "rows": 4,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0251-mini-202611179",
+        "rows": 4,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      }
+    ]
+  },
+  {
+    "task": "BP02",
+    "question": "q0252",
+    "title": "门店月度环比同比与持续下滑",
+    "difficulty": "困难",
+    "rows": 144,
+    "elapsedMs": 45.01,
+    "independent": true,
+    "fixtures": [
+      {
+        "fixture": "q0252-public",
+        "rows": 144,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": false
+      },
+      {
+        "fixture": "q0252-boundary",
+        "rows": 144,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0252-mini-202611171",
+        "rows": 48,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0252-mini-202611179",
+        "rows": 48,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      }
+    ]
+  },
+  {
+    "task": "BP03",
+    "question": "q0253",
+    "title": "高销售低毛利商品诊断",
+    "difficulty": "困难",
+    "rows": 23,
+    "elapsedMs": 53.905,
+    "independent": true,
+    "fixtures": [
+      {
+        "fixture": "q0253-public",
+        "rows": 23,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": false
+      },
+      {
+        "fixture": "q0253-boundary",
+        "rows": 22,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0253-mini-202611171",
+        "rows": 2,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0253-mini-202611179",
+        "rows": 1,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      }
+    ]
+  },
+  {
+    "task": "BP04",
+    "question": "q0254",
+    "title": "促销与非促销的日均表现",
+    "difficulty": "困难",
+    "rows": 2,
+    "elapsedMs": 23.339,
+    "independent": true,
+    "fixtures": [
+      {
+        "fixture": "q0254-public",
+        "rows": 2,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": false
+      },
+      {
+        "fixture": "q0254-boundary",
+        "rows": 1,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0254-mini-202611171",
+        "rows": 2,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0254-mini-202611179",
+        "rows": 2,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      }
+    ]
+  },
+  {
+    "task": "BP05",
+    "question": "q0255",
+    "title": "门店综合经营异常看板",
+    "difficulty": "挑战",
+    "rows": 12,
+    "elapsedMs": 10.922,
+    "independent": true,
+    "fixtures": [
+      {
+        "fixture": "q0255-public",
+        "rows": 12,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": false
+      },
+      {
+        "fixture": "q0255-boundary",
+        "rows": 12,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0255-mini-202611171",
+        "rows": 4,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0255-mini-202611179",
+        "rows": 4,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      }
+    ]
+  },
+  {
+    "task": "BP06",
+    "question": "q0256",
+    "title": "低销量高库存诊断",
+    "difficulty": "中等",
+    "rows": 54,
+    "elapsedMs": 4.434,
+    "independent": true,
+    "fixtures": [
+      {
+        "fixture": "q0256-public",
+        "rows": 54,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": false
+      },
+      {
+        "fixture": "q0256-boundary",
+        "rows": 53,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0256-mini-202611171",
+        "rows": 59,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0256-mini-202611179",
+        "rows": 54,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      }
+    ]
+  },
+  {
+    "task": "BP07",
+    "question": "q0257",
+    "title": "类别库存周转率及周转天数",
+    "difficulty": "困难",
+    "rows": 45,
+    "elapsedMs": 20.713,
+    "independent": true,
+    "fixtures": [
+      {
+        "fixture": "q0257-public",
+        "rows": 45,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": false
+      },
+      {
+        "fixture": "q0257-boundary",
+        "rows": 45,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0257-missing-snapshot",
+        "rows": 45,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0257-mini-202611171",
+        "rows": 12,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0257-mini-202611179",
+        "rows": 12,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      }
+    ]
+  },
+  {
+    "task": "BP08",
+    "question": "q0258",
+    "title": "销售速度与采购周期缺货风险",
+    "difficulty": "困难",
+    "rows": 52,
+    "elapsedMs": 7.579,
+    "independent": true,
+    "fixtures": [
+      {
+        "fixture": "q0258-public",
+        "rows": 52,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": false
+      },
+      {
+        "fixture": "q0258-boundary",
+        "rows": 51,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0258-mini-202611171",
+        "rows": 0,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0258-mini-202611179",
+        "rows": 0,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      }
+    ]
+  },
+  {
+    "task": "BP09",
+    "question": "q0259",
+    "title": "按先进先出假设推算库存库龄",
+    "difficulty": "困难",
+    "rows": 1148,
+    "elapsedMs": 52.733,
+    "independent": true,
+    "fixtures": [
+      {
+        "fixture": "q0259-public",
+        "rows": 1148,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": false
+      },
+      {
+        "fixture": "q0259-boundary",
+        "rows": 1149,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0259-mini-202611171",
+        "rows": 63,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0259-mini-202611179",
+        "rows": 63,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      }
+    ]
+  },
+  {
+    "task": "BP10",
+    "question": "q0260",
+    "title": "补货优先级与供应商风险",
+    "difficulty": "挑战",
+    "rows": 69,
+    "elapsedMs": 25.865,
+    "independent": true,
+    "fixtures": [
+      {
+        "fixture": "q0260-public",
+        "rows": 69,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": false
+      },
+      {
+        "fixture": "q0260-boundary",
+        "rows": 68,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0260-distant-inbound",
+        "rows": 69,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": false
+      },
+      {
+        "fixture": "q0260-mini-202611171",
+        "rows": 0,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0260-mini-202611179",
+        "rows": 0,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      }
+    ]
+  },
+  {
+    "task": "BP11",
+    "question": "q0261",
+    "title": "新老客户净收入及客单价",
+    "difficulty": "中等",
+    "rows": 2,
+    "elapsedMs": 36.519,
+    "independent": true,
+    "fixtures": [
+      {
+        "fixture": "q0261-public",
+        "rows": 2,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": false
+      },
+      {
+        "fixture": "q0261-boundary",
+        "rows": 2,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0261-mini-202611171",
+        "rows": 2,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0261-mini-202611179",
+        "rows": 2,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      }
+    ]
+  },
+  {
+    "task": "BP12",
+    "question": "q0262",
+    "title": "最近消费、频率、金额客户分层",
+    "difficulty": "困难",
+    "rows": 1794,
+    "elapsedMs": 30.501,
+    "independent": true,
+    "fixtures": [
+      {
+        "fixture": "q0262-public",
+        "rows": 1794,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": false
+      },
+      {
+        "fixture": "q0262-boundary",
+        "rows": 1794,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0262-mini-202611171",
+        "rows": 13,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0262-mini-202611179",
+        "rows": 14,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      }
+    ]
+  },
+  {
+    "task": "BP13",
+    "question": "q0263",
+    "title": "首购月份留存矩阵",
+    "difficulty": "困难",
+    "rows": 231,
+    "elapsedMs": 67.088,
+    "independent": true,
+    "fixtures": [
+      {
+        "fixture": "q0263-public",
+        "rows": 231,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": false
+      },
+      {
+        "fixture": "q0263-boundary",
+        "rows": 230,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0263-mini-202611171",
+        "rows": 59,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0263-mini-202611179",
+        "rows": 58,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      }
+    ]
+  },
+  {
+    "task": "BP14",
+    "question": "q0264",
+    "title": "营销渠道转化与获客成本",
+    "difficulty": "困难",
+    "rows": 5,
+    "elapsedMs": 55.703,
+    "independent": true,
+    "fixtures": [
+      {
+        "fixture": "q0264-public",
+        "rows": 5,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": false
+      },
+      {
+        "fixture": "q0264-boundary",
+        "rows": 5,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0264-mini-202611171",
+        "rows": 6,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0264-mini-202611179",
+        "rows": 6,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      }
+    ]
+  },
+  {
+    "task": "BP15",
+    "question": "q0265",
+    "title": "高价值流失风险客户",
+    "difficulty": "挑战",
+    "rows": 106,
+    "elapsedMs": 30.613,
+    "independent": true,
+    "fixtures": [
+      {
+        "fixture": "q0265-public",
+        "rows": 106,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": false
+      },
+      {
+        "fixture": "q0265-boundary",
+        "rows": 105,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0265-mini-202611171",
+        "rows": 0,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0265-mini-202611179",
+        "rows": 0,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      }
+    ]
+  },
+  {
+    "task": "BP16",
+    "question": "q0266",
+    "title": "预算与实际费用差异",
+    "difficulty": "中等",
+    "rows": 35,
+    "elapsedMs": 8.872,
+    "independent": true,
+    "fixtures": [
+      {
+        "fixture": "q0266-public",
+        "rows": 35,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": false
+      },
+      {
+        "fixture": "q0266-boundary",
+        "rows": 35,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0266-mini-202611171",
+        "rows": 35,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0266-mini-202611179",
+        "rows": 35,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      }
+    ]
+  },
+  {
+    "task": "BP17",
+    "question": "q0267",
+    "title": "供应商发票与付款核对",
+    "difficulty": "困难",
+    "rows": 4739,
+    "elapsedMs": 8.981,
+    "independent": true,
+    "fixtures": [
+      {
+        "fixture": "q0267-public",
+        "rows": 4739,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": false
+      },
+      {
+        "fixture": "q0267-boundary",
+        "rows": 4739,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0267-full-credit",
+        "rows": 4739,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0267-mini-202611171",
+        "rows": 72,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0267-mini-202611179",
+        "rows": 72,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      }
+    ]
+  },
+  {
+    "task": "BP18",
+    "question": "q0268",
+    "title": "应付账款账龄",
+    "difficulty": "困难",
+    "rows": 153,
+    "elapsedMs": 4.532,
+    "independent": true,
+    "fixtures": [
+      {
+        "fixture": "q0268-public",
+        "rows": 153,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": false
+      },
+      {
+        "fixture": "q0268-boundary",
+        "rows": 154,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0268-mini-202611171",
+        "rows": 12,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0268-mini-202611179",
+        "rows": 10,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      }
+    ]
+  },
+  {
+    "task": "BP19",
+    "question": "q0269",
+    "title": "银行流水与凭证全量对账",
+    "difficulty": "困难",
+    "rows": 1182,
+    "elapsedMs": 19.001,
+    "independent": true,
+    "fixtures": [
+      {
+        "fixture": "q0269-public",
+        "rows": 1182,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": false
+      },
+      {
+        "fixture": "q0269-boundary",
+        "rows": 1184,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0269-mini-202611171",
+        "rows": 29,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0269-mini-202611179",
+        "rows": 18,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      }
+    ]
+  },
+  {
+    "task": "BP20",
+    "question": "q0270",
+    "title": "多规则异常交易筛查",
+    "difficulty": "挑战",
+    "rows": 1434,
+    "elapsedMs": 34.672,
+    "independent": true,
+    "fixtures": [
+      {
+        "fixture": "q0270-public",
+        "rows": 1434,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": false
+      },
+      {
+        "fixture": "q0270-boundary",
+        "rows": 1435,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0270-mini-202611171",
+        "rows": 39,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0270-mini-202611179",
+        "rows": 42,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      }
+    ]
+  },
+  {
+    "task": "BP21",
+    "question": "q0271",
+    "title": "月末人员规模与变动",
+    "difficulty": "中等",
+    "rows": 84,
+    "elapsedMs": 1.185,
+    "independent": true,
+    "fixtures": [
+      {
+        "fixture": "q0271-public",
+        "rows": 84,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": false
+      },
+      {
+        "fixture": "q0271-boundary",
+        "rows": 84,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0271-mini-202611171",
+        "rows": 84,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0271-mini-202611179",
+        "rows": 84,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      }
+    ]
+  },
+  {
+    "task": "BP22",
+    "question": "q0272",
+    "title": "月度离职率与趋势",
+    "difficulty": "困难",
+    "rows": 84,
+    "elapsedMs": 2.306,
+    "independent": true,
+    "fixtures": [
+      {
+        "fixture": "q0272-public",
+        "rows": 84,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": false
+      },
+      {
+        "fixture": "q0272-boundary",
+        "rows": 84,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0272-mini-202611171",
+        "rows": 84,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0272-mini-202611179",
+        "rows": 84,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      }
+    ]
+  },
+  {
+    "task": "BP23",
+    "question": "q0273",
+    "title": "同岗位薪资分布与异常",
+    "difficulty": "困难",
+    "rows": 62,
+    "elapsedMs": 25.073,
+    "independent": true,
+    "fixtures": [
+      {
+        "fixture": "q0273-public",
+        "rows": 62,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": false
+      },
+      {
+        "fixture": "q0273-boundary",
+        "rows": 63,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0273-mini-202611171",
+        "rows": 1,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0273-mini-202611179",
+        "rows": 1,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      }
+    ]
+  },
+  {
+    "task": "BP24",
+    "question": "q0274",
+    "title": "部门人力成本与加班",
+    "difficulty": "困难",
+    "rows": 21,
+    "elapsedMs": 22.623,
+    "independent": true,
+    "fixtures": [
+      {
+        "fixture": "q0274-public",
+        "rows": 21,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": false
+      },
+      {
+        "fixture": "q0274-boundary",
+        "rows": 21,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0274-mini-202611171",
+        "rows": 6,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0274-mini-202611179",
+        "rows": 6,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      }
+    ]
+  },
+  {
+    "task": "BP25",
+    "question": "q0275",
+    "title": "入职同期群90及180日留任",
+    "difficulty": "挑战",
+    "rows": 73,
+    "elapsedMs": 0.664,
+    "independent": true,
+    "fixtures": [
+      {
+        "fixture": "q0275-public",
+        "rows": 73,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": false
+      },
+      {
+        "fixture": "q0275-boundary",
+        "rows": 73,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0275-mini-202611171",
+        "rows": 4,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0275-mini-202611179",
+        "rows": 5,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      }
+    ]
+  },
+  {
+    "task": "BP26",
+    "question": "q0276",
+    "title": "采购价格与合同、历史价格比较",
+    "difficulty": "中等",
+    "rows": 3469,
+    "elapsedMs": 14.526,
+    "independent": true,
+    "fixtures": [
+      {
+        "fixture": "q0276-public",
+        "rows": 3469,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": false
+      },
+      {
+        "fixture": "q0276-boundary",
+        "rows": 3469,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0276-mini-202611171",
+        "rows": 60,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0276-mini-202611179",
+        "rows": 60,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      }
+    ]
+  },
+  {
+    "task": "BP27",
+    "question": "q0277",
+    "title": "供应商准时、完整交付与质量",
+    "difficulty": "困难",
+    "rows": 55,
+    "elapsedMs": 16.371,
+    "independent": true,
+    "fixtures": [
+      {
+        "fixture": "q0277-public",
+        "rows": 55,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": false
+      },
+      {
+        "fixture": "q0277-boundary",
+        "rows": 55,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0277-mini-202611171",
+        "rows": 3,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0277-mini-202611179",
+        "rows": 3,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      }
+    ]
+  },
+  {
+    "task": "BP28",
+    "question": "q0278",
+    "title": "采购、收货、发票三方核对",
+    "difficulty": "困难",
+    "rows": 928,
+    "elapsedMs": 16.018,
+    "independent": true,
+    "fixtures": [
+      {
+        "fixture": "q0278-public",
+        "rows": 928,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": false
+      },
+      {
+        "fixture": "q0278-boundary",
+        "rows": 928,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": false
+      },
+      {
+        "fixture": "q0278-mini-202611171",
+        "rows": 28,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0278-mini-202611179",
+        "rows": 32,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      }
+    ]
+  },
+  {
+    "task": "BP29",
+    "question": "q0279",
+    "title": "同商品跨供应商采购价差",
+    "difficulty": "困难",
+    "rows": 548,
+    "elapsedMs": 18.908,
+    "independent": true,
+    "fixtures": [
+      {
+        "fixture": "q0279-public",
+        "rows": 548,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": false
+      },
+      {
+        "fixture": "q0279-boundary",
+        "rows": 548,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": false
+      },
+      {
+        "fixture": "q0279-mini-202611171",
+        "rows": 33,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0279-mini-202611179",
+        "rows": 33,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      }
+    ]
+  },
+  {
+    "task": "BP30",
+    "question": "q0280",
+    "title": "供应商多指标综合评价",
+    "difficulty": "挑战",
+    "rows": 37,
+    "elapsedMs": 17.258,
+    "independent": true,
+    "fixtures": [
+      {
+        "fixture": "q0280-public",
+        "rows": 37,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": false
+      },
+      {
+        "fixture": "q0280-boundary",
+        "rows": 37,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0280-mini-202611171",
+        "rows": 3,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0280-mini-202611179",
+        "rows": 3,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      }
+    ]
+  },
+  {
+    "task": "BP31",
+    "question": "q0281",
+    "title": "畅销缺货与滞销积压双向筛查",
+    "difficulty": "困难",
+    "rows": 68,
+    "elapsedMs": 2.795,
+    "independent": true,
+    "fixtures": [
+      {
+        "fixture": "q0281-public",
+        "rows": 68,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": false
+      },
+      {
+        "fixture": "q0281-boundary",
+        "rows": 67,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0281-mini-202611171",
+        "rows": 52,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0281-mini-202611179",
+        "rows": 47,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      }
+    ]
+  },
+  {
+    "task": "BP32",
+    "question": "q0282",
+    "title": "商品销售贡献与库存资金占用错配",
+    "difficulty": "困难",
+    "rows": 500,
+    "elapsedMs": 58.128,
+    "independent": true,
+    "fixtures": [
+      {
+        "fixture": "q0282-public",
+        "rows": 500,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": false
+      },
+      {
+        "fixture": "q0282-boundary",
+        "rows": 500,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0282-mini-202611171",
+        "rows": 21,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0282-mini-202611179",
+        "rows": 21,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      }
+    ]
+  },
+  {
+    "task": "BP33",
+    "question": "q0283",
+    "title": "跨仓库存调拨候选",
+    "difficulty": "挑战",
+    "rows": 99,
+    "elapsedMs": 33.479,
+    "independent": true,
+    "fixtures": [
+      {
+        "fixture": "q0283-public",
+        "rows": 99,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": false
+      },
+      {
+        "fixture": "q0283-boundary",
+        "rows": 98,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0283-mini-202611171",
+        "rows": 0,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0283-mini-202611179",
+        "rows": 0,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      }
+    ]
+  },
+  {
+    "task": "BP34",
+    "question": "q0284",
+    "title": "销售毛利与库存投资回报",
+    "difficulty": "挑战",
+    "rows": 15,
+    "elapsedMs": 40.004,
+    "independent": true,
+    "fixtures": [
+      {
+        "fixture": "q0284-public",
+        "rows": 15,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": false
+      },
+      {
+        "fixture": "q0284-boundary",
+        "rows": 15,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0284-missing-snapshot",
+        "rows": 15,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0284-mini-202611171",
+        "rows": 4,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0284-mini-202611179",
+        "rows": 4,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      }
+    ]
+  },
+  {
+    "task": "BP35",
+    "question": "q0285",
+    "title": "逾期在途与缺货叠加",
+    "difficulty": "困难",
+    "rows": 23,
+    "elapsedMs": 20.708,
+    "independent": true,
+    "fixtures": [
+      {
+        "fixture": "q0285-public",
+        "rows": 23,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": false
+      },
+      {
+        "fixture": "q0285-boundary",
+        "rows": 22,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0285-mini-202611171",
+        "rows": 0,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0285-mini-202611179",
+        "rows": 0,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      }
+    ]
+  },
+  {
+    "task": "BP36",
+    "question": "q0286",
+    "title": "收货入库完整性核对",
+    "difficulty": "困难",
+    "rows": 0,
+    "elapsedMs": 11.612,
+    "independent": true,
+    "fixtures": [
+      {
+        "fixture": "q0286-public",
+        "rows": 0,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": false
+      },
+      {
+        "fixture": "q0286-boundary",
+        "rows": 1,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0286-mini-202611171",
+        "rows": 0,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": false
+      },
+      {
+        "fixture": "q0286-mini-202611179",
+        "rows": 1,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      }
+    ]
+  },
+  {
+    "task": "BP37",
+    "question": "q0287",
+    "title": "供应商延迟与仓库资金压力",
+    "difficulty": "挑战",
+    "rows": 45,
+    "elapsedMs": 16.269,
+    "independent": true,
+    "fixtures": [
+      {
+        "fixture": "q0287-public",
+        "rows": 45,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": false
+      },
+      {
+        "fixture": "q0287-boundary",
+        "rows": 45,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0287-mini-202611171",
+        "rows": 3,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0287-mini-202611179",
+        "rows": 3,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      }
+    ]
+  },
+  {
+    "task": "BP38",
+    "question": "q0288",
+    "title": "门店贡献利润与费用",
+    "difficulty": "困难",
+    "rows": 12,
+    "elapsedMs": 20.863,
+    "independent": true,
+    "fixtures": [
+      {
+        "fixture": "q0288-public",
+        "rows": 12,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": false
+      },
+      {
+        "fixture": "q0288-boundary",
+        "rows": 12,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0288-mini-202611171",
+        "rows": 4,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0288-mini-202611179",
+        "rows": 4,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      }
+    ]
+  },
+  {
+    "task": "BP39",
+    "question": "q0289",
+    "title": "订单结算与收入核对",
+    "difficulty": "困难",
+    "rows": 0,
+    "elapsedMs": 87.733,
+    "independent": true,
+    "fixtures": [
+      {
+        "fixture": "q0289-public",
+        "rows": 0,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": false
+      },
+      {
+        "fixture": "q0289-boundary",
+        "rows": 1,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0289-mini-202611171",
+        "rows": 1,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0289-mini-202611179",
+        "rows": 1,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      }
+    ]
+  },
+  {
+    "task": "BP40",
+    "question": "q0290",
+    "title": "门店月度收入与费用偏离",
+    "difficulty": "挑战",
+    "rows": 144,
+    "elapsedMs": 24.981,
+    "independent": true,
+    "fixtures": [
+      {
+        "fixture": "q0290-public",
+        "rows": 144,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": false
+      },
+      {
+        "fixture": "q0290-boundary",
+        "rows": 144,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0290-mini-202611171",
+        "rows": 48,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0290-mini-202611179",
+        "rows": 48,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      }
+    ]
+  },
+  {
+    "task": "BP41",
+    "question": "q0291",
+    "title": "采购承诺、收货、开票及付款敞口",
+    "difficulty": "困难",
+    "rows": 60,
+    "elapsedMs": 25.219,
+    "independent": true,
+    "fixtures": [
+      {
+        "fixture": "q0291-public",
+        "rows": 60,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": false
+      },
+      {
+        "fixture": "q0291-boundary",
+        "rows": 61,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0291-mini-202611171",
+        "rows": 5,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0291-mini-202611179",
+        "rows": 5,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      }
+    ]
+  },
+  {
+    "task": "BP42",
+    "question": "q0292",
+    "title": "三方不一致且已经付款的发票",
+    "difficulty": "困难",
+    "rows": 721,
+    "elapsedMs": 24.744,
+    "independent": true,
+    "fixtures": [
+      {
+        "fixture": "q0292-public",
+        "rows": 721,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": false
+      },
+      {
+        "fixture": "q0292-boundary",
+        "rows": 721,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0292-mini-202611171",
+        "rows": 18,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0292-mini-202611179",
+        "rows": 14,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      }
+    ]
+  },
+  {
+    "task": "BP43",
+    "question": "q0293",
+    "title": "供应商资金风险分层",
+    "difficulty": "挑战",
+    "rows": 38,
+    "elapsedMs": 20.035,
+    "independent": true,
+    "fixtures": [
+      {
+        "fixture": "q0293-public",
+        "rows": 38,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": false
+      },
+      {
+        "fixture": "q0293-boundary",
+        "rows": 38,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0293-mini-202611171",
+        "rows": 4,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0293-mini-202611179",
+        "rows": 4,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      }
+    ]
+  },
+  {
+    "task": "BP44",
+    "question": "q0294",
+    "title": "渠道广告后的贡献利润",
+    "difficulty": "困难",
+    "rows": 5,
+    "elapsedMs": 32.793,
+    "independent": true,
+    "fixtures": [
+      {
+        "fixture": "q0294-public",
+        "rows": 5,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": false
+      },
+      {
+        "fixture": "q0294-boundary",
+        "rows": 5,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0294-mini-202611171",
+        "rows": 6,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0294-mini-202611179",
+        "rows": 6,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      }
+    ]
+  },
+  {
+    "task": "BP45",
+    "question": "q0295",
+    "title": "首购客户90天毛利与获客成本",
+    "difficulty": "挑战",
+    "rows": 165,
+    "elapsedMs": 44.884,
+    "independent": true,
+    "fixtures": [
+      {
+        "fixture": "q0295-public",
+        "rows": 165,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": false
+      },
+      {
+        "fixture": "q0295-boundary",
+        "rows": 165,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0295-mini-202611171",
+        "rows": 12,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0295-mini-202611179",
+        "rows": 12,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      }
+    ]
+  },
+  {
+    "task": "BP46",
+    "question": "q0296",
+    "title": "退款影响与渠道利润风险",
+    "difficulty": "困难",
+    "rows": 5,
+    "elapsedMs": 44.919,
+    "independent": true,
+    "fixtures": [
+      {
+        "fixture": "q0296-public",
+        "rows": 5,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": false
+      },
+      {
+        "fixture": "q0296-boundary",
+        "rows": 5,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0296-mini-202611171",
+        "rows": 5,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0296-mini-202611179",
+        "rows": 5,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      }
+    ]
+  },
+  {
+    "task": "BP47",
+    "question": "q0297",
+    "title": "门店人效及人工占比",
+    "difficulty": "困难",
+    "rows": 12,
+    "elapsedMs": 40.817,
+    "independent": true,
+    "fixtures": [
+      {
+        "fixture": "q0297-public",
+        "rows": 12,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": false
+      },
+      {
+        "fixture": "q0297-boundary",
+        "rows": 12,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0297-mini-202611171",
+        "rows": 4,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0297-mini-202611179",
+        "rows": 4,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      }
+    ]
+  },
+  {
+    "task": "BP48",
+    "question": "q0298",
+    "title": "门店人员变化与销售变化诊断",
+    "difficulty": "挑战",
+    "rows": 144,
+    "elapsedMs": 25.226,
+    "independent": true,
+    "fixtures": [
+      {
+        "fixture": "q0298-public",
+        "rows": 144,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": false
+      },
+      {
+        "fixture": "q0298-boundary",
+        "rows": 144,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0298-mini-202611171",
+        "rows": 48,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0298-mini-202611179",
+        "rows": 48,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      }
+    ]
+  },
+  {
+    "task": "BP49",
+    "question": "q0299",
+    "title": "月度经营汇总表",
+    "difficulty": "挑战",
+    "rows": 12,
+    "elapsedMs": 88.38,
+    "independent": true,
+    "fixtures": [
+      {
+        "fixture": "q0299-public",
+        "rows": 12,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": false
+      },
+      {
+        "fixture": "q0299-boundary",
+        "rows": 12,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0299-mini-202611171",
+        "rows": 12,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0299-mini-202611179",
+        "rows": 12,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      }
+    ]
+  },
+  {
+    "task": "BP50",
+    "question": "q0300",
+    "title": "跨域季度风险评分与经营报告",
+    "difficulty": "挑战",
+    "rows": 4,
+    "elapsedMs": 102.57,
+    "independent": true,
+    "fixtures": [
+      {
+        "fixture": "q0300-public",
+        "rows": 4,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": false
+      },
+      {
+        "fixture": "q0300-boundary",
+        "rows": 4,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0300-mini-202611171",
+        "rows": 4,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      },
+      {
+        "fixture": "q0300-mini-202611179",
+        "rows": 4,
+        "independent": true,
+        "equivalent": true,
+        "changedFromPublic": true
+      }
+    ]
+  }
+]

@@ -1,0 +1,759 @@
+{
+  "version": "4.2.0",
+  "questions": [
+    {
+      "task": "BP01",
+      "question": "q0251",
+      "fixtures": 4,
+      "updated": [
+        "requirements",
+        "references",
+        "explanation",
+        "publicExpected",
+        "hiddenExpected",
+        "hashes"
+      ]
+    },
+    {
+      "task": "BP02",
+      "question": "q0252",
+      "fixtures": 4,
+      "updated": [
+        "requirements",
+        "references",
+        "explanation",
+        "publicExpected",
+        "hiddenExpected",
+        "hashes"
+      ]
+    },
+    {
+      "task": "BP03",
+      "question": "q0253",
+      "fixtures": 4,
+      "updated": [
+        "requirements",
+        "references",
+        "explanation",
+        "publicExpected",
+        "hiddenExpected",
+        "hashes"
+      ]
+    },
+    {
+      "task": "BP04",
+      "question": "q0254",
+      "fixtures": 4,
+      "updated": [
+        "requirements",
+        "references",
+        "explanation",
+        "publicExpected",
+        "hiddenExpected",
+        "hashes"
+      ]
+    },
+    {
+      "task": "BP05",
+      "question": "q0255",
+      "fixtures": 4,
+      "updated": [
+        "requirements",
+        "references",
+        "explanation",
+        "publicExpected",
+        "hiddenExpected",
+        "hashes"
+      ]
+    },
+    {
+      "task": "BP06",
+      "question": "q0256",
+      "fixtures": 4,
+      "updated": [
+        "requirements",
+        "references",
+        "explanation",
+        "publicExpected",
+        "hiddenExpected",
+        "hashes"
+      ]
+    },
+    {
+      "task": "BP07",
+      "question": "q0257",
+      "fixtures": 5,
+      "updated": [
+        "requirements",
+        "references",
+        "explanation",
+        "publicExpected",
+        "hiddenExpected",
+        "hashes"
+      ]
+    },
+    {
+      "task": "BP08",
+      "question": "q0258",
+      "fixtures": 4,
+      "updated": [
+        "requirements",
+        "references",
+        "explanation",
+        "publicExpected",
+        "hiddenExpected",
+        "hashes"
+      ]
+    },
+    {
+      "task": "BP09",
+      "question": "q0259",
+      "fixtures": 4,
+      "updated": [
+        "requirements",
+        "references",
+        "explanation",
+        "publicExpected",
+        "hiddenExpected",
+        "hashes"
+      ]
+    },
+    {
+      "task": "BP10",
+      "question": "q0260",
+      "fixtures": 5,
+      "updated": [
+        "requirements",
+        "references",
+        "explanation",
+        "publicExpected",
+        "hiddenExpected",
+        "hashes"
+      ]
+    },
+    {
+      "task": "BP11",
+      "question": "q0261",
+      "fixtures": 4,
+      "updated": [
+        "requirements",
+        "references",
+        "explanation",
+        "publicExpected",
+        "hiddenExpected",
+        "hashes"
+      ]
+    },
+    {
+      "task": "BP12",
+      "question": "q0262",
+      "fixtures": 4,
+      "updated": [
+        "requirements",
+        "references",
+        "explanation",
+        "publicExpected",
+        "hiddenExpected",
+        "hashes"
+      ]
+    },
+    {
+      "task": "BP13",
+      "question": "q0263",
+      "fixtures": 4,
+      "updated": [
+        "requirements",
+        "references",
+        "explanation",
+        "publicExpected",
+        "hiddenExpected",
+        "hashes"
+      ]
+    },
+    {
+      "task": "BP14",
+      "question": "q0264",
+      "fixtures": 4,
+      "updated": [
+        "requirements",
+        "references",
+        "explanation",
+        "publicExpected",
+        "hiddenExpected",
+        "hashes"
+      ]
+    },
+    {
+      "task": "BP15",
+      "question": "q0265",
+      "fixtures": 4,
+      "updated": [
+        "requirements",
+        "references",
+        "explanation",
+        "publicExpected",
+        "hiddenExpected",
+        "hashes"
+      ]
+    },
+    {
+      "task": "BP16",
+      "question": "q0266",
+      "fixtures": 4,
+      "updated": [
+        "requirements",
+        "references",
+        "explanation",
+        "publicExpected",
+        "hiddenExpected",
+        "hashes"
+      ]
+    },
+    {
+      "task": "BP17",
+      "question": "q0267",
+      "fixtures": 5,
+      "updated": [
+        "requirements",
+        "references",
+        "explanation",
+        "publicExpected",
+        "hiddenExpected",
+        "hashes"
+      ]
+    },
+    {
+      "task": "BP18",
+      "question": "q0268",
+      "fixtures": 4,
+      "updated": [
+        "requirements",
+        "references",
+        "explanation",
+        "publicExpected",
+        "hiddenExpected",
+        "hashes"
+      ]
+    },
+    {
+      "task": "BP19",
+      "question": "q0269",
+      "fixtures": 4,
+      "updated": [
+        "requirements",
+        "references",
+        "explanation",
+        "publicExpected",
+        "hiddenExpected",
+        "hashes"
+      ]
+    },
+    {
+      "task": "BP20",
+      "question": "q0270",
+      "fixtures": 4,
+      "updated": [
+        "requirements",
+        "references",
+        "explanation",
+        "publicExpected",
+        "hiddenExpected",
+        "hashes"
+      ]
+    },
+    {
+      "task": "BP21",
+      "question": "q0271",
+      "fixtures": 4,
+      "updated": [
+        "requirements",
+        "references",
+        "explanation",
+        "publicExpected",
+        "hiddenExpected",
+        "hashes"
+      ]
+    },
+    {
+      "task": "BP22",
+      "question": "q0272",
+      "fixtures": 4,
+      "updated": [
+        "requirements",
+        "references",
+        "explanation",
+        "publicExpected",
+        "hiddenExpected",
+        "hashes"
+      ]
+    },
+    {
+      "task": "BP23",
+      "question": "q0273",
+      "fixtures": 4,
+      "updated": [
+        "requirements",
+        "references",
+        "explanation",
+        "publicExpected",
+        "hiddenExpected",
+        "hashes"
+      ]
+    },
+    {
+      "task": "BP24",
+      "question": "q0274",
+      "fixtures": 4,
+      "updated": [
+        "requirements",
+        "references",
+        "explanation",
+        "publicExpected",
+        "hiddenExpected",
+        "hashes"
+      ]
+    },
+    {
+      "task": "BP25",
+      "question": "q0275",
+      "fixtures": 4,
+      "updated": [
+        "requirements",
+        "references",
+        "explanation",
+        "publicExpected",
+        "hiddenExpected",
+        "hashes"
+      ]
+    },
+    {
+      "task": "BP26",
+      "question": "q0276",
+      "fixtures": 4,
+      "updated": [
+        "requirements",
+        "references",
+        "explanation",
+        "publicExpected",
+        "hiddenExpected",
+        "hashes"
+      ]
+    },
+    {
+      "task": "BP27",
+      "question": "q0277",
+      "fixtures": 4,
+      "updated": [
+        "requirements",
+        "references",
+        "explanation",
+        "publicExpected",
+        "hiddenExpected",
+        "hashes"
+      ]
+    },
+    {
+      "task": "BP28",
+      "question": "q0278",
+      "fixtures": 4,
+      "updated": [
+        "requirements",
+        "references",
+        "explanation",
+        "publicExpected",
+        "hiddenExpected",
+        "hashes"
+      ]
+    },
+    {
+      "task": "BP29",
+      "question": "q0279",
+      "fixtures": 4,
+      "updated": [
+        "requirements",
+        "references",
+        "explanation",
+        "publicExpected",
+        "hiddenExpected",
+        "hashes"
+      ]
+    },
+    {
+      "task": "BP30",
+      "question": "q0280",
+      "fixtures": 4,
+      "updated": [
+        "requirements",
+        "references",
+        "explanation",
+        "publicExpected",
+        "hiddenExpected",
+        "hashes"
+      ]
+    },
+    {
+      "task": "BP31",
+      "question": "q0281",
+      "fixtures": 4,
+      "updated": [
+        "requirements",
+        "references",
+        "explanation",
+        "publicExpected",
+        "hiddenExpected",
+        "hashes"
+      ]
+    },
+    {
+      "task": "BP32",
+      "question": "q0282",
+      "fixtures": 4,
+      "updated": [
+        "requirements",
+        "references",
+        "explanation",
+        "publicExpected",
+        "hiddenExpected",
+        "hashes"
+      ]
+    },
+    {
+      "task": "BP33",
+      "question": "q0283",
+      "fixtures": 4,
+      "updated": [
+        "requirements",
+        "references",
+        "explanation",
+        "publicExpected",
+        "hiddenExpected",
+        "hashes"
+      ]
+    },
+    {
+      "task": "BP34",
+      "question": "q0284",
+      "fixtures": 5,
+      "updated": [
+        "requirements",
+        "references",
+        "explanation",
+        "publicExpected",
+        "hiddenExpected",
+        "hashes"
+      ]
+    },
+    {
+      "task": "BP35",
+      "question": "q0285",
+      "fixtures": 4,
+      "updated": [
+        "requirements",
+        "references",
+        "explanation",
+        "publicExpected",
+        "hiddenExpected",
+        "hashes"
+      ]
+    },
+    {
+      "task": "BP36",
+      "question": "q0286",
+      "fixtures": 4,
+      "updated": [
+        "requirements",
+        "references",
+        "explanation",
+        "publicExpected",
+        "hiddenExpected",
+        "hashes"
+      ]
+    },
+    {
+      "task": "BP37",
+      "question": "q0287",
+      "fixtures": 4,
+      "updated": [
+        "requirements",
+        "references",
+        "explanation",
+        "publicExpected",
+        "hiddenExpected",
+        "hashes"
+      ]
+    },
+    {
+      "task": "BP38",
+      "question": "q0288",
+      "fixtures": 4,
+      "updated": [
+        "requirements",
+        "references",
+        "explanation",
+        "publicExpected",
+        "hiddenExpected",
+        "hashes"
+      ]
+    },
+    {
+      "task": "BP39",
+      "question": "q0289",
+      "fixtures": 4,
+      "updated": [
+        "requirements",
+        "references",
+        "explanation",
+        "publicExpected",
+        "hiddenExpected",
+        "hashes"
+      ]
+    },
+    {
+      "task": "BP40",
+      "question": "q0290",
+      "fixtures": 4,
+      "updated": [
+        "requirements",
+        "references",
+        "explanation",
+        "publicExpected",
+        "hiddenExpected",
+        "hashes"
+      ]
+    },
+    {
+      "task": "BP41",
+      "question": "q0291",
+      "fixtures": 4,
+      "updated": [
+        "requirements",
+        "references",
+        "explanation",
+        "publicExpected",
+        "hiddenExpected",
+        "hashes"
+      ]
+    },
+    {
+      "task": "BP42",
+      "question": "q0292",
+      "fixtures": 4,
+      "updated": [
+        "requirements",
+        "references",
+        "explanation",
+        "publicExpected",
+        "hiddenExpected",
+        "hashes"
+      ]
+    },
+    {
+      "task": "BP43",
+      "question": "q0293",
+      "fixtures": 4,
+      "updated": [
+        "requirements",
+        "references",
+        "explanation",
+        "publicExpected",
+        "hiddenExpected",
+        "hashes"
+      ]
+    },
+    {
+      "task": "BP44",
+      "question": "q0294",
+      "fixtures": 4,
+      "updated": [
+        "requirements",
+        "references",
+        "explanation",
+        "publicExpected",
+        "hiddenExpected",
+        "hashes"
+      ]
+    },
+    {
+      "task": "BP45",
+      "question": "q0295",
+      "fixtures": 4,
+      "updated": [
+        "requirements",
+        "references",
+        "explanation",
+        "publicExpected",
+        "hiddenExpected",
+        "hashes"
+      ]
+    },
+    {
+      "task": "BP46",
+      "question": "q0296",
+      "fixtures": 4,
+      "updated": [
+        "requirements",
+        "references",
+        "explanation",
+        "publicExpected",
+        "hiddenExpected",
+        "hashes"
+      ]
+    },
+    {
+      "task": "BP47",
+      "question": "q0297",
+      "fixtures": 4,
+      "updated": [
+        "requirements",
+        "references",
+        "explanation",
+        "publicExpected",
+        "hiddenExpected",
+        "hashes"
+      ]
+    },
+    {
+      "task": "BP48",
+      "question": "q0298",
+      "fixtures": 4,
+      "updated": [
+        "requirements",
+        "references",
+        "explanation",
+        "publicExpected",
+        "hiddenExpected",
+        "hashes"
+      ]
+    },
+    {
+      "task": "BP49",
+      "question": "q0299",
+      "fixtures": 4,
+      "updated": [
+        "requirements",
+        "references",
+        "explanation",
+        "publicExpected",
+        "hiddenExpected",
+        "hashes"
+      ]
+    },
+    {
+      "task": "BP50",
+      "question": "q0300",
+      "fixtures": 4,
+      "updated": [
+        "requirements",
+        "references",
+        "explanation",
+        "publicExpected",
+        "hiddenExpected",
+        "hashes"
+      ]
+    }
+  ],
+  "knowledgePoints": [
+    "kp19-31",
+    "kp19-32",
+    "kp19-33",
+    "kp19-34",
+    "kp19-35",
+    "kp19-36",
+    "kp19-37",
+    "kp19-38",
+    "kp19-39",
+    "kp19-40",
+    "kp19-41",
+    "kp19-42",
+    "kp19-43",
+    "kp19-44",
+    "kp19-45",
+    "kp19-46",
+    "kp19-47",
+    "kp19-48",
+    "kp19-49",
+    "kp19-50",
+    "kp19-51",
+    "kp19-52",
+    "kp19-53",
+    "kp19-54",
+    "kp19-55",
+    "kp19-56",
+    "kp19-57",
+    "kp19-58",
+    "kp19-59",
+    "kp19-60",
+    "kp20-05",
+    "kp20-06",
+    "kp20-07",
+    "kp20-08",
+    "kp20-09",
+    "kp20-10",
+    "kp20-11",
+    "kp20-12",
+    "kp20-13",
+    "kp20-14",
+    "kp20-15",
+    "kp20-16",
+    "kp20-17",
+    "kp20-18",
+    "kp20-19",
+    "kp20-20",
+    "kp20-21",
+    "kp20-22",
+    "kp20-23",
+    "kp20-24"
+  ],
+  "flashcards": [
+    "fc0149",
+    "fc0150",
+    "fc0151",
+    "fc0152",
+    "fc0153",
+    "fc0154",
+    "fc0155",
+    "fc0156",
+    "fc0157",
+    "fc0158",
+    "fc0159",
+    "fc0160",
+    "fc0161",
+    "fc0162",
+    "fc0163",
+    "fc0164",
+    "fc0165",
+    "fc0166",
+    "fc0167",
+    "fc0168",
+    "fc0169",
+    "fc0170",
+    "fc0171",
+    "fc0172",
+    "fc0173",
+    "fc0174",
+    "fc0175",
+    "fc0176",
+    "fc0177",
+    "fc0178",
+    "fc0181",
+    "fc0182",
+    "fc0183",
+    "fc0184",
+    "fc0185",
+    "fc0186",
+    "fc0187",
+    "fc0188",
+    "fc0189",
+    "fc0190",
+    "fc0191",
+    "fc0192",
+    "fc0193",
+    "fc0194",
+    "fc0195",
+    "fc0196",
+    "fc0197",
+    "fc0198",
+    "fc0199",
+    "fc0200"
+  ]
+}

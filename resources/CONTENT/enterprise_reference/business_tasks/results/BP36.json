@@ -1,0 +1,10 @@
+{
+  "columns": [
+    "receipt_id",
+    "po_item_id",
+    "expected_units",
+    "posted_units",
+    "difference"
+  ],
+  "rows": []
+}

@@ -1,0 +1,1055 @@
+{
+  "environment": "本机Python sqlite3，顺序执行，每题3次完整取数，记录中位数；不代表实体手机。",
+  "queries": [
+    {
+      "task": "BP01",
+      "before": {
+        "medianMs": 11.248,
+        "samplesMs": [
+          102.197,
+          11.248,
+          11.216
+        ],
+        "rows": 12
+      },
+      "after": {
+        "medianMs": 16.503,
+        "samplesMs": [
+          18.364,
+          14.292,
+          16.503
+        ],
+        "rows": 12
+      }
+    },
+    {
+      "task": "BP02",
+      "before": {
+        "medianMs": 33.129,
+        "samplesMs": [
+          34.333,
+          33.129,
+          32.619
+        ],
+        "rows": 144
+      },
+      "after": {
+        "medianMs": 38.95,
+        "samplesMs": [
+          39.532,
+          38.572,
+          38.95
+        ],
+        "rows": 144
+      }
+    },
+    {
+      "task": "BP03",
+      "before": {
+        "medianMs": 46.225,
+        "samplesMs": [
+          62.404,
+          45.728,
+          46.225
+        ],
+        "rows": 3
+      },
+      "after": {
+        "medianMs": 52.667,
+        "samplesMs": [
+          50.376,
+          54.88,
+          52.667
+        ],
+        "rows": 23
+      }
+    },
+    {
+      "task": "BP04",
+      "before": {
+        "medianMs": 18.351,
+        "samplesMs": [
+          31.093,
+          15.455,
+          18.351
+        ],
+        "rows": 2
+      },
+      "after": {
+        "medianMs": 18.111,
+        "samplesMs": [
+          18.111,
+          20.395,
+          14.962
+        ],
+        "rows": 2
+      }
+    },
+    {
+      "task": "BP05",
+      "before": {
+        "medianMs": 7.62,
+        "samplesMs": [
+          8.21,
+          7.62,
+          7.43
+        ],
+        "rows": 12
+      },
+      "after": {
+        "medianMs": 9.72,
+        "samplesMs": [
+          9.72,
+          10.011,
+          9.687
+        ],
+        "rows": 12
+      }
+    },
+    {
+      "task": "BP06",
+      "before": {
+        "medianMs": 6.177,
+        "samplesMs": [
+          121.979,
+          6.177,
+          5.658
+        ],
+        "rows": 823
+      },
+      "after": {
+        "medianMs": 4.016,
+        "samplesMs": [
+          4.324,
+          3.806,
+          4.016
+        ],
+        "rows": 54
+      }
+    },
+    {
+      "task": "BP07",
+      "before": {
+        "medianMs": 25.245,
+        "samplesMs": [
+          26.585,
+          24.654,
+          25.245
+        ],
+        "rows": 45
+      },
+      "after": {
+        "medianMs": 19.409,
+        "samplesMs": [
+          19.675,
+          19.409,
+          18.77
+        ],
+        "rows": 45
+      }
+    },
+    {
+      "task": "BP08",
+      "before": {
+        "medianMs": 9.071,
+        "samplesMs": [
+          12.891,
+          9.071,
+          6.971
+        ],
+        "rows": 41
+      },
+      "after": {
+        "medianMs": 8.908,
+        "samplesMs": [
+          8.908,
+          8.645,
+          10.511
+        ],
+        "rows": 52
+      }
+    },
+    {
+      "task": "BP09",
+      "before": {
+        "medianMs": 43.838,
+        "samplesMs": [
+          43.838,
+          49.564,
+          37.098
+        ],
+        "rows": 1392
+      },
+      "after": {
+        "medianMs": 49.708,
+        "samplesMs": [
+          71.09,
+          49.708,
+          49.471
+        ],
+        "rows": 1148
+      }
+    },
+    {
+      "task": "BP10",
+      "before": {
+        "medianMs": 19.086,
+        "samplesMs": [
+          24.997,
+          17.892,
+          19.086
+        ],
+        "rows": 68
+      },
+      "after": {
+        "medianMs": 30.356,
+        "samplesMs": [
+          25.979,
+          67.875,
+          30.356
+        ],
+        "rows": 69
+      }
+    },
+    {
+      "task": "BP11",
+      "before": {
+        "medianMs": 21.362,
+        "samplesMs": [
+          23.115,
+          21.362,
+          21.149
+        ],
+        "rows": 2
+      },
+      "after": {
+        "medianMs": 30.318,
+        "samplesMs": [
+          31.113,
+          28.974,
+          30.318
+        ],
+        "rows": 2
+      }
+    },
+    {
+      "task": "BP12",
+      "before": {
+        "medianMs": 20.035,
+        "samplesMs": [
+          20.588,
+          19.885,
+          20.035
+        ],
+        "rows": 2889
+      },
+      "after": {
+        "medianMs": 25.919,
+        "samplesMs": [
+          26.611,
+          25.836,
+          25.919
+        ],
+        "rows": 1794
+      }
+    },
+    {
+      "task": "BP13",
+      "before": {
+        "medianMs": 38.219,
+        "samplesMs": [
+          39.793,
+          38.219,
+          37.907
+        ],
+        "rows": 231
+      },
+      "after": {
+        "medianMs": 49.898,
+        "samplesMs": [
+          54.708,
+          49.844,
+          49.898
+        ],
+        "rows": 231
+      }
+    },
+    {
+      "task": "BP14",
+      "before": {
+        "medianMs": 33.265,
+        "samplesMs": [
+          41.983,
+          32.404,
+          33.265
+        ],
+        "rows": 5
+      },
+      "after": {
+        "medianMs": 47.679,
+        "samplesMs": [
+          47.41,
+          47.679,
+          50.048
+        ],
+        "rows": 5
+      }
+    },
+    {
+      "task": "BP15",
+      "before": {
+        "medianMs": 21.133,
+        "samplesMs": [
+          22.273,
+          21.119,
+          21.133
+        ],
+        "rows": 547
+      },
+      "after": {
+        "medianMs": 25.549,
+        "samplesMs": [
+          26.75,
+          25.549,
+          25.319
+        ],
+        "rows": 106
+      }
+    },
+    {
+      "task": "BP16",
+      "before": {
+        "medianMs": 8.147,
+        "samplesMs": [
+          12.652,
+          7.997,
+          8.147
+        ],
+        "rows": 35
+      },
+      "after": {
+        "medianMs": 7.94,
+        "samplesMs": [
+          8.467,
+          7.94,
+          7.842
+        ],
+        "rows": 35
+      }
+    },
+    {
+      "task": "BP17",
+      "before": {
+        "medianMs": 5.791,
+        "samplesMs": [
+          9.604,
+          5.754,
+          5.791
+        ],
+        "rows": 4658
+      },
+      "after": {
+        "medianMs": 6.363,
+        "samplesMs": [
+          6.431,
+          6.363,
+          6.086
+        ],
+        "rows": 4739
+      }
+    },
+    {
+      "task": "BP18",
+      "before": {
+        "medianMs": 3.17,
+        "samplesMs": [
+          3.445,
+          3.122,
+          3.17
+        ],
+        "rows": 197
+      },
+      "after": {
+        "medianMs": 3.979,
+        "samplesMs": [
+          4.067,
+          3.979,
+          3.879
+        ],
+        "rows": 153
+      }
+    },
+    {
+      "task": "BP19",
+      "before": {
+        "medianMs": 16.681,
+        "samplesMs": [
+          20.035,
+          16.392,
+          16.681
+        ],
+        "rows": 656
+      },
+      "after": {
+        "medianMs": 18.28,
+        "samplesMs": [
+          18.587,
+          18.28,
+          18.167
+        ],
+        "rows": 1182
+      }
+    },
+    {
+      "task": "BP20",
+      "before": {
+        "medianMs": 24.098,
+        "samplesMs": [
+          24.585,
+          24.098,
+          24.009
+        ],
+        "rows": 1090
+      },
+      "after": {
+        "medianMs": 33.087,
+        "samplesMs": [
+          33.216,
+          33.087,
+          32.992
+        ],
+        "rows": 1434
+      }
+    },
+    {
+      "task": "BP21",
+      "before": {
+        "medianMs": 1.022,
+        "samplesMs": [
+          1.592,
+          1.022,
+          1.007
+        ],
+        "rows": 84
+      },
+      "after": {
+        "medianMs": 1.007,
+        "samplesMs": [
+          1.047,
+          1.007,
+          0.961
+        ],
+        "rows": 84
+      }
+    },
+    {
+      "task": "BP22",
+      "before": {
+        "medianMs": 1.86,
+        "samplesMs": [
+          1.937,
+          1.86,
+          1.81
+        ],
+        "rows": 84
+      },
+      "after": {
+        "medianMs": 2.188,
+        "samplesMs": [
+          2.355,
+          2.188,
+          2.149
+        ],
+        "rows": 84
+      }
+    },
+    {
+      "task": "BP23",
+      "before": {
+        "medianMs": 25.691,
+        "samplesMs": [
+          47.254,
+          25.264,
+          25.691
+        ],
+        "rows": 7
+      },
+      "after": {
+        "medianMs": 21.233,
+        "samplesMs": [
+          23.376,
+          21.149,
+          21.233
+        ],
+        "rows": 62
+      }
+    },
+    {
+      "task": "BP24",
+      "before": {
+        "medianMs": 25.324,
+        "samplesMs": [
+          25.324,
+          25.168,
+          25.906
+        ],
+        "rows": 21
+      },
+      "after": {
+        "medianMs": 21.551,
+        "samplesMs": [
+          21.619,
+          21.526,
+          21.551
+        ],
+        "rows": 21
+      }
+    },
+    {
+      "task": "BP25",
+      "before": {
+        "medianMs": 0.437,
+        "samplesMs": [
+          0.605,
+          0.437,
+          0.425
+        ],
+        "rows": 62
+      },
+      "after": {
+        "medianMs": 0.436,
+        "samplesMs": [
+          0.547,
+          0.436,
+          0.427
+        ],
+        "rows": 73
+      }
+    },
+    {
+      "task": "BP26",
+      "before": {
+        "medianMs": 12.226,
+        "samplesMs": [
+          13.092,
+          11.918,
+          12.226
+        ],
+        "rows": 3129
+      },
+      "after": {
+        "medianMs": 14.357,
+        "samplesMs": [
+          14.666,
+          14.257,
+          14.357
+        ],
+        "rows": 3469
+      }
+    },
+    {
+      "task": "BP27",
+      "before": {
+        "medianMs": 12.051,
+        "samplesMs": [
+          12.943,
+          12.051,
+          11.873
+        ],
+        "rows": 60
+      },
+      "after": {
+        "medianMs": 15.603,
+        "samplesMs": [
+          15.935,
+          15.603,
+          15.52
+        ],
+        "rows": 55
+      }
+    },
+    {
+      "task": "BP28",
+      "before": {
+        "medianMs": 10.965,
+        "samplesMs": [
+          11.202,
+          10.856,
+          10.965
+        ],
+        "rows": 876
+      },
+      "after": {
+        "medianMs": 15.798,
+        "samplesMs": [
+          15.912,
+          15.76,
+          15.798
+        ],
+        "rows": 928
+      }
+    },
+    {
+      "task": "BP29",
+      "before": {
+        "medianMs": 15.568,
+        "samplesMs": [
+          16.112,
+          15.568,
+          15.485
+        ],
+        "rows": 900
+      },
+      "after": {
+        "medianMs": 18.29,
+        "samplesMs": [
+          18.373,
+          18.093,
+          18.29
+        ],
+        "rows": 548
+      }
+    },
+    {
+      "task": "BP30",
+      "before": {
+        "medianMs": 12.925,
+        "samplesMs": [
+          13.199,
+          12.925,
+          12.61
+        ],
+        "rows": 60
+      },
+      "after": {
+        "medianMs": 17.103,
+        "samplesMs": [
+          17.22,
+          16.844,
+          17.103
+        ],
+        "rows": 37
+      }
+    },
+    {
+      "task": "BP31",
+      "before": {
+        "medianMs": 2.805,
+        "samplesMs": [
+          3.75,
+          2.805,
+          2.572
+        ],
+        "rows": 698
+      },
+      "after": {
+        "medianMs": 2.263,
+        "samplesMs": [
+          2.524,
+          2.263,
+          2.18
+        ],
+        "rows": 68
+      }
+    },
+    {
+      "task": "BP32",
+      "before": {
+        "medianMs": 48.145,
+        "samplesMs": [
+          49.253,
+          47.454,
+          48.145
+        ],
+        "rows": 500
+      },
+      "after": {
+        "medianMs": 51.713,
+        "samplesMs": [
+          54.122,
+          51.713,
+          51.497
+        ],
+        "rows": 500
+      }
+    },
+    {
+      "task": "BP33",
+      "before": {
+        "medianMs": 12.048,
+        "samplesMs": [
+          15.698,
+          12.046,
+          12.048
+        ],
+        "rows": 116
+      },
+      "after": {
+        "medianMs": 31.005,
+        "samplesMs": [
+          33.727,
+          30.745,
+          31.005
+        ],
+        "rows": 99
+      }
+    },
+    {
+      "task": "BP34",
+      "before": {
+        "medianMs": 28.046,
+        "samplesMs": [
+          30.488,
+          26.058,
+          28.046
+        ],
+        "rows": 15
+      },
+      "after": {
+        "medianMs": 38.691,
+        "samplesMs": [
+          38.24,
+          41.257,
+          38.691
+        ],
+        "rows": 15
+      }
+    },
+    {
+      "task": "BP35",
+      "before": {
+        "medianMs": 15.125,
+        "samplesMs": [
+          20.447,
+          14.877,
+          15.125
+        ],
+        "rows": 32
+      },
+      "after": {
+        "medianMs": 20.543,
+        "samplesMs": [
+          20.638,
+          19.911,
+          20.543
+        ],
+        "rows": 23
+      }
+    },
+    {
+      "task": "BP36",
+      "before": {
+        "medianMs": 13.986,
+        "samplesMs": [
+          14.796,
+          13.986,
+          11.941
+        ],
+        "rows": 0
+      },
+      "after": {
+        "medianMs": 10.714,
+        "samplesMs": [
+          14.142,
+          10.714,
+          10.392
+        ],
+        "rows": 0
+      }
+    },
+    {
+      "task": "BP37",
+      "before": {
+        "medianMs": 12.616,
+        "samplesMs": [
+          12.868,
+          12.616,
+          12.079
+        ],
+        "rows": 60
+      },
+      "after": {
+        "medianMs": 15.563,
+        "samplesMs": [
+          18.026,
+          15.098,
+          15.563
+        ],
+        "rows": 45
+      }
+    },
+    {
+      "task": "BP38",
+      "before": {
+        "medianMs": 14.649,
+        "samplesMs": [
+          14.649,
+          16.856,
+          13.325
+        ],
+        "rows": 12
+      },
+      "after": {
+        "medianMs": 19.126,
+        "samplesMs": [
+          22.327,
+          17.33,
+          19.126
+        ],
+        "rows": 12
+      }
+    },
+    {
+      "task": "BP39",
+      "before": {
+        "medianMs": 41.599,
+        "samplesMs": [
+          55.616,
+          41.599,
+          41.235
+        ],
+        "rows": 0
+      },
+      "after": {
+        "medianMs": 54.647,
+        "samplesMs": [
+          56.143,
+          53.749,
+          54.647
+        ],
+        "rows": 0
+      }
+    },
+    {
+      "task": "BP40",
+      "before": {
+        "medianMs": 21.956,
+        "samplesMs": [
+          22.917,
+          21.956,
+          19.422
+        ],
+        "rows": 144
+      },
+      "after": {
+        "medianMs": 25.847,
+        "samplesMs": [
+          25.847,
+          23.557,
+          31.186
+        ],
+        "rows": 144
+      }
+    },
+    {
+      "task": "BP41",
+      "before": {
+        "medianMs": 19.232,
+        "samplesMs": [
+          19.432,
+          18.653,
+          19.232
+        ],
+        "rows": 60
+      },
+      "after": {
+        "medianMs": 29.717,
+        "samplesMs": [
+          25.12,
+          29.717,
+          32.273
+        ],
+        "rows": 60
+      }
+    },
+    {
+      "task": "BP42",
+      "before": {
+        "medianMs": 17.224,
+        "samplesMs": [
+          17.76,
+          17.224,
+          16.811
+        ],
+        "rows": 598
+      },
+      "after": {
+        "medianMs": 24.361,
+        "samplesMs": [
+          25.177,
+          24.361,
+          24.167
+        ],
+        "rows": 721
+      }
+    },
+    {
+      "task": "BP43",
+      "before": {
+        "medianMs": 15.455,
+        "samplesMs": [
+          16.073,
+          15.196,
+          15.455
+        ],
+        "rows": 60
+      },
+      "after": {
+        "medianMs": 19.659,
+        "samplesMs": [
+          19.821,
+          19.296,
+          19.659
+        ],
+        "rows": 38
+      }
+    },
+    {
+      "task": "BP44",
+      "before": {
+        "medianMs": 14.567,
+        "samplesMs": [
+          19.843,
+          14.567,
+          14.518
+        ],
+        "rows": 5
+      },
+      "after": {
+        "medianMs": 29.895,
+        "samplesMs": [
+          29.913,
+          29.895,
+          26.748
+        ],
+        "rows": 5
+      }
+    },
+    {
+      "task": "BP45",
+      "before": {
+        "medianMs": 41.592,
+        "samplesMs": [
+          43.421,
+          41.592,
+          41.012
+        ],
+        "rows": 169
+      },
+      "after": {
+        "medianMs": 41.566,
+        "samplesMs": [
+          44.561,
+          41.397,
+          41.566
+        ],
+        "rows": 165
+      }
+    },
+    {
+      "task": "BP46",
+      "before": {
+        "medianMs": 21.836,
+        "samplesMs": [
+          25.831,
+          21.718,
+          21.836
+        ],
+        "rows": 5
+      },
+      "after": {
+        "medianMs": 43.528,
+        "samplesMs": [
+          44.449,
+          41.499,
+          43.528
+        ],
+        "rows": 5
+      }
+    },
+    {
+      "task": "BP47",
+      "before": {
+        "medianMs": 37.6,
+        "samplesMs": [
+          39.094,
+          37.586,
+          37.6
+        ],
+        "rows": 12
+      },
+      "after": {
+        "medianMs": 39.006,
+        "samplesMs": [
+          39.847,
+          39.006,
+          38.336
+        ],
+        "rows": 12
+      }
+    },
+    {
+      "task": "BP48",
+      "before": {
+        "medianMs": 17.787,
+        "samplesMs": [
+          18.95,
+          17.787,
+          17.608
+        ],
+        "rows": 144
+      },
+      "after": {
+        "medianMs": 22.493,
+        "samplesMs": [
+          23.073,
+          22.493,
+          21.186
+        ],
+        "rows": 144
+      }
+    },
+    {
+      "task": "BP49",
+      "before": {
+        "medianMs": 60.325,
+        "samplesMs": [
+          62.504,
+          60.325,
+          60.049
+        ],
+        "rows": 12
+      },
+      "after": {
+        "medianMs": 79.294,
+        "samplesMs": [
+          80.034,
+          78.947,
+          79.294
+        ],
+        "rows": 12
+      }
+    },
+    {
+      "task": "BP50",
+      "before": {
+        "medianMs": 79.139,
+        "samplesMs": [
+          80.624,
+          78.498,
+          79.139
+        ],
+        "rows": 4
+      },
+      "after": {
+        "medianMs": 95.205,
+        "samplesMs": [
+          96.226,
+          94.7,
+          95.205
+        ],
+        "rows": 4
+      }
+    }
+  ]
+}

@@ -1,0 +1,82 @@
+{
+  "id": "q0300-public",
+  "questionId": "q0300",
+  "visibility": "public",
+  "variant": "public",
+  "kind": "database_delta",
+  "datasetId": "enterprise-v2",
+  "baseDatabase": "databases/enterprise/enterprise.sqlite",
+  "baseSha256": "d47285cfecd67f2dfd37a0d41a2c8a2714a6ecbc8e1170c3e9c0052204106924",
+  "patchSql": [],
+  "patchDescription": "审计主库公开基准",
+  "patchRowChanges": 0,
+  "testIsolation": "每次使用全新数据库副本；夹具可故意引入对账差异或改变业务记录，仅用于判题，绝不可写入基准库",
+  "expected": {
+    "columns": [
+      "q",
+      "net_cents",
+      "margin_pct",
+      "expense_pct",
+      "labor_pct",
+      "delivery_pct",
+      "stock_cents",
+      "risk_count",
+      "missing_count"
+    ],
+    "rows": [
+      [
+        "2025-Q1",
+        19622301,
+        40.0,
+        824.08,
+        817.54,
+        58.35,
+        173111424,
+        3,
+        0
+      ],
+      [
+        "2025-Q2",
+        21238135,
+        39.6,
+        814.82,
+        831.54,
+        58.68,
+        189357548,
+        3,
+        0
+      ],
+      [
+        "2025-Q3",
+        24691622,
+        37.86,
+        607.96,
+        794.25,
+        58.22,
+        202422645,
+        3,
+        0
+      ],
+      [
+        "2025-Q4",
+        44182594,
+        38.37,
+        433.68,
+        501.99,
+        58.32,
+        211781884,
+        3,
+        0
+      ]
+    ]
+  },
+  "orderPolicy": "ordered",
+  "columnPolicy": "exact_names_in_order",
+  "numericTolerance": {
+    "absolute": 1e-06,
+    "integerExact": true,
+    "textExact": true,
+    "nullDistinct": true
+  },
+  "contentVersion": "4.2.0"
+}

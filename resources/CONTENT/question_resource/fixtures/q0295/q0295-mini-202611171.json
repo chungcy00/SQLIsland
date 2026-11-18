@@ -1,0 +1,139 @@
+{
+  "id": "q0295-mini-202611171",
+  "questionId": "q0295",
+  "visibility": "hidden",
+  "variant": "independent-enterprise",
+  "kind": "query",
+  "sharedDataPath": "fixtures/shared/enterprise-mini-202611171.json",
+  "sharedDataSha256": "14a558f253847a097a9452282012c1a9680ed0a5c496a573b9d42bc16885c57d",
+  "expected": {
+    "columns": [
+      "source_id",
+      "cohort",
+      "mature",
+      "new_customers",
+      "gross90_per_customer_cents",
+      "cac_cents",
+      "difference_cents"
+    ],
+    "rows": [
+      [
+        1,
+        "2024-12",
+        2,
+        2,
+        21331.0,
+        0.0,
+        21331.0
+      ],
+      [
+        1,
+        "2025-02",
+        1,
+        1,
+        5936.0,
+        0.0,
+        5936.0
+      ],
+      [
+        2,
+        "2025-10",
+        1,
+        2,
+        2771.0,
+        14900.0,
+        -12129.0
+      ],
+      [
+        3,
+        "2024-03",
+        1,
+        1,
+        28394.0,
+        18700.0,
+        9694.0
+      ],
+      [
+        3,
+        "2024-09",
+        1,
+        1,
+        6041.0,
+        18900.0,
+        -12859.0
+      ],
+      [
+        3,
+        "2024-11",
+        1,
+        1,
+        3770.0,
+        11000.0,
+        -7230.0
+      ],
+      [
+        4,
+        "2024-01",
+        1,
+        1,
+        5542.0,
+        13500.0,
+        -7958.0
+      ],
+      [
+        4,
+        "2024-12",
+        1,
+        1,
+        39319.0,
+        24600.0,
+        14719.0
+      ],
+      [
+        4,
+        "2025-02",
+        1,
+        1,
+        20395.0,
+        9000.0,
+        11395.0
+      ],
+      [
+        5,
+        "2024-03",
+        1,
+        1,
+        44241.0,
+        7200.0,
+        37041.0
+      ],
+      [
+        5,
+        "2024-10",
+        1,
+        1,
+        1635.0,
+        20100.0,
+        -18465.0
+      ],
+      [
+        5,
+        "2025-03",
+        1,
+        1,
+        18331.0,
+        9600.0,
+        8731.0
+      ]
+    ]
+  },
+  "orderPolicy": "ordered",
+  "numericTolerance": {
+    "absolute": 1e-06,
+    "integerExact": true,
+    "textExact": true,
+    "nullDistinct": true
+  },
+  "columnPolicy": "exact_names_in_order",
+  "contentVersion": "4.2.0"
+}

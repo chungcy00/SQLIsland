@@ -1,0 +1,133 @@
+{
+  "id": "q0288-boundary",
+  "questionId": "q0288",
+  "visibility": "hidden",
+  "variant": "boundary",
+  "kind": "database_delta",
+  "datasetId": "enterprise-v2",
+  "baseDatabase": "databases/enterprise/enterprise.sqlite",
+  "baseSha256": "d47285cfecd67f2dfd37a0d41a2c8a2714a6ecbc8e1170c3e9c0052204106924",
+  "patchSql": [
+    "UPDATE order_items SET unit_price_cents=unit_price_cents+12345 WHERE order_item_id IN (SELECT order_item_id FROM order_items i JOIN orders o ON o.order_id=i.order_id WHERE o.status='completed' AND o.channel='store' AND o.order_date BETWEEN '2025-01-01' AND '2025-12-31' ORDER BY i.order_item_id LIMIT 1)"
+  ],
+  "patchDescription": "隔离诊断边界数据，允许故意制造来源对账差异；改变某门店真实销售明细金额，检验销售与费用的独立汇总及贡献利润。",
+  "patchRowChanges": 1,
+  "testIsolation": "每次使用全新数据库副本；夹具可故意引入对账差异或改变业务记录，仅用于判题，绝不可写入基准库",
+  "expected": {
+    "columns": [
+      "store_id",
+      "net_cents",
+      "cost_cents",
+      "expense_cents",
+      "contribution_cents",
+      "contribution_pct"
+    ],
+    "rows": [
+      [
+        2,
+        4244313,
+        2595961,
+        4266039,
+        -2617687,
+        -61.68
+      ],
+      [
+        4,
+        2496443,
+        1511086,
+        5752093,
+        -4766736,
+        -190.94
+      ],
+      [
+        12,
+        3718711,
+        2276417,
+        7458940,
+        -6016646,
+        -161.79
+      ],
+      [
+        7,
+        5693507,
+        3488280,
+        8472453,
+        -6267226,
+        -110.08
+      ],
+      [
+        6,
+        6969441,
+        4227780,
+        9044370,
+        -6302709,
+        -90.43
+      ],
+      [
+        3,
+        2422875,
+        1457840,
+        7418259,
+        -6453224,
+        -266.35
+      ],
+      [
+        1,
+        3934234,
+        2350359,
+        8041139,
+        -6457264,
+        -164.13
+      ],
+      [
+        10,
+        3167056,
+        1950857,
+        7955525,
+        -6739326,
+        -212.79
+      ],
+      [
+        5,
+        5373344,
+        3251953,
+        8998918,
+        -6877527,
+        -127.99
+      ],
+      [
+        9,
+        2598900,
+        1585378,
+        8563029,
+        -7549507,
+        -290.49
+      ],
+      [
+        11,
+        3591126,
+        2179493,
+        9058120,
+        -7646487,
+        -212.93
+      ],
+      [
+        8,
+        2231300,
+        1357357,
+        9911013,
+        -9037070,
+        -405.01
+      ]
+    ]
+  },
+  "orderPolicy": "ordered",
+  "columnPolicy": "exact_names_in_order",
+  "numericTolerance": {
+    "absolute": 1e-06,
+    "integerExact": true,
+    "textExact": true,
+    "nullDistinct": true
+  },
+  "contentVersion": "4.2.0"
+}

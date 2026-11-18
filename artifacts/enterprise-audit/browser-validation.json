@@ -1,0 +1,20 @@
+{
+  "pass": true,
+  "widths": [
+    320,
+    360,
+    390,
+    430
+  ],
+  "keyboardHeightRemembered": true,
+  "inlineTableNoJump": true,
+  "fullscreenIcons": true,
+  "errors": [],
+  "singleExpandedTable": true,
+  "questionTitleCompact": true,
+  "sourceHashes": {
+    "src/app.js": "3e34a9e0dc8f560ba3b2dfc7ed90ea4f022911dfff269fa1028d63f2de81d57b",
+    "src/style.css": "7dc73c1be71d172cf67bba0d35d3953c7e7d029f66e2447d34c4486f846a06bc",
+    "src/store.js": "c20e144c2a662f586a18dde08f3f5cdd12816236bf415bd1088409332f9b2089"
+  }
+}

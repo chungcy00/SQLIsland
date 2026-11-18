@@ -1,0 +1,96 @@
+{
+  "projectId": "finance",
+  "title": "供应商发票与付款核对",
+  "context": "财务人员需要年底未付及异常付款清单。",
+  "requirements": "所有截至12-31的供应商发票，汇总付款；输出发票金额、实付金额、余额和未付/部分/足额/超额状态。按余额倒序。 paid表示已结清，包含已批准贷项全额抵销而无需付现的情况。 本库v_invoice_balance的billed_cents为发票面额减截至截止日已批准贷项后的净应付，paid_cents仅计截止日前付款；原始发票面额保留在supplier_invoice_items。",
+  "grain": "发票",
+  "commonError": "不能直接将多笔付款与多行发票明细同时连接后求和。",
+  "executionSteps": [
+    "先检查发票行与付款的预聚合视图",
+    "比较金额与余额",
+    "分类"
+  ],
+  "difficulty": "困难",
+  "mysqlSql": "SELECT supplier_invoice_id,supplier_id,billed_cents,paid_cents,balance_cents,CASE WHEN balance_cents=0 THEN 'paid' WHEN paid_cents=0 THEN 'unpaid' WHEN balance_cents>0 THEN 'partial' ELSE 'overpaid' END payment_state FROM v_invoice_balance ORDER BY balance_cents DESC,supplier_invoice_id",
+  "sqliteSql": "SELECT supplier_invoice_id,supplier_id,billed_cents,paid_cents,balance_cents,CASE WHEN balance_cents=0 THEN 'paid' WHEN paid_cents=0 THEN 'unpaid' WHEN balance_cents>0 THEN 'partial' ELSE 'overpaid' END payment_state FROM v_invoice_balance ORDER BY balance_cents DESC,supplier_invoice_id",
+  "compatibility": "直接兼容（原生待验证）",
+  "columns": [
+    "supplier_invoice_id",
+    "supplier_id",
+    "billed_cents",
+    "paid_cents",
+    "balance_cents",
+    "payment_state"
+  ],
+  "id": "BP17",
+  "chapterId": "ch19",
+  "knowledgePointIds": [
+    "kp19-47"
+  ],
+  "datasetId": "finance-v2",
+  "type": "业务情景",
+  "schemaVersion": 2,
+  "contentVersion": "4.2.0",
+  "expectedOutputPath": "business_tasks/results/BP17.json",
+  "expectedRowCount": 4739,
+  "expectedColumns": [
+    "supplier_invoice_id",
+    "supplier_id",
+    "billed_cents",
+    "paid_cents",
+    "balance_cents",
+    "payment_state"
+  ],
+  "sourceTables": [
+    "v_invoice_balance"
+  ],
+  "dependencyTables": [
+    "categories",
+    "products",
+    "purchase_order_items",
+    "purchase_orders",
+    "supplier_contracts",
+    "supplier_invoice_items",
+    "supplier_invoices",
+    "supplier_payments",
+    "suppliers",
+    "v_invoice_balance",
+    "warehouses"
+  ],
+  "orderPolicy": "ordered",
+  "numericTolerance": {
+    "integerCents": 0,
+    "decimalAbsolute": 1e-06
+  },
+  "referenceSolutions": [
+    {
+      "kind": "reference",
+      "mysqlSql": "SELECT supplier_invoice_id,supplier_id,billed_cents,paid_cents,balance_cents,CASE WHEN balance_cents=0 THEN 'paid' WHEN paid_cents=0 THEN 'unpaid' WHEN balance_cents>0 THEN 'partial' ELSE 'overpaid' END payment_state FROM v_invoice_balance ORDER BY balance_cents DESC,supplier_invoice_id",
+      "sqliteSql": "SELECT supplier_invoice_id,supplier_id,billed_cents,paid_cents,balance_cents,CASE WHEN balance_cents=0 THEN 'paid' WHEN paid_cents=0 THEN 'unpaid' WHEN balance_cents>0 THEN 'partial' ELSE 'overpaid' END payment_state FROM v_invoice_balance ORDER BY balance_cents DESC,supplier_invoice_id"
+    },
+    {
+      "kind": "algebraic equivalent",
+      "mysqlSql": "SELECT supplier_invoice_id,supplier_id,billed_cents,paid_cents,balance_cents,CASE WHEN balance_cents IN (0) THEN 'paid' WHEN paid_cents IN (0) THEN 'unpaid' WHEN balance_cents>0 THEN 'partial' ELSE 'overpaid' END payment_state FROM v_invoice_balance ORDER BY balance_cents DESC,supplier_invoice_id",
+      "sqliteSql": "SELECT supplier_invoice_id,supplier_id,billed_cents,paid_cents,balance_cents,CASE WHEN balance_cents IN (0) THEN 'paid' WHEN paid_cents IN (0) THEN 'unpaid' WHEN balance_cents>0 THEN 'partial' ELSE 'overpaid' END payment_state FROM v_invoice_balance ORDER BY balance_cents DESC,supplier_invoice_id"
+    }
+  ],
+  "hints": [
+    "先检查发票行与付款的预聚合视图",
+    "先检查发票行与付款的预聚合视图；比较金额与余额",
+    "重点核对输出粒度：发票"
+  ],
+  "explanation": "先检查发票行与付款的预聚合视图；比较金额与余额；分类。不能直接将多笔付款与多行发票明细同时连接后求和。\n审计口径：先核定日期范围、输出粒度、退款和贷项，再在各事实表中独立聚合，防止连接放大。",
+  "testFixtureIds": [
+    "q0267-public",
+    "q0267-boundary",
+    "q0267-full-credit",
+    "q0267-mini-202611171",
+    "q0267-mini-202611179"
+  ],
+  "validationStatus": {
+    "independentPython": true,
+    "sqliteWasm": true,
+    "mysql84Native": false
+  },
+  "elapsedMs": 8.981
+}

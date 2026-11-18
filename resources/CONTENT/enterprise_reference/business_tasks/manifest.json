@@ -1,0 +1,506 @@
+{
+  "contentVersion": "4.2.0",
+  "count": 50,
+  "tasks": [
+    {
+      "id": "BP01",
+      "path": "BP01.json",
+      "title": "门店净销售、利润与目标达成",
+      "projectId": "retail",
+      "datasetId": "retail-v2",
+      "questionId": "q0251",
+      "sha256": "4a58814a7f4604c79d649f9917416a7103b3464efb30f7afbc916f9564f5fe4f",
+      "expectedRows": 12
+    },
+    {
+      "id": "BP02",
+      "path": "BP02.json",
+      "title": "门店月度环比同比与持续下滑",
+      "projectId": "retail",
+      "datasetId": "retail-v2",
+      "questionId": "q0252",
+      "sha256": "0bd14f454b4ec850fe585a19c3d67df63dd4946d6837bf3ca4c6949dee94e70a",
+      "expectedRows": 144
+    },
+    {
+      "id": "BP03",
+      "path": "BP03.json",
+      "title": "高销售低毛利商品诊断",
+      "projectId": "retail",
+      "datasetId": "retail-v2",
+      "questionId": "q0253",
+      "sha256": "423e380c8c1d99adbec574c065911de1096441b8bbbb18db118b15acebfce64d",
+      "expectedRows": 23
+    },
+    {
+      "id": "BP04",
+      "path": "BP04.json",
+      "title": "促销与非促销的日均表现",
+      "projectId": "retail",
+      "datasetId": "retail-v2",
+      "questionId": "q0254",
+      "sha256": "3ae9b005337779d0ccdadf9e947b2f3cb753689cfec78809cf1894171b45bc73",
+      "expectedRows": 2
+    },
+    {
+      "id": "BP05",
+      "path": "BP05.json",
+      "title": "门店综合经营异常看板",
+      "projectId": "retail",
+      "datasetId": "retail-v2",
+      "questionId": "q0255",
+      "sha256": "7c9affb90e3bda588860381cdebeebd723a2705895f6516efeba2c16d9c772be",
+      "expectedRows": 12
+    },
+    {
+      "id": "BP06",
+      "path": "BP06.json",
+      "title": "低销量高库存诊断",
+      "projectId": "inventory",
+      "datasetId": "inventory-v2",
+      "questionId": "q0256",
+      "sha256": "8cd0dfb1c2597ee678b933b02b9dc8efc1da855aecfc0c26ac8675135c0941e4",
+      "expectedRows": 54
+    },
+    {
+      "id": "BP07",
+      "path": "BP07.json",
+      "title": "类别库存周转率及周转天数",
+      "projectId": "inventory",
+      "datasetId": "inventory-v2",
+      "questionId": "q0257",
+      "sha256": "4ee02c591d85eaf3071933750d37ca59db555788bb8c2acfa5b1e324c3bbfc2c",
+      "expectedRows": 45
+    },
+    {
+      "id": "BP08",
+      "path": "BP08.json",
+      "title": "销售速度与采购周期缺货风险",
+      "projectId": "inventory",
+      "datasetId": "inventory-v2",
+      "questionId": "q0258",
+      "sha256": "992f030a098d22979dd85064c5023292841ce0173b7d3ed099b6b773cae63ec2",
+      "expectedRows": 52
+    },
+    {
+      "id": "BP09",
+      "path": "BP09.json",
+      "title": "按先进先出假设推算库存库龄",
+      "projectId": "inventory",
+      "datasetId": "inventory-v2",
+      "questionId": "q0259",
+      "sha256": "50c4512f7354f23c3bc1794d68d9a732cb1609c9cf794b0f83c550b2fae16ab2",
+      "expectedRows": 1148
+    },
+    {
+      "id": "BP10",
+      "path": "BP10.json",
+      "title": "补货优先级与供应商风险",
+      "projectId": "inventory",
+      "datasetId": "inventory-v2",
+      "questionId": "q0260",
+      "sha256": "c1588ba37e9c296088ff4258b1cb9a48f257cc75a4981b0b5f80a115eb4b01c5",
+      "expectedRows": 69
+    },
+    {
+      "id": "BP11",
+      "path": "BP11.json",
+      "title": "新老客户净收入及客单价",
+      "projectId": "ecommerce",
+      "datasetId": "ecommerce-v2",
+      "questionId": "q0261",
+      "sha256": "c5966dff3318fe310a430aeb746106862ede5b198adc1930108c061b894636c7",
+      "expectedRows": 2
+    },
+    {
+      "id": "BP12",
+      "path": "BP12.json",
+      "title": "最近消费、频率、金额客户分层",
+      "projectId": "ecommerce",
+      "datasetId": "ecommerce-v2",
+      "questionId": "q0262",
+      "sha256": "9f94a69af3ad598f41231c94d868b1e6cb57ca2d3f4a9da52bf90a03b20b5f57",
+      "expectedRows": 1794
+    },
+    {
+      "id": "BP13",
+      "path": "BP13.json",
+      "title": "首购月份留存矩阵",
+      "projectId": "ecommerce",
+      "datasetId": "ecommerce-v2",
+      "questionId": "q0263",
+      "sha256": "299f248ae26a0ded139ee26b0d7b6d617e49d32871c5575943c1213f03d5256f",
+      "expectedRows": 231
+    },
+    {
+      "id": "BP14",
+      "path": "BP14.json",
+      "title": "营销渠道转化与获客成本",
+      "projectId": "ecommerce",
+      "datasetId": "ecommerce-v2",
+      "questionId": "q0264",
+      "sha256": "640b3e27b10f3711f4ed7d6f13ed3b3061df0a05efbfc5beac4444fcc3a8b879",
+      "expectedRows": 5
+    },
+    {
+      "id": "BP15",
+      "path": "BP15.json",
+      "title": "高价值流失风险客户",
+      "projectId": "ecommerce",
+      "datasetId": "ecommerce-v2",
+      "questionId": "q0265",
+      "sha256": "6e3c00d887d901c6b0dd5ed343d2396ae7ad9c0d7a5a3a570def5bd0f7cdbe38",
+      "expectedRows": 106
+    },
+    {
+      "id": "BP16",
+      "path": "BP16.json",
+      "title": "预算与实际费用差异",
+      "projectId": "finance",
+      "datasetId": "finance-v2",
+      "questionId": "q0266",
+      "sha256": "8f85e39aa6b67ef4276ec69b380f791b9367b416f3ff4f08f745c752b07636a9",
+      "expectedRows": 35
+    },
+    {
+      "id": "BP17",
+      "path": "BP17.json",
+      "title": "供应商发票与付款核对",
+      "projectId": "finance",
+      "datasetId": "finance-v2",
+      "questionId": "q0267",
+      "sha256": "a28553c1ccec95b93f57f680ab1cc391cefcd657ad528fa62469157d9e720d3f",
+      "expectedRows": 4739
+    },
+    {
+      "id": "BP18",
+      "path": "BP18.json",
+      "title": "应付账款账龄",
+      "projectId": "finance",
+      "datasetId": "finance-v2",
+      "questionId": "q0268",
+      "sha256": "f79fafef96805afa8598fdec7eff020ed6fb7606364eed7f93e28590afd24298",
+      "expectedRows": 153
+    },
+    {
+      "id": "BP19",
+      "path": "BP19.json",
+      "title": "银行流水与凭证全量对账",
+      "projectId": "finance",
+      "datasetId": "finance-v2",
+      "questionId": "q0269",
+      "sha256": "3654ceadf95b1c679db8ad481aa0bc222bf4289c9c9faf6586229c9c4371c4f1",
+      "expectedRows": 1182
+    },
+    {
+      "id": "BP20",
+      "path": "BP20.json",
+      "title": "多规则异常交易筛查",
+      "projectId": "finance",
+      "datasetId": "finance-v2",
+      "questionId": "q0270",
+      "sha256": "ba148e4e2d39b0a82f4949039ce37b8aedfed6b1a7fcdf67fe62254b6b626e4f",
+      "expectedRows": 1434
+    },
+    {
+      "id": "BP21",
+      "path": "BP21.json",
+      "title": "月末人员规模与变动",
+      "projectId": "hr",
+      "datasetId": "hr-v2",
+      "questionId": "q0271",
+      "sha256": "ab5f9b4fe735b50085d5efe03fa5280b1f84dfc86f12d1e188f77915366f212d",
+      "expectedRows": 84
+    },
+    {
+      "id": "BP22",
+      "path": "BP22.json",
+      "title": "月度离职率与趋势",
+      "projectId": "hr",
+      "datasetId": "hr-v2",
+      "questionId": "q0272",
+      "sha256": "5207253b573a762853ffe6b8658b22b2a50650db17d0b3ef49aa0b028488fff2",
+      "expectedRows": 84
+    },
+    {
+      "id": "BP23",
+      "path": "BP23.json",
+      "title": "同岗位薪资分布与异常",
+      "projectId": "hr",
+      "datasetId": "hr-v2",
+      "questionId": "q0273",
+      "sha256": "704cefbc3eaa842f4a6a8c805b23b3c690e9e4d549505e738070efcfce77ff3d",
+      "expectedRows": 62
+    },
+    {
+      "id": "BP24",
+      "path": "BP24.json",
+      "title": "部门人力成本与加班",
+      "projectId": "hr",
+      "datasetId": "hr-v2",
+      "questionId": "q0274",
+      "sha256": "b413fe3ed8323a2748c5c10eff23248357dc7f854e43c03da23eed0f1f1b6864",
+      "expectedRows": 21
+    },
+    {
+      "id": "BP25",
+      "path": "BP25.json",
+      "title": "入职同期群90及180日留任",
+      "projectId": "hr",
+      "datasetId": "hr-v2",
+      "questionId": "q0275",
+      "sha256": "1c14d0991dea23835b80789b1390d1ac175b48a5cfc3fcef80751463fb94ff23",
+      "expectedRows": 73
+    },
+    {
+      "id": "BP26",
+      "path": "BP26.json",
+      "title": "采购价格与合同、历史价格比较",
+      "projectId": "procurement",
+      "datasetId": "procurement-v2",
+      "questionId": "q0276",
+      "sha256": "47c439003c8b6a6040c1965b95910a24ac6fe9d6b1489b7e81a38a051bf52bad",
+      "expectedRows": 3469
+    },
+    {
+      "id": "BP27",
+      "path": "BP27.json",
+      "title": "供应商准时、完整交付与质量",
+      "projectId": "procurement",
+      "datasetId": "procurement-v2",
+      "questionId": "q0277",
+      "sha256": "86705d36e839ab7015797209a9a029f6d6625bf750fc2e8404b97adb7e206f8e",
+      "expectedRows": 55
+    },
+    {
+      "id": "BP28",
+      "path": "BP28.json",
+      "title": "采购、收货、发票三方核对",
+      "projectId": "procurement",
+      "datasetId": "procurement-v2",
+      "questionId": "q0278",
+      "sha256": "bafd4aba0e7031172c8ea753e2cd37453b257bdb46b5c45edfccf81812924e16",
+      "expectedRows": 928
+    },
+    {
+      "id": "BP29",
+      "path": "BP29.json",
+      "title": "同商品跨供应商采购价差",
+      "projectId": "procurement",
+      "datasetId": "procurement-v2",
+      "questionId": "q0279",
+      "sha256": "0dc9e37b0e828ea1c6096c7b140e5da7c315ab8c1a1718309eafd4839b1a7234",
+      "expectedRows": 548
+    },
+    {
+      "id": "BP30",
+      "path": "BP30.json",
+      "title": "供应商多指标综合评价",
+      "projectId": "procurement",
+      "datasetId": "procurement-v2",
+      "questionId": "q0280",
+      "sha256": "1f13973139e0a145f4882cdc77ed3a00b09b1a6c3e0eaccdc25e33a6c45ebb3a",
+      "expectedRows": 37
+    },
+    {
+      "id": "BP31",
+      "path": "BP31.json",
+      "title": "畅销缺货与滞销积压双向筛查",
+      "projectId": "enterprise",
+      "datasetId": "enterprise-v2",
+      "questionId": "q0281",
+      "sha256": "3ef0cc4ad23fce040101b2f0ad589492e487424c4a38ebc77ff1fbce36842af0",
+      "expectedRows": 68
+    },
+    {
+      "id": "BP32",
+      "path": "BP32.json",
+      "title": "商品销售贡献与库存资金占用错配",
+      "projectId": "enterprise",
+      "datasetId": "enterprise-v2",
+      "questionId": "q0282",
+      "sha256": "a23d7877c857a71030d0d86732011c8668fec91efc84e4682640bc16e21ce50b",
+      "expectedRows": 500
+    },
+    {
+      "id": "BP33",
+      "path": "BP33.json",
+      "title": "跨仓库存调拨候选",
+      "projectId": "enterprise",
+      "datasetId": "enterprise-v2",
+      "questionId": "q0283",
+      "sha256": "4bbb641436031a519bd0ca1728be6f22808ce7e6d932f0d92161f0b422216001",
+      "expectedRows": 99
+    },
+    {
+      "id": "BP34",
+      "path": "BP34.json",
+      "title": "销售毛利与库存投资回报",
+      "projectId": "enterprise",
+      "datasetId": "enterprise-v2",
+      "questionId": "q0284",
+      "sha256": "32f3dc1708a438f7aa8a6e8bc0350a123fcb0345bf97eec6f3b4b0f244bcb098",
+      "expectedRows": 15
+    },
+    {
+      "id": "BP35",
+      "path": "BP35.json",
+      "title": "逾期在途与缺货叠加",
+      "projectId": "enterprise",
+      "datasetId": "enterprise-v2",
+      "questionId": "q0285",
+      "sha256": "b3bebfbf3f98d006a503407ffbde6b8ce94ccb5e983f1fd6d5482117183377ed",
+      "expectedRows": 23
+    },
+    {
+      "id": "BP36",
+      "path": "BP36.json",
+      "title": "收货入库完整性核对",
+      "projectId": "enterprise",
+      "datasetId": "enterprise-v2",
+      "questionId": "q0286",
+      "sha256": "ecac9aed1c226a95c64d5172718c254ce47d7560eec0105ea417312398999b54",
+      "expectedRows": 0
+    },
+    {
+      "id": "BP37",
+      "path": "BP37.json",
+      "title": "供应商延迟与仓库资金压力",
+      "projectId": "enterprise",
+      "datasetId": "enterprise-v2",
+      "questionId": "q0287",
+      "sha256": "d1a1d05f5153076623cbb142e53f01b98bac2becca661af41bee2282d9a2b82b",
+      "expectedRows": 45
+    },
+    {
+      "id": "BP38",
+      "path": "BP38.json",
+      "title": "门店贡献利润与费用",
+      "projectId": "enterprise",
+      "datasetId": "enterprise-v2",
+      "questionId": "q0288",
+      "sha256": "d021f9a488fed141cff816c83bf45a4db19a9c45663317a1b897016c487db15c",
+      "expectedRows": 12
+    },
+    {
+      "id": "BP39",
+      "path": "BP39.json",
+      "title": "订单结算与收入核对",
+      "projectId": "enterprise",
+      "datasetId": "enterprise-v2",
+      "questionId": "q0289",
+      "sha256": "d084ed8149279682fce196b5a3384bde074b68e168f22d13a062f4a5d57b3513",
+      "expectedRows": 0
+    },
+    {
+      "id": "BP40",
+      "path": "BP40.json",
+      "title": "门店月度收入与费用偏离",
+      "projectId": "enterprise",
+      "datasetId": "enterprise-v2",
+      "questionId": "q0290",
+      "sha256": "72bc3e8702a4e6cbf135d04370b9fa27cf66adf51473afca108c52f3504da60b",
+      "expectedRows": 144
+    },
+    {
+      "id": "BP41",
+      "path": "BP41.json",
+      "title": "采购承诺、收货、开票及付款敞口",
+      "projectId": "enterprise",
+      "datasetId": "enterprise-v2",
+      "questionId": "q0291",
+      "sha256": "fecbcd70a88fa0b1bc0eb3fe7573affc465513b3e4a503d00baa16d415c647bb",
+      "expectedRows": 60
+    },
+    {
+      "id": "BP42",
+      "path": "BP42.json",
+      "title": "三方不一致且已经付款的发票",
+      "projectId": "enterprise",
+      "datasetId": "enterprise-v2",
+      "questionId": "q0292",
+      "sha256": "c62fca955c2462fe3b6be190b2185d7fdc05d60cbb9df22d6ce82681d26bdb18",
+      "expectedRows": 721
+    },
+    {
+      "id": "BP43",
+      "path": "BP43.json",
+      "title": "供应商资金风险分层",
+      "projectId": "enterprise",
+      "datasetId": "enterprise-v2",
+      "questionId": "q0293",
+      "sha256": "0e045ffefea7d19a7500891b1831f5030a9d04a819a41d8518b05763c185911f",
+      "expectedRows": 38
+    },
+    {
+      "id": "BP44",
+      "path": "BP44.json",
+      "title": "渠道广告后的贡献利润",
+      "projectId": "enterprise",
+      "datasetId": "enterprise-v2",
+      "questionId": "q0294",
+      "sha256": "3f80b9c380498204935e244b1db4e31604888ecc34d5bfd60750bdd69a51b3a5",
+      "expectedRows": 5
+    },
+    {
+      "id": "BP45",
+      "path": "BP45.json",
+      "title": "首购客户90天毛利与获客成本",
+      "projectId": "enterprise",
+      "datasetId": "enterprise-v2",
+      "questionId": "q0295",
+      "sha256": "acfe2986dccfb2b3b1f5f744f0222cb2756f423539668dd500bc46ffc4f20230",
+      "expectedRows": 165
+    },
+    {
+      "id": "BP46",
+      "path": "BP46.json",
+      "title": "退款影响与渠道利润风险",
+      "projectId": "enterprise",
+      "datasetId": "enterprise-v2",
+      "questionId": "q0296",
+      "sha256": "dae8e2edc01a8389eac81ff151a0234ff861c0c61b21c52ca50229fa5e114b61",
+      "expectedRows": 5
+    },
+    {
+      "id": "BP47",
+      "path": "BP47.json",
+      "title": "门店人效及人工占比",
+      "projectId": "enterprise",
+      "datasetId": "enterprise-v2",
+      "questionId": "q0297",
+      "sha256": "2a1254eee3e233a2ae6de5e38d22ea8adce622244755755f214404b4a60e76a7",
+      "expectedRows": 12
+    },
+    {
+      "id": "BP48",
+      "path": "BP48.json",
+      "title": "门店人员变化与销售变化诊断",
+      "projectId": "enterprise",
+      "datasetId": "enterprise-v2",
+      "questionId": "q0298",
+      "sha256": "1b47a3d625b0f58c015d69bbf4bc0c44d0607d969602a4f690314de8b9149651",
+      "expectedRows": 144
+    },
+    {
+      "id": "BP49",
+      "path": "BP49.json",
+      "title": "月度经营汇总表",
+      "projectId": "enterprise",
+      "datasetId": "enterprise-v2",
+      "questionId": "q0299",
+      "sha256": "9c8c23a733954d3de8c5d197440fb6f2910c7af2b614c85873863f5ece9bf077",
+      "expectedRows": 12
+    },
+    {
+      "id": "BP50",
+      "path": "BP50.json",
+      "title": "跨域季度风险评分与经营报告",
+      "projectId": "enterprise",
+      "datasetId": "enterprise-v2",
+      "questionId": "q0300",
+      "sha256": "9e9f12afde841623ce307e50ff061e3b0b6c46efb570e9bfabde6360acddb544",
+      "expectedRows": 4
+    }
+  ]
+}

@@ -1,0 +1,77 @@
+{
+  "id": "q0294-boundary",
+  "questionId": "q0294",
+  "visibility": "hidden",
+  "variant": "boundary",
+  "kind": "database_delta",
+  "datasetId": "enterprise-v2",
+  "baseDatabase": "databases/enterprise/enterprise.sqlite",
+  "baseSha256": "d47285cfecd67f2dfd37a0d41a2c8a2714a6ecbc8e1170c3e9c0052204106924",
+  "patchSql": [
+    "UPDATE order_items SET unit_price_cents=unit_price_cents+12345 WHERE order_item_id IN (SELECT order_item_id FROM order_items i JOIN orders o ON o.order_id=i.order_id WHERE o.status='completed' AND o.channel='online' AND o.order_date BETWEEN '2025-01-01' AND '2025-12-31' ORDER BY i.order_item_id LIMIT 1)"
+  ],
+  "patchDescription": "隔离诊断边界数据，允许故意制造来源对账差异；改变目标期线上销售金额，以独立数据变体核对查询是否适应底层记录变化。",
+  "patchRowChanges": 1,
+  "testIsolation": "每次使用全新数据库副本；夹具可故意引入对账差异或改变业务记录，仅用于判题，绝不可写入基准库",
+  "expected": {
+    "columns": [
+      "source_id",
+      "net_cents",
+      "gross_cents",
+      "spend_cents",
+      "contribution_cents",
+      "contribution_pct"
+    ],
+    "rows": [
+      [
+        1,
+        27221835,
+        10543653,
+        0,
+        10543653,
+        38.73
+      ],
+      [
+        4,
+        9277495,
+        3535735,
+        435753,
+        3099982,
+        33.41
+      ],
+      [
+        2,
+        14207289,
+        5464079,
+        2877981,
+        2586098,
+        18.2
+      ],
+      [
+        3,
+        9027392,
+        3475284,
+        2608823,
+        866461,
+        9.6
+      ],
+      [
+        5,
+        3621116,
+        1396494,
+        1247280,
+        149214,
+        4.12
+      ]
+    ]
+  },
+  "orderPolicy": "ordered",
+  "columnPolicy": "exact_names_in_order",
+  "numericTolerance": {
+    "absolute": 1e-06,
+    "integerExact": true,
+    "textExact": true,
+    "nullDistinct": true
+  },
+  "contentVersion": "4.2.0"
+}

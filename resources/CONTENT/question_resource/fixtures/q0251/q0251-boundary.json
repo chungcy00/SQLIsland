@@ -1,0 +1,137 @@
+{
+  "id": "q0251-boundary",
+  "questionId": "q0251",
+  "visibility": "hidden",
+  "variant": "boundary",
+  "kind": "database_delta",
+  "datasetId": "retail-v2",
+  "baseDatabase": "databases/retail/retail.sqlite",
+  "baseSha256": "e80ec41c783e5763b0e482b4c30889bdaa313f53582d3d11ee0ea47d2366cd78",
+  "patchSql": [
+    "UPDATE sales_targets SET target_cents=0 WHERE store_id=1 AND month_key BETWEEN '2025-01' AND '2025-12'"
+  ],
+  "patchDescription": "隔离诊断边界数据，允许故意制造来源对账差异；门店1年度目标全部为0，达成率应为NULL，而非除零或0%。",
+  "patchRowChanges": 12,
+  "testIsolation": "每次使用全新数据库副本；夹具可故意引入对账差异或改变业务记录，仅用于判题，绝不可写入基准库",
+  "expected": {
+    "columns": [
+      "store_id",
+      "net_cents",
+      "gross_cents",
+      "margin_pct",
+      "target_cents",
+      "achievement_pct"
+    ],
+    "rows": [
+      [
+        1,
+        3909544,
+        1559185,
+        39.88,
+        0,
+        null
+      ],
+      [
+        2,
+        4244313,
+        1648352,
+        38.84,
+        41668727,
+        10.19
+      ],
+      [
+        3,
+        2422875,
+        965035,
+        39.83,
+        16716511,
+        14.49
+      ],
+      [
+        4,
+        2496443,
+        985357,
+        39.47,
+        18416544,
+        13.56
+      ],
+      [
+        5,
+        5373344,
+        2121391,
+        39.48,
+        65368327,
+        8.22
+      ],
+      [
+        6,
+        6969441,
+        2741661,
+        39.34,
+        69312500,
+        10.06
+      ],
+      [
+        7,
+        5693507,
+        2205227,
+        38.73,
+        62193957,
+        9.15
+      ],
+      [
+        8,
+        2231300,
+        873943,
+        39.17,
+        20027456,
+        11.14
+      ],
+      [
+        9,
+        2598900,
+        1013522,
+        39.0,
+        35417426,
+        7.34
+      ],
+      [
+        10,
+        3167056,
+        1216199,
+        38.4,
+        32419295,
+        9.77
+      ],
+      [
+        11,
+        3591126,
+        1411633,
+        39.31,
+        26005035,
+        13.81
+      ],
+      [
+        12,
+        3718711,
+        1442294,
+        38.78,
+        42565796,
+        8.74
+      ]
+    ]
+  },
+  "orderPolicy": "ordered",
+  "columnPolicy": "exact_names_in_order",
+  "numericTolerance": {
+    "absolute": 1e-06,
+    "integerExact": true,
+    "textExact": true,
+    "nullDistinct": true
+  },
+  "independentAssertion": {
+    "description": "门店1目标0且达成率NULL",
+    "passed": true
+  },
+  "contentVersion": "4.2.0"
+}

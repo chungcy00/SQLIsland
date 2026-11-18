@@ -1,0 +1,124 @@
+import assert from 'node:assert/strict';
+import { chromium } from 'playwright';
+const browser = await chromium.launch({ channel: 'chrome', headless: true });
+const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+const errors = [];
+page.on('pageerror', (error) => errors.push(error.message));
+async function route(path) {
+  await page.goto('http://127.0.0.1:4173/#' + path);
+  await page.locator('.appbar').waitFor();
+}
+try {
+  await route('/');
+  assert.doesNotMatch(await page.locator('main').innerText(), /今日任务|每日练习|学习目标/);
+  await page.screenshot({ path: 'artifacts/refined-home.png', fullPage: true });
+  await route('/lesson/kp01-01');
+  await page.getByRole('button', { name: '完成学习', exact: true }).click();
+  await page.getByRole('button', { name: '已完成学习', exact: true }).waitFor();
+  await route('/learn');
+  const completed = page.locator('.knowledge-row.completed').first();
+  await completed.waitFor();
+  assert.equal(await completed.locator('.point-check').count(), 1);
+  assert.match(await completed.locator('.grow').evaluate((n) => getComputedStyle(n).textDecorationLine), /line-through/);
+  assert.equal(await page.locator('.chapter-progress').count(), 20);
+  await page.screenshot({ path: 'artifacts/refined-learn.png', fullPage: true });
+  await page.locator('#search').fill('zzzz-no-match');
+  await page.locator('[data-action=resetLearning]').click();
+  await page.locator('.chapter-card').first().waitFor();
+  assert.equal(await page.locator('.chapter-card').count(), 20);
+  await route('/practice');
+  assert.equal(await page.locator('.practice-selectors select').count(), 3);
+  await page.locator('[data-filter=status]').selectOption('未作答');
+  await page.locator('[data-filter=type]').selectOption('选择');
+  assert.match(await page.locator('.active-filters').innerText(), /选择/);
+  await page.locator('[data-action=questionDifficulty][data-arg=挑战]').click();
+  assert.equal(await page.locator('.question-difficulties .selected').innerText(), '挑战');
+  await page.getByRole('button', { name: '重置筛选', exact: true }).first().click();
+  assert.equal(await page.locator('.question-difficulties .selected').innerText(), '全部难度');
+  await page.locator('#search').fill('q0002');
+  await page.waitForFunction(() => document.querySelectorAll('.question-id').length === 1);
+  assert.equal(await page.locator('.question-id').count(), 1);
+  assert.equal(await page.locator('main .link-row h3').innerText(), 'NULL 与缺失记录');
+  await page.locator('[data-action=resetQuestions]').click();
+  await page.locator('[data-action=moreQuestions]').click();
+  await page.waitForFunction(() => document.querySelectorAll('.question-id').length === 160);
+  assert.equal(await page.locator('.question-id').count(), 160);
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.screenshot({ path: 'artifacts/refined-practice.png' });
+  await route('/cards');
+  assert.equal(await page.locator('[data-action=startCards]').count(), 1);
+  await page.screenshot({ path: 'artifacts/refined-cards.png' });
+  await page.locator('[data-action=cardMode][data-arg=章节]').click();
+  await page.locator('#card-chapter').selectOption('ch02');
+  await page.locator('[data-action=startCards]').click();
+  await page.locator('.flashcard').waitFor();
+  assert.match(await page.locator('main').innerText(), /自由浏览/);
+  assert.equal(await page.locator('[data-action=rate]').count(), 0);
+  await route('/cards');
+  const firstCard = page.locator('.card-browser-row').first();
+  const cardId = (await firstCard.locator('small').first().innerText()).split(' · ')[0];
+  await page.locator('#card-search').fill(cardId);
+  await page.waitForFunction(() => document.querySelectorAll('.card-browser-row').length === 1);
+  assert.equal(await page.locator('.card-browser-row').count(), 1);
+  await page.locator('.card-browser-row summary').click();
+  assert.equal(await page.locator('.card-browser-answer:visible').count(), 1);
+  await page.locator('[data-action=copyCard]').click();
+  await page.waitForURL('**/#/card-edit/user-*');
+  assert.ok((await page.locator('#card-front').inputValue()).length);
+  await route('/mine');
+  assert.equal(await page.locator('.mine-group').count(), 3);
+  const positions = await page.locator('.menu-title').evaluateAll((nodes) => nodes.map((n) => n.getBoundingClientRect().x));
+  assert.equal(new Set(positions).size, 1);
+  await page.screenshot({ path: 'artifacts/refined-mine.png', fullPage: true });
+  await route('/backup');
+  const download = page.waitForEvent('download');
+  await page.locator('[data-action=exportBackup]').click();
+  await download;
+  await route('/mine');
+  assert.match(await page.locator('main').innerText(), /已发起导出/);
+  await route('/lesson/kp01-01');
+  assert.match(await page.locator('pre').nth(1).innerText(), /SELECT id, category, sales\nFROM orders\nORDER BY id;/);
+  const note = page.locator('#note');
+  const initialHeight = await note.evaluate((n) => n.clientHeight);
+  await note.fill('自适应笔记\n'.repeat(25));
+  assert.ok(await note.evaluate((n) => n.clientHeight) > initialHeight);
+  assert.ok(await note.evaluate((n) => n.scrollHeight <= n.clientHeight + 2));
+  await note.fill('简短笔记');
+  assert.ok(await note.evaluate((n) => n.clientHeight) <= initialHeight + 2);
+  await route('/question/q0012');
+  assert.equal(await page.locator('main > pre').innerText(), 'SELECT {{blank1}} category\nFROM products\nORDER BY category;');
+  await route('/card-edit/new');
+  for (const id of ['card-front', 'card-back', 'card-explanation']) {
+    const field = page.locator('#' + id);
+    const height = await field.evaluate((n) => n.clientHeight);
+    await field.fill('长内容自动适应\n'.repeat(30));
+    assert.ok(await field.evaluate((n) => n.clientHeight) > height);
+    assert.ok(await field.evaluate((n) => n.scrollHeight <= n.clientHeight + 2));
+  }
+  await route('/settings');
+  const slider = page.locator('[data-setting=fontSize]');
+  await slider.fill('18');
+  assert.equal(await page.locator('#font-size-value').innerText(), '18 px');
+  assert.equal(await page.locator('.settings-preview pre').evaluate((n) => getComputedStyle(n).fontSize), '18px');
+  await slider.dispatchEvent('change');
+  await page.locator('[data-setting=editorDark]').check();
+  await page.locator('[data-setting=customKeyboard]').uncheck();
+  await page.waitForTimeout(200);
+  await page.reload();
+  await page.locator('[data-setting=fontSize]').waitFor();
+  assert.equal(await page.locator('[data-setting=fontSize]').inputValue(), '18');
+  assert.equal(await page.locator('[data-setting=editorDark]').isChecked(), true);
+  assert.equal(await page.locator('[data-setting=customKeyboard]').isChecked(), false);
+  await page.screenshot({ path: 'artifacts/refined-settings.png', fullPage: true });
+  for (const width of [320, 360, 390, 430]) {
+    await page.setViewportSize({ width, height: 844 });
+    for (const path of ['/', '/learn', '/practice', '/cards', '/mine', '/settings', '/card-edit/new']) {
+      await route(path);
+      assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), path + ' at ' + width);
+    }
+  }
+  assert.deepEqual(errors, []);
+  console.log('Page refinement checks passed, including completion, filters, card browsing and backup export status.');
+} finally {
+  await browser.close();
+}

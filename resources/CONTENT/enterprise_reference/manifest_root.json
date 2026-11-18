@@ -1,0 +1,498 @@
+{
+  "schemaVersion": 4,
+  "contentVersion": "4.2.0",
+  "cutoff": "2025-12-31",
+  "period": [
+    "2023-01-01",
+    "2025-12-31"
+  ],
+  "moneyUnit": "MYR cent",
+  "seed": 2026111705,
+  "datasets": {
+    "retail": {
+      "tables": 18,
+      "views": 1,
+      "rows": 214879,
+      "bytes": 13529088,
+      "sha256": "e80ec41c783e5763b0e482b4c30889bdaa313f53582d3d11ee0ea47d2366cd78"
+    },
+    "inventory": {
+      "tables": 27,
+      "views": 1,
+      "rows": 372857,
+      "bytes": 28377088,
+      "sha256": "8ffd03557cec269f31946f250002439e5c5722722962be17a86d7a86775c7eda"
+    },
+    "ecommerce": {
+      "tables": 17,
+      "views": 2,
+      "rows": 211356,
+      "bytes": 13312000,
+      "sha256": "31b1767d0e2b774e5cb7395ed186be7c92d534a96e90fc8576780875a69c8ff3"
+    },
+    "finance": {
+      "tables": 20,
+      "views": 3,
+      "rows": 142533,
+      "bytes": 8028160,
+      "sha256": "8ae00caa3958ac0db837a871916324d03061adfa81bbfa0ad3f2d127da1106ec"
+    },
+    "hr": {
+      "tables": 9,
+      "views": 1,
+      "rows": 96228,
+      "bytes": 8069120,
+      "sha256": "5806902531cf0f938bd5fea7cb2c92c8d77314e84bf55ef37bd14e8b3601a033"
+    },
+    "procurement": {
+      "tables": 10,
+      "views": 1,
+      "rows": 45120,
+      "bytes": 3108864,
+      "sha256": "32291e67b8888bba581f4e52fc4eeac482cc785ed9c75e5c89267998283637b7"
+    },
+    "enterprise": {
+      "tables": 45,
+      "views": 6,
+      "rows": 595196,
+      "bytes": 43110400,
+      "sha256": "d47285cfecd67f2dfd37a0d41a2c8a2714a6ecbc8e1170c3e9c0052204106924"
+    }
+  },
+  "taskSummary": [
+    {
+      "id": "BP01",
+      "questionId": "q0251",
+      "rows": 12
+    },
+    {
+      "id": "BP02",
+      "questionId": "q0252",
+      "rows": 144
+    },
+    {
+      "id": "BP03",
+      "questionId": "q0253",
+      "rows": 23
+    },
+    {
+      "id": "BP04",
+      "questionId": "q0254",
+      "rows": 2
+    },
+    {
+      "id": "BP05",
+      "questionId": "q0255",
+      "rows": 12
+    },
+    {
+      "id": "BP06",
+      "questionId": "q0256",
+      "rows": 54
+    },
+    {
+      "id": "BP07",
+      "questionId": "q0257",
+      "rows": 45
+    },
+    {
+      "id": "BP08",
+      "questionId": "q0258",
+      "rows": 52
+    },
+    {
+      "id": "BP09",
+      "questionId": "q0259",
+      "rows": 1148
+    },
+    {
+      "id": "BP10",
+      "questionId": "q0260",
+      "rows": 69
+    },
+    {
+      "id": "BP11",
+      "questionId": "q0261",
+      "rows": 2
+    },
+    {
+      "id": "BP12",
+      "questionId": "q0262",
+      "rows": 1794
+    },
+    {
+      "id": "BP13",
+      "questionId": "q0263",
+      "rows": 231
+    },
+    {
+      "id": "BP14",
+      "questionId": "q0264",
+      "rows": 5
+    },
+    {
+      "id": "BP15",
+      "questionId": "q0265",
+      "rows": 106
+    },
+    {
+      "id": "BP16",
+      "questionId": "q0266",
+      "rows": 35
+    },
+    {
+      "id": "BP17",
+      "questionId": "q0267",
+      "rows": 4739
+    },
+    {
+      "id": "BP18",
+      "questionId": "q0268",
+      "rows": 153
+    },
+    {
+      "id": "BP19",
+      "questionId": "q0269",
+      "rows": 1182
+    },
+    {
+      "id": "BP20",
+      "questionId": "q0270",
+      "rows": 1434
+    },
+    {
+      "id": "BP21",
+      "questionId": "q0271",
+      "rows": 84
+    },
+    {
+      "id": "BP22",
+      "questionId": "q0272",
+      "rows": 84
+    },
+    {
+      "id": "BP23",
+      "questionId": "q0273",
+      "rows": 62
+    },
+    {
+      "id": "BP24",
+      "questionId": "q0274",
+      "rows": 21
+    },
+    {
+      "id": "BP25",
+      "questionId": "q0275",
+      "rows": 73
+    },
+    {
+      "id": "BP26",
+      "questionId": "q0276",
+      "rows": 3469
+    },
+    {
+      "id": "BP27",
+      "questionId": "q0277",
+      "rows": 55
+    },
+    {
+      "id": "BP28",
+      "questionId": "q0278",
+      "rows": 928
+    },
+    {
+      "id": "BP29",
+      "questionId": "q0279",
+      "rows": 548
+    },
+    {
+      "id": "BP30",
+      "questionId": "q0280",
+      "rows": 37
+    },
+    {
+      "id": "BP31",
+      "questionId": "q0281",
+      "rows": 68
+    },
+    {
+      "id": "BP32",
+      "questionId": "q0282",
+      "rows": 500
+    },
+    {
+      "id": "BP33",
+      "questionId": "q0283",
+      "rows": 99
+    },
+    {
+      "id": "BP34",
+      "questionId": "q0284",
+      "rows": 15
+    },
+    {
+      "id": "BP35",
+      "questionId": "q0285",
+      "rows": 23
+    },
+    {
+      "id": "BP36",
+      "questionId": "q0286",
+      "rows": 0
+    },
+    {
+      "id": "BP37",
+      "questionId": "q0287",
+      "rows": 45
+    },
+    {
+      "id": "BP38",
+      "questionId": "q0288",
+      "rows": 12
+    },
+    {
+      "id": "BP39",
+      "questionId": "q0289",
+      "rows": 0
+    },
+    {
+      "id": "BP40",
+      "questionId": "q0290",
+      "rows": 144
+    },
+    {
+      "id": "BP41",
+      "questionId": "q0291",
+      "rows": 60
+    },
+    {
+      "id": "BP42",
+      "questionId": "q0292",
+      "rows": 721
+    },
+    {
+      "id": "BP43",
+      "questionId": "q0293",
+      "rows": 38
+    },
+    {
+      "id": "BP44",
+      "questionId": "q0294",
+      "rows": 5
+    },
+    {
+      "id": "BP45",
+      "questionId": "q0295",
+      "rows": 165
+    },
+    {
+      "id": "BP46",
+      "questionId": "q0296",
+      "rows": 5
+    },
+    {
+      "id": "BP47",
+      "questionId": "q0297",
+      "rows": 12
+    },
+    {
+      "id": "BP48",
+      "questionId": "q0298",
+      "rows": 144
+    },
+    {
+      "id": "BP49",
+      "questionId": "q0299",
+      "rows": 12
+    },
+    {
+      "id": "BP50",
+      "questionId": "q0300",
+      "rows": 4
+    }
+  ],
+  "knowledgePoints": 152,
+  "files": [
+    {
+      "path": "question_resource/databases/ecommerce/DATA_DICTIONARY.md",
+      "sha256": "ef6e36667ca3f882d6d76f93e09c1ef911f9bad78cd42fe788216dfe2301e89b",
+      "bytes": 14150
+    },
+    {
+      "path": "question_resource/databases/ecommerce/README.md",
+      "sha256": "fd8b1b21d7ac3a938bfcfb86d02030b86ff76b04c57191ad139507b06303c815",
+      "bytes": 243
+    },
+    {
+      "path": "question_resource/databases/ecommerce/ecommerce.sqlite",
+      "sha256": "31b1767d0e2b774e5cb7395ed186be7c92d534a96e90fc8576780875a69c8ff3",
+      "bytes": 13312000
+    },
+    {
+      "path": "question_resource/databases/ecommerce/mysql_import.sql",
+      "sha256": "c4a93f4d98e61fd365ffd29887130eb771b47c4ba236701edd843799910e553e",
+      "bytes": 8465917
+    },
+    {
+      "path": "question_resource/databases/ecommerce/schema.json",
+      "sha256": "8c5ef3d9d729bf5fdc5c6244a1f069ad1a70958185aaa8fe583c762430b9ec7e",
+      "bytes": 40508
+    },
+    {
+      "path": "question_resource/databases/enterprise/DATA_DICTIONARY.md",
+      "sha256": "bcd8f3f9aeadbb547aa327017f8b30bca11ce2763cd9277600f17dfb2e0d4641",
+      "bytes": 40569
+    },
+    {
+      "path": "question_resource/databases/enterprise/README.md",
+      "sha256": "0e4d290308dda286ef19fb76bb7a8e81ac1cffdfdaff3e39d5a743b47fed3d88",
+      "bytes": 245
+    },
+    {
+      "path": "question_resource/databases/enterprise/enterprise.sqlite",
+      "sha256": "d47285cfecd67f2dfd37a0d41a2c8a2714a6ecbc8e1170c3e9c0052204106924",
+      "bytes": 43110400
+    },
+    {
+      "path": "question_resource/databases/enterprise/mysql_import.sql",
+      "sha256": "6817665df585761888ff0323ba218e9b47c119486725afbf7ac00c0f0e1ccb0d",
+      "bytes": 25408243
+    },
+    {
+      "path": "question_resource/databases/enterprise/schema.json",
+      "sha256": "a3e67261b800f041482142c73c503cf725df1fb224a6fbd22113fddb939bc92a",
+      "bytes": 119917
+    },
+    {
+      "path": "question_resource/databases/finance/DATA_DICTIONARY.md",
+      "sha256": "0e9f164e6042d190f2dbe2c69727cfb7fbbb6dab7f0de2a25290483a3228805b",
+      "bytes": 17487
+    },
+    {
+      "path": "question_resource/databases/finance/README.md",
+      "sha256": "361dec1adb237b4d03bbbdc0c8508c524825b93b5e2f6f1606f4752cde6a0b70",
+      "bytes": 239
+    },
+    {
+      "path": "question_resource/databases/finance/finance.sqlite",
+      "sha256": "8ae00caa3958ac0db837a871916324d03061adfa81bbfa0ad3f2d127da1106ec",
+      "bytes": 8028160
+    },
+    {
+      "path": "question_resource/databases/finance/mysql_import.sql",
+      "sha256": "9bf7e8e08c94cbb74b24774ae7a82478f758a9b2f7fb2d4db3a9ff6629997571",
+      "bytes": 5052224
+    },
+    {
+      "path": "question_resource/databases/finance/schema.json",
+      "sha256": "85a76cc7dbdc750bef52d360713d2dca780e8dec3c5265e07418a824675e136c",
+      "bytes": 49110
+    },
+    {
+      "path": "question_resource/databases/hr/DATA_DICTIONARY.md",
+      "sha256": "73d8f176b2948c367497af092c2d106c8a789c202cf552aa21e752dfa662a941",
+      "bytes": 6776
+    },
+    {
+      "path": "question_resource/databases/hr/README.md",
+      "sha256": "6f53b11ae053d7301a328ef620f3e8fe2979f74898c1b239905ae8964deadff7",
+      "bytes": 229
+    },
+    {
+      "path": "question_resource/databases/hr/hr.sqlite",
+      "sha256": "5806902531cf0f938bd5fea7cb2c92c8d77314e84bf55ef37bd14e8b3601a033",
+      "bytes": 8069120
+    },
+    {
+      "path": "question_resource/databases/hr/mysql_import.sql",
+      "sha256": "8916924b8289694c760a18490540910fc3a30686166864dd249681a27d0cb81a",
+      "bytes": 3963588
+    },
+    {
+      "path": "question_resource/databases/hr/schema.json",
+      "sha256": "4b7b87e5dc61c40eddb1782a316dd751dcb5be97473c5fa83bbbe5d06433b596",
+      "bytes": 19057
+    },
+    {
+      "path": "question_resource/databases/inventory/DATA_DICTIONARY.md",
+      "sha256": "2c993a7630b47426b9a2d8fdc53cece65a9f1ba3a7be3d6b5a9cdc11e70ccec8",
+      "bytes": 24916
+    },
+    {
+      "path": "question_resource/databases/inventory/README.md",
+      "sha256": "30c8d70f35965139876f28996f7f7d1f0028bad803c4bc4cd474055d2d54e6ec",
+      "bytes": 243
+    },
+    {
+      "path": "question_resource/databases/inventory/inventory.sqlite",
+      "sha256": "8ffd03557cec269f31946f250002439e5c5722722962be17a86d7a86775c7eda",
+      "bytes": 28377088
+    },
+    {
+      "path": "question_resource/databases/inventory/mysql_import.sql",
+      "sha256": "7a09f4e88f3e5d0b4650a74cf41291090424787765413b80bd0d81acdcec4677",
+      "bytes": 16827916
+    },
+    {
+      "path": "question_resource/databases/inventory/schema.json",
+      "sha256": "86051d43c85781d55abc947beacf5cd3d74483b88eb942f3650cd14793936b5a",
+      "bytes": 75757
+    },
+    {
+      "path": "question_resource/databases/manifest.json",
+      "sha256": "b1e27dd52e89109da14ef9de914bd9c23d9ffc357aff5a57f9a96922b5f305b2",
+      "bytes": 1533
+    },
+    {
+      "path": "question_resource/databases/procurement/DATA_DICTIONARY.md",
+      "sha256": "d4a576377467d697b1819d61144f28c00e0610afd36b2b0adbf8d2c3371168d5",
+      "bytes": 9290
+    },
+    {
+      "path": "question_resource/databases/procurement/README.md",
+      "sha256": "0d47db6da3bc2c0825a9091c7ee6682c4b8be2005abd4fd16728b7a1c0f4e89b",
+      "bytes": 247
+    },
+    {
+      "path": "question_resource/databases/procurement/mysql_import.sql",
+      "sha256": "da8061b19d32a737409c76a43207020e8927c9faef35b9c0923bdc31301405bc",
+      "bytes": 1663632
+    },
+    {
+      "path": "question_resource/databases/procurement/procurement.sqlite",
+      "sha256": "32291e67b8888bba581f4e52fc4eeac482cc785ed9c75e5c89267998283637b7",
+      "bytes": 3108864
+    },
+    {
+      "path": "question_resource/databases/procurement/schema.json",
+      "sha256": "4cd9c6c25443867f7c716815441f0677dcc1b56d1eaa75116d68b5ac31688161",
+      "bytes": 26384
+    },
+    {
+      "path": "question_resource/databases/retail/DATA_DICTIONARY.md",
+      "sha256": "72c9bdb792076693a379c1ad01895e3f611c25e917330ccf118730d2a6ebbc68",
+      "bytes": 14533
+    },
+    {
+      "path": "question_resource/databases/retail/README.md",
+      "sha256": "63be23f43cc1afea2cf858c1fea23b8c8547dcc40e4f21b83f9b9c08f986d617",
+      "bytes": 237
+    },
+    {
+      "path": "question_resource/databases/retail/mysql_import.sql",
+      "sha256": "6dd5763a037431ebbac87398dc698203b1347a7e00183d1bc7f91ba2a4c31a60",
+      "bytes": 8568615
+    },
+    {
+      "path": "question_resource/databases/retail/retail.sqlite",
+      "sha256": "e80ec41c783e5763b0e482b4c30889bdaa313f53582d3d11ee0ea47d2366cd78",
+      "bytes": 13529088
+    },
+    {
+      "path": "question_resource/databases/retail/schema.json",
+      "sha256": "1385c502adec308253a7542d47762a02ef04d372ce0ecceb8ca768aa46d8fb9c",
+      "bytes": 42264
+    }
+  ],
+  "filePathRoot": "统一资源包根目录"
+}

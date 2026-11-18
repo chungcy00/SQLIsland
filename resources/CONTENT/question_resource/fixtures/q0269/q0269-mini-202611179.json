@@ -1,0 +1,155 @@
+{
+  "id": "q0269-mini-202611179",
+  "questionId": "q0269",
+  "visibility": "hidden",
+  "variant": "independent-enterprise",
+  "kind": "query",
+  "sharedDataPath": "fixtures/shared/enterprise-mini-202611179.json",
+  "sharedDataSha256": "f88591bb8a3ea3a748206eada73fe85ade1ec92ade7b41d510a02dc75dfd7e83",
+  "expected": {
+    "columns": [
+      "ref",
+      "ledger_cents",
+      "bank_cents",
+      "difference_cents",
+      "issue"
+    ],
+    "rows": [
+      [
+        "BANK-15",
+        null,
+        14300,
+        14300,
+        "bank_only"
+      ],
+      [
+        "BANK-2",
+        null,
+        35900,
+        35900,
+        "bank_only"
+      ],
+      [
+        "BANK-25",
+        null,
+        37200,
+        37200,
+        "bank_only"
+      ],
+      [
+        "BANK-37",
+        null,
+        17500,
+        17500,
+        "bank_only"
+      ],
+      [
+        "BANK-48",
+        null,
+        9800,
+        9800,
+        "bank_only"
+      ],
+      [
+        "BANK-51",
+        null,
+        24400,
+        24400,
+        "bank_only"
+      ],
+      [
+        "BANK-9",
+        null,
+        25900,
+        25900,
+        "bank_only"
+      ],
+      [
+        "ISOJ-15",
+        14300,
+        null,
+        -14300,
+        "ledger_only"
+      ],
+      [
+        "ISOJ-2",
+        35900,
+        null,
+        -35900,
+        "ledger_only"
+      ],
+      [
+        "ISOJ-25",
+        37200,
+        null,
+        -37200,
+        "ledger_only"
+      ],
+      [
+        "ISOJ-29",
+        18800,
+        null,
+        -18800,
+        "ledger_only"
+      ],
+      [
+        "ISOJ-38",
+        17500,
+        null,
+        -17500,
+        "ledger_only"
+      ],
+      [
+        "ISOJ-44",
+        43500,
+        null,
+        -43500,
+        "ledger_only"
+      ],
+      [
+        "ISOJ-5",
+        5900,
+        5800,
+        -100,
+        "difference"
+      ],
+      [
+        "ISOJ-50",
+        9800,
+        null,
+        -9800,
+        "ledger_only"
+      ],
+      [
+        "ISOJ-51",
+        49400,
+        null,
+        -49400,
+        "ledger_only"
+      ],
+      [
+        "ISOJ-54",
+        24400,
+        null,
+        -24400,
+        "ledger_only"
+      ],
+      [
+        "ISOJ-9",
+        25900,
+        null,
+        -25900,
+        "ledger_only"
+      ]
+    ]
+  },
+  "orderPolicy": "ordered",
+  "numericTolerance": {
+    "absolute": 1e-06,
+    "integerExact": true,
+    "textExact": true,
+    "nullDistinct": true
+  },
+  "columnPolicy": "exact_names_in_order",
+  "contentVersion": "4.2.0"
+}

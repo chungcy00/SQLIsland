@@ -1,0 +1,50 @@
+{
+  "id": "q0261-boundary",
+  "questionId": "q0261",
+  "visibility": "hidden",
+  "variant": "boundary",
+  "kind": "database_delta",
+  "datasetId": "ecommerce-v2",
+  "baseDatabase": "databases/ecommerce/ecommerce.sqlite",
+  "baseSha256": "31b1767d0e2b774e5cb7395ed186be7c92d534a96e90fc8576780875a69c8ff3",
+  "patchSql": [
+    "UPDATE orders SET status='cancelled' WHERE channel='online' AND status='completed' AND order_date BETWEEN '2025-01-01' AND '2025-01-31'"
+  ],
+  "patchDescription": "隔离诊断边界数据，允许故意制造来源对账差异；一月有效线上订单改成取消，重新计算首次有效购买和年度新老客。",
+  "patchRowChanges": 328,
+  "testIsolation": "每次使用全新数据库副本；夹具可故意引入对账差异或改变业务记录，仅用于判题，绝不可写入基准库",
+  "expected": {
+    "columns": [
+      "segment",
+      "customers",
+      "orders",
+      "net_cents",
+      "avg_order_cents"
+    ],
+    "rows": [
+      [
+        "new",
+        1231,
+        1231,
+        11697997,
+        9502.84
+      ],
+      [
+        "returning",
+        1137,
+        5277,
+        48091198,
+        9113.36
+      ]
+    ]
+  },
+  "orderPolicy": "ordered",
+  "columnPolicy": "exact_names_in_order",
+  "numericTolerance": {
+    "absolute": 1e-06,
+    "integerExact": true,
+    "textExact": true,
+    "nullDistinct": true
+  },
+  "contentVersion": "4.2.0"
+}

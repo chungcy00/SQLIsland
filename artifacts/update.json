@@ -1,0 +1,17 @@
+{
+  "versionCode": 4,
+  "versionName": "0.3.0",
+  "releaseDate": "2026-11-18",
+  "apkName": "ShuyuSQL-0.3.0.apk",
+  "apkUrl": "https://github.com/chungcy00/SQLIsland/releases/download/v0.3.0/ShuyuSQL-0.3.0.apk",
+  "sha256": "304e9d9b82d9a859c75d74f981b024294811586d5675dd066c80535a0f75eb67",
+  "bytes": 52815493,
+  "notes": [
+    "七套企业数据库完成业务真实性与判题审计，资源升级至4.2.0。",
+    "促销支持非固定周期、适用范围、跨月跨年及重叠校验。",
+    "同步修复50道企业实战题、参考答案和独立测试数据。",
+    "SQL键盘支持拖动调高和高度记忆，补齐全屏收起图标。",
+    "数据表在原位置展开预览。",
+    "代码实验室新增离线ERD关系图，读取真实主外键并支持搜索、缩放和关联聚焦。"
+  ]
+}

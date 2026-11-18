@@ -1,0 +1,172 @@
+{
+  "id": "q0262-mini-202611179",
+  "questionId": "q0262",
+  "visibility": "hidden",
+  "variant": "independent-enterprise",
+  "kind": "query",
+  "sharedDataPath": "fixtures/shared/enterprise-mini-202611179.json",
+  "sharedDataSha256": "f88591bb8a3ea3a748206eada73fe85ade1ec92ade7b41d510a02dc75dfd7e83",
+  "expected": {
+    "columns": [
+      "customer_id",
+      "recency_days",
+      "freq",
+      "net_cents",
+      "r_score",
+      "f_score",
+      "m_score",
+      "segment"
+    ],
+    "rows": [
+      [
+        1,
+        8,
+        13,
+        607880,
+        5,
+        5,
+        5,
+        "high_value"
+      ],
+      [
+        2,
+        4,
+        9,
+        572820,
+        5,
+        5,
+        5,
+        "high_value"
+      ],
+      [
+        3,
+        28,
+        7,
+        273940,
+        3,
+        5,
+        5,
+        "high_value"
+      ],
+      [
+        4,
+        102,
+        3,
+        156100,
+        2,
+        4,
+        4,
+        "regular"
+      ],
+      [
+        5,
+        19,
+        3,
+        197700,
+        4,
+        3,
+        4,
+        "regular"
+      ],
+      [
+        6,
+        57,
+        5,
+        170900,
+        3,
+        4,
+        4,
+        "regular"
+      ],
+      [
+        8,
+        18,
+        3,
+        64400,
+        4,
+        3,
+        3,
+        "regular"
+      ],
+      [
+        10,
+        7,
+        2,
+        60200,
+        5,
+        3,
+        2,
+        "regular"
+      ],
+      [
+        11,
+        164,
+        1,
+        89900,
+        1,
+        2,
+        3,
+        "low_activity"
+      ],
+      [
+        12,
+        60,
+        2,
+        59200,
+        3,
+        2,
+        2,
+        "regular"
+      ],
+      [
+        13,
+        23,
+        4,
+        85980,
+        4,
+        4,
+        3,
+        "regular"
+      ],
+      [
+        14,
+        317,
+        1,
+        11400,
+        1,
+        2,
+        2,
+        "low_activity"
+      ],
+      [
+        16,
+        89,
+        1,
+        10100,
+        2,
+        1,
+        1,
+        "low_activity"
+      ],
+      [
+        17,
+        88,
+        1,
+        10100,
+        2,
+        1,
+        1,
+        "low_activity"
+      ]
+    ]
+  },
+  "orderPolicy": "ordered",
+  "numericTolerance": {
+    "absolute": 1e-06,
+    "integerExact": true,
+    "textExact": true,
+    "nullDistinct": true
+  },
+  "columnPolicy": "exact_names_in_order",
+  "contentVersion": "4.2.0"
+}

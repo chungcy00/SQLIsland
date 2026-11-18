@@ -1,0 +1,78 @@
+{
+  "id": "q0294-mini-202611171",
+  "questionId": "q0294",
+  "visibility": "hidden",
+  "variant": "independent-enterprise",
+  "kind": "query",
+  "sharedDataPath": "fixtures/shared/enterprise-mini-202611171.json",
+  "sharedDataSha256": "14a558f253847a097a9452282012c1a9680ed0a5c496a573b9d42bc16885c57d",
+  "expected": {
+    "columns": [
+      "source_id",
+      "net_cents",
+      "gross_cents",
+      "spend_cents",
+      "contribution_cents",
+      "contribution_pct"
+    ],
+    "rows": [
+      [
+        1,
+        1228940,
+        392214,
+        0,
+        392214,
+        31.91
+      ],
+      [
+        5,
+        892200,
+        302323,
+        201200,
+        101123,
+        11.33
+      ],
+      [
+        6,
+        0,
+        0,
+        0,
+        0,
+        null
+      ],
+      [
+        2,
+        655100,
+        202722,
+        234700,
+        -31978,
+        -4.88
+      ],
+      [
+        3,
+        400300,
+        150649,
+        187600,
+        -36951,
+        -9.23
+      ],
+      [
+        4,
+        535400,
+        174893,
+        214900,
+        -40007,
+        -7.47
+      ]
+    ]
+  },
+  "orderPolicy": "ordered",
+  "numericTolerance": {
+    "absolute": 1e-06,
+    "integerExact": true,
+    "textExact": true,
+    "nullDistinct": true
+  },
+  "columnPolicy": "exact_names_in_order",
+  "contentVersion": "4.2.0"
+}

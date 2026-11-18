@@ -1,0 +1,92 @@
+{
+  "id": "q0264-mini-202611171",
+  "questionId": "q0264",
+  "visibility": "hidden",
+  "variant": "independent-enterprise",
+  "kind": "query",
+  "sharedDataPath": "fixtures/shared/enterprise-mini-202611171.json",
+  "sharedDataSha256": "14a558f253847a097a9452282012c1a9680ed0a5c496a573b9d42bc16885c57d",
+  "expected": {
+    "columns": [
+      "source_id",
+      "sessions",
+      "converted",
+      "conversion_pct",
+      "new_customers",
+      "spend_cents",
+      "cac_cents",
+      "roas"
+    ],
+    "rows": [
+      [
+        1,
+        34,
+        22,
+        64.71,
+        1,
+        0,
+        0.0,
+        null
+      ],
+      [
+        2,
+        34,
+        20,
+        58.82,
+        2,
+        234700,
+        117350.0,
+        2.7912
+      ],
+      [
+        3,
+        23,
+        11,
+        47.83,
+        0,
+        187600,
+        null,
+        2.1338
+      ],
+      [
+        4,
+        19,
+        9,
+        47.37,
+        1,
+        214900,
+        214900.0,
+        2.4914
+      ],
+      [
+        5,
+        21,
+        15,
+        71.43,
+        1,
+        201200,
+        201200.0,
+        4.4344
+      ],
+      [
+        6,
+        null,
+        0,
+        null,
+        0,
+        null,
+        null,
+        null
+      ]
+    ]
+  },
+  "orderPolicy": "ordered",
+  "numericTolerance": {
+    "absolute": 1e-06,
+    "integerExact": true,
+    "textExact": true,
+    "nullDistinct": true
+  },
+  "columnPolicy": "exact_names_in_order",
+  "contentVersion": "4.2.0"
+}

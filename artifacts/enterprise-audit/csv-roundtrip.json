@@ -1,0 +1,506 @@
+[
+  {
+    "version": "before",
+    "table": "accounts",
+    "rows": 6,
+    "pass": true
+  },
+  {
+    "version": "before",
+    "table": "attendance",
+    "rows": 104754,
+    "pass": true
+  },
+  {
+    "version": "before",
+    "table": "bank_transactions",
+    "rows": 16868,
+    "pass": true
+  },
+  {
+    "version": "before",
+    "table": "budgets",
+    "rows": 1260,
+    "pass": true
+  },
+  {
+    "version": "before",
+    "table": "calendar_days",
+    "rows": 1096,
+    "pass": true
+  },
+  {
+    "version": "before",
+    "table": "categories",
+    "rows": 15,
+    "pass": true
+  },
+  {
+    "version": "before",
+    "table": "customer_sessions",
+    "rows": 50000,
+    "pass": true
+  },
+  {
+    "version": "before",
+    "table": "customers",
+    "rows": 5000,
+    "pass": true
+  },
+  {
+    "version": "before",
+    "table": "departments",
+    "rows": 7,
+    "pass": true
+  },
+  {
+    "version": "before",
+    "table": "employees",
+    "rows": 250,
+    "pass": true
+  },
+  {
+    "version": "before",
+    "table": "employment_history",
+    "rows": 307,
+    "pass": true
+  },
+  {
+    "version": "before",
+    "table": "goods_receipts",
+    "rows": 11103,
+    "pass": true
+  },
+  {
+    "version": "before",
+    "table": "inventory_opening",
+    "rows": 1500,
+    "pass": true
+  },
+  {
+    "version": "before",
+    "table": "inventory_snapshots",
+    "rows": 54000,
+    "pass": true
+  },
+  {
+    "version": "before",
+    "table": "journal_entries",
+    "rows": 18000,
+    "pass": true
+  },
+  {
+    "version": "before",
+    "table": "journal_lines",
+    "rows": 36000,
+    "pass": true
+  },
+  {
+    "version": "before",
+    "table": "marketing_campaigns",
+    "rows": 180,
+    "pass": true
+  },
+  {
+    "version": "before",
+    "table": "order_items",
+    "rows": 90074,
+    "pass": true
+  },
+  {
+    "version": "before",
+    "table": "orders",
+    "rows": 30000,
+    "pass": true
+  },
+  {
+    "version": "before",
+    "table": "payments",
+    "rows": 31521,
+    "pass": true
+  },
+  {
+    "version": "before",
+    "table": "positions",
+    "rows": 5,
+    "pass": true
+  },
+  {
+    "version": "before",
+    "table": "product_costs",
+    "rows": 1500,
+    "pass": true
+  },
+  {
+    "version": "before",
+    "table": "products",
+    "rows": 500,
+    "pass": true
+  },
+  {
+    "version": "before",
+    "table": "promotions",
+    "rows": 36,
+    "pass": true
+  },
+  {
+    "version": "before",
+    "table": "purchase_order_items",
+    "rows": 9993,
+    "pass": true
+  },
+  {
+    "version": "before",
+    "table": "purchase_orders",
+    "rows": 5000,
+    "pass": true
+  },
+  {
+    "version": "before",
+    "table": "raw_order_import",
+    "rows": 400,
+    "pass": true
+  },
+  {
+    "version": "before",
+    "table": "returns",
+    "rows": 6117,
+    "pass": true
+  },
+  {
+    "version": "before",
+    "table": "salary_history",
+    "rows": 4966,
+    "pass": true
+  },
+  {
+    "version": "before",
+    "table": "sales_targets",
+    "rows": 432,
+    "pass": true
+  },
+  {
+    "version": "before",
+    "table": "stock_movements",
+    "rows": 99369,
+    "pass": true
+  },
+  {
+    "version": "before",
+    "table": "stores",
+    "rows": 12,
+    "pass": true
+  },
+  {
+    "version": "before",
+    "table": "supplier_contracts",
+    "rows": 3000,
+    "pass": true
+  },
+  {
+    "version": "before",
+    "table": "supplier_invoice_items",
+    "rows": 9266,
+    "pass": true
+  },
+  {
+    "version": "before",
+    "table": "supplier_invoices",
+    "rows": 4658,
+    "pass": true
+  },
+  {
+    "version": "before",
+    "table": "supplier_payments",
+    "rows": 4076,
+    "pass": true
+  },
+  {
+    "version": "before",
+    "table": "suppliers",
+    "rows": 60,
+    "pass": true
+  },
+  {
+    "version": "before",
+    "table": "traffic_sources",
+    "rows": 5,
+    "pass": true
+  },
+  {
+    "version": "before",
+    "table": "warehouses",
+    "rows": 3,
+    "pass": true
+  },
+  {
+    "version": "after",
+    "table": "accounts",
+    "rows": 6,
+    "pass": true
+  },
+  {
+    "version": "after",
+    "table": "attendance",
+    "rows": 90639,
+    "pass": true
+  },
+  {
+    "version": "after",
+    "table": "bank_transactions",
+    "rows": 17931,
+    "pass": true
+  },
+  {
+    "version": "after",
+    "table": "budgets",
+    "rows": 1260,
+    "pass": true
+  },
+  {
+    "version": "after",
+    "table": "calendar_days",
+    "rows": 1096,
+    "pass": true
+  },
+  {
+    "version": "after",
+    "table": "categories",
+    "rows": 15,
+    "pass": true
+  },
+  {
+    "version": "after",
+    "table": "customer_sessions",
+    "rows": 50000,
+    "pass": true
+  },
+  {
+    "version": "after",
+    "table": "customers",
+    "rows": 5000,
+    "pass": true
+  },
+  {
+    "version": "after",
+    "table": "departments",
+    "rows": 7,
+    "pass": true
+  },
+  {
+    "version": "after",
+    "table": "employees",
+    "rows": 250,
+    "pass": true
+  },
+  {
+    "version": "after",
+    "table": "employment_history",
+    "rows": 324,
+    "pass": true
+  },
+  {
+    "version": "after",
+    "table": "expense_documents",
+    "rows": 18000,
+    "pass": true
+  },
+  {
+    "version": "after",
+    "table": "goods_receipts",
+    "rows": 10946,
+    "pass": true
+  },
+  {
+    "version": "after",
+    "table": "inventory_opening",
+    "rows": 1500,
+    "pass": true
+  },
+  {
+    "version": "after",
+    "table": "inventory_snapshots",
+    "rows": 54000,
+    "pass": true
+  },
+  {
+    "version": "after",
+    "table": "journal_entries",
+    "rows": 18000,
+    "pass": true
+  },
+  {
+    "version": "after",
+    "table": "journal_lines",
+    "rows": 36000,
+    "pass": true
+  },
+  {
+    "version": "after",
+    "table": "marketing_campaigns",
+    "rows": 180,
+    "pass": true
+  },
+  {
+    "version": "after",
+    "table": "order_items",
+    "rows": 90074,
+    "pass": true
+  },
+  {
+    "version": "after",
+    "table": "orders",
+    "rows": 30000,
+    "pass": true
+  },
+  {
+    "version": "after",
+    "table": "payments",
+    "rows": 28816,
+    "pass": true
+  },
+  {
+    "version": "after",
+    "table": "positions",
+    "rows": 5,
+    "pass": true
+  },
+  {
+    "version": "after",
+    "table": "product_costs",
+    "rows": 3271,
+    "pass": true
+  },
+  {
+    "version": "after",
+    "table": "products",
+    "rows": 500,
+    "pass": true
+  },
+  {
+    "version": "after",
+    "table": "promotion_categories",
+    "rows": 84,
+    "pass": true
+  },
+  {
+    "version": "after",
+    "table": "promotion_stores",
+    "rows": 64,
+    "pass": true
+  },
+  {
+    "version": "after",
+    "table": "promotions",
+    "rows": 44,
+    "pass": true
+  },
+  {
+    "version": "after",
+    "table": "purchase_order_items",
+    "rows": 9993,
+    "pass": true
+  },
+  {
+    "version": "after",
+    "table": "purchase_orders",
+    "rows": 5000,
+    "pass": true
+  },
+  {
+    "version": "after",
+    "table": "raw_order_import",
+    "rows": 400,
+    "pass": true
+  },
+  {
+    "version": "after",
+    "table": "returns",
+    "rows": 5063,
+    "pass": true
+  },
+  {
+    "version": "after",
+    "table": "salary_history",
+    "rows": 3892,
+    "pass": true
+  },
+  {
+    "version": "after",
+    "table": "sales_targets",
+    "rows": 432,
+    "pass": true
+  },
+  {
+    "version": "after",
+    "table": "stock_adjustments",
+    "rows": 357,
+    "pass": true
+  },
+  {
+    "version": "after",
+    "table": "stock_movements",
+    "rows": 85098,
+    "pass": true
+  },
+  {
+    "version": "after",
+    "table": "stock_transfers",
+    "rows": 2069,
+    "pass": true
+  },
+  {
+    "version": "after",
+    "table": "stores",
+    "rows": 12,
+    "pass": true
+  },
+  {
+    "version": "after",
+    "table": "supplier_contracts",
+    "rows": 4405,
+    "pass": true
+  },
+  {
+    "version": "after",
+    "table": "supplier_credit_notes",
+    "rows": 173,
+    "pass": true
+  },
+  {
+    "version": "after",
+    "table": "supplier_invoice_items",
+    "rows": 9459,
+    "pass": true
+  },
+  {
+    "version": "after",
+    "table": "supplier_invoices",
+    "rows": 4739,
+    "pass": true
+  },
+  {
+    "version": "after",
+    "table": "supplier_payments",
+    "rows": 6024,
+    "pass": true
+  },
+  {
+    "version": "after",
+    "table": "suppliers",
+    "rows": 60,
+    "pass": true
+  },
+  {
+    "version": "after",
+    "table": "traffic_sources",
+    "rows": 5,
+    "pass": true
+  },
+  {
+    "version": "after",
+    "table": "warehouses",
+    "rows": 3,
+    "pass": true
+  }
+]

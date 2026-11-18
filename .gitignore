@@ -1,0 +1,14 @@
+node_modules/
+.tooling/
+dist/
+android/app/src/main/assets/
+android/build/
+android/.gradle/
+android/local.properties
+*.keystore
+__pycache__/
+*.pyc
+.DS_Store
+artifacts/*
+!artifacts/enterprise-audit/
+!artifacts/update.json

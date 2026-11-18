@@ -1,0 +1,70 @@
+{
+  "id": "q0291-mini-202611179",
+  "questionId": "q0291",
+  "visibility": "hidden",
+  "variant": "independent-enterprise",
+  "kind": "query",
+  "sharedDataPath": "fixtures/shared/enterprise-mini-202611179.json",
+  "sharedDataSha256": "f88591bb8a3ea3a748206eada73fe85ade1ec92ade7b41d510a02dc75dfd7e83",
+  "expected": {
+    "columns": [
+      "supplier_id",
+      "ordered_cents",
+      "received_cents",
+      "billed_cents",
+      "paid_cents",
+      "balance_cents"
+    ],
+    "rows": [
+      [
+        2,
+        6684239,
+        5683235,
+        5720070,
+        2899873,
+        2820197
+      ],
+      [
+        3,
+        7777285,
+        5849682,
+        5851639,
+        3090547,
+        2761092
+      ],
+      [
+        1,
+        7933169,
+        6941450,
+        6976913,
+        5302895,
+        1674018
+      ],
+      [
+        4,
+        0,
+        0,
+        1000000,
+        0,
+        1000000
+      ],
+      [
+        5,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    ]
+  },
+  "orderPolicy": "ordered",
+  "numericTolerance": {
+    "absolute": 1e-06,
+    "integerExact": true,
+    "textExact": true,
+    "nullDistinct": true
+  },
+  "columnPolicy": "exact_names_in_order",
+  "contentVersion": "4.2.0"
+}

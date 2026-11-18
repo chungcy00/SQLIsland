@@ -1,0 +1,77 @@
+{
+  "id": "q0296-boundary",
+  "questionId": "q0296",
+  "visibility": "hidden",
+  "variant": "boundary",
+  "kind": "database_delta",
+  "datasetId": "enterprise-v2",
+  "baseDatabase": "databases/enterprise/enterprise.sqlite",
+  "baseSha256": "d47285cfecd67f2dfd37a0d41a2c8a2714a6ecbc8e1170c3e9c0052204106924",
+  "patchSql": [
+    "UPDATE returns SET refund_cents=refund_cents+1 WHERE return_id=(SELECT MIN(r.return_id) FROM returns r JOIN order_items i ON i.order_item_id=r.order_item_id JOIN orders o ON o.order_id=i.order_id WHERE o.status='completed' AND o.channel='online' AND o.order_date BETWEEN '2025-01-01' AND '2025-12-31')"
+  ],
+  "patchDescription": "隔离诊断边界数据，允许故意制造来源对账差异；一条线上有效订单退款增加1分，检验退款率及退款前后利润。",
+  "patchRowChanges": 1,
+  "testIsolation": "每次使用全新数据库副本；夹具可故意引入对账差异或改变业务记录，仅用于判题，绝不可写入基准库",
+  "expected": {
+    "columns": [
+      "source_id",
+      "before_refund_cents",
+      "refund_cents",
+      "refund_pct",
+      "before_gross_cents",
+      "after_gross_cents"
+    ],
+    "rows": [
+      [
+        1,
+        29214029,
+        1992194,
+        6.82,
+        11301033,
+        10543653
+      ],
+      [
+        5,
+        3865932,
+        244816,
+        6.33,
+        1489490,
+        1396494
+      ],
+      [
+        4,
+        9851766,
+        574271,
+        5.83,
+        3748408,
+        3535735
+      ],
+      [
+        2,
+        15040395,
+        870142,
+        5.79,
+        5757805,
+        5427043
+      ],
+      [
+        3,
+        9517520,
+        490128,
+        5.15,
+        3660654,
+        3475284
+      ]
+    ]
+  },
+  "orderPolicy": "ordered",
+  "columnPolicy": "exact_names_in_order",
+  "numericTolerance": {
+    "absolute": 1e-06,
+    "integerExact": true,
+    "textExact": true,
+    "nullDistinct": true
+  },
+  "contentVersion": "4.2.0"
+}

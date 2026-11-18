@@ -1,0 +1,87 @@
+
+> sql-offline-android@0.3.0 test
+> node --test tests/*.test.mjs
+
+TAP version 13
+# Subtest: dialect conversion preserves literals and comments
+ok 1 - dialect conversion preserves literals and comments
+  ---
+  duration_ms: 10.735875
+  type: 'test'
+  ...
+# Subtest: unordered comparison preserves duplicates and null types
+ok 2 - unordered comparison preserves duplicates and null types
+  ---
+  duration_ms: 0.464625
+  type: 'test'
+  ...
+# Subtest: special syntax validates structure instead of comments
+ok 3 - special syntax validates structure instead of comments
+  ---
+  duration_ms: 10.721667
+  type: 'test'
+  ...
+# {"count":775,"failures":[],"unsupported":[{"id":"q0212","message":"该写法的专项结构验证暂不支持，本次保留为未评定。"},{"id":"q0240","message":"该写法的专项结构验证暂不支持，本次保留为未评定。"}]}
+# Subtest: all reference queries execute against their isolated fixtures
+ok 4 - all reference queries execute against their isolated fixtures
+  ---
+  duration_ms: 24454.527542
+  type: 'test'
+  ...
+# Subtest: SQL formatting preserves literals, templates and query punctuation
+ok 5 - SQL formatting preserves literals, templates and query punctuation
+  ---
+  duration_ms: 1.02675
+  type: 'test'
+  ...
+# Subtest: SQL display keeps short queries compact and complex clauses readable
+ok 6 - SQL display keeps short queries compact and complex clauses readable
+  ---
+  duration_ms: 0.882417
+  type: 'test'
+  ...
+# Subtest: ERD preserves compound keys, SQLite nullability, conditional uniqueness and true dependencies
+ok 7 - ERD preserves compound keys, SQLite nullability, conditional uniqueness and true dependencies
+  ---
+  duration_ms: 34.452791
+  type: 'test'
+  ...
+# Subtest: all seven ERDs match actual SQLite tables, columns, PKs, FK groups and unique indexes without mutation
+ok 8 - all seven ERDs match actual SQLite tables, columns, PKs, FK groups and unique indexes without mutation
+  ---
+  duration_ms: 347.736625
+  type: 'test'
+  ...
+# Subtest: an empty release repository stays unpublished
+ok 9 - an empty release repository stays unpublished
+  ---
+  duration_ms: 0.885417
+  type: 'test'
+  ...
+# Subtest: a server failure is not reported as the latest version
+ok 10 - a server failure is not reported as the latest version
+  ---
+  duration_ms: 0.537708
+  type: 'test'
+  ...
+# Subtest: update manifests require checksum and version metadata
+ok 11 - update manifests require checksum and version metadata
+  ---
+  duration_ms: 0.387167
+  type: 'test'
+  ...
+# Subtest: a complete published update is returned unchanged
+ok 12 - a complete published update is returned unchanged
+  ---
+  duration_ms: 1.237084
+  type: 'test'
+  ...
+1..12
+# tests 12
+# suites 0
+# pass 12
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 24655.220583

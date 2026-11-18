@@ -1,0 +1,43 @@
+{
+  "version": "4.2.0",
+  "seed": 2026111705,
+  "counts": {
+    "databases": 7,
+    "questions": 300,
+    "flashcards": 200,
+    "auditedBusinessQuestions": 50,
+    "auditedBusinessFixtures": 204,
+    "independentResultComparisons": 204,
+    "businessInvariantChecks": 38,
+    "wrongQueriesRejected": 290,
+    "additionalEquivalentQueriesAccepted": 1,
+    "candidateQueries": 291,
+    "hardcodedPublicResultsRejected": 50
+  },
+  "nullPolicy": "保留具有业务含义的NULL，不为了完整率填补空值；题目明确规定的零业务量聚合仍按原口径返回0。",
+  "bytes": {
+    "before": 118300672,
+    "after": 117534720
+  },
+  "environment": {
+    "pythonSQLite": "3.51.0",
+    "mysqlAvailable": "本机5.7.24，不支持本任务所需的8.4 CTE/窗口验证；Docker daemon未运行",
+    "mysql84NativeRuns": 0
+  },
+  "limitations": [
+    "原生MySQL8.4脚本尚未实际导入执行，不能将SQLite或WASM验证视为原生通过。",
+    "实体Android10和Android16的完整性能尚待验收。",
+    "分布参数、活动优惠与业务效果均为虚构教学假设，未用真实企业样本校准；前期等长窗口比较不能证明促销因果增量。",
+    "离线隐藏数据可被逆向读取，测试用于检验泛化和业务逻辑，不能提供防逆向作弊保证。",
+    "财务是来源可追溯的业务子账与费用凭证，不是完整总账；FIFO为本仓数量入库库龄，调入日重置本仓库龄。",
+    "人工成本按课程176小时及1.5倍教学模型估算，员工月归属为当月最后在职岗位，不作为法定薪资核算。",
+    "BP42使用明确的一采购单对应一张供应商发票的教学范围；未扩展到任意多发票收货分摊系统。",
+    "BP29派生加权均价允许末位1分的跨引擎浮点误差，整数金额、件数及标识保持精确比较。",
+    "q0212 RANGE窗口、q0240保存点轨迹为原有专项结构未评定项，本次企业50题均不依赖这两项。"
+  ],
+  "wasm": {
+    "pass": true,
+    "sqliteVersion": "3.49.1",
+    "correctExecutions": 408
+  }
+}

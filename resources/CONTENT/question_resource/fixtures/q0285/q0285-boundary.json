@@ -1,0 +1,213 @@
+{
+  "id": "q0285-boundary",
+  "questionId": "q0285",
+  "visibility": "hidden",
+  "variant": "boundary",
+  "kind": "database_delta",
+  "datasetId": "enterprise-v2",
+  "baseDatabase": "databases/enterprise/enterprise.sqlite",
+  "baseSha256": "d47285cfecd67f2dfd37a0d41a2c8a2714a6ecbc8e1170c3e9c0052204106924",
+  "patchSql": [
+    "UPDATE inventory_snapshots SET quantity=1000000 WHERE snapshot_date='2025-12-31' AND product_id=160 AND warehouse_id=3"
+  ],
+  "patchDescription": "隔离诊断边界数据，允许故意制造来源对账差异；逾期未收货仍存在但库存已足够，不应误判叠加缺货。",
+  "patchRowChanges": 1,
+  "testIsolation": "每次使用全新数据库副本；夹具可故意引入对账差异或改变业务记录，仅用于判题，绝不可写入基准库",
+  "expected": {
+    "columns": [
+      "warehouse_id",
+      "product_id",
+      "quantity",
+      "demand",
+      "overdue_units",
+      "shortage"
+    ],
+    "rows": [
+      [
+        3,
+        139,
+        4,
+        40,
+        35,
+        36
+      ],
+      [
+        3,
+        497,
+        0,
+        14,
+        14,
+        14
+      ],
+      [
+        3,
+        386,
+        1,
+        13,
+        1,
+        12
+      ],
+      [
+        3,
+        384,
+        0,
+        10,
+        2,
+        10
+      ],
+      [
+        3,
+        418,
+        8,
+        17,
+        6,
+        9
+      ],
+      [
+        3,
+        189,
+        0,
+        8,
+        10,
+        8
+      ],
+      [
+        3,
+        385,
+        2,
+        10,
+        2,
+        8
+      ],
+      [
+        3,
+        111,
+        17,
+        24,
+        9,
+        7
+      ],
+      [
+        3,
+        151,
+        1,
+        8,
+        22,
+        7
+      ],
+      [
+        3,
+        287,
+        1,
+        7,
+        20,
+        6
+      ],
+      [
+        3,
+        267,
+        0,
+        4,
+        2,
+        4
+      ],
+      [
+        3,
+        349,
+        0,
+        4,
+        3,
+        4
+      ],
+      [
+        3,
+        437,
+        17,
+        21,
+        4,
+        4
+      ],
+      [
+        1,
+        113,
+        3,
+        6,
+        15,
+        3
+      ],
+      [
+        2,
+        73,
+        3,
+        6,
+        1,
+        3
+      ],
+      [
+        3,
+        369,
+        5,
+        8,
+        4,
+        3
+      ],
+      [
+        1,
+        28,
+        0,
+        2,
+        1,
+        2
+      ],
+      [
+        1,
+        242,
+        4,
+        6,
+        1,
+        2
+      ],
+      [
+        2,
+        360,
+        0,
+        2,
+        1,
+        2
+      ],
+      [
+        1,
+        59,
+        0,
+        1,
+        8,
+        1
+      ],
+      [
+        2,
+        155,
+        3,
+        4,
+        3,
+        1
+      ],
+      [
+        3,
+        248,
+        2,
+        3,
+        11,
+        1
+      ]
+    ]
+  },
+  "orderPolicy": "ordered",
+  "columnPolicy": "exact_names_in_order",
+  "numericTolerance": {
+    "absolute": 1e-06,
+    "integerExact": true,
+    "textExact": true,
+    "nullDistinct": true
+  },
+  "contentVersion": "4.2.0"
+}

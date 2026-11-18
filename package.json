@@ -1,0 +1,23 @@
+{
+  "name": "sql-offline-android",
+  "version": "0.3.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "preview": "node scripts/serve.mjs"
+  },
+  "dependencies": {
+    "@dagrejs/dagre": "1.0.4",
+    "node-sql-parser": "5.3.8",
+    "sql-formatter": "15.9.0",
+    "sql.js": "1.13.0",
+    "ts-fsrs": "5.2.3",
+    "xlsx": "0.18.5"
+  },
+  "devDependencies": {
+    "esbuild": "0.25.12",
+    "playwright": "1.56.1"
+  }
+}
