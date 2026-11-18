@@ -1,0 +1,3 @@
+# Preserve audited resource hashes across checkout platforms.
+resources/CONTENT/** -text
+resources/ASSETS/** -text
