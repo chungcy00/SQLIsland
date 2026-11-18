@@ -46,7 +46,7 @@
 - 实验室支持独立的查询标签与草稿保存，旧实验室草稿会接入第一个查询标签。
 - 闪卡可撤回上次评分，恢复之前的 FSRS 状态。
 - 更新源为 `chungcy00/SQLIsland` 的 GitHub Releases。只有点击检查更新才发起联网请求。学习、练习和 SQL 执行继续使用安装包内置资源。
-- `release.json` 维护本版说明。签名 APK 构建后执行 `node scripts/prepare-update.mjs` 生成 `artifacts/update.json`。公开 Release 标签与版本号一致，当前为 `v0.3.2`，同时附加 APK 与更新清单。
+- `release.json` 维护本版说明。签名 APK 构建后执行 `node scripts/prepare-update.mjs` 生成 `artifacts/update.json`。公开 Release 标签与版本号一致，当前为 `v0.3.3`，同时附加 APK 与更新清单。
 - 应用先核对 SHA-256、包名、递增版本号和签名，再调用安卓安装器。首次安装更新需在安卓设置中允许安装应用。
 - 已发布至 https://github.com/chungcy00/SQLIsland/releases 。已在 Android 16 模拟器完成真实版本检查、下载校验与安卓系统覆盖安装。实体手机仍待验收。
 
@@ -57,6 +57,10 @@
 后续发布时同步递增 `release.json`、`android/app/src/main/AndroidManifest.xml`、`android/app/build.gradle` 及构建脚本中的版本号与文件名。使用现有 `.tooling/sql-shouji.keystore` 签名，运行构建和清单生成后，将 APK 与 `update.json` 一起附加到新的 GitHub Release。清单里的 APK 名使用 ASCII 文件名。
 
 本地预览通过开发服务器读取 GitHub 更新信息。安卓安装版由原生更新模块直接检查与下载。已验证从公开 0.2.0 更新至更名后的 0.2.1，学习记录保持完整。
+
+## 0.3.3 桌面图标
+
+安卓桌面图标采用岛屿学习主题插画。
 
 ## 0.3.2 企业实战逐题复审
 
