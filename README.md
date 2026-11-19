@@ -46,7 +46,7 @@
 - 实验室支持独立的查询标签与草稿保存，旧实验室草稿会接入第一个查询标签。
 - 闪卡可撤回上次评分，恢复之前的 FSRS 状态。
 - 更新源为 `chungcy00/SQLIsland` 的 GitHub Releases。只有点击检查更新才发起联网请求。学习、练习和 SQL 执行继续使用安装包内置资源。
-- `release.json` 维护本版说明。签名 APK 构建后执行 `node scripts/prepare-update.mjs` 生成 `artifacts/update.json`。公开 Release 标签与版本号一致，当前为 `v0.3.9`，同时附加 APK 与更新清单。
+- `release.json` 维护本版说明。签名 APK 构建后执行 `node scripts/prepare-update.mjs` 生成 `artifacts/update.json`。公开 Release 标签与版本号一致，当前为 `v0.4.0`，同时附加 APK 与更新清单。
 - 应用先核对 SHA-256、包名、递增版本号和签名，再调用安卓安装器。首次安装更新需在安卓设置中允许安装应用。
 - 已发布至 https://github.com/chungcy00/SQLIsland/releases 。已在 Android 16 模拟器完成真实版本检查、下载校验与安卓系统覆盖安装。实体手机仍待验收。
 
