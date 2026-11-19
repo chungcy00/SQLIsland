@@ -16,6 +16,7 @@ export const defaults = () => ({
     newCards: 10,
     reviewLimit: 100,
     fontSize: 14,
+    bodyFont: 15,
     editorDark: false,
     customKeyboard: true,
   },

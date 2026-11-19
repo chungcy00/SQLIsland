@@ -1,3 +1,5 @@
+> **【部分已被替代 · 2026-11-20】** “152 知识点/300 题”等旧口径已废弃；产品事实与功能边界以 `新版设计规范/PRODUCT.md` 与 `HANDOFF.md` 为准。
+
 # 数屿SQL
 
 <!-- impeccable:product-schema 1 -->

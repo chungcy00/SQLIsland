@@ -55,9 +55,9 @@
   "fullscreen": true,
   "preview": true,
   "buildHashes": {
-    "dist/app.js": "47ec2ca8fb57540439f7ccd067e3c06de0209a2a039a3c269e191dd006fe1273",
-    "dist/sql-worker.js": "cc40d31c872f9324fc2d436f816eb40bad2db12eace8f6094a37bfeeefa69e75",
-    "dist/style.css": "7dc73c1be71d172cf67bba0d35d3953c7e7d029f66e2447d34c4486f846a06bc",
+    "dist/app.js": "c867de9a635bb63029c9265aa8daf407cb880a7d5f0132a03b65cc58c8dcc323",
+    "dist/sql-worker.js": "626b4e3320ee89285e0888e3c96954bb3c38941a6a2082c8de35140f36988503",
+    "dist/style.css": "3dceb531b97d47973deb4eca2cd77a2088ccf05ac2f3928303b049a88705f9b0",
     "dist/databases.json": "787ba613b9cb30080151ed5360f5fbf4357b4c099043e78cddd59cb67bb22359"
   }
 }

@@ -107,6 +107,7 @@ try {
   await page.waitForFunction(() => document.querySelectorAll('.card-browser-row').length === 1);
   assert.equal(await page.locator('.card-browser-row').count(), 1);
   await page.locator('.card-browser-row summary').click();
+  await page.locator('.card-browser-answer').first().waitFor({ state: 'visible' }); // B2：展开有 200ms 高度动画
   assert.equal(await page.locator('.card-browser-answer:visible').count(), 1);
   await page.locator('[data-action=copyCard]').click();
   await page.waitForURL('**/#/card-edit/user-*');

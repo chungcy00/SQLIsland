@@ -1,6 +1,8 @@
 import { lessonComplete, lessonNote, lessonNoteKey, migrateLessonBookmarks } from "./curriculum-progress.js";
 import { isCurrentQuestionAttempt, questionDraft } from "./question-progress.js";
 import { actionIconPaths } from "./action-icons.js";
+import { islandSvg, islandLitCount } from "./island.js";
+import { contourSvg, tideSvg } from "./decor.js";
 import { fetchLatestUpdate, UPDATE_REPOSITORY } from "./updates.js";
 import release from "../release.json";
 import { editorBody, mountEditor, editorCommand } from "./editor.js";
@@ -227,6 +229,112 @@ function navigate(path) {
   if (route() === path) render();
   else location.hash = encodeURI(path);
 }
+
+// ===== 全局浮层：底部面板与确认弹窗（UI_SYSTEM §4.6–§4.7）=====
+let topLayer = null;
+function overlayRoot() {
+  let root = document.querySelector("#overlay-root");
+  if (!root) {
+    root = document.createElement("div");
+    root.id = "overlay-root";
+    document.body.append(root);
+  }
+  return root;
+}
+function closeTopLayer() {
+  if (!topLayer) return false;
+  topLayer.dismiss();
+  return true;
+}
+function showLayer(node, scrim, dismiss) {
+  const root = overlayRoot();
+  root.append(scrim, node);
+  const previous = document.activeElement;
+  const layer = {
+    dismiss: () => {
+      if (topLayer !== layer) return;
+      topLayer = null;
+      node.classList.remove("on");
+      scrim.classList.remove("on");
+      node.setAttribute("aria-hidden", "true");
+      setTimeout(() => { node.remove(); scrim.remove(); }, 260);
+      previous?.focus?.();
+      dismiss();
+    },
+  };
+  topLayer = layer;
+  requestAnimationFrame(() => {
+    node.classList.add("on");
+    scrim.classList.add("on");
+    node.setAttribute("aria-hidden", "false");
+  });
+  return layer;
+}
+// 不可逆确认：点遮罩不关闭；返回键/Esc = 取消。resolve(true) 仅在点确认时。
+function confirmDialog({ title, message, confirmLabel = "确认", danger = true }) {
+  return new Promise((resolve) => {
+    const dialog = document.createElement("div");
+    dialog.className = "dialog";
+    dialog.setAttribute("role", "alertdialog");
+    dialog.setAttribute("aria-modal", "true");
+    dialog.innerHTML = `<h2>${e(title)}</h2><p>${e(message)}</p><div class="dialog-actions"><button class="outline" data-dialog="cancel">取消</button><button class="${danger ? "danger" : "primary"}" data-dialog="ok">${e(confirmLabel)}</button></div>`;
+    const scrim = document.createElement("div");
+    scrim.className = "scrim dialog-scrim";
+    let result = false;
+    const layer = showLayer(dialog, scrim, () => resolve(result));
+    dialog.addEventListener("click", (event) => {
+      const choice = event.target.closest("[data-dialog]")?.dataset.dialog;
+      if (!choice) return;
+      result = choice === "ok";
+      layer.dismiss();
+    });
+    dialog.querySelector('[data-dialog="cancel"]').focus();
+  });
+}
+// 选择类底部面板：options = [{value, label}]；resolve(选中值 | null)
+function openSheet({ title, options, value }) {
+  return new Promise((resolve) => {
+    const sheet = document.createElement("div");
+    sheet.className = "sheet";
+    sheet.setAttribute("role", "dialog");
+    sheet.setAttribute("aria-modal", "true");
+    sheet.setAttribute("aria-label", title);
+    sheet.innerHTML = `<div class="sheet-grab"><i></i></div><div class="sheet-head"><h2>${e(title)}</h2><button class="icon-button" data-sheet="close" aria-label="关闭">${icon("close")}</button></div><div class="sheet-list" role="radiogroup">${options.map((o) => `<button class="sheet-option" role="radio" aria-checked="${o.value === value}" data-sheet-value="${e(o.value)}">${e(o.label)}${icon("check")}</button>`).join("")}</div>`;
+    const scrim = document.createElement("div");
+    scrim.className = "scrim";
+    let result = null;
+    const layer = showLayer(sheet, scrim, () => resolve(result));
+    scrim.addEventListener("click", () => layer.dismiss());
+    sheet.addEventListener("click", (event) => {
+      if (event.target.closest('[data-sheet="close"]')) return layer.dismiss();
+      const option = event.target.closest("[data-sheet-value]");
+      if (!option) return;
+      result = options.find((o) => String(o.value) === option.dataset.sheetValue)?.value ?? null;
+      layer.dismiss();
+    });
+    const grab = sheet.querySelector(".sheet-grab");
+    let startY = null;
+    grab.addEventListener("pointerdown", (event) => { startY = event.clientY; sheet.classList.add("drag"); grab.setPointerCapture(event.pointerId); });
+    grab.addEventListener("pointermove", (event) => { if (startY !== null) sheet.style.transform = `translateY(${Math.max(0, event.clientY - startY)}px)`; });
+    const finish = (event) => {
+      if (startY === null) return;
+      const distance = event.clientY - startY;
+      startY = null;
+      sheet.classList.remove("drag");
+      sheet.style.transform = "";
+      if (distance > 80) layer.dismiss();
+    };
+    grab.addEventListener("pointerup", finish);
+    grab.addEventListener("pointercancel", finish);
+  });
+}
+window.addEventListener("keydown", (event) => { if (event.key === "Escape" && closeTopLayer()) event.preventDefault(); });
+window.addEventListener("hashchange", () => closeTopLayer());
+window.addEventListener("scroll", () => document.body.classList.toggle("scrolled", window.scrollY > 2), { passive: true });
+function applyBodyFont(size = state.settings.bodyFont) {
+  const px = Math.min(20, Math.max(14, Number(size) || 15));
+  document.documentElement.style.setProperty("--body-fs", px / 16 + "rem");
+}
 function shell(title, body, tab = "home", detail = false, extra = "") {
   const navigation = [
     ["home", "首页", "/"],
@@ -235,7 +343,7 @@ function shell(title, body, tab = "home", detail = false, extra = "") {
     ["flashcards", "闪卡", "/cards"],
     ["mine", "我的", "/mine"],
   ];
-  app.innerHTML = `<header class="appbar">${detail ? button(icon("back"), "back", "", "icon-button") : image("brand/logo_d", "logo")}<h1>${e(title)}</h1>${extra || (!detail ? goButton(icon("settings"), "/settings", "icon-button") : "")}</header><main class="page ${detail ? "detail" : ""}">${body}</main>${detail ? "" : `<nav aria-label="主导航">${navigation.map(([key, label, path]) => goButton(`<span class="nav-icon">${image(`navigation/${key}_${tab === key ? "active" : "inactive"}`)}</span>${label}`, path, tab === key ? "active" : "")).join("")}</nav>`}`;
+  app.innerHTML = `<header class="appbar ${detail ? "detail" : ""}">${detail ? button(icon("back"), "back", "", "icon-button") : image("brand/logo_d", "logo")}<h1>${e(title)}</h1>${extra || (!detail ? goButton(icon("settings"), "/settings", "icon-button") : '<span class="appbar-spacer"></span>')}</header><main class="page ${detail ? "detail" : ""}">${body}</main>${detail ? "" : `<nav aria-label="主导航">${navigation.map(([key, label, path]) => goButton(`<span class="nav-icon">${image(`navigation/${key}_${tab === key ? "active" : "inactive"}`)}</span>${label}`, path, tab === key ? "active" : "")).join("")}</nav>`}`;
 }
 function completedChapter(c) {
   return c.knowledgePoints.every((k) => completedLesson(k.id));
@@ -314,14 +422,14 @@ function home() {
   ];
   shell(
     "数屿SQL",
-    `<section class="panel continue learning-hero"><div class="study-badge">连续学习 ${studyStreak()} 天 · 累计 ${minutes} 分钟</div><div class="learning-hero-content"><div class="grow"><h2>${e(title)}</h2><p class="hero-summary">${summary}</p></div>${image("illustrations/states/state_home_learning", "learning-hero-art")}</div><div class="hero-actions">${goButton(icon("play") + " " + (state.lastLesson ? "继续学习" : "开始学习"), "/lesson/" + next.id, "primary")}${goButton("待复习 " + dueCards().length + " 卡", "/cards", "hero-review")}</div></section>
+    `<section class="panel continue learning-hero">${contourSvg("hero-contour")}${islandSvg(islandLitCount(completedKnowledgePoints(), knowledgePoints().length), "learning-hero-art")}<div class="hero-text"><div class="study-badge">连续学习 ${studyStreak()} 天 · 累计 ${minutes} 分钟</div><h2>${e(title)}</h2><p class="hero-summary">${summary}</p></div><div class="hero-progress"><div class="progress" role="progressbar" aria-label="已学知识点" aria-valuemin="0" aria-valuemax="${knowledgePoints().length}" aria-valuenow="${completedKnowledgePoints()}"><span style="width:${knowledgePoints().length ? (completedKnowledgePoints() / knowledgePoints().length) * 100 : 0}%"></span></div><small>已学 ${completedKnowledgePoints()}/${knowledgePoints().length}</small></div><div class="hero-actions">${goButton(icon("play") + " " + (state.lastLesson ? "继续学习" : "开始学习"), "/lesson/" + next.id, "primary")}${goButton("待复习 " + dueCards().length + " 卡", "/cards", "hero-review")}</div></section>
     <div class="section-heading"><h2>快捷入口</h2></div><div class="home-shortcuts">${shortcuts.map(([label, route, asset, count]) => goButton(`<span class="list-icon">${image("functions/" + asset, "asset-icon")}</span><span class="grow"><strong>${label}</strong>${count ? `<small>${count}</small>` : ""}</span>`, route, "shortcut-tile")).join("")}</div>
-    <div class="section-heading"><h2>学习路线</h2>${goButton("查看统计", "/stats")}</div><div class="stats home-progress"><div class="stat"><strong>${completedKnowledgePoints()}<small> / ${knowledgePoints().length}</small></strong><small>学完知识点</small></div><div class="stat"><strong>${stats.done}<small> / ${content.questions.length}</small></strong><small>独立完成题目</small></div><div class="stat"><strong>${studiedCards()}<small> / 200</small></strong><small>已学闪卡</small></div></div>
-    <div class="home-stages">${stages.map((stage) => {
+    ${tideSvg("tide")}<div class="section-heading"><h2>学习路线</h2>${goButton("查看统计", "/stats")}</div><div class="stats home-progress"><div class="stat"><strong>${completedKnowledgePoints()}<small> / ${knowledgePoints().length}</small></strong><small>学完知识点</small></div><div class="stat"><strong>${stats.done}<small> / ${content.questions.length}</small></strong><small>独立完成题目</small></div><div class="stat"><strong>${studiedCards()}<small> / 200</small></strong><small>已学闪卡</small></div></div>
+    <div class="panel home-stages">${stages.map((stage) => {
       const chapters = content.chapters.filter((c) => c.stage === stage);
       const points = chapters.flatMap((c) => c.knowledgePoints);
       const done = points.filter((k) => completedLesson(k.id)).length;
-      return button(`<span class="row between"><strong>${stage}</strong>${icon("right", "chevron")}</span><small>${chapters.length} 章 · ${done} / ${points.length} 已学</small><span class="progress"><span style="width:${points.length ? done / points.length * 100 : 0}%"></span></span>`, "homeStage", stage, "home-stage");
+      return button(`<span class="grow"><strong>${stage}</strong><small>${chapters.length} 章 · 已学 ${done}/${points.length}</small><span class="progress"><span style="width:${points.length ? done / points.length * 100 : 0}%"></span></span></span>${icon("right", "chevron")}`, "homeStage", stage, "home-stage");
     }).join("")}</div>
     <div class="section-heading"><h2>业务实战</h2>${goButton("全部项目", "/projects")}</div><div class="home-projects" aria-label="业务项目">${projects.map((p) => {
       const tasks = content.questions.filter((q) => q.chapterId === "ch19" && q.projectId === p[0]);
@@ -1242,6 +1350,7 @@ function settingsPage() {
       ["newCards", "每日新卡上限", 1, 100],
       ["reviewLimit", "每日复习上限", 1, 500],
     ].map(([key, label, min, max]) => `<label class="setting-row"><span>${label}</span><input type="number" data-setting="${key}" value="${s[key]}" min="${min}" max="${max}" step="1" inputmode="numeric"></label>`).join("")}</section>
+    <section class="panel settings-section"><h2>显示</h2><label class="setting-slider"><span class="row between"><span>正文字号</span><output id="body-font-value" for="body-font">${s.bodyFont} px</output></span><input id="body-font" aria-label="正文字号" type="range" min="14" max="20" step="1" value="${s.bodyFont}" data-setting="bodyFont"></label><p class="body-font-preview">示例正文：WHERE 子句在分组之前筛选行。</p></section>
     <section class="panel settings-section"><h2>代码编辑器</h2>
     ${toggle("深色代码区域", "editorDark")}${toggle("SQL 自定义键盘", "customKeyboard")}
     <label class="setting-slider"><span class="row between"><span>代码字号</span><output id="font-size-value" for="font-size">${s.fontSize} px</output></span><input id="font-size" aria-label="代码字号" type="range" min="12" max="20" step="1" value="${s.fontSize}" data-setting="fontSize"></label>
@@ -1262,6 +1371,11 @@ function resizeTextFields() {
   app.querySelectorAll("textarea").forEach(resizeTextField);
 }
 function updateSettingsPreview() {
+  const body = app.querySelector("#body-font");
+  if (body) {
+    applyBodyFont(body.value);
+    app.querySelector("#body-font-value").value = body.value + " px";
+  }
   const preview = app.querySelector(".settings-preview");
   if (!preview) return;
   const size = app.querySelector('[data-setting="fontSize"]').value;
@@ -2060,7 +2174,7 @@ async function handleAction(action, arg, element) {
       break;
     }
     case "deleteCard":
-      if (confirm("删除这张个人闪卡及其复习计划？")) {
+      if (await confirmDialog({ title: "删除这张个人闪卡？", message: "会同时删除它的复习计划和收藏，删除后无法撤销。", confirmLabel: "删除" })) {
         state.userCards = state.userCards.filter((c) => c.id !== arg);
         delete state.reviews[arg];
         state.favorites = state.favorites.filter((id) => id !== arg);
@@ -2110,7 +2224,7 @@ async function handleAction(action, arg, element) {
       const key = "lab:" + currentLab + ":" + arg;
       if (
         state.drafts[key]?.code?.trim() &&
-        !confirm("关闭查询标签并删除该草稿？")
+        !(await confirmDialog({ title: "关闭查询标签？", message: "标签里的草稿会一并删除，无法撤销。", confirmLabel: "关闭并删除" }))
       )
         break;
       workspace.tabs = workspace.tabs.filter((tab) => tab.id !== arg);
@@ -2185,7 +2299,7 @@ async function handleAction(action, arg, element) {
       break;
     }
     case "deleteDataset":
-      if (confirm("删除这个个人数据库？此操作会删除其中的表和数据。")) {
+      if (await confirmDialog({ title: "删除这个个人数据库？", message: "其中的表和数据都会被删除，无法撤销。", confirmLabel: "删除" })) {
         await deleteDataset(arg);
         if (currentLab === arg) {
           currentLab = "lesson";
@@ -2309,7 +2423,7 @@ async function handleAction(action, arg, element) {
       if (!pendingBackup) break;
       if (
         arg === "replace" &&
-        !confirm("覆盖当前学习记录？个人数据集按 ID 合并。请先导出当前备份。")
+        !(await confirmDialog({ title: "覆盖当前学习记录？", message: "覆盖后无法撤销；个人数据集按 ID 合并。请先导出当前备份。", confirmLabel: "覆盖" }))
       )
         break;
       migrateLessonBookmarks(pendingBackup.state, content.curriculumMigration);
@@ -2673,6 +2787,7 @@ window.addEventListener("visibilitychange", () => {
   if (document.hidden) persist();
 });
 window.onNativeBack = () => {
+  if (closeTopLayer()) return true;
   const diagram = document.querySelector(".erd-fullscreen");
   if (diagram) {
     diagram.querySelector('[data-erd-action="expand"]').click();
@@ -2728,6 +2843,7 @@ async function boot() {
       state.resourceCheck = null;
       await persist();
     }
+    applyBodyFont();
     personal = await datasets();
     if (window.AndroidUpdates) {
       try {

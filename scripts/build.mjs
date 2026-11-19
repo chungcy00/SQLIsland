@@ -31,7 +31,8 @@ await cp("src/style.css", "dist/style.css");
 await cp("node_modules/sql.js/dist/sql-wasm.wasm", "dist/sql-wasm.wasm");
 await cp(assetSource, "dist/assets", {
   recursive: true,
-  filter: (p) => !p.endsWith(".svg") && !p.endsWith(".md"),
+  // v2/illustrations 尚未接入界面（B10 再做白名单），暂不打包，避免 APK 增加约 36MB 未使用资源。
+  filter: (p) => !p.endsWith(".svg") && !p.endsWith(".md") && !p.split(path.sep).join("/").includes("/v2/illustrations"),
 });
 const chapters = [],
   questions = [],
