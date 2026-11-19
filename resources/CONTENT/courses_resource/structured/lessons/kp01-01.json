@@ -1,0 +1,216 @@
+{
+  "schemaVersion": 1,
+  "id": "kp01-01",
+  "sourceBatch": "batch1",
+  "teachingKind": "concept",
+  "conceptBlocks": [
+    {
+      "type": "heading",
+      "text": "表、行与字段",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "数据库是按一定结构组织的数据集合，数据库管理系统负责访问和管理它。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "企业通常把订单、商品、客户分别放在不同的表中，而不是把所有信息堆在一张表。",
+        "表用列定义记录的属性，用行保存具体记录。",
+        "字段名描述属性，字段中的值才是实际数据。"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "记录粒度与统计对象",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "数据粒度指一行代表的业务对象或事件；例如订单表一行是一笔订单，订单明细表一行却可能是一种商品的一条明细。",
+      "emphasis": [
+        "数据粒度"
+      ]
+    },
+    {
+      "type": "list",
+      "items": [
+        "同一个客户可以下多笔订单，所以记录数并不等于客户数。",
+        "开始分析前先确认数据粒度、唯一标识与统计目标，再决定是直接读取、去重还是汇总。"
+      ]
+    },
+    {
+      "type": "table",
+      "columns": [
+        "对象",
+        "含义",
+        "本例"
+      ],
+      "rows": [
+        [
+          "表",
+          "保存同一种记录",
+          "orders"
+        ],
+        [
+          "行",
+          "一次业务记录",
+          "一笔订单"
+        ],
+        [
+          "列",
+          "记录的属性",
+          "sales 销售金额"
+        ],
+        [
+          "客户编号",
+          "识别客户",
+          "同一客户可有多笔订单"
+        ]
+      ]
+    }
+  ],
+  "syntax": {
+    "purpose": "概念说明示例。SELECT 展示“列来自表”的关系；后面的完整查询用于核对订单明细。"
+  },
+  "dataDescriptions": {
+    "orders": "每行一笔订单，id 为订单编号，customer_id 为客户编号。sales 采用教学金额单位，store_id 是门店编号，order_date 是日期。订单 4 的客户编号为 NULL。"
+  },
+  "problem": "主管需要核对订单编号、商品类别与销售金额，不需要查看客户资料或门店编号。订单表已有这些字段，因此直接选择所需列即可。",
+  "methodBlocks": [
+    {
+      "type": "paragraph",
+      "text": "核对逐笔明细需要保留订单行，只选择主管要求的三个字段，再明确显示顺序。"
+    }
+  ],
+  "breakdown": [
+    {
+      "kind": "fragment",
+      "title": "选择数据来源",
+      "sql": "FROM orders",
+      "purpose": "从订单表读取记录。",
+      "reason": "所需字段已经在订单表内，无需关联客户表。"
+    },
+    {
+      "kind": "fragment",
+      "title": "选择报表字段",
+      "sql": "SELECT id, category, sales",
+      "purpose": "依次输出订单编号、类别和销售金额。",
+      "reason": "投影到三列即可完成核对，不需要汇总。"
+    },
+    {
+      "kind": "fragment",
+      "title": "固定输出顺序",
+      "sql": "ORDER BY id;",
+      "purpose": "按订单编号升序排列。",
+      "reason": "查询结果的默认行序没有保证。"
+    }
+  ],
+  "completeCode": {
+    "mysqlSql": "SELECT id, category, sales FROM orders ORDER BY id;",
+    "sqliteSql": "SELECT id, category, sales FROM orders ORDER BY id;"
+  },
+  "expectedResult": {
+    "columns": [
+      "id",
+      "category",
+      "sales"
+    ],
+    "rows": [
+      [
+        1,
+        "护肤品",
+        800
+      ],
+      [
+        2,
+        "化妆品",
+        400
+      ],
+      [
+        3,
+        "护肤品",
+        600
+      ],
+      [
+        4,
+        "化妆品",
+        300
+      ],
+      [
+        5,
+        "日用品",
+        1500
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "resultBlocks": [
+    {
+      "type": "paragraph",
+      "text": "五笔订单全部保留，列数由六列减少为三列，粒度仍是一行一笔订单。订单1和3属于同一已知客户，订单4没有客户编号。已知客户数为3，不能说有5名客户，也不能据此推断匿名客户人数。"
+    }
+  ],
+  "extensions": [
+    {
+      "label": "核对订单与已知客户数量",
+      "explanation": "先观察两个统计值的差异；后续聚合章节会详细学习计数。",
+      "sql": "SELECT COUNT(*) AS order_count, COUNT(DISTINCT customer_id) AS known_customers FROM orders;",
+      "result": {
+        "columns": [
+          "order_count",
+          "known_customers"
+        ],
+        "rows": [
+          [
+            5,
+            3
+          ]
+        ]
+      },
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "先观察两个统计值的差异；后续聚合章节会详细学习计数。"
+        }
+      ]
+    }
+  ],
+  "cautions": {
+    "comparison": [
+      {
+        "type": "paragraph",
+        "text": "选择字段改变结果的列，不一定改变行数；去重或汇总才可能改变记录数量。"
+      }
+    ],
+    "example": [
+      {
+        "type": "paragraph",
+        "text": "把五笔订单当成五名客户。"
+      }
+    ],
+    "reason": [
+      {
+        "type": "paragraph",
+        "text": "一位客户可关联多笔订单；把订单行数当成人数会重复计数同一位客户。"
+      }
+    ],
+    "correction": [
+      {
+        "type": "paragraph",
+        "text": "先检查客户编号，再使用去重计数；匿名订单单独说明。"
+      }
+    ],
+    "notes": [
+      {
+        "type": "paragraph",
+        "text": "查询不修改原始表。订单粒度只是本示例的定义，现实中应查数据字典。"
+      }
+    ]
+  },
+  "sourcePath": "source/batch1/kp01-01.json",
+  "sourceSha256": "6735de6056ae5f4ff96e22462f244cfca95790f3ae532b71c4849052f62a4f85"
+}

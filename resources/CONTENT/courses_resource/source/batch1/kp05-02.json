@@ -1,0 +1,175 @@
+{
+  "id": "kp05-02",
+  "chapterId": "ch05",
+  "title": "空值替换与候选值选择",
+  "learningObjective": "能够使用双参数空值替换及多候选值函数，保留真实的零与空字符串，并明确填补规则。",
+  "prerequisites": [
+    "kp05-01"
+  ],
+  "concept": "报表常需为缺失字段提供显示用替代值。IFNULL 接受两个参数：第一个非空时直接返回，否则返回第二个。COALESCE 按顺序返回第一个非空候选值，适合多个候选来源。若所有候选均为空，结果仍为空。零和空字符串不是 NULL，因此不会被这两个函数替换。替代值仅是报表处理规则，不代表原始缺失真实变成了零或其他值。若业务明确把空文本也视为缺失，可先使用 NULLIF 将其转换为空值，再选择替代文本。",
+  "syntax": "IFNULL(a, b);\nCOALESCE(a, b, c);",
+  "parameters": {
+    "a": "优先使用的原始值",
+    "b, c": "依业务优先级排列的备用值"
+  },
+  "fixtureIds": [
+    "lesson-nullable_values"
+  ],
+  "sourceTables": [
+    {
+      "name": "nullable_values",
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "value",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "note",
+          "type": "TEXT",
+          "mysqlType": "VARCHAR(160) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_bin",
+          "sqliteType": "TEXT"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          null,
+          null
+        ],
+        [
+          2,
+          0,
+          ""
+        ],
+        [
+          3,
+          10,
+          "ok"
+        ],
+        [
+          4,
+          10,
+          "ok"
+        ]
+      ]
+    }
+  ],
+  "mysqlSql": "SELECT id, IFNULL(value, -1) AS filled, COALESCE(note, 'missing') AS note_filled FROM nullable_values ORDER BY id;",
+  "sqliteSql": "SELECT id, IFNULL(value, -1) AS filled, COALESCE(note, 'missing') AS note_filled FROM nullable_values ORDER BY id;",
+  "executionSteps": [
+    "检查原始字段",
+    "为缺失值选择替代项",
+    "保留零及空文本"
+  ],
+  "useCase": "主管希望报表醒目标记未填写的数值与备注，同时不丢失实际零值。示例约定数值缺失显示-1、备注缺失显示 missing；这些仅为展示标记。",
+  "comparison": "IFNULL 固定两个参数；COALESCE 支持多个候选值。两者都不会自动将空文本视作缺失。",
+  "commonError": {
+    "example": "COALESCE(value,0) 后认为所有缺失记录原本都是真实零。",
+    "correction": "先确定业务规则，保留原列或缺失标记；需要将空文本视为缺失时使用 NULLIF。"
+  },
+  "notes": "混合参数类型在 MySQL 与 SQLite 中可能有不同类型推断。本例仅验证所示数据。",
+  "compatibility": {
+    "status": "直接兼容",
+    "detail": "仅在本示例数据与语义范围验证；不代表全部 MySQL 语法兼容。"
+  },
+  "relatedQuestionIds": [
+    "q0054",
+    "q0058",
+    "q0060"
+  ],
+  "relatedFlashcardIds": [
+    "fc0031",
+    "fc0032",
+    "fc0034"
+  ],
+  "relatedKnowledgePointIds": [],
+  "mysqlVerification": "未运行原生 MySQL 8.4",
+  "result": {
+    "columns": [
+      "id",
+      "filled",
+      "note_filled"
+    ],
+    "rows": [
+      [
+        1,
+        -1,
+        "missing"
+      ],
+      [
+        2,
+        0,
+        ""
+      ],
+      [
+        3,
+        10,
+        "ok"
+      ],
+      [
+        4,
+        10,
+        "ok"
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "mysqlVerificationScript": "validation/mysql/kp05-02.sql",
+  "primaryQuestionIds": [
+    "q0054",
+    "q0058",
+    "q0060"
+  ],
+  "primaryFlashcardIds": [
+    "fc0031",
+    "fc0032",
+    "fc0034"
+  ],
+  "teaching": {
+    "problem": "主管希望报表醒目标记未填写的数值与备注，同时不丢失实际零值。示例约定数值缺失显示-1、备注缺失显示 missing；这些仅为展示标记。",
+    "codeExplanation": "IFNULL 检查 value，只有为空才输出-1；COALESCE 检查 note，已有内容即返回原值，否则返回缺失标记。AS 命名展示列。此处只在 SELECT 中转换，不修改原始表。若-1本身可能是合法数值，应另设缺失标识，避免混淆。",
+    "resultExplanation": "编号1显示-1及 missing；编号2仍显示0与空字符串；编号3和4仍显示10与 ok。所有四行保留，粒度不变。替换后的列不应直接用于金额汇总。",
+    "checkpoints": [],
+    "mergedConcepts": [],
+    "mergeExamples": [
+      {
+        "label": "将空文本按业务规则视作缺失",
+        "explanation": "仅当业务确认空文本无有效含义时使用；编号2也显示缺失标记。",
+        "sql": "SELECT id, COALESCE(NULLIF(note, ''), 'missing') AS note_filled FROM nullable_values ORDER BY id;",
+        "result": {
+          "columns": [
+            "id",
+            "note_filled"
+          ],
+          "rows": [
+            [
+              1,
+              "missing"
+            ],
+            [
+              2,
+              "missing"
+            ],
+            [
+              3,
+              "ok"
+            ],
+            [
+              4,
+              "ok"
+            ]
+          ]
+        }
+      }
+    ]
+  }
+}

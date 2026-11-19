@@ -1,0 +1,291 @@
+{
+  "id": "kp05-01",
+  "chapterId": "ch05",
+  "title": "空值判断与三值逻辑",
+  "learningObjective": "能够区分未知值、零与空字符串，并正确筛选缺失、已知以及明确不等于指定值的记录。",
+  "prerequisites": [
+    "kp01-03"
+  ],
+  "concept": "NULL 表示未知或缺失，不是数字0，也不是长度为零的文本。普通比较例如 value = 10 或 value <> 10，遇到 NULL 通常得到未知，而不是假。SQL 的条件判断采用真、假、未知三种逻辑值；WHERE 只保留真，因此未知记录会被排除。判断缺失要用 IS NULL，判断已知要用 IS NOT NULL。NOT 不会让未知变成真。业务上缺失不一定是错误：订单客户外键为空可能意味着允许访客购买，也可能是数据遗漏，须结合业务规则判定。计数非空字段会跳过缺失，与总记录数不同。",
+  "syntax": "WHERE column_name IS NULL;\nWHERE column_name IS NOT NULL;",
+  "parameters": {
+    "IS NULL": "检查字段是否为空值",
+    "IS NOT NULL": "检查字段是否已有值",
+    "<>": "不等于，普通比较遇空值为未知"
+  },
+  "fixtureIds": [
+    "lesson-nullable_values"
+  ],
+  "sourceTables": [
+    {
+      "name": "nullable_values",
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "value",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "note",
+          "type": "TEXT",
+          "mysqlType": "VARCHAR(160) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_bin",
+          "sqliteType": "TEXT"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          null,
+          null
+        ],
+        [
+          2,
+          0,
+          ""
+        ],
+        [
+          3,
+          10,
+          "ok"
+        ],
+        [
+          4,
+          10,
+          "ok"
+        ]
+      ]
+    }
+  ],
+  "mysqlSql": "SELECT id, value FROM nullable_values WHERE value <> 10 ORDER BY id;",
+  "sqliteSql": "SELECT id, value FROM nullable_values WHERE value <> 10 ORDER BY id;",
+  "executionSteps": [
+    "比较数值与10",
+    "排除未知及等于10的记录",
+    "单独检查缺失记录"
+  ],
+  "useCase": "数据质量人员要筛选明确不等于10的记录，同时单独登记缺失值。不能将未知值自动视作异常数值或实际零。",
+  "comparison": "NULL、0与空字符串不同；NOT(value=10) 不会自动包含 NULL。",
+  "commonError": {
+    "example": "WHERE value = NULL，或认为 WHERE value <> 10 自动包含缺失行。",
+    "correction": "使用 IS NULL 检测缺失；若需要两类记录，使用 WHERE value <> 10 OR value IS NULL。"
+  },
+  "notes": "是否将匿名订单或缺失值列入指标，需要明确数据口径。",
+  "compatibility": {
+    "status": "直接兼容",
+    "detail": "仅在本示例数据与语义范围验证；不代表全部 MySQL 语法兼容。"
+  },
+  "relatedQuestionIds": [
+    "q0051",
+    "q0052",
+    "q0053",
+    "q0056",
+    "q0059"
+  ],
+  "relatedFlashcardIds": [
+    "fc0005",
+    "fc0007",
+    "fc0030",
+    "fc0033",
+    "fc0035"
+  ],
+  "relatedKnowledgePointIds": [],
+  "mysqlVerification": "未运行原生 MySQL 8.4",
+  "result": {
+    "columns": [
+      "id",
+      "value"
+    ],
+    "rows": [
+      [
+        2,
+        0
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "mysqlVerificationScript": "validation/mysql/kp05-01.sql",
+  "primaryQuestionIds": [
+    "q0051",
+    "q0052",
+    "q0053",
+    "q0056",
+    "q0059"
+  ],
+  "primaryFlashcardIds": [
+    "fc0005",
+    "fc0007",
+    "fc0030",
+    "fc0033",
+    "fc0035"
+  ],
+  "mergedFrom": [
+    {
+      "id": "kp01-04",
+      "title": "NULL 与缺失记录"
+    }
+  ],
+  "teaching": {
+    "problem": "数据质量人员要筛选明确不等于10的记录，同时单独登记缺失值。不能将未知值自动视作异常数值或实际零。",
+    "codeExplanation": "逐行比较 value 与10：第一行未知，第二行0不等于10，第三和第四行等于10。只有第二行满足 WHERE。若任务要求找缺失记录，则改为 IS NULL；需要同时返回已知不等于10和未知记录，就用 OR 将两种条件明确连接。示例中的 note 空字符串仍是已知文本。",
+    "resultExplanation": "主查询仅返回编号2、值0。缺失检查仅返回编号1；合并条件则返回编号1和2。由此可见，排除10不等于找出所有不是已知10的记录。",
+    "checkpoints": [],
+    "mergedConcepts": [
+      {
+        "sourceId": "kp01-04",
+        "explanation": "缺失定义、零与空文本辨析、匿名外键、IS NULL 原示例及错误修正已融入正文。"
+      }
+    ],
+    "mergeExamples": [
+      {
+        "label": "合并来源：识别缺失记录",
+        "explanation": "仅返回真正的空值记录。",
+        "sql": "SELECT id, value, note FROM nullable_values WHERE value IS NULL ORDER BY id;",
+        "result": {
+          "columns": [
+            "id",
+            "value",
+            "note"
+          ],
+          "rows": [
+            [
+              1,
+              null,
+              null
+            ]
+          ]
+        }
+      },
+      {
+        "label": "同时筛选未知和非10",
+        "explanation": "显式保留未知值，不依赖普通比较。",
+        "sql": "SELECT id,value FROM nullable_values WHERE value <> 10 OR value IS NULL ORDER BY id;",
+        "result": {
+          "columns": [
+            "id",
+            "value"
+          ],
+          "rows": [
+            [
+              1,
+              null
+            ],
+            [
+              2,
+              0
+            ]
+          ]
+        }
+      },
+      {
+        "label": "识别缺少客户编号的订单",
+        "explanation": "作为匿名订单或数据缺失的待核记录，不直接认定错误。",
+        "sql": "SELECT id,customer_id FROM orders WHERE customer_id IS NULL ORDER BY id;",
+        "result": {
+          "columns": [
+            "id",
+            "customer_id"
+          ],
+          "rows": [
+            [
+              4,
+              null
+            ]
+          ]
+        },
+        "sourceTables": [
+          {
+            "name": "orders",
+            "columns": [
+              {
+                "name": "id",
+                "type": "INTEGER",
+                "mysqlType": "INT",
+                "sqliteType": "INTEGER"
+              },
+              {
+                "name": "category",
+                "type": "TEXT",
+                "mysqlType": "VARCHAR(160) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_bin",
+                "sqliteType": "TEXT"
+              },
+              {
+                "name": "sales",
+                "type": "INTEGER",
+                "mysqlType": "INT",
+                "sqliteType": "INTEGER"
+              },
+              {
+                "name": "store_id",
+                "type": "INTEGER",
+                "mysqlType": "INT",
+                "sqliteType": "INTEGER"
+              },
+              {
+                "name": "order_date",
+                "type": "TEXT",
+                "mysqlType": "DATE",
+                "sqliteType": "TEXT"
+              },
+              {
+                "name": "customer_id",
+                "type": "INTEGER",
+                "mysqlType": "INT",
+                "sqliteType": "INTEGER"
+              }
+            ],
+            "rows": [
+              [
+                1,
+                "护肤品",
+                800,
+                1,
+                "2026-01-03",
+                1
+              ],
+              [
+                2,
+                "化妆品",
+                400,
+                2,
+                "2026-01-10",
+                2
+              ],
+              [
+                3,
+                "护肤品",
+                600,
+                1,
+                "2026-02-02",
+                1
+              ],
+              [
+                4,
+                "化妆品",
+                300,
+                2,
+                "2026-02-15",
+                null
+              ],
+              [
+                5,
+                "日用品",
+                1500,
+                1,
+                "2026-02-20",
+                3
+              ]
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

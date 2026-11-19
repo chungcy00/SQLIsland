@@ -258,6 +258,13 @@ test("course checkpoints match their recorded results in SQLite WASM", async () 
     try {
       if (lesson.setupSql) db.run(lesson.setupSql);
       for (const step of steps) {
+        if (step.sourceTables) {
+          const supplemental = initializeFixture(SQL, { tables: step.sourceTables });
+          try { assert.ok(compareResults(query(supplemental, step.sql), step.result, "ordered").pass); }
+          finally { supplemental.close(); }
+          count++;
+          continue;
+        }
         assert.ok(compareResults(query(db, step.sql), step.result, "ordered").pass,
           lesson.id + " " + (step.name || step.label));
         count++;
@@ -266,7 +273,7 @@ test("course checkpoints match their recorded results in SQLite WASM", async () 
       db.close();
     }
   }
-  assert.equal(count, 85);
+  assert.equal(count, 92);
 });
 
 test("salary RANGE frames accept both answers and reject ROWS and literal spoofing", async () => {

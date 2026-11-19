@@ -1,0 +1,236 @@
+{
+  "schemaVersion": 1,
+  "id": "kp05-02",
+  "sourceBatch": "batch1",
+  "teachingKind": "function",
+  "conceptBlocks": [
+    {
+      "type": "heading",
+      "text": "按优先级选择值",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "报表常需为缺失字段提供显示用替代值。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "IFNULL 接受两个参数：第一个非空时直接返回，否则返回第二个。",
+        "COALESCE 按顺序返回第一个非空候选值，适合多个候选来源。"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "保留真实零与空文本",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "若所有候选均为空，结果仍为空。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "零和空字符串不是 NULL，因此不会被这两个函数替换。",
+        "替代值仅是报表处理规则，不代表原始缺失真实变成了零或其他值。",
+        "若业务明确把空文本也视为缺失，可先使用 NULLIF 将其转换为空值，再选择替代文本。"
+      ]
+    },
+    {
+      "type": "table",
+      "columns": [
+        "输入",
+        "处理表达式",
+        "返回结果"
+      ],
+      "rows": [
+        [
+          "NULL",
+          "IFNULL(value, -1)",
+          "-1"
+        ],
+        [
+          "0",
+          "IFNULL(value, -1)",
+          "0"
+        ],
+        [
+          "NULL",
+          "COALESCE(note, 'missing')",
+          "missing"
+        ],
+        [
+          "空字符串",
+          "COALESCE(note, 'missing')",
+          "空字符串"
+        ]
+      ]
+    }
+  ],
+  "syntax": {
+    "purpose": "本节核心语法。函数参数定义备用值顺序，完整查询将两种函数应用到数值与备注列。"
+  },
+  "dataDescriptions": {
+    "nullable_values": "每行一条填报记录。value 的 NULL 与 0 含义不同，note 的 NULL 与空字符串也不同。-1 和 missing 是本例约定的展示标记。"
+  },
+  "problem": "主管希望报表醒目标记未填写的数值与备注，同时不丢失实际零值。示例约定数值缺失显示-1、备注缺失显示 missing；这些仅为展示标记。",
+  "methodBlocks": [
+    {
+      "type": "paragraph",
+      "text": "只对输出列选择备用值，保留原始记录，并使用别名区分处理后的字段。"
+    }
+  ],
+  "breakdown": [
+    {
+      "kind": "fragment",
+      "title": "选择数据来源",
+      "sql": "FROM nullable_values",
+      "purpose": "读取原始数值及备注。",
+      "reason": "替换只发生在结果显示中。"
+    },
+    {
+      "kind": "fragment",
+      "title": "处理数值缺失",
+      "sql": "IFNULL(value, -1) AS filled",
+      "purpose": "value 非空时保留原值，否则输出 -1。",
+      "reason": "区分未填值与真实零；备用值是否合适需由业务约定。若 -1 本身可能是合法数值，应另设缺失标识，避免混淆。"
+    },
+    {
+      "kind": "fragment",
+      "title": "处理备注缺失",
+      "sql": "COALESCE(note, 'missing') AS note_filled",
+      "purpose": "返回第一个非空候选值。",
+      "reason": "空字符串已是非空值，因此仍保留；扩展示例说明如何先处理空文本。"
+    },
+    {
+      "kind": "fragment",
+      "title": "保留顺序与标识",
+      "sql": "ORDER BY id;",
+      "purpose": "按记录编号显示。",
+      "reason": "便于把输出的替代标记与原始行核对。"
+    }
+  ],
+  "completeCode": {
+    "mysqlSql": "SELECT id, IFNULL(value, -1) AS filled, COALESCE(note, 'missing') AS note_filled FROM nullable_values ORDER BY id;",
+    "sqliteSql": "SELECT id, IFNULL(value, -1) AS filled, COALESCE(note, 'missing') AS note_filled FROM nullable_values ORDER BY id;"
+  },
+  "expectedResult": {
+    "columns": [
+      "id",
+      "filled",
+      "note_filled"
+    ],
+    "rows": [
+      [
+        1,
+        -1,
+        "missing"
+      ],
+      [
+        2,
+        0,
+        ""
+      ],
+      [
+        3,
+        10,
+        "ok"
+      ],
+      [
+        4,
+        10,
+        "ok"
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "resultBlocks": [
+    {
+      "type": "paragraph",
+      "text": "编号1显示-1及 missing；编号2仍显示0与空字符串；编号3和4仍显示10与 ok。所有四行保留，粒度不变。替换后的列不应直接用于金额汇总。"
+    }
+  ],
+  "extensions": [
+    {
+      "label": "将空文本按业务规则视作缺失",
+      "explanation": "仅当业务确认空文本无有效含义时使用；编号2也显示缺失标记。",
+      "sql": "SELECT id, COALESCE(NULLIF(note, ''), 'missing') AS note_filled FROM nullable_values ORDER BY id;",
+      "result": {
+        "columns": [
+          "id",
+          "note_filled"
+        ],
+        "rows": [
+          [
+            1,
+            "missing"
+          ],
+          [
+            2,
+            "missing"
+          ],
+          [
+            3,
+            "ok"
+          ],
+          [
+            4,
+            "ok"
+          ]
+        ]
+      },
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "仅当业务确认空文本无有效含义时使用；编号2也显示缺失标记。"
+        }
+      ]
+    }
+  ],
+  "cautions": {
+    "comparison": [
+      {
+        "type": "paragraph",
+        "text": "IFNULL 固定两个参数；COALESCE 支持多个候选值。两者都不会自动将空文本视作缺失。"
+      }
+    ],
+    "example": [
+      {
+        "type": "paragraph",
+        "text": "用零填补后，认为所有缺失记录原本都是真实零。"
+      },
+      {
+        "type": "code",
+        "sql": "COALESCE(value,0)"
+      }
+    ],
+    "reason": [
+      {
+        "type": "paragraph",
+        "text": "IFNULL 与 COALESCE 只判断 NULL。填入的 -1 或 missing 是展示约定，不能作为原本观测到的真实值使用。"
+      }
+    ],
+    "correction": [
+      {
+        "type": "paragraph",
+        "text": "先确定业务规则，保留原列或缺失标记；需要将空文本视为缺失时，先转为 NULL。"
+      },
+      {
+        "type": "code",
+        "sql": "NULLIF(note, '')"
+      }
+    ],
+    "notes": [
+      {
+        "type": "paragraph",
+        "text": "混合参数类型在 MySQL 与 SQLite 中可能有不同类型推断。本例仅验证所示数据。"
+      }
+    ]
+  },
+  "sourcePath": "source/batch1/kp05-02.json",
+  "sourceSha256": "0fba905e7fb6488d33930d172000c48243ac8ac54155bbba8392a50bbf49c93e"
+}

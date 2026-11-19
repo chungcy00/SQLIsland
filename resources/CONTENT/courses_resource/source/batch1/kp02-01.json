@@ -1,0 +1,287 @@
+{
+  "id": "kp02-01",
+  "chapterId": "ch02",
+  "title": "基础查询、表达式与别名",
+  "learningObjective": "能够独立选择数据来源和输出字段，使用算术表达式生成派生列，并为结果列命名。",
+  "prerequisites": [
+    "kp02-02"
+  ],
+  "concept": "基础查询由数据来源和输出列表组成。FROM 指定输入表，SELECT 指定需要返回的列或表达式。查询可以直接读取原字段，也可以逐行计算新值，例如单价乘库存数量。AS 为结果列设置易读名称，并不改变源表字段或写入新数据。选择具体列能让报表结构明确，避免不必要字段；探索未知表时可以临时使用 SELECT *。派生列仍属于当前记录粒度，不是跨行汇总。表达式中的任一乘数为空时，计算结果通常为空，需要依据业务判断未知值，不可直接当零。",
+  "syntax": "SELECT column_name, expression AS alias FROM table_name;",
+  "parameters": {
+    "SELECT": "指定输出列与表达式",
+    "FROM": "指定输入表",
+    "expression": "计算表达式",
+    "AS alias": "为输出表达式命名"
+  },
+  "fixtureIds": [
+    "lesson-products"
+  ],
+  "sourceTables": [
+    {
+      "name": "products",
+      "columns": [
+        {
+          "name": "product_id",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "product_name",
+          "type": "TEXT",
+          "mysqlType": "VARCHAR(160) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_bin",
+          "sqliteType": "TEXT"
+        },
+        {
+          "name": "category",
+          "type": "TEXT",
+          "mysqlType": "VARCHAR(160) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_bin",
+          "sqliteType": "TEXT"
+        },
+        {
+          "name": "price",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "stock",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          "Mask",
+          "护肤品",
+          15,
+          150
+        ],
+        [
+          2,
+          "Serum",
+          "护肤品",
+          89,
+          40
+        ],
+        [
+          3,
+          "Cleanser",
+          "护肤品",
+          35,
+          200
+        ],
+        [
+          4,
+          "Cream",
+          "化妆品",
+          65,
+          180
+        ],
+        [
+          5,
+          "Sunscreen",
+          "化妆品",
+          45,
+          80
+        ],
+        [
+          6,
+          "Soap_1",
+          "日用品",
+          15,
+          0
+        ]
+      ]
+    }
+  ],
+  "mysqlSql": "SELECT product_name, price FROM products ORDER BY product_id;",
+  "sqliteSql": "SELECT product_name, price FROM products ORDER BY product_id;",
+  "executionSteps": [
+    "读取商品表",
+    "选择所需字段",
+    "计算并命名派生列",
+    "按编号排序"
+  ],
+  "useCase": "采购主管先需要商品价目表，再希望估算每件商品的现有库存按售价计算的金额。现有商品表包含单价和库存件数，不需要其他表或分组。",
+  "comparison": "原字段直接读取；派生列由表达式计算；别名只修改输出名称。",
+  "commonError": {
+    "example": "同层 WHERE stock_value > 1000，或将售价库存值称为成本库存金额。",
+    "correction": "使用 WHERE price * stock > 1000，或外层查询筛选；明确售价口径。"
+  },
+  "notes": "MySQL 的部分 GROUP BY、HAVING 场景可使用别名，但不能据此假定所有子句都允许。",
+  "compatibility": {
+    "status": "直接兼容",
+    "detail": "仅在本示例数据与语义范围验证；不代表全部 MySQL 语法兼容。"
+  },
+  "relatedQuestionIds": [
+    "q0011",
+    "q0014",
+    "q0017",
+    "q0018",
+    "q0019"
+  ],
+  "relatedFlashcardIds": [
+    "fc0008",
+    "fc0009",
+    "fc0011",
+    "fc0013"
+  ],
+  "relatedKnowledgePointIds": [],
+  "mysqlVerification": "未运行原生 MySQL 8.4",
+  "result": {
+    "columns": [
+      "product_name",
+      "price"
+    ],
+    "rows": [
+      [
+        "Mask",
+        15
+      ],
+      [
+        "Serum",
+        89
+      ],
+      [
+        "Cleanser",
+        35
+      ],
+      [
+        "Cream",
+        65
+      ],
+      [
+        "Sunscreen",
+        45
+      ],
+      [
+        "Soap_1",
+        15
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "mysqlVerificationScript": "validation/mysql/kp02-01.sql",
+  "primaryQuestionIds": [
+    "q0011",
+    "q0014",
+    "q0017",
+    "q0018",
+    "q0019"
+  ],
+  "primaryFlashcardIds": [
+    "fc0008",
+    "fc0009",
+    "fc0011",
+    "fc0013"
+  ],
+  "mergedFrom": [
+    {
+      "id": "kp02-03",
+      "title": "表达式与 AS 别名"
+    }
+  ],
+  "teaching": {
+    "problem": "采购主管先需要商品价目表，再希望估算每件商品的现有库存按售价计算的金额。现有商品表包含单价和库存件数，不需要其他表或分组。",
+    "codeExplanation": "第一步先提取商品名称和价格，确认每件商品一行。第二步在 SELECT 中加入 price * stock，并以 stock_value 命名，让结果直观表示每个商品的售价库存值。该值不是成本口径库存资产，也不是未来一定实现的收入。需要筛选派生金额时，同层 WHERE 通常不能使用 SELECT 中定义的别名，应写原表达式或在外层查询中使用别名。ORDER BY 可以使用输出别名。",
+    "resultExplanation": "价目表显示六件商品。扩展示例中商品1售价库存值2250，商品2为3560，商品6库存为0所以结果为0；行数始终为六。",
+    "checkpoints": [],
+    "mergedConcepts": [
+      {
+        "sourceId": "kp02-03",
+        "explanation": "表达式、别名、售价库存值、空值传播、同层筛选限制均已融入核心概念、代码讲解及示例。"
+      }
+    ],
+    "mergeExamples": [
+      {
+        "label": "合并来源：库存售价估算",
+        "explanation": "逐行计算价格与库存乘积，保留原粒度。",
+        "sql": "SELECT product_id, price, stock, price * stock AS stock_value FROM products ORDER BY product_id;",
+        "result": {
+          "columns": [
+            "product_id",
+            "price",
+            "stock",
+            "stock_value"
+          ],
+          "rows": [
+            [
+              1,
+              15,
+              150,
+              2250
+            ],
+            [
+              2,
+              89,
+              40,
+              3560
+            ],
+            [
+              3,
+              35,
+              200,
+              7000
+            ],
+            [
+              4,
+              65,
+              180,
+              11700
+            ],
+            [
+              5,
+              45,
+              80,
+              3600
+            ],
+            [
+              6,
+              15,
+              0,
+              0
+            ]
+          ]
+        }
+      },
+      {
+        "label": "按派生金额筛选",
+        "explanation": "筛选时重复表达式，排序时使用别名。",
+        "sql": "SELECT product_id, price * stock AS stock_value FROM products WHERE price * stock > 1000 ORDER BY stock_value DESC, product_id;",
+        "result": {
+          "columns": [
+            "product_id",
+            "stock_value"
+          ],
+          "rows": [
+            [
+              4,
+              11700
+            ],
+            [
+              3,
+              7000
+            ],
+            [
+              5,
+              3600
+            ],
+            [
+              2,
+              3560
+            ],
+            [
+              1,
+              2250
+            ]
+          ]
+        }
+      }
+    ]
+  }
+}

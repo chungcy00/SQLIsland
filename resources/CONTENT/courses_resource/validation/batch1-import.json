@@ -1,0 +1,477 @@
+{
+  "lessons": 7,
+  "executions": [
+    {
+      "id": "kp01-01",
+      "label": "原有主示例",
+      "actual": {
+        "columns": [
+          "id",
+          "category",
+          "sales"
+        ],
+        "rows": [
+          [
+            1,
+            "护肤品",
+            800
+          ],
+          [
+            2,
+            "化妆品",
+            400
+          ],
+          [
+            3,
+            "护肤品",
+            600
+          ],
+          [
+            4,
+            "化妆品",
+            300
+          ],
+          [
+            5,
+            "日用品",
+            1500
+          ]
+        ]
+      }
+    },
+    {
+      "id": "kp01-01",
+      "label": "核对订单与已知客户数量",
+      "actual": {
+        "columns": [
+          "order_count",
+          "known_customers"
+        ],
+        "rows": [
+          [
+            5,
+            3
+          ]
+        ]
+      }
+    },
+    {
+      "id": "kp01-02",
+      "label": "原有主示例",
+      "actual": {
+        "columns": [
+          "product_id",
+          "price",
+          "stock"
+        ],
+        "rows": [
+          [
+            1,
+            15,
+            150
+          ],
+          [
+            2,
+            89,
+            40
+          ],
+          [
+            3,
+            35,
+            200
+          ],
+          [
+            4,
+            65,
+            180
+          ],
+          [
+            5,
+            45,
+            80
+          ],
+          [
+            6,
+            15,
+            0
+          ]
+        ]
+      }
+    },
+    {
+      "id": "kp01-03",
+      "label": "原有主示例",
+      "actual": {
+        "columns": [
+          "customer_id",
+          "order_count"
+        ],
+        "rows": [
+          [
+            1,
+            2
+          ],
+          [
+            2,
+            1
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            4,
+            0
+          ]
+        ]
+      }
+    },
+    {
+      "id": "kp01-03",
+      "label": "查看一对多匹配明细",
+      "actual": {
+        "columns": [
+          "customer_id",
+          "order_id"
+        ],
+        "rows": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            2,
+            2
+          ],
+          [
+            3,
+            5
+          ],
+          [
+            4,
+            null
+          ]
+        ]
+      }
+    },
+    {
+      "id": "kp02-01",
+      "label": "原有主示例",
+      "actual": {
+        "columns": [
+          "product_name",
+          "price"
+        ],
+        "rows": [
+          [
+            "Mask",
+            15
+          ],
+          [
+            "Serum",
+            89
+          ],
+          [
+            "Cleanser",
+            35
+          ],
+          [
+            "Cream",
+            65
+          ],
+          [
+            "Sunscreen",
+            45
+          ],
+          [
+            "Soap_1",
+            15
+          ]
+        ]
+      }
+    },
+    {
+      "id": "kp02-01",
+      "label": "合并来源：库存售价估算",
+      "actual": {
+        "columns": [
+          "product_id",
+          "price",
+          "stock",
+          "stock_value"
+        ],
+        "rows": [
+          [
+            1,
+            15,
+            150,
+            2250
+          ],
+          [
+            2,
+            89,
+            40,
+            3560
+          ],
+          [
+            3,
+            35,
+            200,
+            7000
+          ],
+          [
+            4,
+            65,
+            180,
+            11700
+          ],
+          [
+            5,
+            45,
+            80,
+            3600
+          ],
+          [
+            6,
+            15,
+            0,
+            0
+          ]
+        ]
+      }
+    },
+    {
+      "id": "kp02-01",
+      "label": "按派生金额筛选",
+      "actual": {
+        "columns": [
+          "product_id",
+          "stock_value"
+        ],
+        "rows": [
+          [
+            4,
+            11700
+          ],
+          [
+            3,
+            7000
+          ],
+          [
+            5,
+            3600
+          ],
+          [
+            2,
+            3560
+          ],
+          [
+            1,
+            2250
+          ]
+        ]
+      }
+    },
+    {
+      "id": "kp02-02",
+      "label": "原有主示例",
+      "actual": {
+        "columns": [
+          "store_id",
+          "category"
+        ],
+        "rows": [
+          [
+            1,
+            "护肤品"
+          ],
+          [
+            1,
+            "日用品"
+          ],
+          [
+            2,
+            "化妆品"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "kp02-02",
+      "label": "对比单列去重",
+      "actual": {
+        "columns": [
+          "category"
+        ],
+        "rows": [
+          [
+            "化妆品"
+          ],
+          [
+            "护肤品"
+          ],
+          [
+            "日用品"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "kp05-01",
+      "label": "原有主示例",
+      "actual": {
+        "columns": [
+          "id",
+          "value"
+        ],
+        "rows": [
+          [
+            2,
+            0
+          ]
+        ]
+      }
+    },
+    {
+      "id": "kp05-01",
+      "label": "合并来源：识别缺失记录",
+      "actual": {
+        "columns": [
+          "id",
+          "value",
+          "note"
+        ],
+        "rows": [
+          [
+            1,
+            null,
+            null
+          ]
+        ]
+      }
+    },
+    {
+      "id": "kp05-01",
+      "label": "同时筛选未知和非10",
+      "actual": {
+        "columns": [
+          "id",
+          "value"
+        ],
+        "rows": [
+          [
+            1,
+            null
+          ],
+          [
+            2,
+            0
+          ]
+        ]
+      }
+    },
+    {
+      "id": "kp05-01",
+      "label": "识别缺少客户编号的订单",
+      "actual": {
+        "columns": [
+          "id",
+          "customer_id"
+        ],
+        "rows": [
+          [
+            4,
+            null
+          ]
+        ]
+      }
+    },
+    {
+      "id": "kp05-02",
+      "label": "原有主示例",
+      "actual": {
+        "columns": [
+          "id",
+          "filled",
+          "note_filled"
+        ],
+        "rows": [
+          [
+            1,
+            -1,
+            "missing"
+          ],
+          [
+            2,
+            0,
+            ""
+          ],
+          [
+            3,
+            10,
+            "ok"
+          ],
+          [
+            4,
+            10,
+            "ok"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "kp05-02",
+      "label": "将空文本按业务规则视作缺失",
+      "actual": {
+        "columns": [
+          "id",
+          "note_filled"
+        ],
+        "rows": [
+          [
+            1,
+            "missing"
+          ],
+          [
+            2,
+            "missing"
+          ],
+          [
+            3,
+            "ok"
+          ],
+          [
+            4,
+            "ok"
+          ]
+        ]
+      }
+    }
+  ],
+  "unchangedFields": true,
+  "otherLessonsUnchanged": true,
+  "browserErrors": [],
+  "sourceHashes": {
+    "课程字段补丁.json": "50e23587ef1b5244f8eb53ee645b42ec48d16360d21e3d8edfcff4c0d3303120",
+    "课程正文.md": "e0ef57985af4d9b65527a90d0d3d519b83e937f6fb63377e476d5ddf19c4c4cc",
+    "fixtures.json": "91fe75433b4697173a77a7ca4cedf2a9721b003dd57da63ebcabf43b3907a324",
+    "执行记录.json": "449d06d7517787d02252f570c31699f8d8ff1a036a591a562e47186731fc1166"
+  },
+  "mysqlNative": "未执行",
+  "browserWidths": [
+    320,
+    390,
+    975
+  ],
+  "mainQueriesExecutedViaPage": 7,
+  "supplementalFixture": {
+    "lessonId": "kp05-01",
+    "example": "识别缺少客户编号的订单",
+    "table": "orders",
+    "mainSourceTablesPreserved": true
+  }
+}

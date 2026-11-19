@@ -46,7 +46,7 @@
 - 实验室支持独立的查询标签与草稿保存，旧实验室草稿会接入第一个查询标签。
 - 闪卡可撤回上次评分，恢复之前的 FSRS 状态。
 - 更新源为 `chungcy00/SQLIsland` 的 GitHub Releases。只有点击检查更新才发起联网请求。学习、练习和 SQL 执行继续使用安装包内置资源。
-- `release.json` 维护本版说明。签名 APK 构建后执行 `node scripts/prepare-update.mjs` 生成 `artifacts/update.json`。公开 Release 标签与版本号一致，当前为 `v0.3.6`，同时附加 APK 与更新清单。
+- `release.json` 维护本版说明。签名 APK 构建后执行 `node scripts/prepare-update.mjs` 生成 `artifacts/update.json`。公开 Release 标签与版本号一致，当前为 `v0.3.8`，同时附加 APK 与更新清单。
 - 应用先核对 SHA-256、包名、递增版本号和签名，再调用安卓安装器。首次安装更新需在安卓设置中允许安装应用。
 - 已发布至 https://github.com/chungcy00/SQLIsland/releases 。已在 Android 16 模拟器完成真实版本检查、下载校验与安卓系统覆盖安装。实体手机仍待验收。
 
@@ -118,3 +118,7 @@ tar -xzf .tooling/audit-baseline.tar.gz -C .tooling/audit-original CONTENT
 审计程序默认读取`.tooling/audit-original/CONTENT`，也可用`SQL_AUDIT_ORIGINAL`指定原始快照。固定种子、命令顺序和验证限制见`resources/CONTENT/DEVELOPMENT_AUDIT.md`。中期促销分布聚合证据保存在`promotion-review.json`，用于复查追溯。
 
 ERD检查运行`node scripts/check-erd.mjs`，需要本机Chrome与预览服务。历史浏览器迁移检查还需准备`.tooling/audit-migration-source/dist`中的0.2.1构建。
+
+## 0.3.8 课程资源与统一教学展示
+
+第一批 7 节课程已导入并完成独立结构化转换，原始资源包留存校验。完整代码、运行按钮、预期结果和扩展示例采用统一顺序；其余 73 节等待新版外部资源。开发续作请先读取 [HANDOFF.md](HANDOFF.md)。

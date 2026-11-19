@@ -1,0 +1,484 @@
+[
+  {
+    "id": "kp01-01",
+    "label": "原有主示例",
+    "sql": "SELECT id, category, sales FROM orders ORDER BY id;",
+    "result": {
+      "columns": [
+        "id",
+        "category",
+        "sales"
+      ],
+      "rows": [
+        [
+          1,
+          "护肤品",
+          800
+        ],
+        [
+          2,
+          "化妆品",
+          400
+        ],
+        [
+          3,
+          "护肤品",
+          600
+        ],
+        [
+          4,
+          "化妆品",
+          300
+        ],
+        [
+          5,
+          "日用品",
+          1500
+        ]
+      ]
+    },
+    "status": "SQLite实际执行成功"
+  },
+  {
+    "id": "kp01-01",
+    "label": "核对订单与已知客户数量",
+    "sql": "SELECT COUNT(*) AS order_count, COUNT(DISTINCT customer_id) AS known_customers FROM orders;",
+    "result": {
+      "columns": [
+        "order_count",
+        "known_customers"
+      ],
+      "rows": [
+        [
+          5,
+          3
+        ]
+      ]
+    },
+    "status": "SQLite实际执行成功"
+  },
+  {
+    "id": "kp01-02",
+    "label": "原有主示例",
+    "sql": "SELECT product_id, price, stock FROM products ORDER BY product_id;",
+    "result": {
+      "columns": [
+        "product_id",
+        "price",
+        "stock"
+      ],
+      "rows": [
+        [
+          1,
+          15,
+          150
+        ],
+        [
+          2,
+          89,
+          40
+        ],
+        [
+          3,
+          35,
+          200
+        ],
+        [
+          4,
+          65,
+          180
+        ],
+        [
+          5,
+          45,
+          80
+        ],
+        [
+          6,
+          15,
+          0
+        ]
+      ]
+    },
+    "status": "SQLite实际执行成功"
+  },
+  {
+    "id": "kp01-03",
+    "label": "原有主示例",
+    "sql": "SELECT c.customer_id, COUNT(o.id) AS order_count FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id GROUP BY c.customer_id ORDER BY c.customer_id;",
+    "result": {
+      "columns": [
+        "customer_id",
+        "order_count"
+      ],
+      "rows": [
+        [
+          1,
+          2
+        ],
+        [
+          2,
+          1
+        ],
+        [
+          3,
+          1
+        ],
+        [
+          4,
+          0
+        ]
+      ]
+    },
+    "status": "SQLite实际执行成功"
+  },
+  {
+    "id": "kp01-03",
+    "label": "查看一对多匹配明细",
+    "sql": "SELECT c.customer_id, o.id AS order_id FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id ORDER BY c.customer_id,o.id;",
+    "result": {
+      "columns": [
+        "customer_id",
+        "order_id"
+      ],
+      "rows": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          3
+        ],
+        [
+          2,
+          2
+        ],
+        [
+          3,
+          5
+        ],
+        [
+          4,
+          null
+        ]
+      ]
+    },
+    "status": "SQLite实际执行成功"
+  },
+  {
+    "id": "kp02-01",
+    "label": "原有主示例",
+    "sql": "SELECT product_name, price FROM products ORDER BY product_id;",
+    "result": {
+      "columns": [
+        "product_name",
+        "price"
+      ],
+      "rows": [
+        [
+          "Mask",
+          15
+        ],
+        [
+          "Serum",
+          89
+        ],
+        [
+          "Cleanser",
+          35
+        ],
+        [
+          "Cream",
+          65
+        ],
+        [
+          "Sunscreen",
+          45
+        ],
+        [
+          "Soap_1",
+          15
+        ]
+      ]
+    },
+    "status": "SQLite实际执行成功"
+  },
+  {
+    "id": "kp02-01",
+    "label": "合并来源：库存售价估算",
+    "sql": "SELECT product_id, price, stock, price * stock AS stock_value FROM products ORDER BY product_id;",
+    "result": {
+      "columns": [
+        "product_id",
+        "price",
+        "stock",
+        "stock_value"
+      ],
+      "rows": [
+        [
+          1,
+          15,
+          150,
+          2250
+        ],
+        [
+          2,
+          89,
+          40,
+          3560
+        ],
+        [
+          3,
+          35,
+          200,
+          7000
+        ],
+        [
+          4,
+          65,
+          180,
+          11700
+        ],
+        [
+          5,
+          45,
+          80,
+          3600
+        ],
+        [
+          6,
+          15,
+          0,
+          0
+        ]
+      ]
+    },
+    "status": "SQLite实际执行成功"
+  },
+  {
+    "id": "kp02-01",
+    "label": "按派生金额筛选",
+    "sql": "SELECT product_id, price * stock AS stock_value FROM products WHERE price * stock > 1000 ORDER BY stock_value DESC, product_id;",
+    "result": {
+      "columns": [
+        "product_id",
+        "stock_value"
+      ],
+      "rows": [
+        [
+          4,
+          11700
+        ],
+        [
+          3,
+          7000
+        ],
+        [
+          5,
+          3600
+        ],
+        [
+          2,
+          3560
+        ],
+        [
+          1,
+          2250
+        ]
+      ]
+    },
+    "status": "SQLite实际执行成功"
+  },
+  {
+    "id": "kp02-02",
+    "label": "原有主示例",
+    "sql": "SELECT DISTINCT store_id, category FROM orders ORDER BY store_id, category;",
+    "result": {
+      "columns": [
+        "store_id",
+        "category"
+      ],
+      "rows": [
+        [
+          1,
+          "护肤品"
+        ],
+        [
+          1,
+          "日用品"
+        ],
+        [
+          2,
+          "化妆品"
+        ]
+      ]
+    },
+    "status": "SQLite实际执行成功"
+  },
+  {
+    "id": "kp02-02",
+    "label": "对比单列去重",
+    "sql": "SELECT DISTINCT category FROM orders ORDER BY category;",
+    "result": {
+      "columns": [
+        "category"
+      ],
+      "rows": [
+        [
+          "化妆品"
+        ],
+        [
+          "护肤品"
+        ],
+        [
+          "日用品"
+        ]
+      ]
+    },
+    "status": "SQLite实际执行成功"
+  },
+  {
+    "id": "kp05-01",
+    "label": "原有主示例",
+    "sql": "SELECT id, value FROM nullable_values WHERE value <> 10 ORDER BY id;",
+    "result": {
+      "columns": [
+        "id",
+        "value"
+      ],
+      "rows": [
+        [
+          2,
+          0
+        ]
+      ]
+    },
+    "status": "SQLite实际执行成功"
+  },
+  {
+    "id": "kp05-01",
+    "label": "合并来源：识别缺失记录",
+    "sql": "SELECT id, value, note FROM nullable_values WHERE value IS NULL ORDER BY id;",
+    "result": {
+      "columns": [
+        "id",
+        "value",
+        "note"
+      ],
+      "rows": [
+        [
+          1,
+          null,
+          null
+        ]
+      ]
+    },
+    "status": "SQLite实际执行成功"
+  },
+  {
+    "id": "kp05-01",
+    "label": "同时筛选未知和非10",
+    "sql": "SELECT id,value FROM nullable_values WHERE value <> 10 OR value IS NULL ORDER BY id;",
+    "result": {
+      "columns": [
+        "id",
+        "value"
+      ],
+      "rows": [
+        [
+          1,
+          null
+        ],
+        [
+          2,
+          0
+        ]
+      ]
+    },
+    "status": "SQLite实际执行成功"
+  },
+  {
+    "id": "kp05-01",
+    "label": "识别缺少客户编号的订单",
+    "sql": "SELECT id,customer_id FROM orders WHERE customer_id IS NULL ORDER BY id;",
+    "result": {
+      "columns": [
+        "id",
+        "customer_id"
+      ],
+      "rows": [
+        [
+          4,
+          null
+        ]
+      ]
+    },
+    "status": "SQLite实际执行成功"
+  },
+  {
+    "id": "kp05-02",
+    "label": "原有主示例",
+    "sql": "SELECT id, IFNULL(value, -1) AS filled, COALESCE(note, 'missing') AS note_filled FROM nullable_values ORDER BY id;",
+    "result": {
+      "columns": [
+        "id",
+        "filled",
+        "note_filled"
+      ],
+      "rows": [
+        [
+          1,
+          -1,
+          "missing"
+        ],
+        [
+          2,
+          0,
+          ""
+        ],
+        [
+          3,
+          10,
+          "ok"
+        ],
+        [
+          4,
+          10,
+          "ok"
+        ]
+      ]
+    },
+    "status": "SQLite实际执行成功"
+  },
+  {
+    "id": "kp05-02",
+    "label": "将空文本按业务规则视作缺失",
+    "sql": "SELECT id, COALESCE(NULLIF(note, ''), 'missing') AS note_filled FROM nullable_values ORDER BY id;",
+    "result": {
+      "columns": [
+        "id",
+        "note_filled"
+      ],
+      "rows": [
+        [
+          1,
+          "missing"
+        ],
+        [
+          2,
+          "missing"
+        ],
+        [
+          3,
+          "ok"
+        ],
+        [
+          4,
+          "ok"
+        ]
+      ]
+    },
+    "status": "SQLite实际执行成功"
+  }
+]

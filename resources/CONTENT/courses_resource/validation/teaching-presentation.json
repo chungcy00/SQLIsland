@@ -1,0 +1,32 @@
+{
+  "scope": "Shared lesson renderer and seven imported lessons",
+  "lessons": [
+    "kp01-01",
+    "kp01-02",
+    "kp01-03",
+    "kp02-01",
+    "kp02-02",
+    "kp05-01",
+    "kp05-02"
+  ],
+  "checks": {
+    "originalPatchFieldsPreserved": true,
+    "other73LessonsUnchanged": true,
+    "explicitSqlFragmentsMatchMainQuery": true,
+    "dataDescriptionsBesideTables": true,
+    "syntaxPurposeExplicit": true,
+    "expectedVisibleAndActualDistinct": true,
+    "completeQueryAdjacentToRun": true,
+    "mainQueriesExecuted": 80,
+    "automatedTestsPassed": 27,
+    "responsiveWidths": [
+      320,
+      390,
+      975
+    ],
+    "browserErrors": []
+  },
+  "limitations": [
+    "Browser checks use desktop Chrome mobile viewport emulation; physical devices were not tested."
+  ]
+}

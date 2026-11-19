@@ -7,14 +7,14 @@
       "path": "courses/ch01.json",
       "title": "数据库基础",
       "knowledgePointCount": 3,
-      "sha256": "c5efadd8fc51a060628167824a6cfc07aaa22a05341ba2e6aaa05274d530ffcb"
+      "sha256": "ba2883a0417bc8a8a0d254f2d34f68e97e7db06b0dd9607fa56cc0f0a34b9361"
     },
     {
       "id": "ch02",
       "path": "courses/ch02.json",
       "title": "基础查询",
       "knowledgePointCount": 2,
-      "sha256": "2bf7a703abc3687b21c9f00495b086ef156f915a2363845c87f5565cd424691c"
+      "sha256": "65cc7315846ff97584ebcee53e214061859c5cb953947d2b12b69fb17a493fbd"
     },
     {
       "id": "ch03",
@@ -35,7 +35,7 @@
       "path": "courses/ch05.json",
       "title": "空值处理",
       "knowledgePointCount": 2,
-      "sha256": "63b786c682c2534cf3fb4b3e996a169d695da60bf3404a2775fdb7d579d5a16b"
+      "sha256": "32434ed3b096e8dde598c8696e3f560f367a94c4f468c83fe9a75fd1339dc796"
     },
     {
       "id": "ch06",
@@ -152,13 +152,13 @@
     },
     {
       "path": "courses/ch01.json",
-      "bytes": 16544,
-      "sha256": "c5efadd8fc51a060628167824a6cfc07aaa22a05341ba2e6aaa05274d530ffcb"
+      "bytes": 21784,
+      "sha256": "ba2883a0417bc8a8a0d254f2d34f68e97e7db06b0dd9607fa56cc0f0a34b9361"
     },
     {
       "path": "courses/ch02.json",
-      "bytes": 11992,
-      "sha256": "2bf7a703abc3687b21c9f00495b086ef156f915a2363845c87f5565cd424691c"
+      "bytes": 16037,
+      "sha256": "65cc7315846ff97584ebcee53e214061859c5cb953947d2b12b69fb17a493fbd"
     },
     {
       "path": "courses/ch03.json",
@@ -172,8 +172,8 @@
     },
     {
       "path": "courses/ch05.json",
-      "bytes": 9540,
-      "sha256": "63b786c682c2534cf3fb4b3e996a169d695da60bf3404a2775fdb7d579d5a16b"
+      "bytes": 16313,
+      "sha256": "32434ed3b096e8dde598c8696e3f560f367a94c4f468c83fe9a75fd1339dc796"
     },
     {
       "path": "courses/ch06.json",
@@ -407,13 +407,13 @@
     },
     {
       "path": "reading/ch01.md",
-      "bytes": 4893,
-      "sha256": "e5947ea03bf009815ef9a8dea0c5075f00751ed7722e6c59b62406dff09b20ba"
+      "bytes": 9624,
+      "sha256": "fc160514178fc2b3dcef18b18f0abafda5c708354152044b10acc840ba1d1410"
     },
     {
       "path": "reading/ch02.md",
-      "bytes": 3536,
-      "sha256": "c74352998a65af48470ddcd4f225f1ba40d8cd6ec1fb11d6ceaf03b44fb3ef30"
+      "bytes": 6575,
+      "sha256": "6268d2f44a4ca809ad7ffbe5189117d658b6d7bd6ca0a2e63096adfc2bb47b0c"
     },
     {
       "path": "reading/ch03.md",
@@ -427,8 +427,8 @@
     },
     {
       "path": "reading/ch05.md",
-      "bytes": 3017,
-      "sha256": "924621e5881d55b5df1f7494037dc17842ed6da323a0145f07d6471081bc0598"
+      "bytes": 6515,
+      "sha256": "4220fb2d620f3bcf0bf4242eeb60d335db4832a1f622f8d36d9abcbc5a0141c2"
     },
     {
       "path": "reading/ch06.md",
@@ -1057,7 +1057,7 @@
     "intermediateQueries": 73,
     "theoryOnly": 0,
     "mysqlExecuted": 0,
-    "mergedExamples": 12
+    "mergedExamples": 19
   },
   "fixtureCount": 33,
   "advancedTasks": 24,

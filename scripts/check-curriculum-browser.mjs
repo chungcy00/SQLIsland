@@ -128,7 +128,7 @@ try {
     });
     const rows = k.result.totalRows ?? k.result.rows.length;
     assert.match(await page.locator('#lesson-result small').innerText(), new RegExp(' · '+ rows +' 行'),k.id);
-    assert.equal(await page.locator('#lesson-result p').last().innerText(),k.teaching.resultExplanation,k.id);
+    assert.equal(await page.locator('.lesson-result-explanation p').innerText(),k.teaching.resultExplanation,k.id);
   }
   assert.deepEqual(errors,[]);
   console.log('80 browser lesson executions, four rewritten submissions, 80/200/200 counts, fixed separator-free footer, and historical-state migration passed.');

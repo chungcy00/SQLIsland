@@ -1,0 +1,205 @@
+{
+  "schemaVersion": 1,
+  "id": "kp02-02",
+  "sourceBatch": "batch1",
+  "teachingKind": "syntax",
+  "conceptBlocks": [
+    {
+      "type": "heading",
+      "text": "整行去重的含义",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "去重是把重复结果行合并成一条，而不是删除源表记录。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "DISTINCT 比较 SELECT 输出的整组字段：只选类别时，每种类别出现一次；同时选门店与类别时，只有两个字段都相同才算重复。",
+        "若额外选择订单编号，因为编号各不相同，原本重复的类别可能仍显示多次。"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "输出列如何改变粒度",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "去重适合提取报表筛选选项、客户名单或业务维度组合；若需要销售合计、平均值等指标，应使用分组聚合。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "去重结果的排序仍须显式指定。"
+      ]
+    },
+    {
+      "type": "table",
+      "columns": [
+        "输出列",
+        "一行代表",
+        "本例结果行数"
+      ],
+      "rows": [
+        [
+          "category",
+          "一种类别",
+          "3"
+        ],
+        [
+          "store_id, category",
+          "一个门店类别组合",
+          "3"
+        ],
+        [
+          "id, category",
+          "一笔订单的编号与类别",
+          "5"
+        ]
+      ]
+    }
+  ],
+  "syntax": {
+    "purpose": "本节核心语法。DISTINCT 的全部输出列共同定义去重粒度；完整查询选择门店和类别两列。"
+  },
+  "dataDescriptions": {
+    "orders": "原表 5 行，每行一笔订单。1、3 同属门店 1 的护肤品，2、4 同属门店 2 的化妆品，属于重复的门店类别组合。"
+  },
+  "problem": "运营人员希望为报表生成实际发生过销售的门店和类别组合，而不是展示每笔订单。相同门店多次销售同一类别时只需显示一次。",
+  "methodBlocks": [
+    {
+      "type": "paragraph",
+      "text": "先选定门店与类别作为组合键，再去掉整组重复值，最后按这两列排序。"
+    }
+  ],
+  "breakdown": [
+    {
+      "kind": "fragment",
+      "title": "读取订单组合",
+      "sql": "FROM orders",
+      "purpose": "使用实际发生的订单。",
+      "reason": "需求是发生过销售的组合，不能从商品主档推断。"
+    },
+    {
+      "kind": "fragment",
+      "title": "按两列共同去重",
+      "sql": "SELECT DISTINCT store_id, category",
+      "purpose": "合并门店和类别都相同的输出行。",
+      "reason": "只按类别去重会丢失门店维度。"
+    },
+    {
+      "kind": "fragment",
+      "title": "按组合排序",
+      "sql": "ORDER BY store_id, category;",
+      "purpose": "先按门店，再按类别排列。",
+      "reason": "DISTINCT 本身不保证输出顺序。"
+    }
+  ],
+  "completeCode": {
+    "mysqlSql": "SELECT DISTINCT store_id, category FROM orders ORDER BY store_id, category;",
+    "sqliteSql": "SELECT DISTINCT store_id, category FROM orders ORDER BY store_id, category;"
+  },
+  "expectedResult": {
+    "columns": [
+      "store_id",
+      "category"
+    ],
+    "rows": [
+      [
+        1,
+        "护肤品"
+      ],
+      [
+        1,
+        "日用品"
+      ],
+      [
+        2,
+        "化妆品"
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "resultBlocks": [
+    {
+      "type": "paragraph",
+      "text": "结果从5笔订单减少为3种门店类别组合：门店1的护肤品、日用品和门店2的化妆品。不能据此断定商品主档全部类别，也不能得出各类别销售额。"
+    }
+  ],
+  "extensions": [
+    {
+      "label": "对比单列去重",
+      "explanation": "输出只剩类别，门店不再参与去重。",
+      "sql": "SELECT DISTINCT category FROM orders ORDER BY category;",
+      "result": {
+        "columns": [
+          "category"
+        ],
+        "rows": [
+          [
+            "化妆品"
+          ],
+          [
+            "护肤品"
+          ],
+          [
+            "日用品"
+          ]
+        ]
+      },
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "输出只剩类别，门店不再参与去重。"
+        }
+      ]
+    }
+  ],
+  "cautions": {
+    "comparison": [
+      {
+        "type": "paragraph",
+        "text": "DISTINCT 去重不计算指标；GROUP BY 可结合聚合函数计算各组指标。"
+      }
+    ],
+    "example": [
+      {
+        "type": "paragraph",
+        "text": "期待每类别仅一行，但还输出了销售金额。"
+      },
+      {
+        "type": "code",
+        "sql": "SELECT DISTINCT(category), sales FROM orders"
+      }
+    ],
+    "reason": [
+      {
+        "type": "paragraph",
+        "text": "DISTINCT 比较整组输出列；额外加入 sales 或订单编号会使原本相同的类别行仍有差异。"
+      }
+    ],
+    "correction": [
+      {
+        "type": "paragraph",
+        "text": "只需要类别时只输出类别；需要类别销售额则分组求和。"
+      },
+      {
+        "type": "code",
+        "sql": "SELECT DISTINCT category FROM orders"
+      }
+    ],
+    "notes": [
+      {
+        "type": "paragraph",
+        "text": "文本排序规则会影响去重；本例没有大小写差异。"
+      }
+    ]
+  },
+  "sourcePath": "source/batch1/kp02-02.json",
+  "sourceSha256": "0c15cd0cd46418a56e424fe29c87347137037e8513925933ccf1534796330518"
+}

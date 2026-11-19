@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "resourceVersion": "5.0.0-batch1",
+  "sourceBatches": [
+    {
+      "id": "batch1",
+      "version": "5.0.0-batch1",
+      "files": [
+        {
+          "path": "source/batch1/合并对照与导入说明.md",
+          "sha256": "0f1ea45d6352e88438ac4458d4a2cfd6e9fce4a9c661a8c6ab936a380b77dd82"
+        },
+        {
+          "path": "source/batch1/课程字段补丁.json",
+          "sha256": "50e23587ef1b5244f8eb53ee645b42ec48d16360d21e3d8edfcff4c0d3303120"
+        },
+        {
+          "path": "source/batch1/课程正文.md",
+          "sha256": "e0ef57985af4d9b65527a90d0d3d519b83e937f6fb63377e476d5ddf19c4c4cc"
+        },
+        {
+          "path": "source/batch1/fixtures.json",
+          "sha256": "91fe75433b4697173a77a7ca4cedf2a9721b003dd57da63ebcabf43b3907a324"
+        },
+        {
+          "path": "source/batch1/执行记录.json",
+          "sha256": "449d06d7517787d02252f570c31699f8d8ff1a036a591a562e47186731fc1166"
+        },
+        {
+          "path": "source/batch1/复验.py",
+          "sha256": "c658ab2165e93197725de7f654ca87652f6090be0665dcdc5ca5625945ee04a7"
+        }
+      ]
+    }
+  ],
+  "lessons": [
+    {
+      "id": "kp01-01",
+      "path": "lessons/kp01-01.json",
+      "sha256": "02794724411bdf0894f5e49473402d582cf87b3cedb6d309f06cb2b9731cee48"
+    },
+    {
+      "id": "kp01-02",
+      "path": "lessons/kp01-02.json",
+      "sha256": "f805cbf6fd3910593277c442226c0ff41252b4bc97eadf98261a4d35b1d22c12"
+    },
+    {
+      "id": "kp01-03",
+      "path": "lessons/kp01-03.json",
+      "sha256": "d65bcdf633b3abeef9ae48068aab1256144f28515fdb3540cc306202318d8151"
+    },
+    {
+      "id": "kp02-01",
+      "path": "lessons/kp02-01.json",
+      "sha256": "8897bdb97802e77f51fabc68a22e617b8fe4c3834db7533c12db38c314448f62"
+    },
+    {
+      "id": "kp02-02",
+      "path": "lessons/kp02-02.json",
+      "sha256": "6aefb77a47dec645a9e69acfa69d95e475482b6e565c9078a9c0a4e31010f0d9"
+    },
+    {
+      "id": "kp05-01",
+      "path": "lessons/kp05-01.json",
+      "sha256": "5cae9b4b952dcb12cc412d54a7da5844075c5f849d50280cbf7488605b80502d"
+    },
+    {
+      "id": "kp05-02",
+      "path": "lessons/kp05-02.json",
+      "sha256": "c8261c49414d6ff582ec7d29da2838104bd7801052ba08d6ec30d6cd47fecd53"
+    }
+  ]
+}

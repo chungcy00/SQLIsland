@@ -1,0 +1,483 @@
+[
+  {
+    "id": "kp01-01",
+    "title": "数据库、表、行与列",
+    "learningObjective": "能够判断数据表的一行代表什么，区分订单数、客户数与字段数，并提取报表所需字段。",
+    "concept": "数据库是按一定结构组织的数据集合，数据库管理系统负责访问和管理它。企业通常把订单、商品、客户分别放在不同的表中，而不是把所有信息堆在一张表。表用列定义记录的属性，用行保存具体记录。字段名描述属性，字段中的值才是实际数据。数据粒度指一行代表的业务对象或事件；例如订单表一行是一笔订单，订单明细表一行却可能是一种商品的一条明细。同一个客户可以下多笔订单，所以记录数并不等于客户数。开始分析前先确认数据粒度、唯一标识与统计目标，再决定是直接读取、去重还是汇总。",
+    "syntax": "SELECT column_name FROM table_name;",
+    "parameters": {
+      "column_name": "需要输出的字段，可用逗号分隔多个字段",
+      "table_name": "数据来源表"
+    },
+    "executionSteps": [
+      "定位订单表",
+      "提取三个字段",
+      "按订单编号排序"
+    ],
+    "useCase": "主管需要核对订单编号、商品类别与销售金额，不需要查看客户资料或门店编号。订单表已有这些字段，因此直接选择所需列即可。",
+    "comparison": "选择字段改变结果的列，不一定改变行数；去重或汇总才可能改变记录数量。",
+    "commonError": {
+      "example": "把五笔订单当成五名客户。",
+      "correction": "先检查客户编号，再使用去重计数；匿名订单单独说明。"
+    },
+    "notes": "查询不修改原始表。订单粒度只是本示例的定义，现实中应查数据字典。",
+    "teaching": {
+      "problem": "主管需要核对订单编号、商品类别与销售金额，不需要查看客户资料或门店编号。订单表已有这些字段，因此直接选择所需列即可。",
+      "codeExplanation": "先从订单表读取记录；SELECT 只投影编号、类别与金额，不筛选记录。ORDER BY id 指定编号升序，避免依赖数据库默认行序。这里不需要分组，因为主管要的是逐笔明细。原表 id 标识订单，customer_id 标识客户，store_id 标识门店，order_date 是订单日期。",
+      "resultExplanation": "五笔订单全部保留，列数由六列减少为三列，粒度仍是一行一笔订单。订单1和3属于同一已知客户，订单4没有客户编号。已知客户数为3，不能说有5名客户，也不能据此推断匿名客户人数。",
+      "checkpoints": [],
+      "mergedConcepts": [],
+      "mergeExamples": [
+        {
+          "label": "核对订单与已知客户数量",
+          "explanation": "先观察两个统计值的差异；后续聚合章节会详细学习计数。",
+          "sql": "SELECT COUNT(*) AS order_count, COUNT(DISTINCT customer_id) AS known_customers FROM orders;",
+          "result": {
+            "columns": [
+              "order_count",
+              "known_customers"
+            ],
+            "rows": [
+              [
+                5,
+                3
+              ]
+            ]
+          }
+        }
+      ]
+    }
+  },
+  {
+    "id": "kp01-02",
+    "title": "数据类型与数据字典",
+    "learningObjective": "能够根据字段的业务含义识别数据类型、单位、允许缺失情况及是否适合作为计算指标。",
+    "concept": "数据类型决定字段可以保存什么值以及如何比较、计算。整数适合计数和整数编号；精确十进制适合货币金额；文本用来保存名称或保留前导零的编码；日期类型用于日历日期。数据字典不只是字段名列表，还应说明业务含义、单位、精度、可空性、约束及取值范围。尤其要区分编号和数量：两者都可能使用整数，却只有后者通常适合求和。金额字段的单位也要核对，例如元与分不能直接相加。示例使用整数价格，仅为教学简化，不代表生产系统的金额类型。",
+    "syntax": "CREATE TABLE t (id INT, amount DECIMAL(12,2), label VARCHAR(80), day DATE);",
+    "parameters": {
+      "INT": "整数",
+      "DECIMAL(12,2)": "总精度12位，其中小数2位",
+      "VARCHAR(80)": "可变长度文本，最多80字符",
+      "DATE": "日期，不含时刻"
+    },
+    "executionSteps": [
+      "读取商品编号、单价与库存",
+      "核对字段含义及单位",
+      "识别零库存"
+    ],
+    "useCase": "接手商品库存报表前，需要确认哪些列可以计算，避免把商品编号当成金额，并识别零库存与数据缺失。",
+    "comparison": "数字型编号不等于可求和指标；文本日期不等于真正的日期类型。",
+    "commonError": {
+      "example": "将浮点数作为精确货币，或把商品编号相加当成业务指标。",
+      "correction": "货币优先使用精确十进制或整数分，计算前确认字段单位；编号用于识别。"
+    },
+    "notes": "本地 SQLite 类型亲和性与 MySQL 类型约束不同；本节未执行原生建表语法。",
+    "teaching": {
+      "problem": "接手商品库存报表前，需要确认哪些列可以计算，避免把商品编号当成金额，并识别零库存与数据缺失。",
+      "codeExplanation": "商品编号用于识别商品，price 是教学单价，stock 是库存件数。把三列并排输出便于核对。这里的建表语法仅用于解释类型，不需要运行建表操作；实际查询读取现有表即可。",
+      "resultExplanation": "结果有六行，每行一件商品。商品6库存为0，表示该条记录明确显示零库存；不是缺失。商品2单价89、库存40，两个数值含义和单位不同。",
+      "checkpoints": [],
+      "mergedConcepts": [],
+      "mergeExamples": []
+    }
+  },
+  {
+    "id": "kp01-03",
+    "title": "主键、外键和一对多",
+    "learningObjective": "能够识别主键和外键、判断一对多关系，并解释为什么客户与订单连接后可能出现多行。",
+    "concept": "主键用来唯一识别表中的一条记录，不能重复或为空。外键描述数据之间的引用关系；若数据库建立并启用约束，非空外键必须指向有效的父表记录。外键本身可以重复，也可以在允许时为空。一对多关系表示一条父记录可对应多条子记录，例如一名客户能下多笔订单，而一笔订单在本示例中最多关联一名客户。分析时要区分关系定义和实际查询结果：连接会按匹配记录生成结果，因此客户资料可能出现多次。如果需要每位客户一行，就应按客户汇总。",
+    "syntax": "PRIMARY KEY (id); FOREIGN KEY (customer_id) REFERENCES customers(customer_id);",
+    "parameters": {
+      "PRIMARY KEY": "主键约束，唯一标识记录",
+      "FOREIGN KEY": "外键约束",
+      "REFERENCES": "指定被引用的表和字段"
+    },
+    "executionSteps": [
+      "以客户表为起点",
+      "匹配关联订单",
+      "按客户统计订单数"
+    ],
+    "useCase": "客服主管要查看每位登记客户的下单次数，包括还没有下单的客户。客户表保存客户身份，订单表记录购买事件，两者通过客户编号关联。",
+    "comparison": "主键唯一，外键不保证唯一；外键为空与非空外键找不到父记录不是同一情况。",
+    "commonError": {
+      "example": "把订单表的 customer_id 设置为唯一约束，或用 COUNT(*) 统计左连接后的订单数。",
+      "correction": "订单编号作为主键，客户编号作为外键；统计已匹配订单用 COUNT(o.id)。"
+    },
+    "notes": "示例查询验证关系与统计结果，不表示已经验证生产数据库约束。",
+    "teaching": {
+      "problem": "客服主管要查看每位登记客户的下单次数，包括还没有下单的客户。客户表保存客户身份，订单表记录购买事件，两者通过客户编号关联。",
+      "codeExplanation": "customers 的客户编号是父表标识，orders 的客户编号是引用字段。LEFT JOIN 从客户表出发，使没有订单的客户仍能显示。COUNT(o.id) 只数非空订单编号，未匹配行不会被误计为一笔订单。GROUP BY 将连接后的多行整理成每位客户一行。此处先理解关系，具体连接和聚合语法在后续课程展开。",
+      "resultExplanation": "客户1有2笔订单，客户2和3各1笔，客户4为0笔。匿名订单没有客户编号，因此没有归入任何登记客户。在本例中订单编号唯一；同一客户编号则可以出现在多笔订单里。",
+      "checkpoints": [],
+      "mergedConcepts": [],
+      "mergeExamples": [
+        {
+          "label": "查看一对多匹配明细",
+          "explanation": "观察客户1出现两次、客户4订单编号为空，再理解为什么最终需要分组。",
+          "sql": "SELECT c.customer_id, o.id AS order_id FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id ORDER BY c.customer_id,o.id;",
+          "result": {
+            "columns": [
+              "customer_id",
+              "order_id"
+            ],
+            "rows": [
+              [
+                1,
+                1
+              ],
+              [
+                1,
+                3
+              ],
+              [
+                2,
+                2
+              ],
+              [
+                3,
+                5
+              ],
+              [
+                4,
+                null
+              ]
+            ]
+          }
+        }
+      ]
+    }
+  },
+  {
+    "id": "kp02-01",
+    "title": "基础查询、表达式与别名",
+    "learningObjective": "能够独立选择数据来源和输出字段，使用算术表达式生成派生列，并为结果列命名。",
+    "concept": "基础查询由数据来源和输出列表组成。FROM 指定输入表，SELECT 指定需要返回的列或表达式。查询可以直接读取原字段，也可以逐行计算新值，例如单价乘库存数量。AS 为结果列设置易读名称，并不改变源表字段或写入新数据。选择具体列能让报表结构明确，避免不必要字段；探索未知表时可以临时使用 SELECT *。派生列仍属于当前记录粒度，不是跨行汇总。表达式中的任一乘数为空时，计算结果通常为空，需要依据业务判断未知值，不可直接当零。",
+    "syntax": "SELECT column_name, expression AS alias FROM table_name;",
+    "parameters": {
+      "SELECT": "指定输出列与表达式",
+      "FROM": "指定输入表",
+      "expression": "计算表达式",
+      "AS alias": "为输出表达式命名"
+    },
+    "executionSteps": [
+      "读取商品表",
+      "选择所需字段",
+      "计算并命名派生列",
+      "按编号排序"
+    ],
+    "useCase": "采购主管先需要商品价目表，再希望估算每件商品的现有库存按售价计算的金额。现有商品表包含单价和库存件数，不需要其他表或分组。",
+    "comparison": "原字段直接读取；派生列由表达式计算；别名只修改输出名称。",
+    "commonError": {
+      "example": "同层 WHERE stock_value > 1000，或将售价库存值称为成本库存金额。",
+      "correction": "使用 WHERE price * stock > 1000，或外层查询筛选；明确售价口径。"
+    },
+    "notes": "MySQL 的部分 GROUP BY、HAVING 场景可使用别名，但不能据此假定所有子句都允许。",
+    "teaching": {
+      "problem": "采购主管先需要商品价目表，再希望估算每件商品的现有库存按售价计算的金额。现有商品表包含单价和库存件数，不需要其他表或分组。",
+      "codeExplanation": "第一步先提取商品名称和价格，确认每件商品一行。第二步在 SELECT 中加入 price * stock，并以 stock_value 命名，让结果直观表示每个商品的售价库存值。该值不是成本口径库存资产，也不是未来一定实现的收入。需要筛选派生金额时，同层 WHERE 通常不能使用 SELECT 中定义的别名，应写原表达式或在外层查询中使用别名。ORDER BY 可以使用输出别名。",
+      "resultExplanation": "价目表显示六件商品。扩展示例中商品1售价库存值2250，商品2为3560，商品6库存为0所以结果为0；行数始终为六。",
+      "checkpoints": [],
+      "mergedConcepts": [
+        {
+          "sourceId": "kp02-03",
+          "explanation": "表达式、别名、售价库存值、空值传播、同层筛选限制均已融入核心概念、代码讲解及示例。"
+        }
+      ],
+      "mergeExamples": [
+        {
+          "label": "合并来源：库存售价估算",
+          "explanation": "逐行计算价格与库存乘积，保留原粒度。",
+          "sql": "SELECT product_id, price, stock, price * stock AS stock_value FROM products ORDER BY product_id;",
+          "result": {
+            "columns": [
+              "product_id",
+              "price",
+              "stock",
+              "stock_value"
+            ],
+            "rows": [
+              [
+                1,
+                15,
+                150,
+                2250
+              ],
+              [
+                2,
+                89,
+                40,
+                3560
+              ],
+              [
+                3,
+                35,
+                200,
+                7000
+              ],
+              [
+                4,
+                65,
+                180,
+                11700
+              ],
+              [
+                5,
+                45,
+                80,
+                3600
+              ],
+              [
+                6,
+                15,
+                0,
+                0
+              ]
+            ]
+          }
+        },
+        {
+          "label": "按派生金额筛选",
+          "explanation": "筛选时重复表达式，排序时使用别名。",
+          "sql": "SELECT product_id, price * stock AS stock_value FROM products WHERE price * stock > 1000 ORDER BY stock_value DESC, product_id;",
+          "result": {
+            "columns": [
+              "product_id",
+              "stock_value"
+            ],
+            "rows": [
+              [
+                4,
+                11700
+              ],
+              [
+                3,
+                7000
+              ],
+              [
+                5,
+                3600
+              ],
+              [
+                2,
+                3560
+              ],
+              [
+                1,
+                2250
+              ]
+            ]
+          }
+        }
+      ]
+    }
+  },
+  {
+    "id": "kp02-02",
+    "title": "DISTINCT 去重",
+    "learningObjective": "能够依据输出字段确定去重粒度，正确提取唯一类别或门店与类别组合。",
+    "concept": "去重是把重复结果行合并成一条，而不是删除源表记录。DISTINCT 比较 SELECT 输出的整组字段：只选类别时，每种类别出现一次；同时选门店与类别时，只有两个字段都相同才算重复。若额外选择订单编号，因为编号各不相同，原本重复的类别可能仍显示多次。去重适合提取报表筛选选项、客户名单或业务维度组合；若需要销售合计、平均值等指标，应使用分组聚合。去重结果的排序仍须显式指定。",
+    "syntax": "SELECT DISTINCT column1, column2 FROM table_name;",
+    "parameters": {
+      "DISTINCT": "移除完全相同的输出行",
+      "column1, column2": "共同决定去重粒度"
+    },
+    "executionSteps": [
+      "提取门店和类别",
+      "合并重复组合",
+      "按门店及类别排序"
+    ],
+    "useCase": "运营人员希望为报表生成实际发生过销售的门店和类别组合，而不是展示每笔订单。相同门店多次销售同一类别时只需显示一次。",
+    "comparison": "DISTINCT 去重不计算指标；GROUP BY 可结合聚合函数计算各组指标。",
+    "commonError": {
+      "example": "SELECT DISTINCT(category), sales FROM orders，期待每类别仅一行。",
+      "correction": "只需要类别时使用 SELECT DISTINCT category FROM orders；需要类别销售额则分组求和。"
+    },
+    "notes": "文本排序规则会影响去重；本例没有大小写差异。",
+    "teaching": {
+      "problem": "运营人员希望为报表生成实际发生过销售的门店和类别组合，而不是展示每笔订单。相同门店多次销售同一类别时只需显示一次。",
+      "codeExplanation": "先选择 store_id 与 category，明确结果一行代表一个门店类别组合；DISTINCT 将重复组合合并。订单1和3都是门店1的护肤品，订单2和4都是门店2的化妆品，分别只需保留一行。排序让结果稳定易读。",
+      "resultExplanation": "结果从5笔订单减少为3种门店类别组合：门店1的护肤品、日用品和门店2的化妆品。不能据此断定商品主档全部类别，也不能得出各类别销售额。",
+      "checkpoints": [],
+      "mergedConcepts": [],
+      "mergeExamples": [
+        {
+          "label": "对比单列去重",
+          "explanation": "输出只剩类别，门店不再参与去重。",
+          "sql": "SELECT DISTINCT category FROM orders ORDER BY category;",
+          "result": {
+            "columns": [
+              "category"
+            ],
+            "rows": [
+              [
+                "化妆品"
+              ],
+              [
+                "护肤品"
+              ],
+              [
+                "日用品"
+              ]
+            ]
+          }
+        }
+      ]
+    }
+  },
+  {
+    "id": "kp05-01",
+    "title": "空值判断与三值逻辑",
+    "learningObjective": "能够区分未知值、零与空字符串，并正确筛选缺失、已知以及明确不等于指定值的记录。",
+    "concept": "NULL 表示未知或缺失，不是数字0，也不是长度为零的文本。普通比较例如 value = 10 或 value <> 10，遇到 NULL 通常得到未知，而不是假。SQL 的条件判断采用真、假、未知三种逻辑值；WHERE 只保留真，因此未知记录会被排除。判断缺失要用 IS NULL，判断已知要用 IS NOT NULL。NOT 不会让未知变成真。业务上缺失不一定是错误：订单客户外键为空可能意味着允许访客购买，也可能是数据遗漏，须结合业务规则判定。计数非空字段会跳过缺失，与总记录数不同。",
+    "syntax": "WHERE column_name IS NULL;\nWHERE column_name IS NOT NULL;",
+    "parameters": {
+      "IS NULL": "检查字段是否为空值",
+      "IS NOT NULL": "检查字段是否已有值",
+      "<>": "不等于，普通比较遇空值为未知"
+    },
+    "executionSteps": [
+      "比较数值与10",
+      "排除未知及等于10的记录",
+      "单独检查缺失记录"
+    ],
+    "useCase": "数据质量人员要筛选明确不等于10的记录，同时单独登记缺失值。不能将未知值自动视作异常数值或实际零。",
+    "comparison": "NULL、0与空字符串不同；NOT(value=10) 不会自动包含 NULL。",
+    "commonError": {
+      "example": "WHERE value = NULL，或认为 WHERE value <> 10 自动包含缺失行。",
+      "correction": "使用 IS NULL 检测缺失；若需要两类记录，使用 WHERE value <> 10 OR value IS NULL。"
+    },
+    "notes": "是否将匿名订单或缺失值列入指标，需要明确数据口径。",
+    "teaching": {
+      "problem": "数据质量人员要筛选明确不等于10的记录，同时单独登记缺失值。不能将未知值自动视作异常数值或实际零。",
+      "codeExplanation": "逐行比较 value 与10：第一行未知，第二行0不等于10，第三和第四行等于10。只有第二行满足 WHERE。若任务要求找缺失记录，则改为 IS NULL；需要同时返回已知不等于10和未知记录，就用 OR 将两种条件明确连接。示例中的 note 空字符串仍是已知文本。",
+      "resultExplanation": "主查询仅返回编号2、值0。缺失检查仅返回编号1；合并条件则返回编号1和2。由此可见，排除10不等于找出所有不是已知10的记录。",
+      "checkpoints": [],
+      "mergedConcepts": [
+        {
+          "sourceId": "kp01-04",
+          "explanation": "缺失定义、零与空文本辨析、匿名外键、IS NULL 原示例及错误修正已融入正文。"
+        }
+      ],
+      "mergeExamples": [
+        {
+          "label": "合并来源：识别缺失记录",
+          "explanation": "仅返回真正的空值记录。",
+          "sql": "SELECT id, value, note FROM nullable_values WHERE value IS NULL ORDER BY id;",
+          "result": {
+            "columns": [
+              "id",
+              "value",
+              "note"
+            ],
+            "rows": [
+              [
+                1,
+                null,
+                null
+              ]
+            ]
+          }
+        },
+        {
+          "label": "同时筛选未知和非10",
+          "explanation": "显式保留未知值，不依赖普通比较。",
+          "sql": "SELECT id,value FROM nullable_values WHERE value <> 10 OR value IS NULL ORDER BY id;",
+          "result": {
+            "columns": [
+              "id",
+              "value"
+            ],
+            "rows": [
+              [
+                1,
+                null
+              ],
+              [
+                2,
+                0
+              ]
+            ]
+          }
+        },
+        {
+          "label": "识别缺少客户编号的订单",
+          "explanation": "作为匿名订单或数据缺失的待核记录，不直接认定错误。",
+          "sql": "SELECT id,customer_id FROM orders WHERE customer_id IS NULL ORDER BY id;",
+          "result": {
+            "columns": [
+              "id",
+              "customer_id"
+            ],
+            "rows": [
+              [
+                4,
+                null
+              ]
+            ]
+          }
+        }
+      ]
+    }
+  },
+  {
+    "id": "kp05-02",
+    "title": "空值替换与候选值选择",
+    "learningObjective": "能够使用双参数空值替换及多候选值函数，保留真实的零与空字符串，并明确填补规则。",
+    "concept": "报表常需为缺失字段提供显示用替代值。IFNULL 接受两个参数：第一个非空时直接返回，否则返回第二个。COALESCE 按顺序返回第一个非空候选值，适合多个候选来源。若所有候选均为空，结果仍为空。零和空字符串不是 NULL，因此不会被这两个函数替换。替代值仅是报表处理规则，不代表原始缺失真实变成了零或其他值。若业务明确把空文本也视为缺失，可先使用 NULLIF 将其转换为空值，再选择替代文本。",
+    "syntax": "IFNULL(a, b);\nCOALESCE(a, b, c);",
+    "parameters": {
+      "a": "优先使用的原始值",
+      "b, c": "依业务优先级排列的备用值"
+    },
+    "executionSteps": [
+      "检查原始字段",
+      "为缺失值选择替代项",
+      "保留零及空文本"
+    ],
+    "useCase": "主管希望报表醒目标记未填写的数值与备注，同时不丢失实际零值。示例约定数值缺失显示-1、备注缺失显示 missing；这些仅为展示标记。",
+    "comparison": "IFNULL 固定两个参数；COALESCE 支持多个候选值。两者都不会自动将空文本视作缺失。",
+    "commonError": {
+      "example": "COALESCE(value,0) 后认为所有缺失记录原本都是真实零。",
+      "correction": "先确定业务规则，保留原列或缺失标记；需要将空文本视为缺失时使用 NULLIF。"
+    },
+    "notes": "混合参数类型在 MySQL 与 SQLite 中可能有不同类型推断。本例仅验证所示数据。",
+    "teaching": {
+      "problem": "主管希望报表醒目标记未填写的数值与备注，同时不丢失实际零值。示例约定数值缺失显示-1、备注缺失显示 missing；这些仅为展示标记。",
+      "codeExplanation": "IFNULL 检查 value，只有为空才输出-1；COALESCE 检查 note，已有内容即返回原值，否则返回缺失标记。AS 命名展示列。此处只在 SELECT 中转换，不修改原始表。若-1本身可能是合法数值，应另设缺失标识，避免混淆。",
+      "resultExplanation": "编号1显示-1及 missing；编号2仍显示0与空字符串；编号3和4仍显示10与 ok。所有四行保留，粒度不变。替换后的列不应直接用于金额汇总。",
+      "checkpoints": [],
+      "mergedConcepts": [],
+      "mergeExamples": [
+        {
+          "label": "将空文本按业务规则视作缺失",
+          "explanation": "仅当业务确认空文本无有效含义时使用；编号2也显示缺失标记。",
+          "sql": "SELECT id, COALESCE(NULLIF(note, ''), 'missing') AS note_filled FROM nullable_values ORDER BY id;",
+          "result": {
+            "columns": [
+              "id",
+              "note_filled"
+            ],
+            "rows": [
+              [
+                1,
+                "missing"
+              ],
+              [
+                2,
+                "missing"
+              ],
+              [
+                3,
+                "ok"
+              ],
+              [
+                4,
+                "ok"
+              ]
+            ]
+          }
+        }
+      ]
+    }
+  }
+]

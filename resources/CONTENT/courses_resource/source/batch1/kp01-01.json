@@ -1,0 +1,200 @@
+{
+  "id": "kp01-01",
+  "chapterId": "ch01",
+  "title": "数据库、表、行与列",
+  "learningObjective": "能够判断数据表的一行代表什么，区分订单数、客户数与字段数，并提取报表所需字段。",
+  "prerequisites": [],
+  "concept": "数据库是按一定结构组织的数据集合，数据库管理系统负责访问和管理它。企业通常把订单、商品、客户分别放在不同的表中，而不是把所有信息堆在一张表。表用列定义记录的属性，用行保存具体记录。字段名描述属性，字段中的值才是实际数据。数据粒度指一行代表的业务对象或事件；例如订单表一行是一笔订单，订单明细表一行却可能是一种商品的一条明细。同一个客户可以下多笔订单，所以记录数并不等于客户数。开始分析前先确认数据粒度、唯一标识与统计目标，再决定是直接读取、去重还是汇总。",
+  "syntax": "SELECT column_name FROM table_name;",
+  "parameters": {
+    "column_name": "需要输出的字段，可用逗号分隔多个字段",
+    "table_name": "数据来源表"
+  },
+  "fixtureIds": [
+    "lesson-orders"
+  ],
+  "sourceTables": [
+    {
+      "name": "orders",
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "category",
+          "type": "TEXT",
+          "mysqlType": "VARCHAR(160) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_bin",
+          "sqliteType": "TEXT"
+        },
+        {
+          "name": "sales",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "store_id",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "order_date",
+          "type": "TEXT",
+          "mysqlType": "DATE",
+          "sqliteType": "TEXT"
+        },
+        {
+          "name": "customer_id",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          "护肤品",
+          800,
+          1,
+          "2026-01-03",
+          1
+        ],
+        [
+          2,
+          "化妆品",
+          400,
+          2,
+          "2026-01-10",
+          2
+        ],
+        [
+          3,
+          "护肤品",
+          600,
+          1,
+          "2026-02-02",
+          1
+        ],
+        [
+          4,
+          "化妆品",
+          300,
+          2,
+          "2026-02-15",
+          null
+        ],
+        [
+          5,
+          "日用品",
+          1500,
+          1,
+          "2026-02-20",
+          3
+        ]
+      ]
+    }
+  ],
+  "mysqlSql": "SELECT id, category, sales FROM orders ORDER BY id;",
+  "sqliteSql": "SELECT id, category, sales FROM orders ORDER BY id;",
+  "executionSteps": [
+    "定位订单表",
+    "提取三个字段",
+    "按订单编号排序"
+  ],
+  "useCase": "主管需要核对订单编号、商品类别与销售金额，不需要查看客户资料或门店编号。订单表已有这些字段，因此直接选择所需列即可。",
+  "comparison": "选择字段改变结果的列，不一定改变行数；去重或汇总才可能改变记录数量。",
+  "commonError": {
+    "example": "把五笔订单当成五名客户。",
+    "correction": "先检查客户编号，再使用去重计数；匿名订单单独说明。"
+  },
+  "notes": "查询不修改原始表。订单粒度只是本示例的定义，现实中应查数据字典。",
+  "compatibility": {
+    "status": "直接兼容",
+    "detail": "仅在本示例数据与语义范围验证；不代表全部 MySQL 语法兼容。"
+  },
+  "relatedQuestionIds": [
+    "q0006"
+  ],
+  "relatedFlashcardIds": [
+    "fc0001",
+    "fc0006",
+    "fc0007"
+  ],
+  "relatedKnowledgePointIds": [],
+  "mysqlVerification": "未运行原生 MySQL 8.4",
+  "result": {
+    "columns": [
+      "id",
+      "category",
+      "sales"
+    ],
+    "rows": [
+      [
+        1,
+        "护肤品",
+        800
+      ],
+      [
+        2,
+        "化妆品",
+        400
+      ],
+      [
+        3,
+        "护肤品",
+        600
+      ],
+      [
+        4,
+        "化妆品",
+        300
+      ],
+      [
+        5,
+        "日用品",
+        1500
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "mysqlVerificationScript": "validation/mysql/kp01-01.sql",
+  "primaryQuestionIds": [
+    "q0006"
+  ],
+  "primaryFlashcardIds": [
+    "fc0001",
+    "fc0006",
+    "fc0007"
+  ],
+  "teaching": {
+    "problem": "主管需要核对订单编号、商品类别与销售金额，不需要查看客户资料或门店编号。订单表已有这些字段，因此直接选择所需列即可。",
+    "codeExplanation": "先从订单表读取记录；SELECT 只投影编号、类别与金额，不筛选记录。ORDER BY id 指定编号升序，避免依赖数据库默认行序。这里不需要分组，因为主管要的是逐笔明细。原表 id 标识订单，customer_id 标识客户，store_id 标识门店，order_date 是订单日期。",
+    "resultExplanation": "五笔订单全部保留，列数由六列减少为三列，粒度仍是一行一笔订单。订单1和3属于同一已知客户，订单4没有客户编号。已知客户数为3，不能说有5名客户，也不能据此推断匿名客户人数。",
+    "checkpoints": [],
+    "mergedConcepts": [],
+    "mergeExamples": [
+      {
+        "label": "核对订单与已知客户数量",
+        "explanation": "先观察两个统计值的差异；后续聚合章节会详细学习计数。",
+        "sql": "SELECT COUNT(*) AS order_count, COUNT(DISTINCT customer_id) AS known_customers FROM orders;",
+        "result": {
+          "columns": [
+            "order_count",
+            "known_customers"
+          ],
+          "rows": [
+            [
+              5,
+              3
+            ]
+          ]
+        }
+      }
+    ]
+  }
+}

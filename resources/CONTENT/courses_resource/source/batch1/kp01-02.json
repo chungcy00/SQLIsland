@@ -1,0 +1,185 @@
+{
+  "id": "kp01-02",
+  "chapterId": "ch01",
+  "title": "数据类型与数据字典",
+  "learningObjective": "能够根据字段的业务含义识别数据类型、单位、允许缺失情况及是否适合作为计算指标。",
+  "prerequisites": [
+    "kp01-01"
+  ],
+  "concept": "数据类型决定字段可以保存什么值以及如何比较、计算。整数适合计数和整数编号；精确十进制适合货币金额；文本用来保存名称或保留前导零的编码；日期类型用于日历日期。数据字典不只是字段名列表，还应说明业务含义、单位、精度、可空性、约束及取值范围。尤其要区分编号和数量：两者都可能使用整数，却只有后者通常适合求和。金额字段的单位也要核对，例如元与分不能直接相加。示例使用整数价格，仅为教学简化，不代表生产系统的金额类型。",
+  "syntax": "CREATE TABLE t (id INT, amount DECIMAL(12,2), label VARCHAR(80), day DATE);",
+  "parameters": {
+    "INT": "整数",
+    "DECIMAL(12,2)": "总精度12位，其中小数2位",
+    "VARCHAR(80)": "可变长度文本，最多80字符",
+    "DATE": "日期，不含时刻"
+  },
+  "fixtureIds": [
+    "lesson-products"
+  ],
+  "sourceTables": [
+    {
+      "name": "products",
+      "columns": [
+        {
+          "name": "product_id",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "product_name",
+          "type": "TEXT",
+          "mysqlType": "VARCHAR(160) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_bin",
+          "sqliteType": "TEXT"
+        },
+        {
+          "name": "category",
+          "type": "TEXT",
+          "mysqlType": "VARCHAR(160) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_bin",
+          "sqliteType": "TEXT"
+        },
+        {
+          "name": "price",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "stock",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          "Mask",
+          "护肤品",
+          15,
+          150
+        ],
+        [
+          2,
+          "Serum",
+          "护肤品",
+          89,
+          40
+        ],
+        [
+          3,
+          "Cleanser",
+          "护肤品",
+          35,
+          200
+        ],
+        [
+          4,
+          "Cream",
+          "化妆品",
+          65,
+          180
+        ],
+        [
+          5,
+          "Sunscreen",
+          "化妆品",
+          45,
+          80
+        ],
+        [
+          6,
+          "Soap_1",
+          "日用品",
+          15,
+          0
+        ]
+      ]
+    }
+  ],
+  "mysqlSql": "SELECT product_id, price, stock FROM products ORDER BY product_id;",
+  "sqliteSql": "SELECT product_id, price, stock FROM products ORDER BY product_id;",
+  "executionSteps": [
+    "读取商品编号、单价与库存",
+    "核对字段含义及单位",
+    "识别零库存"
+  ],
+  "useCase": "接手商品库存报表前，需要确认哪些列可以计算，避免把商品编号当成金额，并识别零库存与数据缺失。",
+  "comparison": "数字型编号不等于可求和指标；文本日期不等于真正的日期类型。",
+  "commonError": {
+    "example": "将浮点数作为精确货币，或把商品编号相加当成业务指标。",
+    "correction": "货币优先使用精确十进制或整数分，计算前确认字段单位；编号用于识别。"
+  },
+  "notes": "本地 SQLite 类型亲和性与 MySQL 类型约束不同；本节未执行原生建表语法。",
+  "compatibility": {
+    "status": "直接兼容",
+    "detail": "仅在本示例数据与语义范围验证；不代表全部 MySQL 语法兼容。"
+  },
+  "relatedQuestionIds": [
+    "q0003",
+    "q0005"
+  ],
+  "relatedFlashcardIds": [
+    "fc0002"
+  ],
+  "relatedKnowledgePointIds": [],
+  "mysqlVerification": "未运行原生 MySQL 8.4",
+  "result": {
+    "columns": [
+      "product_id",
+      "price",
+      "stock"
+    ],
+    "rows": [
+      [
+        1,
+        15,
+        150
+      ],
+      [
+        2,
+        89,
+        40
+      ],
+      [
+        3,
+        35,
+        200
+      ],
+      [
+        4,
+        65,
+        180
+      ],
+      [
+        5,
+        45,
+        80
+      ],
+      [
+        6,
+        15,
+        0
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "mysqlVerificationScript": "validation/mysql/kp01-02.sql",
+  "primaryQuestionIds": [
+    "q0003",
+    "q0005"
+  ],
+  "primaryFlashcardIds": [
+    "fc0002"
+  ],
+  "teaching": {
+    "problem": "接手商品库存报表前，需要确认哪些列可以计算，避免把商品编号当成金额，并识别零库存与数据缺失。",
+    "codeExplanation": "商品编号用于识别商品，price 是教学单价，stock 是库存件数。把三列并排输出便于核对。这里的建表语法仅用于解释类型，不需要运行建表操作；实际查询读取现有表即可。",
+    "resultExplanation": "结果有六行，每行一件商品。商品6库存为0，表示该条记录明确显示零库存；不是缺失。商品2单价89、库存40，两个数值含义和单位不同。",
+    "checkpoints": [],
+    "mergedConcepts": [],
+    "mergeExamples": []
+  }
+}

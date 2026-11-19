@@ -404,13 +404,13 @@ function chapterPage(id) {
     return goButton(`${completed ? '<span class="point-check">' + icon("check") + '</span>' : '<span class="point-dot"></span>'}<span class="grow">${e(k.title)}</span>${k.id === state.lastLesson ? '<small class="learning-position">上次学到</small>' : ''}${icon("right", "chevron")}`, "/lesson/" + k.id, "knowledge-row" + (completed ? " completed" : "") + (k.id === state.lastLesson ? " current" : ""));
   }).join("")}`, "learn", true);
 }
-function renderTables(tables, expandable = true) {
+function renderTables(tables, expandable = true, descriptions = {}) {
   return (tables || []).map((t) => {
     const rows = t.rows || [];
     const rowCount = t.rowCount ?? rows.length;
     const displayedRows = expandable ? rows.length : Math.min(5, rows.length);
     const preview = table(t.columns, rows.slice(0, 5));
-    return `<section class="source-table"><div class="row between table-heading"><h3><span class="source-table-name" title="${e(t.name)}">${e(t.name)}</span></h3><small>${rowCount} 行</small></div>${preview}${expandable && rows.length > 5 ? `<details class="remaining-rows"><summary>查看其余 ${rows.length - 5} 行</summary>${table(t.columns, rows.slice(5), rows.length)}</details>` : ""}${rowCount > displayedRows ? `<small>预览前 ${displayedRows} 行</small>` : ""}</section>`;
+    return `<section class="source-table"><div class="row between table-heading"><h3><span class="source-table-name" title="${e(t.name)}">${e(t.name)}</span></h3><small>${rowCount} 行</small></div>${descriptions[t.name] ? `<p class="source-table-description">${teachingText(descriptions[t.name])}</p>` : ""}${preview}${expandable && rows.length > 5 ? `<details class="remaining-rows"><summary>查看其余 ${rows.length - 5} 行</summary>${table(t.columns, rows.slice(5), rows.length)}</details>` : ""}${rowCount > displayedRows ? `<small>预览前 ${displayedRows} 行</small>` : ""}</section>`;
   }).join("");
 }
 function lessonCode(sql) {
@@ -458,18 +458,73 @@ function rich(value) {
     })
     .join("");
 }
+function teachingText(text) {
+  return e(text).replace(/数据粒度|数据类型|三值逻辑|精确十进制|主键|外键/g, '<strong>$&</strong>').replace(/\b(SELECT|FROM|WHERE|ORDER BY|GROUP BY|DISTINCT|LEFT JOIN|COUNT|IFNULL|COALESCE|IS NULL|IS NOT NULL|NULL|AS)\b/g, '<strong>$1</strong>');
+}
+function renderTeachingBlocks(blocks = []) {
+  const text = (value, emphasis = []) => {
+    const escaped = e(value);
+    const words = [...emphasis].sort((a, b) => b.length - a.length);
+    if (!words.length) return escaped;
+    const pattern = words.map(word => e(word).replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|");
+    return escaped.replace(new RegExp(pattern, "g"), word => `<strong>${word}</strong>`);
+  };
+  return blocks.map(block => {
+    switch (block.type) {
+      case "heading": return `<h3>${text(block.text, block.emphasis)}</h3>`;
+      case "paragraph": return `<p>${text(block.text, block.emphasis)}</p>`;
+      case "list": return `<ul>${block.items.map(item => `<li>${typeof item === "string" ? e(item) : text(item.text, item.emphasis)}</li>`).join("")}</ul>`;
+      case "table": return `<div class="concept-comparison">${table(block.columns, block.rows)}</div>`;
+      case "code": return code(block.sql);
+      default: return "";
+    }
+  }).join("");
+}
+function conceptContent(k) {
+  return `<div class="concept-group">${k.presentation ? renderTeachingBlocks(k.presentation.conceptBlocks) : `<p>${e(k.concept)}</p>${(k.teaching?.mergedConcepts || []).map(item => `<p>${e(item.explanation)}</p>`).join("")}`}</div>`;
+}
 function lessonTeaching(k) {
   if (!k.teaching) return "";
-  const { problem, codeExplanation, checkpoints, mergeExamples = [] } = k.teaching;
-  return `<p>${e(problem)}</p><p>${e(codeExplanation)}</p>${checkpoints.map((step) =>
+  const presentation = k.presentation;
+  const method = presentation ? renderTeachingBlocks(presentation.methodBlocks) : `<p>${e(k.teaching.codeExplanation || "")}</p>`;
+  return `<div class="lesson-demand"><h3>实际业务需求</h3><p>${e(presentation?.problem || k.teaching.problem)}</p></div><div class="lesson-method"><h3>查询思路讲解</h3>${method}</div>`;
+}
+function lessonBreakdown(k) {
+  const fragments = (k.presentation?.breakdown || []).map(step => step.kind === "fragment"
+    ? `<div class="code-explanation-part"><h4>${e(step.title)}</h4><small>代码片段 · 不能独立运行</small>${code(step.sql)}<p><strong>作用：</strong>${e(step.purpose)}</p><p><strong>原因：</strong>${e(step.reason)}</p></div>`
+    : `<details class="lesson-checkpoint"><summary>${e(step.title)}</summary>${renderTables(step.sourceTables)}${code(step.sql)}<p>${e(step.purpose)}</p><p>${e(step.reason)}</p><h3>中间结果</h3>${table(step.result.columns, step.result.rows)}</details>`).join("");
+  const steps = k.presentation ? "" : (k.teaching?.checkpoints || []).map(step =>
     `<details class="lesson-checkpoint"><summary>${e(step.label)} · <code>${e(step.name)}</code></summary>${lessonCode(step.sql)}${table(step.result.columns, step.result.rows)}</details>`
-  ).join("")}${mergeExamples.map((example) =>
-    `<details class="lesson-checkpoint"><summary>${e(example.label)}</summary><p>${e(example.explanation)}</p>${lessonCode(example.sql)}${table(example.result.columns, example.result.rows)}</details>`
-  ).join("")}`;
+  ).join("");
+  return `<div class="lesson-breakdown">${fragments ? `<div class="lesson-code-explanation"><h3>代码拆解</h3>${fragments}</div>` : ""}${steps}</div>`;
+}
+function lessonCompleteCode(k) {
+  return `<div class="lesson-complete-code"><h3>完整代码</h3>${code(k.presentation?.completeCode.mysqlSql || k.mysqlSql)}${k.sqliteSql ? button(actionIcon("play") + " 运行兼容示例", "lessonRun", k.id, "primary full") : ""}</div>`;
+}
+function lessonExtensions(k) {
+  return (k.presentation?.extensions || k.teaching?.mergeExamples || []).map(example =>
+    `<details class="lesson-checkpoint lesson-extension"><summary>${e(example.label)}</summary>${example.sourceTables ? renderTables(example.sourceTables) : ""}${lessonCode(example.sql)}<h3>示例执行结果</h3>${table(example.result.columns, example.result.rows)}${example.explanationBlocks ? renderTeachingBlocks(example.explanationBlocks) : `<p>${e(example.explanation)}</p>`}</details>`
+  ).join("");
+}
+function lessonExpected(k) {
+  const result = k.presentation?.expectedResult || k.result;
+  if (!result?.columns) return "";
+  return `<div class="lesson-expected"><h3>预期查询结果</h3>${`<small>${result.totalRows ?? result.rows.length} 行 · ${result.columns.length} 列${result.totalRows > result.rows.length ? " · 展示样例" : ""}</small>`}${table(result.columns, result.rows)}<div class="lesson-result-explanation"><h3>结果解读</h3>${k.presentation ? renderTeachingBlocks(k.presentation.resultBlocks) : `<p>${e(k.teaching?.resultExplanation || "")}</p>`}</div></div>`;
+}
+function cautionText(text = "") {
+  // Legacy courses remain verbatim until an external resource is converted.
+  return e(text);
+}
+function lessonMistake(k, key) {
+  const blocks = k.presentation?.cautions?.[key];
+  return blocks ? renderTeachingBlocks(blocks) : cautionText(k.commonError[key]);
+}
+function lessonErrorReason(k) {
+  return k.presentation?.cautions.reason ? renderTeachingBlocks(k.presentation.cautions.reason) : (k.commonError?.reason ? `<p>${e(k.commonError.reason)}</p>` : "");
 }
 function lessonResult(k, result) {
   const shown = result.rows.slice(0, 20);
-  return `<small>本次 SQLite 兼容执行结果 · ${result.rowCount} 行${result.rowCount > shown.length ? ` · 展示前 ${shown.length} 行` : ""}</small>${table(result.columns, shown)}${k.teaching?.resultExplanation ? `<p>${e(k.teaching.resultExplanation)}</p>` : ""}`;
+  return `<small>本次 SQLite 兼容执行结果 · ${result.rowCount} 行${result.rowCount > shown.length ? ` · 展示前 ${shown.length} 行` : ""}</small>${table(result.columns, shown)}`;
 }
 function lessonPage(id) {
   const k = getKP(id);
@@ -484,20 +539,20 @@ function lessonPage(id) {
   const position = chapter.knowledgePoints.findIndex((point) => point.id === id) + 1;
   const related = (k.relatedQuestionIds || []).map(getQuestion).filter(Boolean);
   const sharedExample = formatSqlForDisplay(k.syntax) === formatSqlForDisplay(k.mysqlSql);
-  const goal = (k.learningObjective || k.useCase || "").replace(/^(能够运用本节知识完成|在统一企业数据库中独立完成)[：:]\s*/, "");
-  const scenario = k.useCase && k.useCase !== goal ? k.useCase : "";
+  const goal = (k.learningObjective || k.useCase || "").replace(/^(能够运用本节知识完成|在统一企业数据库中独立完成)[：:]\s*/, "").replace(/^能够/, "");
+
   const parameters = k.parameters ? `<ul class="parameter-list">${Object.entries(k.parameters).map(([name, description]) => `<li><strong>${e(name)}</strong><span>${e(description)}</span></li>`).join("")}</ul>` : "";
   state.lastLesson = id;
   if (!state.learningView.expanded.includes(k.chapterId)) state.learningView.expanded.push(k.chapterId);
   persist().catch((err) => toast(err.message));
   shell("知识点详情", `<div class="lesson-details">
     <header class="lesson-intro"><div class="question-meta">${tag(chapter.title)}${tag(k.compatibility?.status || "MySQL 教学")}<small>${position} / ${chapter.knowledgePoints.length}</small></div><h1 class="lesson-title">${e(k.title)}</h1>${goal ? `<section class="lesson-purpose" data-lesson-section="purpose"><p>能够运用本节知识完成：${e(goal)}</p></section>` : ""}</header>
-    <div class="lesson-foundation"><section class="lesson-section" data-lesson-section="concept"><h2>核心概念</h2>${scenario ? `<p class="lesson-scenario">${e(scenario)}</p>` : ""}<div class="lesson-concept">${readingChunks(k.concept).map((chunk) => `<p>${e(chunk)}</p>`).join("")}${(k.teaching?.mergedConcepts || []).map((item) => `<p>${e(item.explanation)}</p>`).join("")}</div>${sharedExample ? parameters : ""}</section>
-    ${!sharedExample ? `<section class="lesson-section" data-lesson-section="syntax"><h2>语法</h2>${lessonCode(k.syntax)}${parameters}</section>` : ""}</div>
+    <div class="lesson-foundation"><section class="lesson-section" data-lesson-section="concept"><h2>核心概念</h2><div class="lesson-concept">${conceptContent(k)}</div>${sharedExample ? parameters : ""}</section>
+    ${!sharedExample ? `<section class="lesson-section" data-lesson-section="syntax"><h2>语法</h2>${k.presentation?.syntax.purpose ? `<p class="syntax-purpose">${teachingText(k.presentation.syntax.purpose)}</p>` : ""}${lessonCode(k.syntax)}${parameters}</section>` : ""}</div>
     ${(k.executionSteps || []).length ? `<section class="lesson-section" data-lesson-section="steps"><h2>执行思路</h2><ol class="steps">${k.executionSteps.map((step, i) => `<li class="step"><b>${i + 1}</b><span>${e(step)}</span></li>`).join("")}</ol></section>` : ""}
-    <section class="lesson-section" data-lesson-section="data"><h2>示例数据</h2>${renderTables(k.sourceTables)}</section>
-    <section class="lesson-section" data-lesson-section="example"><div class="section-heading example-heading"><h2>SQL 示例</h2>${button(icon("code") + " 去实验室", "lessonLab", id, "small-button")}</div>${lessonTeaching(k)}${lessonCode(k.mysqlSql)}${k.sqliteSql ? button(actionIcon("play") + " 运行兼容示例", "lessonRun", id, "primary full") : ""}<div id="lesson-result">${lessonExampleResult?.id === id ? lessonResult(k, lessonExampleResult.result) : ""}</div></section>
-    <section class="lesson-section lesson-cautions"><h2>辨析与易错点</h2><p>${e(k.comparison)}</p>${k.commonError ? `<dl class="mistake-comparison"><div><dt>易错</dt><dd>${e(k.commonError.example)}</dd></div><div><dt>修正</dt><dd>${e(k.commonError.correction)}</dd></div></dl>` : ""}<p>${e(k.notes)}</p></section>
+    <section class="lesson-section" data-lesson-section="data"><h2>示例数据</h2>${renderTables(k.sourceTables, true, k.presentation?.dataDescriptions)}</section>
+    <section class="lesson-section" data-lesson-section="example"><div class="section-heading example-heading"><h2>SQL 示例</h2>${button(icon("code") + " 去实验室", "lessonLab", id, "small-button")}</div>${lessonTeaching(k)}${lessonBreakdown(k)}${lessonCompleteCode(k)}${lessonExpected(k)}<div id="lesson-result" aria-live="polite">${lessonExampleResult?.id === id ? lessonResult(k, lessonExampleResult.result) : ""}</div>${lessonExtensions(k)}</section>
+    <section class="lesson-section lesson-cautions"><h2>辨析与易错点</h2><div class="caution-comparison"><h3>辨析</h3><div class="caution-copy">${k.presentation ? renderTeachingBlocks(k.presentation.cautions.comparison) : cautionText(k.comparison)}</div></div>${k.commonError ? `<dl class="mistake-comparison"><div><dt>易错</dt><dd>${lessonMistake(k, "example")}</dd></div>${lessonErrorReason(k) ? `<div class="mistake-reason"><dt>原因</dt><dd>${lessonErrorReason(k)}</dd></div>` : ""}<div><dt>修正</dt><dd>${lessonMistake(k, "correction")}</dd></div></dl>` : ""}<div class="caution-reason"><h3>注意事项</h3><div class="caution-copy">${k.presentation ? renderTeachingBlocks(k.presentation.cautions.notes) : cautionText(k.notes)}</div></div></section>
     ${related.length ? `<section class="lesson-section related-questions"><div class="section-heading"><h2>关联练习</h2>${goButton("全部 " + related.length + " 题", "/practice/kp/" + id, "small-button")}</div>${questionList(related, true)}</section>` : ""}
     <section class="lesson-section"><label class="form-field">我的笔记<textarea id="note" data-id="${id}" aria-label="我的笔记">${e(lessonNote(state, content.curriculumMigration, id))}</textarea></label><div class="note-controls"><small id="note-status" role="status"></small>${button(actionIcon("save") + " 保存笔记", "saveLessonNote", id, "primary")}</div></section>
     <div class="lesson-completion">${button(completedLesson(id) ? actionIcon("check") + " 已完成学习" : actionIcon("check") + " 完成学习", "completeLesson", id, "primary full")}</div>
@@ -1736,7 +1791,7 @@ async function handleAction(action, arg, element) {
           tables: k.datasetId ? undefined : k.sourceTables,
           setupSql: k.setupSql,
           path: dbManifest.datasets.find((dataset) => dataset.id === k.datasetId)?.path,
-          sql: k.sqliteSql,
+          sql: k.presentation?.completeCode.sqliteSql || k.sqliteSql,
         });
         if (route() !== "/lesson/" + arg) break;
         lessonExampleResult = { id: arg, result: r };

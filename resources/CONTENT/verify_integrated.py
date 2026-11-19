@@ -60,8 +60,15 @@ def main():
    cursor=connection.execute(step['sql'])
    assert [col[0] for col in cursor.description]==step['result']['columns'] and [list(row) for row in cursor]==step['result']['rows'],(k['id'],step['name'])
   for step in k.get('teaching',{}).get('mergeExamples',[]):
-   cursor=execute_snippet(conns[k['datasetId']] if k.get('datasetId') else c, step['sql'])
+   snippet=conns[k['datasetId']] if k.get('datasetId') else c
+   if step.get('sourceTables'):
+    snippet=sqlite3.connect(':memory:')
+    for table in step['sourceTables']:
+     snippet.execute('CREATE TABLE '+table['name']+'('+','.join(col['name']+' '+(col.get('sqliteType') or col['type']) for col in table['columns'])+')')
+     snippet.executemany('INSERT INTO '+table['name']+' VALUES('+','.join('?' for col in table['columns'])+')',table['rows'])
+   cursor=execute_snippet(snippet, step['sql'])
    assert [col[0] for col in cursor.description]==step['result']['columns'] and [list(row) for row in cursor]==step['result']['rows'],(k['id'],step['label'])
+   if step.get('sourceTables'):snippet.close()
   if not k.get('taskId'):c.close()
   passed+=1
  for c in conns.values():c.close()

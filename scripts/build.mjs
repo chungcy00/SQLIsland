@@ -1,3 +1,4 @@
+import { loadCourseStructures } from "./course-structure-resources.mjs";
 import { build } from "esbuild";
 import {
   mkdir,
@@ -53,6 +54,7 @@ for (let i = 1; i <= 20; i++) {
     ).cards,
   );
 }
+const courseStructureStatus = await loadCourseStructures(chapters);
 const integerPolicies = JSON.parse(await readFile("src/integer-column-policy.json"));
 for (const question of questions) {
   const policy = integerPolicies[question.id];
@@ -74,6 +76,7 @@ await writeFile(
   JSON.stringify({
     contentVersion: contentManifest.auditRelease,
     chapters,
+    courseStructureStatus,
     curriculumMigration: JSON.parse(await readFile(contentSource + "/courses_resource/curriculum-migration.json")),
     questions,
     cards,

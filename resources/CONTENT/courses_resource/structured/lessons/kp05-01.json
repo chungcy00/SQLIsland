@@ -1,0 +1,341 @@
+{
+  "schemaVersion": 1,
+  "id": "kp05-01",
+  "sourceBatch": "batch1",
+  "teachingKind": "syntax",
+  "conceptBlocks": [
+    {
+      "type": "heading",
+      "text": "缺失与已知值",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "NULL 表示未知或缺失，不是数字0，也不是长度为零的文本。",
+      "emphasis": [
+        "NULL"
+      ]
+    },
+    {
+      "type": "list",
+      "items": [
+        "普通比较例如 value = 10 或 value <> 10，遇到 NULL 通常得到未知，而不是假。",
+        "SQL 的条件判断采用真、假、未知三种逻辑值；WHERE 只保留真，因此未知记录会被排除。",
+        "判断缺失要用 IS NULL，判断已知要用 IS NOT NULL。"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "未知条件如何通过筛选",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "NOT 不会让未知变成真。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "业务上缺失不一定是错误：订单客户外键为空可能意味着允许访客购买，也可能是数据遗漏，须结合业务规则判定。",
+        "计数非空字段会跳过缺失，与总记录数不同。"
+      ]
+    },
+    {
+      "type": "table",
+      "columns": [
+        "输入 value",
+        "value <> 10",
+        "WHERE 是否保留"
+      ],
+      "rows": [
+        [
+          "NULL",
+          "未知",
+          "否"
+        ],
+        [
+          "0",
+          "真",
+          "是"
+        ],
+        [
+          "10",
+          "假",
+          "否"
+        ]
+      ]
+    }
+  ],
+  "syntax": {
+    "purpose": "本节核心语法。IS NULL 用于查缺失；主查询刻意使用 <> 10，展示普通比较会排除未知值。两种任务的代码不能互换。"
+  },
+  "dataDescriptions": {
+    "nullable_values": "每行一条待检查记录。id 标识记录，value 是待比较数值，note 是备注。编号 1 缺失，编号 2 明确为 0 且备注为空字符串。"
+  },
+  "problem": "数据质量人员要筛选明确不等于10的记录，同时单独登记缺失值。不能将未知值自动视作异常数值或实际零。",
+  "methodBlocks": [
+    {
+      "type": "paragraph",
+      "text": "先逐行判断 value <> 10，再只保留条件为真的记录；需要查缺失时使用扩展示例里的 IS NULL。"
+    }
+  ],
+  "breakdown": [
+    {
+      "kind": "fragment",
+      "title": "选定待检查记录",
+      "sql": "FROM nullable_values",
+      "purpose": "读取包含已知值及缺失值的样本。",
+      "reason": "同一张表可以对照 NULL、0 和 10。"
+    },
+    {
+      "kind": "fragment",
+      "title": "应用明确的不等于条件",
+      "sql": "WHERE value <> 10",
+      "purpose": "仅保留已知不等于 10 的行。",
+      "reason": "普通比较遇到 NULL 得到未知，WHERE 只保留真。"
+    },
+    {
+      "kind": "fragment",
+      "title": "保留回查字段",
+      "sql": "SELECT id, value",
+      "purpose": "输出记录编号和数值。",
+      "reason": "可以确认入选的是实际零值，而非填补的缺失值。"
+    },
+    {
+      "kind": "fragment",
+      "title": "按记录编号排序",
+      "sql": "ORDER BY id;",
+      "purpose": "按编号排列。",
+      "reason": "在扩展条件返回多行时也能稳定核对。"
+    }
+  ],
+  "completeCode": {
+    "mysqlSql": "SELECT id, value FROM nullable_values WHERE value <> 10 ORDER BY id;",
+    "sqliteSql": "SELECT id, value FROM nullable_values WHERE value <> 10 ORDER BY id;"
+  },
+  "expectedResult": {
+    "columns": [
+      "id",
+      "value"
+    ],
+    "rows": [
+      [
+        2,
+        0
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "resultBlocks": [
+    {
+      "type": "paragraph",
+      "text": "主查询仅返回编号2、值0。缺失检查仅返回编号1；合并条件则返回编号1和2。由此可见，排除10不等于找出所有不是已知10的记录。"
+    }
+  ],
+  "extensions": [
+    {
+      "label": "合并来源：识别缺失记录",
+      "explanation": "仅返回真正的空值记录。",
+      "sql": "SELECT id, value, note FROM nullable_values WHERE value IS NULL ORDER BY id;",
+      "result": {
+        "columns": [
+          "id",
+          "value",
+          "note"
+        ],
+        "rows": [
+          [
+            1,
+            null,
+            null
+          ]
+        ]
+      },
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "仅返回真正的空值记录。"
+        }
+      ]
+    },
+    {
+      "label": "同时筛选未知和非10",
+      "explanation": "显式保留未知值，不依赖普通比较。",
+      "sql": "SELECT id,value FROM nullable_values WHERE value <> 10 OR value IS NULL ORDER BY id;",
+      "result": {
+        "columns": [
+          "id",
+          "value"
+        ],
+        "rows": [
+          [
+            1,
+            null
+          ],
+          [
+            2,
+            0
+          ]
+        ]
+      },
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "显式保留未知值，不依赖普通比较。"
+        }
+      ]
+    },
+    {
+      "label": "识别缺少客户编号的订单",
+      "explanation": "作为匿名订单或数据缺失的待核记录，不直接认定错误。",
+      "sql": "SELECT id,customer_id FROM orders WHERE customer_id IS NULL ORDER BY id;",
+      "result": {
+        "columns": [
+          "id",
+          "customer_id"
+        ],
+        "rows": [
+          [
+            4,
+            null
+          ]
+        ]
+      },
+      "sourceTables": [
+        {
+          "name": "orders",
+          "columns": [
+            {
+              "name": "id",
+              "type": "INTEGER",
+              "mysqlType": "INT",
+              "sqliteType": "INTEGER"
+            },
+            {
+              "name": "category",
+              "type": "TEXT",
+              "mysqlType": "VARCHAR(160) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_bin",
+              "sqliteType": "TEXT"
+            },
+            {
+              "name": "sales",
+              "type": "INTEGER",
+              "mysqlType": "INT",
+              "sqliteType": "INTEGER"
+            },
+            {
+              "name": "store_id",
+              "type": "INTEGER",
+              "mysqlType": "INT",
+              "sqliteType": "INTEGER"
+            },
+            {
+              "name": "order_date",
+              "type": "TEXT",
+              "mysqlType": "DATE",
+              "sqliteType": "TEXT"
+            },
+            {
+              "name": "customer_id",
+              "type": "INTEGER",
+              "mysqlType": "INT",
+              "sqliteType": "INTEGER"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              "护肤品",
+              800,
+              1,
+              "2026-01-03",
+              1
+            ],
+            [
+              2,
+              "化妆品",
+              400,
+              2,
+              "2026-01-10",
+              2
+            ],
+            [
+              3,
+              "护肤品",
+              600,
+              1,
+              "2026-02-02",
+              1
+            ],
+            [
+              4,
+              "化妆品",
+              300,
+              2,
+              "2026-02-15",
+              null
+            ],
+            [
+              5,
+              "日用品",
+              1500,
+              1,
+              "2026-02-20",
+              3
+            ]
+          ]
+        }
+      ],
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "作为匿名订单或数据缺失的待核记录，不直接认定错误。"
+        }
+      ]
+    }
+  ],
+  "cautions": {
+    "comparison": [
+      {
+        "type": "paragraph",
+        "text": "NULL、0与空字符串不同；NOT(value=10) 不会自动包含 NULL。"
+      }
+    ],
+    "example": [
+      {
+        "type": "paragraph",
+        "text": "用等号判断缺失，或认为不等于 10 的普通比较会自动包含缺失行。"
+      },
+      {
+        "type": "code",
+        "sql": "WHERE value = NULL"
+      }
+    ],
+    "reason": [
+      {
+        "type": "paragraph",
+        "text": "普通比较遇到 NULL 产生未知，= NULL 和 <> 10 都不能用来选择缺失行。NOT 对未知取反也仍是未知。"
+      }
+    ],
+    "correction": [
+      {
+        "type": "paragraph",
+        "text": "用空值判断检测缺失；若还需要已知不等于 10 的记录，将两个条件用 OR 连接。"
+      },
+      {
+        "type": "code",
+        "sql": "WHERE value <> 10 OR value IS NULL"
+      }
+    ],
+    "notes": [
+      {
+        "type": "paragraph",
+        "text": "是否将匿名订单或缺失值列入指标，需要明确数据口径。"
+      }
+    ]
+  },
+  "sourcePath": "source/batch1/kp05-01.json",
+  "sourceSha256": "d3f727d62ff59da5461ca19e5d423e3efd8de031831b54404a21ab60cb8ed9e7"
+}

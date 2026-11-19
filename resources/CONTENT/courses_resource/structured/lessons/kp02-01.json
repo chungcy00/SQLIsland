@@ -1,0 +1,263 @@
+{
+  "schemaVersion": 1,
+  "id": "kp02-01",
+  "sourceBatch": "batch1",
+  "teachingKind": "syntax",
+  "conceptBlocks": [
+    {
+      "type": "heading",
+      "text": "确定来源与输出",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "基础查询由数据来源和输出列表组成。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "FROM 指定输入表，SELECT 指定需要返回的列或表达式。",
+        "查询可以直接读取原字段，也可以逐行计算新值，例如单价乘库存数量。",
+        "AS 为结果列设置易读名称，并不改变源表字段或写入新数据。"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "逐行表达式与别名",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "选择具体列能让报表结构明确，避免不必要字段；探索未知表时可以临时使用 SELECT *。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "派生列仍属于当前记录粒度，不是跨行汇总。",
+        "表达式中的任一乘数为空时，计算结果通常为空，需要依据业务判断未知值，不可直接当零。"
+      ]
+    }
+  ],
+  "syntax": {
+    "purpose": "本节核心语法。模板展示表达式与别名的位置；主查询先读取价目表，price * stock 和 AS 的应用放在扩展示例。"
+  },
+  "dataDescriptions": {
+    "products": "每行一件商品，price 是教学售价，stock 是库存件数。二者乘积表示售价口径库存值，不是成本资产或确定可实现的收入。"
+  },
+  "problem": "采购主管先需要商品价目表，再希望估算每件商品的现有库存按售价计算的金额。现有商品表包含单价和库存件数，不需要其他表或分组。",
+  "methodBlocks": [
+    {
+      "type": "paragraph",
+      "text": "主示例先选择价目表需要的字段；在扩展示例中逐行增加售价库存值，再演示如何筛选该派生值。"
+    }
+  ],
+  "breakdown": [
+    {
+      "kind": "fragment",
+      "title": "指定商品来源",
+      "sql": "FROM products",
+      "purpose": "从商品表读取数据。",
+      "reason": "名称和价格可直接从同一表取得。"
+    },
+    {
+      "kind": "fragment",
+      "title": "选择价目字段",
+      "sql": "SELECT product_name, price",
+      "purpose": "输出商品名称与价格。",
+      "reason": "价目表不需要其他字段，行粒度仍为每商品一行。"
+    },
+    {
+      "kind": "fragment",
+      "title": "按编号排列",
+      "sql": "ORDER BY product_id;",
+      "purpose": "按未显示的商品编号排序。",
+      "reason": "排序依据可以来自来源表，无需为了排序额外显示该列。"
+    }
+  ],
+  "completeCode": {
+    "mysqlSql": "SELECT product_name, price FROM products ORDER BY product_id;",
+    "sqliteSql": "SELECT product_name, price FROM products ORDER BY product_id;"
+  },
+  "expectedResult": {
+    "columns": [
+      "product_name",
+      "price"
+    ],
+    "rows": [
+      [
+        "Mask",
+        15
+      ],
+      [
+        "Serum",
+        89
+      ],
+      [
+        "Cleanser",
+        35
+      ],
+      [
+        "Cream",
+        65
+      ],
+      [
+        "Sunscreen",
+        45
+      ],
+      [
+        "Soap_1",
+        15
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "resultBlocks": [
+    {
+      "type": "paragraph",
+      "text": "价目表显示六件商品。扩展示例中商品1售价库存值2250，商品2为3560，商品6库存为0所以结果为0；行数始终为六。"
+    }
+  ],
+  "extensions": [
+    {
+      "label": "合并来源：库存售价估算",
+      "explanation": "逐行计算价格与库存乘积，保留原粒度。ORDER BY 可以使用输出别名。",
+      "sql": "SELECT product_id, price, stock, price * stock AS stock_value FROM products ORDER BY product_id;",
+      "result": {
+        "columns": [
+          "product_id",
+          "price",
+          "stock",
+          "stock_value"
+        ],
+        "rows": [
+          [
+            1,
+            15,
+            150,
+            2250
+          ],
+          [
+            2,
+            89,
+            40,
+            3560
+          ],
+          [
+            3,
+            35,
+            200,
+            7000
+          ],
+          [
+            4,
+            65,
+            180,
+            11700
+          ],
+          [
+            5,
+            45,
+            80,
+            3600
+          ],
+          [
+            6,
+            15,
+            0,
+            0
+          ]
+        ]
+      },
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "逐行计算价格与库存乘积，保留原粒度。ORDER BY 可以使用输出别名。"
+        }
+      ]
+    },
+    {
+      "label": "按派生金额筛选",
+      "explanation": "筛选时重复表达式，排序时使用别名。",
+      "sql": "SELECT product_id, price * stock AS stock_value FROM products WHERE price * stock > 1000 ORDER BY stock_value DESC, product_id;",
+      "result": {
+        "columns": [
+          "product_id",
+          "stock_value"
+        ],
+        "rows": [
+          [
+            4,
+            11700
+          ],
+          [
+            3,
+            7000
+          ],
+          [
+            5,
+            3600
+          ],
+          [
+            2,
+            3560
+          ],
+          [
+            1,
+            2250
+          ]
+        ]
+      },
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "筛选时重复表达式，排序时使用别名。"
+        }
+      ]
+    }
+  ],
+  "cautions": {
+    "comparison": [
+      {
+        "type": "paragraph",
+        "text": "原字段直接读取；派生列由表达式计算；别名只修改输出名称。"
+      }
+    ],
+    "example": [
+      {
+        "type": "paragraph",
+        "text": "在同层筛选中直接使用输出别名，或将售价库存值称为成本库存金额。"
+      },
+      {
+        "type": "code",
+        "sql": "WHERE stock_value > 1000"
+      }
+    ],
+    "reason": [
+      {
+        "type": "paragraph",
+        "text": "同层 WHERE 判断发生在 SELECT 别名可被引用之前；同时，price 使用售价时，乘库存只能得到售价口径数值。"
+      }
+    ],
+    "correction": [
+      {
+        "type": "paragraph",
+        "text": "在筛选中写出计算表达式，或在外层查询中筛选别名；明确售价口径。"
+      },
+      {
+        "type": "code",
+        "sql": "WHERE price * stock > 1000"
+      }
+    ],
+    "notes": [
+      {
+        "type": "paragraph",
+        "text": "MySQL 的部分 GROUP BY、HAVING 场景可使用别名，但不能据此假定所有子句都允许。"
+      }
+    ]
+  },
+  "sourcePath": "source/batch1/kp02-01.json",
+  "sourceSha256": "0b8f8b4c5f15a1c34a5c8749651bff83525a4a41970a7c629b8d7d6e0625f48d"
+}

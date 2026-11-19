@@ -1,0 +1,196 @@
+{
+  "schemaVersion": 1,
+  "id": "kp01-02",
+  "sourceBatch": "batch1",
+  "teachingKind": "concept",
+  "conceptBlocks": [
+    {
+      "type": "heading",
+      "text": "类型如何影响数据",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "数据类型决定字段可以保存什么值以及如何比较、计算。",
+      "emphasis": [
+        "数据类型"
+      ]
+    },
+    {
+      "type": "list",
+      "items": [
+        "整数适合计数和整数编号；精确十进制适合货币金额；文本用来保存名称或保留前导零的编码；日期类型用于日历日期。"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "数据字典需要记录什么",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "数据字典不只是字段名列表，还应说明业务含义、单位、精度、可空性、约束及取值范围。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "尤其要区分编号和数量：两者都可能使用整数，却只有后者通常适合求和。",
+        "金额字段的单位也要核对，例如元与分不能直接相加。",
+        "示例使用整数价格，仅为教学简化，不代表生产系统的金额类型。"
+      ]
+    },
+    {
+      "type": "table",
+      "columns": [
+        "字段含义",
+        "常见表示",
+        "需要核对"
+      ],
+      "rows": [
+        [
+          "商品编号",
+          "整数或文本",
+          "是否唯一、是否保留前导零"
+        ],
+        [
+          "货币金额",
+          "精确十进制或整数分",
+          "单位、小数精度"
+        ],
+        [
+          "库存数量",
+          "整数",
+          "计量单位、是否允许缺失"
+        ],
+        [
+          "日期",
+          "日期类型",
+          "是否包含时刻"
+        ]
+      ]
+    }
+  ],
+  "syntax": {
+    "purpose": "概念说明示例。CREATE TABLE 用于解释类型声明，不在本页运行；完整查询只读取已有商品记录，结果值不能证明原生数据库的类型约束。"
+  },
+  "dataDescriptions": {
+    "products": "每行一件商品。product_id 用于识别，price 是教学单价，stock 是库存件数。示例的整数价格用于简化阅读，实际字段类型应查数据字典。"
+  },
+  "problem": "接手商品库存报表前，需要确认哪些列可以计算，避免把商品编号当成金额，并识别零库存与数据缺失。",
+  "methodBlocks": [
+    {
+      "type": "paragraph",
+      "text": "先并排展示标识、价格和数量，借助已知记录核对三者的业务用途。建表语法只辅助理解类型。"
+    }
+  ],
+  "breakdown": [
+    {
+      "kind": "fragment",
+      "title": "读取已有商品",
+      "sql": "FROM products",
+      "purpose": "使用已经存在的商品表。",
+      "reason": "本页的任务是读懂字段，无需创建新表。"
+    },
+    {
+      "kind": "fragment",
+      "title": "对照三种字段",
+      "sql": "SELECT product_id, price, stock",
+      "purpose": "并排输出编号、价格和库存。",
+      "reason": "编号用于识别，价格和库存用于不同单位的计算。"
+    },
+    {
+      "kind": "fragment",
+      "title": "便于逐项核对",
+      "sql": "ORDER BY product_id;",
+      "purpose": "按商品编号排序。",
+      "reason": "稳定顺序便于回查示例中的具体商品。"
+    }
+  ],
+  "completeCode": {
+    "mysqlSql": "SELECT product_id, price, stock FROM products ORDER BY product_id;",
+    "sqliteSql": "SELECT product_id, price, stock FROM products ORDER BY product_id;"
+  },
+  "expectedResult": {
+    "columns": [
+      "product_id",
+      "price",
+      "stock"
+    ],
+    "rows": [
+      [
+        1,
+        15,
+        150
+      ],
+      [
+        2,
+        89,
+        40
+      ],
+      [
+        3,
+        35,
+        200
+      ],
+      [
+        4,
+        65,
+        180
+      ],
+      [
+        5,
+        45,
+        80
+      ],
+      [
+        6,
+        15,
+        0
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "resultBlocks": [
+    {
+      "type": "paragraph",
+      "text": "结果有六行，每行一件商品。商品6库存为0，表示该条记录明确显示零库存；不是缺失。商品2单价89、库存40，两个数值含义和单位不同。"
+    }
+  ],
+  "extensions": [],
+  "cautions": {
+    "comparison": [
+      {
+        "type": "paragraph",
+        "text": "数字型编号不等于可求和指标；文本日期不等于真正的日期类型。"
+      }
+    ],
+    "example": [
+      {
+        "type": "paragraph",
+        "text": "将浮点数作为精确货币，或把商品编号相加当成业务指标。"
+      }
+    ],
+    "reason": [
+      {
+        "type": "paragraph",
+        "text": "数字外观不能决定字段的业务含义；编号相加没有所需统计意义，浮点近似值还可能引入货币舍入误差。"
+      }
+    ],
+    "correction": [
+      {
+        "type": "paragraph",
+        "text": "货币优先使用精确十进制或整数分，计算前确认字段单位；编号用于识别。"
+      }
+    ],
+    "notes": [
+      {
+        "type": "paragraph",
+        "text": "本地 SQLite 类型亲和性与 MySQL 类型约束不同；本节未执行原生建表语法。"
+      }
+    ]
+  },
+  "sourcePath": "source/batch1/kp01-02.json",
+  "sourceSha256": "f703d7210cb0589ef0479bdc93d34ee0af38e8cafd69187a787d7e6af3992697"
+}

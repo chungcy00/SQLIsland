@@ -2210,3 +2210,27 @@ pre, .code-input {white-space: pre-wrap; overflow-wrap: anywhere; overflow-x: hi
 .quiz-details > .sequence-actions button {pointer-events: auto;}
 .has-sql-keyboard .quiz-details > .sequence-actions {visibility: hidden;}
 .editor-is-fullscreen .quiz-details > .sequence-actions {display: none;}
+
+.lesson-details h3 {font-size: .875rem; font-weight: 600; line-height: 1.5; margin: 16px 0 6px;}
+.lesson-details .concept-group:first-child h3 {margin-top: 0;}
+.lesson-details .concept-group ul {padding-left: 22px; margin: 6px 0 12px;}
+.lesson-details .concept-group li {margin: 6px 0; line-height: 1.8;}
+.lesson-demand {background: #eaf1f4; border-radius: 12px; padding: 12px 14px; margin: 10px 0 14px;}
+.lesson-demand h3 {margin-top: 0;}
+.lesson-demand p:last-child {margin-bottom: 0;}
+.lesson-expected {margin-top: 16px;}
+.lesson-extension {margin-top: 16px;}
+.lesson-cautions h3 {margin-top: 12px;}
+.lesson-cautions .caution-comparison h3 {margin-top: 0;}
+.lesson-details pre {white-space: pre; overflow-wrap: normal; overflow-x: auto;}
+.lesson-cautions .mistake-comparison {min-width: 0;}
+.lesson-cautions .mistake-comparison > div {grid-template-columns: 32px minmax(0, 1fr);}
+.lesson-cautions .mistake-comparison dd {min-width: 0;}
+
+.lesson-details h4 {font-size: .875rem; font-weight: 600; line-height: 1.5; margin: 14px 0 6px;}
+.lesson-details .code-explanation-part p {margin: 4px 0;}
+.lesson-details .code-explanation-part pre {margin: 6px 0;}
+.lesson-details .source-table-description {font-size: .875rem; line-height: 1.7; margin: 6px 0 10px;}
+.lesson-details .syntax-purpose {font-size: .875rem; line-height: 1.7;}
+.lesson-details .concept-comparison {margin: 12px 0;}
+.lesson-cautions .mistake-comparison .mistake-reason dt {color: var(--muted);}
