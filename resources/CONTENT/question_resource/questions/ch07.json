@@ -325,8 +325,8 @@
       "difficulty": "入门",
       "type": "独立编写",
       "title": "按门店计算订单笔数",
-      "context": "使用课程中小型订单数据练习按门店计算订单笔数。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "每个 store_id 一行，输出 store_id、order_count，按门店编号升序。\n输出列名称及顺序：store_id, order_count。按题设排序；参考排序键：store_id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "运营想知道每个门店各有多少笔订单。",
+      "requirements": "按门店统计订单笔数，每个 store_id 一行，输出 store_id、order_count。\n输出列名称及顺序：store_id, order_count。",
       "datasetId": "q0078-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -357,26 +357,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT store_id,COUNT(*) AS order_count FROM orders GROUP BY store_id ORDER BY store_id",
-          "sqliteSql": "SELECT store_id,COUNT(*) AS order_count FROM orders GROUP BY store_id ORDER BY store_id"
+          "mysqlSql": "SELECT store_id,COUNT(*) AS order_count FROM orders GROUP BY store_id",
+          "sqliteSql": "SELECT store_id,COUNT(*) AS order_count FROM orders GROUP BY store_id"
         },
         {
           "kind": "代数或函数等价",
-          "mysqlSql": "SELECT store_id,COUNT(1) AS order_count FROM orders GROUP BY store_id ORDER BY store_id",
-          "sqliteSql": "SELECT store_id,COUNT(1) AS order_count FROM orders GROUP BY store_id ORDER BY store_id",
-          "explanation": "常量1对每行非NULL，因此 COUNT(1) 与 COUNT(*) 同计行数。"
+          "mysqlSql": "SELECT store_id,COUNT(id) AS order_count FROM orders GROUP BY store_id",
+          "sqliteSql": "SELECT store_id,COUNT(id) AS order_count FROM orders GROUP BY store_id"
         }
       ],
       "hints": [
-        "明确每一行结果代表哪一个组；区分分组前后筛选。",
-        "结合《GROUP BY 分组》：依据分组键将输入行归入不同组，再对每组计算聚合值；本例三个类别。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT store_id,COUNT(*) AS order_count FROM orders □□□ ORDER BY store_id"
+        "“每个门店一行”意味着要按门店把订单分组。",
+        "GROUP BY 指定分组列，COUNT(*) 统计每组的行数；SELECT 里的非聚合列要出现在 GROUP BY 中。",
+        "分组键要对应“门店”，而不是每笔订单各自唯一的编号。"
       ],
-      "explanation": "每家门店汇总一次，不能以订单编号为分组键。\n执行思路：确认orders的输入记录；按指定键分组后计算聚合值；输出store_id、order_count列；遵循题设排序和并列规则。\n公开夹具实际返回 2 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：常量1对每行非NULL，因此 COUNT(1) 与 COUNT(*) 同计行数。",
+      "explanation": "按 store_id 分组后，COUNT(*) 统计每组有多少行，也就是每家门店的订单笔数。\n易错：分组键里多写了订单编号（如 GROUP BY store_id,id），每笔订单自成一组，每组的计数都是 1。",
       "commonErrors": [
         {
-          "sql": "SELECT store_id,COUNT(*) AS order_count FROM orders GROUP BY id ORDER BY store_id",
-          "reason": "每家门店汇总一次，不能以订单编号为分组键。",
+          "sql": "SELECT store_id,COUNT(*) AS order_count FROM orders GROUP BY store_id,id",
+          "reason": "每家门店应汇总一次；分组键里多加订单编号，每笔订单就自成一组，计数都是 1。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -391,24 +390,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0078/q0078-public.json",
-          "sha256": "f152b1bf4913dd03531261bf84083c19f11ea2a223c099ec135e6b3b964b6bf5"
+          "sha256": "3cac3467d0889ba66cc9ccfb7db95a653cc4691f2586578f9d38cfcd9efef4f1"
         },
         {
           "id": "q0078-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0078/q0078-boundary.json",
-          "sha256": "da849920b024023a9e4992364b7b1f5456ff73262c6a83ae8edd47cfc6669d12"
+          "sha256": "f7ef69694250bc30f45c19324ef4603358c67e455b0923a81e9799e25b74a997"
         },
         {
           "id": "q0078-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0078/q0078-empty.json",
-          "sha256": "7da142e8069f35320610d032748fde91aa6ab9610a54088a2503410646e71a0c"
+          "sha256": "0a7c727b455896841cae8992b6d48bb1736277505e7cc5b6bb0c5da5e6961ae2"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -514,8 +513,8 @@
       "difficulty": "简单",
       "type": "独立编写",
       "title": "类别商品平均售价",
-      "context": "使用课程中小型商品数据练习类别商品平均售价。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "按 category 计算 products 平均售价 avg_price，保留两位小数，按类别升序。\n输出列名称及顺序：category, avg_price。按题设排序；参考排序键：category。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "商品组想比较各类别商品的平均定价。",
+      "requirements": "按 category 计算 products 的平均售价，保留两位小数，列别名 avg_price。\n输出列名称及顺序：category, avg_price。",
       "datasetId": "q0081-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -550,26 +549,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT category,ROUND(AVG(price),2) AS avg_price FROM products GROUP BY category ORDER BY category",
-          "sqliteSql": "SELECT category,ROUND(AVG(price),2) AS avg_price FROM products GROUP BY category ORDER BY category"
+          "mysqlSql": "SELECT category,ROUND(AVG(price),2) AS avg_price FROM products GROUP BY category",
+          "sqliteSql": "SELECT category,ROUND(AVG(price),2) AS avg_price FROM products GROUP BY category"
         },
         {
-          "kind": "关系结构等价",
-          "mysqlSql": "SELECT DISTINCT category,ROUND(AVG(price) OVER(PARTITION BY category),2) AS avg_price FROM products ORDER BY category",
-          "sqliteSql": "SELECT DISTINCT category,ROUND(AVG(price) OVER(PARTITION BY category),2) AS avg_price FROM products ORDER BY category",
-          "explanation": "用相同分区键的聚合窗口计算结果，再去重恢复分组粒度。"
+          "kind": "独立方法等价",
+          "mysqlSql": "SELECT category,ROUND(SUM(price)*1.0/COUNT(price),2) AS avg_price FROM products GROUP BY category",
+          "sqliteSql": "SELECT category,ROUND(SUM(price)*1.0/COUNT(price),2) AS avg_price FROM products GROUP BY category"
         }
       ],
       "hints": [
-        "明确每一行结果代表哪一个组；区分分组前后筛选。",
-        "结合《GROUP BY 分组》：依据分组键将输入行归入不同组，再对每组计算聚合值；本例三个类别。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT category,ROUND(□□□,2) AS avg_price FROM products GROUP BY category ORDER BY category"
+        "平均值要在每个类别内部计算，所以需要先分组。",
+        "AVG(列) 计算平均值，ROUND(值, 2) 保留两位小数；AVG 会忽略 NULL。",
+        "确认你用的是平均函数，而不是总和或最大值。"
       ],
-      "explanation": "平均单价不是销售总额。\n执行思路：确认products的输入记录；按指定键分组后计算聚合值；输出category、avg_price列；遵循题设排序和并列规则。\n公开夹具实际返回 3 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：用相同分区键的聚合窗口计算结果，再去重恢复分组粒度。",
+      "explanation": "GROUP BY category 后，AVG(price) 给出每个类别的平均售价，ROUND(…,2) 保留两位小数。AVG 会忽略价格为 NULL 的商品。\n易错：用 SUM(price) 得到的是价格总和，不是平均。",
       "commonErrors": [
         {
-          "sql": "SELECT category,ROUND(SUM(price),2) AS avg_price FROM products GROUP BY category ORDER BY category",
-          "reason": "平均单价不是销售总额。",
+          "sql": "SELECT category,ROUND(SUM(price),2) AS avg_price FROM products GROUP BY category",
+          "reason": "平均售价不是价格总和，应使用 AVG。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -584,24 +582,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0081/q0081-public.json",
-          "sha256": "7fe81f93d813094c4b3151419dcd69ecd0b2cb579b429b49751a79fb13cd3ee0"
+          "sha256": "180e1df0e8f3dd203f4c87b6b66fda9abb41b1fc47bbdf33638ced473597654a"
         },
         {
           "id": "q0081-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0081/q0081-boundary.json",
-          "sha256": "75e76dba46f63f5a2422537ca29a41168c31f8fc7f1b66b0f69d4de9909ea154"
+          "sha256": "dec4e2b3a4675851b2d9cd4323ee382059e25c40006e7a1dabf8f4dffaad564b"
         },
         {
           "id": "q0081-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0081/q0081-empty.json",
-          "sha256": "2fd3cf37aa1ab2ac0206a50cc999e649ad766bfb728f9db1007dfb9ec344fc45"
+          "sha256": "ccb0719d9a3a67b33f63e2a819f73b6be63b585b30917dbf2668ceb392692cba"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -620,7 +618,7 @@
       "mysqlVerification": "未运行 MySQL 8.4",
       "validation": {
         "kind": "query",
-        "equivalentKind": "关系结构等价",
+        "equivalentKind": "独立方法等价",
         "fixtures": [
           {
             "fixtureId": "q0081-public",
@@ -705,8 +703,8 @@
       "difficulty": "简单",
       "type": "业务情景",
       "title": "类别库存资金代理指标",
-      "context": "盘点主管用售价估算商品在零售端的潜在销售价值。此指标不是按采购成本计算的库存账面价值。",
-      "requirements": "按类别合计售价乘库存（非真实成本），列名 retail_value，按类别升序。\n输出列名称及顺序：category, retail_value。按题设排序；参考排序键：category。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "仓库想用“零售价乘库存”粗略估算各类别的库存零售价值（不是真实成本）。",
+      "requirements": "按类别合计“售价 × 库存”，列别名 retail_value。\n输出列名称及顺序：category, retail_value。",
       "datasetId": "q0082-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -741,26 +739,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT category,SUM(price*stock) AS retail_value FROM products GROUP BY category ORDER BY category",
-          "sqliteSql": "SELECT category,SUM(price*stock) AS retail_value FROM products GROUP BY category ORDER BY category"
+          "mysqlSql": "SELECT category,SUM(price*stock) AS retail_value FROM products GROUP BY category",
+          "sqliteSql": "SELECT category,SUM(price*stock) AS retail_value FROM products GROUP BY category"
         },
         {
-          "kind": "关系结构等价",
-          "mysqlSql": "SELECT DISTINCT category,SUM(price*stock) OVER(PARTITION BY category) AS retail_value FROM products ORDER BY category",
-          "sqliteSql": "SELECT DISTINCT category,SUM(price*stock) OVER(PARTITION BY category) AS retail_value FROM products ORDER BY category",
-          "explanation": "用相同分区键的聚合窗口计算结果，再去重恢复分组粒度。"
+          "kind": "代数或函数等价",
+          "mysqlSql": "SELECT category,SUM(stock*price) AS retail_value FROM products GROUP BY category",
+          "sqliteSql": "SELECT category,SUM(stock*price) AS retail_value FROM products GROUP BY category"
         }
       ],
       "hints": [
-        "明确每一行结果代表哪一个组；区分分组前后筛选。",
-        "结合《GROUP BY 分组》：依据分组键将输入行归入不同组，再对每组计算聚合值；本例三个类别。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT category,□□□ AS retail_value FROM products GROUP BY category ORDER BY category"
+        "每件商品的零售价值是它自己的价格乘以它自己的库存，然后才按类别汇总。",
+        "SUM() 可以对一个表达式求和，如 SUM(列A*列B)：表达式先逐行计算，再汇总。",
+        "先乘后加，不要先分别加总再相乘。"
       ],
-      "explanation": "先逐商品相乘再加总；总价格乘总库存会引入交叉项。\n执行思路：确认products的输入记录；按指定键分组后计算聚合值；输出category、retail_value列；遵循题设排序和并列规则。\n公开夹具实际返回 3 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：用相同分区键的聚合窗口计算结果，再去重恢复分组粒度。",
+      "explanation": "SUM(price*stock) 先逐行算出每件商品的零售价值，再按类别相加。\n易错：SUM(price)*SUM(stock) 把整个类别的价格总和乘以库存总和，混入了不同商品之间的交叉项，数值会大得多。",
       "commonErrors": [
         {
-          "sql": "SELECT category,SUM(price)*SUM(stock) AS retail_value FROM products GROUP BY category ORDER BY category",
-          "reason": "先逐商品相乘再加总；总价格乘总库存会引入交叉项。",
+          "sql": "SELECT category,SUM(price)*SUM(stock) AS retail_value FROM products GROUP BY category",
+          "reason": "应先逐商品相乘再加总；总价格乘总库存会引入交叉项。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -775,24 +772,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0082/q0082-public.json",
-          "sha256": "850539c1bec14ace35a96c07bca10eb66ccc23f73a626042c53d92137df3780a"
+          "sha256": "40ade401ad985ce4534f0aed5503d0bd7a5b885f560a4c30354eb55faf54270f"
         },
         {
           "id": "q0082-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0082/q0082-boundary.json",
-          "sha256": "3f08001b09f143d25aba233d4ec7de748abf19d3df1b346c9f069c12b76371d0"
+          "sha256": "d02f8b6d94155d92b47f10f693b3bd4971da733e644e7871ef3ad4b8eccae3aa"
         },
         {
           "id": "q0082-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0082/q0082-empty.json",
-          "sha256": "3589ec13efdbd71f5326ce3c12d14d9e3dcd5a2aca6c1a79904a1a8271be795c"
+          "sha256": "1c07a8befdfed4a4f3cb7048b552f3615c8e26790f1196a03b27dc5e9f982479"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -811,7 +808,7 @@
       "mysqlVerification": "未运行 MySQL 8.4",
       "validation": {
         "kind": "query",
-        "equivalentKind": "关系结构等价",
+        "equivalentKind": "代数或函数等价",
         "fixtures": [
           {
             "fixtureId": "q0082-public",
@@ -896,8 +893,8 @@
       "difficulty": "简单",
       "type": "独立编写",
       "title": "门店独立客户数",
-      "context": "使用课程中小型订单数据练习门店独立客户数。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "编写 SQL，完成以下查询要求。\n按门店统计不同非空客户数 unique_customers，输出 store_id、unique_customers，按门店升序。\n输出列名称及顺序：store_id, unique_customers。按题设排序；参考排序键：store_id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "运营想知道每个门店服务了多少位不同的客户。",
+      "requirements": "按门店统计不重复的非空客户数，列别名 unique_customers。\n输出列名称及顺序：store_id, unique_customers。",
       "datasetId": "q0083-lesson",
       "schemaVersion": 3,
       "contentVersion": "4.2.2",
@@ -928,26 +925,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT store_id,COUNT(DISTINCT customer_id) AS unique_customers FROM orders GROUP BY store_id ORDER BY store_id",
-          "sqliteSql": "SELECT store_id,COUNT(DISTINCT customer_id) AS unique_customers FROM orders GROUP BY store_id ORDER BY store_id"
+          "mysqlSql": "SELECT store_id,COUNT(DISTINCT customer_id) AS unique_customers FROM orders GROUP BY store_id",
+          "sqliteSql": "SELECT store_id,COUNT(DISTINCT customer_id) AS unique_customers FROM orders GROUP BY store_id"
         },
         {
-          "kind": "关系结构等价",
-          "mysqlSql": "SELECT store_id,COUNT(DISTINCT customer_id) AS unique_customers FROM (SELECT * FROM orders) AS orders GROUP BY store_id ORDER BY store_id",
-          "sqliteSql": "SELECT store_id,COUNT(DISTINCT customer_id) AS unique_customers FROM (SELECT * FROM orders) AS orders GROUP BY store_id ORDER BY store_id",
-          "explanation": "先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。"
+          "kind": "代数或函数等价",
+          "mysqlSql": "SELECT store_id,COUNT(DISTINCT orders.customer_id) AS unique_customers FROM orders GROUP BY store_id",
+          "sqliteSql": "SELECT store_id,COUNT(DISTINCT orders.customer_id) AS unique_customers FROM orders GROUP BY store_id"
         }
       ],
       "hints": [
-        "明确每一行结果代表哪一个组；区分分组前后筛选。",
-        "结合《GROUP BY 分组》：依据分组键将输入行归入不同组，再对每组计算聚合值；本例三个类别。",
-        "按题设编写投影、筛选及分组，使用运行检查列名、NULL、重复记录和排序。"
+        "同一个客户在同一家店可能下多单，但只应计一次。",
+        "COUNT(DISTINCT 列) 统计不重复的非 NULL 值的个数。",
+        "对比 COUNT(列) 和 COUNT(DISTINCT 列)：前者会把重复的客户重复计算。"
       ],
-      "explanation": "同一客户在该店多单只计一次。\n执行思路：确认orders的输入记录；按指定键分组后计算聚合值；仅在题设指定的范围内去重；输出store_id、unique_customers列；遵循题设排序和并列规则。\n公开夹具实际返回 2 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
+      "explanation": "COUNT(DISTINCT customer_id) 先去重再计数，并且自动忽略 NULL（匿名订单不计入）。\n易错：COUNT(customer_id) 统计的是有客户编号的订单笔数，同一客户多单会被重复计算。",
       "commonErrors": [
         {
-          "sql": "SELECT store_id,COUNT(customer_id) AS unique_customers FROM orders GROUP BY store_id ORDER BY store_id",
-          "reason": "同一客户在该店多单只计一次。",
+          "sql": "SELECT store_id,COUNT(customer_id) AS unique_customers FROM orders GROUP BY store_id",
+          "reason": "同一客户在该店的多笔订单只能计一次，需要 DISTINCT。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -962,24 +958,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0083/q0083-public.json",
-          "sha256": "934486fb2aca5e721c9ea9a08eff90f41b58ed96bbbb7030fd14cbeae7c1525a"
+          "sha256": "5cd6a31098e079b61d93733df3ea1ebfce0a321ae6b4a7c0c41511a19b2383ed"
         },
         {
           "id": "q0083-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0083/q0083-boundary.json",
-          "sha256": "322977493275fa9a1ef83dde8dadf3e926ad97976df78554d96a6ee0394a2301"
+          "sha256": "200bac7844c366638da2a50002880a1cbfe06f6fd32f13ca9a3268f950aaf143"
         },
         {
           "id": "q0083-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0083/q0083-empty.json",
-          "sha256": "680dc3d3c431ed7b5bf130a56c8a5376de5d6517d1d4bd801435b4582db3ab72"
+          "sha256": "15da94a784a9b73fe9c7657c5d61dc2ab271258798624d7d560997cd86cee79d"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -998,7 +994,7 @@
       "mysqlVerification": "未运行 MySQL 8.4",
       "validation": {
         "kind": "query",
-        "equivalentKind": "关系结构等价",
+        "equivalentKind": "代数或函数等价",
         "fixtures": [
           {
             "fixtureId": "q0083-public",
@@ -1084,15 +1080,15 @@
       "difficulty": "简单",
       "type": "代码纠错",
       "title": "高订单量门店",
-      "context": "使用课程中小型订单数据练习高订单量门店。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "下面提供的初始代码存在逻辑、语法或结构错误。请修改整段代码，使其满足以下要求。\n仅订单数至少2的门店，返回 store_id、n，按编号升序。\n输出列名称及顺序：store_id, n。按题设排序；参考排序键：store_id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "运营想找出订单量较高的门店，至少 2 笔订单就算。",
+      "requirements": "下面的代码想筛出订单数至少为 2 的门店，但漏掉了恰好 2 笔的门店。请修改代码，输出 store_id 和订单数 n。\n输出列名称及顺序：store_id, n。",
       "datasetId": "q0084-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
       "sourceTables": [
         "orders"
       ],
-      "initialCode": "SELECT store_id,COUNT(*) AS n FROM orders GROUP BY store_id HAVING COUNT(*)>2 ORDER BY store_id",
+      "initialCode": "SELECT store_id,COUNT(*) AS n FROM orders GROUP BY store_id HAVING COUNT(*)>2",
       "options": [],
       "acceptedBlanks": [],
       "expectedOutput": {
@@ -1116,26 +1112,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT store_id,COUNT(*) AS n FROM orders GROUP BY store_id HAVING COUNT(*)>=2 ORDER BY store_id",
-          "sqliteSql": "SELECT store_id,COUNT(*) AS n FROM orders GROUP BY store_id HAVING COUNT(*)>=2 ORDER BY store_id"
+          "mysqlSql": "SELECT store_id,COUNT(*) AS n FROM orders GROUP BY store_id HAVING COUNT(*)>=2",
+          "sqliteSql": "SELECT store_id,COUNT(*) AS n FROM orders GROUP BY store_id HAVING COUNT(*)>=2"
         },
         {
           "kind": "代数或函数等价",
-          "mysqlSql": "SELECT store_id,COUNT(1) AS n FROM orders GROUP BY store_id HAVING COUNT(1)>=2 ORDER BY store_id",
-          "sqliteSql": "SELECT store_id,COUNT(1) AS n FROM orders GROUP BY store_id HAVING COUNT(1)>=2 ORDER BY store_id",
-          "explanation": "常量1对每行非NULL，因此 COUNT(1) 与 COUNT(*) 同计行数。"
+          "mysqlSql": "SELECT store_id,COUNT(1) AS n FROM orders GROUP BY store_id HAVING COUNT(1)>=2",
+          "sqliteSql": "SELECT store_id,COUNT(1) AS n FROM orders GROUP BY store_id HAVING COUNT(1)>=2"
         }
       ],
       "hints": [
-        "明确每一行结果代表哪一个组；区分分组前后筛选。",
-        "结合《HAVING 与 WHERE》：WHERE 在聚合前筛行，HAVING 在聚合后筛组；无 GROUP BY 的聚合查询也可有 HAVING。",
-        "检查初始代码的 COUNT(*)>=2 对应的业务规则。HAVING 对聚合结果筛选，恰好2单也符合。"
+        "“至少 2”包含 2 本身。",
+        "HAVING 用来筛选分组后的结果，条件里可以直接使用聚合函数。",
+        "检查比较运算符：> 与 >= 在恰好 2 笔时结果不同。"
       ],
-      "explanation": "HAVING 对聚合结果筛选，恰好2单也符合。\n执行思路：确认orders的输入记录；按指定键分组后计算聚合值；对分组后的计算结果筛选；输出store_id、n列；遵循题设排序和并列规则。\n公开夹具实际返回 2 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：常量1对每行非NULL，因此 COUNT(1) 与 COUNT(*) 同计行数。",
+      "explanation": "“至少 2 笔”即 COUNT(*)>=2，包含恰好 2 笔的门店。初始代码用了 >2，这些门店被误排除。\nHAVING 在分组汇总之后过滤，所以可以直接比较聚合结果；WHERE 在分组之前执行，不能使用聚合函数。",
       "commonErrors": [
         {
-          "sql": "SELECT store_id,COUNT(*) AS n FROM orders GROUP BY store_id HAVING COUNT(*)>2 ORDER BY store_id",
-          "reason": "HAVING 对聚合结果筛选，恰好2单也符合。",
+          "sql": "SELECT store_id,COUNT(*) AS n FROM orders GROUP BY store_id HAVING COUNT(*)>2",
+          "reason": "“至少 2 笔”包含恰好 2 笔，HAVING 里应使用 >=。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -1150,24 +1145,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0084/q0084-public.json",
-          "sha256": "5e909a93f4deedfa5fb523c8b5d2ea7d52d93535d16425395663b53aad1376f3"
+          "sha256": "14202339b728d43765bed0635ee61b82637cba73b150e818526819f79ba8033f"
         },
         {
           "id": "q0084-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0084/q0084-boundary.json",
-          "sha256": "e22eabbcd9df04cd094c24e7c3ed6dcbae5183104d79032395f19c2835d5defb"
+          "sha256": "4327d696f917d7b6f95327e31737cb2527c9e25fe26287c2f12f76e9cfe9f2e2"
         },
         {
           "id": "q0084-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0084/q0084-empty.json",
-          "sha256": "b5637dca392454700ffc6b5341e5087f091730ae342786b4f73fa652cb908328"
+          "sha256": "2a522bcb9f44ab0da0465e14804232e48b96e345d1a5ca7325e7ec0fda005a62"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -1479,8 +1474,8 @@
       "difficulty": "简单",
       "type": "独立编写",
       "title": "门店与商品类别平均订单金额",
-      "context": "使用课程中小型订单数据练习门店与商品类别平均订单金额。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "每个门店类别组合返回 store_id、category、avg_sales，两位小数，按门店、类别升序。\n输出列名称及顺序：store_id, category, avg_sales。按题设排序；参考排序键：store_id,category。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "管理层想比较每个门店在各商品类别上的平均订单金额。",
+      "requirements": "按门店和商品类别的每个组合，计算平均订单金额，保留两位小数，列别名 avg_sales。\n输出列名称及顺序：store_id, category, avg_sales。",
       "datasetId": "q0086-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -1519,26 +1514,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT store_id,category,ROUND(AVG(sales),2) AS avg_sales FROM orders GROUP BY store_id,category ORDER BY store_id,category",
-          "sqliteSql": "SELECT store_id,category,ROUND(AVG(sales),2) AS avg_sales FROM orders GROUP BY store_id,category ORDER BY store_id,category"
+          "mysqlSql": "SELECT store_id,category,ROUND(AVG(sales),2) AS avg_sales FROM orders GROUP BY store_id,category",
+          "sqliteSql": "SELECT store_id,category,ROUND(AVG(sales),2) AS avg_sales FROM orders GROUP BY store_id,category"
         },
         {
-          "kind": "关系结构等价",
-          "mysqlSql": "SELECT DISTINCT store_id,category,ROUND(AVG(sales) OVER(PARTITION BY store_id,category),2) AS avg_sales FROM orders ORDER BY store_id,category",
-          "sqliteSql": "SELECT DISTINCT store_id,category,ROUND(AVG(sales) OVER(PARTITION BY store_id,category),2) AS avg_sales FROM orders ORDER BY store_id,category",
-          "explanation": "用相同分区键的聚合窗口计算结果，再去重恢复分组粒度。"
+          "kind": "独立方法等价",
+          "mysqlSql": "SELECT store_id,category,ROUND(SUM(sales)*1.0/COUNT(sales),2) AS avg_sales FROM orders GROUP BY store_id,category",
+          "sqliteSql": "SELECT store_id,category,ROUND(SUM(sales)*1.0/COUNT(sales),2) AS avg_sales FROM orders GROUP BY store_id,category"
         }
       ],
       "hints": [
-        "明确每一行结果代表哪一个组；区分分组前后筛选。",
-        "结合《多字段分组与严格分组》：多个分组字段形成联合键；MySQL 默认 ONLY_FULL_GROUP_BY 要求非聚合表达式在分组键中、由其函数决定或符合允许的单值条件。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT store_id,category,ROUND(□□□,2) AS avg_sales FROM orders GROUP BY store_id,category ORDER BY store_id,category"
+        "结果的粒度是“门店 × 类别”的组合，每个组合一行。",
+        "GROUP BY 可以写多个列，这些列的取值组合共同决定一个分组。",
+        "平均订单金额用 AVG，而不是 SUM；记得 ROUND 保留两位小数。"
       ],
-      "explanation": "明确组合键后每组计算平均订单金额。\n执行思路：确认orders的输入记录；按指定键分组后计算聚合值；输出store_id、category、avg_sales列；遵循题设排序和并列规则。\n公开夹具实际返回 3 行、3 列；完整结果见 expectedOutput。\n另一种可用写法：用相同分区键的聚合窗口计算结果，再去重恢复分组粒度。",
+      "explanation": "GROUP BY store_id,category 让每个“门店 + 类别”组合各成一组，AVG(sales) 在组内求平均，ROUND(…,2) 保留两位小数。\n易错：用 SUM 得到的是组合的订单总额，不是平均订单金额。",
       "commonErrors": [
         {
-          "sql": "SELECT store_id,category,ROUND(SUM(sales),2) AS avg_sales FROM orders GROUP BY store_id,category ORDER BY store_id,category",
-          "reason": "明确组合键后每组计算平均订单金额。",
+          "sql": "SELECT store_id,category,ROUND(SUM(sales),2) AS avg_sales FROM orders GROUP BY store_id,category",
+          "reason": "平均订单金额应使用 AVG；SUM 得到的是总额。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -1553,24 +1547,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0086/q0086-public.json",
-          "sha256": "470211b19db40a58338418d98b88db3754dc99c8290ea4a871cf467caadb236f"
+          "sha256": "aa78135b4078a89af6c860f073c052ebeb6ef76fca83cb8778ed4988b3e63cdd"
         },
         {
           "id": "q0086-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0086/q0086-boundary.json",
-          "sha256": "90930495310481164010c5e1d7bd3712cd5de750310d5fc2043f2cd081295a7b"
+          "sha256": "d030cc74bd023f2a7cc831427f9d5b0d96f2add13677d8f492dc01a56903dac4"
         },
         {
           "id": "q0086-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0086/q0086-empty.json",
-          "sha256": "6dceb110138747760cc258df5e0468935ec039c2427dd3c459b68056330c29a1"
+          "sha256": "f4f0ee0092af25f213755f6608cd24730b875a9e8d1b33b883bd4e5bb32acc7b"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -1589,7 +1583,7 @@
       "mysqlVerification": "未运行 MySQL 8.4",
       "validation": {
         "kind": "query",
-        "equivalentKind": "关系结构等价",
+        "equivalentKind": "独立方法等价",
         "fixtures": [
           {
             "fixtureId": "q0086-public",
@@ -1674,8 +1668,8 @@
       "difficulty": "简单",
       "type": "独立编写",
       "title": "筛选存在已知销售的门店",
-      "context": "使用课程中小型订单数据练习筛选存在已知销售的门店。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "按 store_id 输出有效销售额计数 n，仅 n>0 的组，按门店升序。\n输出列名称及顺序：store_id, n。按题设排序；参考排序键：store_id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "统计各门店有多少笔已记录销售额的订单，没有任何有效销售额的门店不必列出。",
+      "requirements": "按 store_id 统计销售额不为空的订单数 n，只保留 n 大于 0 的门店。\n输出列名称及顺序：store_id, n。",
       "datasetId": "q0087-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -1706,26 +1700,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT store_id,COUNT(sales) AS n FROM orders GROUP BY store_id HAVING COUNT(sales)>0 ORDER BY store_id",
-          "sqliteSql": "SELECT store_id,COUNT(sales) AS n FROM orders GROUP BY store_id HAVING COUNT(sales)>0 ORDER BY store_id"
+          "mysqlSql": "SELECT store_id,COUNT(sales) AS n FROM orders GROUP BY store_id HAVING COUNT(sales)>0",
+          "sqliteSql": "SELECT store_id,COUNT(sales) AS n FROM orders GROUP BY store_id HAVING COUNT(sales)>0"
         },
         {
-          "kind": "关系结构等价",
-          "mysqlSql": "SELECT store_id,COUNT(sales) AS n FROM (SELECT * FROM orders) AS orders GROUP BY store_id HAVING COUNT(sales)>0 ORDER BY store_id",
-          "sqliteSql": "SELECT store_id,COUNT(sales) AS n FROM (SELECT * FROM orders) AS orders GROUP BY store_id HAVING COUNT(sales)>0 ORDER BY store_id",
-          "explanation": "先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。"
+          "kind": "代数或函数等价",
+          "mysqlSql": "SELECT store_id,COUNT(sales) AS n FROM orders GROUP BY store_id HAVING COUNT(sales)>=1",
+          "sqliteSql": "SELECT store_id,COUNT(sales) AS n FROM orders GROUP BY store_id HAVING COUNT(sales)>=1"
         }
       ],
       "hints": [
-        "明确每一行结果代表哪一个组；区分分组前后筛选。",
-        "结合《HAVING 与 WHERE》：WHERE 在聚合前筛行，HAVING 在聚合后筛组；无 GROUP BY 的聚合查询也可有 HAVING。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT store_id,COUNT(sales) AS n FROM orders GROUP BY store_id HAVING □□□ ORDER BY store_id"
+        "要统计的是“销售额有值”的订单数，缺失销售额的订单不算。",
+        "COUNT(列) 只统计该列不为 NULL 的行，COUNT(*) 统计所有行。",
+        "分组之后再筛选要用 HAVING，条件里可以直接使用聚合结果。"
       ],
-      "explanation": "组内至少一个有效观测就保留。\n执行思路：确认orders的输入记录；按指定键分组后计算聚合值；对分组后的计算结果筛选；输出store_id、n列；遵循题设排序和并列规则。\n公开夹具实际返回 2 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
+      "explanation": "COUNT(sales) 忽略 sales 为 NULL 的行，得到的是有效销售记录数；HAVING COUNT(sales)>0 去掉没有任何有效销售的门店。\n易错：把阈值写成 >2 会连只有 1~2 笔有效订单的门店也去掉，混淆了“至少一笔”和“超过两笔”。",
       "commonErrors": [
         {
-          "sql": "SELECT store_id,COUNT(sales) AS n FROM orders GROUP BY store_id HAVING COUNT(sales)>2 ORDER BY store_id",
-          "reason": "组内至少一个有效观测就保留。",
+          "sql": "SELECT store_id,COUNT(sales) AS n FROM orders GROUP BY store_id HAVING COUNT(sales)>2",
+          "reason": "组内只要有一个有效销售记录就应保留，阈值不能写成 >2。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -1740,24 +1733,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0087/q0087-public.json",
-          "sha256": "36dd1723eb0da7023b25dfc2735089fcecfcc818f74dd462db80d53c199879a2"
+          "sha256": "4c84721e1cab18fe27d3cb4655d5e591091d1f9518d3ce7975f9048e4da41018"
         },
         {
           "id": "q0087-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0087/q0087-boundary.json",
-          "sha256": "a80b2a841624c00adacd47cf18633add137173179cad49026728f3e21a16cf38"
+          "sha256": "faac09dd0eaa243a778b585d597c6f575be88e433c0c8531cf50935bf3530cea"
         },
         {
           "id": "q0087-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0087/q0087-empty.json",
-          "sha256": "5a9deaa0cdf93ae7bb61f15f8f4636e306a2a79c51773c6c809cfb9131cd5640"
+          "sha256": "063d942d201e5d5cb582a199d9226038beb37e28b9c87184fa767b705bf19d4d"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -1776,7 +1769,7 @@
       "mysqlVerification": "未运行 MySQL 8.4",
       "validation": {
         "kind": "query",
-        "equivalentKind": "关系结构等价",
+        "equivalentKind": "代数或函数等价",
         "fixtures": [
           {
             "fixtureId": "q0087-public",
@@ -1861,8 +1854,8 @@
       "difficulty": "中等",
       "type": "独立编写",
       "title": "平均价格达标类别",
-      "context": "使用课程中小型商品数据练习平均价格达标类别。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "平均售价严格高于40的类别，返回 category、avg_price（两位小数），按类别升序；按未舍入均值判断。\n输出列名称及顺序：category, avg_price。按题设排序；参考排序键：category。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "商品组想找出平均定价高于 40 的类别。",
+      "requirements": "找出平均售价严格高于 40 的类别，返回 category 和平均售价 avg_price（保留两位小数）。判断时按未舍入的平均值计算。\n输出列名称及顺序：category, avg_price。",
       "datasetId": "q0089-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -1893,32 +1886,32 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT category,ROUND(AVG(price),2) AS avg_price FROM products GROUP BY category HAVING AVG(price)>40 ORDER BY category",
-          "sqliteSql": "SELECT category,ROUND(AVG(price),2) AS avg_price FROM products GROUP BY category HAVING AVG(price)>40 ORDER BY category"
+          "mysqlSql": "SELECT category,ROUND(AVG(price),2) AS avg_price FROM products GROUP BY category HAVING AVG(price)>40",
+          "sqliteSql": "SELECT category,ROUND(AVG(price),2) AS avg_price FROM products GROUP BY category HAVING AVG(price)>40"
         },
         {
-          "kind": "关系结构等价",
-          "mysqlSql": "SELECT category,ROUND(AVG(price),2) AS avg_price FROM (SELECT * FROM products) AS products GROUP BY category HAVING AVG(price)>40 ORDER BY category",
-          "sqliteSql": "SELECT category,ROUND(AVG(price),2) AS avg_price FROM (SELECT * FROM products) AS products GROUP BY category HAVING AVG(price)>40 ORDER BY category",
-          "explanation": "先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。"
+          "kind": "独立方法等价",
+          "mysqlSql": "SELECT category,ROUND(AVG(price),2) AS avg_price FROM products GROUP BY category HAVING SUM(price)>40*COUNT(price)",
+          "sqliteSql": "SELECT category,ROUND(AVG(price),2) AS avg_price FROM products GROUP BY category HAVING SUM(price)>40*COUNT(price)"
         }
       ],
       "hints": [
-        "明确每一行结果代表哪一个组；区分分组前后筛选。",
-        "结合《HAVING 与 WHERE》：WHERE 在聚合前筛行，HAVING 在聚合后筛组；无 GROUP BY 的聚合查询也可有 HAVING。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT category,ROUND(AVG(price),2) AS avg_price FROM products GROUP BY category HAVING □□□ ORDER BY category"
+        "要筛选的是每个类别的平均值，而不是单个商品的价格。",
+        "分组之后对聚合结果设条件，要用 HAVING，不能用 WHERE。",
+        "“严格高于”不含 40 本身；比较时用未舍入的 AVG(price)，ROUND 只用来显示结果。"
       ],
-      "explanation": "组平均条件不是单笔商品条件。\n执行思路：确认products的输入记录；按指定键分组后计算聚合值；对分组后的计算结果筛选；输出category、avg_price列；遵循题设排序和并列规则。\n公开夹具实际返回 2 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
+      "explanation": "先按类别分组，HAVING AVG(price)>40 保留平均值严格大于 40 的类别，SELECT 里再用 ROUND 显示两位小数。\n易错：把 ROUND(AVG(price),2) 放进 HAVING 比较，平均值 40.0035 会被舍成 40.00，类别就被漏掉了。",
       "commonErrors": [
         {
-          "sql": "SELECT category,ROUND(AVG(price),2) AS avg_price FROM products GROUP BY category HAVING AVG(price)<40 ORDER BY category",
-          "reason": "组平均条件不是单笔商品条件。",
+          "sql": "SELECT category,ROUND(AVG(price),2) AS avg_price FROM products GROUP BY category HAVING ROUND(AVG(price),2)>40",
+          "reason": "先舍入再比较会让略高于 40 的平均值被舍成 40.00 而漏掉，应按未舍入的平均值判断。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
       "testFixtureIds": [
         "q0089-public",
         "q0089-boundary",
+        "q0089-extra",
         "q0089-empty"
       ],
       "testFixtures": [
@@ -1927,24 +1920,31 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0089/q0089-public.json",
-          "sha256": "f841a1f51eb327d059d9af83038abc80fe32d8daa56da6e01afa6690c92dcea5"
+          "sha256": "d6aae31126e71173c7985e9247af05c6c1a2d83809eca36b05f6573048f0be50"
         },
         {
           "id": "q0089-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0089/q0089-boundary.json",
-          "sha256": "9f05628bc02c81794df71a6b3d0c3889120ab39a25cc73ea2795adef2e78eeab"
+          "sha256": "87f725d92ad648d3d6a6e7c54ff309b2809b611cebe825510d10b83b5023b42b"
+        },
+        {
+          "id": "q0089-extra",
+          "visibility": "hidden",
+          "variant": "extra",
+          "path": "fixtures/q0089/q0089-extra.json",
+          "sha256": "3db64366983c1f6d34fd16a358fe352c501b067bbe06eb5bccaa4ee38aad9696"
         },
         {
           "id": "q0089-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0089/q0089-empty.json",
-          "sha256": "8ac798de62a30f04d49d0870db61f28b43e2ef57b0ab519c8dfe38c1f9779e68"
+          "sha256": "cfdb5765973b1ca5ca301b1fddc038ba04aefbdcb6a353d2a5a6eaa098351b0f"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -1963,7 +1963,7 @@
       "mysqlVerification": "未运行 MySQL 8.4",
       "validation": {
         "kind": "query",
-        "equivalentKind": "关系结构等价",
+        "equivalentKind": "独立方法等价",
         "fixtures": [
           {
             "fixtureId": "q0089-public",
@@ -1981,9 +1981,9 @@
             },
             "wrong": {
               "ran": true,
-              "match": false,
-              "resultHash": "5037968ffd92d95d014a2f2eea263482f76074a0d4be9f91e3946f5631af663a",
-              "rows": 1
+              "match": true,
+              "resultHash": "b1ac891bacf7f4b7b2cc28c95573a2d4efbfbc7d41c61bb042365695b2cfe15f",
+              "rows": 2
             }
           },
           {
@@ -2002,8 +2002,29 @@
             },
             "wrong": {
               "ran": true,
+              "match": true,
+              "resultHash": "92354bd36c214e6f87a8c5460a23ba28be1b11943be2d00e32455442c45aa6fb",
+              "rows": 2
+            }
+          },
+          {
+            "fixtureId": "q0089-extra",
+            "reference": {
+              "ran": true,
+              "match": true,
+              "resultHash": "7988a8d8584e9200385a8195c400f2af4636bb955853438cbea485890c2c3e87",
+              "rowCount": 2
+            },
+            "equivalent": {
+              "ran": true,
+              "match": true,
+              "resultHash": "7988a8d8584e9200385a8195c400f2af4636bb955853438cbea485890c2c3e87",
+              "rows": 2
+            },
+            "wrong": {
+              "ran": true,
               "match": false,
-              "resultHash": "a9bb58729a80dcc071f2212b9157b27e0f49864da82eadb5e4f48c87077dc7d5",
+              "resultHash": "88ed2dbb8040263570f38feec0ab212d5092ea31500d7ec5908687b9325904a7",
               "rows": 1
             }
           },
@@ -2048,15 +2069,15 @@
       "difficulty": "中等",
       "type": "代码填空",
       "title": "销售较高但不含大额单的类别",
-      "context": "使用课程中小型订单数据练习销售较高但不含大额单的类别。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "补全代码中的一个空位，使完整SQL满足以下要求。可输入具有相同语义的片段，提交后按完整代码执行结果核对。\n先排除销售额大于1000的订单，再保留剩余销售总额至少700的类别，返回 category、total，按类别升序。\n输出列名称及顺序：category, total。按题设排序；参考排序键：category。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "运营想找出销售总额较高、但不依赖大额订单的类别。",
+      "requirements": "补全空位：先排除单笔销售额大于 1000 的订单，再汇总各类别，保留剩余销售总额至少 700 的类别，返回 category、total。\n输出列名称及顺序：category, total。",
       "datasetId": "q0090-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
       "sourceTables": [
         "orders"
       ],
-      "initialCode": "SELECT category,SUM(sales) AS total FROM orders {{blank1}}GROUP BY category HAVING SUM(sales)>=700 ORDER BY category",
+      "initialCode": "SELECT category,SUM(sales) AS total FROM orders {{blank1}}GROUP BY category HAVING SUM(sales)>=700",
       "options": [],
       "acceptedBlanks": [
         {
@@ -2089,32 +2110,32 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT category,SUM(sales) AS total FROM orders WHERE sales<=1000 GROUP BY category HAVING SUM(sales)>=700 ORDER BY category",
-          "sqliteSql": "SELECT category,SUM(sales) AS total FROM orders WHERE sales<=1000 GROUP BY category HAVING SUM(sales)>=700 ORDER BY category"
+          "mysqlSql": "SELECT category,SUM(sales) AS total FROM orders WHERE sales<=1000 GROUP BY category HAVING SUM(sales)>=700",
+          "sqliteSql": "SELECT category,SUM(sales) AS total FROM orders WHERE sales<=1000 GROUP BY category HAVING SUM(sales)>=700"
         },
         {
           "kind": "代数或函数等价",
-          "mysqlSql": "SELECT category,SUM(sales) AS total FROM orders WHERE NOT (sales>1000) GROUP BY category HAVING SUM(sales)>=700 ORDER BY category",
-          "sqliteSql": "SELECT category,SUM(sales) AS total FROM orders WHERE NOT (sales>1000) GROUP BY category HAVING SUM(sales)>=700 ORDER BY category",
-          "explanation": "用反向比较并取 NOT 表达相同三值逻辑。"
+          "mysqlSql": "SELECT category,SUM(sales) AS total FROM orders WHERE NOT (sales>1000) GROUP BY category HAVING SUM(sales)>=700",
+          "sqliteSql": "SELECT category,SUM(sales) AS total FROM orders WHERE NOT (sales>1000) GROUP BY category HAVING SUM(sales)>=700"
         }
       ],
       "hints": [
-        "明确每一行结果代表哪一个组；区分分组前后筛选。",
-        "结合《HAVING 与 WHERE》：WHERE 在聚合前筛行，HAVING 在聚合后筛组；无 GROUP BY 的聚合查询也可有 HAVING。",
-        "回想空位所在子句的功能：HAVING 与 WHERE；保留周围代码，填入实现题设的表达式。"
+        "先筛选单笔订单，再对剩下的订单做汇总——筛选发生在分组之前。",
+        "分组之前的行筛选用 WHERE；分组之后的汇总筛选用 HAVING。",
+        "空位里要写的是针对单笔订单的条件：销售额超过 1000 的订单不能参与汇总。"
       ],
-      "explanation": "必须先排除单笔大额订单，再汇总组金额。\n执行思路：确认orders的输入记录；按筛选条件保留符合要求的记录，并考虑空值；按指定键分组后计算聚合值；对分组后的计算结果筛选；输出category、total列；遵循题设排序和并列规则。\n公开夹具实际返回 2 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：用反向比较并取 NOT 表达相同三值逻辑。",
+      "explanation": "WHERE sales<=1000 在分组之前去掉大额订单，HAVING SUM(sales)>=700 再对剩下订单的类别总额设门槛。\n易错：没有 WHERE 时，大额订单也被计入总额，一个类别可能只是因为那笔大订单就过了门槛。",
       "commonErrors": [
         {
-          "sql": "SELECT category,SUM(sales) AS total FROM orders GROUP BY category HAVING SUM(sales)>=700 ORDER BY category",
-          "reason": "必须先排除单笔大额订单，再汇总组金额。",
+          "sql": "SELECT category,SUM(sales) AS total FROM orders GROUP BY category HAVING SUM(sales)>=700",
+          "reason": "必须先用 WHERE 排除单笔大额订单，再汇总各类别的金额。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
       "testFixtureIds": [
         "q0090-public",
         "q0090-boundary",
+        "q0090-extra",
         "q0090-empty"
       ],
       "testFixtures": [
@@ -2123,24 +2144,31 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0090/q0090-public.json",
-          "sha256": "cff595ea2a2ede3c1a6c87729194f88a0a33b77f5b0322634417d5c4fcbccb9e"
+          "sha256": "8323bf5e87dbbfa0a320ab62d10041902e2afd7b5310c59dc7d7ba37e609f267"
         },
         {
           "id": "q0090-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0090/q0090-boundary.json",
-          "sha256": "fdbcbf581829d405947bd148daa0dfdd3299e334a00b0c189dedca3afd60cf89"
+          "sha256": "bd71117cfba0a9fb706e5205ca4ba665f146d6512d082feb3c757542201e222a"
+        },
+        {
+          "id": "q0090-extra",
+          "visibility": "hidden",
+          "variant": "extra",
+          "path": "fixtures/q0090/q0090-extra.json",
+          "sha256": "93b969b47a434550f6e8f35f378cee8ce57b15e58e10bc82af74e9c2493189bb"
         },
         {
           "id": "q0090-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0090/q0090-empty.json",
-          "sha256": "568aeb39d17547cbe1398c0819e47b0c02929b2803029a3d3ca530a9a8d1d2b6"
+          "sha256": "6850b674900a1d56a52b03a973a126c2ede906db1bdfd3b006caee9c60a6c62e"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -2204,6 +2232,27 @@
             }
           },
           {
+            "fixtureId": "q0090-extra",
+            "reference": {
+              "ran": true,
+              "match": true,
+              "resultHash": "a28722499ba028564797ab5a256404bbcd12debcffeca89420d61e2799d0ddfa",
+              "rowCount": 4
+            },
+            "equivalent": {
+              "ran": true,
+              "match": true,
+              "resultHash": "a28722499ba028564797ab5a256404bbcd12debcffeca89420d61e2799d0ddfa",
+              "rows": 4
+            },
+            "wrong": {
+              "ran": true,
+              "match": false,
+              "resultHash": "d9765a9e92e5f8ae068a5786e1f5fe04f64dbfd32375e797158a8e293dca444a",
+              "rows": 5
+            }
+          },
+          {
             "fixtureId": "q0090-empty",
             "reference": {
               "ran": true,
@@ -2248,8 +2297,8 @@
       "difficulty": "中等",
       "type": "独立编写",
       "title": "月份和门店销售汇总",
-      "context": "使用课程中小型订单数据练习月份和门店销售汇总。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "按门店和订单月份（YYYY-MM）分组，输出 store_id、month_key、total，按门店、月份升序。\n输出列名称及顺序：store_id, month_key, total。按题设排序；参考排序键：store_id,month_key。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "财务想按月查看各门店的销售汇总。",
+      "requirements": "按门店和订单月份（YYYY-MM 形式，列别名 month_key）分组，汇总销售额 total。\n输出列名称及顺序：store_id, month_key, total。",
       "datasetId": "q0091-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -2293,26 +2342,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT store_id,SUBSTR(order_date,1,7) AS month_key,SUM(sales) AS total FROM orders GROUP BY store_id,SUBSTR(order_date,1,7) ORDER BY store_id,month_key",
-          "sqliteSql": "SELECT store_id,SUBSTR(order_date,1,7) AS month_key,SUM(sales) AS total FROM orders GROUP BY store_id,SUBSTR(order_date,1,7) ORDER BY store_id,month_key"
+          "mysqlSql": "SELECT store_id,SUBSTR(order_date,1,7) AS month_key,SUM(sales) AS total FROM orders GROUP BY store_id,SUBSTR(order_date,1,7)",
+          "sqliteSql": "SELECT store_id,SUBSTR(order_date,1,7) AS month_key,SUM(sales) AS total FROM orders GROUP BY store_id,SUBSTR(order_date,1,7)"
         },
         {
-          "kind": "关系结构等价",
-          "mysqlSql": "SELECT store_id,SUBSTR(order_date,1,7) AS month_key,SUM(sales) AS total FROM (SELECT * FROM orders) AS orders GROUP BY store_id,SUBSTR(order_date,1,7) ORDER BY store_id,month_key",
-          "sqliteSql": "SELECT store_id,SUBSTR(order_date,1,7) AS month_key,SUM(sales) AS total FROM (SELECT * FROM orders) AS orders GROUP BY store_id,SUBSTR(order_date,1,7) ORDER BY store_id,month_key",
-          "explanation": "先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。"
+          "kind": "代数或函数等价",
+          "mysqlSql": "SELECT store_id,SUBSTR(order_date,1,7) AS month_key,SUM(sales) AS total FROM orders GROUP BY store_id,month_key",
+          "sqliteSql": "SELECT store_id,SUBSTR(order_date,1,7) AS month_key,SUM(sales) AS total FROM orders GROUP BY store_id,month_key"
         }
       ],
       "hints": [
-        "明确每一行结果代表哪一个组；区分分组前后筛选。",
-        "结合《多字段分组与严格分组》：多个分组字段形成联合键；MySQL 默认 ONLY_FULL_GROUP_BY 要求非聚合表达式在分组键中、由其函数决定或符合允许的单值条件。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT store_id,SUBSTR(order_date,1,7) AS month_key,□□□ AS total FROM orders GROUP BY store_id,SUBSTR(order_date,1,7) ORDER BY store_id,month_key"
+        "分组粒度是“门店 + 月份”，月份要从完整日期里取出来。",
+        "日期是 YYYY-MM-DD 形式的文本，截取前 7 个字符就得到年月；GROUP BY 里使用同样的表达式。",
+        "汇总金额用 SUM，而不是计数；SELECT 与 GROUP BY 的表达式要一致。"
       ],
-      "explanation": "月和门店共同确定汇总粒度，SUM计算金额而非笔数。\n执行思路：确认orders的输入记录；按指定键分组后计算聚合值；输出store_id、month_key、total列；遵循题设排序和并列规则。\n公开夹具实际返回 4 行、3 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
+      "explanation": "SUBSTR(order_date,1,7) 取出 YYYY-MM 作为月份分组键；按 store_id 和这个表达式分组后，SUM(sales) 得到每个门店每月的销售额。\n易错：用 COUNT(sales) 得到的是订单笔数，不是金额。",
       "commonErrors": [
         {
-          "sql": "SELECT store_id,SUBSTR(order_date,1,7) AS month_key,COUNT(sales) AS total FROM orders GROUP BY store_id,SUBSTR(order_date,1,7) ORDER BY store_id,month_key",
-          "reason": "月和门店共同确定汇总粒度，SUM计算金额而非笔数。",
+          "sql": "SELECT store_id,SUBSTR(order_date,1,7) AS month_key,COUNT(sales) AS total FROM orders GROUP BY store_id,SUBSTR(order_date,1,7)",
+          "reason": "汇总的是金额，应使用 SUM；COUNT 得到的是订单笔数。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -2327,24 +2375,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0091/q0091-public.json",
-          "sha256": "2b201f2344ec510c0d261a94a8a4427e8ab48a0f17c5fb517070636e6b41e4a8"
+          "sha256": "abdc073dcb0085fbe666cf618a72e34967d2ba9e53ece93a32a9445503302c9c"
         },
         {
           "id": "q0091-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0091/q0091-boundary.json",
-          "sha256": "3098aaa7c99be058d676ea101d82c16837b8542ff7b8df092cecce3d6db0ec24"
+          "sha256": "2b9cba285d4b53c3ef7b53b4a55061ffe2ef166a47ec211fe0668b8dd55002e9"
         },
         {
           "id": "q0091-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0091/q0091-empty.json",
-          "sha256": "121de591a4d839cb6907dac6cc66e992b7d80fe7faa8e9fad470e73a60849f93"
+          "sha256": "78cd1c918d30e814ff1052a13611d34d12e985702d38b5af623b8527635fc499"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -2363,7 +2411,7 @@
       "mysqlVerification": "未运行 MySQL 8.4",
       "validation": {
         "kind": "query",
-        "equivalentKind": "关系结构等价",
+        "equivalentKind": "代数或函数等价",
         "fixtures": [
           {
             "fixtureId": "q0091-public",
@@ -2448,8 +2496,8 @@
       "difficulty": "中等",
       "type": "独立编写",
       "title": "筛选多商品类别",
-      "context": "使用课程中小型商品数据练习筛选多商品类别。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "至少包含两个不同商品编号的类别，返回 category、n，按类别升序。\n输出列名称及顺序：category, n。按题设排序；参考排序键：category。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "商品组想找出商品种类不少于 2 种的类别。",
+      "requirements": "找出至少包含两个不同商品编号的类别，返回 category 和商品数 n。\n输出列名称及顺序：category, n。",
       "datasetId": "q0093-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -2480,26 +2528,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT category,COUNT(DISTINCT product_id) AS n FROM products GROUP BY category HAVING COUNT(DISTINCT product_id)>=2 ORDER BY category",
-          "sqliteSql": "SELECT category,COUNT(DISTINCT product_id) AS n FROM products GROUP BY category HAVING COUNT(DISTINCT product_id)>=2 ORDER BY category"
+          "mysqlSql": "SELECT category,COUNT(DISTINCT product_id) AS n FROM products GROUP BY category HAVING COUNT(DISTINCT product_id)>=2",
+          "sqliteSql": "SELECT category,COUNT(DISTINCT product_id) AS n FROM products GROUP BY category HAVING COUNT(DISTINCT product_id)>=2"
         },
         {
-          "kind": "关系结构等价",
-          "mysqlSql": "SELECT category,COUNT(DISTINCT product_id) AS n FROM (SELECT * FROM products) AS products GROUP BY category HAVING COUNT(DISTINCT product_id)>=2 ORDER BY category",
-          "sqliteSql": "SELECT category,COUNT(DISTINCT product_id) AS n FROM (SELECT * FROM products) AS products GROUP BY category HAVING COUNT(DISTINCT product_id)>=2 ORDER BY category",
-          "explanation": "先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。"
+          "kind": "代数或函数等价",
+          "mysqlSql": "SELECT category,COUNT(DISTINCT product_id) AS n FROM products GROUP BY category HAVING COUNT(DISTINCT product_id)>1",
+          "sqliteSql": "SELECT category,COUNT(DISTINCT product_id) AS n FROM products GROUP BY category HAVING COUNT(DISTINCT product_id)>1"
         }
       ],
       "hints": [
-        "明确每一行结果代表哪一个组；区分分组前后筛选。",
-        "结合《HAVING 与 WHERE》：WHERE 在聚合前筛行，HAVING 在聚合后筛组；无 GROUP BY 的聚合查询也可有 HAVING。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT category,COUNT(DISTINCT product_id) AS n FROM products GROUP BY category HAVING COUNT(DISTINCT product_id)□□□ ORDER BY category"
+        "“不同的商品”要先去重再数。",
+        "COUNT(DISTINCT 列) 统计不重复值的个数；分组后的数量条件用 HAVING。",
+        "“至少两个”包含 2 本身，注意比较运算符。"
       ],
-      "explanation": "阈值包含两个商品，不能变成严格大于。\n执行思路：确认products的输入记录；按指定键分组后计算聚合值；对分组后的计算结果筛选；仅在题设指定的范围内去重；输出category、n列；遵循题设排序和并列规则。\n公开夹具实际返回 2 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
+      "explanation": "COUNT(DISTINCT product_id) 统计每个类别的商品种类数，HAVING …>=2 保留至少有 2 种的类别。\n易错：把 >=2 写成 >2，会漏掉恰好有 2 种商品的类别。",
       "commonErrors": [
         {
-          "sql": "SELECT category,COUNT(DISTINCT product_id) AS n FROM products GROUP BY category HAVING COUNT(DISTINCT product_id)>2 ORDER BY category",
-          "reason": "阈值包含两个商品，不能变成严格大于。",
+          "sql": "SELECT category,COUNT(DISTINCT product_id) AS n FROM products GROUP BY category HAVING COUNT(DISTINCT product_id)>2",
+          "reason": "“至少两个”包含恰好两个，阈值不能写成严格大于 2。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -2514,24 +2561,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0093/q0093-public.json",
-          "sha256": "206a5ab8d4407acec8299b8de7d66647aa04000b2a1a8cfe85c697762b3e157f"
+          "sha256": "bc0d7985707d6ee19632ec2d133b799b568b3376d3faf8691670e4ad194212bc"
         },
         {
           "id": "q0093-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0093/q0093-boundary.json",
-          "sha256": "dccb0e6b03b94b909d9a8e1aa80545061282c772b99bb47d535e8568f905b66c"
+          "sha256": "948361e407a986730be1c8f9a3da0f50926e949edafc871d4159ea8881750ad4"
         },
         {
           "id": "q0093-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0093/q0093-empty.json",
-          "sha256": "2c9daaca90d85be71caa170758ddcea18dc4c2e3769c0b0c0108dfcc49d9bd72"
+          "sha256": "b9bf5e0b2170f0feff604f4dc5345ce3bf15b0d54adec628605ade50cdd763ed"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -2550,7 +2597,7 @@
       "mysqlVerification": "未运行 MySQL 8.4",
       "validation": {
         "kind": "query",
-        "equivalentKind": "关系结构等价",
+        "equivalentKind": "代数或函数等价",
         "fixtures": [
           {
             "fixtureId": "q0093-public",

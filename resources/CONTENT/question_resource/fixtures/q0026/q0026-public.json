@@ -52,7 +52,7 @@
         ],
         [
           4,
-          "Soap",
+          "Soap 5%",
           "-5",
           "HOME"
         ],
@@ -67,6 +67,12 @@
           "",
           "20",
           "HOME"
+        ],
+        [
+          7,
+          "Soap_B",
+          "10",
+          "HOME"
         ]
       ]
     }
@@ -79,9 +85,14 @@
       "id",
       "name"
     ],
-    "rows": []
+    "rows": [
+      [
+        4,
+        "Soap 5%"
+      ]
+    ]
   },
-  "orderPolicy": "ordered",
+  "orderPolicy": "unordered_multiset",
   "columnPolicy": "exact_names_in_order",
   "numericTolerance": {
     "absolute": 1e-06,

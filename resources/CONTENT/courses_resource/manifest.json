@@ -147,8 +147,8 @@
   "files": [
     {
       "path": "README.md",
-      "bytes": 2959,
-      "sha256": "29b8792b885bb19cbfe10967a69fbcecce45176337ea15a365ab7e00641cf103"
+      "bytes": 3414,
+      "sha256": "544bfc2fb066c552f8eb6534e9cab5274ff7725a4e30e733cc0dd9283246ff7a"
     },
     {
       "path": "courses/ch01.json",

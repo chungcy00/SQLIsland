@@ -1,6 +1,0 @@
--- 同岗位薪资分布与异常
--- 题目资源4.2.1，原生MySQL8.4尚未验证
-
-WITH a AS (SELECT employee_id,department_id,position_id,base_cents,AVG(base_cents) OVER(PARTITION BY department_id,position_id) avg_base,COUNT(*) OVER(PARTITION BY department_id,position_id) n,RANK() OVER(PARTITION BY department_id,position_id ORDER BY base_cents DESC) salary_rank FROM v_staff_month WHERE month_key='2025-12') SELECT employee_id,department_id,position_id,base_cents,ROUND(avg_base,2) avg_base_cents,salary_rank,ROUND(100.0*(base_cents-avg_base)/NULLIF(avg_base,0),2) deviation_pct FROM a WHERE n>=3 AND ABS(base_cents-avg_base)>avg_base*.15 ORDER BY department_id,position_id,salary_rank,employee_id;
-
-WITH a AS (SELECT employee_id,department_id,position_id,base_cents,AVG(base_cents) OVER(PARTITION BY department_id,position_id) avg_base,COUNT(*) OVER(PARTITION BY department_id,position_id) n,RANK() OVER(PARTITION BY department_id,position_id ORDER BY base_cents DESC) salary_rank FROM v_staff_month WHERE month_key='2025-12') SELECT employee_id,department_id,position_id,base_cents,ROUND(avg_base,2) avg_base_cents,salary_rank,ROUND(100.0*(base_cents-avg_base)/NULLIF(avg_base,0),2) deviation_pct FROM a WHERE n>2 AND ABS(base_cents-avg_base)>avg_base*.15 ORDER BY department_id,position_id,salary_rank,employee_id;

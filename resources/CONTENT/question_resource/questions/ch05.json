@@ -17,8 +17,8 @@
       "difficulty": "入门",
       "type": "独立编写",
       "title": "零值不是缺失",
-      "context": "使用课程中小型缺失值示例数据练习零值不是缺失。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "从 nullable_values 找 value 恰等于0的记录，仅输出 id，按编号升序。\n输出列名称及顺序：id。按题设排序；参考排序键：id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "数据质检要区分“值为 0”和“值缺失”这两种情况。",
+      "requirements": "从 nullable_values 中找出 value 恰好等于 0 的记录，只输出 id。\n输出列名称及顺序：id。",
       "datasetId": "q0051-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -43,32 +43,32 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT id FROM nullable_values WHERE value=0 ORDER BY id",
-          "sqliteSql": "SELECT id FROM nullable_values WHERE value=0 ORDER BY id"
+          "mysqlSql": "SELECT id FROM nullable_values WHERE value=0",
+          "sqliteSql": "SELECT id FROM nullable_values WHERE value=0"
         },
         {
-          "kind": "独立方法等价",
-          "mysqlSql": "SELECT id FROM nullable_values WHERE value IN (0) ORDER BY id",
-          "sqliteSql": "SELECT id FROM nullable_values WHERE value IN (0) ORDER BY id",
-          "explanation": "采用另一种关系运算或查询结构计算相同结果。"
+          "kind": "代数或函数等价",
+          "mysqlSql": "SELECT id FROM nullable_values WHERE NOT (value<>0)",
+          "sqliteSql": "SELECT id FROM nullable_values WHERE NOT (value<>0)"
         }
       ],
       "hints": [
-        "区分未知、零与空字符串，判断是否需要排除或填补缺失。",
-        "结合《IS NULL 与三值逻辑》：比较未知值通常返回 UNKNOWN，WHERE 只保留 TRUE；IS NULL 专门检测缺失。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT id FROM nullable_values WHERE □□□ ORDER BY id"
+        "0 是一个确定的数值，NULL 表示未知，二者不是一回事。",
+        "判断“等于 0”用普通的比较运算；判断“是否缺失”才需要 IS NULL。",
+        "检查你的结果里是否混入了 value 为 NULL 的记录。"
       ],
-      "explanation": "数值0表示已知值，NULL 表示未知。\n执行思路：确认nullable_values的输入记录；按筛选条件保留符合要求的记录，并考虑空值；输出id列；遵循题设排序和并列规则。\n公开夹具实际返回 1 行、1 列；完整结果见 expectedOutput。\n另一种可用写法：采用另一种关系运算或查询结构计算相同结果。",
+      "explanation": "value=0 只会选中已知且等于 0 的行。NULL 表示“未知”，既不等于 0，也不等于任何数，所以不会被选中。\n易错：用 value IS NULL 得到的是缺失记录，与零值恰好相反。",
       "commonErrors": [
         {
-          "sql": "SELECT id FROM nullable_values WHERE value IS NULL ORDER BY id",
-          "reason": "数值0表示已知值，NULL 表示未知。",
+          "sql": "SELECT id FROM nullable_values WHERE value IS NULL",
+          "reason": "数值 0 是已知值，NULL 表示未知；IS NULL 选出的是缺失记录。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
       "testFixtureIds": [
         "q0051-public",
         "q0051-boundary",
+        "q0051-extra",
         "q0051-empty"
       ],
       "testFixtures": [
@@ -77,24 +77,31 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0051/q0051-public.json",
-          "sha256": "ac0339be98d7e72f72542f2fed1c9db9d31457bdc2777f4b92e9128749b442dd"
+          "sha256": "f2ff0777e79f17b6f60f6c5fdfe53eeaa423818ea531cfabe3e6a3c4f6e9fb48"
         },
         {
           "id": "q0051-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0051/q0051-boundary.json",
-          "sha256": "bc8480f5bb2869222e049530e07dc53f0d469d68d5064c3530779ce391358629"
+          "sha256": "35529498c8265cfa9fea465b2feb517b5e126882fb47b27d73fecfe1287f2fcc"
+        },
+        {
+          "id": "q0051-extra",
+          "visibility": "hidden",
+          "variant": "extra",
+          "path": "fixtures/q0051/q0051-extra.json",
+          "sha256": "c93823b08d22546a0fea251b28265cf0ccbb15b043f7d9cc466eb3f2433b34a9"
         },
         {
           "id": "q0051-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0051/q0051-empty.json",
-          "sha256": "5cf668a3e1562ef8ca57c9874513ba6892f393384c71de8319cdf1845470c2ee"
+          "sha256": "6ec38d9635ea7b1d0229c9917d677d59f597c0f2e0241f6b48a638af3f47f226"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -113,7 +120,7 @@
       "mysqlVerification": "未运行 MySQL 8.4",
       "validation": {
         "kind": "query",
-        "equivalentKind": "独立方法等价",
+        "equivalentKind": "代数或函数等价",
         "fixtures": [
           {
             "fixtureId": "q0051-public",
@@ -154,6 +161,27 @@
               "ran": true,
               "match": false,
               "resultHash": "3a28b454110766151d40ef58730c3be2657c097ad0cb2ed449734c2c0d8374c1",
+              "rows": 2
+            }
+          },
+          {
+            "fixtureId": "q0051-extra",
+            "reference": {
+              "ran": true,
+              "match": true,
+              "resultHash": "2ad0e497e6818161c6a647950cbae8df133f74e7a6c16539ef8f3335bf77de2a",
+              "rowCount": 3
+            },
+            "equivalent": {
+              "ran": true,
+              "match": true,
+              "resultHash": "2ad0e497e6818161c6a647950cbae8df133f74e7a6c16539ef8f3335bf77de2a",
+              "rows": 3
+            },
+            "wrong": {
+              "ran": true,
+              "match": false,
+              "resultHash": "3d47e471a2b80c50596c739e1817b83cdaec715f8a7a5fb79017ffb5ff39e85e",
               "rows": 2
             }
           },
@@ -216,8 +244,8 @@
       "difficulty": "入门",
       "type": "独立编写",
       "title": "缺少客户键的订单",
-      "context": "使用课程中小型订单数据练习缺少客户键的订单。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "输出 customer_id 为NULL的 orders.id，按编号升序。\n输出列名称及顺序：id。按题设排序；参考排序键：id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "订单里有些记录没有登记客户，运营需要把它们核对出来。",
+      "requirements": "输出 orders 中 customer_id 为 NULL 的订单 id。\n输出列名称及顺序：id。",
       "datasetId": "q0052-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -242,26 +270,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT id FROM orders WHERE customer_id IS NULL ORDER BY id",
-          "sqliteSql": "SELECT id FROM orders WHERE customer_id IS NULL ORDER BY id"
+          "mysqlSql": "SELECT id FROM orders WHERE customer_id IS NULL",
+          "sqliteSql": "SELECT id FROM orders WHERE customer_id IS NULL"
         },
         {
-          "kind": "关系结构等价",
-          "mysqlSql": "SELECT id FROM (SELECT * FROM orders) AS orders WHERE customer_id IS NULL ORDER BY id",
-          "sqliteSql": "SELECT id FROM (SELECT * FROM orders) AS orders WHERE customer_id IS NULL ORDER BY id",
-          "explanation": "先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。"
+          "kind": "代数或函数等价",
+          "mysqlSql": "SELECT id FROM orders WHERE NOT (customer_id IS NOT NULL)",
+          "sqliteSql": "SELECT id FROM orders WHERE NOT (customer_id IS NOT NULL)"
         }
       ],
       "hints": [
-        "区分未知、零与空字符串，判断是否需要排除或填补缺失。",
-        "结合《IS NULL 与三值逻辑》：比较未知值通常返回 UNKNOWN，WHERE 只保留 TRUE；IS NULL 专门检测缺失。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT id FROM orders WHERE customer_id □□□ ORDER BY id"
+        "NULL 表示“没有登记/未知”，不是一个可以直接比较的普通值。",
+        "判断是否为 NULL 要用专门的 IS NULL，而不是 =。",
+        "= NULL 的结果既不是真也不是假，而是未知，WHERE 会把这样的行全部过滤掉。"
       ],
-      "explanation": "NULL 不能通过普通等号比较。\n执行思路：确认orders的输入记录；按筛选条件保留符合要求的记录，并考虑空值；输出id列；遵循题设排序和并列规则。\n公开夹具实际返回 1 行、1 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
+      "explanation": "customer_id IS NULL 是判断缺失的正确写法。customer_id = NULL 的结果永远是未知，WHERE 只保留结果为真的行，所以一行也选不到。",
       "commonErrors": [
         {
-          "sql": "SELECT id FROM orders WHERE customer_id = NULL ORDER BY id",
-          "reason": "NULL 不能通过普通等号比较。",
+          "sql": "SELECT id FROM orders WHERE customer_id = NULL",
+          "reason": "NULL 不能用 = 比较，条件结果永远是未知，选不到任何行。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -276,24 +303,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0052/q0052-public.json",
-          "sha256": "220e297c38c19150b89b8c33b24d036811fa664ee0e95adb84bbcc45bc98e419"
+          "sha256": "9305382d09ae03d6488732a0188ac65313d4cc6521bc7eb39dd9f0a0d025454f"
         },
         {
           "id": "q0052-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0052/q0052-boundary.json",
-          "sha256": "cc9a10af1047ef7bdca59c7cfbd94b2d872748d394986452203629ab5821f3e6"
+          "sha256": "346e07253ba99d7a1b7643794da696f489dc95f30f7a045fa7fbc5669e8389ff"
         },
         {
           "id": "q0052-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0052/q0052-empty.json",
-          "sha256": "c81b6fa7d2d6cd72285e93c5f318493c69c2279cb0e736eb8c6cb9c7ba176ea7"
+          "sha256": "5f038af6e5878a0b7768c0d100aac125f7938437376d4d0928b858c32abab397"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -312,7 +339,7 @@
       "mysqlVerification": "未运行 MySQL 8.4",
       "validation": {
         "kind": "query",
-        "equivalentKind": "关系结构等价",
+        "equivalentKind": "代数或函数等价",
         "fixtures": [
           {
             "fixtureId": "q0052-public",
@@ -540,8 +567,8 @@
       "difficulty": "入门",
       "type": "独立编写",
       "title": "客户编号占位",
-      "context": "使用课程中小型订单数据练习客户编号占位。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "输出 orders 的 id 以及 customer_id 缺失时返回-1的 client_key，按 id 升序。\n输出列名称及顺序：id, client_key。按题设排序；参考排序键：id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "报表要求客户编号缺失时用 -1 占位，方便下游系统识别。",
+      "requirements": "输出 orders 的 id，以及客户编号缺失时用 -1 代替的列 client_key。\n输出列名称及顺序：id, client_key。",
       "datasetId": "q0054-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -584,26 +611,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT id,COALESCE(customer_id,-1) AS client_key FROM orders ORDER BY id",
-          "sqliteSql": "SELECT id,COALESCE(customer_id,-1) AS client_key FROM orders ORDER BY id"
+          "mysqlSql": "SELECT id,COALESCE(customer_id,-1) AS client_key FROM orders",
+          "sqliteSql": "SELECT id,COALESCE(customer_id,-1) AS client_key FROM orders"
         },
         {
-          "kind": "关系结构等价",
-          "mysqlSql": "SELECT id,COALESCE(customer_id,-1) AS client_key FROM (SELECT * FROM orders) AS orders ORDER BY id",
-          "sqliteSql": "SELECT id,COALESCE(customer_id,-1) AS client_key FROM (SELECT * FROM orders) AS orders ORDER BY id",
-          "explanation": "先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。"
+          "kind": "独立方法等价",
+          "mysqlSql": "SELECT id,CASE WHEN customer_id IS NULL THEN -1 ELSE customer_id END AS client_key FROM orders",
+          "sqliteSql": "SELECT id,CASE WHEN customer_id IS NULL THEN -1 ELSE customer_id END AS client_key FROM orders"
         }
       ],
       "hints": [
-        "区分未知、零与空字符串，判断是否需要排除或填补缺失。",
-        "结合《IFNULL 与 COALESCE》：IFNULL 接受两个参数，COALESCE 返回首个非空参数；仅在业务允许时填补缺失。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT id,□□□ AS client_key FROM orders ORDER BY id"
+        "需要在“有值时用原值、缺失时用默认值”之间二选一。",
+        "COALESCE(a, b) 返回第一个不是 NULL 的值，可以用它给 NULL 指定替代值。",
+        "核对替代值：题目指定的是 -1，而不是 0。"
       ],
-      "explanation": "占位值必须一致，并与原数据分开。\n执行思路：确认orders的输入记录；输出id、client_key列；遵循题设排序和并列规则。\n公开夹具实际返回 5 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
+      "explanation": "COALESCE(customer_id,-1) 在 customer_id 有值时返回原值，缺失时返回 -1。占位值要按题目指定，写成 0 容易和真实的编号混淆。\n另一种写法：CASE WHEN customer_id IS NULL THEN -1 ELSE customer_id END，含义一致，只是更啰嗦。",
       "commonErrors": [
         {
-          "sql": "SELECT id,COALESCE(customer_id,0) AS client_key FROM orders ORDER BY id",
-          "reason": "占位值必须一致，并与原数据分开。",
+          "sql": "SELECT id,COALESCE(customer_id,0) AS client_key FROM orders",
+          "reason": "占位值必须按题目指定为 -1；用 0 会与真实编号混淆。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -618,24 +644,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0054/q0054-public.json",
-          "sha256": "b5693248ad656a79b75bf0ace7a50210660773ab6c42b40c70c8ef4a50ccc242"
+          "sha256": "6e39c9646630b2a51208b07db5e62faa631abb5f447a480ce6ea3697799f57d4"
         },
         {
           "id": "q0054-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0054/q0054-boundary.json",
-          "sha256": "b77de50f5457cd21ecb06fa28e5c32c2633a6fc58ed688dad8032c01e5ac2f37"
+          "sha256": "4b4e81a8a4b06eb2c2b3cfdbe0af4aa15a72365c795e9ec232daac961e9e59c5"
         },
         {
           "id": "q0054-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0054/q0054-empty.json",
-          "sha256": "3333fadb3deb178672a4880b7203588aedfc15350fb14074b6868cbc29958895"
+          "sha256": "863e1a8c0a4d02f3307493fa28b55cd701151b4412e4954b36c2cef384891361"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -654,7 +680,7 @@
       "mysqlVerification": "未运行 MySQL 8.4",
       "validation": {
         "kind": "query",
-        "equivalentKind": "关系结构等价",
+        "equivalentKind": "独立方法等价",
         "fixtures": [
           {
             "fixtureId": "q0054-public",
@@ -741,8 +767,8 @@
       "difficulty": "入门",
       "type": "独立编写",
       "title": "空文本与未知文本",
-      "context": "使用课程中小型缺失值示例数据练习空文本与未知文本。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "寻找 note 为空字符串或NULL的记录，输出 id、note，按编号升序。\n输出列名称及顺序：id, note。按题设排序；参考排序键：id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "备注字段里既有空字符串，也有 NULL，运营想把“没有写备注”的记录都找出来。",
+      "requirements": "找出 note 为空字符串或 NULL 的记录，输出 id、note。\n输出列名称及顺序：id, note。",
       "datasetId": "q0056-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -773,26 +799,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT id,note FROM nullable_values WHERE note='' OR note IS NULL ORDER BY id",
-          "sqliteSql": "SELECT id,note FROM nullable_values WHERE note='' OR note IS NULL ORDER BY id"
+          "mysqlSql": "SELECT id,note FROM nullable_values WHERE note='' OR note IS NULL",
+          "sqliteSql": "SELECT id,note FROM nullable_values WHERE note='' OR note IS NULL"
         },
         {
-          "kind": "代数或函数等价",
-          "mysqlSql": "SELECT id,note FROM nullable_values WHERE NOT (note<>'') OR note IS NULL ORDER BY id",
-          "sqliteSql": "SELECT id,note FROM nullable_values WHERE NOT (note<>'') OR note IS NULL ORDER BY id",
-          "explanation": "用反向比较并取 NOT 表达相同三值逻辑。"
+          "kind": "独立方法等价",
+          "mysqlSql": "SELECT id,note FROM nullable_values WHERE COALESCE(note,'')=''",
+          "sqliteSql": "SELECT id,note FROM nullable_values WHERE COALESCE(note,'')=''"
         }
       ],
       "hints": [
-        "区分未知、零与空字符串，判断是否需要排除或填补缺失。",
-        "结合《IS NULL 与三值逻辑》：比较未知值通常返回 UNKNOWN，WHERE 只保留 TRUE；IS NULL 专门检测缺失。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT id,note FROM nullable_values WHERE note=''□□□note IS NULL ORDER BY id"
+        "空字符串和 NULL 都表示“没有备注”，但在数据库里是两种不同的值。",
+        "空字符串用 = '' 判断，NULL 用 IS NULL 判断，两种情况要用逻辑运算符连接。",
+        "同一行的 note 不可能既是空字符串又是 NULL，想想该用 AND 还是 OR。"
       ],
-      "explanation": "空字符串与NULL互斥，OR 才覆盖两者。\n执行思路：确认nullable_values的输入记录；按筛选条件保留符合要求的记录，并考虑空值；输出id、note列；遵循题设排序和并列规则。\n公开夹具实际返回 2 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：用反向比较并取 NOT 表达相同三值逻辑。",
+      "explanation": "note='' OR note IS NULL 同时覆盖两种“没有备注”。空字符串是已知的空文本，NULL 是未知，二者互斥，用 AND 连接永远不会为真，结果为空。\n另一种写法：COALESCE(note,'')='' 先把 NULL 换成空字符串再比较，结果相同。",
       "commonErrors": [
         {
-          "sql": "SELECT id,note FROM nullable_values WHERE note='' AND note IS NULL ORDER BY id",
-          "reason": "空字符串与NULL互斥，OR 才覆盖两者。",
+          "sql": "SELECT id,note FROM nullable_values WHERE note='' AND note IS NULL",
+          "reason": "空字符串与 NULL 互斥，AND 永远不成立，需要用 OR 覆盖两者。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -807,24 +832,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0056/q0056-public.json",
-          "sha256": "b9df846e70f7f02591f16b3a4b2f16b3df522ef56a1586fa358b7cdb5956d03d"
+          "sha256": "f09a4221010c04fc1aaf783ccbf128e50764f4adf340bf5843899e07f5640d88"
         },
         {
           "id": "q0056-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0056/q0056-boundary.json",
-          "sha256": "07eb1a21a5f3dc9e0cebf2b60b8c930a39cf84a2715684c9e00282e5e7a315a5"
+          "sha256": "2efa6f66b4a5caf184234077231e10cd938beb7f95ef1d0a233ff2548f295007"
         },
         {
           "id": "q0056-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0056/q0056-empty.json",
-          "sha256": "deb8d3c77c2cb7254271c0252cd3642df23ea84ef099f6f86e9ccdbeb13e5d4a"
+          "sha256": "6cc2502915f3887b94a8849a96664f88ffb6df4899d917c77f9e5ff881c1c788"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -843,7 +868,7 @@
       "mysqlVerification": "未运行 MySQL 8.4",
       "validation": {
         "kind": "query",
-        "equivalentKind": "代数或函数等价",
+        "equivalentKind": "独立方法等价",
         "fixtures": [
           {
             "fixtureId": "q0056-public",
@@ -944,15 +969,15 @@
       "difficulty": "简单",
       "type": "代码纠错",
       "title": "缺失销售记录标记",
-      "context": "使用课程中小型缺失值示例数据练习缺失销售记录标记。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "下面提供的初始代码存在逻辑、语法或结构错误。请修改整段代码，使其满足以下要求。\n输出 nullable_values 的 id、reported_value，缺失数值以-99代替，其他值保持不变，按编号升序。\n输出列名称及顺序：id, reported_value。按题设排序；参考排序键：id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "销售日报里缺失的数值要用 -99 标记，其他值保持原样。",
+      "requirements": "下面的代码想把缺失数值替换成标记值，但标记值不对。请修改代码：输出 id、reported_value，缺失的 value 用 -99 代替，其他值保持不变。\n输出列名称及顺序：id, reported_value。",
       "datasetId": "q0058-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
       "sourceTables": [
         "nullable_values"
       ],
-      "initialCode": "SELECT id,COALESCE(value,0) AS reported_value FROM nullable_values ORDER BY id",
+      "initialCode": "SELECT id,COALESCE(value,0) AS reported_value FROM nullable_values",
       "options": [],
       "acceptedBlanks": [],
       "expectedOutput": {
@@ -984,26 +1009,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT id,COALESCE(value,-99) AS reported_value FROM nullable_values ORDER BY id",
-          "sqliteSql": "SELECT id,COALESCE(value,-99) AS reported_value FROM nullable_values ORDER BY id"
+          "mysqlSql": "SELECT id,COALESCE(value,-99) AS reported_value FROM nullable_values",
+          "sqliteSql": "SELECT id,COALESCE(value,-99) AS reported_value FROM nullable_values"
         },
         {
-          "kind": "关系结构等价",
-          "mysqlSql": "SELECT id,COALESCE(value,-99) AS reported_value FROM (SELECT * FROM nullable_values) AS nullable_values ORDER BY id",
-          "sqliteSql": "SELECT id,COALESCE(value,-99) AS reported_value FROM (SELECT * FROM nullable_values) AS nullable_values ORDER BY id",
-          "explanation": "先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。"
+          "kind": "独立方法等价",
+          "mysqlSql": "SELECT id,CASE WHEN value IS NULL THEN -99 ELSE value END AS reported_value FROM nullable_values",
+          "sqliteSql": "SELECT id,CASE WHEN value IS NULL THEN -99 ELSE value END AS reported_value FROM nullable_values"
         }
       ],
       "hints": [
-        "区分未知、零与空字符串，判断是否需要排除或填补缺失。",
-        "结合《IFNULL 与 COALESCE》：IFNULL 接受两个参数，COALESCE 返回首个非空参数；仅在业务允许时填补缺失。",
-        "检查初始代码的 COALESCE(value,-99) 对应的业务规则。替代标识必须按题目指定，0本身可能是有效值。"
+        "对照题目要求，缺失值应该被替换成什么数？",
+        "COALESCE(列, 替代值) 在列为 NULL 时返回替代值，其余情况返回原值。",
+        "0 本身可能是合法的数据值，用它做标记会和真实的 0 混在一起。"
       ],
-      "explanation": "替代标识必须按题目指定，0本身可能是有效值。\n执行思路：确认nullable_values的输入记录；输出id、reported_value列；遵循题设排序和并列规则。\n公开夹具实际返回 4 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
+      "explanation": "COALESCE(value,-99) 把 NULL 换成指定的标记 -99，已知的值（包括真实的 0）保持不变。初始代码用 0 做替代值，缺失值就和真实的零值分不出来了。\n另一种写法：CASE WHEN value IS NULL THEN -99 ELSE value END。",
       "commonErrors": [
         {
-          "sql": "SELECT id,COALESCE(value,0) AS reported_value FROM nullable_values ORDER BY id",
-          "reason": "替代标识必须按题目指定，0本身可能是有效值。",
+          "sql": "SELECT id,COALESCE(value,0) AS reported_value FROM nullable_values",
+          "reason": "标记值必须按题目指定为 -99；用 0 会让缺失值和真实的 0 无法区分。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -1018,24 +1042,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0058/q0058-public.json",
-          "sha256": "4138738bff0994d4c3e8e923ce3b5b4500c6f95e84710b067ea57a204e9fddc8"
+          "sha256": "e47c9521f693b7d156e721c30aa022143fc5451ae74445eb7f287f221b996a55"
         },
         {
           "id": "q0058-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0058/q0058-boundary.json",
-          "sha256": "0bc0af8810cf4f3ef969447eda2f6d50101adf6e409b684e5f79ac20fe5b8f61"
+          "sha256": "d613c422860668d96bc3968f73fa45d9a2b74a68027ee5afa857db20694bd22d"
         },
         {
           "id": "q0058-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0058/q0058-empty.json",
-          "sha256": "2dc0112f0ed27416b37a8348a2defc63453577496a5ac2e4c371234aa3f4284a"
+          "sha256": "86cc7a8ca2b21b6abc219b5546e1864423451e7e4c87da09c00e691fd4765637"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -1054,7 +1078,7 @@
       "mysqlVerification": "未运行 MySQL 8.4",
       "validation": {
         "kind": "query",
-        "equivalentKind": "关系结构等价",
+        "equivalentKind": "独立方法等价",
         "fixtures": [
           {
             "fixtureId": "q0058-public",
@@ -1139,15 +1163,15 @@
       "difficulty": "简单",
       "type": "代码填空",
       "title": "包含未知值的排除条件",
-      "context": "使用课程中小型缺失值示例数据练习包含未知值的排除条件。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "补全代码中的一个空位，使完整SQL满足以下要求。可输入具有相同语义的片段，提交后按完整代码执行结果核对。\n保留 value 不等于10的已知值和未知值，输出 id、value，按编号升序。\n输出列名称及顺序：id, value。按题设排序；参考排序键：id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "筛选“不等于 10”的记录时，缺失值是否保留需要特别处理。",
+      "requirements": "补全空位，保留 value 不等于 10 的记录，包括 value 缺失（NULL）的记录，输出 id、value。\n输出列名称及顺序：id, value。",
       "datasetId": "q0059-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
       "sourceTables": [
         "nullable_values"
       ],
-      "initialCode": "SELECT id,value FROM nullable_values WHERE value<>10{{blank1}} ORDER BY id",
+      "initialCode": "SELECT id,value FROM nullable_values WHERE value<>10{{blank1}}",
       "options": [],
       "acceptedBlanks": [
         {
@@ -1179,26 +1203,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT id,value FROM nullable_values WHERE value<>10 OR value IS NULL ORDER BY id",
-          "sqliteSql": "SELECT id,value FROM nullable_values WHERE value<>10 OR value IS NULL ORDER BY id"
+          "mysqlSql": "SELECT id,value FROM nullable_values WHERE value<>10 OR value IS NULL",
+          "sqliteSql": "SELECT id,value FROM nullable_values WHERE value<>10 OR value IS NULL"
         },
         {
           "kind": "代数或函数等价",
-          "mysqlSql": "SELECT id,value FROM nullable_values WHERE NOT (value=10) OR value IS NULL ORDER BY id",
-          "sqliteSql": "SELECT id,value FROM nullable_values WHERE NOT (value=10) OR value IS NULL ORDER BY id",
-          "explanation": "用反向比较并取 NOT 表达相同三值逻辑。"
+          "mysqlSql": "SELECT id,value FROM nullable_values WHERE value IS NULL OR value<>10",
+          "sqliteSql": "SELECT id,value FROM nullable_values WHERE value IS NULL OR value<>10"
         }
       ],
       "hints": [
-        "区分未知、零与空字符串，判断是否需要排除或填补缺失。",
-        "结合《IS NULL 与三值逻辑》：比较未知值通常返回 UNKNOWN，WHERE 只保留 TRUE；IS NULL 专门检测缺失。",
-        "回想空位所在子句的功能：IS NULL 与三值逻辑；保留周围代码，填入实现题设的表达式。"
+        "value<>10 遇到 NULL 时结果是未知，而不是真。",
+        "WHERE 只保留结果为真的行，所以 NULL 默认会被过滤掉。",
+        "想保留缺失值，需要把“值缺失”这个条件单独补进来，并与原条件用合适的逻辑运算符连接。"
       ],
-      "explanation": "不等于在缺失值上为未知，必须明确补入 NULL。\n执行思路：确认nullable_values的输入记录；按筛选条件保留符合要求的记录，并考虑空值；输出id、value列；遵循题设排序和并列规则。\n公开夹具实际返回 2 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：用反向比较并取 NOT 表达相同三值逻辑。",
+      "explanation": "value<>10 遇到 NULL 得到的是未知，WHERE 会丢掉这些行；题目要求保留缺失值，所以要补上 OR value IS NULL。不补的话，所有 value 为 NULL 的记录都会漏掉。",
       "commonErrors": [
         {
-          "sql": "SELECT id,value FROM nullable_values WHERE value<>10 ORDER BY id",
-          "reason": "不等于在缺失值上为未知，必须明确补入 NULL。",
+          "sql": "SELECT id,value FROM nullable_values WHERE value<>10",
+          "reason": "不等于在 NULL 上结果为未知，缺失值被过滤掉了，必须明确补入 IS NULL。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -1213,24 +1236,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0059/q0059-public.json",
-          "sha256": "8795fd067941581f705830c637fd467faea506da1117e944402a95e22937b60e"
+          "sha256": "e2ade2df9c7198f524f3725d9609faaa9482281f81e703524b47cd47dd7365f1"
         },
         {
           "id": "q0059-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0059/q0059-boundary.json",
-          "sha256": "90d643c2de7efb504357351dc189df57ddd9213f6b784d0b74714f82c2b8b87e"
+          "sha256": "ee538b4d1d78015fa9196674b4978bcf9a882a9e6828722133e463af2c946dc8"
         },
         {
           "id": "q0059-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0059/q0059-empty.json",
-          "sha256": "afd5088dce2569b6156f020eeedd2e95a0136356ebd294ca0e32e4ec94d9e4ec"
+          "sha256": "48e09e9b2c6729d5326a7b1fcb9e3dfe0d56748f313e2de573e83da1ba5d150c"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -1338,8 +1361,8 @@
       "difficulty": "简单",
       "type": "独立编写",
       "title": "优先选备注后选缺省",
-      "context": "使用课程中小型缺失值示例数据练习优先选备注后选缺省。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "编写 SQL，完成以下查询要求。\n输出 id、label：先选非空且非空串 note，否则输出“无信息”，按编号升序。\n输出列名称及顺序：id, label。按题设排序；参考排序键：id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "客户备注里有 NULL，也有空字符串，展示时都要换成统一的提示文字。",
+      "requirements": "输出 id 和 label：note 有实际内容时显示 note，note 为 NULL 或空字符串时显示“无信息”。\n输出列名称及顺序：id, label。",
       "datasetId": "q0060-lesson",
       "schemaVersion": 3,
       "contentVersion": "4.2.2",
@@ -1378,26 +1401,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT id,COALESCE(NULLIF(note,''),'无信息') AS label FROM nullable_values ORDER BY id",
-          "sqliteSql": "SELECT id,COALESCE(NULLIF(note,''),'无信息') AS label FROM nullable_values ORDER BY id"
+          "mysqlSql": "SELECT id,COALESCE(NULLIF(note,''),'无信息') AS label FROM nullable_values",
+          "sqliteSql": "SELECT id,COALESCE(NULLIF(note,''),'无信息') AS label FROM nullable_values"
         },
         {
-          "kind": "关系结构等价",
-          "mysqlSql": "SELECT id,COALESCE(NULLIF(note,''),'无信息') AS label FROM (SELECT * FROM nullable_values) AS nullable_values ORDER BY id",
-          "sqliteSql": "SELECT id,COALESCE(NULLIF(note,''),'无信息') AS label FROM (SELECT * FROM nullable_values) AS nullable_values ORDER BY id",
-          "explanation": "先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。"
+          "kind": "独立方法等价",
+          "mysqlSql": "SELECT id,CASE WHEN note IS NULL OR note='' THEN '无信息' ELSE note END AS label FROM nullable_values",
+          "sqliteSql": "SELECT id,CASE WHEN note IS NULL OR note='' THEN '无信息' ELSE note END AS label FROM nullable_values"
         }
       ],
       "hints": [
-        "区分未知、零与空字符串，判断是否需要排除或填补缺失。",
-        "结合《IFNULL 与 COALESCE》：IFNULL 接受两个参数，COALESCE 返回首个非空参数；仅在业务允许时填补缺失。",
-        "按题设编写投影、筛选及分组，使用运行检查列名、NULL、重复记录和排序。"
+        "两种“没有内容”（NULL 和空字符串）都要被识别为需要替换的情况。",
+        "NULLIF(a, b) 在 a 等于 b 时返回 NULL；COALESCE 取第一个非 NULL 的值，两者可以组合。",
+        "先把空字符串变成 NULL，再给 NULL 指定替代文字。"
       ],
-      "explanation": "将空串先转换为NULL后才可以统一默认文字。\n执行思路：确认nullable_values的输入记录；输出id、label列；遵循题设排序和并列规则。\n公开夹具实际返回 4 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
+      "explanation": "NULLIF(note,'') 先把空字符串转成 NULL，COALESCE(…,'无信息') 再把所有 NULL 换成提示文字，两类“无内容”就都处理到了。\n易错：只写 COALESCE(note,'无信息') 只会替换 NULL，空字符串会原样保留。\n另一种写法：CASE WHEN note IS NULL OR note='' THEN '无信息' ELSE note END。",
       "commonErrors": [
         {
-          "sql": "SELECT id,COALESCE(note,'无信息') AS label FROM nullable_values ORDER BY id",
-          "reason": "将空串先转换为NULL后才可以统一默认文字。",
+          "sql": "SELECT id,COALESCE(note,'无信息') AS label FROM nullable_values",
+          "reason": "只替换 NULL 不会处理空字符串，需要先用 NULLIF 把空字符串转成 NULL。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -1412,24 +1434,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0060/q0060-public.json",
-          "sha256": "b60dba99b24e5214fd0c55b3d8b07f6d80f85496a51c8b6c470148c859dd3f64"
+          "sha256": "69aaa4da700f84416430696befe8c6128f944ee9ee586a3bb5520f585f13d787"
         },
         {
           "id": "q0060-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0060/q0060-boundary.json",
-          "sha256": "ae8879fbf7bc4b9f95134424ff7b6756e009e6e2bccff61ef30dfbd5a5722cc8"
+          "sha256": "2b3226a1e6fb2d2e5d1b68ea98714f221524c3fb54840cf3c9fc9ec7ab08bb16"
         },
         {
           "id": "q0060-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0060/q0060-empty.json",
-          "sha256": "7aaa3a45a7b4564c4be026c3a746f854ee9bac165eb202abc7e87f25edb81077"
+          "sha256": "9baa0fcfb44bf9c31ec0161b1d56573a9efc76ed2203940195e620c96ecc622a"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -1448,7 +1470,7 @@
       "mysqlVerification": "未运行 MySQL 8.4",
       "validation": {
         "kind": "query",
-        "equivalentKind": "关系结构等价",
+        "equivalentKind": "独立方法等价",
         "fixtures": [
           {
             "fixtureId": "q0060-public",

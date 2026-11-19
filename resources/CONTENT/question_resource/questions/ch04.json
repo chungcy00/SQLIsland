@@ -17,8 +17,8 @@
       "difficulty": "入门",
       "type": "独立编写",
       "title": "分页第二页",
-      "context": "使用课程中小型订单数据练习分页第二页。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "每页2条，按 id 升序输出 orders 的 id、sales，第2页。\n输出列名称及顺序：id, sales。按题设排序；参考排序键：id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "后台订单列表每页显示 2 条，需要取出第二页的内容。",
+      "requirements": "订单按 id 从小到大排列，每页 2 条，取第 2 页的 id、sales。\n输出列名称及顺序：id, sales。",
       "datasetId": "q0043-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -53,22 +53,21 @@
           "sqliteSql": "SELECT id,sales FROM orders ORDER BY id LIMIT 2 OFFSET 2"
         },
         {
-          "kind": "关系结构等价",
-          "mysqlSql": "WITH ranked_input AS (SELECT *,ROW_NUMBER() OVER(ORDER BY id) AS row_pos FROM orders ) SELECT id,sales FROM ranked_input WHERE row_pos>2 AND row_pos<=4 ORDER BY row_pos",
-          "sqliteSql": "WITH ranked_input AS (SELECT *,ROW_NUMBER() OVER(ORDER BY id) AS row_pos FROM orders ) SELECT id,sales FROM ranked_input WHERE row_pos>2 AND row_pos<=4 ORDER BY row_pos",
-          "explanation": "使用相同排序生成行号，再映射分页起止行。"
+          "kind": "代数或函数等价",
+          "mysqlSql": "SELECT id,sales FROM orders ORDER BY id LIMIT 2, 2",
+          "sqliteSql": "SELECT id,sales FROM orders ORDER BY id LIMIT 2, 2"
         }
       ],
       "hints": [
-        "先确定主排序键和并列决胜键，再考虑需要保留的行段。",
-        "结合《LIMIT 与 OFFSET》：LIMIT 控制最多返回多少行；OFFSET 跳过前几行。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT id,sales FROM orders ORDER BY id LIMIT 2 □□□"
+        "分页前必须先固定排序，否则“第几页”没有意义。",
+        "LIMIT 控制本页返回几行，OFFSET 控制先跳过几行；第 n 页要跳过前面 (n-1) 页的全部行。",
+        "每页 2 条、取第 2 页，需要跳过的行数恰好是一整页。"
       ],
-      "explanation": "第二页应跳过第一页完整的两条记录。\n执行思路：确认orders的输入记录；输出id、sales列；遵循题设排序和并列规则；按指定范围截取记录。\n公开夹具实际返回 2 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：使用相同排序生成行号，再映射分页起止行。",
+      "explanation": "先 ORDER BY id 固定顺序，再用 LIMIT 2 OFFSET 2：跳过第一页的 2 行，返回接下来的 2 行。不写 ORDER BY 时，返回哪些行取决于数据的存放顺序，分页结果不可靠。\n易错：OFFSET 1 只跳过 1 行，得到的是把第一页向后挪一行，并不是第二页。\n另一种写法：MySQL 支持 LIMIT 2, 2（先写跳过的行数，再写返回的行数），含义相同。",
       "commonErrors": [
         {
           "sql": "SELECT id,sales FROM orders ORDER BY id LIMIT 2 OFFSET 1",
-          "reason": "第二页应跳过第一页完整的两条记录。",
+          "reason": "第二页应跳过第一页完整的两条记录，OFFSET 1 只跳过了一条。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -83,14 +82,14 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0043/q0043-public.json",
-          "sha256": "391cd1831a7784b4f2e00ee9371be08aaa71644c5dd0dbde16e5c15570d0d671"
+          "sha256": "41dbdfec6274258aa9c424109b6dabe9256b1464a3a011da96bfc767a8bedda2"
         },
         {
           "id": "q0043-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0043/q0043-boundary.json",
-          "sha256": "2593ff63e5fa0f20a2cfbc2059b38a7fbbb04a5a6266378177dcc6f3799c37ec"
+          "sha256": "4dba67976ca967a8d6a96d0c359adc3392a6e7c3ad08118e0813f1fbb339d5a9"
         },
         {
           "id": "q0043-empty",
@@ -119,7 +118,7 @@
       "mysqlVerification": "未运行 MySQL 8.4",
       "validation": {
         "kind": "query",
-        "equivalentKind": "关系结构等价",
+        "equivalentKind": "代数或函数等价",
         "fixtures": [
           {
             "fixtureId": "q0043-public",

@@ -1,0 +1,135 @@
+{
+  "visibility": "hidden",
+  "variant": "extra",
+  "kind": "query",
+  "tables": [
+    {
+      "name": "products",
+      "columns": [
+        {
+          "name": "product_id",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "product_name",
+          "type": "TEXT",
+          "mysqlType": "VARCHAR(160) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_bin",
+          "sqliteType": "TEXT"
+        },
+        {
+          "name": "category",
+          "type": "TEXT",
+          "mysqlType": "VARCHAR(160) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_bin",
+          "sqliteType": "TEXT"
+        },
+        {
+          "name": "price",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "stock",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        }
+      ],
+      "rows": [
+        [
+          51,
+          "A_B",
+          "护肤品",
+          10,
+          10
+        ],
+        [
+          52,
+          "_lead",
+          "日用品",
+          20,
+          5
+        ],
+        [
+          53,
+          "tail_",
+          "日用品",
+          30,
+          0
+        ],
+        [
+          54,
+          "plain",
+          "护肤品",
+          15,
+          12
+        ],
+        [
+          55,
+          "AxB",
+          "化妆品",
+          40,
+          3
+        ],
+        [
+          56,
+          "A%B",
+          "化妆品",
+          50,
+          4
+        ],
+        [
+          57,
+          null,
+          "日用品",
+          60,
+          6
+        ],
+        [
+          58,
+          "x_y_z",
+          "护肤品",
+          70,
+          7
+        ]
+      ]
+    }
+  ],
+  "id": "q0041-extra",
+  "questionId": "q0041",
+  "datasetId": "q0041-lesson",
+  "orderPolicy": "unordered_multiset",
+  "columnPolicy": "exact_names_in_order",
+  "numericTolerance": {
+    "absolute": 1e-06,
+    "integerExact": true,
+    "textExact": true,
+    "nullDistinct": true
+  },
+  "expected": {
+    "columns": [
+      "product_id",
+      "product_name"
+    ],
+    "rows": [
+      [
+        51,
+        "A_B"
+      ],
+      [
+        52,
+        "_lead"
+      ],
+      [
+        53,
+        "tail_"
+      ],
+      [
+        58,
+        "x_y_z"
+      ]
+    ]
+  }
+}

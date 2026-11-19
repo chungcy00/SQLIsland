@@ -20,9 +20,9 @@ try{
   const structure=await page.locator('[data-lesson-section=example]').evaluate(n=>{
    const children=[...n.children];return {d:children.findIndex(n=>n.matches('.lesson-demand')),m:children.findIndex(n=>n.matches('.lesson-method')),b:children.findIndex(n=>n.matches('.lesson-breakdown')),c:children.findIndex(n=>n.matches('.lesson-complete-code')),e:children.findIndex(n=>n.matches('.lesson-expected')),x:children.findIndex(n=>n.matches('.lesson-extension'))};
   });
-  assert.ok(structure.d<structure.m&&structure.m<structure.b&&structure.b<structure.c&&structure.c<structure.e,lesson.id);
-  if(structure.x>=0)assert.ok(structure.e<structure.x,lesson.id);
-  assert.equal(await full.locator('pre').evaluate(n=>n.nextElementSibling?.dataset.action),'lessonRun');
+  assert.ok(structure.d<structure.m&&structure.m<structure.b&&structure.b<structure.c,lesson.id);
+  if(structure.x>=0)assert.ok(structure.c<structure.x,lesson.id);
+  assert.equal(await full.locator('pre').first().evaluate(n=>n.closest('.code-block').nextElementSibling?.dataset.action),'lessonRun');
   assert.equal(await page.locator('.lesson-extension[open]').count(),0);
   assert.equal(await page.locator('#lesson-result table').count(),0);
   await full.locator('[data-action=lessonRun]').click();

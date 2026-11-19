@@ -1,3 +1,0 @@
-11-18 00:11:32.818  4145  4213 E chromium: [ERROR:backing_store.cc(195)] Failed to open LevelDB database from /data/user/0/cn.sqlstudy.offline/app_webview/Default/IndexedDB/https_app.sqlshouji.local_0.indexeddb.leveldb,Corruption: missing start of fragmented record(2)
-11-18 00:11:32.818  4145  4213 E chromium: [ERROR:bucket_context.cc(1072)] Got corruption for { origin: https://app.sqlshouji.local, top-level site: https://sqlshouji.local, nonce: <null>, ancestor chain bit: Same-Site }, missing start of fragmented record
-11-18 00:11:32.824  4145  4213 E chromium: [ERROR:backing_store.cc(1500)] IndexedDB recovering from a corrupted (and deleted) database.

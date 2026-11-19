@@ -25,6 +25,7 @@ await build({
   external: ["fs", "path", "crypto"],
   target: "chrome80",
   minify: false,
+  loader: { ".svg": "text" }, // 首页数据岛内联 milestone.svg
 });
 await cp("src/index.html", "dist/index.html");
 await cp("src/style.css", "dist/style.css");

@@ -1,9 +1,0 @@
-{
-  "pass": true,
-  "sourceCommit": "9acc256",
-  "cleanInstall": true,
-  "build": true,
-  "testsPassed": 12,
-  "offlineFilesMatchApk": 1151,
-  "contentManifestFilesVerified": 2480
-}

@@ -212,7 +212,7 @@
       "type": "独立编写",
       "title": "门店订单明细摘录",
       "context": "使用课程中小型订单数据练习门店订单明细摘录。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "输出 orders 的 id、store_id、order_date，按 id 升序。\n输出列名称及顺序：id, store_id, order_date。按题设排序；参考排序键：id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "requirements": "输出 orders 的 id、store_id、order_date，先按 order_date 降序（日期新的在前），日期相同再按 id 升序。\n输出列名称及顺序：id, store_id, order_date。按题设排序；参考排序键：order_date DESC, id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
       "datasetId": "q0011-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -231,19 +231,9 @@
         ],
         "rows": [
           [
+            5,
             1,
-            1,
-            "2026-01-03"
-          ],
-          [
-            2,
-            2,
-            "2026-01-10"
-          ],
-          [
-            3,
-            1,
-            "2026-02-02"
+            "2026-02-20"
           ],
           [
             4,
@@ -251,9 +241,19 @@
             "2026-02-15"
           ],
           [
-            5,
+            3,
             1,
-            "2026-02-20"
+            "2026-02-02"
+          ],
+          [
+            2,
+            2,
+            "2026-01-10"
+          ],
+          [
+            1,
+            1,
+            "2026-01-03"
           ]
         ],
         "rowCount": 5
@@ -261,25 +261,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT id,store_id,order_date FROM orders ORDER BY id",
-          "sqliteSql": "SELECT id,store_id,order_date FROM orders ORDER BY id"
+          "mysqlSql": "SELECT id,store_id,order_date FROM orders ORDER BY order_date DESC, id",
+          "sqliteSql": "SELECT id,store_id,order_date FROM orders ORDER BY order_date DESC, id"
         },
         {
           "kind": "关系结构等价",
-          "mysqlSql": "SELECT id,store_id,order_date FROM (SELECT * FROM orders) AS orders ORDER BY id",
-          "sqliteSql": "SELECT id,store_id,order_date FROM (SELECT * FROM orders) AS orders ORDER BY id",
+          "mysqlSql": "SELECT id,store_id,order_date FROM (SELECT * FROM orders) AS orders ORDER BY order_date DESC, id",
+          "sqliteSql": "SELECT id,store_id,order_date FROM (SELECT * FROM orders) AS orders ORDER BY order_date DESC, id",
           "explanation": "先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。"
         }
       ],
       "hints": [
         "明确结果需要哪些输入字段，以及是否保留原始行的重复。",
-        "结合《SELECT 与 FROM》：SELECT 指定输出表达式，FROM 指定输入关系；查询不修改源表。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT id,□□□ FROM orders ORDER BY id"
+        "结合《SELECT 与 FROM》：SELECT 指定输出表达式，FROM 指定输入关系；排序用 ORDER BY，DESC 表示降序，多个排序键用逗号分隔，前一个键相同时才看下一个。",
+        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT id,□□□ FROM orders ORDER BY □□□ DESC, □□"
       ],
-      "explanation": "门店键与客户键不同，不应混淆。\n执行思路：确认orders的输入记录；输出id、store_id、order_date列；遵循题设排序和并列规则。\n公开夹具实际返回 5 行、3 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
+      "explanation": "门店键与客户键不同，不应混淆。\n执行思路：确认orders的输入记录；输出id、store_id、order_date列；先按order_date降序，日期相同再按id升序。\n公开夹具实际返回 5 行、3 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、排序；保持结果语义。",
       "commonErrors": [
         {
-          "sql": "SELECT id,customer_id,order_date FROM orders ORDER BY id",
+          "sql": "SELECT id,customer_id,order_date FROM orders ORDER BY order_date DESC, id",
           "reason": "门店键与客户键不同，不应混淆。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
@@ -338,19 +338,19 @@
             "reference": {
               "ran": true,
               "match": true,
-              "resultHash": "43a09af86c3433662239f7732c001faf49714664599d2c31318edd1e0c99ab15",
+              "resultHash": "4c0d5f9b1dc8067a48676a0e2941662805ea345851e665e99c7e74f4a90f7d84",
               "rowCount": 5
             },
             "equivalent": {
               "ran": true,
               "match": true,
-              "resultHash": "43a09af86c3433662239f7732c001faf49714664599d2c31318edd1e0c99ab15",
+              "resultHash": "4c0d5f9b1dc8067a48676a0e2941662805ea345851e665e99c7e74f4a90f7d84",
               "rows": 5
             },
             "wrong": {
               "ran": true,
               "match": false,
-              "resultHash": "54e94d5810ab1bb6472786109261eca72dbc2c53eb0139fc9ab3faf5a8069ea6",
+              "resultHash": "505c022639aaecd363cbc8aeb48dc896cd23f38193c979971b651d2b7b6aae6f",
               "rows": 5
             }
           },
@@ -359,19 +359,19 @@
             "reference": {
               "ran": true,
               "match": true,
-              "resultHash": "390d0289d7f3b419dd2763270c025c733bd67eeb648e379b435803419ee9804c",
+              "resultHash": "066b7eaa8f88efc698fe51a095f8e3c3b9e817506acab8daf93af2ae3e131f72",
               "rowCount": 13
             },
             "equivalent": {
               "ran": true,
               "match": true,
-              "resultHash": "390d0289d7f3b419dd2763270c025c733bd67eeb648e379b435803419ee9804c",
+              "resultHash": "066b7eaa8f88efc698fe51a095f8e3c3b9e817506acab8daf93af2ae3e131f72",
               "rows": 13
             },
             "wrong": {
               "ran": true,
               "match": false,
-              "resultHash": "67fd5558c039450b7b352a66129291d0ce8f28be2f10eeedb9770f3299315248",
+              "resultHash": "e62cdcd89816dc5b071c3f2471ab95251f29e652763eb48f6e0e7dd209a279fa",
               "rows": 13
             }
           },
@@ -391,7 +391,7 @@
             },
             "wrong": {
               "ran": true,
-              "match": false,
+              "match": true,
               "resultHash": "abff33bad4fff075cb66c5747682c403db1ec5506392012d76c710c671d58b67",
               "rows": 0
             }
@@ -937,15 +937,15 @@
       "difficulty": "入门",
       "type": "代码填空",
       "title": "推算员工年基础薪资",
-      "context": "使用课程中小型员工数据练习推算员工年基础薪资。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "补全代码中的一个空位，使完整SQL满足以下要求。可输入具有相同语义的片段，提交后按完整代码执行结果核对。\n月薪 salary 乘12，不计奖金；输出 employee_id、annual_salary 按编号升序。\n输出列名称及顺序：employee_id, annual_salary。按题设排序；参考排序键：employee_id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "人事部门需要为每位员工估算一年的基础薪资，用于预算。",
+      "requirements": "补全空位，计算每位员工的年基础薪资：月薪 salary 乘以 12，不含奖金，列别名 annual_salary。\n输出列名称及顺序：employee_id, annual_salary。",
       "datasetId": "q0017-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
       "sourceTables": [
         "employees"
       ],
-      "initialCode": "SELECT employee_id,{{blank1}} AS annual_salary FROM employees ORDER BY employee_id",
+      "initialCode": "SELECT employee_id,{{blank1}} AS annual_salary FROM employees",
       "options": [],
       "acceptedBlanks": [
         {
@@ -985,26 +985,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT employee_id,salary*12 AS annual_salary FROM employees ORDER BY employee_id",
-          "sqliteSql": "SELECT employee_id,salary*12 AS annual_salary FROM employees ORDER BY employee_id"
+          "mysqlSql": "SELECT employee_id,salary*12 AS annual_salary FROM employees",
+          "sqliteSql": "SELECT employee_id,salary*12 AS annual_salary FROM employees"
         },
         {
-          "kind": "关系结构等价",
-          "mysqlSql": "SELECT employee_id,salary*12 AS annual_salary FROM (SELECT * FROM employees) AS employees ORDER BY employee_id",
-          "sqliteSql": "SELECT employee_id,salary*12 AS annual_salary FROM (SELECT * FROM employees) AS employees ORDER BY employee_id",
-          "explanation": "先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。"
+          "kind": "代数或函数等价",
+          "mysqlSql": "SELECT employee_id,12*salary AS annual_salary FROM employees",
+          "sqliteSql": "SELECT employee_id,12*salary AS annual_salary FROM employees"
         }
       ],
       "hints": [
-        "明确结果需要哪些输入字段，以及是否保留原始行的重复。",
-        "结合《表达式与 AS 别名》：可在查询时计算派生字段；AS 为输出列命名，不更改数据表定义。",
-        "回想空位所在子句的功能：表达式与 AS 别名；保留周围代码，填入实现题设的表达式。"
+        "年薪需要由月薪推算，先确定参与计算的是哪一列。",
+        "SELECT 后面可以直接写算术表达式，并用 AS 给结果列命名；表达式只改变查询结果，不会修改表中的数据。",
+        "月薪和月数之间是乘法关系；填写后确认输出列名与题目一致。"
       ],
-      "explanation": "月薪与月份相乘，不是相加。\n执行思路：确认employees的输入记录；输出employee_id、annual_salary列；遵循题设排序和并列规则。\n公开夹具实际返回 4 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
+      "explanation": "年薪 = 月薪 × 12，所以空位里写 salary*12。表达式会在每一行上单独计算，AS annual_salary 只是给结果列命名，不会改动 employees 表。\n易错：把乘号写成加号，得到的是“月薪加 12”，数值会明显偏小。",
       "commonErrors": [
         {
-          "sql": "SELECT employee_id,salary+12 AS annual_salary FROM employees ORDER BY employee_id",
-          "reason": "月薪与月份相乘，不是相加。",
+          "sql": "SELECT employee_id,salary+12 AS annual_salary FROM employees",
+          "reason": "把乘法写成了加法：月薪加 12 并不是年薪。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -1019,24 +1018,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0017/q0017-public.json",
-          "sha256": "b647dc2a9de0c8f8d8b5b0735bb3a4a611131b85f356336ed55bf6601c7e7468"
+          "sha256": "9cba5a93455852e77bc3331b67c13607c0fbd79acb1d7866b7f325957546460d"
         },
         {
           "id": "q0017-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0017/q0017-boundary.json",
-          "sha256": "a9c1acbc9794f291cdfba477a4ae5f7e58c9adcf59e8f4e140a4b2c7f7c44229"
+          "sha256": "94d5c842731cad20337fa1b4d4d7745c33614dd6bfc1ea38df524b0c37bd9cff"
         },
         {
           "id": "q0017-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0017/q0017-empty.json",
-          "sha256": "39dd92194439cdfc3f7310f021a234f2ed4e61150c73618a7bb886a41fece9fe"
+          "sha256": "1e1473710efa0806ab1747e7799e8cf752f3339789769713ad7ec67fec0bad15"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -1055,7 +1054,7 @@
       "mysqlVerification": "未运行 MySQL 8.4",
       "validation": {
         "kind": "query",
-        "equivalentKind": "关系结构等价",
+        "equivalentKind": "代数或函数等价",
         "fixtures": [
           {
             "fixtureId": "q0017-public",
@@ -1144,15 +1143,15 @@
       "difficulty": "入门",
       "type": "代码纠错",
       "title": "每件商品折扣后报价",
-      "context": "使用课程中小型商品数据练习每件商品折扣后报价。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "下面提供的初始代码存在逻辑、语法或结构错误。请修改整段代码，使其满足以下要求。\n输出 product_id 和打八折后的 price*0.8，保留两位小数并命名 offer_price，按编号升序。\n输出列名称及顺序：product_id, offer_price。按题设排序；参考排序键：product_id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "商品部准备做八折促销，需要列出每件商品的促销价。",
+      "requirements": "下面的代码想计算八折促销价，但结果不对。请修改代码：输出 product_id 和打八折后的价格（保留两位小数，列别名 offer_price）。\n输出列名称及顺序：product_id, offer_price。",
       "datasetId": "q0018-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
       "sourceTables": [
         "products"
       ],
-      "initialCode": "SELECT product_id,ROUND(price*0.2,2) AS offer_price FROM products ORDER BY product_id",
+      "initialCode": "SELECT product_id,ROUND(price*0.2,2) AS offer_price FROM products",
       "options": [],
       "acceptedBlanks": [],
       "expectedOutput": {
@@ -1192,26 +1191,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT product_id,ROUND(price*0.8,2) AS offer_price FROM products ORDER BY product_id",
-          "sqliteSql": "SELECT product_id,ROUND(price*0.8,2) AS offer_price FROM products ORDER BY product_id"
+          "mysqlSql": "SELECT product_id,ROUND(price*0.8,2) AS offer_price FROM products",
+          "sqliteSql": "SELECT product_id,ROUND(price*0.8,2) AS offer_price FROM products"
         },
         {
-          "kind": "关系结构等价",
-          "mysqlSql": "SELECT product_id,ROUND(price*0.8,2) AS offer_price FROM (SELECT * FROM products) AS products ORDER BY product_id",
-          "sqliteSql": "SELECT product_id,ROUND(price*0.8,2) AS offer_price FROM (SELECT * FROM products) AS products ORDER BY product_id",
-          "explanation": "先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。"
+          "kind": "代数或函数等价",
+          "mysqlSql": "SELECT product_id,ROUND(0.8*price,2) AS offer_price FROM products",
+          "sqliteSql": "SELECT product_id,ROUND(0.8*price,2) AS offer_price FROM products"
         }
       ],
       "hints": [
-        "明确结果需要哪些输入字段，以及是否保留原始行的重复。",
-        "结合《表达式与 AS 别名》：可在查询时计算派生字段；AS 为输出列命名，不更改数据表定义。",
-        "检查初始代码的 0.8 对应的业务规则。打八折是支付原价的80%，不是20%。"
+        "先想一想：打八折，顾客实际要付原价的百分之几？",
+        "ROUND(数值, 2) 保留两位小数；检查括号里的乘数是否对应上面的比例。",
+        "拿初始代码的结果和 price 对比：折后价应当比原价低一些，而不是只剩一小部分。"
       ],
-      "explanation": "打八折是支付原价的80%，不是20%。\n执行思路：确认products的输入记录；输出product_id、offer_price列；遵循题设排序和并列规则。\n公开夹具实际返回 6 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
+      "explanation": "打八折表示按原价的 80% 收费，折后价是 price*0.8。初始代码乘的是 0.2，相当于打两折。ROUND(…,2) 负责保留两位小数，列别名要与题目要求完全一致。",
       "commonErrors": [
         {
-          "sql": "SELECT product_id,ROUND(price*0.2,2) AS offer_price FROM products ORDER BY product_id",
-          "reason": "打八折是支付原价的80%，不是20%。",
+          "sql": "SELECT product_id,ROUND(price*0.2,2) AS offer_price FROM products",
+          "reason": "打八折是原价的 80%，乘 0.2 得到的是打两折的价格。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -1226,24 +1224,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0018/q0018-public.json",
-          "sha256": "0992dd35c7dad97dc6e8ed691c1738b6d44852966750d90878357b6ed49d06bd"
+          "sha256": "59ae295ade105039bc82d4bbfb89e384499d30187da56a3dceb421691fbca40c"
         },
         {
           "id": "q0018-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0018/q0018-boundary.json",
-          "sha256": "c05671d7f91264d48d36a7a919f6713298e35bda751971403b1abe6e6d90ace6"
+          "sha256": "faab6fddf7069f8a02d7f6e4e7d06e9ea0e1447714840cc8ffd2ea7c82e4938a"
         },
         {
           "id": "q0018-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0018/q0018-empty.json",
-          "sha256": "e5d312c68c21d5e6c2b20f3d62985066ae112c68aedcd4e8cf01520e19955d93"
+          "sha256": "e29b04021a495c1206b501c029dabc7cdded937be1453ef7a7d8c5c01afd1b38"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -1262,7 +1260,7 @@
       "mysqlVerification": "未运行 MySQL 8.4",
       "validation": {
         "kind": "query",
-        "equivalentKind": "关系结构等价",
+        "equivalentKind": "代数或函数等价",
         "fixtures": [
           {
             "fixtureId": "q0018-public",

@@ -36,25 +36,25 @@
       "id": "ch02",
       "path": "questions/ch02.json",
       "count": 8,
-      "sha256": "aae1de68256e7add0671b160a1a0b4a5c8b6da12d7a73fbd50acd5e0786243c9"
+      "sha256": "f2721356da424d4fc85c9e5580fb1ded2091e42845af634ff9505cfe510516c8"
     },
     {
       "id": "ch03",
       "path": "questions/ch03.json",
       "count": 14,
-      "sha256": "eb7ff369b3387c57011442d2c5b48a8a6f5bd33abab4f8f6ff1fceecfbb5cb13"
+      "sha256": "c1e1a2c29de787fbb00b1b51714bb322613abda3dc6cbb593c663effa33ffd28"
     },
     {
       "id": "ch04",
       "path": "questions/ch04.json",
       "count": 6,
-      "sha256": "7fa197aa34685326eb245c21eb54638cf868e49813bc9467e7daa3bdeed788bb"
+      "sha256": "c3e7913c2d076adec421716113a77ed070cf61c29741d0135ba03366de8cc166"
     },
     {
       "id": "ch05",
       "path": "questions/ch05.json",
       "count": 8,
-      "sha256": "7af3202345dd94c534bb96f6b975ad8a2ed642c899ba63fc79b210050b57b005"
+      "sha256": "fe3c4464e86e591ea425a9c77f6bae5aa8fadf381aff2bb7b2aa83d822adfc1e"
     },
     {
       "id": "ch06",
@@ -66,7 +66,7 @@
       "id": "ch07",
       "path": "questions/ch07.json",
       "count": 14,
-      "sha256": "b4319abb73058a8018836088c706157f38aae7323b2442c91e55fade162c3c24"
+      "sha256": "2399442b69fb8324186a816f7e341764b5e4fdd937ce9dc13d023f74f14ad1cf"
     },
     {
       "id": "ch08",

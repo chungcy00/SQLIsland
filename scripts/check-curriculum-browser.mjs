@@ -62,40 +62,22 @@ try {
   await page.locator('[data-action=hint]').click();
   assert.equal(await page.locator('#sql-editor').inputValue(), '');
 
+  // B5（用户修改 2026-11-20）：上一题/下一题位于页面内容末尾，不再固定在屏幕底部
   for (const width of [320,390,975]) {
     await page.setViewportSize({width,height:844});
     const footer = page.locator('.quiz-details .sequence-actions');
     await page.evaluate(() => window.scrollTo(0, 0));
-    assert.equal(await footer.evaluate(node => getComputedStyle(node).position), 'fixed');
-    assert.equal(await footer.evaluate(node => getComputedStyle(node).borderTopWidth), '0px');
+    assert.equal(await footer.evaluate(node => getComputedStyle(node).position), 'static');
     assert.equal(await footer.evaluate(node => getComputedStyle(node).backgroundColor), 'rgba(0, 0, 0, 0)');
+    assert.equal(await footer.evaluate(node => node === node.parentElement.lastElementChild), true);
     const firstButton = await footer.locator('button').first().boundingBox();
     const question = await page.locator('.quiz-details').boundingBox();
     assert.ok(Math.abs(firstButton.x - question.x) <= 1);
-    const atTop = await footer.boundingBox();
-    assert.ok(Math.abs(atTop.y + atTop.height - 844) <= 1);
-    await page.evaluate(() => window.scrollTo(0, 450));
-    await page.waitForFunction(() => window.scrollY > 0);
-    assert.equal((await footer.boundingBox()).y, atTop.y);
-    await page.locator('#sql-editor').focus();
-    const keyboard = page.locator('.keyboard-wrap:not(.hidden)');
-    await keyboard.waitFor();
-    const resize = keyboard.locator('.keyboard-resize');
-    for (const key of ['Home', 'End', 'ArrowDown']) {
-      await resize.press(key);
-      const bounds = await footer.evaluate(node => {
-        const rect = node.getBoundingClientRect();
-        const cover = document.elementFromPoint(rect.x + rect.width / 2, rect.y + rect.height / 2);
-        return {top:rect.top,bottom:rect.bottom,covered:!!cover?.closest('.keyboard-wrap')};
-      });
-      assert.equal(bounds.top, atTop.y);
-      assert.equal(bounds.bottom, 844);
-      assert.equal(bounds.covered, true);
-      assert.equal(await footer.locator('button').last().isVisible(), false);
-    }
+    await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+    const atBottom = await footer.boundingBox();
+    assert.ok(atBottom.y + atBottom.height <= 844 - 8 + 1, 'footer ends with spacing above the viewport bottom');
     await page.locator('[data-action=quizTab][data-arg=数据表]').click();
     await page.locator('.source-table').first().waitFor();
-    assert.equal((await footer.boundingBox()).y, atTop.y);
     await footer.getByRole('button', {name:'下一题'}).click({trial:true});
     await page.locator('[data-action=quizTab][data-arg=题目]').click();
     await page.locator('#sql-editor').waitFor();

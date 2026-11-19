@@ -9,8 +9,66 @@ android/local.properties
 __pycache__/
 *.pyc
 .DS_Store
-artifacts/*
-!artifacts/enterprise-audit/
-!artifacts/update.json
 
-!artifacts/task-reaudit-20261118/
+# ===== 内部资料、开发助手配置与临时成果：仅保留在本地，不上传（2026-11-20 起）=====
+.claude/
+.codex-attachments/
+/CLAUDE.md
+/AGENTS.md
+/DESIGN.md
+/HANDOFF.md
+/PRODUCT.md
+/PROJECT_CONTEXT.md
+/新版设计规范/
+/练习题专项修订/
+/仓库清理清单.md
+/仓库清理-移除文件清单.txt
+
+# 产物与截图：只保留占位文件，供测试写入（artifacts/enterprise-audit/ 需存在）
+artifacts/*
+!artifacts/.gitkeep
+!artifacts/enterprise-audit/
+artifacts/enterprise-audit/*
+!artifacts/enterprise-audit/.gitkeep
+
+# 未使用的旧版资源/插画样稿/中间制作成果
+resources/ASSETS/INDEX.md
+resources/ASSETS/v2/illustrations/final/source/
+resources/ASSETS/v2/illustrations/business/
+resources/ASSETS/v2/illustrations/tools/
+resources/ASSETS/v2/illustrations/**/*.md
+resources/ASSETS/v2/illustrations/**/test.html
+
+# 内部审核记录与制作脚本（构建与运行不依赖）
+resources/CONTENT/*.md
+resources/CONTENT/*.log
+resources/CONTENT/*.py
+resources/CONTENT/audit_results.json
+resources/CONTENT/changes.json
+resources/CONTENT/comparator_regression.json
+resources/CONTENT/similarity.json
+resources/CONTENT/*_resource/validation/
+resources/CONTENT/*_resource/reading/
+resources/CONTENT/enterprise_reference/validation/
+resources/CONTENT/enterprise_reference/docs/
+scripts/enterprise_audit/
+scripts/task_reaudit/
+scripts/curriculum/
+scripts/consolidate-*.py
+scripts/deepen-*.py
+scripts/convert-*.py
+scripts/reduce-*.py
+scripts/revise-*.py
+scripts/practice_revision_lib.py
+scripts/check-directed-revision.py
+
+# 敏感文件与发布产物
+.env
+.env.*
+*.pem
+*.jks
+*.p12
+*.idsig
+*.apk
+*.log
+

@@ -143,15 +143,15 @@
       "difficulty": "入门",
       "type": "代码填空",
       "title": "严格高于门槛的商品",
-      "context": "使用课程中小型商品数据练习严格高于门槛的商品。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "补全代码中的一个空位，使完整SQL满足以下要求。可输入具有相同语义的片段，提交后按完整代码执行结果核对。\n商品售价严格大于45，输出 product_id、price，按编号升序。\n输出列名称及顺序：product_id, price。按题设排序；参考排序键：product_id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "商品组要筛出价格偏高的商品，做重点检查。",
+      "requirements": "补全空位，只保留售价严格高于 45 的商品（恰好等于 45 的不算）。\n输出列名称及顺序：product_id, price。",
       "datasetId": "q0024-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
       "sourceTables": [
         "products"
       ],
-      "initialCode": "SELECT product_id,price FROM products WHERE {{blank1}} ORDER BY product_id",
+      "initialCode": "SELECT product_id,price FROM products WHERE {{blank1}}",
       "options": [],
       "acceptedBlanks": [
         {
@@ -184,26 +184,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT product_id,price FROM products WHERE price>45 ORDER BY product_id",
-          "sqliteSql": "SELECT product_id,price FROM products WHERE price>45 ORDER BY product_id"
+          "mysqlSql": "SELECT product_id,price FROM products WHERE price>45",
+          "sqliteSql": "SELECT product_id,price FROM products WHERE price>45"
         },
         {
           "kind": "代数或函数等价",
-          "mysqlSql": "SELECT product_id,price FROM products WHERE NOT (price<=45) ORDER BY product_id",
-          "sqliteSql": "SELECT product_id,price FROM products WHERE NOT (price<=45) ORDER BY product_id",
-          "explanation": "用反向比较并取 NOT 表达相同三值逻辑。"
+          "mysqlSql": "SELECT product_id,price FROM products WHERE NOT (price<=45)",
+          "sqliteSql": "SELECT product_id,price FROM products WHERE NOT (price<=45)"
         }
       ],
       "hints": [
-        "将题设条件逐项翻译为真假判断，特别注意边界值和括号。",
-        "结合《WHERE 与比较运算》：WHERE 对每行计算条件，只保留真值；比较符包括 =、<>、!=、>、>=、<、<=。",
-        "回想空位所在子句的功能：WHERE 与比较运算；保留周围代码，填入实现题设的表达式。"
+        "“严格高于”意味着边界值 45 本身要不要保留？",
+        "WHERE 会对每一行判断条件，只有结果为真的行才会返回；常用的比较运算符有 >、>=、<、<=、=。",
+        "确认你写的运算符在价格恰好等于 45 时结果为假。"
       ],
-      "explanation": "严格大于不包含45，边界应排除。\n执行思路：确认products的输入记录；按筛选条件保留符合要求的记录，并考虑空值；输出product_id、price列；遵循题设排序和并列规则。\n公开夹具实际返回 2 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：用反向比较并取 NOT 表达相同三值逻辑。",
+      "explanation": "“严格高于 45”不包含 45，所以条件是 price>45。写成 price>=45 会把价格恰好等于 45 的商品也带进来。\n另一种写法：NOT (price<=45) 与它等价，但不如直接写 > 清楚。",
       "commonErrors": [
         {
-          "sql": "SELECT product_id,price FROM products WHERE price>=45 ORDER BY product_id",
-          "reason": "严格大于不包含45，边界应排除。",
+          "sql": "SELECT product_id,price FROM products WHERE price>=45",
+          "reason": "price>=45 把恰好等于 45 的商品也保留了，违背“严格高于”。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -218,24 +217,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0024/q0024-public.json",
-          "sha256": "dfe8e657a863ed657ba7422051dda2927686a3856b6bfde99b2dbb2447850244"
+          "sha256": "3a69be81591af6e2f05c4b64bde85a8a4eebd24a8bfdfaecf62027cac980741d"
         },
         {
           "id": "q0024-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0024/q0024-boundary.json",
-          "sha256": "de1909b1ddb062a2cccbd9dcc4ca7743f91d41293f401220be41413f496834c1"
+          "sha256": "31cb3955fc8444a13b4d8d1b14c66902e93e8072a156facce7e6a2d2a41492ca"
         },
         {
           "id": "q0024-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0024/q0024-empty.json",
-          "sha256": "05b605db192bb82b38a43b28673c5b899167922ef9d5f77ff429a9ae3a34ef64"
+          "sha256": "2e15a5d216414ebdd5db799fa272c3943d39006dbc2a1a00d3ede509999600db"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -360,8 +359,8 @@
       "difficulty": "入门",
       "type": "独立编写",
       "title": "百分号字段核查",
-      "context": "使用课程中小型原始导入资料数据练习百分号字段核查。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "原始数据 raw_data.name 中查找名称含字面百分号的记录，输出 id、name，按编号升序；! 为转义字符。\n输出列名称及顺序：id, name。按题设排序；参考排序键：id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "数据治理组怀疑导入的名称里混入了带百分号的文本，需要核查。",
+      "requirements": "在 raw_data 中找出名称 name 含有字面百分号 % 的记录，输出 id、name。查询中用 ! 作为转义字符。\n输出列名称及顺序：id, name。",
       "datasetId": "q0026-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -377,38 +376,43 @@
           "id",
           "name"
         ],
-        "rows": [],
-        "rowCount": 0
+        "rows": [
+          [
+            4,
+            "Soap 5%"
+          ]
+        ],
+        "rowCount": 1
       },
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT id,name FROM raw_data WHERE name LIKE '%!%%' ESCAPE '!' ORDER BY id",
-          "sqliteSql": "SELECT id,name FROM raw_data WHERE name LIKE '%!%%' ESCAPE '!' ORDER BY id"
+          "mysqlSql": "SELECT id,name FROM raw_data WHERE name LIKE '%!%%' ESCAPE '!'",
+          "sqliteSql": "SELECT id,name FROM raw_data WHERE name LIKE '%!%%' ESCAPE '!'"
         },
         {
-          "kind": "关系结构等价",
-          "mysqlSql": "SELECT id,name FROM (SELECT * FROM raw_data) AS raw_data WHERE name LIKE '%!%%' ESCAPE '!' ORDER BY id",
-          "sqliteSql": "SELECT id,name FROM (SELECT * FROM raw_data) AS raw_data WHERE name LIKE '%!%%' ESCAPE '!' ORDER BY id",
-          "explanation": "先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。"
+          "kind": "独立方法等价",
+          "mysqlSql": "SELECT id,name FROM raw_data WHERE INSTR(name,'%')>0",
+          "sqliteSql": "SELECT id,name FROM raw_data WHERE INSTR(name,'%')>0"
         }
       ],
       "hints": [
-        "将题设条件逐项翻译为真假判断，特别注意边界值和括号。",
-        "结合《LIKE、通配符与转义》：% 匹配零个或多个字符；_ 匹配单个字符；ESCAPE 指定转义符。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT id,name FROM raw_data WHERE name LIKE □□□ ESCAPE '!' ORDER BY id"
+        "% 在 LIKE 里是通配符；要找真正的百分号字符，就得告诉数据库“这个 % 不是通配符”。",
+        "ESCAPE 子句用来指定转义字符；写在转义字符后面的 % 或 _ 会按字面字符匹配。",
+        "模式里既要有表示“前后可以有任意内容”的通配符，也要有被转义的字面 %。"
       ],
-      "explanation": "字面百分号需要转义，否则任意文本均可能匹配。\n执行思路：确认raw_data的输入记录；按筛选条件保留符合要求的记录，并考虑空值；输出id、name列；遵循题设排序和并列规则。\n公开夹具实际返回 0 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
+      "explanation": "LIKE '%!%%' ESCAPE '!' 中，第一个和最后一个 % 是通配符，表示百分号前后可以有任意文字；中间的 !% 表示字面百分号。\n易错：直接写 LIKE '%%%'，三个 % 全是通配符，会匹配所有非空名称，等于没有筛选。\n另一种写法：INSTR(name,'%')>0 不需要转义，但本题考查的是 LIKE 的转义用法。",
       "commonErrors": [
         {
-          "sql": "SELECT id,name FROM raw_data WHERE name LIKE '%%%' ESCAPE '!' ORDER BY id",
-          "reason": "字面百分号需要转义，否则任意文本均可能匹配。",
+          "sql": "SELECT id,name FROM raw_data WHERE name LIKE '%%%' ESCAPE '!'",
+          "reason": "没有转义的 % 仍是通配符，三个通配符会匹配任何非空名称。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
       "testFixtureIds": [
         "q0026-public",
         "q0026-boundary",
+        "q0026-extra",
         "q0026-empty"
       ],
       "testFixtures": [
@@ -417,24 +421,31 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0026/q0026-public.json",
-          "sha256": "a166bf0d83b1295a4d6aa543823d2a1a3267fa066414d43e42d7a3155e37c89d"
+          "sha256": "7f18eb41e2ec1b462ec7f6f373b51dc9fcf46e4642defdd6ae9c7e95e1fed024"
         },
         {
           "id": "q0026-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0026/q0026-boundary.json",
-          "sha256": "f359a8c561cdcddcb63a986ce0c16166506854ec75d710e5e5247dd01ff7cd9f"
+          "sha256": "c88c6fe54517a657ece745b2234b2eb992f6ae79ce00e8f205c555c25af96af3"
+        },
+        {
+          "id": "q0026-extra",
+          "visibility": "hidden",
+          "variant": "extra",
+          "path": "fixtures/q0026/q0026-extra.json",
+          "sha256": "f79b2587c27453d0e789086576418abe3ab88944b11e4e495fe79744e9e97a37"
         },
         {
           "id": "q0026-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0026/q0026-empty.json",
-          "sha256": "43bb49440af4c1234442f88b71036968053f54b394a020957e0fdf04a199ecc3"
+          "sha256": "b74b25803488a15f19cac7d3a05eef5b59315f5dc2105ae43229afae2985f5f6"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -453,27 +464,27 @@
       "mysqlVerification": "未运行 MySQL 8.4",
       "validation": {
         "kind": "query",
-        "equivalentKind": "关系结构等价",
+        "equivalentKind": "独立方法等价",
         "fixtures": [
           {
             "fixtureId": "q0026-public",
             "reference": {
               "ran": true,
               "match": true,
-              "resultHash": "7a7d15a6526cca536ff608feff0dcd6537b6ad1bbaec8670172851f92deb3f88",
-              "rowCount": 0
+              "resultHash": "3d4caa6efa59fbda3c890ea3591254867db885d193515c14ee55872d80f75793",
+              "rowCount": 1
             },
             "equivalent": {
               "ran": true,
               "match": true,
-              "resultHash": "7a7d15a6526cca536ff608feff0dcd6537b6ad1bbaec8670172851f92deb3f88",
-              "rows": 0
+              "resultHash": "3d4caa6efa59fbda3c890ea3591254867db885d193515c14ee55872d80f75793",
+              "rows": 1
             },
             "wrong": {
               "ran": true,
               "match": false,
-              "resultHash": "82bf95cdd1a75ff61c347aa1b5d6bacf02b054cdddd4124aee799299eae39758",
-              "rows": 6
+              "resultHash": "351318e63c169756a367a068ef35bc368f54642d48fd378080d5c95f146e2c83",
+              "rows": 7
             }
           },
           {
@@ -495,6 +506,27 @@
               "match": false,
               "resultHash": "f97abc725b0009d707416b8519f3a67e6f806dafabd67a200fa349844e7a9067",
               "rows": 9
+            }
+          },
+          {
+            "fixtureId": "q0026-extra",
+            "reference": {
+              "ran": true,
+              "match": true,
+              "resultHash": "65e8827c0ceba67be03c394427dc6f0c00d7cd4152b60de3f0cbeb688595ed62",
+              "rowCount": 4
+            },
+            "equivalent": {
+              "ran": true,
+              "match": true,
+              "resultHash": "65e8827c0ceba67be03c394427dc6f0c00d7cd4152b60de3f0cbeb688595ed62",
+              "rows": 4
+            },
+            "wrong": {
+              "ran": true,
+              "match": false,
+              "resultHash": "44cd8efadbd6c467a9f31bf86fe53017493950f28292042267cfd3a14e6f16a5",
+              "rows": 7
             }
           },
           {
@@ -666,8 +698,8 @@
       "difficulty": "入门",
       "type": "独立编写",
       "title": "找出缺货商品",
-      "context": "使用课程中小型商品数据练习找出缺货商品。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "仅库存等于0的商品，输出 product_id、product_name，按编号升序。\n输出列名称及顺序：product_id, product_name。按题设排序；参考排序键：product_id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "仓储部门想列出当前没有库存的商品，以便补货。",
+      "requirements": "找出库存恰好为 0 的商品，输出 product_id、product_name。\n输出列名称及顺序：product_id, product_name。",
       "datasetId": "q0028-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -694,26 +726,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT product_id,product_name FROM products WHERE stock=0 ORDER BY product_id",
-          "sqliteSql": "SELECT product_id,product_name FROM products WHERE stock=0 ORDER BY product_id"
+          "mysqlSql": "SELECT product_id,product_name FROM products WHERE stock=0",
+          "sqliteSql": "SELECT product_id,product_name FROM products WHERE stock=0"
         },
         {
           "kind": "代数或函数等价",
-          "mysqlSql": "SELECT product_id,product_name FROM products WHERE NOT (stock<>0) ORDER BY product_id",
-          "sqliteSql": "SELECT product_id,product_name FROM products WHERE NOT (stock<>0) ORDER BY product_id",
-          "explanation": "用反向比较并取 NOT 表达相同三值逻辑。"
+          "mysqlSql": "SELECT product_id,product_name FROM products WHERE NOT (stock<>0)",
+          "sqliteSql": "SELECT product_id,product_name FROM products WHERE NOT (stock<>0)"
         }
       ],
       "hints": [
-        "将题设条件逐项翻译为真假判断，特别注意边界值和括号。",
-        "结合《WHERE 与比较运算》：WHERE 对每行计算条件，只保留真值；比较符包括 =、<>、!=、>、>=、<、<=。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT product_id,product_name FROM products WHERE □□□ ORDER BY product_id"
+        "缺货在数据里由哪个字段、哪个取值表示？",
+        "用 WHERE 配合 = 比较；库存为 NULL 表示未知，和 0 是两回事，= 0 不会选中 NULL。",
+        "确认条件选出的是“库存为 0”，而不是“还有库存”。"
       ],
-      "explanation": "缺货指数量为0，不是有库存的商品。\n执行思路：确认products的输入记录；按筛选条件保留符合要求的记录，并考虑空值；输出product_id、product_name列；遵循题设排序和并列规则。\n公开夹具实际返回 1 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：用反向比较并取 NOT 表达相同三值逻辑。",
+      "explanation": "缺货就是 stock 等于 0，所以条件写 stock=0。写成 stock>0 得到的恰好是有库存的商品，与题意相反。库存为 NULL 表示未知，不等于 0，不会出现在结果里。\n另一种写法：NOT (stock<>0) 等价，但更绕，直接用 = 更清楚。",
       "commonErrors": [
         {
-          "sql": "SELECT product_id,product_name FROM products WHERE stock>0 ORDER BY product_id",
-          "reason": "缺货指数量为0，不是有库存的商品。",
+          "sql": "SELECT product_id,product_name FROM products WHERE stock>0",
+          "reason": "stock>0 选出的是有库存的商品，与“缺货”相反。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -728,24 +759,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0028/q0028-public.json",
-          "sha256": "2962accdd5925309cd4e679837493ba0dc3c3bda943aa5010cb35cfc55c7dc55"
+          "sha256": "c89d61c35e72caf67b82359067b5261c9142b6f08141bc81ec90dc4e3f10e186"
         },
         {
           "id": "q0028-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0028/q0028-boundary.json",
-          "sha256": "7a4b0992cd8492e54c97d3d5e179ac301d8b92b2d2b9237cf74bdbbca1f8f25b"
+          "sha256": "5d9dc294e71d41e39e6e759d10194add795a37b7bb82ebc9e7202ac8f665e3e2"
         },
         {
           "id": "q0028-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0028/q0028-empty.json",
-          "sha256": "fd4010da6231bffe3acc5b496883da43f05a12d11b57075f4934a24878417e0a"
+          "sha256": "680746966d01ec876b870a93836b90a4664485f12f8470eb4452de94abd3975a"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -865,8 +896,8 @@
       "difficulty": "入门",
       "type": "独立编写",
       "title": "低价且有现货",
-      "context": "使用课程中小型商品数据练习低价且有现货。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "找出售价低于40并且库存大于0的商品，返回 product_id，按编号升序。\n输出列名称及顺序：product_id。按题设排序；参考排序键：product_id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "运营想找出既便宜又有货的商品做推荐。",
+      "requirements": "找出售价低于 40 并且库存大于 0 的商品，返回 product_id。\n输出列名称及顺序：product_id。",
       "datasetId": "q0029-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -894,26 +925,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT product_id FROM products WHERE price<40 AND stock>0 ORDER BY product_id",
-          "sqliteSql": "SELECT product_id FROM products WHERE price<40 AND stock>0 ORDER BY product_id"
+          "mysqlSql": "SELECT product_id FROM products WHERE price<40 AND stock>0",
+          "sqliteSql": "SELECT product_id FROM products WHERE price<40 AND stock>0"
         },
         {
           "kind": "代数或函数等价",
-          "mysqlSql": "SELECT product_id FROM products WHERE NOT (price>=40) AND stock>0 ORDER BY product_id",
-          "sqliteSql": "SELECT product_id FROM products WHERE NOT (price>=40) AND stock>0 ORDER BY product_id",
-          "explanation": "用反向比较并取 NOT 表达相同三值逻辑。"
+          "mysqlSql": "SELECT product_id FROM products WHERE stock>0 AND price<40",
+          "sqliteSql": "SELECT product_id FROM products WHERE stock>0 AND price<40"
         }
       ],
       "hints": [
-        "将题设条件逐项翻译为真假判断，特别注意边界值和括号。",
-        "结合《AND、OR、NOT 与优先级》：NOT 通常先于 AND，AND 先于 OR；括号明确业务条件，避免依赖记忆。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT product_id FROM products WHERE price<40□□□stock>0 ORDER BY product_id"
+        "题目有两个条件，先判断它们是“同时成立”还是“满足其一即可”。",
+        "AND 要求两个条件都为真，OR 只要有一个为真；两个比较之间需要用逻辑运算符连接。",
+        "想想“便宜但缺货”的商品，它应该出现在结果里吗？检查你的写法是否会把它选进来。"
       ],
-      "explanation": "两个条件必须同时成立，不能用 OR。\n执行思路：确认products的输入记录；按筛选条件保留符合要求的记录，并考虑空值；输出product_id列；遵循题设排序和并列规则。\n公开夹具实际返回 2 行、1 列；完整结果见 expectedOutput。\n另一种可用写法：用反向比较并取 NOT 表达相同三值逻辑。",
+      "explanation": "“并且”对应 AND：price<40 AND stock>0，两个条件必须同时成立。用 OR 时只要满足其中一个就会入选，例如价格低但库存为 0 的商品也会被误选。",
       "commonErrors": [
         {
-          "sql": "SELECT product_id FROM products WHERE price<40 OR stock>0 ORDER BY product_id",
-          "reason": "两个条件必须同时成立，不能用 OR。",
+          "sql": "SELECT product_id FROM products WHERE price<40 OR stock>0",
+          "reason": "OR 只需满足一个条件，会选入“便宜但缺货”或“贵但有货”的商品。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -928,24 +958,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0029/q0029-public.json",
-          "sha256": "db390a5d95d2d09d7c5bc0a1a483c27f15158f1fa5a6dbc1272d1af5ed361ceb"
+          "sha256": "418f155ea1c9ddfc7421f5670b10d8609cd8a56090931bde36e9db9879519c3a"
         },
         {
           "id": "q0029-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0029/q0029-boundary.json",
-          "sha256": "51eb7bfe72d137925239e10e5fb6a3517fc852e5d2867da680dff5ea8091dedf"
+          "sha256": "38a0e433ee9e111767978ecb0852967865e9c50e82cd3d04d9c354aa77b5a8b8"
         },
         {
           "id": "q0029-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0029/q0029-empty.json",
-          "sha256": "97cb5bc35490737b1feae616a955ab9e1ea89639bab569838c71f2cf46bb0c30"
+          "sha256": "eda79200377f314d1c8874f5242d435b4eb0957a718249202b29331176934c11"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -1051,15 +1081,15 @@
       "difficulty": "入门",
       "type": "代码纠错",
       "title": "排除高价或缺货情况",
-      "context": "使用课程中小型商品数据练习排除高价或缺货情况。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "下面提供的初始代码存在逻辑、语法或结构错误。请修改整段代码，使其满足以下要求。\n返回既非售价大于60也非库存为0的商品编号，按编号升序。\n输出列名称及顺序：product_id。按题设排序；参考排序键：product_id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "选品组要剔除高价商品和缺货商品，保留其余商品。",
+      "requirements": "下面的代码想排除“售价大于 60”和“库存为 0”这两类商品，但结果不对。请修改代码，返回既不是高价、也不缺货的商品 product_id。\n输出列名称及顺序：product_id。",
       "datasetId": "q0031-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
       "sourceTables": [
         "products"
       ],
-      "initialCode": "SELECT product_id FROM products WHERE NOT (price>60 AND stock=0) ORDER BY product_id",
+      "initialCode": "SELECT product_id FROM products WHERE NOT (price>60 AND stock=0)",
       "options": [],
       "acceptedBlanks": [],
       "expectedOutput": {
@@ -1083,26 +1113,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT product_id FROM products WHERE NOT (price>60 OR stock=0) ORDER BY product_id",
-          "sqliteSql": "SELECT product_id FROM products WHERE NOT (price>60 OR stock=0) ORDER BY product_id"
+          "mysqlSql": "SELECT product_id FROM products WHERE NOT (price>60 OR stock=0)",
+          "sqliteSql": "SELECT product_id FROM products WHERE NOT (price>60 OR stock=0)"
         },
         {
           "kind": "代数或函数等价",
-          "mysqlSql": "SELECT product_id FROM products WHERE NOT (NOT (price<=60) OR stock=0) ORDER BY product_id",
-          "sqliteSql": "SELECT product_id FROM products WHERE NOT (NOT (price<=60) OR stock=0) ORDER BY product_id",
-          "explanation": "用反向比较并取 NOT 表达相同三值逻辑。"
+          "mysqlSql": "SELECT product_id FROM products WHERE price<=60 AND stock<>0",
+          "sqliteSql": "SELECT product_id FROM products WHERE price<=60 AND stock<>0"
         }
       ],
       "hints": [
-        "将题设条件逐项翻译为真假判断，特别注意边界值和括号。",
-        "结合《AND、OR、NOT 与优先级》：NOT 通常先于 AND，AND 先于 OR；括号明确业务条件，避免依赖记忆。",
-        "检查初始代码的 NOT (price>60 OR stock=0) 对应的业务规则。不满足任一坏条件，等价于两个好条件都成立。"
+        "“既不是 A、也不是 B”意味着 A、B 两种情况都要排除。",
+        "NOT (A AND B) 只排除“同时满足 A 和 B”的行；想排除任意一种，括号里要表达“满足 A 或 B”。",
+        "对照初始代码：括号里的逻辑运算符是否表达了“满足任一坏条件就排除”？"
       ],
-      "explanation": "不满足任一坏条件，等价于两个好条件都成立。\n执行思路：确认products的输入记录；按筛选条件保留符合要求的记录，并考虑空值；输出product_id列；遵循题设排序和并列规则。\n公开夹具实际返回 3 行、1 列；完整结果见 expectedOutput。\n另一种可用写法：用反向比较并取 NOT 表达相同三值逻辑。",
+      "explanation": "要排除的是“价格大于 60，或者库存为 0”的商品，所以括号里应写 OR：NOT (price>60 OR stock=0)。初始代码用 AND，只排除既贵又缺货的商品，漏掉了“只贵”或“只缺货”的商品。\n等价写法是反过来要求两个好条件同时成立：price<=60 AND stock<>0。",
       "commonErrors": [
         {
-          "sql": "SELECT product_id FROM products WHERE NOT (price>60 AND stock=0) ORDER BY product_id",
-          "reason": "不满足任一坏条件，等价于两个好条件都成立。",
+          "sql": "SELECT product_id FROM products WHERE NOT (price>60 AND stock=0)",
+          "reason": "括号内用 AND 只排除“既贵又缺货”的商品，只贵或只缺货的商品仍被保留。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -1117,24 +1146,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0031/q0031-public.json",
-          "sha256": "c7e85588d5803ff1438ab04d6b754ba656f2d39e4a23d2074875523a22282fe2"
+          "sha256": "0e1bc556cac9abb65eba2e0d54a99b8d50f8372fff25a2a8e2a67c634fb2314a"
         },
         {
           "id": "q0031-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0031/q0031-boundary.json",
-          "sha256": "af1a25058558a191a8b27c5e4ffdc601a445ec173734ba5d9c4ce0d135d37ec0"
+          "sha256": "8a969b5c162b603ac8b9c7338321d4c10e1fb759f035069e744f214e166b4ea8"
         },
         {
           "id": "q0031-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0031/q0031-empty.json",
-          "sha256": "6f7a4f00a37d93d3c129d00e355622588480fd3445c4444b17e2c0e092b67fc5"
+          "sha256": "b4961937a92930f3ae1a68348f07439759772991ff2d53d715fbd4952677d1b8"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -1238,15 +1267,15 @@
       "difficulty": "入门",
       "type": "代码填空",
       "title": "指定字符长度模式",
-      "context": "使用课程中小型商品数据练习指定字符长度模式。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "补全代码中的一个空位，使完整SQL满足以下要求。可输入具有相同语义的片段，提交后按完整代码执行结果核对。\n使用 LIKE 匹配恰好四个字符的商品名称，按 product_id 升序输出 product_name。\n输出列名称及顺序：product_name。按题设排序；参考排序键：product_id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "商品命名规范要求短名称恰好 4 个字符，需要核查哪些商品符合。",
+      "requirements": "补全空位，用 LIKE 匹配名称恰好为四个字符的商品，输出 product_name。\n输出列名称及顺序：product_name。",
       "datasetId": "q0032-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
       "sourceTables": [
         "products"
       ],
-      "initialCode": "SELECT product_name FROM products WHERE product_name LIKE {{blank1}} ORDER BY product_id",
+      "initialCode": "SELECT product_name FROM products WHERE product_name LIKE {{blank1}}",
       "options": [],
       "acceptedBlanks": [
         {
@@ -1272,26 +1301,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT product_name FROM products WHERE product_name LIKE '____' ORDER BY product_id",
-          "sqliteSql": "SELECT product_name FROM products WHERE product_name LIKE '____' ORDER BY product_id"
+          "mysqlSql": "SELECT product_name FROM products WHERE product_name LIKE '____'",
+          "sqliteSql": "SELECT product_name FROM products WHERE product_name LIKE '____'"
         },
         {
-          "kind": "关系结构等价",
-          "mysqlSql": "SELECT product_name FROM (SELECT * FROM products) AS products WHERE product_name LIKE '____' ORDER BY product_id",
-          "sqliteSql": "SELECT product_name FROM (SELECT * FROM products) AS products WHERE product_name LIKE '____' ORDER BY product_id",
-          "explanation": "先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。"
+          "kind": "代数或函数等价",
+          "mysqlSql": "SELECT product_name FROM products WHERE product_name LIKE '____' ESCAPE '!'",
+          "sqliteSql": "SELECT product_name FROM products WHERE product_name LIKE '____' ESCAPE '!'"
         }
       ],
       "hints": [
-        "将题设条件逐项翻译为真假判断，特别注意边界值和括号。",
-        "结合《LIKE、通配符与转义》：% 匹配零个或多个字符；_ 匹配单个字符；ESCAPE 指定转义符。",
-        "回想空位所在子句的功能：LIKE、通配符与转义；保留周围代码，填入实现题设的表达式。"
+        "LIKE 的模式里有两种通配符，分别代表“任意多个字符”和“恰好一个字符”。",
+        "恰好 N 个字符，就需要 N 个“恰好一个字符”的通配符，并且不能再混入“任意多个字符”的通配符。",
+        "数一数你写的模式里有几个通配符，是否正好是 4 个。"
       ],
-      "explanation": "下划线每个匹配一个字符，百分号会接受任意尾部。\n执行思路：确认products的输入记录；按筛选条件保留符合要求的记录，并考虑空值；输出product_name列；遵循题设排序和并列规则。\n公开夹具实际返回 1 行、1 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
+      "explanation": "_ 表示恰好一个字符，四个 _ 写成 '____'，名称长度必须正好是 4。\n易错：'___%' 里的 % 可以匹配任意长度的尾部，所以长度不少于 3 的名称都会入选。",
       "commonErrors": [
         {
-          "sql": "SELECT product_name FROM products WHERE product_name LIKE '___%' ORDER BY product_id",
-          "reason": "下划线每个匹配一个字符，百分号会接受任意尾部。",
+          "sql": "SELECT product_name FROM products WHERE product_name LIKE '___%'",
+          "reason": "'___%' 的 % 允许任意长度的尾部，结果会包含长度超过 4 的名称。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -1306,24 +1334,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0032/q0032-public.json",
-          "sha256": "a5bc6cbef8ee102273017f9e6ee23c14995f69b54d22867876cdaa2e74d9b6e8"
+          "sha256": "e57797060a1d977b9e8039334f444aeef380327dce8fee022b1cfed042b23ed8"
         },
         {
           "id": "q0032-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0032/q0032-boundary.json",
-          "sha256": "1b5715f54f89865fec4236873a48375c67fa924dd53e08cde29f8ca8ff201e5f"
+          "sha256": "656aad27017f6163a2b2ab20f173dac591a527c092c9ca53ae783adf219e546d"
         },
         {
           "id": "q0032-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0032/q0032-empty.json",
-          "sha256": "0832554d6dc63ae15dcb0d1810e435afd1fa2bfe7b8aeb237fe74c34f47f6f19"
+          "sha256": "855a87866618c350a255a9266f2c0a019156c84ed20a393c427f4597fe03998a"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -1335,7 +1363,7 @@
         {
           "kind": "like_predicate",
           "status": "需运行时语法树核查；不以关键词匹配判分",
-          "requirement": "使用 LIKE 匹配恰好四个字符的商品名称，按 product_id 升序输出 product_name。"
+          "requirement": "使用 LIKE 匹配恰好四个字符的商品名称。"
         }
       ],
       "supportStatus": "直接兼容",
@@ -1348,7 +1376,7 @@
       "mysqlVerification": "未运行 MySQL 8.4",
       "validation": {
         "kind": "query",
-        "equivalentKind": "关系结构等价",
+        "equivalentKind": "代数或函数等价",
         "fixtures": [
           {
             "fixtureId": "q0032-public",
@@ -1618,8 +1646,8 @@
       "difficulty": "入门",
       "type": "独立编写",
       "title": "库存区间之外",
-      "context": "使用课程中小型商品数据练习库存区间之外。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "返回库存数量不在50至150闭区间的商品编号、库存，按编号升序。\n输出列名称及顺序：product_id, stock。按题设排序；参考排序键：product_id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "采购组想找出库存偏离合理区间的商品，合理区间为 50 到 150（含两端）。",
+      "requirements": "返回库存不在 50 至 150 闭区间内的商品，输出 product_id、stock。\n输出列名称及顺序：product_id, stock。",
       "datasetId": "q0034-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -1658,26 +1686,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT product_id,stock FROM products WHERE stock NOT BETWEEN 50 AND 150 ORDER BY product_id",
-          "sqliteSql": "SELECT product_id,stock FROM products WHERE stock NOT BETWEEN 50 AND 150 ORDER BY product_id"
+          "mysqlSql": "SELECT product_id,stock FROM products WHERE stock NOT BETWEEN 50 AND 150",
+          "sqliteSql": "SELECT product_id,stock FROM products WHERE stock NOT BETWEEN 50 AND 150"
         },
         {
           "kind": "独立方法等价",
-          "mysqlSql": "SELECT product_id,stock FROM products WHERE stock<50 OR stock>150 ORDER BY product_id",
-          "sqliteSql": "SELECT product_id,stock FROM products WHERE stock<50 OR stock>150 ORDER BY product_id",
-          "explanation": "采用另一种关系运算或查询结构计算相同结果。"
+          "mysqlSql": "SELECT product_id,stock FROM products WHERE stock<50 OR stock>150",
+          "sqliteSql": "SELECT product_id,stock FROM products WHERE stock<50 OR stock>150"
         }
       ],
       "hints": [
-        "将题设条件逐项翻译为真假判断，特别注意边界值和括号。",
-        "结合《IN 与 BETWEEN》：IN 判断是否属于集合；BETWEEN 包含上下端点。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT product_id,stock FROM products WHERE stock □□□ 50 AND 150 ORDER BY product_id"
+        "闭区间的两个端点都算“在区间内”，所以库存恰好是 50 或 150 的商品不应出现在结果里。",
+        "BETWEEN a AND b 包含两个端点；它的反面可以写 NOT BETWEEN，也可以拆成两个比较并用 OR 连接。",
+        "检查库存恰好为 50 或 150 的商品有没有被误选；库存为 NULL 的行比较结果未知，也不会出现在结果中。"
       ],
-      "explanation": "区间外为小于50或大于150，端点排除。\n执行思路：确认products的输入记录；按筛选条件保留符合要求的记录，并考虑空值；输出product_id、stock列；遵循题设排序和并列规则。\n公开夹具实际返回 4 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：采用另一种关系运算或查询结构计算相同结果。",
+      "explanation": "stock NOT BETWEEN 50 AND 150 等价于 stock<50 OR stock>150：小于下限或大于上限才算区间之外，50 和 150 本身都在区间内，不会返回。库存为 NULL 时比较结果未知，该行不会返回。\n易错：直接写 BETWEEN 50 AND 150 得到的是区间内的商品，恰好相反。",
       "commonErrors": [
         {
-          "sql": "SELECT product_id,stock FROM products WHERE stock BETWEEN 50 AND 150 ORDER BY product_id",
-          "reason": "区间外为小于50或大于150，端点排除。",
+          "sql": "SELECT product_id,stock FROM products WHERE stock BETWEEN 50 AND 150",
+          "reason": "BETWEEN 选出的是区间内的商品，需要的是区间之外。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -1692,24 +1719,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0034/q0034-public.json",
-          "sha256": "0f0d09cec373176e05123bb2acc5627798246ebac2c2702c2ebeec5168cc0b03"
+          "sha256": "7d035ac805e7f2b7c5bb644653bddb4c928996cd4c0522de0c0db35c962e2ae4"
         },
         {
           "id": "q0034-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0034/q0034-boundary.json",
-          "sha256": "878a5481180a50e6f88a065aeb11fcfb3aa23192106025e2fdcffa130d3718f3"
+          "sha256": "700c9537abc011e8b701379c899daf1ee8b3b1ce2c3ac32ad815a077a46eb533"
         },
         {
           "id": "q0034-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0034/q0034-empty.json",
-          "sha256": "6f75fbcf419069567303cf27008e6c93650a317cc649617c9dd6aef22d091ce7"
+          "sha256": "19931531cd3d8e2f3e9b222b66c00128a02d69f8876c6a67451949e2f58a6c4d"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -1815,15 +1842,15 @@
       "difficulty": "简单",
       "type": "代码填空",
       "title": "排除两个商品类别",
-      "context": "使用课程中小型商品数据练习排除两个商品类别。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "补全代码中的一个空位，使完整SQL满足以下要求。可输入具有相同语义的片段，提交后按完整代码执行结果核对。\n排除护肤品和日用品，输出 product_id、category，按编号升序；空类别不纳入。\n输出列名称及顺序：product_id, category。按题设排序；参考排序键：product_id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "活动方案只面向护肤品和日用品之外的商品，需要列出这些商品。",
+      "requirements": "补全空位，排除“护肤品”和“日用品”两个类别，输出 product_id、category；类别为空的商品不纳入。\n输出列名称及顺序：product_id, category。",
       "datasetId": "q0037-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
       "sourceTables": [
         "products"
       ],
-      "initialCode": "SELECT product_id,category FROM products WHERE category {{blank1}} ('护肤品','日用品') ORDER BY product_id",
+      "initialCode": "SELECT product_id,category FROM products WHERE category {{blank1}} ('护肤品','日用品')",
       "options": [],
       "acceptedBlanks": [
         {
@@ -1855,26 +1882,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT product_id,category FROM products WHERE category NOT IN ('护肤品','日用品') ORDER BY product_id",
-          "sqliteSql": "SELECT product_id,category FROM products WHERE category NOT IN ('护肤品','日用品') ORDER BY product_id"
+          "mysqlSql": "SELECT product_id,category FROM products WHERE category NOT IN ('护肤品','日用品')",
+          "sqliteSql": "SELECT product_id,category FROM products WHERE category NOT IN ('护肤品','日用品')"
         },
         {
           "kind": "代数或函数等价",
-          "mysqlSql": "SELECT product_id,category FROM products WHERE (category<>'护肤品' AND category<>'日用品') ORDER BY product_id",
-          "sqliteSql": "SELECT product_id,category FROM products WHERE (category<>'护肤品' AND category<>'日用品') ORDER BY product_id",
-          "explanation": "用逐值相等或不等谓词表示同一成员集合。"
+          "mysqlSql": "SELECT product_id,category FROM products WHERE (category<>'护肤品' AND category<>'日用品')",
+          "sqliteSql": "SELECT product_id,category FROM products WHERE (category<>'护肤品' AND category<>'日用品')"
         }
       ],
       "hints": [
-        "将题设条件逐项翻译为真假判断，特别注意边界值和括号。",
-        "结合《IN 与 BETWEEN》：IN 判断是否属于集合；BETWEEN 包含上下端点。",
-        "回想空位所在子句的功能：IN 与 BETWEEN；保留周围代码，填入实现题设的表达式。"
+        "要排除的是一小份名单里的任意一个值，可以用集合判断一次写完，不必写两个不等于。",
+        "IN (…) 判断是否属于列表；在它前面加 NOT 就表示不属于，列表里的值用逗号隔开。",
+        "NULL 与任何值比较结果都是未知，所以类别为空的行不会被保留，这正好符合“空类别不纳入”。"
       ],
-      "explanation": "NOT IN 针对列表中不存在的值，NULL仍为未知。\n执行思路：确认products的输入记录；按筛选条件保留符合要求的记录，并考虑空值；输出product_id、category列；遵循题设排序和并列规则。\n公开夹具实际返回 2 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：用逐值相等或不等谓词表示同一成员集合。",
+      "explanation": "category NOT IN ('护肤品','日用品') 保留类别不在名单内的商品。类别为 NULL 时比较结果未知，WHERE 不会返回它，所以空类别自然被排除。\n易错：只写 IN 会选出名单内的商品，与题意相反。\n另一种写法：category<>'护肤品' AND category<>'日用品'，名单较长时 NOT IN 更简洁。",
       "commonErrors": [
         {
-          "sql": "SELECT product_id,category FROM products WHERE category IN ('护肤品','日用品') ORDER BY product_id",
-          "reason": "NOT IN 针对列表中不存在的值，NULL仍为未知。",
+          "sql": "SELECT product_id,category FROM products WHERE category IN ('护肤品','日用品')",
+          "reason": "IN 选出的是名单内的类别，需要的是名单之外的类别。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -1889,24 +1915,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0037/q0037-public.json",
-          "sha256": "0476f64ea41c75fae9329668d5a280413fd741d7e7a820d9e26867bcc6344ab1"
+          "sha256": "1d6b88d1547aed5b1a4e6458080f159e858842a4135fe9d77e69614bc33e24d8"
         },
         {
           "id": "q0037-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0037/q0037-boundary.json",
-          "sha256": "d464b8be4e8b06eb06f96a256609c1becb4a756e1a3f3963e97110cc72fe5734"
+          "sha256": "3c5514697357f4650f03b24369a9375223a0030e582f288b72bec9a2881ac0be"
         },
         {
           "id": "q0037-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0037/q0037-empty.json",
-          "sha256": "28a9a08b0163ec30cef37ec95231e6fa78d8ba88354c7c7767cd4853326b954c"
+          "sha256": "69dfa21eb247e845908608c6db5ca12a539fac9d39fce8680cc64d793d135eaa"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -2014,8 +2040,8 @@
       "difficulty": "简单",
       "type": "独立编写",
       "title": "指定客户编号名单",
-      "context": "使用课程中小型客户数据练习指定客户编号名单。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "从 customers 取编号1、3、4的客户，返回 customer_id、customer_name，按编号升序。\n输出列名称及顺序：customer_id, customer_name。按题设排序；参考排序键：customer_id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "客户成功团队要回访编号为 1、3、4 的重点客户。",
+      "requirements": "从 customers 中取编号为 1、3、4 的客户，返回 customer_id、customer_name。\n输出列名称及顺序：customer_id, customer_name。",
       "datasetId": "q0039-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -2050,26 +2076,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT customer_id,customer_name FROM customers WHERE customer_id IN (1,3,4) ORDER BY customer_id",
-          "sqliteSql": "SELECT customer_id,customer_name FROM customers WHERE customer_id IN (1,3,4) ORDER BY customer_id"
+          "mysqlSql": "SELECT customer_id,customer_name FROM customers WHERE customer_id IN (1,3,4)",
+          "sqliteSql": "SELECT customer_id,customer_name FROM customers WHERE customer_id IN (1,3,4)"
         },
         {
           "kind": "代数或函数等价",
-          "mysqlSql": "SELECT customer_id,customer_name FROM customers WHERE (customer_id=1 OR customer_id=3 OR customer_id=4) ORDER BY customer_id",
-          "sqliteSql": "SELECT customer_id,customer_name FROM customers WHERE (customer_id=1 OR customer_id=3 OR customer_id=4) ORDER BY customer_id",
-          "explanation": "用逐值相等或不等谓词表示同一成员集合。"
+          "mysqlSql": "SELECT customer_id,customer_name FROM customers WHERE (customer_id=1 OR customer_id=3 OR customer_id=4)",
+          "sqliteSql": "SELECT customer_id,customer_name FROM customers WHERE (customer_id=1 OR customer_id=3 OR customer_id=4)"
         }
       ],
       "hints": [
-        "将题设条件逐项翻译为真假判断，特别注意边界值和括号。",
-        "结合《IN 与 BETWEEN》：IN 判断是否属于集合；BETWEEN 包含上下端点。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT customer_id,customer_name FROM customers WHERE customer_id □□□ ORDER BY customer_id"
+        "要匹配的是一小份固定名单，而不是一个连续范围。",
+        "IN (值1, 值2, …) 可以一次判断“是否等于名单中的任意一个”，比连续写多个 OR 更简洁。",
+        "核对名单里的每个编号都写全了，漏掉一个就会少一位客户。"
       ],
-      "explanation": "IN 枚举所有允许值，漏写4就会漏客户。\n执行思路：确认customers的输入记录；按筛选条件保留符合要求的记录，并考虑空值；输出customer_id、customer_name列；遵循题设排序和并列规则。\n公开夹具实际返回 3 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：用逐值相等或不等谓词表示同一成员集合。",
+      "explanation": "customer_id IN (1,3,4) 等价于 customer_id=1 OR customer_id=3 OR customer_id=4，名单较长时用 IN 更清晰。漏写任何一个编号，都会漏掉对应的客户。",
       "commonErrors": [
         {
-          "sql": "SELECT customer_id,customer_name FROM customers WHERE customer_id IN (1,3) ORDER BY customer_id",
-          "reason": "IN 枚举所有允许值，漏写4就会漏客户。",
+          "sql": "SELECT customer_id,customer_name FROM customers WHERE customer_id IN (1,3)",
+          "reason": "名单漏写了编号 4，对应的客户不会出现在结果里。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -2084,24 +2109,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0039/q0039-public.json",
-          "sha256": "dfc58cc437649c94139deb7ef40b754440d70f11143155f5fb7e103a64508dea"
+          "sha256": "32b5c8cf2be06c0296b3999efb72a6fb987432fee6e6e2cb9234f7f67880b973"
         },
         {
           "id": "q0039-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0039/q0039-boundary.json",
-          "sha256": "a1a59a37100abb89d7044eb482aeb8b485ce9a3211c89a46cf8d80bae15925e9"
+          "sha256": "f465c7891927a92233190f0a62397e1f3721effd43240c90f9beb23eba2e762c"
         },
         {
           "id": "q0039-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0039/q0039-empty.json",
-          "sha256": "8f59c21e2e441273e22add946f5bf3794e7859ff2e1a42a6b4076a075e248299"
+          "sha256": "915601739b4b1085287b2d7e1fbeb74773f54a54e5fbfe498b412f0dbe6afd4f"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -2205,8 +2230,8 @@
       "difficulty": "简单",
       "type": "独立编写",
       "title": "类别限定下的库存筛选",
-      "context": "使用课程中小型商品数据练习类别限定下的库存筛选。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "护肤品中售价低于40或库存大于180者，返回 product_id，按编号升序。\n输出列名称及顺序：product_id。按题设排序；参考排序键：product_id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "市场部想在护肤品里找出两类商品：价格低的，或者库存积压的。",
+      "requirements": "在护肤品类别中，找出售价低于 40 或库存大于 180 的商品，返回 product_id。\n输出列名称及顺序：product_id。",
       "datasetId": "q0040-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -2234,32 +2259,32 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT product_id FROM products WHERE category='护肤品' AND (price<40 OR stock>180) ORDER BY product_id",
-          "sqliteSql": "SELECT product_id FROM products WHERE category='护肤品' AND (price<40 OR stock>180) ORDER BY product_id"
+          "mysqlSql": "SELECT product_id FROM products WHERE category='护肤品' AND (price<40 OR stock>180)",
+          "sqliteSql": "SELECT product_id FROM products WHERE category='护肤品' AND (price<40 OR stock>180)"
         },
         {
           "kind": "代数或函数等价",
-          "mysqlSql": "SELECT product_id FROM products WHERE NOT (category<>'护肤品') AND (price<40 OR stock>180) ORDER BY product_id",
-          "sqliteSql": "SELECT product_id FROM products WHERE NOT (category<>'护肤品') AND (price<40 OR stock>180) ORDER BY product_id",
-          "explanation": "用反向比较并取 NOT 表达相同三值逻辑。"
+          "mysqlSql": "SELECT product_id FROM products WHERE (category='护肤品' AND price<40) OR (category='护肤品' AND stock>180)",
+          "sqliteSql": "SELECT product_id FROM products WHERE (category='护肤品' AND price<40) OR (category='护肤品' AND stock>180)"
         }
       ],
       "hints": [
-        "将题设条件逐项翻译为真假判断，特别注意边界值和括号。",
-        "结合《AND、OR、NOT 与优先级》：NOT 通常先于 AND，AND 先于 OR；括号明确业务条件，避免依赖记忆。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT product_id FROM products WHERE category='护肤品' □□□ ORDER BY product_id"
+        "“护肤品”是前提，“价格低或库存高”是二选一的入选原因，两者的层次不同。",
+        "AND 比 OR 先计算；AND 和 OR 混用时，用括号明确哪几个条件先合并。",
+        "设想一件非护肤品但库存很高的商品：它应该出现在结果里吗？检查你的写法会不会把它选进来。"
       ],
-      "explanation": "括号让类别限制适用于两种入选原因。\n执行思路：确认products的输入记录；按筛选条件保留符合要求的记录，并考虑空值；输出product_id列；遵循题设排序和并列规则。\n公开夹具实际返回 2 行、1 列；完整结果见 expectedOutput。\n另一种可用写法：用反向比较并取 NOT 表达相同三值逻辑。",
+      "explanation": "类别限制必须对两种入选原因都生效，所以要把“价格低或库存高”放进括号：category='护肤品' AND (price<40 OR stock>180)。\n易错：不加括号时 AND 先计算，条件变成“护肤品且价格低”或者“任何类别的高库存”，会混入其他类别的商品。\n另一种写法：把 AND 分配到括号里的每一项，(category='护肤品' AND price<40) OR (category='护肤品' AND stock>180)。",
       "commonErrors": [
         {
-          "sql": "SELECT product_id FROM products WHERE category='护肤品' AND price<40 OR stock>180 ORDER BY product_id",
-          "reason": "括号让类别限制适用于两种入选原因。",
+          "sql": "SELECT product_id FROM products WHERE category='护肤品' AND price<40 OR stock>180",
+          "reason": "没有括号时 AND 先计算，类别限制只作用于价格条件，其他类别的高库存商品也会入选。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
       "testFixtureIds": [
         "q0040-public",
         "q0040-boundary",
+        "q0040-extra",
         "q0040-empty"
       ],
       "testFixtures": [
@@ -2268,24 +2293,31 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0040/q0040-public.json",
-          "sha256": "568ccb6bd8a0e4c7f87055a0ff9e599127bd504436bd2a58467a9c175067d085"
+          "sha256": "68a19b436f90d6934411d8a3923b3709a68723aa6bfb84b87ad594b0d15587dc"
         },
         {
           "id": "q0040-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0040/q0040-boundary.json",
-          "sha256": "5a9d83626b71faa9f2754c8d497273d708662a804050e7aa4db431741e384d41"
+          "sha256": "8fa298fadbdaf89b6215c79fb2f3eadf4a7c203a2e8d37a2911d4ff24ce9d877"
+        },
+        {
+          "id": "q0040-extra",
+          "visibility": "hidden",
+          "variant": "extra",
+          "path": "fixtures/q0040/q0040-extra.json",
+          "sha256": "79aea8b831f7a82dd0de339ed164f9e9e76d8c591d82433abae043cc98445d21"
         },
         {
           "id": "q0040-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0040/q0040-empty.json",
-          "sha256": "7e204ecf4e0b5caf4842b122ef98f4fa45904f5b604e577678ba2aa81c2bea88"
+          "sha256": "49e050c812232b05653e3a19d262bf3056e77a2e83aac5a6aaa40cd8016d82d7"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -2349,6 +2381,27 @@
             }
           },
           {
+            "fixtureId": "q0040-extra",
+            "reference": {
+              "ran": true,
+              "match": true,
+              "resultHash": "0bdd09513590a1d1ca253f20b8f6db7405b3372b65be9ac07aa937c2e4afc025",
+              "rowCount": 4
+            },
+            "equivalent": {
+              "ran": true,
+              "match": true,
+              "resultHash": "0bdd09513590a1d1ca253f20b8f6db7405b3372b65be9ac07aa937c2e4afc025",
+              "rows": 4
+            },
+            "wrong": {
+              "ran": true,
+              "match": false,
+              "resultHash": "43cb2ae3b607b1be1ec521ebc3f116738a7ba2662a9696b03ad464235be24797",
+              "rows": 5
+            }
+          },
+          {
             "fixtureId": "q0040-empty",
             "reference": {
               "ran": true,
@@ -2389,8 +2442,8 @@
       "difficulty": "简单",
       "type": "独立编写",
       "title": "名称内的字面下划线",
-      "context": "使用课程中小型商品数据练习名称内的字面下划线。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "查找产品名称含字面下划线的商品，返回 product_id、product_name，按编号升序，指定 ! 为转义字符。\n输出列名称及顺序：product_id, product_name。按题设排序；参考排序键：product_id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "商品名称里有些带下划线，数据组想核查这些名称。",
+      "requirements": "找出商品名称中含有字面下划线 _ 的商品，返回 product_id、product_name。查询中用 ! 作为转义字符。\n输出列名称及顺序：product_id, product_name。",
       "datasetId": "q0041-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -2417,32 +2470,32 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT product_id,product_name FROM products WHERE product_name LIKE '%!_%' ESCAPE '!' ORDER BY product_id",
-          "sqliteSql": "SELECT product_id,product_name FROM products WHERE product_name LIKE '%!_%' ESCAPE '!' ORDER BY product_id"
+          "mysqlSql": "SELECT product_id,product_name FROM products WHERE product_name LIKE '%!_%' ESCAPE '!'",
+          "sqliteSql": "SELECT product_id,product_name FROM products WHERE product_name LIKE '%!_%' ESCAPE '!'"
         },
         {
-          "kind": "关系结构等价",
-          "mysqlSql": "SELECT product_id,product_name FROM (SELECT * FROM products) AS products WHERE product_name LIKE '%!_%' ESCAPE '!' ORDER BY product_id",
-          "sqliteSql": "SELECT product_id,product_name FROM (SELECT * FROM products) AS products WHERE product_name LIKE '%!_%' ESCAPE '!' ORDER BY product_id",
-          "explanation": "先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。"
+          "kind": "独立方法等价",
+          "mysqlSql": "SELECT product_id,product_name FROM products WHERE INSTR(product_name,'_')>0",
+          "sqliteSql": "SELECT product_id,product_name FROM products WHERE INSTR(product_name,'_')>0"
         }
       ],
       "hints": [
-        "将题设条件逐项翻译为真假判断，特别注意边界值和括号。",
-        "结合《LIKE、通配符与转义》：% 匹配零个或多个字符；_ 匹配单个字符；ESCAPE 指定转义符。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT product_id,product_name FROM products WHERE product_name LIKE □□□ ESCAPE '!' ORDER BY product_id"
+        "_ 在 LIKE 里是“恰好一个任意字符”的通配符，不是普通的下划线。",
+        "用 ESCAPE 指定转义字符后，写在它后面的 _ 或 % 会按字面字符处理。",
+        "模式两端各留一个“任意多个字符”的位置，中间放被转义的下划线。"
       ],
-      "explanation": "不转义的下划线表示任意单个字符而非字面符号。\n执行思路：确认products的输入记录；按筛选条件保留符合要求的记录，并考虑空值；输出product_id、product_name列；遵循题设排序和并列规则。\n公开夹具实际返回 1 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
+      "explanation": "LIKE '%!_%' ESCAPE '!' 中，两端的 % 是通配符，!_ 表示字面下划线。\n易错：不转义的 '%_%' 里，_ 代表任意单个字符，只要名称非空就会匹配，筛选形同虚设。\n另一种写法：INSTR(product_name,'_')>0 不需要转义，但本题考查的是 LIKE 的转义用法。",
       "commonErrors": [
         {
-          "sql": "SELECT product_id,product_name FROM products WHERE product_name LIKE '%_%' ESCAPE '!' ORDER BY product_id",
-          "reason": "不转义的下划线表示任意单个字符而非字面符号。",
+          "sql": "SELECT product_id,product_name FROM products WHERE product_name LIKE '%_%' ESCAPE '!'",
+          "reason": "不转义的下划线表示任意单个字符，几乎所有名称都会匹配，而不是只找字面下划线。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
       "testFixtureIds": [
         "q0041-public",
         "q0041-boundary",
+        "q0041-extra",
         "q0041-empty"
       ],
       "testFixtures": [
@@ -2451,24 +2504,31 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0041/q0041-public.json",
-          "sha256": "d11515bcbbab8b0463727bb598dc3de0e3a65fa97b71e2c2f66c4c651a8ff066"
+          "sha256": "a5c3aa5e1255ff7387759727dfc64371c5e6db328d8d1d02cb1e40c818651b2c"
         },
         {
           "id": "q0041-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0041/q0041-boundary.json",
-          "sha256": "20595e55d9742436a1aa4ecb23939cd1077ddcdc898ff51f5061ab28808f56fa"
+          "sha256": "1bf1a4cc8b6e0f6e610ec8714bda5296f3190723d6485065f1e661cc004ef507"
+        },
+        {
+          "id": "q0041-extra",
+          "visibility": "hidden",
+          "variant": "extra",
+          "path": "fixtures/q0041/q0041-extra.json",
+          "sha256": "607dc20f62bf98bfbe44973e385392e59cd760ed9de68c6f269517c0461f5a97"
         },
         {
           "id": "q0041-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0041/q0041-empty.json",
-          "sha256": "cc4c7b4aab21a27e74f9d4f976288d65206b04ea8d78ab511842553b50e7ef47"
+          "sha256": "526f6b1030bea669875a5e21d269ab253e2153e05ec39cd14c55b88c715a1dc2"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -2487,7 +2547,7 @@
       "mysqlVerification": "未运行 MySQL 8.4",
       "validation": {
         "kind": "query",
-        "equivalentKind": "关系结构等价",
+        "equivalentKind": "独立方法等价",
         "fixtures": [
           {
             "fixtureId": "q0041-public",
@@ -2529,6 +2589,27 @@
               "match": false,
               "resultHash": "e6b5ca05b1fb3d94af8bad66424d78ee57cc0c61391ddf7b20b456ac5ba50d62",
               "rows": 21
+            }
+          },
+          {
+            "fixtureId": "q0041-extra",
+            "reference": {
+              "ran": true,
+              "match": true,
+              "resultHash": "f87a04c6ed98e75b8540b4d678b2239c54a035da70d06958ec8a44c64c35ae2e",
+              "rowCount": 4
+            },
+            "equivalent": {
+              "ran": true,
+              "match": true,
+              "resultHash": "f87a04c6ed98e75b8540b4d678b2239c54a035da70d06958ec8a44c64c35ae2e",
+              "rows": 4
+            },
+            "wrong": {
+              "ran": true,
+              "match": false,
+              "resultHash": "43938dedb7220c320b9c0b99778f7dc20e3daf67fab93f770a46e10290c16f16",
+              "rows": 7
             }
           },
           {
