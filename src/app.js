@@ -57,6 +57,8 @@ const paths = {
   clock: "M12 7v5l3 2 M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0",
   wrong: "M5 3h14v18H5Z M9 9l6 6 M15 9l-6 6",
   play: "m8 4 13 8-13 8Z",
+  flip: "M4 8h13l-3-3 M20 16H7l3 3",
+  skip: "m6 5 9 7-9 7Z M18 5v14",
   undo: "M9 5 3 10l6 5 M3 10h10a7 7 0 0 1 7 7",
   reset: "M3 11a9 9 0 1 1 2.6 6.4 M3 4v7h7",
   redo: "m15 5 6 5-6 5 M21 10H11a7 7 0 0 0-7 7",
@@ -128,6 +130,9 @@ let importData = null,
   importFileName = "";
 let newMode = "每日到期";
 let cardChapter = "ch01", cardSearch = "", cardBrowseLimit = 40;
+let cardScheduled = true, spotId = null, spotBack = false, cardBrowseChapter = "";
+const cardFlipped = new Set();
+const modeLabels = { 每日到期: "今日待复习", 新卡: "新卡", 薄弱: "困难/薄弱", 章节: "按章节", 自定义: "自定义卡", 收藏: "收藏卡", 随机: "随机自由浏览" };
 const labResults = new Map();
 let labDataView = "list";
 let disposeErd = null;
@@ -398,6 +403,10 @@ app.addEventListener("toggle", (event) => {
   const key = loadedQuestionId + ":" + fold;
   if (event.target.open) openFolds.add(key); else openFolds.delete(key);
 }, true);
+app.addEventListener("keydown", (event) => {
+  const card = event.target.closest?.('.flashcard[role="button"], .card-flip[role="button"]');
+  if (card && (event.key === "Enter" || event.key === " ")) { event.preventDefault(); card.click(); }
+});
 let spyFrame = 0;
 function lessonScrollSpy() {
   const nav = document.querySelector(".lesson-nav");
@@ -548,9 +557,7 @@ function learning() {
     learningSearchView = { key: searchKey, expanded: matching.map((c) => c.id) };
   }
   const expansion = search ? learningSearchView : view;
-  shell(
-    "学习路线",
-    `<div class="row between route-summary"><h2>体系课程</h2>${tag(completedKnowledgePoints() + " / " + knowledgePoints().length + " 已学")}</div><div class="search">${icon("search")}<input id="search" value="${e(search)}" placeholder="搜索知识点或语法" aria-label="搜索章节或知识点"></div><div class="chips stage-filters">${stages.map((stage) => button(stage, "learningStage", stage, "chip " + (view.stage === stage ? "selected" : ""))).join("")}</div><div class="chapter-list">${matching
+  const chapterSections = matching
       .map((c) => {
         const learned = c.knowledgePoints.filter((k) =>
           completedLesson(k.id),
@@ -569,11 +576,12 @@ function learning() {
           const done = completedLesson(k.id);
           const active = k.id === state.lastLesson;
           const status = done
-            ? '<span class="point-check">' + icon("check") + '</span>'
-            : '<span class="point-dot"></span>';
+            ? '<span class="point-check status-icon done" aria-hidden="true"></span>'
+            : '<span class="point-dot status-icon' + (active ? ' half' : '') + '" aria-hidden="true"></span>';
+          const questionCount = (k.relatedQuestionIds || []).length;
           return goButton(
             status + '<span class="grow">' + e(k.title) + '</span>' +
-              (active ? '<small class="learning-position">上次学到</small>' : '') + icon("right", "chevron"),
+              (active ? '<small class="learning-position">上次学到</small>' : '') + (questionCount ? '<span class="tag">' + questionCount + ' 题</span>' : ''),
             "/lesson/" + k.id,
             "knowledge-row" + (done ? " completed" : "") + (active ? " current" : ""),
           );
@@ -581,15 +589,22 @@ function learning() {
         return `<section class="chapter-card${current ? " current-chapter" : ""}">
           <button class="chapter-toggle" data-action="toggleChapter" data-arg="${c.id}" aria-expanded="${!!expanded}" aria-controls="learn-points-${c.id}">
             <span class="chapter-number">${String(c.number).padStart(2, "0")}</span>
-            <strong class="grow">${e(c.title)}${current ? '<span class="sr-only">，上次学习的章节</span>' : ''}</strong>
-            <small class="chapter-count" aria-label="已学 ${learned} 个，共 ${c.knowledgePoints.length} 个知识点">${learned} / ${c.knowledgePoints.length}</small>
-            ${icon("right", expanded ? "chevron expanded" : "chevron")}
+            <span class="chapter-main"><strong>${e(c.title)}${learned === c.knowledgePoints.length ? '<i class="done-dot" aria-hidden="true"></i><span class="sr-only">，本章已全部学完</span>' : ""}${current ? '<span class="sr-only">，上次学习的章节</span>' : ''}</strong><span class="barline"><span class="progress chapter-progress" role="progressbar" aria-label="${e(c.title)}学习进度" aria-valuemin="0" aria-valuemax="${c.knowledgePoints.length}" aria-valuenow="${learned}"><span style="width:${learned / c.knowledgePoints.length * 100}%"></span></span><small class="chapter-count" aria-label="已学 ${learned} 个，共 ${c.knowledgePoints.length} 个知识点">${learned}/${c.knowledgePoints.length}</small></span></span>
+            ${icon("down", expanded ? "chevron expanded" : "chevron")}
           </button>
-          <div class="progress chapter-progress" role="progressbar" aria-label="${e(c.title)}学习进度" aria-valuemin="0" aria-valuemax="${c.knowledgePoints.length}" aria-valuenow="${learned}"><span style="width:${learned / c.knowledgePoints.length * 100}%"></span></div>
           <div id="learn-points-${c.id}" ${expanded ? '' : 'hidden'}>${expanded ? '<p class="chapter-goal">' + e(c.objective) + '</p><div class="chapter-points">' + rows + '</div>' : ''}</div>
         </section>`;
       })
-      .join("")}</div>${matching.length ? "" : empty("未找到相关内容", "", button("重置筛选", "resetLearning", "", "outline"))}`,
+      ;
+  const stageGroups = stages.filter((stage) => stage !== "全部").map((stage) => {
+    const indexes = matching.map((c, i) => (c.stage === stage ? i : -1)).filter((i) => i >= 0);
+    if (!indexes.length) return "";
+    const done = indexes.filter((i) => completedChapter(matching[i])).length;
+    return `<div class="stage-h"><b>${e(stage)}</b><span class="aux">共 ${indexes.length} 章 · 已完成 ${done}</span></div><div class="panel route-list">${indexes.map((i) => chapterSections[i]).join("")}</div>`;
+  }).join("");
+    shell(
+    "学习路线",
+    `<div class="row between route-summary"><h2>体系课程</h2>${tag(completedKnowledgePoints() + " / " + knowledgePoints().length + " 已学")}</div><div class="search">${icon("search")}<input id="search" value="${e(search)}" placeholder="搜索知识点或语法" aria-label="搜索章节或知识点"></div><div class="chips stage-filters">${stages.map((stage) => button(stage, "learningStage", stage, "chip " + (view.stage === stage ? "selected" : ""))).join("")}</div><div class="chapter-list">${stageGroups}</div>${matching.length ? "" : empty("未找到相关内容", "", button("重置筛选", "resetLearning", "", "outline"))}`,
     "learn",
   );
 }
@@ -1087,25 +1102,51 @@ function interval(date) {
       ? Math.round(minutes / 60) + " 小时"
       : Math.round(minutes / 1440) + " 天";
 }
+function cardCode(c) {
+  const sql = c.front.code || "";
+  return sql ? `<div class="code-sample">${e(formatSqlForDisplay(sql))}</div>` : "";
+}
+function cardBackCode(c) {
+  const sql = c.back.code || c.back.sqliteCode || "";
+  return sql ? `<div class="code-sample">${e(formatSqlForDisplay(sql))}</div>` : "";
+}
+function cardBackBody(card, withRun = true) {
+  return `<p class="aux">原题：${e(card.front.question || "")}</p><div class="sec3"><h3>核心答案</h3><p>${e(card.back.answer || "")}</p></div>${card.back.explanation ? `<div class="sec3"><h3>原理拆解</h3><p>${e(card.back.explanation)}</p></div>` : ""}${card.back.correctionReason ? `<p class="note">补充提示：${e(card.back.correctionReason)}</p>` : ""}${cardBackCode(card)}${withRun && card.back.sqliteCode ? button(icon("play") + "本地实操运行示例", "cardLab", card.id, "outline full") : ""}`;
+}
+function cardStatus(c) {
+  const r = state.reviews[c.id];
+  return r ? `<span class="st o">已复习 ${r.reps || 0} 次 · S=${(r.stability || 0).toFixed(1)}</span>` : `<span class="st">新卡 · 待初学</span>`;
+}
 function cardsPage() {
   const fresh = allCards().filter((c) => !state.reviews[c.id]);
   const query = cardSearch.trim().toLowerCase();
-  const matching = content.cards.filter((c) => !query ||
+  const matching = content.cards.filter((c) => (!cardBrowseChapter || c.chapterId === cardBrowseChapter) && (!query ||
     [c.id, c.front.question, c.back.answer, c.back.explanation, ...(c.tags || [])]
-      .some((value) => String(value || "").toLowerCase().includes(query)));
-  const scheduled = ["每日到期", "新卡", "薄弱"].includes(newMode);
+      .some((value) => String(value || "").toLowerCase().includes(query))));
+  const all = allCards();
+  if (!spotId || !all.some((c) => c.id === spotId)) spotId = all[Math.floor(Math.random() * all.length)]?.id;
+  const spot = all.find((c) => c.id === spotId);
+  const chapterChips = (current, action) => content.chapters.map((c) => button("Ch" + c.number, action, c.id, "chip " + (current === c.id ? "selected" : ""))).join("");
+  const modeText = modeLabels[newMode];
   shell(
     "闪卡",
-    `<div class="row between route-summary"><small>200 张内置闪卡</small>${goButton("个人闪卡 " + state.userCards.length, "/my-cards", "small-button")}</div>
-    <section class="panel continue card-center"><div class="row between"><div class="grow"><h2>今日复习</h2><div class="card-counts"><span><strong>${dueCards().length}</strong><small>到期</small></span><span><strong>${fresh.length}</strong><small>新卡</small></span><span><strong>${studiedCards()}<small> / 200</small></strong><small>已学内置卡</small></span></div></div>${image("illustrations/states/state_flashcard_review", "card-center-art")}</div>
-    <div class="chips review-modes">${["每日到期", "新卡", "章节", "薄弱", "随机", "收藏", "自定义"].map((mode) => button(mode, "cardMode", mode, "chip " + (newMode === mode ? "selected" : ""))).join("")}</div>
-    ${newMode === "章节" ? `<label class="form-field">选择章节<select id="card-chapter">${content.chapters.map((c) => `<option value="${c.id}" ${cardChapter === c.id ? "selected" : ""}>${c.number}. ${e(c.title)}</option>`).join("")}</select></label>` : ""}
-    <p class="schedule-status">${scheduled ? "计入复习计划" : "自由浏览 · 不改变复习计划"}${newMode === "薄弱" ? " · 近期忘记或困难" : ""}</p>
-    ${button(newMode === "每日到期" ? "开始今日复习" : "开始" + newMode + "复习", "startCards", newMode, "primary full")}${state.flashSession ? button("继续上次复习", "resumeCards", "", "tonal full") : ""}</section>
-    <div class="section-heading"><h2>浏览闪卡</h2>${goButton(icon("plus") + " 新建", "/card-edit/new", "small-button")}</div>
-    <div class="search">${icon("search")}<input id="card-search" value="${e(cardSearch)}" placeholder="搜索问题、答案或标签" aria-label="搜索闪卡"></div>
-    <small class="card-match-count">${matching.length} 张</small>
-    ${matching.slice(0, cardBrowseLimit).map((c) => `<article class="card-browser-row"><div class="row between"><small>${e(c.id.toUpperCase())} · ${e(c.type)}</small>${button("复制为个人闪卡", "copyCard", c.id, "small-button")}</div><details><summary>${e(c.front.question)}</summary><div class="card-browser-answer">${rich(c.back)}</div></details></article>`).join("")}
+    `<div class="row route-summary card-head">${goButton(icon("plus") + " 自定义 (" + state.userCards.length + ")", "/my-cards", "small-button")}</div>
+    <section class="panel continue card-center"><div class="hub-row"><div class="grow"><h2>今日记忆调度台</h2><div class="card-counts"><span><strong class="c-due">${dueCards().length}</strong><small>待复习</small></span><span><strong class="c-new">${fresh.length}</strong><small>未学新卡</small></span><span><strong class="c-done">${studiedCards()}</strong><small>已掌握</small></span></div></div>${image("illustrations/states/state_flashcard_review", "card-center-art")}</div>
+    <div class="hub-prog"><div class="between-text"><span>累计涉猎 ${studiedCards()}/${content.cards.length} 张</span><b>目标保持率 90%</b></div><div class="hub-track"><i style="width:${Math.round((studiedCards() / Math.max(1, content.cards.length)) * 100)}%"></i></div></div>
+    <div class="chips review-modes">${Object.keys(modeLabels).map((mode) => button(modeLabels[mode], "cardMode", mode, "chip " + (newMode === mode ? "selected" : ""))).join("")}</div>
+    ${newMode === "章节" ? `<div class="chips review-modes chapter-chips">${chapterChips(cardChapter, "cardChapter")}</div>` : ""}
+    <div class="sched"><span>${cardScheduled ? "正式调度（自动计算下次复习时间）" : "自由浏览（不改变复习计划）"}</span><button class="switch" role="switch" aria-checked="${cardScheduled}" aria-label="正式调度" data-action="toggleSched"></button></div>
+    ${button(icon("flip") + `<span>进入「${modeText}」3D 翻卡学习</span>`, "startCards", newMode, "primary full start-flip")}${state.flashSession ? button("继续上次复习", "resumeCards", "", "tonal full") : ""}</section>
+    ${spot ? `<div class="section-heading"><h2>随手翻一张</h2>${button(icon("skip") + " 换一张", "spotNext", "", "text-button")}</div>
+    ${spotBack
+      ? `<div class="card-flip big back" role="button" tabindex="0" data-action="spotFlip" aria-label="点击翻回正面"><div class="row"><span class="aux">${e(spot.id.toUpperCase())} · 答案 · 解析</span><span class="tools">${button(icon("copy"), "copyCard", spot.id, "icon-button")}</span></div>${cardBackBody(spot)}</div>`
+      : `<button class="card-flip big" data-action="spotFlip" aria-label="点击翻面"><div class="t">${tag(spot.id.toUpperCase())}<span class="ic">${icon("flip")}</span><span class="aux">正面 · 点击翻面</span></div><div class="q">${e(spot.front.question || "")}</div>${cardCode(spot)}<div class="hint">先默想答案，再点击卡片翻面核对</div></button>`}` : ""}
+    <div class="section-heading"><small class="card-match-count">匹配到 ${matching.length} 张 · 点击卡片直接翻面</small>${cardFlipped.size ? button(icon("reset") + " 全部正面", "allFront", "", "text-button") : ""}</div>
+    <div class="search">${icon("search")}<input id="card-search" value="${e(cardSearch)}" placeholder="搜索闪卡问题、答案、卡号或标签…" aria-label="搜索闪卡"></div>
+    <div class="chips">${button("全部章", "browseChapter", "", "chip " + (!cardBrowseChapter ? "selected" : ""))}${chapterChips(cardBrowseChapter, "browseChapter")}</div>
+    ${matching.slice(0, cardBrowseLimit).map((c) => cardFlipped.has(c.id)
+      ? `<div class="card-flip mini back" role="button" tabindex="0" data-action="miniFlip" data-arg="${c.id}" aria-label="点击翻回正面"><div class="row"><span class="aux">${e(c.id.toUpperCase())} · 答案 · 解析</span><span class="tools">${button(icon("copy"), "copyCard", c.id, "icon-button")}</span></div>${cardBackBody(c)}</div>`
+      : `<button class="card-flip mini" data-action="miniFlip" data-arg="${c.id}"><div class="t"><span class="ic">${icon("flip")}</span><span class="q">${e(c.front.question)}</span></div>${cardCode(c)}<div class="row">${cardStatus(c)}<span class="tap">${icon("reset")}轻触翻面看答案</span></div></button>`).join("")}
     ${matching.length > cardBrowseLimit ? button("加载更多闪卡", "moreCards", "", "outline full") : ""}${matching.length ? "" : empty("暂无匹配闪卡", "", button("清除搜索", "resetCardSearch", "", "outline"))}`,
     "flashcards",
   );
@@ -1113,7 +1154,7 @@ function cardsPage() {
 async function startCards(mode, relatedIds) {
   let list = [];
   const all = allCards();
-  let scheduled = ["每日到期", "新卡", "薄弱"].includes(mode);
+  const scheduled = mode === "关联" ? false : cardScheduled;
   if (mode === "每日到期") {
     const reviewedToday = state.reviewEvents.filter(
       (r) => localDay(new Date(r.time)) === today(),
@@ -1189,7 +1230,9 @@ function reviewPage() {
   );
   shell(
     session.mode + "复习",
-    `<div class="row between"><small>${session.index + 1} / ${session.ids.length}</small><div class="row">${tag(session.scheduled ? "计入复习计划" : "自由浏览")}${session.lastRating ? button(icon("undo") + '<span class="sr-only">撤回上次评分</span>', "undoRating", "", "icon-button") : ""}</div></div><div class="progress"><span style="width:${(session.index / session.ids.length) * 100}%"></span></div><div class="row between">${tag(card.type)}${favButton(card.id)}</div><section class="flashcard ${flashBack ? "back" : ""}">${flashBack ? `${rich(card.back)}` : `<div class="question">${e(card.front.question || "")}</div>${rich(Object.fromEntries(Object.entries(card.front).filter(([k]) => k !== "question")))}`}</section>${!flashBack ? button("翻开答案", "flip", "", "primary full") : session.scheduled ? `<div class="rating">${["忘记", "困难", "记得", "熟练"].map((label, i) => button(label + `<small>${interval(schedule[i + 1].card.due)}</small>`, "rate", i + 1)).join("")}</div>` : button("下一张", "skipCard", "", "primary full")}<div class="actions">${button("跳过", "skipCard", "", "outline")}${goButton("暂停复习", "/cards", "outline")}</div>${button("复制为个人闪卡", "copyCard", card.id, "full")}`,
+    `<div class="row between"><small>${session.index + 1} / ${session.ids.length}</small><div class="row">${tag(session.scheduled ? "计入复习计划" : "自由浏览")}${session.lastRating ? button(icon("undo") + '<span class="sr-only">撤回上次评分</span>', "undoRating", "", "icon-button") : ""}</div></div><div class="progress"><span style="width:${(session.index / session.ids.length) * 100}%"></span></div><div class="row between flash-meta"><div class="flash-tags">${[card.type, ...(card.tags || [])].filter((t, i, a) => t && a.indexOf(t) === i).map((t) => tag(t)).join("")}</div>${favButton(card.id)}</div>
+    <section class="flashcard ${flashBack ? "back" : "front"}" role="button" tabindex="0" data-action="${flashBack ? "unflip" : "flip"}" aria-label="${flashBack ? "点击卡片翻回正面" : "点击卡片翻开答案"}"><div class="flash-top"><span class="flash-lab">${flashBack ? "答案 · 解析" : "正面 · 待翻卡"}</span></div>${flashBack
+      ? cardBackBody(card) : `<div class="question">${e(card.front.question || "")}</div>${cardCode(card)}${card.front.dataNote ? `<p class="aux">${e(card.front.dataNote)}</p>` : ""}${card.front.sourceTables?.length ? rich({ sourceTables: card.front.sourceTables }) : ""}`}</section>${!flashBack ? button(icon("skip") + "跳过", "skipCard", "", "outline full flash-under") : session.scheduled ? `<div class="rating">${["重来", "困难", "良好", "简单"].map((label, i) => button(label + `<small>${interval(schedule[i + 1].card.due)}</small>`, "rate", i + 1, "rate-" + (i + 1))).join("")}</div>` : button("下一张", "skipCard", "", "primary full flash-under")}<div class="actions">${goButton("暂停复习", "/cards", "outline")}${button("复制为个人闪卡", "copyCard", card.id, "outline")}</div>`,
     "flashcards",
     true,
   );
@@ -1945,6 +1988,56 @@ async function handleAction(action, arg, element) {
       break;
     case "cardMode":
       newMode = arg;
+      cardScheduled = ["每日到期", "新卡", "薄弱"].includes(arg);
+      await render();
+      break;
+    case "toggleSched":
+      cardScheduled = !cardScheduled;
+      await render();
+      break;
+    case "spotFlip":
+      spotBack = !spotBack;
+      await render();
+      break;
+    case "spotNext": {
+      const pool = allCards();
+      spotId = pool[Math.floor(Math.random() * pool.length)]?.id;
+      spotBack = false;
+      await render();
+      break;
+    }
+    case "miniFlip":
+      cardFlipped.has(arg) ? cardFlipped.delete(arg) : cardFlipped.add(arg);
+      await render();
+      break;
+    case "allFront":
+      cardFlipped.clear();
+      await render();
+      break;
+    case "browseChapter":
+      cardBrowseChapter = arg;
+      cardBrowseLimit = 40;
+      await render();
+      break;
+    case "cardLab": {
+      const c = allCards().find((x) => x.id === arg);
+      if (!c) return;
+      const kpId = (c.primaryKnowledgePointIds || c.knowledgePointIds || [])[0];
+      const dataset = getKP(kpId)?.datasetId || "example-" + kpId;
+      await openLab(dataset);
+      const workspace = labWorkspace();
+      const tabId = "query" + ++workspace.counter;
+      workspace.tabs.push({ id: tabId, title: "闪卡示例" });
+      workspace.active = tabId;
+      state.drafts[labDraftId()] = { code: formatSqlForDisplay(c.back.sqliteCode || c.back.code) };
+      await persist();
+      lastResult = null;
+      labTab = "代码";
+      navigate("/lab/" + dataset);
+      break;
+    }
+    case "cardChapter":
+      cardChapter = arg;
       await render();
       break;
     case "resetCardSearch":
@@ -2283,6 +2376,10 @@ async function handleAction(action, arg, element) {
       break;
     case "flip":
       flashBack = true;
+      await render();
+      break;
+    case "unflip":
+      flashBack = false;
       await render();
       break;
     case "rate": {
