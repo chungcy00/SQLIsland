@@ -2291,7 +2291,8 @@ pre, .code-input {white-space: pre-wrap; overflow-wrap: anywhere; overflow-x: hi
 .editor-line-measure {position: absolute; visibility: hidden; pointer-events: none; white-space: pre-wrap; overflow-wrap: anywhere; word-break: normal; padding: 0; border: 0; tab-size: 2; letter-spacing: 0;}
 
 /* B5：上一题/下一题位于内容末尾（不固定），与最后一行留间距 */
-.quiz-details > .sequence-actions { margin: 32px 0 8px; }
+.quiz-details { display: flex; flex-direction: column; min-height: calc(100dvh - 56px - 16px - 35px); }
+.quiz-details > .sequence-actions { margin: auto 0 8px; padding-top: 32px; }
 .editor-is-fullscreen .quiz-details > .sequence-actions { display: none; }
 
 .lesson-details h3 {font-size: .875rem; font-weight: 600; line-height: 1.5; margin: 16px 0 6px;}
