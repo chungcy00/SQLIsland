@@ -1184,25 +1184,45 @@ li {
   white-space: nowrap;
 }
 .sql-editor {
-  --editor-bg: #fbfdff;
-  --editor-fg: #344d5c;
-  --editor-comment: #647b88;
-  --editor-string: #327568;
-  --editor-number: #79591c;
-  --editor-keyword: #2f6486;
-  border: 1px solid var(--line);
-  border-radius: 14px;
+  --editor-bg: #ffffff;
+  --editor-fg: #17293a;
+  --editor-comment: #5e7281;
+  --editor-string: #a1473a;
+  --editor-number: #2e7a5a;
+  --editor-keyword: #2b5c9e;
+  --editor-function: #8a5a1c;
+  --editor-ident: #1b5d73;
+  --editor-gutter: #e2ecf2;
+  --editor-gutter-fg: #4f6272;
+  --editor-current: #eef4f8;
+  --editor-bracket: #c7e3f5;
+  --editor-bracket-line: #38607f;
+  --editor-line: #cfe0ea;
+  border: 1px solid var(--ctl);
+  border-radius: 12px;
   overflow: hidden;
   background: var(--editor-bg);
   margin-top: 10px;
 }
+.sql-editor:focus-within {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 1px var(--primary);
+}
 .sql-editor.dark {
-  --editor-bg: #243a48;
-  --editor-fg: #e0edf3;
-  --editor-comment: #aac1cf;
-  --editor-string: #a2d6bf;
-  --editor-number: #e6c68b;
-  --editor-keyword: #a5d4ed;
+  --editor-bg: #162634;
+  --editor-fg: #e4ecf1;
+  --editor-comment: #7f97a7;
+  --editor-string: #e0a07f;
+  --editor-number: #9fd0a5;
+  --editor-keyword: #7fb2e5;
+  --editor-function: #e3c98a;
+  --editor-ident: #9fd8e8;
+  --editor-gutter: #1a2d3c;
+  --editor-gutter-fg: #7f97a7;
+  --editor-current: #1a2d3c;
+  --editor-bracket: #2f4a60;
+  --editor-bracket-line: #7fb2e5;
+  --editor-line: #2f4a60;
 }
 .sql-editor-toolbar {
   display: flex;
@@ -1239,7 +1259,8 @@ li {
 }
 .editor-gutter {
   overflow: hidden;
-  color: var(--editor-comment);
+  color: var(--editor-gutter-fg);
+  background: var(--editor-gutter);
   font:
     var(--editor-font) / 24px "SFMono-Regular",
     Consolas,
@@ -1247,7 +1268,7 @@ li {
     monospace;
   text-align: right;
   padding: 14px 6px 0 0;
-  border-right: 1px solid var(--line);
+  border-right: 1px solid var(--editor-line);
   user-select: none;
 }
 #editor-lines {
@@ -1297,15 +1318,38 @@ li {
   overflow: auto;
   outline-offset: -3px;
 }
-.sql-keyword,
-.sql-function {
+.sql-keyword {
   color: var(--editor-keyword);
+}
+.sql-function {
+  color: var(--editor-function);
+}
+.sql-ident {
+  color: var(--editor-ident);
+}
+.sql-bracket {
+  background: var(--editor-bracket);
+  outline: 1px solid var(--editor-bracket-line);
+  border-radius: 2px;
+}
+#editor-curline {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  background: var(--editor-current);
+  pointer-events: none;
+}
+#editor-lines > div.current {
+  color: var(--editor-fg);
+  font-weight: 600;
 }
 .sql-string {
   color: var(--editor-string);
 }
 .sql-comment {
   color: var(--editor-comment);
+  font-style: italic;
 }
 .sql-number {
   color: var(--editor-number);

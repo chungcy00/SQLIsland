@@ -14,11 +14,31 @@ const keywords = new Set(
 );
 const controllers = new Map();
 
-function highlight(sql) {
+function bracketPairs(sql) {
+  const pairs = new Map();
+  const stack = [];
+  let offset = 0;
+  for (const token of tokens(sql)) {
+    if (token.type === "code") {
+      if (token.value === "(") stack.push(offset);
+      else if (token.value === ")" && stack.length) {
+        const open = stack.pop();
+        pairs.set(open, offset);
+        pairs.set(offset, open);
+      }
+    }
+    offset += token.value.length;
+  }
+  return pairs;
+}
+function highlight(sql, marks = new Set()) {
   const list = tokens(sql);
+  let offset = 0;
   return (
     list
       .map((token, index) => {
+        const at = offset;
+        offset += token.value.length;
         let kind = "";
         if (token.type === "comment") kind = "comment";
         else if (token.type === "quoted" && token.value[0] !== "`")
@@ -31,15 +51,21 @@ function highlight(sql) {
           list.slice(index + 1).find((t) => t.type !== "space")?.value === "("
         )
           kind = "function";
+        else if (
+          (token.type === "code" && /^[a-z_][\w$]*$/i.test(token.value)) ||
+          (token.type === "quoted" && token.value[0] === "`")
+        )
+          kind = "ident";
+        if (marks.has(at)) kind = (kind ? kind + " " : "") + "bracket";
         return kind
-          ? `<span class="sql-${kind}">${escape(token.value)}</span>`
+          ? `<span class="${kind.split(" ").map((k) => "sql-" + k).join(" ")}">${escape(token.value)}</span>`
           : escape(token.value);
       })
       .join("") + "\n"
   );
 }
 export function editorBody(id, value, settings, toolbar) {
-  return `<section class="sql-editor ${settings.editorDark ? "dark" : ""}" style="--editor-font:${settings.fontSize}px" data-editor="${escape(id)}"><div class="sql-editor-toolbar"><small>SQL <span id="editor-line-count">${value.split("\n").length}</span> 行</small><div class="editor-controls">${toolbar}</div></div><div class="editor-body"><div class="editor-gutter" aria-hidden="true"><div id="editor-lines"></div></div><div class="editor-content"><pre id="editor-highlight" aria-hidden="true"></pre><textarea id="sql-editor" class="code-input" data-id="${escape(id)}" inputmode="${settings.customKeyboard ? "none" : "text"}" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" wrap="soft" aria-label="SQL 代码编辑器">${escape(value)}</textarea></div></div></section>`;
+  return `<section class="sql-editor ${settings.editorDark ? "dark" : ""}" style="--editor-font:${settings.fontSize}px" data-editor="${escape(id)}"><div class="sql-editor-toolbar"><small>SQL <span id="editor-line-count">${value.split("\n").length}</span> 行</small><div class="editor-controls">${toolbar}</div></div><div class="editor-body"><div class="editor-gutter" aria-hidden="true"><div id="editor-lines"></div></div><div class="editor-content"><div id="editor-curline" aria-hidden="true" hidden></div><pre id="editor-highlight" aria-hidden="true"></pre><textarea id="sql-editor" class="code-input" data-id="${escape(id)}" inputmode="${settings.customKeyboard ? "none" : "text"}" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" wrap="soft" aria-label="SQL 代码编辑器">${escape(value)}</textarea></div></div></section>`;
 }
 export function mountEditor(root, onChange) {
   const input = root.querySelector("#sql-editor");
@@ -65,7 +91,8 @@ export function mountEditor(root, onChange) {
     };
   }
   function sync() {
-    root.querySelector("#editor-highlight").innerHTML = highlight(input.value);
+    marksKey = "";
+    root.querySelector("#editor-highlight").innerHTML = highlight(input.value, currentMarks());
     const lines = input.value.split("\n");
     const count = lines.length;
     const style = getComputedStyle(input);
@@ -76,10 +103,12 @@ export function mountEditor(root, onChange) {
     measure.innerHTML = lines.map((line) => `<div>${escape(line) || "<br>"}</div>`).join("");
     root.append(measure);
     const heights = [...measure.children].map((line) => line.getBoundingClientRect().height);
+    lineHeights = heights;
     measure.remove();
     root.querySelector(".editor-body").style.height = Math.max(120, heights.reduce((total, height) => total + height, 0) + 28) + "px";
     root.querySelector("#editor-lines").innerHTML = heights.map((height, index) => `<div style="height:${height}px">${index + 1}</div>`).join("");
     root.querySelector("#editor-line-count").textContent = count;
+    cursor();
     root.querySelector("[data-action=editorUndo]").disabled =
       !controller.undo.length;
     root.querySelector("[data-action=editorRedo]").disabled =
@@ -91,6 +120,48 @@ export function mountEditor(root, onChange) {
       `translate(${-input.scrollLeft}px,${-input.scrollTop}px)`;
     root.querySelector("#editor-lines").style.transform =
       `translateY(${-input.scrollTop}px)`;
+    placeCurrentLine();
+  }
+  let lineHeights = [];
+  let marksKey = "";
+  function focused() {
+    return document.activeElement === input;
+  }
+  function currentMarks() {
+    if (!focused() || input.selectionStart !== input.selectionEnd) return new Set();
+    const pos = input.selectionStart;
+    const pairs = bracketPairs(input.value);
+    for (const at of [pos - 1, pos]) {
+      if (pairs.has(at)) return new Set([at, pairs.get(at)]);
+    }
+    return new Set();
+  }
+  function currentLine() {
+    return input.value.slice(0, input.selectionStart).split("\n").length - 1;
+  }
+  function placeCurrentLine() {
+    const bar = root.querySelector("#editor-curline");
+    if (!bar) return;
+    if (!focused() || input.selectionStart !== input.selectionEnd || !lineHeights.length) {
+      bar.hidden = true;
+      return;
+    }
+    const line = Math.min(currentLine(), lineHeights.length - 1);
+    const top = lineHeights.slice(0, line).reduce((total, height) => total + height, 0);
+    bar.hidden = false;
+    bar.style.height = lineHeights[line] + "px";
+    bar.style.transform = `translateY(${14 + top - input.scrollTop}px)`;
+  }
+  function cursor() {
+    const marks = currentMarks();
+    const key = [...marks].sort().join(",");
+    if (key !== marksKey) {
+      marksKey = key;
+      root.querySelector("#editor-highlight").innerHTML = highlight(input.value, marks);
+    }
+    const line = focused() && input.selectionStart === input.selectionEnd ? currentLine() : -1;
+    root.querySelectorAll("#editor-lines > div").forEach((row, index) => row.classList.toggle("current", index === line));
+    placeCurrentLine();
   }
   function publish(previous) {
     if (previous.text !== input.value) {
@@ -113,6 +184,13 @@ export function mountEditor(root, onChange) {
     controller.current = snapshot();
   });
   input.addEventListener("scroll", scroll);
+  for (const name of ["keyup", "click", "touchend", "focus", "blur"])
+    input.addEventListener(name, () => requestAnimationFrame(cursor));
+  const onSelection = () => {
+    if (!input.isConnected) document.removeEventListener("selectionchange", onSelection);
+    else if (focused()) cursor();
+  };
+  document.addEventListener("selectionchange", onSelection);
   input.addEventListener("keydown", (event) => {
     if (event.isComposing) return;
     if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "z") {
