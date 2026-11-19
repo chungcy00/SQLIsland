@@ -268,8 +268,8 @@
       "difficulty": "入门",
       "type": "独立编写",
       "title": "门店月份骨架",
-      "context": "使用课程中小型月度销售、门店数据练习门店月份骨架。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "编写 SQL，完成以下查询要求。\n生成每家门店和每个月份所有组合，输出 store_id、month，按门店、月份升序。\n输出列名称及顺序：store_id, month。按题设排序；参考排序键：s.store_id,m.month。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "运营要做一张“门店 × 月份”的报表骨架，每家门店在每个月都要有一行。",
+      "requirements": "生成每家门店和每个月份的全部组合，输出 store_id、month。\n输出列名称及顺序：store_id, month。",
       "datasetId": "q0096-lesson",
       "schemaVersion": 3,
       "contentVersion": "4.2.2",
@@ -341,26 +341,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT s.store_id,m.month FROM stores s CROSS JOIN monthly m ORDER BY s.store_id,m.month",
-          "sqliteSql": "SELECT s.store_id,m.month FROM stores s CROSS JOIN monthly m ORDER BY s.store_id,m.month"
+          "mysqlSql": "SELECT s.store_id,m.month FROM stores s CROSS JOIN monthly m",
+          "sqliteSql": "SELECT s.store_id,m.month FROM stores s CROSS JOIN monthly m"
         },
         {
-          "kind": "语法等价",
-          "mysqlSql": "SELECT ALL s.store_id,m.month FROM stores s CROSS JOIN monthly m ORDER BY s.store_id,m.month",
-          "sqliteSql": "SELECT ALL s.store_id,m.month FROM stores s CROSS JOIN monthly m ORDER BY s.store_id,m.month",
-          "explanation": "普通 SELECT 默认保留重复记录，显式 ALL 不改变结果。"
+          "kind": "代数或函数等价",
+          "mysqlSql": "SELECT s.store_id,m.month FROM stores s, monthly m",
+          "sqliteSql": "SELECT s.store_id,m.month FROM stores s, monthly m"
         }
       ],
       "hints": [
-        "先画出两个关系中使用的键与一对多方向，判断哪一侧必须保留。",
-        "结合《笛卡尔积与完整维度》：CROSS JOIN 可构建所有维度组合，例如每个月份与每家门店；再左连接真实销售数据可补齐无交易组合。",
-        "按题设编写投影、筛选及分组，使用运行检查列名、NULL、重复记录和排序。"
+        "结果行数应该等于门店数乘以月份数，两张表之间没有可用于匹配的关联字段。",
+        "没有连接条件、把两张表的行两两配对的连接叫交叉连接（笛卡尔积）。",
+        "如果连接条件写成永远不成立，结果会是空的，而不是全部组合。"
       ],
-      "explanation": "笛卡尔积为完整月份报表生成骨架，不用实际订单驱动。\n执行思路：确认monthly、stores的输入记录；按题设连接条件匹配数据，注意连接造成的行数变化；输出store_id、month列；遵循题设排序和并列规则。\n公开夹具实际返回 12 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：普通 SELECT 默认保留重复记录，显式 ALL 不改变结果。",
+      "explanation": "CROSS JOIN 把 stores 的每一行与 monthly 的每一行配对，得到全部“门店 × 月份”组合，不需要连接条件。\n易错：用 JOIN … ON 1=0 加了一个永不成立的条件，结果为空。\n另一种写法：FROM stores s, monthly m（逗号连接）效果相同，但显式的 CROSS JOIN 更清楚。",
       "commonErrors": [
         {
-          "sql": "SELECT s.store_id,m.month FROM stores s JOIN monthly m ON 1=0 ORDER BY s.store_id,m.month",
-          "reason": "笛卡尔积为完整月份报表生成骨架，不用实际订单驱动。",
+          "sql": "SELECT s.store_id,m.month FROM stores s JOIN monthly m ON 1=0",
+          "reason": "连接条件永不成立，结果为空；需要的是不加条件的全部组合。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -375,24 +374,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0096/q0096-public.json",
-          "sha256": "2e55c16f88e72be3c647430013f2690f4e74551207f575b4a56e879f989278c5"
+          "sha256": "b0691603efa9d5a6f1ccab62da919c98780dcc7f6b3d30e8a81bad4e505f44c5"
         },
         {
           "id": "q0096-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0096/q0096-boundary.json",
-          "sha256": "1c69b15408846517a59c86825159968e06cd27cac18eb6b485a0428d832dd3dd"
+          "sha256": "ca6b3879623bc140fd8f46371cc02f1535eb5cd2e327a24decdcdd69f0b0f3cb"
         },
         {
           "id": "q0096-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0096/q0096-empty.json",
-          "sha256": "9ae01da8fcb7bba4e1c59810ade541ecad0e64564a639a82f10abd268e0bbc3a"
+          "sha256": "439e16cdbaa394c1b56648cba274e601d23d7764d81dfe92d717179c4bd4ef36"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -411,7 +410,7 @@
       "mysqlVerification": "未运行 MySQL 8.4",
       "validation": {
         "kind": "query",
-        "equivalentKind": "语法等价",
+        "equivalentKind": "代数或函数等价",
         "fixtures": [
           {
             "fixtureId": "q0096-public",
@@ -497,8 +496,8 @@
       "difficulty": "简单",
       "type": "独立编写",
       "title": "订单所属门店名称",
-      "context": "使用课程中小型订单、门店数据练习订单所属门店名称。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "编写 SQL，完成以下查询要求。\n匹配 orders.store_id 与 stores.store_id，输出 id、store_name，按 id 升序，仅匹配记录。\n输出列名称及顺序：id, store_name。按题设排序；参考排序键：o.id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "订单表里只存了门店编号，报表需要显示门店名称。",
+      "requirements": "用 orders.store_id 与 stores.store_id 匹配，输出订单 id 和门店名称 store_name，只保留能匹配上的记录。\n输出列名称及顺序：id, store_name。",
       "datasetId": "q0097-lesson",
       "schemaVersion": 3,
       "contentVersion": "4.2.2",
@@ -542,26 +541,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT o.id,s.store_name FROM orders o JOIN stores s ON o.store_id=s.store_id ORDER BY o.id",
-          "sqliteSql": "SELECT o.id,s.store_name FROM orders o JOIN stores s ON o.store_id=s.store_id ORDER BY o.id"
+          "mysqlSql": "SELECT o.id,s.store_name FROM orders o JOIN stores s ON o.store_id=s.store_id",
+          "sqliteSql": "SELECT o.id,s.store_name FROM orders o JOIN stores s ON o.store_id=s.store_id"
         },
         {
-          "kind": "语法等价",
-          "mysqlSql": "SELECT ALL o.id,s.store_name FROM orders o JOIN stores s ON o.store_id=s.store_id ORDER BY o.id",
-          "sqliteSql": "SELECT ALL o.id,s.store_name FROM orders o JOIN stores s ON o.store_id=s.store_id ORDER BY o.id",
-          "explanation": "普通 SELECT 默认保留重复记录，显式 ALL 不改变结果。"
+          "kind": "代数或函数等价",
+          "mysqlSql": "SELECT o.id,s.store_name FROM orders o JOIN stores s USING (store_id)",
+          "sqliteSql": "SELECT o.id,s.store_name FROM orders o JOIN stores s USING (store_id)"
         }
       ],
       "hints": [
-        "先画出两个关系中使用的键与一对多方向，判断哪一侧必须保留。",
-        "结合《INNER JOIN 与 ON》：内连接仅返回满足连接条件的行对；一个父记录匹配多个子记录会产生多行。",
-        "按题设编写投影、筛选及分组，使用运行检查列名、NULL、重复记录和排序。"
+        "门店名称在另一张表里，需要通过两张表共有的门店编号把它们连接起来。",
+        "JOIN … ON 左表字段 = 右表字段 指定连接条件；只保留双方都匹配的行用普通的 JOIN（内连接）。",
+        "检查 ON 两边是不是同一种含义的字段：订单的门店编号应该对应门店表的门店编号。"
       ],
-      "explanation": "连接键应该是门店键，而不是订单主键。\n执行思路：确认orders、stores的输入记录；按题设连接条件匹配数据，注意连接造成的行数变化；输出id、store_name列；遵循题设排序和并列规则。\n公开夹具实际返回 5 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：普通 SELECT 默认保留重复记录，显式 ALL 不改变结果。",
+      "explanation": "orders o JOIN stores s ON o.store_id=s.store_id 用门店编号把订单和门店配对，只返回两边都匹配的行。\n易错：用 o.id（订单编号）去匹配 s.store_id，两个字段含义不同，只是数字碰巧相等时才会“匹配”，结果是错的。\n另一种写法：JOIN stores s USING (store_id)，当两边字段同名时可以省略 ON。",
       "commonErrors": [
         {
-          "sql": "SELECT o.id,s.store_name FROM orders o JOIN stores s ON o.id=s.store_id ORDER BY o.id",
-          "reason": "连接键应该是门店键，而不是订单主键。",
+          "sql": "SELECT o.id,s.store_name FROM orders o JOIN stores s ON o.id=s.store_id",
+          "reason": "连接字段错了：订单编号与门店编号含义不同，不能用来匹配。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -576,24 +574,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0097/q0097-public.json",
-          "sha256": "f9027e482c054e9a0653f43d50db4130ef1d15fc1cd8f39dd9c708db3f37a0b0"
+          "sha256": "4671999abc1b6d84f3c71c144ea972e385c29046324ceef18693a6f0d74f29f5"
         },
         {
           "id": "q0097-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0097/q0097-boundary.json",
-          "sha256": "c1dad986ad1d5cd6119ec5d8824dbe6be6ec29b3349519472f0a04628e39f4e8"
+          "sha256": "26f0e47307b1b9098fd0d87a9e0e44b2c9c4d15ffca69a23c45b6ccd6c49496c"
         },
         {
           "id": "q0097-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0097/q0097-empty.json",
-          "sha256": "f5915859707ce1f82552ff6a58e8439df14a67b0cdbe49a073bd87dc215a96c1"
+          "sha256": "bc1633e734aa1e55fbf424306e89decc59d9840ef5b77b215ce158566d435af6"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -612,7 +610,7 @@
       "mysqlVerification": "未运行 MySQL 8.4",
       "validation": {
         "kind": "query",
-        "equivalentKind": "语法等价",
+        "equivalentKind": "代数或函数等价",
         "fixtures": [
           {
             "fixtureId": "q0097-public",
@@ -699,8 +697,8 @@
       "difficulty": "简单",
       "type": "独立编写",
       "title": "匹配真实客户姓名",
-      "context": "使用课程中小型客户、订单数据练习匹配真实客户姓名。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "只保留订单与客户均有匹配的记录，返回 id、customer_name，按订单编号升序。\n输出列名称及顺序：id, customer_name。按题设排序；参考排序键：o.id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "运营要核对订单对应的客户姓名，缺少客户信息的订单不需要列出。",
+      "requirements": "只保留订单与客户都能匹配上的记录，返回订单 id 和客户姓名 customer_name。\n输出列名称及顺序：id, customer_name。",
       "datasetId": "q0098-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -740,26 +738,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT o.id,c.customer_name FROM orders o JOIN customers c ON o.customer_id=c.customer_id ORDER BY o.id",
-          "sqliteSql": "SELECT o.id,c.customer_name FROM orders o JOIN customers c ON o.customer_id=c.customer_id ORDER BY o.id"
+          "mysqlSql": "SELECT o.id,c.customer_name FROM orders o JOIN customers c ON o.customer_id=c.customer_id",
+          "sqliteSql": "SELECT o.id,c.customer_name FROM orders o JOIN customers c ON o.customer_id=c.customer_id"
         },
         {
-          "kind": "语法等价",
-          "mysqlSql": "SELECT ALL o.id,c.customer_name FROM orders o JOIN customers c ON o.customer_id=c.customer_id ORDER BY o.id",
-          "sqliteSql": "SELECT ALL o.id,c.customer_name FROM orders o JOIN customers c ON o.customer_id=c.customer_id ORDER BY o.id",
-          "explanation": "普通 SELECT 默认保留重复记录，显式 ALL 不改变结果。"
+          "kind": "代数或函数等价",
+          "mysqlSql": "SELECT o.id,c.customer_name FROM orders o INNER JOIN customers c ON o.customer_id=c.customer_id",
+          "sqliteSql": "SELECT o.id,c.customer_name FROM orders o INNER JOIN customers c ON o.customer_id=c.customer_id"
         }
       ],
       "hints": [
-        "先画出两个关系中使用的键与一对多方向，判断哪一侧必须保留。",
-        "结合《INNER JOIN 与 ON》：内连接仅返回满足连接条件的行对；一个父记录匹配多个子记录会产生多行。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT o.id,c.customer_name FROM orders o □□□ c ON o.customer_id=c.customer_id ORDER BY o.id"
+        "“只保留双方都匹配”说明要用哪一种连接？",
+        "内连接只返回两张表都有对应记录的行；左连接会保留左表的全部行，没有匹配的右表字段为 NULL。",
+        "检查结果里有没有客户姓名为 NULL 的行，有的话说明保留了没有匹配的订单。"
       ],
-      "explanation": "内连接舍弃无法匹配客户的订单。\n执行思路：确认customers、orders的输入记录；按题设连接条件匹配数据，注意连接造成的行数变化；输出id、customer_name列；遵循题设排序和并列规则。\n公开夹具实际返回 4 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：普通 SELECT 默认保留重复记录，显式 ALL 不改变结果。",
+      "explanation": "JOIN（内连接）只返回订单和客户都匹配的行，customer_id 为 NULL 或客户不存在的订单会被丢掉。\n易错：LEFT JOIN 会保留所有订单，没有匹配的订单姓名为 NULL，多出来的行不符合“只保留匹配”。",
       "commonErrors": [
         {
-          "sql": "SELECT o.id,c.customer_name FROM orders o LEFT JOIN customers c ON o.customer_id=c.customer_id ORDER BY o.id",
-          "reason": "内连接舍弃无法匹配客户的订单。",
+          "sql": "SELECT o.id,c.customer_name FROM orders o LEFT JOIN customers c ON o.customer_id=c.customer_id",
+          "reason": "LEFT JOIN 会保留没有匹配客户的订单，题目要求只保留双方匹配的记录。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -774,24 +771,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0098/q0098-public.json",
-          "sha256": "70c543f050822284e47fb90c709db2cce80cd23739ac824b439d666c061ffe1d"
+          "sha256": "bc02334d7cd207f6e405f0304466e6af13a2e734e7d5ad6dd873d2dc05af4c63"
         },
         {
           "id": "q0098-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0098/q0098-boundary.json",
-          "sha256": "2124991e3e4790b6c1c849dce60fb7527ff8c728ae222cc22bfabb09b40858d0"
+          "sha256": "0dbd5595e1df9f25e8851c472e85d681ba84195fbf3625a73267841683ac7b91"
         },
         {
           "id": "q0098-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0098/q0098-empty.json",
-          "sha256": "7688d779d0881291e4f8b12acae805999bb8a38556ff19c68b13f7c86c2fd7b2"
+          "sha256": "51b31d7061e8ff2917a7d666064b46670f7ecd513b3b5cf1f68b2309ef6b288a"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -810,7 +807,7 @@
       "mysqlVerification": "未运行 MySQL 8.4",
       "validation": {
         "kind": "query",
-        "equivalentKind": "语法等价",
+        "equivalentKind": "代数或函数等价",
         "fixtures": [
           {
             "fixtureId": "q0098-public",
@@ -896,8 +893,8 @@
       "difficulty": "简单",
       "type": "独立编写",
       "title": "门店所有订单及匿名标识",
-      "context": "使用课程中小型客户、订单数据练习门店所有订单及匿名标识。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "所有订单须保留，匹配客户时显示姓名；输出 id、customer_name，按 id 升序。\n输出列名称及顺序：id, customer_name。按题设排序；参考排序键：o.id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "运营要看所有订单的客户姓名，匿名订单（没有客户）也要列出来。",
+      "requirements": "保留全部订单；能匹配到客户时显示客户姓名，匹配不到时姓名为 NULL。输出 id、customer_name。\n输出列名称及顺序：id, customer_name。",
       "datasetId": "q0099-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -941,26 +938,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT o.id,c.customer_name FROM orders o LEFT JOIN customers c ON o.customer_id=c.customer_id ORDER BY o.id",
-          "sqliteSql": "SELECT o.id,c.customer_name FROM orders o LEFT JOIN customers c ON o.customer_id=c.customer_id ORDER BY o.id"
+          "mysqlSql": "SELECT o.id,c.customer_name FROM orders o LEFT JOIN customers c ON o.customer_id=c.customer_id",
+          "sqliteSql": "SELECT o.id,c.customer_name FROM orders o LEFT JOIN customers c ON o.customer_id=c.customer_id"
         },
         {
-          "kind": "语法等价",
-          "mysqlSql": "SELECT o.id,c.customer_name FROM orders o LEFT OUTER JOIN customers c ON o.customer_id=c.customer_id ORDER BY o.id",
-          "sqliteSql": "SELECT o.id,c.customer_name FROM orders o LEFT OUTER JOIN customers c ON o.customer_id=c.customer_id ORDER BY o.id",
-          "explanation": "省略或写出 OUTER 不改变左连接。"
+          "kind": "代数或函数等价",
+          "mysqlSql": "SELECT o.id,c.customer_name FROM orders o LEFT OUTER JOIN customers c ON o.customer_id=c.customer_id",
+          "sqliteSql": "SELECT o.id,c.customer_name FROM orders o LEFT OUTER JOIN customers c ON o.customer_id=c.customer_id"
         }
       ],
       "hints": [
-        "先画出两个关系中使用的键与一对多方向，判断哪一侧必须保留。",
-        "结合《LEFT JOIN 与 RIGHT JOIN》：左连接保留左表全部行，右表无匹配时补 NULL；右连接反向保留。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT o.id,c.customer_name FROM orders o □□□ customers c ON o.customer_id=c.customer_id ORDER BY o.id"
+        "“所有订单都要保留”意味着订单表是主表，不能因为没有客户而丢行。",
+        "左连接保留左表的全部行，右表没有匹配时对应字段为 NULL。",
+        "内连接会把没有客户的订单丢掉，对比一下行数看看有没有少。"
       ],
-      "explanation": "匿名或无匹配客户的订单不能丢失。\n执行思路：确认customers、orders的输入记录；按题设连接条件匹配数据，注意连接造成的行数变化；输出id、customer_name列；遵循题设排序和并列规则。\n公开夹具实际返回 5 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：省略或写出 OUTER 不改变左连接。",
+      "explanation": "orders o LEFT JOIN customers c ON … 以订单为主表：每个订单都出现，有客户时带出姓名，没有客户时姓名是 NULL。\n易错：普通 JOIN 只保留匹配的行，匿名订单会消失，订单数就对不上了。",
       "commonErrors": [
         {
-          "sql": "SELECT o.id,c.customer_name FROM orders o JOIN customers c ON o.customer_id=c.customer_id ORDER BY o.id",
-          "reason": "匿名或无匹配客户的订单不能丢失。",
+          "sql": "SELECT o.id,c.customer_name FROM orders o JOIN customers c ON o.customer_id=c.customer_id",
+          "reason": "内连接会丢掉没有匹配客户的订单，题目要求保留所有订单。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -975,24 +971,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0099/q0099-public.json",
-          "sha256": "a4feb2dc7dca21bc3f83b4c21c4c4cac724b05075556a10fced7222d1782766e"
+          "sha256": "e069aaca85157c37547bb0807a33d476f6b091b674b4cdbecb0a530450f7b9c6"
         },
         {
           "id": "q0099-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0099/q0099-boundary.json",
-          "sha256": "da67fb5d7792eabfd72be9671270a9897dbfcbeeb1fb992a457eef5cee4c14b7"
+          "sha256": "428232e0bca7c3dda6edd98735b3a4471c00ac1941d2ea7cc22240489cd7f09e"
         },
         {
           "id": "q0099-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0099/q0099-empty.json",
-          "sha256": "dd3656fcb6d8f655e56fb971687acccc0efd00703ac83660cdd140cb2f01db99"
+          "sha256": "5577ab25e66d8a0332fcb63c99dcb2fd1fbc0028e29d437814cae6592ff76993"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -1011,7 +1007,7 @@
       "mysqlVerification": "未运行 MySQL 8.4",
       "validation": {
         "kind": "query",
-        "equivalentKind": "语法等价",
+        "equivalentKind": "代数或函数等价",
         "fixtures": [
           {
             "fixtureId": "q0099-public",
@@ -1096,8 +1092,8 @@
       "difficulty": "简单",
       "type": "代码填空",
       "title": "门店是否拥有订单",
-      "context": "使用课程中小型订单、门店数据练习门店是否拥有订单。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "补全代码中的一个空位，使完整SQL满足以下要求。可输入具有相同语义的片段，提交后按完整代码执行结果核对。\n所有门店输出 store_id、对应 order_id；无订单为NULL，按门店和订单编号升序。\n输出列名称及顺序：store_id, order_id。按题设排序；参考排序键：s.store_id,o.id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "运营想知道每家门店有哪些订单，没有订单的门店也要出现在结果里。",
+      "requirements": "补全空位，列出所有门店和对应的订单编号（列别名 order_id）；没有订单的门店，order_id 为 NULL。\n输出列名称及顺序：store_id, order_id。",
       "datasetId": "q0101-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -1105,7 +1101,7 @@
         "orders",
         "stores"
       ],
-      "initialCode": "SELECT s.store_id,o.id AS order_id FROM stores s {{blank1}} orders o ON s.store_id=o.store_id ORDER BY s.store_id,o.id",
+      "initialCode": "SELECT s.store_id,o.id AS order_id FROM stores s {{blank1}} orders o ON s.store_id=o.store_id",
       "options": [],
       "acceptedBlanks": [
         {
@@ -1154,26 +1150,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT s.store_id,o.id AS order_id FROM stores s LEFT JOIN orders o ON s.store_id=o.store_id ORDER BY s.store_id,o.id",
-          "sqliteSql": "SELECT s.store_id,o.id AS order_id FROM stores s LEFT JOIN orders o ON s.store_id=o.store_id ORDER BY s.store_id,o.id"
+          "mysqlSql": "SELECT s.store_id,o.id AS order_id FROM stores s LEFT JOIN orders o ON s.store_id=o.store_id",
+          "sqliteSql": "SELECT s.store_id,o.id AS order_id FROM stores s LEFT JOIN orders o ON s.store_id=o.store_id"
         },
         {
-          "kind": "语法等价",
-          "mysqlSql": "SELECT s.store_id,o.id AS order_id FROM stores s LEFT OUTER JOIN orders o ON s.store_id=o.store_id ORDER BY s.store_id,o.id",
-          "sqliteSql": "SELECT s.store_id,o.id AS order_id FROM stores s LEFT OUTER JOIN orders o ON s.store_id=o.store_id ORDER BY s.store_id,o.id",
-          "explanation": "省略或写出 OUTER 不改变左连接。"
+          "kind": "代数或函数等价",
+          "mysqlSql": "SELECT s.store_id,o.id AS order_id FROM stores s LEFT OUTER JOIN orders o ON s.store_id=o.store_id",
+          "sqliteSql": "SELECT s.store_id,o.id AS order_id FROM stores s LEFT OUTER JOIN orders o ON s.store_id=o.store_id"
         }
       ],
       "hints": [
-        "先画出两个关系中使用的键与一对多方向，判断哪一侧必须保留。",
-        "结合《LEFT JOIN 与 RIGHT JOIN》：左连接保留左表全部行，右表无匹配时补 NULL；右连接反向保留。",
-        "回想空位所在子句的功能：LEFT JOIN 与 RIGHT JOIN；保留周围代码，填入实现题设的表达式。"
+        "“所有门店都要出现”说明门店表是必须完整保留的一侧。",
+        "左连接保留左表的全部行；FROM 后面的表是左表。",
+        "用内连接时，没有订单的门店会被丢掉。"
       ],
-      "explanation": "维度完整性要求保留零业务门店。\n执行思路：确认orders、stores的输入记录；按题设连接条件匹配数据，注意连接造成的行数变化；输出store_id、order_id列；遵循题设排序和并列规则。\n公开夹具实际返回 6 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：省略或写出 OUTER 不改变左连接。",
+      "explanation": "stores 在 FROM 后面，是左表；LEFT JOIN 保留它的全部行，没有订单的门店在 order_id 位置显示 NULL。\n易错：普通 JOIN 只保留匹配的行，没有订单的门店会消失。",
       "commonErrors": [
         {
-          "sql": "SELECT s.store_id,o.id AS order_id FROM stores s JOIN orders o ON s.store_id=o.store_id ORDER BY s.store_id,o.id",
-          "reason": "维度完整性要求保留零业务门店。",
+          "sql": "SELECT s.store_id,o.id AS order_id FROM stores s JOIN orders o ON s.store_id=o.store_id",
+          "reason": "内连接会丢掉没有订单的门店，需要左连接保留全部门店。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -1188,24 +1183,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0101/q0101-public.json",
-          "sha256": "f984aa3467371c5f820e31a1c8c1560f89819877e55cc2c8bad5e62a19129088"
+          "sha256": "9bcc5851497aab18bb1ffbdb18cce2997b68f379c15051a92967b1a55c57005e"
         },
         {
           "id": "q0101-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0101/q0101-boundary.json",
-          "sha256": "0678ec9c367453bf9856a57cba600f2486f534545d346d7e659497c03e36bced"
+          "sha256": "f584b95aa645ae6a3e1dd81586b749d2e69511bbc94f6aed16a54f3c28c28fed"
         },
         {
           "id": "q0101-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0101/q0101-empty.json",
-          "sha256": "af00995eb168994bab7f267048c3a21c90a1787f3e93927e8920981fe8476fa0"
+          "sha256": "eecc73cbe24efb093b70c31964e63f421c32b02bb58b5677f582e9f7d77d9284"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -1224,7 +1219,7 @@
       "mysqlVerification": "未运行 MySQL 8.4",
       "validation": {
         "kind": "query",
-        "equivalentKind": "语法等价",
+        "equivalentKind": "代数或函数等价",
         "fixtures": [
           {
             "fixtureId": "q0101-public",
@@ -1729,8 +1724,8 @@
       "difficulty": "简单",
       "type": "独立编写",
       "title": "商品销售明细补全",
-      "context": "使用课程中小型订单明细、商品数据练习商品销售明细补全。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "order_items 与 products 按商品键内连接，输出 order_item_id、product_name、quantity，按明细编号升序。\n输出列名称及顺序：order_item_id, product_name, quantity。按题设排序；参考排序键：i.order_item_id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "销售明细里只有商品编号，报表需要同时显示商品名称。",
+      "requirements": "用商品编号把 order_items 与 products 做内连接，输出明细编号 order_item_id、商品名称 product_name 和数量 quantity。\n输出列名称及顺序：order_item_id, product_name, quantity。",
       "datasetId": "q0106-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -1770,26 +1765,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT i.order_item_id,p.product_name,i.quantity FROM order_items i JOIN products p ON i.product_id=p.product_id ORDER BY i.order_item_id",
-          "sqliteSql": "SELECT i.order_item_id,p.product_name,i.quantity FROM order_items i JOIN products p ON i.product_id=p.product_id ORDER BY i.order_item_id"
+          "mysqlSql": "SELECT i.order_item_id,p.product_name,i.quantity FROM order_items i JOIN products p ON i.product_id=p.product_id",
+          "sqliteSql": "SELECT i.order_item_id,p.product_name,i.quantity FROM order_items i JOIN products p ON i.product_id=p.product_id"
         },
         {
-          "kind": "语法等价",
-          "mysqlSql": "SELECT ALL i.order_item_id,p.product_name,i.quantity FROM order_items i JOIN products p ON i.product_id=p.product_id ORDER BY i.order_item_id",
-          "sqliteSql": "SELECT ALL i.order_item_id,p.product_name,i.quantity FROM order_items i JOIN products p ON i.product_id=p.product_id ORDER BY i.order_item_id",
-          "explanation": "普通 SELECT 默认保留重复记录，显式 ALL 不改变结果。"
+          "kind": "代数或函数等价",
+          "mysqlSql": "SELECT i.order_item_id,p.product_name,i.quantity FROM order_items i INNER JOIN products p ON i.product_id=p.product_id",
+          "sqliteSql": "SELECT i.order_item_id,p.product_name,i.quantity FROM order_items i INNER JOIN products p ON i.product_id=p.product_id"
         }
       ],
       "hints": [
-        "先画出两个关系中使用的键与一对多方向，判断哪一侧必须保留。",
-        "结合《INNER JOIN 与 ON》：内连接仅返回满足连接条件的行对；一个父记录匹配多个子记录会产生多行。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT i.order_item_id,p.product_name,i.quantity FROM order_items i JOIN products p ON □□□ ORDER BY i.order_item_id"
+        "商品名称在 products 表里，需要通过商品编号把两张表连起来。",
+        "ON 后面写两张表中含义相同的字段：明细里的商品编号对应商品表的商品编号。",
+        "不要用明细自己的编号去匹配商品编号。"
       ],
-      "explanation": "明细编号是本表主键，不等于商品外键。\n执行思路：确认order_items、products的输入记录；按题设连接条件匹配数据，注意连接造成的行数变化；输出order_item_id、product_name、quantity列；遵循题设排序和并列规则。\n公开夹具实际返回 3 行、3 列；完整结果见 expectedOutput。\n另一种可用写法：普通 SELECT 默认保留重复记录，显式 ALL 不改变结果。",
+      "explanation": "order_items i JOIN products p ON i.product_id=p.product_id 用商品编号配对，返回每条明细对应的商品名称。\n易错：用 i.order_item_id（明细编号）去匹配 p.product_id，字段含义不同，配对结果是错的。",
       "commonErrors": [
         {
-          "sql": "SELECT i.order_item_id,p.product_name,i.quantity FROM order_items i JOIN products p ON i.order_item_id=p.product_id ORDER BY i.order_item_id",
-          "reason": "明细编号是本表主键，不等于商品外键。",
+          "sql": "SELECT i.order_item_id,p.product_name,i.quantity FROM order_items i JOIN products p ON i.order_item_id=p.product_id",
+          "reason": "连接字段错误：明细编号和商品编号含义不同。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -1804,24 +1798,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0106/q0106-public.json",
-          "sha256": "b7023fcbd372f9a3c263097e28e921b48d6292a4886f0d28a9d7ce95b64ae3ad"
+          "sha256": "44853d880dd4db5cb9aacd579830c5d5ee0266a66f980179386cf271de87f4d6"
         },
         {
           "id": "q0106-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0106/q0106-boundary.json",
-          "sha256": "91c2cc2fc46687feab845c54f2e03b8e95881d0bf797003e59ba0b340a5ce706"
+          "sha256": "3e945abfc7ed172711e069a709f0a194ab008ea229cbfbe0bcdc597766907427"
         },
         {
           "id": "q0106-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0106/q0106-empty.json",
-          "sha256": "eed58e95689e76ac7979aba9af3425a65550cacd75311b4497031d7e96c618c1"
+          "sha256": "7603c7204a19ee73e4791e1a394c00168f91250f861e09624a79d741175ef1cf"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -1840,7 +1834,7 @@
       "mysqlVerification": "未运行 MySQL 8.4",
       "validation": {
         "kind": "query",
-        "equivalentKind": "语法等价",
+        "equivalentKind": "代数或函数等价",
         "fixtures": [
           {
             "fixtureId": "q0106-public",
@@ -1925,8 +1919,8 @@
       "difficulty": "简单",
       "type": "独立编写",
       "title": "所有客户及订单金额",
-      "context": "使用课程中小型客户、订单数据练习所有客户及订单金额。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "客户表为主，输出 customer_id、order_id（o.id）、sales，包含没下单的客户；按客户、订单编号升序。\n输出列名称及顺序：customer_id, order_id, sales。按题设排序；参考排序键：c.customer_id,o.id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "客户经理要看每位客户的订单情况，没下过单的客户也要列出。",
+      "requirements": "以客户表为主，输出 customer_id、订单编号 order_id（即 o.id）和销售额 sales，没下过单的客户也要出现。\n输出列名称及顺序：customer_id, order_id, sales。",
       "datasetId": "q0107-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -1976,26 +1970,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT c.customer_id,o.id AS order_id,o.sales FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id ORDER BY c.customer_id,o.id",
-          "sqliteSql": "SELECT c.customer_id,o.id AS order_id,o.sales FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id ORDER BY c.customer_id,o.id"
+          "mysqlSql": "SELECT c.customer_id,o.id AS order_id,o.sales FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id",
+          "sqliteSql": "SELECT c.customer_id,o.id AS order_id,o.sales FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id"
         },
         {
-          "kind": "语法等价",
-          "mysqlSql": "SELECT c.customer_id,o.id AS order_id,o.sales FROM customers c LEFT OUTER JOIN orders o ON c.customer_id=o.customer_id ORDER BY c.customer_id,o.id",
-          "sqliteSql": "SELECT c.customer_id,o.id AS order_id,o.sales FROM customers c LEFT OUTER JOIN orders o ON c.customer_id=o.customer_id ORDER BY c.customer_id,o.id",
-          "explanation": "省略或写出 OUTER 不改变左连接。"
+          "kind": "代数或函数等价",
+          "mysqlSql": "SELECT c.customer_id,o.id AS order_id,o.sales FROM customers c LEFT OUTER JOIN orders o ON c.customer_id=o.customer_id",
+          "sqliteSql": "SELECT c.customer_id,o.id AS order_id,o.sales FROM customers c LEFT OUTER JOIN orders o ON c.customer_id=o.customer_id"
         }
       ],
       "hints": [
-        "先画出两个关系中使用的键与一对多方向，判断哪一侧必须保留。",
-        "结合《LEFT JOIN 与 RIGHT JOIN》：左连接保留左表全部行，右表无匹配时补 NULL；右连接反向保留。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT c.customer_id,o.id AS order_id,o.sales FROM customers c □□□ orders o ON c.customer_id=o.customer_id ORDER BY c.customer_id,o.id"
+        "“没下单的客户也要出现”说明客户表是必须完整保留的一侧。",
+        "客户表写在 FROM 后面作为左表，用左连接接订单表。",
+        "没有订单的客户，订单字段会是 NULL，这是正常的。"
       ],
-      "explanation": "客户即使没有匹配订单也必须保留。\n执行思路：确认customers、orders的输入记录；按题设连接条件匹配数据，注意连接造成的行数变化；输出customer_id、order_id、sales列；遵循题设排序和并列规则。\n公开夹具实际返回 5 行、3 列；完整结果见 expectedOutput。\n另一种可用写法：省略或写出 OUTER 不改变左连接。",
+      "explanation": "customers c LEFT JOIN orders o ON c.customer_id=o.customer_id 保留所有客户：有订单的客户每个订单一行，没有订单的客户只有一行，订单字段为 NULL。\n易错：内连接只返回下过单的客户，没下单的客户会丢失。",
       "commonErrors": [
         {
-          "sql": "SELECT c.customer_id,o.id AS order_id,o.sales FROM customers c JOIN orders o ON c.customer_id=o.customer_id ORDER BY c.customer_id,o.id",
-          "reason": "客户即使没有匹配订单也必须保留。",
+          "sql": "SELECT c.customer_id,o.id AS order_id,o.sales FROM customers c JOIN orders o ON c.customer_id=o.customer_id",
+          "reason": "内连接会丢掉没有订单的客户，题目要求客户表全部保留。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -2010,24 +2003,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0107/q0107-public.json",
-          "sha256": "8a1ee68da55c41ca70000252d7af078676717f21e9e6a75a4b068c83429a50d5"
+          "sha256": "c7fa85cc95f0aa69783520e72edf5be7804d0f194a91de3a0b1bfdbd3f03df8c"
         },
         {
           "id": "q0107-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0107/q0107-boundary.json",
-          "sha256": "018b7f786932ddfc4359050dfaef735f5aeb66577ca7b82c96334c973c13f9a2"
+          "sha256": "5b4c806894a5804cfe49d8034ccfea1d08ee606e5570a1e9c757491b2dd0808d"
         },
         {
           "id": "q0107-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0107/q0107-empty.json",
-          "sha256": "63393b432d4ec7b1a782b1aa1fe45c5cd6a1d8466810b7d02349fd6f544cecbb"
+          "sha256": "ceb5fb2c8524cc3395918dad7815e64aca356af0622e87771e3b1c7edf351eb6"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -2046,7 +2039,7 @@
       "mysqlVerification": "未运行 MySQL 8.4",
       "validation": {
         "kind": "query",
-        "equivalentKind": "语法等价",
+        "equivalentKind": "代数或函数等价",
         "fixtures": [
           {
             "fixtureId": "q0107-public",
@@ -2131,8 +2124,8 @@
       "difficulty": "简单",
       "type": "独立编写",
       "title": "员工直属主管编号核查",
-      "context": "使用课程中小型员工数据练习员工直属主管编号核查。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "保留每个员工，返回 employee_id、直属主管的 employee_id 命名 manager_key，按员工编号升序。\n输出列名称及顺序：employee_id, manager_key。按题设排序；参考排序键：e.employee_id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "人事想核对每位员工的直属主管编号，包括没有主管的最高层员工。",
+      "requirements": "保留每位员工，返回员工编号 employee_id，以及直属主管的编号，列别名 manager_key；没有主管的员工 manager_key 为 NULL。\n输出列名称及顺序：employee_id, manager_key。",
       "datasetId": "q0108-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -2171,26 +2164,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT e.employee_id,m.employee_id AS manager_key FROM employees e LEFT JOIN employees m ON e.manager_id=m.employee_id ORDER BY e.employee_id",
-          "sqliteSql": "SELECT e.employee_id,m.employee_id AS manager_key FROM employees e LEFT JOIN employees m ON e.manager_id=m.employee_id ORDER BY e.employee_id"
+          "mysqlSql": "SELECT e.employee_id,m.employee_id AS manager_key FROM employees e LEFT JOIN employees m ON e.manager_id=m.employee_id",
+          "sqliteSql": "SELECT e.employee_id,m.employee_id AS manager_key FROM employees e LEFT JOIN employees m ON e.manager_id=m.employee_id"
         },
         {
-          "kind": "语法等价",
-          "mysqlSql": "SELECT e.employee_id,m.employee_id AS manager_key FROM employees e LEFT OUTER JOIN employees m ON e.manager_id=m.employee_id ORDER BY e.employee_id",
-          "sqliteSql": "SELECT e.employee_id,m.employee_id AS manager_key FROM employees e LEFT OUTER JOIN employees m ON e.manager_id=m.employee_id ORDER BY e.employee_id",
-          "explanation": "省略或写出 OUTER 不改变左连接。"
+          "kind": "代数或函数等价",
+          "mysqlSql": "SELECT e.employee_id,m.employee_id AS manager_key FROM employees e LEFT OUTER JOIN employees m ON e.manager_id=m.employee_id",
+          "sqliteSql": "SELECT e.employee_id,m.employee_id AS manager_key FROM employees e LEFT OUTER JOIN employees m ON e.manager_id=m.employee_id"
         }
       ],
       "hints": [
-        "先画出两个关系中使用的键与一对多方向，判断哪一侧必须保留。",
-        "结合《CROSS JOIN 与自连接》：交叉连接形成两表笛卡尔积；自连接使用同一表的不同别名表示不同角色。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT e.employee_id,m.employee_id AS manager_key FROM employees e LEFT JOIN employees m ON □□□ ORDER BY e.employee_id"
+        "员工和主管都在同一张表里，需要把这张表当作两份来连接，给它们取不同的别名。",
+        "员工的 manager_id 应该等于主管那一行的 employee_id。",
+        "没有主管的员工也要保留，所以应该用左连接。"
       ],
-      "explanation": "自连接两个角色不同，主管键匹配另一行主键。\n执行思路：确认employees的输入记录；按题设连接条件匹配数据，注意连接造成的行数变化；输出employee_id、manager_key列；遵循题设排序和并列规则。\n公开夹具实际返回 4 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：省略或写出 OUTER 不改变左连接。",
+      "explanation": "自连接：employees e LEFT JOIN employees m ON e.manager_id=m.employee_id，e 代表员工，m 代表主管。左连接保证没有主管的员工也出现，manager_key 为 NULL。\n易错：ON e.employee_id=m.employee_id 把每个员工和自己配对，得到的“主管”就是员工本人。",
       "commonErrors": [
         {
-          "sql": "SELECT e.employee_id,m.employee_id AS manager_key FROM employees e LEFT JOIN employees m ON e.employee_id=m.employee_id ORDER BY e.employee_id",
-          "reason": "自连接两个角色不同，主管键匹配另一行主键。",
+          "sql": "SELECT e.employee_id,m.employee_id AS manager_key FROM employees e LEFT JOIN employees m ON e.employee_id=m.employee_id",
+          "reason": "连接条件让员工和自己配对，应该用 manager_id 指向主管。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -2205,24 +2197,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0108/q0108-public.json",
-          "sha256": "36052ba18e26e678f6359d2e7c58a51eb5d0a58271fd9ed8ed54fa8e5ea2613a"
+          "sha256": "2d7ecc5bbf0a7ba2bee952f5ac463a242f43704257f0a67aa6ef3c22dd052ef2"
         },
         {
           "id": "q0108-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0108/q0108-boundary.json",
-          "sha256": "43a921d747341ac08694f67090dc8434b7a1d7d0210da12d73ecc9d27e034f15"
+          "sha256": "47fd4a4188c6ef88460cfbd429ed663bd64f5518f22325b2c946cf0f43d5f2ef"
         },
         {
           "id": "q0108-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0108/q0108-empty.json",
-          "sha256": "a66ddb191fc7b23127e952d8681b63944aca3c2c0bc6026e24f713b1a8379a72"
+          "sha256": "123d353734e6546af0dcc8180c4287ff32f3e7ae07bd2de2169ebce7e8376ffc"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -2241,7 +2233,7 @@
       "mysqlVerification": "未运行 MySQL 8.4",
       "validation": {
         "kind": "query",
-        "equivalentKind": "语法等价",
+        "equivalentKind": "代数或函数等价",
         "fixtures": [
           {
             "fixtureId": "q0108-public",
@@ -2327,8 +2319,8 @@
       "difficulty": "中等",
       "type": "代码纠错",
       "title": "没有付款的发票仍出现",
-      "context": "使用课程中小型发票、付款数据练习没有付款的发票仍出现。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "下面提供的初始代码存在逻辑、语法或结构错误。请修改整段代码，使其满足以下要求。\n所有 invoices 与 payments 左连接，输出 invoice_id、payment_id、amount_paid（付款字段），按发票和付款编号升序。\n输出列名称及顺序：invoice_id, payment_id, amount_paid。按题设排序；参考排序键：i.invoice_id,p.payment_id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "财务要核对每张发票的付款情况，没有付款的发票也要列出来。",
+      "requirements": "下面的代码想列出所有发票及其付款，但没有付款的发票不见了。请修改代码，使所有发票都保留，输出 invoice_id、payment_id 和付款金额 amount_paid。\n输出列名称及顺序：invoice_id, payment_id, amount_paid。",
       "datasetId": "q0109-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -2336,7 +2328,7 @@
         "invoices",
         "payments"
       ],
-      "initialCode": "SELECT i.invoice_id,p.payment_id,p.amount AS amount_paid FROM invoices i JOIN payments p ON i.invoice_id=p.invoice_id ORDER BY i.invoice_id,p.payment_id",
+      "initialCode": "SELECT i.invoice_id,p.payment_id,p.amount AS amount_paid FROM invoices i JOIN payments p ON i.invoice_id=p.invoice_id",
       "options": [],
       "acceptedBlanks": [],
       "expectedOutput": {
@@ -2368,26 +2360,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT i.invoice_id,p.payment_id,p.amount AS amount_paid FROM invoices i LEFT JOIN payments p ON i.invoice_id=p.invoice_id ORDER BY i.invoice_id,p.payment_id",
-          "sqliteSql": "SELECT i.invoice_id,p.payment_id,p.amount AS amount_paid FROM invoices i LEFT JOIN payments p ON i.invoice_id=p.invoice_id ORDER BY i.invoice_id,p.payment_id"
+          "mysqlSql": "SELECT i.invoice_id,p.payment_id,p.amount AS amount_paid FROM invoices i LEFT JOIN payments p ON i.invoice_id=p.invoice_id",
+          "sqliteSql": "SELECT i.invoice_id,p.payment_id,p.amount AS amount_paid FROM invoices i LEFT JOIN payments p ON i.invoice_id=p.invoice_id"
         },
         {
-          "kind": "语法等价",
-          "mysqlSql": "SELECT i.invoice_id,p.payment_id,p.amount AS amount_paid FROM invoices i LEFT OUTER JOIN payments p ON i.invoice_id=p.invoice_id ORDER BY i.invoice_id,p.payment_id",
-          "sqliteSql": "SELECT i.invoice_id,p.payment_id,p.amount AS amount_paid FROM invoices i LEFT OUTER JOIN payments p ON i.invoice_id=p.invoice_id ORDER BY i.invoice_id,p.payment_id",
-          "explanation": "省略或写出 OUTER 不改变左连接。"
+          "kind": "代数或函数等价",
+          "mysqlSql": "SELECT i.invoice_id,p.payment_id,p.amount AS amount_paid FROM invoices i LEFT OUTER JOIN payments p ON i.invoice_id=p.invoice_id",
+          "sqliteSql": "SELECT i.invoice_id,p.payment_id,p.amount AS amount_paid FROM invoices i LEFT OUTER JOIN payments p ON i.invoice_id=p.invoice_id"
         }
       ],
       "hints": [
-        "先画出两个关系中使用的键与一对多方向，判断哪一侧必须保留。",
-        "结合《LEFT JOIN 与 RIGHT JOIN》：左连接保留左表全部行，右表无匹配时补 NULL；右连接反向保留。",
-        "检查初始代码的 LEFT JOIN 对应的业务规则。发票可有0至多次付款，需保留无付款发票。"
+        "先对比结果：没有付款的发票为什么消失了？",
+        "普通 JOIN 只保留两边都匹配的行；要保留左表全部行，需要换成另一种连接。",
+        "改动只需要连接类型，ON 条件本身是对的。"
       ],
-      "explanation": "发票可有0至多次付款，需保留无付款发票。\n执行思路：确认invoices、payments的输入记录；按题设连接条件匹配数据，注意连接造成的行数变化；输出invoice_id、payment_id、amount_paid列；遵循题设排序和并列规则。\n公开夹具实际返回 3 行、3 列；完整结果见 expectedOutput。\n另一种可用写法：省略或写出 OUTER 不改变左连接。",
+      "explanation": "内连接只保留有付款记录的发票，未付款的发票被丢掉。改成 LEFT JOIN 后，所有发票都保留，没有付款的发票 payment_id 和 amount_paid 为 NULL。",
       "commonErrors": [
         {
-          "sql": "SELECT i.invoice_id,p.payment_id,p.amount AS amount_paid FROM invoices i JOIN payments p ON i.invoice_id=p.invoice_id ORDER BY i.invoice_id,p.payment_id",
-          "reason": "发票可有0至多次付款，需保留无付款发票。",
+          "sql": "SELECT i.invoice_id,p.payment_id,p.amount AS amount_paid FROM invoices i JOIN payments p ON i.invoice_id=p.invoice_id",
+          "reason": "内连接丢掉了没有付款记录的发票，需要用左连接。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -2402,24 +2393,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0109/q0109-public.json",
-          "sha256": "3478c334384942a43a715a11a31eea82abf709567c5bf6969a57e826242b741d"
+          "sha256": "2a719fd5d1f83134ea3d43701251d4ff06cfbb9b62535ea44a213c9d57594f0b"
         },
         {
           "id": "q0109-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0109/q0109-boundary.json",
-          "sha256": "698b1eb239207fa0a49eab5a740de2928f670afafabb64defbd2d061f9a7c497"
+          "sha256": "8f1ae6187e7f7e87c114a212c0b596e47fffa473cf64e704a20ece67ebd92449"
         },
         {
           "id": "q0109-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0109/q0109-empty.json",
-          "sha256": "94988c7089618c1039233deec6d113419a6c80196a5c9449c8e82c9c01f4d86b"
+          "sha256": "b5ffa49ecc3dc271e968076905a511a39b43bf94e697d38d3a87898a58d9322e"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -2438,7 +2429,7 @@
       "mysqlVerification": "未运行 MySQL 8.4",
       "validation": {
         "kind": "query",
-        "equivalentKind": "语法等价",
+        "equivalentKind": "代数或函数等价",
         "fixtures": [
           {
             "fixtureId": "q0109-public",
@@ -2714,8 +2705,8 @@
       "difficulty": "中等",
       "type": "独立编写",
       "title": "门店高额订单数量",
-      "context": "使用课程中小型订单、门店数据练习门店高额订单数量。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "所有门店统计销售额大于500的订单数量 high_orders，无匹配为0，按门店升序。\n输出列名称及顺序：store_id, high_orders。按题设排序；参考排序键：s.store_id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "运营想统计每家门店的大额订单数量，没有大额订单的门店也要显示 0。",
+      "requirements": "对所有门店，统计销售额大于 500 的订单数量，列别名 high_orders；没有符合条件订单的门店显示 0。\n输出列名称及顺序：store_id, high_orders。",
       "datasetId": "q0112-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -2751,26 +2742,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT s.store_id,COUNT(o.id) AS high_orders FROM stores s LEFT JOIN orders o ON s.store_id=o.store_id AND o.sales>500 GROUP BY s.store_id ORDER BY s.store_id",
-          "sqliteSql": "SELECT s.store_id,COUNT(o.id) AS high_orders FROM stores s LEFT JOIN orders o ON s.store_id=o.store_id AND o.sales>500 GROUP BY s.store_id ORDER BY s.store_id"
+          "mysqlSql": "SELECT s.store_id,COUNT(o.id) AS high_orders FROM stores s LEFT JOIN orders o ON s.store_id=o.store_id AND o.sales>500 GROUP BY s.store_id",
+          "sqliteSql": "SELECT s.store_id,COUNT(o.id) AS high_orders FROM stores s LEFT JOIN orders o ON s.store_id=o.store_id AND o.sales>500 GROUP BY s.store_id"
         },
         {
           "kind": "代数或函数等价",
-          "mysqlSql": "SELECT s.store_id,COUNT(o.id) AS high_orders FROM stores s LEFT JOIN orders o ON s.store_id=o.store_id AND NOT (o.sales<=500) GROUP BY s.store_id ORDER BY s.store_id",
-          "sqliteSql": "SELECT s.store_id,COUNT(o.id) AS high_orders FROM stores s LEFT JOIN orders o ON s.store_id=o.store_id AND NOT (o.sales<=500) GROUP BY s.store_id ORDER BY s.store_id",
-          "explanation": "用反向比较并取 NOT 表达相同三值逻辑。"
+          "mysqlSql": "SELECT s.store_id,COUNT(o.sales) AS high_orders FROM stores s LEFT JOIN orders o ON s.store_id=o.store_id AND o.sales>500 GROUP BY s.store_id",
+          "sqliteSql": "SELECT s.store_id,COUNT(o.sales) AS high_orders FROM stores s LEFT JOIN orders o ON s.store_id=o.store_id AND o.sales>500 GROUP BY s.store_id"
         }
       ],
       "hints": [
-        "先画出两个关系中使用的键与一对多方向，判断哪一侧必须保留。",
-        "结合《外连接的 ON 与 WHERE》：ON 决定匹配，WHERE 在连接完成后筛结果；对右侧字段的 WHERE 条件可能移除补 NULL 的行。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT s.store_id,□□□ AS high_orders FROM stores s LEFT JOIN orders o ON s.store_id=o.store_id AND o.sales>500 GROUP BY s.store_id ORDER BY s.store_id"
+        "所有门店都要出现，所以门店表是左连接的主表。",
+        "“大额订单”的条件如果写在 WHERE 里，会把没有匹配的门店也过滤掉；想想条件应该放在哪里。",
+        "统计“符合条件的订单数”时，用 COUNT(订单字段) 而不是 COUNT(*)：没有匹配的门店右表字段是 NULL，不应被计数。"
       ],
-      "explanation": "左连接的空扩展行不是真实订单，计数需使用右表非空键。\n执行思路：确认orders、stores的输入记录；按题设连接条件匹配数据，注意连接造成的行数变化；按指定键分组后计算聚合值；输出store_id、high_orders列；遵循题设排序和并列规则。\n公开夹具实际返回 3 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：用反向比较并取 NOT 表达相同三值逻辑。",
+      "explanation": "LEFT JOIN orders o ON … AND o.sales>500 把条件放进 ON，门店仍然全部保留；COUNT(o.id) 只统计匹配到的订单，没有大额订单的门店结果是 0。\n易错：COUNT(*) 会把“没有匹配”的那一行也算成 1，没有大额订单的门店会显示 1，而不是 0。",
       "commonErrors": [
         {
-          "sql": "SELECT s.store_id,COUNT(*) AS high_orders FROM stores s LEFT JOIN orders o ON s.store_id=o.store_id AND o.sales>500 GROUP BY s.store_id ORDER BY s.store_id",
-          "reason": "左连接的空扩展行不是真实订单，计数需使用右表非空键。",
+          "sql": "SELECT s.store_id,COUNT(*) AS high_orders FROM stores s LEFT JOIN orders o ON s.store_id=o.store_id AND o.sales>500 GROUP BY s.store_id",
+          "reason": "COUNT(*) 会把“没有匹配”的那一行也计为 1，没有大额订单的门店应为 0。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -2785,24 +2775,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0112/q0112-public.json",
-          "sha256": "b456182dce333ba5fda6c59ec3077ae1b046185e7cdcdcfc4c8ea625fa6adab7"
+          "sha256": "1bf3c24e8b3b3cc614658e9c0ea90d4eca2ede92b5f431c1275f6746e2f3b2fe"
         },
         {
           "id": "q0112-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0112/q0112-boundary.json",
-          "sha256": "1bd6334138c04bad169005e0fa58d0ec15884725e43681f5df0aa853799eed57"
+          "sha256": "dffa97536b332c728f6eac26b421b98fdfde01fec38e40f8fdcec203897bdcad"
         },
         {
           "id": "q0112-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0112/q0112-empty.json",
-          "sha256": "6ea70f11f6e7ade99a0b2a604976bec6c1024900e9598859d13b76305790cff2"
+          "sha256": "8634f24a946773dab973eded79887837ddde197075315422ea8fd692ebfccea6"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -2907,8 +2897,8 @@
       "difficulty": "中等",
       "type": "代码填空",
       "title": "只匹配二月客户订单",
-      "context": "使用课程中小型客户、订单数据练习只匹配二月客户订单。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "补全代码中的一个空位，使完整SQL满足以下要求。可输入具有相同语义的片段，提交后按完整代码执行结果核对。\n所有客户保留，仅匹配二月订单（2月1日至2月末），输出 customer_id、order_id，按客户、订单编号升序。\n输出列名称及顺序：customer_id, order_id。按题设排序；参考排序键：c.customer_id,o.id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "运营想看每位客户在 2 月份的订单，没有 2 月订单的客户也要保留。",
+      "requirements": "补全空位：保留所有客户，只匹配 2 月份（2026-02-01 至 2026-02-28）的订单，输出 customer_id 和订单编号 order_id。\n输出列名称及顺序：customer_id, order_id。",
       "datasetId": "q0113-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -2916,7 +2906,7 @@
         "customers",
         "orders"
       ],
-      "initialCode": "SELECT c.customer_id,o.id AS order_id FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id{{blank1}}'2026-02-01' AND o.order_date<'2026-03-01' ORDER BY c.customer_id,o.id",
+      "initialCode": "SELECT c.customer_id,o.id AS order_id FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id{{blank1}}'2026-02-01' AND o.order_date<'2026-03-01'",
       "options": [],
       "acceptedBlanks": [
         {
@@ -2956,26 +2946,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT c.customer_id,o.id AS order_id FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id AND o.order_date>='2026-02-01' AND o.order_date<'2026-03-01' ORDER BY c.customer_id,o.id",
-          "sqliteSql": "SELECT c.customer_id,o.id AS order_id FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id AND o.order_date>='2026-02-01' AND o.order_date<'2026-03-01' ORDER BY c.customer_id,o.id"
+          "mysqlSql": "SELECT c.customer_id,o.id AS order_id FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id AND o.order_date>='2026-02-01' AND o.order_date<'2026-03-01'",
+          "sqliteSql": "SELECT c.customer_id,o.id AS order_id FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id AND o.order_date>='2026-02-01' AND o.order_date<'2026-03-01'"
         },
         {
           "kind": "代数或函数等价",
-          "mysqlSql": "SELECT c.customer_id,o.id AS order_id FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id AND NOT (o.order_date<'2026-02-01') AND o.order_date<'2026-03-01' ORDER BY c.customer_id,o.id",
-          "sqliteSql": "SELECT c.customer_id,o.id AS order_id FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id AND NOT (o.order_date<'2026-02-01') AND o.order_date<'2026-03-01' ORDER BY c.customer_id,o.id",
-          "explanation": "用反向比较并取 NOT 表达相同三值逻辑。"
+          "mysqlSql": "SELECT c.customer_id,o.id AS order_id FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id AND o.order_date BETWEEN '2026-02-01' AND '2026-02-28'",
+          "sqliteSql": "SELECT c.customer_id,o.id AS order_id FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id AND o.order_date BETWEEN '2026-02-01' AND '2026-02-28'"
         }
       ],
       "hints": [
-        "先画出两个关系中使用的键与一对多方向，判断哪一侧必须保留。",
-        "结合《外连接的 ON 与 WHERE》：ON 决定匹配，WHERE 在连接完成后筛结果；对右侧字段的 WHERE 条件可能移除补 NULL 的行。",
-        "回想空位所在子句的功能：外连接的 ON 与 WHERE；保留周围代码，填入实现题设的表达式。"
+        "要保留所有客户，所以日期条件不能把客户行过滤掉。",
+        "对右表的筛选条件写在 ON 里，只影响“能不能匹配上”；写在 WHERE 里会过滤整行结果。",
+        "空位里要接上 ON 里的第一个日期条件，用 AND 把它和客户匹配条件连起来。"
       ],
-      "explanation": "右表筛选写在ON中，不会误删无匹配客户。\n执行思路：确认customers、orders的输入记录；按题设连接条件匹配数据，注意连接造成的行数变化；输出customer_id、order_id列；遵循题设排序和并列规则。\n公开夹具实际返回 4 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：用反向比较并取 NOT 表达相同三值逻辑。",
+      "explanation": "日期条件放在 ON 里（用 AND 连接），表示“只匹配 2 月的订单”，没有 2 月订单的客户仍然保留，订单编号为 NULL。\n易错：把日期条件放进 WHERE，没有匹配的行 o.order_date 是 NULL，会被 WHERE 过滤掉，LEFT JOIN 退化成内连接，没有 2 月订单的客户就消失了。",
       "commonErrors": [
         {
-          "sql": "SELECT c.customer_id,o.id AS order_id FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id WHERE o.order_date>='2026-02-01' AND o.order_date<'2026-03-01' ORDER BY c.customer_id,o.id",
-          "reason": "右表筛选写在ON中，不会误删无匹配客户。",
+          "sql": "SELECT c.customer_id,o.id AS order_id FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id WHERE o.order_date>='2026-02-01' AND o.order_date<'2026-03-01'",
+          "reason": "日期条件放进 WHERE 会过滤掉没有匹配的客户，LEFT JOIN 失去保留全部客户的作用。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -2990,24 +2979,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0113/q0113-public.json",
-          "sha256": "149a0e9ee09a832b27a8176c70850784af1cb49bdcabf4b53ff1df62f424641f"
+          "sha256": "5b7a9306ef27f6f8773c0dd5b3cd5c92d62eb04e07fc46ac9c6cc546616545ca"
         },
         {
           "id": "q0113-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0113/q0113-boundary.json",
-          "sha256": "f74fc6157654d6c57afbfb541ebc9dfe3232c647dc2b8f8ec8a8001424ee0391"
+          "sha256": "7dce7f025046fdfda73f48302a3ccb0d84e66a78ec29325bea68f4be6214f9bc"
         },
         {
           "id": "q0113-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0113/q0113-empty.json",
-          "sha256": "4ead345b67aa0d4f6f5e3a99899cc7b22fa67392ae64a24e390cec4bb079a6e4"
+          "sha256": "43a0bdfaf5b082396b147e04eaa4ed9057a215d746613daee8b4193c4eb6cf70"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -3066,7 +3055,7 @@
             "wrong": {
               "ran": true,
               "match": false,
-              "resultHash": "44a9a0bca3aa42d569eb17b6100c24885c1a089acb48566f5da3759c2f657c87",
+              "resultHash": "f6af99d277eb1473284bd4ad39171e46bd629f0af19269e7560f859ec3525c82",
               "rows": 6
             }
           },
@@ -3116,8 +3105,8 @@
       "difficulty": "中等",
       "type": "代码纠错",
       "title": "订单层与明细层正确汇总",
-      "context": "使用课程中小型订单明细、订单数据练习订单层与明细层正确汇总。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。 初始代码在公开样本可能碰巧正确，仍需按业务边界纠正。",
-      "requirements": "下面提供的初始代码存在逻辑、语法或结构错误。请修改整段代码，使其满足以下要求。\n各门店输出 store_id、orders_count（有明细的不同订单数）、quantity（明细件数合计），只含匹配明细的门店，按门店升序。\n输出列名称及顺序：store_id, orders_count, quantity。按题设排序；参考排序键：o.store_id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "运营想统计每家门店带有明细的订单数和卖出的商品件数。",
+      "requirements": "下面的代码想按门店统计“有明细的不同订单数”和“明细件数合计”，但订单数算多了。请修改代码，输出 store_id、orders_count 和 quantity，只包含有匹配明细的门店。\n输出列名称及顺序：store_id, orders_count, quantity。",
       "datasetId": "q0114-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -3125,7 +3114,7 @@
         "order_items",
         "orders"
       ],
-      "initialCode": "SELECT o.store_id,COUNT(o.id) AS orders_count,SUM(i.quantity) AS quantity FROM orders o JOIN order_items i ON o.id=i.order_id GROUP BY o.store_id ORDER BY o.store_id",
+      "initialCode": "SELECT o.store_id,COUNT(o.id) AS orders_count,SUM(i.quantity) AS quantity FROM orders o JOIN order_items i ON o.id=i.order_id GROUP BY o.store_id",
       "options": [],
       "acceptedBlanks": [],
       "expectedOutput": {
@@ -3152,26 +3141,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT o.store_id,COUNT(DISTINCT o.id) AS orders_count,SUM(i.quantity) AS quantity FROM orders o JOIN order_items i ON o.id=i.order_id GROUP BY o.store_id ORDER BY o.store_id",
-          "sqliteSql": "SELECT o.store_id,COUNT(DISTINCT o.id) AS orders_count,SUM(i.quantity) AS quantity FROM orders o JOIN order_items i ON o.id=i.order_id GROUP BY o.store_id ORDER BY o.store_id"
+          "mysqlSql": "SELECT o.store_id,COUNT(DISTINCT o.id) AS orders_count,SUM(i.quantity) AS quantity FROM orders o JOIN order_items i ON o.id=i.order_id GROUP BY o.store_id",
+          "sqliteSql": "SELECT o.store_id,COUNT(DISTINCT o.id) AS orders_count,SUM(i.quantity) AS quantity FROM orders o JOIN order_items i ON o.id=i.order_id GROUP BY o.store_id"
         },
         {
-          "kind": "语法等价",
-          "mysqlSql": "SELECT ALL o.store_id,COUNT(DISTINCT o.id) AS orders_count,SUM(i.quantity) AS quantity FROM orders o JOIN order_items i ON o.id=i.order_id GROUP BY o.store_id ORDER BY o.store_id",
-          "sqliteSql": "SELECT ALL o.store_id,COUNT(DISTINCT o.id) AS orders_count,SUM(i.quantity) AS quantity FROM orders o JOIN order_items i ON o.id=i.order_id GROUP BY o.store_id ORDER BY o.store_id",
-          "explanation": "普通 SELECT 默认保留重复记录，显式 ALL 不改变结果。"
+          "kind": "代数或函数等价",
+          "mysqlSql": "SELECT o.store_id,COUNT(DISTINCT i.order_id) AS orders_count,SUM(i.quantity) AS quantity FROM orders o JOIN order_items i ON o.id=i.order_id GROUP BY o.store_id",
+          "sqliteSql": "SELECT o.store_id,COUNT(DISTINCT i.order_id) AS orders_count,SUM(i.quantity) AS quantity FROM orders o JOIN order_items i ON o.id=i.order_id GROUP BY o.store_id"
         }
       ],
       "hints": [
-        "先画出两个关系中使用的键与一对多方向，判断哪一侧必须保留。",
-        "结合《连接膨胀与预聚合》：订单与两个一对多明细直接相连，会形成明细组合，导致金额重复；先按共同键汇总再连接。",
-        "检查初始代码的 DISTINCT  对应的业务规则。一单多明细会扩张行数，订单量需按主键去重。"
+        "订单和明细是一对多：一个订单有几条明细，连接后这个订单就会出现几行。",
+        "COUNT(o.id) 数的是连接后的行数，一个订单有多条明细时会被重复计数。",
+        "统计“不同的订单数”需要先去重。"
       ],
-      "explanation": "一单多明细会扩张行数，订单量需按主键去重。\n执行思路：确认order_items、orders的输入记录；按题设连接条件匹配数据，注意连接造成的行数变化；按指定键分组后计算聚合值；仅在题设指定的范围内去重；输出store_id、orders_count、quantity列；遵循题设排序和并列规则。\n公开夹具实际返回 2 行、3 列；完整结果见 expectedOutput。\n另一种可用写法：普通 SELECT 默认保留重复记录，显式 ALL 不改变结果。",
+      "explanation": "连接后订单行会随着明细数量重复，COUNT(o.id) 数的是行数，多明细订单被重复计算。改成 COUNT(DISTINCT o.id) 才是不同订单数；SUM(i.quantity) 对明细求和，不受影响。",
       "commonErrors": [
         {
-          "sql": "SELECT o.store_id,COUNT(o.id) AS orders_count,SUM(i.quantity) AS quantity FROM orders o JOIN order_items i ON o.id=i.order_id GROUP BY o.store_id ORDER BY o.store_id",
-          "reason": "一单多明细会扩张行数，订单量需按主键去重。",
+          "sql": "SELECT o.store_id,COUNT(o.id) AS orders_count,SUM(i.quantity) AS quantity FROM orders o JOIN order_items i ON o.id=i.order_id GROUP BY o.store_id",
+          "reason": "一对多连接后订单被重复，COUNT(o.id) 会重复计数，应使用 COUNT(DISTINCT o.id)。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -3186,24 +3174,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0114/q0114-public.json",
-          "sha256": "479035c9b3c0970d8191ecf65f067b975aab555781cc6e1a29fdfbb6f0162fa6"
+          "sha256": "d9f663c761e1201a04c404dec3c87b09e72eef0acf976f897e1fcf796668bf3e"
         },
         {
           "id": "q0114-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0114/q0114-boundary.json",
-          "sha256": "72d9c8dc65cb55c1e3a24e3be3851f9d457f28837dcd3d17d77509c0fc0a12e5"
+          "sha256": "4754441d36df05cde861fa6aab2999ca73bcce72b502f00d4391c42b41cfa1a8"
         },
         {
           "id": "q0114-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0114/q0114-empty.json",
-          "sha256": "2e9affc811daff2c16ecdf97fa337f44323d993cd2368ad04dd77c999447b16a"
+          "sha256": "33a27bd15521e0a727c3a9749bfd9cd96a33886130b36aad851daecd37431ba4"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -3222,7 +3210,7 @@
       "mysqlVerification": "未运行 MySQL 8.4",
       "validation": {
         "kind": "query",
-        "equivalentKind": "语法等价",
+        "equivalentKind": "代数或函数等价",
         "fixtures": [
           {
             "fixtureId": "q0114-public",
@@ -3308,8 +3296,8 @@
       "difficulty": "中等",
       "type": "代码纠错",
       "title": "发票截至一月底已付款",
-      "context": "使用课程中小型发票、付款数据练习发票截至一月底已付款。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "下面提供的初始代码存在逻辑、语法或结构错误。请修改整段代码，使其满足以下要求。\n全部发票，统计2026-01-31及以前付款金额 paid，未付款0，输出 invoice_id、paid，按发票编号升序。\n输出列名称及顺序：invoice_id, paid。按题设排序；参考排序键：i.invoice_id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "财务要统计每张发票截至 1 月底已收到的付款，没有付款的发票也要列出，金额为 0。",
+      "requirements": "下面的代码想统计所有发票截至 2026-01-31（含）的已付款金额 paid，未付款的发票显示 0，但有些发票消失了。请修改代码。\n输出列名称及顺序：invoice_id, paid。",
       "datasetId": "q0115-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -3317,7 +3305,7 @@
         "invoices",
         "payments"
       ],
-      "initialCode": "SELECT i.invoice_id,COALESCE(SUM(p.amount),0) AS paid FROM invoices i LEFT JOIN payments p ON i.invoice_id=p.invoice_id WHERE p.payment_date<='2026-01-31' GROUP BY i.invoice_id ORDER BY i.invoice_id",
+      "initialCode": "SELECT i.invoice_id,COALESCE(SUM(p.amount),0) AS paid FROM invoices i LEFT JOIN payments p ON i.invoice_id=p.invoice_id WHERE p.payment_date<='2026-01-31' GROUP BY i.invoice_id",
       "options": [],
       "acceptedBlanks": [],
       "expectedOutput": {
@@ -3341,26 +3329,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT i.invoice_id,COALESCE(SUM(p.amount),0) AS paid FROM invoices i LEFT JOIN payments p ON i.invoice_id=p.invoice_id AND p.payment_date<='2026-01-31' GROUP BY i.invoice_id ORDER BY i.invoice_id",
-          "sqliteSql": "SELECT i.invoice_id,COALESCE(SUM(p.amount),0) AS paid FROM invoices i LEFT JOIN payments p ON i.invoice_id=p.invoice_id AND p.payment_date<='2026-01-31' GROUP BY i.invoice_id ORDER BY i.invoice_id"
+          "mysqlSql": "SELECT i.invoice_id,COALESCE(SUM(p.amount),0) AS paid FROM invoices i LEFT JOIN payments p ON i.invoice_id=p.invoice_id AND p.payment_date<='2026-01-31' GROUP BY i.invoice_id",
+          "sqliteSql": "SELECT i.invoice_id,COALESCE(SUM(p.amount),0) AS paid FROM invoices i LEFT JOIN payments p ON i.invoice_id=p.invoice_id AND p.payment_date<='2026-01-31' GROUP BY i.invoice_id"
         },
         {
-          "kind": "代数或函数等价",
-          "mysqlSql": "SELECT i.invoice_id,COALESCE(SUM(p.amount),0) AS paid FROM invoices i LEFT JOIN payments p ON i.invoice_id=p.invoice_id AND NOT (p.payment_date>'2026-01-31') GROUP BY i.invoice_id ORDER BY i.invoice_id",
-          "sqliteSql": "SELECT i.invoice_id,COALESCE(SUM(p.amount),0) AS paid FROM invoices i LEFT JOIN payments p ON i.invoice_id=p.invoice_id AND NOT (p.payment_date>'2026-01-31') GROUP BY i.invoice_id ORDER BY i.invoice_id",
-          "explanation": "用反向比较并取 NOT 表达相同三值逻辑。"
+          "kind": "独立方法等价",
+          "mysqlSql": "SELECT i.invoice_id,COALESCE(SUM(p.amount),0) AS paid FROM invoices i LEFT JOIN (SELECT * FROM payments WHERE payment_date<='2026-01-31') p ON i.invoice_id=p.invoice_id GROUP BY i.invoice_id",
+          "sqliteSql": "SELECT i.invoice_id,COALESCE(SUM(p.amount),0) AS paid FROM invoices i LEFT JOIN (SELECT * FROM payments WHERE payment_date<='2026-01-31') p ON i.invoice_id=p.invoice_id GROUP BY i.invoice_id"
         }
       ],
       "hints": [
-        "先画出两个关系中使用的键与一对多方向，判断哪一侧必须保留。",
-        "结合《外连接的 ON 与 WHERE》：ON 决定匹配，WHERE 在连接完成后筛结果；对右侧字段的 WHERE 条件可能移除补 NULL 的行。",
-        "检查初始代码的  AND p.payment_date<= 对应的业务规则。截止日是匹配条件，不能删除无付款的发票。"
+        "哪些发票消失了？它们的共同点是什么？",
+        "没有匹配付款的发票，p.payment_date 是 NULL，WHERE 里的日期比较对它结果为未知。",
+        "对右表的筛选如果想保留左表的行，条件应该放在 ON 里。"
       ],
-      "explanation": "截止日是匹配条件，不能删除无付款的发票。\n执行思路：确认invoices、payments的输入记录；按题设连接条件匹配数据，注意连接造成的行数变化；按指定键分组后计算聚合值；输出invoice_id、paid列；遵循题设排序和并列规则。\n公开夹具实际返回 2 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：用反向比较并取 NOT 表达相同三值逻辑。",
+      "explanation": "WHERE p.payment_date<=… 会过滤掉所有没有付款（或付款晚于 1 月底）的发票，LEFT JOIN 失去保留全部发票的作用。把日期条件移到 ON 里，只限制“哪些付款算数”，发票仍然全部保留，COALESCE 把没有付款的合计换成 0。\n另一种写法：先在子查询里筛出 1 月底前的付款，再左连接。",
       "commonErrors": [
         {
-          "sql": "SELECT i.invoice_id,COALESCE(SUM(p.amount),0) AS paid FROM invoices i LEFT JOIN payments p ON i.invoice_id=p.invoice_id WHERE p.payment_date<='2026-01-31' GROUP BY i.invoice_id ORDER BY i.invoice_id",
-          "reason": "截止日是匹配条件，不能删除无付款的发票。",
+          "sql": "SELECT i.invoice_id,COALESCE(SUM(p.amount),0) AS paid FROM invoices i LEFT JOIN payments p ON i.invoice_id=p.invoice_id WHERE p.payment_date<='2026-01-31' GROUP BY i.invoice_id",
+          "reason": "日期条件放在 WHERE 里，会过滤掉没有付款的发票，应放进 ON。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -3375,24 +3362,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0115/q0115-public.json",
-          "sha256": "21b223157b88303b22ff6b605e416d57094a6afdf739ece94053e1194530f845"
+          "sha256": "54e3403f447a404168ffd864d71a811c9b853f29cf3bd71b49637610c433db20"
         },
         {
           "id": "q0115-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0115/q0115-boundary.json",
-          "sha256": "f435ce2857d350471c119e4d397c937965cc89e76b2e14718e47002460e312d3"
+          "sha256": "7728a147898796e5430378a4544dcd64bc50687824e77270ed90fb5e2d3dd8b8"
         },
         {
           "id": "q0115-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0115/q0115-empty.json",
-          "sha256": "4bb9a2c4a2906d7915707fd98148ce9a17d987f82754fdd2fb1f077547fa43a2"
+          "sha256": "25b29ec1c306232e866545accb3f0d4a66b4b3a85bd1d01c9e9a2d20aaccceb1"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -3411,7 +3398,7 @@
       "mysqlVerification": "未运行 MySQL 8.4",
       "validation": {
         "kind": "query",
-        "equivalentKind": "代数或函数等价",
+        "equivalentKind": "独立方法等价",
         "fixtures": [
           {
             "fixtureId": "q0115-public",
@@ -3496,8 +3483,8 @@
       "difficulty": "中等",
       "type": "业务情景",
       "title": "付款汇总后计算发票余额",
-      "context": "审计人员收到一张发票可能对应多条付款的记录，需逐发票核对尚未结清的金额。",
-      "requirements": "按发票编号输出 invoice_id、balance（发票金额减付款和，没付款视0），按编号升序。\n输出列名称及顺序：invoice_id, balance。按题设排序；参考排序键：i.invoice_id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "财务要计算每张发票还有多少余额没收回，一张发票可能分多次付款。",
+      "requirements": "按发票输出 invoice_id 和余额 balance（发票金额减已付款合计，没有付款按 0 计算）。\n输出列名称及顺序：invoice_id, balance。",
       "datasetId": "q0116-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -3529,26 +3516,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "WITH p AS (SELECT invoice_id,SUM(amount) AS paid FROM payments GROUP BY invoice_id) SELECT i.invoice_id,i.amount-COALESCE(p.paid,0) AS balance FROM invoices i LEFT JOIN p ON i.invoice_id=p.invoice_id ORDER BY i.invoice_id",
-          "sqliteSql": "WITH p AS (SELECT invoice_id,SUM(amount) AS paid FROM payments GROUP BY invoice_id) SELECT i.invoice_id,i.amount-COALESCE(p.paid,0) AS balance FROM invoices i LEFT JOIN p ON i.invoice_id=p.invoice_id ORDER BY i.invoice_id"
+          "mysqlSql": "WITH p AS (SELECT invoice_id,SUM(amount) AS paid FROM payments GROUP BY invoice_id) SELECT i.invoice_id,i.amount-COALESCE(p.paid,0) AS balance FROM invoices i LEFT JOIN p ON i.invoice_id=p.invoice_id",
+          "sqliteSql": "WITH p AS (SELECT invoice_id,SUM(amount) AS paid FROM payments GROUP BY invoice_id) SELECT i.invoice_id,i.amount-COALESCE(p.paid,0) AS balance FROM invoices i LEFT JOIN p ON i.invoice_id=p.invoice_id"
         },
         {
-          "kind": "语法等价",
-          "mysqlSql": "WITH p AS (SELECT invoice_id,SUM(amount) AS paid FROM payments GROUP BY invoice_id) SELECT i.invoice_id,i.amount-COALESCE(p.paid,0) AS balance FROM invoices i LEFT OUTER JOIN p ON i.invoice_id=p.invoice_id ORDER BY i.invoice_id",
-          "sqliteSql": "WITH p AS (SELECT invoice_id,SUM(amount) AS paid FROM payments GROUP BY invoice_id) SELECT i.invoice_id,i.amount-COALESCE(p.paid,0) AS balance FROM invoices i LEFT OUTER JOIN p ON i.invoice_id=p.invoice_id ORDER BY i.invoice_id",
-          "explanation": "省略或写出 OUTER 不改变左连接。"
+          "kind": "独立方法等价",
+          "mysqlSql": "SELECT i.invoice_id,i.amount-COALESCE((SELECT SUM(amount) FROM payments p WHERE p.invoice_id=i.invoice_id),0) AS balance FROM invoices i",
+          "sqliteSql": "SELECT i.invoice_id,i.amount-COALESCE((SELECT SUM(amount) FROM payments p WHERE p.invoice_id=i.invoice_id),0) AS balance FROM invoices i"
         }
       ],
       "hints": [
-        "先画出两个关系中使用的键与一对多方向，判断哪一侧必须保留。",
-        "结合《连接膨胀与预聚合》：订单与两个一对多明细直接相连，会形成明细组合，导致金额重复；先按共同键汇总再连接。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nWITH p AS (SELECT invoice_id,□□□ AS paid FROM payments GROUP BY invoice_id) SELECT i.invoice_id,i.amount-COALESCE(p.paid,0) AS balance FROM invoices i LEFT JOIN p ON i.invoice_id=p.invoice_id ORDER BY i.invoice_id"
+        "一张发票可能有多条付款记录，先把每张发票的付款合并成一个合计再计算余额。",
+        "先对付款表按发票分组求和，再把结果左连接到发票表。",
+        "没有付款的发票合计是 NULL，需要换成 0 再相减。"
       ],
-      "explanation": "一张发票可多次付款，先汇总不得只取最大付款。\n执行思路：确认invoices、payments的输入记录；先明确公用表表达式的中间数据及其粒度；按题设连接条件匹配数据，注意连接造成的行数变化；按指定键分组后计算聚合值；输出invoice_id、balance列；遵循题设排序和并列规则。\n公开夹具实际返回 2 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：省略或写出 OUTER 不改变左连接。",
+      "explanation": "先用子查询（这里用 WITH）把付款按发票汇总成每张发票一行，再左连接到发票表，余额 = 发票金额 − COALESCE(付款合计,0)。这样每张发票只出现一次，没有付款的发票余额等于发票金额。\n易错：用 MAX 只取最大的一笔付款，分多次付款的发票余额会算错。\n另一种写法：用相关子查询在 SELECT 里直接取每张发票的付款合计。",
       "commonErrors": [
         {
-          "sql": "WITH p AS (SELECT invoice_id,MAX(amount) AS paid FROM payments GROUP BY invoice_id) SELECT i.invoice_id,i.amount-COALESCE(p.paid,0) AS balance FROM invoices i LEFT JOIN p ON i.invoice_id=p.invoice_id ORDER BY i.invoice_id",
-          "reason": "一张发票可多次付款，先汇总不得只取最大付款。",
+          "sql": "WITH p AS (SELECT invoice_id,MAX(amount) AS paid FROM payments GROUP BY invoice_id) SELECT i.invoice_id,i.amount-COALESCE(p.paid,0) AS balance FROM invoices i LEFT JOIN p ON i.invoice_id=p.invoice_id",
+          "reason": "付款合计应使用 SUM；MAX 只取最大的一笔，分次付款的发票余额会算错。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -3563,24 +3549,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0116/q0116-public.json",
-          "sha256": "d71f8feed63995a527cfb4cda05b7c35d75e591f0688232ae31da758a17cbd85"
+          "sha256": "e76782da525de72e7828312b8dbcb8df2b586d891b102c75100d2f272d59f958"
         },
         {
           "id": "q0116-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0116/q0116-boundary.json",
-          "sha256": "f4a07b7672b5dd6cb43d574336be04b4e4222b2a171bfde46eadc79ee90d3685"
+          "sha256": "37356a3bb8c98652d9a72616396a523f4b8509fb32cfb7da644a555c32c86cd4"
         },
         {
           "id": "q0116-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0116/q0116-empty.json",
-          "sha256": "29564ade9a59a4835eeb54c5d9a4b3fb029d36355c6bc838fb9bc161541fc140"
+          "sha256": "d2e636ad5ec81bf9267b660800e6444aec9db797225e3d5a7777e4e044eb021f"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -3599,7 +3585,7 @@
       "mysqlVerification": "未运行 MySQL 8.4",
       "validation": {
         "kind": "query",
-        "equivalentKind": "语法等价",
+        "equivalentKind": "独立方法等价",
         "fixtures": [
           {
             "fixtureId": "q0116-public",
@@ -3684,8 +3670,8 @@
       "difficulty": "中等",
       "type": "独立编写",
       "title": "客户订单金额与数量",
-      "context": "使用课程中小型客户、订单数据练习客户订单金额与数量。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "每客户输出 customer_id、total（销售额无订单为0）、n（实际订单数），按客户升序。\n输出列名称及顺序：customer_id, total, n。按题设排序；参考排序键：c.customer_id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "客户经理想比较每位客户的订单总额和订单数，没下过单的客户也要显示。",
+      "requirements": "每位客户输出 customer_id、订单销售额合计 total（没有订单为 0）和订单数 n（没有订单为 0）。\n输出列名称及顺序：customer_id, total, n。",
       "datasetId": "q0117-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -3730,26 +3716,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "WITH a AS (SELECT customer_id,SUM(sales) AS total,COUNT(*) AS n FROM orders GROUP BY customer_id) SELECT c.customer_id,COALESCE(a.total,0) AS total,COALESCE(a.n,0) AS n FROM customers c LEFT JOIN a ON c.customer_id=a.customer_id ORDER BY c.customer_id",
-          "sqliteSql": "WITH a AS (SELECT customer_id,SUM(sales) AS total,COUNT(*) AS n FROM orders GROUP BY customer_id) SELECT c.customer_id,COALESCE(a.total,0) AS total,COALESCE(a.n,0) AS n FROM customers c LEFT JOIN a ON c.customer_id=a.customer_id ORDER BY c.customer_id"
+          "mysqlSql": "WITH a AS (SELECT customer_id,SUM(sales) AS total,COUNT(*) AS n FROM orders GROUP BY customer_id) SELECT c.customer_id,COALESCE(a.total,0) AS total,COALESCE(a.n,0) AS n FROM customers c LEFT JOIN a ON c.customer_id=a.customer_id",
+          "sqliteSql": "WITH a AS (SELECT customer_id,SUM(sales) AS total,COUNT(*) AS n FROM orders GROUP BY customer_id) SELECT c.customer_id,COALESCE(a.total,0) AS total,COALESCE(a.n,0) AS n FROM customers c LEFT JOIN a ON c.customer_id=a.customer_id"
         },
         {
-          "kind": "代数或函数等价",
-          "mysqlSql": "WITH a AS (SELECT customer_id,SUM(sales) AS total,COUNT(1) AS n FROM orders GROUP BY customer_id) SELECT c.customer_id,COALESCE(a.total,0) AS total,COALESCE(a.n,0) AS n FROM customers c LEFT JOIN a ON c.customer_id=a.customer_id ORDER BY c.customer_id",
-          "sqliteSql": "WITH a AS (SELECT customer_id,SUM(sales) AS total,COUNT(1) AS n FROM orders GROUP BY customer_id) SELECT c.customer_id,COALESCE(a.total,0) AS total,COALESCE(a.n,0) AS n FROM customers c LEFT JOIN a ON c.customer_id=a.customer_id ORDER BY c.customer_id",
-          "explanation": "常量1对每行非NULL，因此 COUNT(1) 与 COUNT(*) 同计行数。"
+          "kind": "独立方法等价",
+          "mysqlSql": "SELECT c.customer_id,COALESCE(SUM(o.sales),0) AS total,COUNT(o.id) AS n FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id GROUP BY c.customer_id",
+          "sqliteSql": "SELECT c.customer_id,COALESCE(SUM(o.sales),0) AS total,COUNT(o.id) AS n FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id GROUP BY c.customer_id"
         }
       ],
       "hints": [
-        "先画出两个关系中使用的键与一对多方向，判断哪一侧必须保留。",
-        "结合《连接膨胀与预聚合》：订单与两个一对多明细直接相连，会形成明细组合，导致金额重复；先按共同键汇总再连接。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nWITH a AS (SELECT customer_id,SUM(sales) AS total,COUNT(*) AS n FROM orders GROUP BY customer_id) SELECT c.customer_id,COALESCE(a.total,0) AS total,COALESCE(a.n,0) AS n FROM customers c □□□ ON c.customer_id=a.customer_id ORDER BY c.customer_id"
+        "结果的粒度是“每位客户一行”，包括没有订单的客户。",
+        "先把订单按客户汇总成一行，再和客户表左连接，可以避免一对多重复。",
+        "没有订单的客户汇总结果是 NULL，要换成 0。"
       ],
-      "explanation": "预聚合后连接客户维度，保留无订单者。\n执行思路：确认customers、orders的输入记录；先明确公用表表达式的中间数据及其粒度；按题设连接条件匹配数据，注意连接造成的行数变化；按指定键分组后计算聚合值；输出customer_id、total、n列；遵循题设排序和并列规则。\n公开夹具实际返回 4 行、3 列；完整结果见 expectedOutput。\n另一种可用写法：常量1对每行非NULL，因此 COUNT(1) 与 COUNT(*) 同计行数。",
+      "explanation": "先把订单按 customer_id 汇总出 total 和 n，再让 customers 左连接这份汇总，没有订单的客户用 COALESCE 补 0。\n易错：把汇总表和客户表做内连接，没有订单的客户会消失。\n另一种写法：customers 直接 LEFT JOIN orders 后按客户分组，用 COALESCE(SUM(o.sales),0) 和 COUNT(o.id)。",
       "commonErrors": [
         {
-          "sql": "WITH a AS (SELECT customer_id,SUM(sales) AS total,COUNT(*) AS n FROM orders GROUP BY customer_id) SELECT c.customer_id,COALESCE(a.total,0) AS total,COALESCE(a.n,0) AS n FROM customers c JOIN a ON c.customer_id=a.customer_id ORDER BY c.customer_id",
-          "reason": "预聚合后连接客户维度，保留无订单者。",
+          "sql": "WITH a AS (SELECT customer_id,SUM(sales) AS total,COUNT(*) AS n FROM orders GROUP BY customer_id) SELECT c.customer_id,COALESCE(a.total,0) AS total,COALESCE(a.n,0) AS n FROM customers c JOIN a ON c.customer_id=a.customer_id",
+          "reason": "内连接会丢掉没有订单的客户，应使用左连接。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -3764,24 +3749,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0117/q0117-public.json",
-          "sha256": "4e9d206efa75925cf165fee3287247ec8cd9b4a3cd8b61468e977d3336e84792"
+          "sha256": "bbc729e3e8ad2a7e67a741d17a8216e46d85a4b821ff2176951dbf2c18d963ce"
         },
         {
           "id": "q0117-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0117/q0117-boundary.json",
-          "sha256": "cb3330cb0d933476c7703c08958f18a62c33528089c1c12d116398cf602aeb91"
+          "sha256": "67e60c887da28f68b627b5071cafc0ca6af5d2ee9808bad3dbd507c2ffad5b6c"
         },
         {
           "id": "q0117-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0117/q0117-empty.json",
-          "sha256": "46ab384fd13b008589779f0f915fc7c951f1bf914f3d465312fbdf2f60900e0f"
+          "sha256": "84ade36405e5ee835bbc8d9358a5a8bd05c0d1567018c63c3511c02533798ea8"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -3800,7 +3785,7 @@
       "mysqlVerification": "未运行 MySQL 8.4",
       "validation": {
         "kind": "query",
-        "equivalentKind": "代数或函数等价",
+        "equivalentKind": "独立方法等价",
         "fixtures": [
           {
             "fixtureId": "q0117-public",
@@ -3885,8 +3870,8 @@
       "difficulty": "中等",
       "type": "业务情景",
       "title": "采购订购量与收货量",
-      "context": "采购人员核对分批收货情况，需要按采购明细行显示订购量和实际收货总量，未收货也必须出现。",
-      "requirements": "每采购明细输出 po_item_id、quantity_ordered、received（没收货0），按采购行编号升序。\n输出列名称及顺序：po_item_id, quantity_ordered, received。按题设排序；参考排序键：i.po_item_id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "采购部要核对每条采购明细订了多少、实际收了多少，还没收货的明细也要显示。",
+      "requirements": "每条采购明细输出 po_item_id、订购数量 quantity_ordered 和已收货数量 received（没有收货为 0）。\n输出列名称及顺序：po_item_id, quantity_ordered, received。",
       "datasetId": "q0118-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -3921,26 +3906,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "WITH r AS (SELECT po_item_id,SUM(quantity_received) AS received FROM receipts GROUP BY po_item_id) SELECT i.po_item_id,i.quantity_ordered,COALESCE(r.received,0) AS received FROM purchase_items i LEFT JOIN r ON i.po_item_id=r.po_item_id ORDER BY i.po_item_id",
-          "sqliteSql": "WITH r AS (SELECT po_item_id,SUM(quantity_received) AS received FROM receipts GROUP BY po_item_id) SELECT i.po_item_id,i.quantity_ordered,COALESCE(r.received,0) AS received FROM purchase_items i LEFT JOIN r ON i.po_item_id=r.po_item_id ORDER BY i.po_item_id"
+          "mysqlSql": "WITH r AS (SELECT po_item_id,SUM(quantity_received) AS received FROM receipts GROUP BY po_item_id) SELECT i.po_item_id,i.quantity_ordered,COALESCE(r.received,0) AS received FROM purchase_items i LEFT JOIN r ON i.po_item_id=r.po_item_id",
+          "sqliteSql": "WITH r AS (SELECT po_item_id,SUM(quantity_received) AS received FROM receipts GROUP BY po_item_id) SELECT i.po_item_id,i.quantity_ordered,COALESCE(r.received,0) AS received FROM purchase_items i LEFT JOIN r ON i.po_item_id=r.po_item_id"
         },
         {
-          "kind": "语法等价",
-          "mysqlSql": "WITH r AS (SELECT po_item_id,SUM(quantity_received) AS received FROM receipts GROUP BY po_item_id) SELECT i.po_item_id,i.quantity_ordered,COALESCE(r.received,0) AS received FROM purchase_items i LEFT OUTER JOIN r ON i.po_item_id=r.po_item_id ORDER BY i.po_item_id",
-          "sqliteSql": "WITH r AS (SELECT po_item_id,SUM(quantity_received) AS received FROM receipts GROUP BY po_item_id) SELECT i.po_item_id,i.quantity_ordered,COALESCE(r.received,0) AS received FROM purchase_items i LEFT OUTER JOIN r ON i.po_item_id=r.po_item_id ORDER BY i.po_item_id",
-          "explanation": "省略或写出 OUTER 不改变左连接。"
+          "kind": "独立方法等价",
+          "mysqlSql": "SELECT i.po_item_id,i.quantity_ordered,COALESCE(SUM(r.quantity_received),0) AS received FROM purchase_items i LEFT JOIN receipts r ON i.po_item_id=r.po_item_id GROUP BY i.po_item_id,i.quantity_ordered",
+          "sqliteSql": "SELECT i.po_item_id,i.quantity_ordered,COALESCE(SUM(r.quantity_received),0) AS received FROM purchase_items i LEFT JOIN receipts r ON i.po_item_id=r.po_item_id GROUP BY i.po_item_id,i.quantity_ordered"
         }
       ],
       "hints": [
-        "先画出两个关系中使用的键与一对多方向，判断哪一侧必须保留。",
-        "结合《连接膨胀与预聚合》：订单与两个一对多明细直接相连，会形成明细组合，导致金额重复；先按共同键汇总再连接。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nWITH r AS (SELECT po_item_id,□□□ AS received FROM receipts GROUP BY po_item_id) SELECT i.po_item_id,i.quantity_ordered,COALESCE(r.received,0) AS received FROM purchase_items i LEFT JOIN r ON i.po_item_id=r.po_item_id ORDER BY i.po_item_id"
+        "同一条采购明细可能分多次收货，要先把收货记录合并成每条明细一个合计。",
+        "先对收货表按采购明细分组求和，再左连接到采购明细表。",
+        "没有收货记录的明细合计是 NULL，需要换成 0。"
       ],
-      "explanation": "收货批次数不是收货件数，先按采购行加总收货量。\n执行思路：确认purchase_items、receipts的输入记录；先明确公用表表达式的中间数据及其粒度；按题设连接条件匹配数据，注意连接造成的行数变化；按指定键分组后计算聚合值；输出po_item_id、quantity_ordered、received列；遵循题设排序和并列规则。\n公开夹具实际返回 2 行、3 列；完整结果见 expectedOutput。\n另一种可用写法：省略或写出 OUTER 不改变左连接。",
+      "explanation": "先把收货按明细汇总成每条明细一行的“已收货数量”，再左连接到采购明细，没收货的明细用 COALESCE 补 0。\n易错：用 COUNT(*) 统计的是收货记录的次数，不是数量。\n另一种写法：采购明细直接 LEFT JOIN 收货表后按明细分组，对 quantity_received 求和。",
       "commonErrors": [
         {
-          "sql": "WITH r AS (SELECT po_item_id,COUNT(*) AS received FROM receipts GROUP BY po_item_id) SELECT i.po_item_id,i.quantity_ordered,COALESCE(r.received,0) AS received FROM purchase_items i LEFT JOIN r ON i.po_item_id=r.po_item_id ORDER BY i.po_item_id",
-          "reason": "收货批次数不是收货件数，先按采购行加总收货量。",
+          "sql": "WITH r AS (SELECT po_item_id,COUNT(*) AS received FROM receipts GROUP BY po_item_id) SELECT i.po_item_id,i.quantity_ordered,COALESCE(r.received,0) AS received FROM purchase_items i LEFT JOIN r ON i.po_item_id=r.po_item_id",
+          "reason": "收货数量应使用 SUM；COUNT 统计的是收货记录的次数。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -3955,24 +3939,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0118/q0118-public.json",
-          "sha256": "43ef406ab22b8133c6eb5138986e58a2f8e5190d7a115e940e012f0299f39816"
+          "sha256": "23cc30b59e44b2c129c265e85860650bb47f52ae5727f32e2bb9788013b2163b"
         },
         {
           "id": "q0118-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0118/q0118-boundary.json",
-          "sha256": "883697f64c769eca5f1524031138d1b17387b6c6bd440b847490616eca353c78"
+          "sha256": "9c02d37190db5d3b3e8c2024a464ef2b7b2b0156d25cce287889ed4af22a17fd"
         },
         {
           "id": "q0118-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0118/q0118-empty.json",
-          "sha256": "17abdd642bc2a72f65b31583631a5c6484534bd540a7e709be340faed245e2f0"
+          "sha256": "72385cfc30d4ab5652f9fa573a30d0f8b39d6328f80ffb9322c2073bec4bc34e"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -3991,7 +3975,7 @@
       "mysqlVerification": "未运行 MySQL 8.4",
       "validation": {
         "kind": "query",
-        "equivalentKind": "语法等价",
+        "equivalentKind": "独立方法等价",
         "fixtures": [
           {
             "fixtureId": "q0118-public",

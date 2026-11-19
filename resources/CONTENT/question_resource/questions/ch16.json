@@ -144,8 +144,8 @@
       "difficulty": "简单",
       "type": "独立编写",
       "title": "缺失名称或金额的筛查",
-      "context": "使用课程中小型原始导入资料数据练习缺失名称或金额的筛查。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "返回原始数据中名称为NULL或去空格后为空、或者 amount 为NULL的 id，按编号升序。\n输出列名称及顺序：id。按题设排序；参考排序键：id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "数据质检想找出名称或金额缺失的原始记录。",
+      "requirements": "返回满足任一条件的记录 id：名称为 NULL、名称去掉两端空格后为空，或者 amount 为 NULL。\n输出列名称及顺序：id。",
       "datasetId": "q0222-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -173,26 +173,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT id FROM raw_data WHERE name IS NULL OR TRIM(name)='' OR amount IS NULL ORDER BY id",
-          "sqliteSql": "SELECT id FROM raw_data WHERE name IS NULL OR TRIM(name)='' OR amount IS NULL ORDER BY id"
+          "mysqlSql": "SELECT id FROM raw_data WHERE name IS NULL OR TRIM(name)='' OR amount IS NULL",
+          "sqliteSql": "SELECT id FROM raw_data WHERE name IS NULL OR TRIM(name)='' OR amount IS NULL"
         },
         {
-          "kind": "关系结构等价",
-          "mysqlSql": "SELECT id FROM (SELECT * FROM raw_data) AS raw_data WHERE name IS NULL OR TRIM(name)='' OR amount IS NULL ORDER BY id",
-          "sqliteSql": "SELECT id FROM (SELECT * FROM raw_data) AS raw_data WHERE name IS NULL OR TRIM(name)='' OR amount IS NULL ORDER BY id",
-          "explanation": "先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。"
+          "kind": "代数或函数等价",
+          "mysqlSql": "SELECT id FROM raw_data WHERE amount IS NULL OR COALESCE(TRIM(name),'')=''",
+          "sqliteSql": "SELECT id FROM raw_data WHERE amount IS NULL OR COALESCE(TRIM(name),'')=''"
         }
       ],
       "hints": [
-        "先明确原始数据异常规则和规范化标准，再决定保留哪些记录。",
-        "结合《缺失与异常检测》：先定义规则，再标记异常；空字符串、NULL、负值及零值有不同含义。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT id FROM raw_data WHERE name IS NULL OR TRIM(name)=''□□□ ORDER BY id"
+        "三种“缺失”情况满足任意一种就要入选。",
+        "“或者”用 OR 连接；去掉两端空格用 TRIM。",
+        "注意 AND 比 OR 先计算，混用时容易改变含义。"
       ],
-      "explanation": "任何必填字段缺失就应标记，不能要求同时缺失。\n执行思路：确认raw_data的输入记录；按筛选条件保留符合要求的记录，并考虑空值；输出id列；遵循题设排序和并列规则。\n公开夹具实际返回 2 行、1 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
+      "explanation": "name IS NULL OR TRIM(name)='' OR amount IS NULL：三种情况任一成立就入选。\n易错：把后两个条件用 AND 连接（… OR TRIM(name)='' AND amount IS NULL），因为 AND 先计算，会把“名称为空”和“金额为空”变成必须同时满足。",
       "commonErrors": [
         {
-          "sql": "SELECT id FROM raw_data WHERE name IS NULL OR TRIM(name)='' AND amount IS NULL ORDER BY id",
-          "reason": "任何必填字段缺失就应标记，不能要求同时缺失。",
+          "sql": "SELECT id FROM raw_data WHERE name IS NULL OR TRIM(name)='' AND amount IS NULL",
+          "reason": "AND 先于 OR 计算，条件含义被改变：后两个条件变成必须同时满足。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -207,24 +206,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0222/q0222-public.json",
-          "sha256": "a7e6a0dc0466db1dbb7a8f9e77ec776e1415cae5b613f9ed918505b5000ca9f7"
+          "sha256": "9a37192e5213aa1ca73f3ec0958c0564b38f978e5c997ceb216bda9a1df270e3"
         },
         {
           "id": "q0222-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0222/q0222-boundary.json",
-          "sha256": "20615f027a6dbe343ab9bbeb7c7868579f2350b5561aa65ae20f5c4b8fde8b3c"
+          "sha256": "f6baae3bcf526da1f77609933ed1b55b4e629626663608af46e1b4e493678c2a"
         },
         {
           "id": "q0222-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0222/q0222-empty.json",
-          "sha256": "731e336ca79bdcda1f79e6853e1083f3fe14e4c8611f8523564a279fb0b301c9"
+          "sha256": "566d1f8443f1f8848c0c56cdff2a589c5d5b5ce0d46c6a101b1bb4a18c103cff"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -243,7 +242,7 @@
       "mysqlVerification": "未运行 MySQL 8.4",
       "validation": {
         "kind": "query",
-        "equivalentKind": "关系结构等价",
+        "equivalentKind": "代数或函数等价",
         "fixtures": [
           {
             "fixtureId": "q0222-public",
@@ -1353,8 +1352,8 @@
       "difficulty": "困难",
       "type": "独立编写",
       "title": "分类映射后计数",
-      "context": "使用课程中小型原始导入资料数据练习分类映射后计数。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "将规范化类别 skin/home 映射“个护”“家居”，其他（含NULL）为“其他”；按映射类别输出 clean_category、n，按类别升序。\n输出列名称及顺序：clean_category, n。按题设排序；参考排序键：clean_category。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "类别字段需要先规范化，再按业务口径归并后统计。",
+      "requirements": "把规范化后（去两端空格、转小写）为 skin 的类别映射为“个护”，home 映射为“家居”，其他（包括 NULL）都归为“其他”，再按映射后的类别统计数量 n。\n输出列名称及顺序：clean_category, n。",
       "datasetId": "q0230-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -1389,26 +1388,20 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "WITH a AS (SELECT CASE WHEN LOWER(TRIM(category))='skin' THEN '个护' WHEN LOWER(TRIM(category))='home' THEN '家居' ELSE '其他' END AS clean_category FROM raw_data) SELECT clean_category,COUNT(*) AS n FROM a GROUP BY clean_category ORDER BY clean_category",
-          "sqliteSql": "WITH a AS (SELECT CASE WHEN LOWER(TRIM(category))='skin' THEN '个护' WHEN LOWER(TRIM(category))='home' THEN '家居' ELSE '其他' END AS clean_category FROM raw_data) SELECT clean_category,COUNT(*) AS n FROM a GROUP BY clean_category ORDER BY clean_category"
-        },
-        {
-          "kind": "代数或函数等价",
-          "mysqlSql": "WITH a AS (SELECT CASE WHEN LOWER(TRIM(category))='skin' THEN '个护' WHEN LOWER(TRIM(category))='home' THEN '家居' ELSE '其他' END AS clean_category FROM raw_data) SELECT clean_category,COUNT(1) AS n FROM a GROUP BY clean_category ORDER BY clean_category",
-          "sqliteSql": "WITH a AS (SELECT CASE WHEN LOWER(TRIM(category))='skin' THEN '个护' WHEN LOWER(TRIM(category))='home' THEN '家居' ELSE '其他' END AS clean_category FROM raw_data) SELECT clean_category,COUNT(1) AS n FROM a GROUP BY clean_category ORDER BY clean_category",
-          "explanation": "常量1对每行非NULL，因此 COUNT(1) 与 COUNT(*) 同计行数。"
+          "mysqlSql": "WITH a AS (SELECT CASE WHEN LOWER(TRIM(category))='skin' THEN '个护' WHEN LOWER(TRIM(category))='home' THEN '家居' ELSE '其他' END AS clean_category FROM raw_data) SELECT clean_category,COUNT(*) AS n FROM a GROUP BY clean_category",
+          "sqliteSql": "WITH a AS (SELECT CASE WHEN LOWER(TRIM(category))='skin' THEN '个护' WHEN LOWER(TRIM(category))='home' THEN '家居' ELSE '其他' END AS clean_category FROM raw_data) SELECT clean_category,COUNT(*) AS n FROM a GROUP BY clean_category"
         }
       ],
       "hints": [
-        "先明确原始数据异常规则和规范化标准，再决定保留哪些记录。",
-        "结合《CAST 与分类标准化》：CAST 显式转换类型；先清理空白和格式，再验证合法性并转换，最后统一类别。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nWITH a AS (SELECT CASE WHEN □□□ THEN '个护' WHEN LOWER(TRIM(category))='home' THEN '家居' ELSE '其他' END AS clean_category FROM raw_data) SELECT clean_category,COUNT(*) AS n FROM a GROUP BY clean_category ORDER BY clean_category"
+        "先做类别映射，再按映射结果分组计数，顺序不能反。",
+        "映射用 CASE WHEN；比较前先用 TRIM 和 LOWER 规范化文本。",
+        "大小写和空格都要处理，漏掉任何一项都会让部分记录落入“其他”。"
       ],
-      "explanation": "映射必须先标准化大小写，避免同类文本被划入其他；原生环境需固定区分大小写比较规则。\n执行思路：确认raw_data的输入记录；先明确公用表表达式的中间数据及其粒度；按指定键分组后计算聚合值；输出clean_category、n列；遵循题设排序和并列规则。\n公开夹具实际返回 3 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：常量1对每行非NULL，因此 COUNT(1) 与 COUNT(*) 同计行数。",
+      "explanation": "先在子查询里用 CASE 把规范化后的类别映射成中文名，再对映射结果分组计数，NULL 和未列出的类别通过 ELSE 归入“其他”。\n易错：只处理了空格没处理大小写（缺少 LOWER），大写的 SKIN 会落入“其他”。",
       "commonErrors": [
         {
-          "sql": "WITH a AS (SELECT CASE WHEN TRIM(category)='skin' THEN '个护' WHEN LOWER(TRIM(category))='home' THEN '家居' ELSE '其他' END AS clean_category FROM raw_data) SELECT clean_category,COUNT(*) AS n FROM a GROUP BY clean_category ORDER BY clean_category",
-          "reason": "映射必须先标准化大小写，避免同类文本被划入其他；原生环境需固定区分大小写比较规则。",
+          "sql": "WITH a AS (SELECT CASE WHEN TRIM(category)='skin' THEN '个护' WHEN LOWER(TRIM(category))='home' THEN '家居' ELSE '其他' END AS clean_category FROM raw_data) SELECT clean_category,COUNT(*) AS n FROM a GROUP BY clean_category",
+          "reason": "第一个分支漏了 LOWER，大写的 SKIN 没有被识别，落入“其他”。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -1423,24 +1416,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0230/q0230-public.json",
-          "sha256": "0d8f93c666e5aaff75c2bbde56ffc259442c22b9db502d8faf6f96521dedb9a6"
+          "sha256": "d77feb1e50b27878de9a48c92f82bbfb729066b197dab1595a0e920be6df49eb"
         },
         {
           "id": "q0230-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0230/q0230-boundary.json",
-          "sha256": "0548f03f084cbea1436948e593485f074c0650223e51b63beaa90d2a6243dc66"
+          "sha256": "c06180f1411719e01cb302eedbf1f17ce8d6a64545aa21e9628edd800fc63d00"
         },
         {
           "id": "q0230-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0230/q0230-empty.json",
-          "sha256": "d9a4252265d18af542068ab8d9b8cf7b67ce6948cf7bbfca579d14eaa83af68a"
+          "sha256": "99a784b2bcf18ed6f7011771f892c4c9f96e1149e332b23776be814aecace20a"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,

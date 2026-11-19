@@ -218,8 +218,8 @@
       "difficulty": "简单",
       "type": "独立编写",
       "title": "订单金额以百元为单位",
-      "context": "使用课程中小型订单数据练习订单金额以百元为单位。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "编写 SQL，完成以下查询要求。\n输出 id、hundreds（销售额除100，保留1位小数），按编号升序。\n输出列名称及顺序：id, hundreds。按题设排序；参考排序键：id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "销售报表以“百元”为单位展示订单金额。",
+      "requirements": "输出订单 id 和 hundreds：销售额除以 100，保留 1 位小数。\n输出列名称及顺序：id, hundreds。",
       "datasetId": "q0163-lesson",
       "schemaVersion": 3,
       "contentVersion": "4.2.2",
@@ -262,26 +262,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT id,ROUND(sales/100.0,1) AS hundreds FROM orders ORDER BY id",
-          "sqliteSql": "SELECT id,ROUND(sales/100.0,1) AS hundreds FROM orders ORDER BY id"
+          "mysqlSql": "SELECT id,ROUND(sales/100.0,1) AS hundreds FROM orders",
+          "sqliteSql": "SELECT id,ROUND(sales/100.0,1) AS hundreds FROM orders"
         },
         {
-          "kind": "关系结构等价",
-          "mysqlSql": "SELECT id,ROUND(sales/100.0,1) AS hundreds FROM (SELECT * FROM orders) AS orders ORDER BY id",
-          "sqliteSql": "SELECT id,ROUND(sales/100.0,1) AS hundreds FROM (SELECT * FROM orders) AS orders ORDER BY id",
-          "explanation": "先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。"
+          "kind": "代数或函数等价",
+          "mysqlSql": "SELECT id,ROUND(sales*1.0/100,1) AS hundreds FROM orders",
+          "sqliteSql": "SELECT id,ROUND(sales*1.0/100,1) AS hundreds FROM orders"
         }
       ],
       "hints": [
-        "确认计算单位；确定日期或数值的边界，对零分母另作判断。",
-        "结合《ROUND 与 ABS》：ROUND 在指定小数位舍入；ABS 返回绝对值。金额分析应优先精确十进制。",
-        "按题设编写投影、筛选及分组，使用运行检查列名、NULL、重复记录和排序。"
+        "把金额换算成百元，是除以 100。",
+        "两个整数相除在有的数据库里会得到整数，写成 100.0 可以保留小数；ROUND(值,1) 保留一位。",
+        "除数要和单位一致：百元对应 100。"
       ],
-      "explanation": "单位是百元，不是千元；先转换再舍入。\n执行思路：确认orders的输入记录；输出id、hundreds列；遵循题设排序和并列规则。\n公开夹具实际返回 5 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
+      "explanation": "ROUND(sales/100.0,1) 先除以 100.0 保留小数，再保留 1 位。\n易错：除以 1000.0 是以“千元”为单位，数值会小一个数量级。",
       "commonErrors": [
         {
-          "sql": "SELECT id,ROUND(sales/1000.0,1) AS hundreds FROM orders ORDER BY id",
-          "reason": "单位是百元，不是千元；先转换再舍入。",
+          "sql": "SELECT id,ROUND(sales/1000.0,1) AS hundreds FROM orders",
+          "reason": "除数应为 100（百元），除以 1000 得到的是千元。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -296,24 +295,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0163/q0163-public.json",
-          "sha256": "e4fd8c81bba19b4c16b2aefe1ef6798d722c18a9029933eb9a1532194620aee2"
+          "sha256": "4eef3078bd02700134562f14593cb318e5e412a93e18716fe3cfa83fb5ceed07"
         },
         {
           "id": "q0163-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0163/q0163-boundary.json",
-          "sha256": "34f9a2d20eee0f20ef76d99042def4f5e6b7069fe49b9d7774ef504ca7792445"
+          "sha256": "769f7e3f9c539c39e4663295fb318c5d19e41b0da573e97ec91ac3a6e02b595e"
         },
         {
           "id": "q0163-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0163/q0163-empty.json",
-          "sha256": "834441bcf38e1a131b25797e5aa2e7e48aded18973d9fbad9e87c6f201420077"
+          "sha256": "31777eb01086de435eeaca0e808ff5075c3b2c32aca10d0b0e618c68a5f5f0bc"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -332,7 +331,7 @@
       "mysqlVerification": "未运行 MySQL 8.4",
       "validation": {
         "kind": "query",
-        "equivalentKind": "关系结构等价",
+        "equivalentKind": "代数或函数等价",
         "fixtures": [
           {
             "fixtureId": "q0163-public",
@@ -542,8 +541,8 @@
       "difficulty": "简单",
       "type": "独立编写",
       "title": "单位商品差额绝对值",
-      "context": "使用课程中小型商品数据练习单位商品差额绝对值。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "输出 product_id、deviation（售价与50的绝对差值），按编号升序。\n输出列名称及顺序：product_id, deviation。按题设排序；参考排序键：product_id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "价格管理想看每件商品距离基准价 50 差多少，不关心高低方向。",
+      "requirements": "输出 product_id 和 deviation：售价与 50 的差的绝对值。\n输出列名称及顺序：product_id, deviation。",
       "datasetId": "q0166-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -590,26 +589,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT product_id,ABS(price-50) AS deviation FROM products ORDER BY product_id",
-          "sqliteSql": "SELECT product_id,ABS(price-50) AS deviation FROM products ORDER BY product_id"
+          "mysqlSql": "SELECT product_id,ABS(price-50) AS deviation FROM products",
+          "sqliteSql": "SELECT product_id,ABS(price-50) AS deviation FROM products"
         },
         {
-          "kind": "关系结构等价",
-          "mysqlSql": "SELECT product_id,ABS(price-50) AS deviation FROM (SELECT * FROM products) AS products ORDER BY product_id",
-          "sqliteSql": "SELECT product_id,ABS(price-50) AS deviation FROM (SELECT * FROM products) AS products ORDER BY product_id",
-          "explanation": "先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。"
+          "kind": "独立方法等价",
+          "mysqlSql": "SELECT product_id,CASE WHEN price>=50 THEN price-50 ELSE 50-price END AS deviation FROM products",
+          "sqliteSql": "SELECT product_id,CASE WHEN price>=50 THEN price-50 ELSE 50-price END AS deviation FROM products"
         }
       ],
       "hints": [
-        "确认计算单位；确定日期或数值的边界，对零分母另作判断。",
-        "结合《ROUND 与 ABS》：ROUND 在指定小数位舍入；ABS 返回绝对值。金额分析应优先精确十进制。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT product_id,□□□ AS deviation FROM products ORDER BY product_id"
+        "“不关心高低方向”说明结果不能是负数。",
+        "ABS(数值) 返回绝对值。",
+        "先算差值 price-50，再取绝对值。"
       ],
-      "explanation": "绝对差为非负数，不能保留差值符号。\n执行思路：确认products的输入记录；输出product_id、deviation列；遵循题设排序和并列规则。\n公开夹具实际返回 6 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
+      "explanation": "ABS(price-50) 把差值转成非负数，价格比 50 高或低都得到同样的偏离量。\n易错：只写 price-50，价格低于 50 时得到负数。\n另一种写法：CASE WHEN price>=50 THEN price-50 ELSE 50-price END。",
       "commonErrors": [
         {
-          "sql": "SELECT product_id,price-50 AS deviation FROM products ORDER BY product_id",
-          "reason": "绝对差为非负数，不能保留差值符号。",
+          "sql": "SELECT product_id,price-50 AS deviation FROM products",
+          "reason": "没有取绝对值，价格低于 50 的商品得到负数。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -624,24 +622,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0166/q0166-public.json",
-          "sha256": "27ed9ccc9d70552cc283f5d0075ec50714e9bc9a0dd91a112859b2fc03af108e"
+          "sha256": "c036fd0270b178a71450c5b10acbba6e1599a59f42901447358473da53aad328"
         },
         {
           "id": "q0166-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0166/q0166-boundary.json",
-          "sha256": "98742c43bb7384711f7a6f0e9c14f8560bc09947eb9708475a349d7285b791b8"
+          "sha256": "abce40ada71e731815b28fb45541574713b3441c6ea2c082aa99b58cc7c6cf1d"
         },
         {
           "id": "q0166-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0166/q0166-empty.json",
-          "sha256": "e8d34ead8149af874a8da652d1e779bf597574138bf952f5031bd0e8cce6f7e3"
+          "sha256": "5be18f9c2b1ebc605ec964afc7009eba159e27c89fbfcdfae2bc39b9238b248a"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -660,7 +658,7 @@
       "mysqlVerification": "未运行 MySQL 8.4",
       "validation": {
         "kind": "query",
-        "equivalentKind": "关系结构等价",
+        "equivalentKind": "独立方法等价",
         "fixtures": [
           {
             "fixtureId": "q0166-public",
@@ -1515,8 +1513,8 @@
       "difficulty": "中等",
       "type": "业务情景",
       "title": "实际收货覆盖比例",
-      "context": "仓库管理员核查每批到货相对于原采购行订购量的覆盖率，零订购量视作无法计算。",
-      "requirements": "按采购行计算每批收货占订购数比例 receipt_ratio（非百分比，两位小数，零分母NULL），输出 receipt_id 按编号升序。\n输出列名称及顺序：receipt_id, receipt_ratio。按题设排序；参考排序键：r.receipt_id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "采购想看每批收货占订购数量的比例。",
+      "requirements": "按采购明细计算每次收货占订购数量的比例 receipt_ratio（用小数而不是百分比，保留两位小数，订购数量为 0 时为 NULL），输出 receipt_id。\n输出列名称及顺序：receipt_id, receipt_ratio。",
       "datasetId": "q0174-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -1548,26 +1546,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT r.receipt_id,ROUND(1.0*r.quantity_received/NULLIF(i.quantity_ordered,0),2) AS receipt_ratio FROM receipts r JOIN purchase_items i ON i.po_item_id=r.po_item_id ORDER BY r.receipt_id",
-          "sqliteSql": "SELECT r.receipt_id,ROUND(1.0*r.quantity_received/NULLIF(i.quantity_ordered,0),2) AS receipt_ratio FROM receipts r JOIN purchase_items i ON i.po_item_id=r.po_item_id ORDER BY r.receipt_id"
+          "mysqlSql": "SELECT r.receipt_id,ROUND(1.0*r.quantity_received/NULLIF(i.quantity_ordered,0),2) AS receipt_ratio FROM receipts r JOIN purchase_items i ON i.po_item_id=r.po_item_id",
+          "sqliteSql": "SELECT r.receipt_id,ROUND(1.0*r.quantity_received/NULLIF(i.quantity_ordered,0),2) AS receipt_ratio FROM receipts r JOIN purchase_items i ON i.po_item_id=r.po_item_id"
         },
         {
-          "kind": "语法等价",
-          "mysqlSql": "SELECT ALL r.receipt_id,ROUND(1.0*r.quantity_received/NULLIF(i.quantity_ordered,0),2) AS receipt_ratio FROM receipts r JOIN purchase_items i ON i.po_item_id=r.po_item_id ORDER BY r.receipt_id",
-          "sqliteSql": "SELECT ALL r.receipt_id,ROUND(1.0*r.quantity_received/NULLIF(i.quantity_ordered,0),2) AS receipt_ratio FROM receipts r JOIN purchase_items i ON i.po_item_id=r.po_item_id ORDER BY r.receipt_id",
-          "explanation": "普通 SELECT 默认保留重复记录，显式 ALL 不改变结果。"
+          "kind": "代数或函数等价",
+          "mysqlSql": "SELECT r.receipt_id,ROUND(r.quantity_received*1.0/NULLIF(i.quantity_ordered,0),2) AS receipt_ratio FROM receipts r JOIN purchase_items i ON i.po_item_id=r.po_item_id",
+          "sqliteSql": "SELECT r.receipt_id,ROUND(r.quantity_received*1.0/NULLIF(i.quantity_ordered,0),2) AS receipt_ratio FROM receipts r JOIN purchase_items i ON i.po_item_id=r.po_item_id"
         }
       ],
       "hints": [
-        "确认计算单位；确定日期或数值的边界，对零分母另作判断。",
-        "结合《数值除法与整数除法》：MySQL / 的精确值除法可返回小数，DIV 为整数商；SQLite 两个整数使用 / 可能截断。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT r.receipt_id,ROUND(□□□/NULLIF(i.quantity_ordered,0),2) AS receipt_ratio FROM receipts r JOIN purchase_items i ON i.po_item_id=r.po_item_id ORDER BY r.receipt_id"
+        "比例 = 收货数量 ÷ 订购数量，要用收货记录连接采购明细。",
+        "NULLIF(分母,0) 避免除零；乘以 1.0 避免整数除法截断。",
+        "题目要的是小数比例，不要乘以 100。"
       ],
-      "explanation": "题目要0至1形式的比例，不是百分比0至100。\n执行思路：确认purchase_items、receipts的输入记录；按题设连接条件匹配数据，注意连接造成的行数变化；输出receipt_id、receipt_ratio列；遵循题设排序和并列规则。\n公开夹具实际返回 2 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：普通 SELECT 默认保留重复记录，显式 ALL 不改变结果。",
+      "explanation": "收货表连接采购明细后，用 quantity_received / NULLIF(quantity_ordered,0)：分母为 0 时得到 NULL；1.0* 避免整数除法，ROUND(…,2) 保留两位小数。\n易错：乘以 100 得到的是百分比，而题目要求小数比例。",
       "commonErrors": [
         {
-          "sql": "SELECT r.receipt_id,ROUND(100.0*r.quantity_received/NULLIF(i.quantity_ordered,0),2) AS receipt_ratio FROM receipts r JOIN purchase_items i ON i.po_item_id=r.po_item_id ORDER BY r.receipt_id",
-          "reason": "题目要0至1形式的比例，不是百分比0至100。",
+          "sql": "SELECT r.receipt_id,ROUND(100.0*r.quantity_received/NULLIF(i.quantity_ordered,0),2) AS receipt_ratio FROM receipts r JOIN purchase_items i ON i.po_item_id=r.po_item_id",
+          "reason": "乘以 100 得到的是百分比，题目要求小数比例。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -1582,24 +1579,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0174/q0174-public.json",
-          "sha256": "76ec907950cd29c986622b4c77dd71a9e8dda21bfcc1695701019ec3e22cfd01"
+          "sha256": "52f09d35721262cd2fee4d292cd5eae06ba82467701196ed85c992aaedc466ef"
         },
         {
           "id": "q0174-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0174/q0174-boundary.json",
-          "sha256": "caeae783444abf8bfeeac57f5b40446801eba6905f3108eb8889b297c248dcbe"
+          "sha256": "c173d43253bd752f9c96b38008dadb11a35fbc5c737e37075d696357a11c1c6a"
         },
         {
           "id": "q0174-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0174/q0174-empty.json",
-          "sha256": "ca90371ea25053f9aa41b6c831378ad0ca136bd7ce8561181c1359b39eb28d31"
+          "sha256": "d09bd86dd273949b5870f66fae7884316ebdc2ff5e211bd24d9360c04a57f855"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -1618,7 +1615,7 @@
       "mysqlVerification": "未运行 MySQL 8.4",
       "validation": {
         "kind": "query",
-        "equivalentKind": "语法等价",
+        "equivalentKind": "代数或函数等价",
         "fixtures": [
           {
             "fixtureId": "q0174-public",

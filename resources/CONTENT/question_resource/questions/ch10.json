@@ -144,8 +144,8 @@
       "difficulty": "简单",
       "type": "独立编写",
       "title": "最高销售额的全部订单",
-      "context": "使用课程中小型订单数据练习最高销售额的全部订单。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "包括并列最高的订单，返回 id、sales，按 id 升序。\n输出列名称及顺序：id, sales。按题设排序；参考排序键：id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "运营想找出销售额最高的订单，如果有并列，都要列出。",
+      "requirements": "找出销售额等于全部订单中最大值的订单（包括并列最高的），返回 id、sales。\n输出列名称及顺序：id, sales。",
       "datasetId": "q0132-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -172,32 +172,32 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT id,sales FROM orders WHERE sales=(SELECT MAX(sales) FROM orders) ORDER BY id",
-          "sqliteSql": "SELECT id,sales FROM orders WHERE sales=(SELECT MAX(sales) FROM orders) ORDER BY id"
+          "mysqlSql": "SELECT id,sales FROM orders WHERE sales=(SELECT MAX(sales) FROM orders)",
+          "sqliteSql": "SELECT id,sales FROM orders WHERE sales=(SELECT MAX(sales) FROM orders)"
         },
         {
           "kind": "独立方法等价",
-          "mysqlSql": "SELECT id,sales FROM (SELECT id,sales,MAX(sales) OVER() AS m FROM orders) a WHERE sales=m ORDER BY id",
-          "sqliteSql": "SELECT id,sales FROM (SELECT id,sales,MAX(sales) OVER() AS m FROM orders) a WHERE sales=m ORDER BY id",
-          "explanation": "采用另一种关系运算或查询结构计算相同结果。"
+          "mysqlSql": "SELECT id,sales FROM orders WHERE sales=(SELECT sales FROM orders ORDER BY sales DESC LIMIT 1)",
+          "sqliteSql": "SELECT id,sales FROM orders WHERE sales=(SELECT sales FROM orders ORDER BY sales DESC LIMIT 1)"
         }
       ],
       "hints": [
-        "确定内层查询应计算单一值、键集合还是某行的匹配关系。",
-        "结合《标量子查询》：标量子查询应返回至多一行一列；空结果通常为 NULL。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT id,sales FROM orders WHERE sales=(SELECT □□□ FROM orders) ORDER BY id"
+        "先知道最大销售额是多少，再找出等于它的订单。",
+        "子查询 (SELECT MAX(sales) FROM orders) 返回一个值，可以放在 WHERE 的比较里。",
+        "用“等于最大值”而不是 LIMIT 1，才能保留并列。"
       ],
-      "explanation": "等于最大值可保留所有并列行，不能仅截取一行。\n执行思路：确认orders的输入记录；按筛选条件保留符合要求的记录，并考虑空值；输出id、sales列；遵循题设排序和并列规则。\n公开夹具实际返回 1 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：采用另一种关系运算或查询结构计算相同结果。",
+      "explanation": "内层子查询先算出最大销售额，外层 WHERE sales=… 选出所有等于它的订单，并列最高的都会出现。\n易错：用 MIN 得到的是最低销售额；用 ORDER BY … LIMIT 1 只会取一条，丢掉并列。",
       "commonErrors": [
         {
-          "sql": "SELECT id,sales FROM orders WHERE sales=(SELECT MIN(sales) FROM orders) ORDER BY id",
-          "reason": "等于最大值可保留所有并列行，不能仅截取一行。",
+          "sql": "SELECT id,sales FROM orders WHERE sales=(SELECT MIN(sales) FROM orders)",
+          "reason": "MIN 取到的是最低销售额，需要最大值。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
       "testFixtureIds": [
         "q0132-public",
         "q0132-boundary",
+        "q0132-extra",
         "q0132-empty"
       ],
       "testFixtures": [
@@ -206,24 +206,31 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0132/q0132-public.json",
-          "sha256": "5164b0826498d1e328f6afa21d0ae6e624f51f4bc7ec3fac1b1eafde50cc1aab"
+          "sha256": "354cfb8a3f60d015255f76a136a223c33d2b637ec4f7f46ea00dc31dbcf6e850"
         },
         {
           "id": "q0132-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0132/q0132-boundary.json",
-          "sha256": "1bd049de7bb92b25af4f9c8c2689e0f4cab173f37d7b3771b0065e20f4a9bdc4"
+          "sha256": "9e98ceb2d5ed0fe1aa603ca0c856b3de3d0039bb5f17a01df02b7ccef8f655b4"
+        },
+        {
+          "id": "q0132-extra",
+          "visibility": "hidden",
+          "variant": "extra",
+          "path": "fixtures/q0132/q0132-extra.json",
+          "sha256": "82994fd5f56424a50ea173b2e9ca430959a1f79ade4f71a18e3fe384cd7a2761"
         },
         {
           "id": "q0132-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0132/q0132-empty.json",
-          "sha256": "70061ccf47e4bc48061ebcabad068dfdd3dd58b21b225dcec23a5535b5d2796f"
+          "sha256": "7e098542aa674f0dd386ddb38e6148eea6c68a410dd869a478d5047b45fbd9ff"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -287,6 +294,27 @@
             }
           },
           {
+            "fixtureId": "q0132-extra",
+            "reference": {
+              "ran": true,
+              "match": true,
+              "resultHash": "ddc437209b6917cb399fe9f0901cd8461b119a7534dfcd8d98e18a7120151fba",
+              "rowCount": 2
+            },
+            "equivalent": {
+              "ran": true,
+              "match": true,
+              "resultHash": "ddc437209b6917cb399fe9f0901cd8461b119a7534dfcd8d98e18a7120151fba",
+              "rows": 2
+            },
+            "wrong": {
+              "ran": true,
+              "match": false,
+              "resultHash": "bd26cc8aafa75f6db89c2a02df31a010a23201d80ac2a14730bc86a848a2c033",
+              "rows": 1
+            }
+          },
+          {
             "fixtureId": "q0132-empty",
             "reference": {
               "ran": true,
@@ -328,15 +356,15 @@
       "difficulty": "简单",
       "type": "代码填空",
       "title": "高于所有商品平均库存",
-      "context": "使用课程中小型商品数据练习高于所有商品平均库存。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "补全代码中的一个空位，使完整SQL满足以下要求。可输入具有相同语义的片段，提交后按完整代码执行结果核对。\n返回 product_id、stock，只选库存大于全部商品已知平均库存者，按编号升序。\n输出列名称及顺序：product_id, stock。按题设排序；参考排序键：product_id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "仓储想找出库存高于整体平均水平的商品。",
+      "requirements": "补全空位：只保留库存大于全部商品平均库存（忽略 NULL）的商品，输出 product_id、stock。\n输出列名称及顺序：product_id, stock。",
       "datasetId": "q0134-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
       "sourceTables": [
         "products"
       ],
-      "initialCode": "SELECT product_id,stock FROM products WHERE stock>(SELECT {{blank1}} FROM products) ORDER BY product_id",
+      "initialCode": "SELECT product_id,stock FROM products WHERE stock>(SELECT {{blank1}} FROM products)",
       "options": [],
       "acceptedBlanks": [
         {
@@ -372,26 +400,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT product_id,stock FROM products WHERE stock>(SELECT AVG(stock) FROM products) ORDER BY product_id",
-          "sqliteSql": "SELECT product_id,stock FROM products WHERE stock>(SELECT AVG(stock) FROM products) ORDER BY product_id"
+          "mysqlSql": "SELECT product_id,stock FROM products WHERE stock>(SELECT AVG(stock) FROM products)",
+          "sqliteSql": "SELECT product_id,stock FROM products WHERE stock>(SELECT AVG(stock) FROM products)"
         },
         {
-          "kind": "关系结构等价",
-          "mysqlSql": "SELECT product_id,stock FROM (SELECT * FROM products) AS products WHERE stock>(SELECT AVG(stock) FROM products) ORDER BY product_id",
-          "sqliteSql": "SELECT product_id,stock FROM (SELECT * FROM products) AS products WHERE stock>(SELECT AVG(stock) FROM products) ORDER BY product_id",
-          "explanation": "先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。"
+          "kind": "独立方法等价",
+          "mysqlSql": "SELECT product_id,stock FROM products WHERE stock>(SELECT SUM(stock)*1.0/COUNT(stock) FROM products)",
+          "sqliteSql": "SELECT product_id,stock FROM products WHERE stock>(SELECT SUM(stock)*1.0/COUNT(stock) FROM products)"
         }
       ],
       "hints": [
-        "确定内层查询应计算单一值、键集合还是某行的匹配关系。",
-        "结合《标量子查询》：标量子查询应返回至多一行一列；空结果通常为 NULL。",
-        "回想空位所在子句的功能：标量子查询；保留周围代码，填入实现题设的表达式。"
+        "平均库存是一个整体数值，先用子查询把它算出来。",
+        "AVG(列) 计算平均值并自动忽略 NULL；子查询只返回一个值时可以直接参与比较。",
+        "不是和最大值比较，也不是和某一行比较。"
       ],
-      "explanation": "标量子查询计算唯一全体基准，最大值不是平均值。\n执行思路：确认products的输入记录；按筛选条件保留符合要求的记录，并考虑空值；输出product_id、stock列；遵循题设排序和并列规则。\n公开夹具实际返回 3 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
+      "explanation": "(SELECT AVG(stock) FROM products) 返回一个平均值，外层 stock> 该值只保留高于平均的商品；库存为 NULL 的行比较结果未知，不会入选。\n易错：和 MAX(stock) 比较，几乎选不到任何商品。",
       "commonErrors": [
         {
-          "sql": "SELECT product_id,stock FROM products WHERE stock>(SELECT MAX(stock) FROM products) ORDER BY product_id",
-          "reason": "标量子查询计算唯一全体基准，最大值不是平均值。",
+          "sql": "SELECT product_id,stock FROM products WHERE stock>(SELECT MAX(stock) FROM products)",
+          "reason": "和最大值比较几乎选不到商品，应与平均值比较。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -406,24 +433,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0134/q0134-public.json",
-          "sha256": "6d40ab22a650b905b2f724cf949d907097a7237259465d4bcc2363e1d5c32834"
+          "sha256": "f42e71d3512647dd2e28f33d6398b53f1601e6613d2d9b5c28921cb5c8e483f4"
         },
         {
           "id": "q0134-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0134/q0134-boundary.json",
-          "sha256": "5630b42c931f9e608447126f29fa4c32b865e861e80812ff7f6be0cca07015e3"
+          "sha256": "af82f7d32617e3dd9f3d5501a71002be36d742d1cc14421b8d4b3dc5ebc230c7"
         },
         {
           "id": "q0134-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0134/q0134-empty.json",
-          "sha256": "bfd43eeb90b5742699e41f46ac74bc467c6d11ef2a9f61daeb8715e56745cac6"
+          "sha256": "2104c33a90ae0609b42ab9cff5b25091c87db59314459f144cfcab2ea4fbd2f3"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -442,7 +469,7 @@
       "mysqlVerification": "未运行 MySQL 8.4",
       "validation": {
         "kind": "query",
-        "equivalentKind": "关系结构等价",
+        "equivalentKind": "独立方法等价",
         "fixtures": [
           {
             "fixtureId": "q0134-public",
@@ -531,8 +558,8 @@
       "difficulty": "简单",
       "type": "独立编写",
       "title": "经营日用品的门店",
-      "context": "使用课程中小型订单、门店数据练习经营日用品的门店。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "编写 SQL，完成以下查询要求。\n输出出现在日用品订单中的 stores.store_id，按编号升序。\n输出列名称及顺序：store_id。按题设排序；参考排序键：store_id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "市场部想知道哪些门店有日用品的订单。",
+      "requirements": "输出在日用品类别订单中出现过的门店 store_id（来自 stores 表）。\n输出列名称及顺序：store_id。",
       "datasetId": "q0136-lesson",
       "schemaVersion": 3,
       "contentVersion": "4.2.2",
@@ -558,26 +585,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT store_id FROM stores WHERE store_id IN (SELECT store_id FROM orders WHERE category='日用品') ORDER BY store_id",
-          "sqliteSql": "SELECT store_id FROM stores WHERE store_id IN (SELECT store_id FROM orders WHERE category='日用品') ORDER BY store_id"
+          "mysqlSql": "SELECT store_id FROM stores WHERE store_id IN (SELECT store_id FROM orders WHERE category='日用品')",
+          "sqliteSql": "SELECT store_id FROM stores WHERE store_id IN (SELECT store_id FROM orders WHERE category='日用品')"
         },
         {
-          "kind": "代数或函数等价",
-          "mysqlSql": "SELECT store_id FROM stores WHERE store_id IN (SELECT store_id FROM orders WHERE NOT (category<>'日用品')) ORDER BY store_id",
-          "sqliteSql": "SELECT store_id FROM stores WHERE store_id IN (SELECT store_id FROM orders WHERE NOT (category<>'日用品')) ORDER BY store_id",
-          "explanation": "用反向比较并取 NOT 表达相同三值逻辑。"
+          "kind": "独立方法等价",
+          "mysqlSql": "SELECT s.store_id FROM stores s WHERE EXISTS(SELECT 1 FROM orders o WHERE o.store_id=s.store_id AND o.category='日用品')",
+          "sqliteSql": "SELECT s.store_id FROM stores s WHERE EXISTS(SELECT 1 FROM orders o WHERE o.store_id=s.store_id AND o.category='日用品')"
         }
       ],
       "hints": [
-        "确定内层查询应计算单一值、键集合还是某行的匹配关系。",
-        "结合《IN 与多行子查询》：IN 可用子查询生成候选集合；子查询列数应与比较表达式一致。",
-        "按题设编写投影、筛选及分组，使用运行检查列名、NULL、重复记录和排序。"
+        "门店信息在 stores 表，是否经营日用品要看订单表。",
+        "IN (子查询) 判断某个值是否出现在子查询返回的列表中。",
+        "子查询里筛选的类别要与题目一致。"
       ],
-      "explanation": "子查询应返回目标商品类别对应的门店键。\n执行思路：确认orders、stores的输入记录；按筛选条件保留符合要求的记录，并考虑空值；输出store_id列；遵循题设排序和并列规则。\n公开夹具实际返回 1 行、1 列；完整结果见 expectedOutput。\n另一种可用写法：用反向比较并取 NOT 表达相同三值逻辑。",
+      "explanation": "子查询先列出日用品订单涉及的门店编号，外层用 IN 保留 stores 中在这个列表里的门店。\n另一种写法：EXISTS 相关子查询——对每个门店检查是否存在日用品订单。",
       "commonErrors": [
         {
-          "sql": "SELECT store_id FROM stores WHERE store_id IN (SELECT store_id FROM orders WHERE category='化妆品') ORDER BY store_id",
-          "reason": "子查询应返回目标商品类别对应的门店键。",
+          "sql": "SELECT store_id FROM stores WHERE store_id IN (SELECT store_id FROM orders WHERE category='化妆品')",
+          "reason": "子查询筛选的类别错了，应为“日用品”。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -592,24 +618,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0136/q0136-public.json",
-          "sha256": "79cb30f6bfba2c61ebf1c56822734b8620b83a3c47513af37431575620720b7a"
+          "sha256": "5bd1d425c9e8c4ed2855658343cc29e913c087bd3b01b16906d391016af3e43c"
         },
         {
           "id": "q0136-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0136/q0136-boundary.json",
-          "sha256": "d5565fbca7a76615d7ec126695f4aeb4d1d0b34ea46977cf70f39e9e7c3e303a"
+          "sha256": "c9689edd0e977e4b5cc5f7daab7d7b0bf35b5ea4d3630f38c2b519f56dc4e6a7"
         },
         {
           "id": "q0136-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0136/q0136-empty.json",
-          "sha256": "ba3bdd25af236c10f7ca3f6935a954608e63a7599e69fca8804236fc7727a069"
+          "sha256": "b59af97b90aaf350e5006f23bd99eeaf552563bae335e49ef801b94333f5d980"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -628,7 +654,7 @@
       "mysqlVerification": "未运行 MySQL 8.4",
       "validation": {
         "kind": "query",
-        "equivalentKind": "代数或函数等价",
+        "equivalentKind": "独立方法等价",
         "fixtures": [
           {
             "fixtureId": "q0136-public",
@@ -715,8 +741,8 @@
       "difficulty": "简单",
       "type": "独立编写",
       "title": "筛选有大额付款的发票",
-      "context": "使用课程中小型发票、付款数据练习筛选有大额付款的发票。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "任一付款金额至少60的发票，返回 invoice_id、amount，按编号升序。\n输出列名称及顺序：invoice_id, amount。按题设排序；参考排序键：invoice_id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "财务想找出收到过大额付款的发票。",
+      "requirements": "找出任一笔付款金额至少为 60 的发票，返回 invoice_id、amount。\n输出列名称及顺序：invoice_id, amount。",
       "datasetId": "q0138-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -744,26 +770,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT invoice_id,amount FROM invoices WHERE invoice_id IN (SELECT invoice_id FROM payments WHERE amount>=60) ORDER BY invoice_id",
-          "sqliteSql": "SELECT invoice_id,amount FROM invoices WHERE invoice_id IN (SELECT invoice_id FROM payments WHERE amount>=60) ORDER BY invoice_id"
+          "mysqlSql": "SELECT invoice_id,amount FROM invoices WHERE invoice_id IN (SELECT invoice_id FROM payments WHERE amount>=60)",
+          "sqliteSql": "SELECT invoice_id,amount FROM invoices WHERE invoice_id IN (SELECT invoice_id FROM payments WHERE amount>=60)"
         },
         {
-          "kind": "代数或函数等价",
-          "mysqlSql": "SELECT invoice_id,amount FROM invoices WHERE invoice_id IN (SELECT invoice_id FROM payments WHERE NOT (amount<60)) ORDER BY invoice_id",
-          "sqliteSql": "SELECT invoice_id,amount FROM invoices WHERE invoice_id IN (SELECT invoice_id FROM payments WHERE NOT (amount<60)) ORDER BY invoice_id",
-          "explanation": "用反向比较并取 NOT 表达相同三值逻辑。"
+          "kind": "独立方法等价",
+          "mysqlSql": "SELECT i.invoice_id,i.amount FROM invoices i WHERE EXISTS(SELECT 1 FROM payments p WHERE p.invoice_id=i.invoice_id AND p.amount>=60)",
+          "sqliteSql": "SELECT i.invoice_id,i.amount FROM invoices i WHERE EXISTS(SELECT 1 FROM payments p WHERE p.invoice_id=i.invoice_id AND p.amount>=60)"
         }
       ],
       "hints": [
-        "确定内层查询应计算单一值、键集合还是某行的匹配关系。",
-        "结合《IN 与多行子查询》：IN 可用子查询生成候选集合；子查询列数应与比较表达式一致。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT invoice_id,amount FROM invoices WHERE invoice_id IN (SELECT invoice_id FROM payments WHERE □□□) ORDER BY invoice_id"
+        "是否大额看付款表，发票金额在发票表。",
+        "IN (子查询) 判断发票编号是否出现在“有大额付款的发票编号”列表中。",
+        "“至少 60”包含 60 本身。"
       ],
-      "explanation": "阈值包含60，查找任一满足事件，不是汇总金额。\n执行思路：确认invoices、payments的输入记录；按筛选条件保留符合要求的记录，并考虑空值；输出invoice_id、amount列；遵循题设排序和并列规则。\n公开夹具实际返回 1 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：用反向比较并取 NOT 表达相同三值逻辑。",
+      "explanation": "子查询取出付款金额>=60 的发票编号，外层 IN 保留这些发票；同一张发票有多笔大额付款也只出现一次（JOIN 则会重复）。\n易错：把 >= 写成 >，恰好 60 的付款会被漏掉。",
       "commonErrors": [
         {
-          "sql": "SELECT invoice_id,amount FROM invoices WHERE invoice_id IN (SELECT invoice_id FROM payments WHERE amount>60) ORDER BY invoice_id",
-          "reason": "阈值包含60，查找任一满足事件，不是汇总金额。",
+          "sql": "SELECT invoice_id,amount FROM invoices WHERE invoice_id IN (SELECT invoice_id FROM payments WHERE amount>60)",
+          "reason": "“至少 60”包含 60，>60 漏掉了恰好 60 的付款。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -778,24 +803,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0138/q0138-public.json",
-          "sha256": "be4a609efda9661d77989fdb10081c0ddc7f88defe4da09877fa87448e12b192"
+          "sha256": "cc3417c1ec43eaafbedb138505aab3a5b14f964a014a212743260a6aa40dcdf1"
         },
         {
           "id": "q0138-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0138/q0138-boundary.json",
-          "sha256": "23b11aceedd0864c941b4ac2dda977e138eb61c5c6cdb119792a7de56f3053f8"
+          "sha256": "f6b59515c2634f714bb4a5ee8ca3270889e76dc6629f2c3cd1171b141a797f5d"
         },
         {
           "id": "q0138-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0138/q0138-empty.json",
-          "sha256": "64ef71d0d90bb49b5bcf03ff8c2920fc7509ec810681d68e2603e3314bd69d9d"
+          "sha256": "d777529dc2ca99c36081c62537a2815ace70ad436fc8f66f78d9bc2544025bcc"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -814,7 +839,7 @@
       "mysqlVerification": "未运行 MySQL 8.4",
       "validation": {
         "kind": "query",
-        "equivalentKind": "代数或函数等价",
+        "equivalentKind": "独立方法等价",
         "fixtures": [
           {
             "fixtureId": "q0138-public",
@@ -899,8 +924,8 @@
       "difficulty": "简单",
       "type": "独立编写",
       "title": "按客户逐个计算订单数",
-      "context": "使用课程中小型客户、订单数据练习按客户逐个计算订单数。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "编写 SQL，完成以下查询要求。\n对全部 customers，返回 customer_id 及相同客户键在 orders 的计数 n（无订单为0），按编号升序。\n输出列名称及顺序：customer_id, n。按题设排序；参考排序键：c.customer_id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "客户经理想给每位客户附上订单数，没下单的显示 0。",
+      "requirements": "对全部客户返回 customer_id，以及该客户在 orders 中的订单数 n（没有订单为 0）。\n输出列名称及顺序：customer_id, n。",
       "datasetId": "q0139-lesson",
       "schemaVersion": 3,
       "contentVersion": "4.2.2",
@@ -940,26 +965,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT c.customer_id,(SELECT COUNT(*) FROM orders o WHERE o.customer_id=c.customer_id) AS n FROM customers c ORDER BY c.customer_id",
-          "sqliteSql": "SELECT c.customer_id,(SELECT COUNT(*) FROM orders o WHERE o.customer_id=c.customer_id) AS n FROM customers c ORDER BY c.customer_id"
+          "mysqlSql": "SELECT c.customer_id,(SELECT COUNT(*) FROM orders o WHERE o.customer_id=c.customer_id) AS n FROM customers c",
+          "sqliteSql": "SELECT c.customer_id,(SELECT COUNT(*) FROM orders o WHERE o.customer_id=c.customer_id) AS n FROM customers c"
         },
         {
           "kind": "独立方法等价",
-          "mysqlSql": "SELECT c.customer_id,COUNT(o.id) AS n FROM customers c LEFT JOIN orders o ON o.customer_id=c.customer_id GROUP BY c.customer_id ORDER BY c.customer_id",
-          "sqliteSql": "SELECT c.customer_id,COUNT(o.id) AS n FROM customers c LEFT JOIN orders o ON o.customer_id=c.customer_id GROUP BY c.customer_id ORDER BY c.customer_id",
-          "explanation": "采用另一种关系运算或查询结构计算相同结果。"
+          "mysqlSql": "SELECT c.customer_id,COUNT(o.id) AS n FROM customers c LEFT JOIN orders o ON o.customer_id=c.customer_id GROUP BY c.customer_id",
+          "sqliteSql": "SELECT c.customer_id,COUNT(o.id) AS n FROM customers c LEFT JOIN orders o ON o.customer_id=c.customer_id GROUP BY c.customer_id"
         }
       ],
       "hints": [
-        "确定内层查询应计算单一值、键集合还是某行的匹配关系。",
-        "结合《相关子查询与 EXISTS》：相关子查询引用外层行；EXISTS 只检查是否存在结果行，不关心输出值。",
-        "按题设编写投影、筛选及分组，使用运行检查列名、NULL、重复记录和排序。"
+        "每位客户一行，订单数要和当前客户对应。",
+        "SELECT 里可以放相关子查询：子查询引用外层当前行（c.customer_id）。",
+        "子查询里别忘了写关联条件，否则每位客户得到的都是总订单数。"
       ],
-      "explanation": "每个客户的相关计数应该不同，非相关子查询会给所有客户相同总计。\n执行思路：确认customers、orders的输入记录；按筛选条件保留符合要求的记录，并考虑空值；输出customer_id、n列；遵循题设排序和并列规则。\n公开夹具实际返回 4 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：采用另一种关系运算或查询结构计算相同结果。",
+      "explanation": "相关子查询对每个客户各执行一次：COUNT(*) 统计 orders 中 customer_id 与当前客户相同的行数，没有订单时 COUNT 返回 0，不需要 COALESCE。\n易错：子查询里没有 WHERE 关联条件，每位客户显示的都是全部订单数。\n另一种写法：LEFT JOIN 后按客户分组计数。",
       "commonErrors": [
         {
-          "sql": "SELECT c.customer_id,(SELECT COUNT(*) FROM orders o) AS n FROM customers c ORDER BY c.customer_id",
-          "reason": "每个客户的相关计数应该不同，非相关子查询会给所有客户相同总计。",
+          "sql": "SELECT c.customer_id,(SELECT COUNT(*) FROM orders o) AS n FROM customers c",
+          "reason": "子查询缺少与当前客户的关联条件，每位客户得到的都是全部订单数。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -974,24 +998,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0139/q0139-public.json",
-          "sha256": "d766c7eddffc6ff577b82de6f0a5e10be4bd3ceb917a1c4ee74f60ff4c411354"
+          "sha256": "704bc6d2ccc909520f30e9b9386592124b2a489a3aa8d82a7016f3df8b6f2f6f"
         },
         {
           "id": "q0139-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0139/q0139-boundary.json",
-          "sha256": "fb167476081ee94c43b5e183da70cbd5601d45c480dda487e708d5efccca3aa2"
+          "sha256": "0c01a14d338e1b0abe21039fc06f11937f1c605c8c6a789d386db0e8fa26e04f"
         },
         {
           "id": "q0139-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0139/q0139-empty.json",
-          "sha256": "b05778981479610a9674dc1c2c139929c9fd71ddc3ab2bba4721128645bc955e"
+          "sha256": "e13cdd3875212dd8933ccd1bd21ab8ace267eae6ef5972863318259de2a93c06"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -1098,15 +1122,15 @@
       "difficulty": "中等",
       "type": "代码纠错",
       "title": "员工高于直属主管薪资",
-      "context": "使用课程中小型员工数据练习员工高于直属主管薪资。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "下面提供的初始代码存在逻辑、语法或结构错误。请修改整段代码，使其满足以下要求。\n有实际主管且高于主管薪资者，返回 employee_id、salary，按编号升序。\n输出列名称及顺序：employee_id, salary。按题设排序；参考排序键：e.employee_id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "人事想找出薪资比直属主管还高的员工。",
+      "requirements": "下面的代码想找出薪资高于直属主管的员工，但结果相反。请修改代码，输出 employee_id 和 salary；没有主管的员工不算。\n输出列名称及顺序：employee_id, salary。",
       "datasetId": "q0140-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
       "sourceTables": [
         "employees"
       ],
-      "initialCode": "SELECT e.employee_id,e.salary FROM employees e WHERE e.salary<(SELECT m.salary FROM employees m WHERE m.employee_id=e.manager_id) ORDER BY e.employee_id",
+      "initialCode": "SELECT e.employee_id,e.salary FROM employees e WHERE e.salary<(SELECT m.salary FROM employees m WHERE m.employee_id=e.manager_id)",
       "options": [],
       "acceptedBlanks": [],
       "expectedOutput": {
@@ -1115,38 +1139,43 @@
           "employee_id",
           "salary"
         ],
-        "rows": [],
-        "rowCount": 0
+        "rows": [
+          [
+            4,
+            5500
+          ]
+        ],
+        "rowCount": 1
       },
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT e.employee_id,e.salary FROM employees e WHERE e.salary>(SELECT m.salary FROM employees m WHERE m.employee_id=e.manager_id) ORDER BY e.employee_id",
-          "sqliteSql": "SELECT e.employee_id,e.salary FROM employees e WHERE e.salary>(SELECT m.salary FROM employees m WHERE m.employee_id=e.manager_id) ORDER BY e.employee_id"
+          "mysqlSql": "SELECT e.employee_id,e.salary FROM employees e WHERE e.salary>(SELECT m.salary FROM employees m WHERE m.employee_id=e.manager_id)",
+          "sqliteSql": "SELECT e.employee_id,e.salary FROM employees e WHERE e.salary>(SELECT m.salary FROM employees m WHERE m.employee_id=e.manager_id)"
         },
         {
-          "kind": "关系结构等价",
-          "mysqlSql": "SELECT e.employee_id,e.salary FROM (SELECT * FROM employees) AS e WHERE e.salary>(SELECT m.salary FROM employees m WHERE m.employee_id=e.manager_id) ORDER BY e.employee_id",
-          "sqliteSql": "SELECT e.employee_id,e.salary FROM (SELECT * FROM employees) AS e WHERE e.salary>(SELECT m.salary FROM employees m WHERE m.employee_id=e.manager_id) ORDER BY e.employee_id",
-          "explanation": "先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。"
+          "kind": "独立方法等价",
+          "mysqlSql": "SELECT e.employee_id,e.salary FROM employees e JOIN employees m ON e.manager_id=m.employee_id WHERE e.salary>m.salary",
+          "sqliteSql": "SELECT e.employee_id,e.salary FROM employees e JOIN employees m ON e.manager_id=m.employee_id WHERE e.salary>m.salary"
         }
       ],
       "hints": [
-        "确定内层查询应计算单一值、键集合还是某行的匹配关系。",
-        "结合《相关子查询与 EXISTS》：相关子查询引用外层行；EXISTS 只检查是否存在结果行，不关心输出值。",
-        "检查初始代码的 e.salary> 对应的业务规则。比较方向必须符合需求；缺少主管时标量结果NULL，不入选。"
+        "对比初始代码里的比较方向：题目要的是员工比主管高。",
+        "相关子查询用 e.manager_id 找到主管那一行，返回主管薪资。",
+        "没有主管的员工，子查询返回 NULL，比较结果未知，自然不会入选。"
       ],
-      "explanation": "比较方向必须符合需求；缺少主管时标量结果NULL，不入选。\n执行思路：确认employees的输入记录；按筛选条件保留符合要求的记录，并考虑空值；输出employee_id、salary列；遵循题设排序和并列规则。\n公开夹具实际返回 0 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
+      "explanation": "子查询按 e.manager_id 取出主管薪资，外层条件应为 e.salary>主管薪资。初始代码写成 <，找到的是比主管低的员工。没有主管时子查询为 NULL，比较未知，这些员工不会出现，符合“没有主管的不算”。\n另一种写法：员工表与自己连接，WHERE e.salary>m.salary。",
       "commonErrors": [
         {
-          "sql": "SELECT e.employee_id,e.salary FROM employees e WHERE e.salary<(SELECT m.salary FROM employees m WHERE m.employee_id=e.manager_id) ORDER BY e.employee_id",
-          "reason": "比较方向必须符合需求；缺少主管时标量结果NULL，不入选。",
+          "sql": "SELECT e.employee_id,e.salary FROM employees e WHERE e.salary<(SELECT m.salary FROM employees m WHERE m.employee_id=e.manager_id)",
+          "reason": "比较方向反了：这样找出的是比主管薪资低的员工。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
       "testFixtureIds": [
         "q0140-public",
         "q0140-boundary",
+        "q0140-extra",
         "q0140-empty"
       ],
       "testFixtures": [
@@ -1155,24 +1184,31 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0140/q0140-public.json",
-          "sha256": "deca6345ab18ae390e9622f433bd1e80a5604ce431a9ae9965bf444ea501c300"
+          "sha256": "edcb6b80648cc55688bb38b279d196df84b29526b9b7e2b63a3a5c5131fe4638"
         },
         {
           "id": "q0140-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0140/q0140-boundary.json",
-          "sha256": "c449fc20be4bf3bd688fd62fe8d62cdc75afba8bd1a1d38b0ccb8430b3113dbe"
+          "sha256": "2aac1a3361225e940b8dea07f10211dc6e38ee9dcdad06a9a6ecd0103e06236f"
+        },
+        {
+          "id": "q0140-extra",
+          "visibility": "hidden",
+          "variant": "extra",
+          "path": "fixtures/q0140/q0140-extra.json",
+          "sha256": "fcb9ecce1a851fee7b0d32bf7805c4f73fca9169770252abfada6be750856eb1"
         },
         {
           "id": "q0140-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0140/q0140-empty.json",
-          "sha256": "04f6b85f47e456583d6d8d5b402bbbb725abcb9b40889c3968b607d38dc05548"
+          "sha256": "add03a30222343e33ece2887022029a340cedf4ba0705aed9aca2191b7a4205d"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -1191,27 +1227,27 @@
       "mysqlVerification": "未运行 MySQL 8.4",
       "validation": {
         "kind": "query",
-        "equivalentKind": "关系结构等价",
+        "equivalentKind": "独立方法等价",
         "fixtures": [
           {
             "fixtureId": "q0140-public",
             "reference": {
               "ran": true,
               "match": true,
-              "resultHash": "0e14489e2a13b2cbb842afe3204bcb77284f8a8bf87d432cfee49d7c2034019c",
-              "rowCount": 0
+              "resultHash": "502063e56b94031cf341bcd35029fe6da2236ca4e41df18c805546955b744729",
+              "rowCount": 1
             },
             "equivalent": {
               "ran": true,
               "match": true,
-              "resultHash": "0e14489e2a13b2cbb842afe3204bcb77284f8a8bf87d432cfee49d7c2034019c",
-              "rows": 0
+              "resultHash": "502063e56b94031cf341bcd35029fe6da2236ca4e41df18c805546955b744729",
+              "rows": 1
             },
             "wrong": {
               "ran": true,
               "match": false,
-              "resultHash": "53fa17ce1684f0e8429639e80e1d23762ccbd38269d4c04095b835ea60983389",
-              "rows": 3
+              "resultHash": "235feee85c7325cdfbe5ffcacfcd7d44d7d4abcc43af3ca67b1cd6ef2e8e7988",
+              "rows": 2
             }
           },
           {
@@ -1233,6 +1269,27 @@
               "match": false,
               "resultHash": "4eba9a449b69deda683de801c938b588c0560d2baee547c91410505d80f20f4b",
               "rows": 3
+            }
+          },
+          {
+            "fixtureId": "q0140-extra",
+            "reference": {
+              "ran": true,
+              "match": true,
+              "resultHash": "72a35585c24b35c78f84dc28683e3362bb17d47fe3e9a633f895b925c38c6a9b",
+              "rowCount": 2
+            },
+            "equivalent": {
+              "ran": true,
+              "match": true,
+              "resultHash": "72a35585c24b35c78f84dc28683e3362bb17d47fe3e9a633f895b925c38c6a9b",
+              "rows": 2
+            },
+            "wrong": {
+              "ran": true,
+              "match": false,
+              "resultHash": "ee245be1d8fe6fddf04993175cb9a4fa3ae4c5377c990a645e7e10917817240a",
+              "rows": 1
             }
           },
           {
@@ -1278,8 +1335,8 @@
       "difficulty": "中等",
       "type": "代码纠错",
       "title": "匹配有已完成订单的电商客户",
-      "context": "使用课程中小型电商订单、客户数据练习匹配有已完成订单的电商客户。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "下面提供的初始代码存在逻辑、语法或结构错误。请修改整段代码，使其满足以下要求。\n从 customers 筛选有已完成 commerce_orders 的客户，返回 customer_id、customer_name，按编号升序。\n输出列名称及顺序：customer_id, customer_name。按题设排序；参考排序键：customer_id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "电商运营想找出下过已完成订单的客户。",
+      "requirements": "下面的代码想找出有已完成订单的客户，但筛选的订单状态不对。请修改代码，返回 customer_id、customer_name。\n输出列名称及顺序：customer_id, customer_name。",
       "datasetId": "q0141-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -1287,7 +1344,7 @@
         "commerce_orders",
         "customers"
       ],
-      "initialCode": "SELECT customer_id,customer_name FROM customers WHERE customer_id IN (SELECT customer_id FROM commerce_orders WHERE status='cancelled') ORDER BY customer_id",
+      "initialCode": "SELECT customer_id,customer_name FROM customers WHERE customer_id IN (SELECT customer_id FROM commerce_orders WHERE status='cancelled')",
       "options": [],
       "acceptedBlanks": [],
       "expectedOutput": {
@@ -1311,26 +1368,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT customer_id,customer_name FROM customers WHERE customer_id IN (SELECT customer_id FROM commerce_orders WHERE status='completed') ORDER BY customer_id",
-          "sqliteSql": "SELECT customer_id,customer_name FROM customers WHERE customer_id IN (SELECT customer_id FROM commerce_orders WHERE status='completed') ORDER BY customer_id"
+          "mysqlSql": "SELECT customer_id,customer_name FROM customers WHERE customer_id IN (SELECT customer_id FROM commerce_orders WHERE status='completed')",
+          "sqliteSql": "SELECT customer_id,customer_name FROM customers WHERE customer_id IN (SELECT customer_id FROM commerce_orders WHERE status='completed')"
         },
         {
-          "kind": "代数或函数等价",
-          "mysqlSql": "SELECT customer_id,customer_name FROM customers WHERE customer_id IN (SELECT customer_id FROM commerce_orders WHERE NOT (status<>'completed')) ORDER BY customer_id",
-          "sqliteSql": "SELECT customer_id,customer_name FROM customers WHERE customer_id IN (SELECT customer_id FROM commerce_orders WHERE NOT (status<>'completed')) ORDER BY customer_id",
-          "explanation": "用反向比较并取 NOT 表达相同三值逻辑。"
+          "kind": "独立方法等价",
+          "mysqlSql": "SELECT c.customer_id,c.customer_name FROM customers c WHERE EXISTS(SELECT 1 FROM commerce_orders o WHERE o.customer_id=c.customer_id AND o.status='completed')",
+          "sqliteSql": "SELECT c.customer_id,c.customer_name FROM customers c WHERE EXISTS(SELECT 1 FROM commerce_orders o WHERE o.customer_id=c.customer_id AND o.status='completed')"
         }
       ],
       "hints": [
-        "确定内层查询应计算单一值、键集合还是某行的匹配关系。",
-        "结合《IN 与多行子查询》：IN 可用子查询生成候选集合；子查询列数应与比较表达式一致。",
-        "检查初始代码的 'completed' 对应的业务规则。取消订单不算有效购买，状态条件必须正确。"
+        "对照题目，订单状态应该是哪一种？",
+        "子查询用 status 筛选订单，外层 IN 保留匹配的客户。",
+        "检查子查询里的状态值是否和题目一致。"
       ],
-      "explanation": "取消订单不算有效购买，状态条件必须正确。\n执行思路：确认commerce_orders、customers的输入记录；按筛选条件保留符合要求的记录，并考虑空值；输出customer_id、customer_name列；遵循题设排序和并列规则。\n公开夹具实际返回 2 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：用反向比较并取 NOT 表达相同三值逻辑。",
+      "explanation": "子查询应筛选 status='completed' 的订单，再用 IN 保留对应的客户。初始代码用了 'cancelled'，找到的是有已取消订单的客户。\n另一种写法：EXISTS 相关子查询。",
       "commonErrors": [
         {
-          "sql": "SELECT customer_id,customer_name FROM customers WHERE customer_id IN (SELECT customer_id FROM commerce_orders WHERE status='cancelled') ORDER BY customer_id",
-          "reason": "取消订单不算有效购买，状态条件必须正确。",
+          "sql": "SELECT customer_id,customer_name FROM customers WHERE customer_id IN (SELECT customer_id FROM commerce_orders WHERE status='cancelled')",
+          "reason": "订单状态筛错了：已完成应为 completed，而不是 cancelled。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -1345,24 +1401,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0141/q0141-public.json",
-          "sha256": "5611bda0bd4922a566b8b974f633afdc32cb089cf04fb6bb5a6bc1ba9452fe60"
+          "sha256": "0136346c712c65a672cc88ae9125b081106b30e07b2649d982815fa7bfe247a6"
         },
         {
           "id": "q0141-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0141/q0141-boundary.json",
-          "sha256": "4a9e2296b27aa3c50615293a8b5e2e83c9cafc6f9404c827f5ca4887e178e071"
+          "sha256": "b9e6029d4cad58dfed016f0aca22888a6e1e8c1742c4413a174a74591a6d075c"
         },
         {
           "id": "q0141-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0141/q0141-empty.json",
-          "sha256": "5ba36fc8498150cc2ee75e7a0c3ab25a925dc83c66f831cc6da995bb2bbfff93"
+          "sha256": "66b1d169746393b8150a69724d941decc4068b29708e91d310df436a92f3eb9a"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -1381,7 +1437,7 @@
       "mysqlVerification": "未运行 MySQL 8.4",
       "validation": {
         "kind": "query",
-        "equivalentKind": "代数或函数等价",
+        "equivalentKind": "独立方法等价",
         "fixtures": [
           {
             "fixtureId": "q0141-public",
@@ -1466,15 +1522,15 @@
       "difficulty": "中等",
       "type": "代码填空",
       "title": "高于本类别平均售价",
-      "context": "使用课程中小型商品数据练习高于本类别平均售价。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "补全代码中的一个空位，使完整SQL满足以下要求。可输入具有相同语义的片段，提交后按完整代码执行结果核对。\n返回 product_id、price、category，仅售价高于自身类别已知平均价的商品，按编号升序。\n输出列名称及顺序：product_id, price, category。按题设排序；参考排序键：p.product_id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "商品组想找出价格高于本类别平均价的商品。",
+      "requirements": "补全空位：返回售价高于自己所属类别平均售价的商品 product_id、price、category。\n输出列名称及顺序：product_id, price, category。",
       "datasetId": "q0142-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
       "sourceTables": [
         "products"
       ],
-      "initialCode": "SELECT p.product_id,p.price,p.category FROM products p WHERE p.price>(SELECT AVG(x.price) FROM products x{{blank1}}) ORDER BY p.product_id",
+      "initialCode": "SELECT p.product_id,p.price,p.category FROM products p WHERE p.price>(SELECT AVG(x.price) FROM products x{{blank1}})",
       "options": [],
       "acceptedBlanks": [
         {
@@ -1509,26 +1565,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT p.product_id,p.price,p.category FROM products p WHERE p.price>(SELECT AVG(x.price) FROM products x WHERE x.category=p.category) ORDER BY p.product_id",
-          "sqliteSql": "SELECT p.product_id,p.price,p.category FROM products p WHERE p.price>(SELECT AVG(x.price) FROM products x WHERE x.category=p.category) ORDER BY p.product_id"
+          "mysqlSql": "SELECT p.product_id,p.price,p.category FROM products p WHERE p.price>(SELECT AVG(x.price) FROM products x WHERE x.category=p.category)",
+          "sqliteSql": "SELECT p.product_id,p.price,p.category FROM products p WHERE p.price>(SELECT AVG(x.price) FROM products x WHERE x.category=p.category)"
         },
         {
-          "kind": "关系结构等价",
-          "mysqlSql": "SELECT p.product_id,p.price,p.category FROM (SELECT * FROM products) AS p WHERE p.price>(SELECT AVG(x.price) FROM products x WHERE x.category=p.category) ORDER BY p.product_id",
-          "sqliteSql": "SELECT p.product_id,p.price,p.category FROM (SELECT * FROM products) AS p WHERE p.price>(SELECT AVG(x.price) FROM products x WHERE x.category=p.category) ORDER BY p.product_id",
-          "explanation": "先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。"
+          "kind": "独立方法等价",
+          "mysqlSql": "SELECT p.product_id,p.price,p.category FROM products p JOIN (SELECT category,AVG(price) AS a FROM products GROUP BY category) t ON p.category=t.category WHERE p.price>t.a",
+          "sqliteSql": "SELECT p.product_id,p.price,p.category FROM products p JOIN (SELECT category,AVG(price) AS a FROM products GROUP BY category) t ON p.category=t.category WHERE p.price>t.a"
         }
       ],
       "hints": [
-        "确定内层查询应计算单一值、键集合还是某行的匹配关系。",
-        "结合《相关子查询与 EXISTS》：相关子查询引用外层行；EXISTS 只检查是否存在结果行，不关心输出值。",
-        "回想空位所在子句的功能：相关子查询与 EXISTS；保留周围代码，填入实现题设的表达式。"
+        "要比较的是“本类别”的平均价，而不是全部商品的平均价。",
+        "相关子查询里引用外层当前商品的类别：x.category=p.category。",
+        "空位要补的是子查询里的筛选条件。"
       ],
-      "explanation": "相关子查询计算每个类别自己的基准，不能使用全体均值。\n执行思路：确认products的输入记录；按筛选条件保留符合要求的记录，并考虑空值；输出product_id、price、category列；遵循题设排序和并列规则。\n公开夹具实际返回 2 行、3 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
+      "explanation": "内层子查询对每个商品 p 只计算同类别商品 x 的平均价，外层再比较 p.price。缺少类别条件时比较的是全表平均，结果会混入其他类别的商品。\n另一种写法：先按类别算出平均价，再与商品表连接比较。",
       "commonErrors": [
         {
-          "sql": "SELECT p.product_id,p.price,p.category FROM products p WHERE p.price>(SELECT AVG(x.price) FROM products x) ORDER BY p.product_id",
-          "reason": "相关子查询计算每个类别自己的基准，不能使用全体均值。",
+          "sql": "SELECT p.product_id,p.price,p.category FROM products p WHERE p.price>(SELECT AVG(x.price) FROM products x)",
+          "reason": "子查询缺少类别条件，比较的是全部商品的平均价。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -1543,24 +1598,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0142/q0142-public.json",
-          "sha256": "eeae510d69047b18e1e174946dd1b8682734910ee397d560c63b183d016e5f9c"
+          "sha256": "9110a99645d7d19cd0732ab34cf49716684cbac9f7af943e47b4a740c79c43d0"
         },
         {
           "id": "q0142-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0142/q0142-boundary.json",
-          "sha256": "7d063d3c36e7a7b19678539bb05e4b49408c062561bb762178346c0b2493d6f4"
+          "sha256": "1953df273bfc1d1b686748f6c4a1dc46f70600d8b9cff0d31f214a54976c0ddd"
         },
         {
           "id": "q0142-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0142/q0142-empty.json",
-          "sha256": "dd5d6f27d7c6f25a17ce40fa7465586b34030c4a0f4573aeb0a44c935ec5f2be"
+          "sha256": "5c800701b0d421c0acdd9e48503cb7bff48209e4a127fb527a9ec8fb6a8593a4"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -1579,7 +1634,7 @@
       "mysqlVerification": "未运行 MySQL 8.4",
       "validation": {
         "kind": "query",
-        "equivalentKind": "关系结构等价",
+        "equivalentKind": "独立方法等价",
         "fixtures": [
           {
             "fixtureId": "q0142-public",
@@ -1668,8 +1723,8 @@
       "difficulty": "中等",
       "type": "独立编写",
       "title": "没有登记订单的客户",
-      "context": "使用课程中小型客户、订单数据练习没有登记订单的客户。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "返回无任何 orders 匹配的客户编号，按编号升序，orders 含NULL客户键。\n输出列名称及顺序：customer_id。按题设排序；参考排序键：c.customer_id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "运营想找出还没有任何订单的客户。",
+      "requirements": "返回在 orders 中没有任何匹配记录的客户编号；orders 里存在客户键为 NULL 的订单。\n输出列名称及顺序：customer_id。",
       "datasetId": "q0144-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -1695,26 +1750,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT c.customer_id FROM customers c WHERE NOT EXISTS(SELECT 1 FROM orders o WHERE o.customer_id=c.customer_id) ORDER BY c.customer_id",
-          "sqliteSql": "SELECT c.customer_id FROM customers c WHERE NOT EXISTS(SELECT 1 FROM orders o WHERE o.customer_id=c.customer_id) ORDER BY c.customer_id"
+          "mysqlSql": "SELECT c.customer_id FROM customers c WHERE NOT EXISTS(SELECT 1 FROM orders o WHERE o.customer_id=c.customer_id)",
+          "sqliteSql": "SELECT c.customer_id FROM customers c WHERE NOT EXISTS(SELECT 1 FROM orders o WHERE o.customer_id=c.customer_id)"
         },
         {
           "kind": "独立方法等价",
-          "mysqlSql": "SELECT c.customer_id FROM customers c LEFT JOIN orders o ON o.customer_id=c.customer_id WHERE o.id IS NULL ORDER BY c.customer_id",
-          "sqliteSql": "SELECT c.customer_id FROM customers c LEFT JOIN orders o ON o.customer_id=c.customer_id WHERE o.id IS NULL ORDER BY c.customer_id",
-          "explanation": "采用另一种关系运算或查询结构计算相同结果。"
+          "mysqlSql": "SELECT c.customer_id FROM customers c LEFT JOIN orders o ON o.customer_id=c.customer_id WHERE o.id IS NULL",
+          "sqliteSql": "SELECT c.customer_id FROM customers c LEFT JOIN orders o ON o.customer_id=c.customer_id WHERE o.id IS NULL"
         }
       ],
       "hints": [
-        "确定内层查询应计算单一值、键集合还是某行的匹配关系。",
-        "结合《NOT EXISTS 与 NOT IN》：若 NOT IN 的候选集合含 NULL，未匹配比较可能变成 UNKNOWN；NOT EXISTS 检测不存在符合条件的行。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT c.customer_id FROM customers c WHERE □□□(SELECT 1 FROM orders o WHERE o.customer_id=c.customer_id) ORDER BY c.customer_id"
+        "“没有任何匹配”是“不存在”的关系，而不是“不等于”。",
+        "NOT EXISTS(子查询) 在子查询没有返回任何行时为真。",
+        "NOT IN 遇到子查询结果里有 NULL 时会得到未知，这里订单的客户键有 NULL，要避免它。"
       ],
-      "explanation": "NOT EXISTS 不因其他订单的空客户键而排除全部客户。\n执行思路：确认customers、orders的输入记录；按筛选条件保留符合要求的记录，并考虑空值；输出customer_id列；遵循题设排序和并列规则。\n公开夹具实际返回 1 行、1 列；完整结果见 expectedOutput。\n另一种可用写法：采用另一种关系运算或查询结构计算相同结果。",
+      "explanation": "NOT EXISTS 对每个客户检查是否存在匹配订单，不存在就保留，不受 orders 中 NULL 客户键的影响。\n易错：写成 EXISTS 得到的是有订单的客户，正好相反；NOT IN 在子查询含 NULL 时结果为空。\n另一种写法：LEFT JOIN 后筛选订单字段为 NULL。",
       "commonErrors": [
         {
-          "sql": "SELECT c.customer_id FROM customers c WHERE EXISTS(SELECT 1 FROM orders o WHERE o.customer_id=c.customer_id) ORDER BY c.customer_id",
-          "reason": "NOT EXISTS 不因其他订单的空客户键而排除全部客户。",
+          "sql": "SELECT c.customer_id FROM customers c WHERE EXISTS(SELECT 1 FROM orders o WHERE o.customer_id=c.customer_id)",
+          "reason": "EXISTS 选出的是有订单的客户，需要的是没有订单的客户。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -1729,24 +1783,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0144/q0144-public.json",
-          "sha256": "fff37ee24eec25a0ca3a97225c8bcef21de2b9e695c23d3219372a07e7730631"
+          "sha256": "e757ce7548dfce4805df6b1adf72fe49beaabd2f5fba74e801747fce0fe46567"
         },
         {
           "id": "q0144-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0144/q0144-boundary.json",
-          "sha256": "3ccf9b82e5ae0db08b7028a887210d922d610e0041f4ee91309a92330a67a902"
+          "sha256": "1e8ddf1c6a3dc302610b96e244e258bd2a0932ae41dc42f7c298af24310c0e44"
         },
         {
           "id": "q0144-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0144/q0144-empty.json",
-          "sha256": "2e05e2249cf9993da980456b2d2a5e2928bfcd6991a39a174a374185d2024596"
+          "sha256": "87b9eab3143ed9c9f2172b6844e6602aa648bf50c7e6628642a3a4b6a48e71ee"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -1868,8 +1922,8 @@
       "difficulty": "中等",
       "type": "代码纠错",
       "title": "没有采购记录的商品",
-      "context": "使用课程中小型商品、采购明细数据练习没有采购记录的商品。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "下面提供的初始代码存在逻辑、语法或结构错误。请修改整段代码，使其满足以下要求。\n从 products 查找从未出现在 purchase_items 中的商品编号，按编号升序；NULL键不影响。\n输出列名称及顺序：product_id。按题设排序；参考排序键：p.product_id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "采购想找出从没被采购过的商品。",
+      "requirements": "下面的代码想找出从未出现在采购明细里的商品，但结果相反。请修改代码，输出商品编号 product_id。\n输出列名称及顺序：product_id。",
       "datasetId": "q0145-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -1877,7 +1931,7 @@
         "products",
         "purchase_items"
       ],
-      "initialCode": "SELECT p.product_id FROM products p WHERE EXISTS(SELECT 1 FROM purchase_items i WHERE i.product_id=p.product_id) ORDER BY p.product_id",
+      "initialCode": "SELECT p.product_id FROM products p WHERE EXISTS(SELECT 1 FROM purchase_items i WHERE i.product_id=p.product_id)",
       "options": [],
       "acceptedBlanks": [],
       "expectedOutput": {
@@ -1904,26 +1958,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT p.product_id FROM products p WHERE NOT EXISTS(SELECT 1 FROM purchase_items i WHERE i.product_id=p.product_id) ORDER BY p.product_id",
-          "sqliteSql": "SELECT p.product_id FROM products p WHERE NOT EXISTS(SELECT 1 FROM purchase_items i WHERE i.product_id=p.product_id) ORDER BY p.product_id"
+          "mysqlSql": "SELECT p.product_id FROM products p WHERE NOT EXISTS(SELECT 1 FROM purchase_items i WHERE i.product_id=p.product_id)",
+          "sqliteSql": "SELECT p.product_id FROM products p WHERE NOT EXISTS(SELECT 1 FROM purchase_items i WHERE i.product_id=p.product_id)"
         },
         {
           "kind": "独立方法等价",
-          "mysqlSql": "SELECT p.product_id FROM products p LEFT JOIN purchase_items i ON i.product_id=p.product_id WHERE i.po_item_id IS NULL ORDER BY p.product_id",
-          "sqliteSql": "SELECT p.product_id FROM products p LEFT JOIN purchase_items i ON i.product_id=p.product_id WHERE i.po_item_id IS NULL ORDER BY p.product_id",
-          "explanation": "采用另一种关系运算或查询结构计算相同结果。"
+          "mysqlSql": "SELECT p.product_id FROM products p LEFT JOIN purchase_items i ON i.product_id=p.product_id WHERE i.po_item_id IS NULL",
+          "sqliteSql": "SELECT p.product_id FROM products p LEFT JOIN purchase_items i ON i.product_id=p.product_id WHERE i.po_item_id IS NULL"
         }
       ],
       "hints": [
-        "确定内层查询应计算单一值、键集合还是某行的匹配关系。",
-        "结合《NOT EXISTS 与 NOT IN》：若 NOT IN 的候选集合含 NULL，未匹配比较可能变成 UNKNOWN；NOT EXISTS 检测不存在符合条件的行。",
-        "检查初始代码的 NOT EXISTS 对应的业务规则。反存在性要排除所有能匹配的商品。"
+        "题目要的是“没有采购记录”。",
+        "EXISTS 为真表示存在匹配行；想要“不存在”，要在它前面加 NOT。",
+        "对比结果：初始代码返回的是已经被采购过的商品。"
       ],
-      "explanation": "反存在性要排除所有能匹配的商品。\n执行思路：确认products、purchase_items的输入记录；按筛选条件保留符合要求的记录，并考虑空值；输出product_id列；遵循题设排序和并列规则。\n公开夹具实际返回 4 行、1 列；完整结果见 expectedOutput。\n另一种可用写法：采用另一种关系运算或查询结构计算相同结果。",
+      "explanation": "NOT EXISTS 在子查询找不到匹配的采购明细时为真，这样得到从未采购过的商品。初始代码用 EXISTS，返回的是已采购的商品。\n另一种写法：LEFT JOIN 采购明细，筛选明细字段为 NULL。",
       "commonErrors": [
         {
-          "sql": "SELECT p.product_id FROM products p WHERE EXISTS(SELECT 1 FROM purchase_items i WHERE i.product_id=p.product_id) ORDER BY p.product_id",
-          "reason": "反存在性要排除所有能匹配的商品。",
+          "sql": "SELECT p.product_id FROM products p WHERE EXISTS(SELECT 1 FROM purchase_items i WHERE i.product_id=p.product_id)",
+          "reason": "EXISTS 选出的是被采购过的商品，需要 NOT EXISTS。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -1938,24 +1991,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0145/q0145-public.json",
-          "sha256": "18174cfea5f94d1c13ec9ecc84a4e37bc5df68f4e40c50b2e8e31ca0f3204dfb"
+          "sha256": "a657aa4eb14e8116b2368e112174c42e89a7c237cd3417f66478b2f0b6bd1162"
         },
         {
           "id": "q0145-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0145/q0145-boundary.json",
-          "sha256": "6101bd0d642dd6bef37e97589502d67734b86cabbf1b99779f6cafa0f9838755"
+          "sha256": "982c371491e6d0cfa875ee49b8b8793fbd876e8da00a00a98847d3169bb3f67e"
         },
         {
           "id": "q0145-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0145/q0145-empty.json",
-          "sha256": "031cba673777e1f4c106c6e5454fdd19550d2456d84df0496f6dd347484aeb9e"
+          "sha256": "c9b3f1ae3b349def6e460854c5ac83a10d4723eaa1d956b1860f9679720564da"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -2059,8 +2112,8 @@
       "difficulty": "中等",
       "type": "独立编写",
       "title": "从未付款的发票",
-      "context": "使用课程中小型发票、付款数据练习从未付款的发票。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "返回没有任何 payment 匹配的发票 invoice_id、amount，按编号升序。\n输出列名称及顺序：invoice_id, amount。按题设排序；参考排序键：i.invoice_id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "财务想找出一直没有收到付款的发票。",
+      "requirements": "返回没有任何付款记录的发票，输出 invoice_id、amount。\n输出列名称及顺序：invoice_id, amount。",
       "datasetId": "q0146-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -2088,26 +2141,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT i.invoice_id,i.amount FROM invoices i WHERE NOT EXISTS(SELECT 1 FROM payments p WHERE p.invoice_id=i.invoice_id) ORDER BY i.invoice_id",
-          "sqliteSql": "SELECT i.invoice_id,i.amount FROM invoices i WHERE NOT EXISTS(SELECT 1 FROM payments p WHERE p.invoice_id=i.invoice_id) ORDER BY i.invoice_id"
+          "mysqlSql": "SELECT i.invoice_id,i.amount FROM invoices i WHERE NOT EXISTS(SELECT 1 FROM payments p WHERE p.invoice_id=i.invoice_id)",
+          "sqliteSql": "SELECT i.invoice_id,i.amount FROM invoices i WHERE NOT EXISTS(SELECT 1 FROM payments p WHERE p.invoice_id=i.invoice_id)"
         },
         {
           "kind": "独立方法等价",
-          "mysqlSql": "SELECT i.invoice_id,i.amount FROM invoices i LEFT JOIN payments p ON p.invoice_id=i.invoice_id WHERE p.payment_id IS NULL ORDER BY i.invoice_id",
-          "sqliteSql": "SELECT i.invoice_id,i.amount FROM invoices i LEFT JOIN payments p ON p.invoice_id=i.invoice_id WHERE p.payment_id IS NULL ORDER BY i.invoice_id",
-          "explanation": "采用另一种关系运算或查询结构计算相同结果。"
+          "mysqlSql": "SELECT i.invoice_id,i.amount FROM invoices i LEFT JOIN payments p ON p.invoice_id=i.invoice_id WHERE p.payment_id IS NULL",
+          "sqliteSql": "SELECT i.invoice_id,i.amount FROM invoices i LEFT JOIN payments p ON p.invoice_id=i.invoice_id WHERE p.payment_id IS NULL"
         }
       ],
       "hints": [
-        "确定内层查询应计算单一值、键集合还是某行的匹配关系。",
-        "结合《NOT EXISTS 与 NOT IN》：若 NOT IN 的候选集合含 NULL，未匹配比较可能变成 UNKNOWN；NOT EXISTS 检测不存在符合条件的行。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT i.invoice_id,i.amount FROM invoices i WHERE □□□(SELECT 1 FROM payments p WHERE p.invoice_id=i.invoice_id) ORDER BY i.invoice_id"
+        "“没有任何付款”是“不存在”的关系。",
+        "NOT EXISTS 配合相关子查询，用发票编号关联付款表。",
+        "子查询里别忘了写发票编号相等的条件。"
       ],
-      "explanation": "没有付款不等于有退款或付款金额为0；题目要求不存在付款行。\n执行思路：确认invoices、payments的输入记录；按筛选条件保留符合要求的记录，并考虑空值；输出invoice_id、amount列；遵循题设排序和并列规则。\n公开夹具实际返回 1 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：采用另一种关系运算或查询结构计算相同结果。",
+      "explanation": "NOT EXISTS 检查付款表里是否存在属于该发票的记录，没有就保留这张发票。\n易错：写成 EXISTS 得到的是已有付款的发票。\n另一种写法：LEFT JOIN 付款表后筛选付款字段为 NULL。",
       "commonErrors": [
         {
-          "sql": "SELECT i.invoice_id,i.amount FROM invoices i WHERE EXISTS(SELECT 1 FROM payments p WHERE p.invoice_id=i.invoice_id) ORDER BY i.invoice_id",
-          "reason": "没有付款不等于有退款或付款金额为0；题目要求不存在付款行。",
+          "sql": "SELECT i.invoice_id,i.amount FROM invoices i WHERE EXISTS(SELECT 1 FROM payments p WHERE p.invoice_id=i.invoice_id)",
+          "reason": "EXISTS 选出的是已有付款的发票，需要 NOT EXISTS。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -2122,24 +2174,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0146/q0146-public.json",
-          "sha256": "953fbea578f52e88fdb3efce91c3dd6ffb84831721308ccdb016d1d06071e985"
+          "sha256": "44bbe746844d6b651cdf991667c33e4cf719c1f6bf0b5bd47c13cb458ddac21a"
         },
         {
           "id": "q0146-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0146/q0146-boundary.json",
-          "sha256": "bf6addbd2490c39d231337a5e8dff5c9f905ffd8382a9e2ffe9db20d4a333124"
+          "sha256": "f6b4a4fda44c0f6efb7160273f534884de645502c7e892e5e6a67bb44aef1a5f"
         },
         {
           "id": "q0146-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0146/q0146-empty.json",
-          "sha256": "1e35d3d202c41813d283fd4c6fedf8260cbaa354c0a08df289adb33cd9a01a13"
+          "sha256": "02b1e9bda742dcd097cdfbc4d45ba32393ad677f4802d78ee5798ca52c2348a7"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -2259,8 +2311,8 @@
       "difficulty": "中等",
       "type": "独立编写",
       "title": "不在旧客户名单的新增客户",
-      "context": "使用课程中小型新客户名单、旧客户名单数据练习不在旧客户名单的新增客户。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "从 new_customers 取未匹配 old_customers 的不同非空 customer_id，按编号升序。\n输出列名称及顺序：customer_id。按题设排序；参考排序键：n.customer_id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "运营想找出名单里新出现的客户，已在老名单里的不算。",
+      "requirements": "从 new_customers 中取不在 old_customers 里的、不重复的非空 customer_id。\n输出列名称及顺序：customer_id。",
       "datasetId": "q0148-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -2286,32 +2338,32 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT DISTINCT n.customer_id FROM new_customers n WHERE n.customer_id IS NOT NULL AND NOT EXISTS(SELECT 1 FROM old_customers o WHERE o.customer_id=n.customer_id) ORDER BY n.customer_id",
-          "sqliteSql": "SELECT DISTINCT n.customer_id FROM new_customers n WHERE n.customer_id IS NOT NULL AND NOT EXISTS(SELECT 1 FROM old_customers o WHERE o.customer_id=n.customer_id) ORDER BY n.customer_id"
+          "mysqlSql": "SELECT DISTINCT n.customer_id FROM new_customers n WHERE n.customer_id IS NOT NULL AND NOT EXISTS(SELECT 1 FROM old_customers o WHERE o.customer_id=n.customer_id)",
+          "sqliteSql": "SELECT DISTINCT n.customer_id FROM new_customers n WHERE n.customer_id IS NOT NULL AND NOT EXISTS(SELECT 1 FROM old_customers o WHERE o.customer_id=n.customer_id)"
         },
         {
-          "kind": "关系结构等价",
-          "mysqlSql": "SELECT DISTINCT n.customer_id FROM (SELECT * FROM new_customers) AS n WHERE n.customer_id IS NOT NULL AND NOT EXISTS(SELECT 1 FROM old_customers o WHERE o.customer_id=n.customer_id) ORDER BY n.customer_id",
-          "sqliteSql": "SELECT DISTINCT n.customer_id FROM (SELECT * FROM new_customers) AS n WHERE n.customer_id IS NOT NULL AND NOT EXISTS(SELECT 1 FROM old_customers o WHERE o.customer_id=n.customer_id) ORDER BY n.customer_id",
-          "explanation": "先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。"
+          "kind": "独立方法等价",
+          "mysqlSql": "SELECT DISTINCT customer_id FROM new_customers WHERE customer_id IS NOT NULL AND customer_id NOT IN (SELECT customer_id FROM old_customers WHERE customer_id IS NOT NULL)",
+          "sqliteSql": "SELECT DISTINCT customer_id FROM new_customers WHERE customer_id IS NOT NULL AND customer_id NOT IN (SELECT customer_id FROM old_customers WHERE customer_id IS NOT NULL)"
         }
       ],
       "hints": [
-        "确定内层查询应计算单一值、键集合还是某行的匹配关系。",
-        "结合《NOT EXISTS 与 NOT IN》：若 NOT IN 的候选集合含 NULL，未匹配比较可能变成 UNKNOWN；NOT EXISTS 检测不存在符合条件的行。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT DISTINCT n.customer_id FROM new_customers n WHERE n.customer_id IS NOT NULL AND □□□(SELECT 1 FROM old_customers o WHERE o.customer_id=n.customer_id) ORDER BY n.customer_id"
+        "新名单里要排除掉老名单已有的客户，还要去掉重复和空值。",
+        "NOT EXISTS 判断老名单里不存在相同的客户编号；DISTINCT 去重。",
+        "NULL 不是有效的客户编号，要单独排除。"
       ],
-      "explanation": "反连接配合去重可以列出真正新出现的客户。\n执行思路：确认new_customers、old_customers的输入记录；按筛选条件保留符合要求的记录，并考虑空值；仅在题设指定的范围内去重；输出customer_id列；遵循题设排序和并列规则。\n公开夹具实际返回 1 行、1 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
+      "explanation": "先排除 NULL，再用 NOT EXISTS 保留老名单里找不到的编号，DISTINCT 去掉新名单里的重复。\n易错：用 NOT IN 时，老名单里有 NULL 会让条件变为未知，导致没有任何结果。",
       "commonErrors": [
         {
-          "sql": "SELECT DISTINCT n.customer_id FROM new_customers n WHERE n.customer_id IS NOT NULL AND EXISTS(SELECT 1 FROM old_customers o WHERE o.customer_id=n.customer_id) ORDER BY n.customer_id",
-          "reason": "反连接配合去重可以列出真正新出现的客户。",
+          "sql": "SELECT DISTINCT n.customer_id FROM new_customers n WHERE n.customer_id IS NOT NULL AND EXISTS(SELECT 1 FROM old_customers o WHERE o.customer_id=n.customer_id)",
+          "reason": "EXISTS 选出的是老名单里已有的客户，需要 NOT EXISTS。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
       "testFixtureIds": [
         "q0148-public",
         "q0148-boundary",
+        "q0148-extra",
         "q0148-empty"
       ],
       "testFixtures": [
@@ -2320,24 +2372,31 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0148/q0148-public.json",
-          "sha256": "2e7ab6fd39026154806c183c18ef2dc607bf8700527e97ae82b8ce793b56906c"
+          "sha256": "9dad6e4620d422c622d7f162ccd08329065755363eeaf714e70e6e9ac4d431a0"
         },
         {
           "id": "q0148-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0148/q0148-boundary.json",
-          "sha256": "99decf7f72850ab467ae53dbf4b6080138d67aa9cc1ced81bbad26d29b4e5213"
+          "sha256": "899cef0eb62b5fcb5af8077bfaf3641d0c84a374280b3fbf6691ecf3a4e4ebd8"
+        },
+        {
+          "id": "q0148-extra",
+          "visibility": "hidden",
+          "variant": "extra",
+          "path": "fixtures/q0148/q0148-extra.json",
+          "sha256": "64ef6ca3067f101d093952dfda5a5aac863816c0653b7c8cd790efa1179fe67a"
         },
         {
           "id": "q0148-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0148/q0148-empty.json",
-          "sha256": "76b96fde0014c768d04885edd837c742b95b8b492fe950606475666b2fa4f333"
+          "sha256": "0bd048f230f9ef70b81470009911a77e03c39dffc6fdff53d1b2a194b6379bdd"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -2356,7 +2415,7 @@
       "mysqlVerification": "未运行 MySQL 8.4",
       "validation": {
         "kind": "query",
-        "equivalentKind": "关系结构等价",
+        "equivalentKind": "独立方法等价",
         "fixtures": [
           {
             "fixtureId": "q0148-public",
@@ -2401,6 +2460,27 @@
             }
           },
           {
+            "fixtureId": "q0148-extra",
+            "reference": {
+              "ran": true,
+              "match": true,
+              "resultHash": "1e280278ca65db8ce9ff648950436a648b770e77f739a72a9da80916d8f64abf",
+              "rowCount": 2
+            },
+            "equivalent": {
+              "ran": true,
+              "match": true,
+              "resultHash": "1e280278ca65db8ce9ff648950436a648b770e77f739a72a9da80916d8f64abf",
+              "rows": 2
+            },
+            "wrong": {
+              "ran": true,
+              "match": false,
+              "resultHash": "c3e2fbf3be4f5c7202aaea7d5e7551eb584b1be74d0286f6970eb0c2c4330d9a",
+              "rows": 2
+            }
+          },
+          {
             "fixtureId": "q0148-empty",
             "reference": {
               "ran": true,
@@ -2441,8 +2521,8 @@
       "difficulty": "中等",
       "type": "独立编写",
       "title": "每件商品是否有销售明细",
-      "context": "使用课程中小型订单明细、商品数据练习每件商品是否有销售明细。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "输出 product_id、has_item（存在 order_items 为1，否则0），按编号升序。\n输出列名称及顺序：product_id, has_item。按题设排序；参考排序键：p.product_id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "商品组想标记每件商品有没有销售明细。",
+      "requirements": "输出 product_id 和 has_item：该商品在 order_items 中有明细为 1，否则为 0。\n输出列名称及顺序：product_id, has_item。",
       "datasetId": "q0149-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -2490,26 +2570,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT p.product_id,CASE WHEN EXISTS(SELECT 1 FROM order_items i WHERE i.product_id=p.product_id) THEN 1 ELSE 0 END AS has_item FROM products p ORDER BY p.product_id",
-          "sqliteSql": "SELECT p.product_id,CASE WHEN EXISTS(SELECT 1 FROM order_items i WHERE i.product_id=p.product_id) THEN 1 ELSE 0 END AS has_item FROM products p ORDER BY p.product_id"
+          "mysqlSql": "SELECT p.product_id,CASE WHEN EXISTS(SELECT 1 FROM order_items i WHERE i.product_id=p.product_id) THEN 1 ELSE 0 END AS has_item FROM products p",
+          "sqliteSql": "SELECT p.product_id,CASE WHEN EXISTS(SELECT 1 FROM order_items i WHERE i.product_id=p.product_id) THEN 1 ELSE 0 END AS has_item FROM products p"
         },
         {
           "kind": "独立方法等价",
-          "mysqlSql": "SELECT p.product_id,CASE WHEN p.product_id IN (SELECT product_id FROM order_items) THEN 1 ELSE 0 END AS has_item FROM products p ORDER BY p.product_id",
-          "sqliteSql": "SELECT p.product_id,CASE WHEN p.product_id IN (SELECT product_id FROM order_items) THEN 1 ELSE 0 END AS has_item FROM products p ORDER BY p.product_id",
-          "explanation": "采用另一种关系运算或查询结构计算相同结果。"
+          "mysqlSql": "SELECT p.product_id,CASE WHEN p.product_id IN (SELECT product_id FROM order_items) THEN 1 ELSE 0 END AS has_item FROM products p",
+          "sqliteSql": "SELECT p.product_id,CASE WHEN p.product_id IN (SELECT product_id FROM order_items) THEN 1 ELSE 0 END AS has_item FROM products p"
         }
       ],
       "hints": [
-        "确定内层查询应计算单一值、键集合还是某行的匹配关系。",
-        "结合《相关子查询与 EXISTS》：相关子查询引用外层行；EXISTS 只检查是否存在结果行，不关心输出值。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT p.product_id,CASE WHEN EXISTS(SELECT 1 FROM order_items i WHERE □□□) THEN 1 ELSE 0 END AS has_item FROM products p ORDER BY p.product_id"
+        "每件商品一行，用“是否存在明细”来决定 1 或 0。",
+        "EXISTS(子查询) 可以直接放在 CASE WHEN 里当作条件。",
+        "子查询里用商品编号把明细和当前商品关联起来。"
       ],
-      "explanation": "存在性判断用商品键，不能用明细主键。\n执行思路：确认order_items、products的输入记录；按筛选条件保留符合要求的记录，并考虑空值；输出product_id、has_item列；遵循题设排序和并列规则。\n公开夹具实际返回 6 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：采用另一种关系运算或查询结构计算相同结果。",
+      "explanation": "CASE WHEN EXISTS(…) THEN 1 ELSE 0 END 对每个商品检查是否存在匹配的明细。\n易错：关联条件写成明细编号等于商品编号，两个字段含义不同，结果会错。\n另一种写法：product_id IN (SELECT product_id FROM order_items)。",
       "commonErrors": [
         {
-          "sql": "SELECT p.product_id,CASE WHEN EXISTS(SELECT 1 FROM order_items i WHERE i.order_item_id=p.product_id) THEN 1 ELSE 0 END AS has_item FROM products p ORDER BY p.product_id",
-          "reason": "存在性判断用商品键，不能用明细主键。",
+          "sql": "SELECT p.product_id,CASE WHEN EXISTS(SELECT 1 FROM order_items i WHERE i.order_item_id=p.product_id) THEN 1 ELSE 0 END AS has_item FROM products p",
+          "reason": "关联字段错误：明细编号与商品编号含义不同。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -2524,24 +2603,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0149/q0149-public.json",
-          "sha256": "89b311fbee62576d501ca9023b2f6677c33c2c4281a7dd5a3f67319722fcb3b5"
+          "sha256": "7ca96ee940074c185cd3ff73b3ac299b7d1edf0614eee640eb56ebadeeb89ad4"
         },
         {
           "id": "q0149-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0149/q0149-boundary.json",
-          "sha256": "6a10ebcb87db58e5f29a40e5f074647aaafa4e4818443dd629e49abcadf2b5f9"
+          "sha256": "df60209f7037421a0a5a93fe896c281000dd6455cc4867440c447fb6c22a618a"
         },
         {
           "id": "q0149-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0149/q0149-empty.json",
-          "sha256": "6b922169cc5f05dbff30cd3e832df4b74fe8935287d6ecccee055c36971c6beb"
+          "sha256": "236f1db9320c1bb54a1d584a6f37442b567d00ba8746efefb549a341377aacd3"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -2645,8 +2724,8 @@
       "difficulty": "困难",
       "type": "代码填空",
       "title": "全部订单均非高额的已购客户",
-      "context": "使用课程中小型客户、订单数据练习全部订单均非高额的已购客户。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "补全代码中的一个空位，使完整SQL满足以下要求。可输入具有相同语义的片段，提交后按完整代码执行结果核对。\n客户须至少有一单，且没有金额>=800的订单；返回编号，按编号升序。\n输出列名称及顺序：customer_id。按题设排序；参考排序键：c.customer_id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "客户成功想找出下过单、但没有任何大额订单的客户。",
+      "requirements": "补全空位：返回至少有一笔订单、并且没有任何销售额大于等于 800 的订单的客户编号。\n输出列名称及顺序：customer_id。",
       "datasetId": "q0150-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -2654,7 +2733,7 @@
         "customers",
         "orders"
       ],
-      "initialCode": "SELECT c.customer_id FROM customers c WHERE EXISTS(SELECT 1 FROM orders o WHERE o.customer_id=c.customer_id) {{blank1}}(SELECT 1 FROM orders o WHERE o.customer_id=c.customer_id AND o.sales>=800) ORDER BY c.customer_id",
+      "initialCode": "SELECT c.customer_id FROM customers c WHERE EXISTS(SELECT 1 FROM orders o WHERE o.customer_id=c.customer_id) {{blank1}}(SELECT 1 FROM orders o WHERE o.customer_id=c.customer_id AND o.sales>=800)",
       "options": [],
       "acceptedBlanks": [
         {
@@ -2680,32 +2759,32 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT c.customer_id FROM customers c WHERE EXISTS(SELECT 1 FROM orders o WHERE o.customer_id=c.customer_id) AND NOT EXISTS(SELECT 1 FROM orders o WHERE o.customer_id=c.customer_id AND o.sales>=800) ORDER BY c.customer_id",
-          "sqliteSql": "SELECT c.customer_id FROM customers c WHERE EXISTS(SELECT 1 FROM orders o WHERE o.customer_id=c.customer_id) AND NOT EXISTS(SELECT 1 FROM orders o WHERE o.customer_id=c.customer_id AND o.sales>=800) ORDER BY c.customer_id"
+          "mysqlSql": "SELECT c.customer_id FROM customers c WHERE EXISTS(SELECT 1 FROM orders o WHERE o.customer_id=c.customer_id) AND NOT EXISTS(SELECT 1 FROM orders o WHERE o.customer_id=c.customer_id AND o.sales>=800)",
+          "sqliteSql": "SELECT c.customer_id FROM customers c WHERE EXISTS(SELECT 1 FROM orders o WHERE o.customer_id=c.customer_id) AND NOT EXISTS(SELECT 1 FROM orders o WHERE o.customer_id=c.customer_id AND o.sales>=800)"
         },
         {
-          "kind": "代数或函数等价",
-          "mysqlSql": "SELECT c.customer_id FROM customers c WHERE EXISTS(SELECT 1 FROM orders o WHERE o.customer_id=c.customer_id) AND NOT EXISTS(SELECT 1 FROM orders o WHERE o.customer_id=c.customer_id AND NOT (o.sales<800)) ORDER BY c.customer_id",
-          "sqliteSql": "SELECT c.customer_id FROM customers c WHERE EXISTS(SELECT 1 FROM orders o WHERE o.customer_id=c.customer_id) AND NOT EXISTS(SELECT 1 FROM orders o WHERE o.customer_id=c.customer_id AND NOT (o.sales<800)) ORDER BY c.customer_id",
-          "explanation": "用反向比较并取 NOT 表达相同三值逻辑。"
+          "kind": "独立方法等价",
+          "mysqlSql": "SELECT c.customer_id FROM customers c WHERE c.customer_id IN (SELECT customer_id FROM orders) AND c.customer_id NOT IN (SELECT customer_id FROM orders WHERE sales>=800 AND customer_id IS NOT NULL)",
+          "sqliteSql": "SELECT c.customer_id FROM customers c WHERE c.customer_id IN (SELECT customer_id FROM orders) AND c.customer_id NOT IN (SELECT customer_id FROM orders WHERE sales>=800 AND customer_id IS NOT NULL)"
         }
       ],
       "hints": [
-        "确定内层查询应计算单一值、键集合还是某行的匹配关系。",
-        "结合《NOT EXISTS 与 NOT IN》：若 NOT IN 的候选集合含 NULL，未匹配比较可能变成 UNKNOWN；NOT EXISTS 检测不存在符合条件的行。",
-        "回想空位所在子句的功能：NOT EXISTS 与 NOT IN；保留周围代码，填入实现题设的表达式。"
+        "条件有两层：至少有一笔订单，并且不存在大额订单。",
+        "EXISTS 表示存在，NOT EXISTS 表示不存在，两个条件用 AND 连接。",
+        "空位接在第一个 EXISTS 后面，要表达“并且不存在”。"
       ],
-      "explanation": "存在购买与不存在高额购买是两个独立判断。\n执行思路：确认customers、orders的输入记录；按筛选条件保留符合要求的记录，并考虑空值；输出customer_id列；遵循题设排序和并列规则。\n公开夹具实际返回 1 行、1 列；完整结果见 expectedOutput。\n另一种可用写法：用反向比较并取 NOT 表达相同三值逻辑。",
+      "explanation": "第一个 EXISTS 保证至少有订单，AND NOT EXISTS 排除有 >=800 订单的客户。\n易错：把第二个条件写成 EXISTS，得到的反而是有大额订单的客户。\n另一种写法：用 IN 和 NOT IN 表达同样的两层条件。",
       "commonErrors": [
         {
-          "sql": "SELECT c.customer_id FROM customers c WHERE EXISTS(SELECT 1 FROM orders o WHERE o.customer_id=c.customer_id) AND EXISTS(SELECT 1 FROM orders o WHERE o.customer_id=c.customer_id AND o.sales>=800) ORDER BY c.customer_id",
-          "reason": "存在购买与不存在高额购买是两个独立判断。",
+          "sql": "SELECT c.customer_id FROM customers c WHERE EXISTS(SELECT 1 FROM orders o WHERE o.customer_id=c.customer_id) AND EXISTS(SELECT 1 FROM orders o WHERE o.customer_id=c.customer_id AND o.sales>=800)",
+          "reason": "第二个条件写成了 EXISTS，选出的是有大额订单的客户。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
       "testFixtureIds": [
         "q0150-public",
         "q0150-boundary",
+        "q0150-extra",
         "q0150-empty"
       ],
       "testFixtures": [
@@ -2714,24 +2793,31 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0150/q0150-public.json",
-          "sha256": "96c3da5b0ef65046bd794045d27512c37c370bc9e98ba7ed29130637c622a58b"
+          "sha256": "53781c3263e50048e0d0d31c37821b0c602dfc60b1604d2e7410c13495183f7b"
         },
         {
           "id": "q0150-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0150/q0150-boundary.json",
-          "sha256": "5c7d82bb9822a840cd2c39c78fb82a1c01cf0d8ece9f1c478a7b353425379ea4"
+          "sha256": "7dfa9e12e6ae3fb83d2f26d881b19f61adc2802fb00f9352bc3b2e7789d5be6f"
+        },
+        {
+          "id": "q0150-extra",
+          "visibility": "hidden",
+          "variant": "extra",
+          "path": "fixtures/q0150/q0150-extra.json",
+          "sha256": "123d22e943657aa2ab873e56c9dba2459ecf70ad8a97afbdec03867c941b795d"
         },
         {
           "id": "q0150-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0150/q0150-empty.json",
-          "sha256": "0da83eb8aea6e92cf40938cb87e8d2cbbd097e7b6f1e01c47afb3da4c708af9f"
+          "sha256": "812597a08ba7b4d625f906bfef455e4bf3c6762a3ab1af5aca2417e4686607c5"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -2750,7 +2836,7 @@
       "mysqlVerification": "未运行 MySQL 8.4",
       "validation": {
         "kind": "query",
-        "equivalentKind": "代数或函数等价",
+        "equivalentKind": "独立方法等价",
         "fixtures": [
           {
             "fixtureId": "q0150-public",
@@ -2792,6 +2878,27 @@
               "match": false,
               "resultHash": "b9264aff933fdc0b52d973b5ad3652848b8c103ca17d98fa75cb3c9a75d4033c",
               "rows": 4
+            }
+          },
+          {
+            "fixtureId": "q0150-extra",
+            "reference": {
+              "ran": true,
+              "match": true,
+              "resultHash": "f69ba4f9345a2731c9c7a33e154884e042aa97185114da12702fab4e21ebb412",
+              "rowCount": 2
+            },
+            "equivalent": {
+              "ran": true,
+              "match": true,
+              "resultHash": "f69ba4f9345a2731c9c7a33e154884e042aa97185114da12702fab4e21ebb412",
+              "rows": 2
+            },
+            "wrong": {
+              "ran": true,
+              "match": false,
+              "resultHash": "634d1f8f070cc66390cb39bc8eaaf93cf82e733a55f7bf12ed4c713b39217d4c",
+              "rows": 1
             }
           },
           {

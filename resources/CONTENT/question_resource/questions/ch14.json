@@ -212,8 +212,8 @@
       "difficulty": "中等",
       "type": "独立编写",
       "title": "预先过滤一月订单并统计客户",
-      "context": "使用课程中小型订单数据练习预先过滤一月订单并统计客户。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "定义 jan 为一月订单，排除匿名客户；从 jan 按客户统计 n，按客户升序。\n输出列名称及顺序：customer_id, n。按题设排序；参考排序键：customer_id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "运营想统计一月份各客户的下单次数，匿名订单不计入。",
+      "requirements": "先用 WITH 定义 jan 为 2026 年 1 月的订单（排除没有客户编号的匿名订单），再从 jan 按客户统计订单数 n。\n输出列名称及顺序：customer_id, n。",
       "datasetId": "q0189-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -244,26 +244,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "WITH jan AS (SELECT customer_id FROM orders WHERE order_date>='2026-01-01' AND order_date<'2026-02-01' AND customer_id IS NOT NULL) SELECT customer_id,COUNT(*) AS n FROM jan GROUP BY customer_id ORDER BY customer_id",
-          "sqliteSql": "WITH jan AS (SELECT customer_id FROM orders WHERE order_date>='2026-01-01' AND order_date<'2026-02-01' AND customer_id IS NOT NULL) SELECT customer_id,COUNT(*) AS n FROM jan GROUP BY customer_id ORDER BY customer_id"
+          "mysqlSql": "WITH jan AS (SELECT customer_id FROM orders WHERE order_date>='2026-01-01' AND order_date<'2026-02-01' AND customer_id IS NOT NULL) SELECT customer_id,COUNT(*) AS n FROM jan GROUP BY customer_id",
+          "sqliteSql": "WITH jan AS (SELECT customer_id FROM orders WHERE order_date>='2026-01-01' AND order_date<'2026-02-01' AND customer_id IS NOT NULL) SELECT customer_id,COUNT(*) AS n FROM jan GROUP BY customer_id"
         },
         {
-          "kind": "代数或函数等价",
-          "mysqlSql": "WITH jan AS (SELECT customer_id FROM orders WHERE order_date>='2026-01-01' AND order_date<'2026-02-01' AND customer_id IS NOT NULL) SELECT customer_id,COUNT(1) AS n FROM jan GROUP BY customer_id ORDER BY customer_id",
-          "sqliteSql": "WITH jan AS (SELECT customer_id FROM orders WHERE order_date>='2026-01-01' AND order_date<'2026-02-01' AND customer_id IS NOT NULL) SELECT customer_id,COUNT(1) AS n FROM jan GROUP BY customer_id ORDER BY customer_id",
-          "explanation": "常量1对每行非NULL，因此 COUNT(1) 与 COUNT(*) 同计行数。"
+          "kind": "独立方法等价",
+          "mysqlSql": "WITH jan AS (SELECT customer_id FROM orders WHERE order_date BETWEEN '2026-01-01' AND '2026-01-31' AND customer_id IS NOT NULL) SELECT customer_id,COUNT(*) AS n FROM jan GROUP BY customer_id",
+          "sqliteSql": "WITH jan AS (SELECT customer_id FROM orders WHERE order_date BETWEEN '2026-01-01' AND '2026-01-31' AND customer_id IS NOT NULL) SELECT customer_id,COUNT(*) AS n FROM jan GROUP BY customer_id"
         }
       ],
       "hints": [
-        "将要求拆成可独立核对的中间集合，并为递归确定起点与终点。",
-        "结合《WITH 与多个 CTE》：公用表表达式为当前语句中的具名查询结果，可在后续查询引用；多表达式用逗号连接。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nWITH jan AS (SELECT customer_id FROM orders WHERE order_date>='2026-01-01' AND order_date<'□□□' AND customer_id IS NOT NULL) SELECT customer_id,COUNT(*) AS n FROM jan GROUP BY customer_id ORDER BY customer_id"
+        "先把一月份的订单单独整理成一个临时结果，再对它做统计。",
+        "WITH 名称 AS (查询) 定义一个公用表表达式，后面的查询可以像表一样使用它。",
+        "一月份的日期范围是“大于等于 1 月 1 日、小于 2 月 1 日”，不要多取到 2 月。"
       ],
-      "explanation": "中间表把统一的日期范围与身份条件一次定义清楚。\n执行思路：确认orders的输入记录；先明确公用表表达式的中间数据及其粒度；按筛选条件保留符合要求的记录，并考虑空值；按指定键分组后计算聚合值；输出customer_id、n列；遵循题设排序和并列规则。\n公开夹具实际返回 2 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：常量1对每行非NULL，因此 COUNT(1) 与 COUNT(*) 同计行数。",
+      "explanation": "WITH jan AS (…) 先筛出一月的非匿名订单，主查询再对 jan 按客户分组计数，分步清晰。\n易错：日期上限写成 2026-03-01，会把二月订单也算进来。",
       "commonErrors": [
         {
-          "sql": "WITH jan AS (SELECT customer_id FROM orders WHERE order_date>='2026-01-01' AND order_date<'2026-03-01' AND customer_id IS NOT NULL) SELECT customer_id,COUNT(*) AS n FROM jan GROUP BY customer_id ORDER BY customer_id",
-          "reason": "中间表把统一的日期范围与身份条件一次定义清楚。",
+          "sql": "WITH jan AS (SELECT customer_id FROM orders WHERE order_date>='2026-01-01' AND order_date<'2026-03-01' AND customer_id IS NOT NULL) SELECT customer_id,COUNT(*) AS n FROM jan GROUP BY customer_id",
+          "reason": "日期上限多取了一个月，二月订单也被计入。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -278,24 +277,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0189/q0189-public.json",
-          "sha256": "61a59a4598d589ab8967cfa84bdb888fd5c1c1b7c542b9da423a3773db194b26"
+          "sha256": "c49c729d6dc76b746f53ba5b095bf0e27e80ce97777dc51a656cc1555acc4e16"
         },
         {
           "id": "q0189-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0189/q0189-boundary.json",
-          "sha256": "1e950faed193d75f2ab87c61d192bdaa248d5b886ba9a570f3879fae2cd4d051"
+          "sha256": "d745967f8f41941d7745b8cbc02311dfb91cf9583669e317f8d1b0e468d22d1f"
         },
         {
           "id": "q0189-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0189/q0189-empty.json",
-          "sha256": "82e49ee1395608f1b739cd2dcf3f5674a77b18d8c4bee9cceb07a85c679d406e"
+          "sha256": "4d6ba8ee76b2c869572d60002a8624d21ca6371fe8b5c7fd2cdc3de9d236e87f"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -307,7 +306,7 @@
         {
           "kind": "cte_jan",
           "status": "需运行时语法树核查；不以关键词匹配判分",
-          "requirement": "定义 jan 为一月订单，排除匿名客户；从 jan 按客户统计 n，按客户升序。"
+          "requirement": "定义 jan 为一月订单，排除匿名客户；从 jan 按客户统计 n。"
         }
       ],
       "supportStatus": "直接兼容",
@@ -320,7 +319,7 @@
       "mysqlVerification": "未运行 MySQL 8.4",
       "validation": {
         "kind": "query",
-        "equivalentKind": "代数或函数等价",
+        "equivalentKind": "独立方法等价",
         "fixtures": [
           {
             "fixtureId": "q0189-public",
@@ -801,8 +800,8 @@
       "difficulty": "困难",
       "type": "业务情景",
       "title": "对比实际与预算统一汇总",
-      "context": "财务控制部门按会计科目核对费用预算与实际发生额，预算与交易是不同明细粒度。",
-      "requirements": "分别按 account_id 聚合预算和 expense 交易金额；仅预算存在的科目输出 account_id、variance（实际-预算，无实际视0），按科目升序。\n输出列名称及顺序：account_id, variance。按题设排序；参考排序键：b.account_id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "财务要比较各科目的实际支出和预算，找出超支或结余的情况。",
+      "requirements": "分别按科目 account_id 汇总预算金额和 expense（支出）类交易金额；只输出预算表里存在的科目，variance = 实际支出 − 预算，没有实际支出按 0 计算。\n输出列名称及顺序：account_id, variance。",
       "datasetId": "q0194-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -834,26 +833,20 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "WITH b AS (SELECT account_id,SUM(budget_amount) AS budget FROM budgets GROUP BY account_id),a AS (SELECT account_id,SUM(amount) AS actual FROM transactions WHERE direction='expense' GROUP BY account_id) SELECT b.account_id,COALESCE(a.actual,0)-b.budget AS variance FROM b LEFT JOIN a ON a.account_id=b.account_id ORDER BY b.account_id",
-          "sqliteSql": "WITH b AS (SELECT account_id,SUM(budget_amount) AS budget FROM budgets GROUP BY account_id),a AS (SELECT account_id,SUM(amount) AS actual FROM transactions WHERE direction='expense' GROUP BY account_id) SELECT b.account_id,COALESCE(a.actual,0)-b.budget AS variance FROM b LEFT JOIN a ON a.account_id=b.account_id ORDER BY b.account_id"
-        },
-        {
-          "kind": "代数或函数等价",
-          "mysqlSql": "WITH b AS (SELECT account_id,SUM(budget_amount) AS budget FROM budgets GROUP BY account_id),a AS (SELECT account_id,SUM(amount) AS actual FROM transactions WHERE NOT (direction<>'expense') GROUP BY account_id) SELECT b.account_id,COALESCE(a.actual,0)-b.budget AS variance FROM b LEFT JOIN a ON a.account_id=b.account_id ORDER BY b.account_id",
-          "sqliteSql": "WITH b AS (SELECT account_id,SUM(budget_amount) AS budget FROM budgets GROUP BY account_id),a AS (SELECT account_id,SUM(amount) AS actual FROM transactions WHERE NOT (direction<>'expense') GROUP BY account_id) SELECT b.account_id,COALESCE(a.actual,0)-b.budget AS variance FROM b LEFT JOIN a ON a.account_id=b.account_id ORDER BY b.account_id",
-          "explanation": "用反向比较并取 NOT 表达相同三值逻辑。"
+          "mysqlSql": "WITH b AS (SELECT account_id,SUM(budget_amount) AS budget FROM budgets GROUP BY account_id),a AS (SELECT account_id,SUM(amount) AS actual FROM transactions WHERE direction='expense' GROUP BY account_id) SELECT b.account_id,COALESCE(a.actual,0)-b.budget AS variance FROM b LEFT JOIN a ON a.account_id=b.account_id",
+          "sqliteSql": "WITH b AS (SELECT account_id,SUM(budget_amount) AS budget FROM budgets GROUP BY account_id),a AS (SELECT account_id,SUM(amount) AS actual FROM transactions WHERE direction='expense' GROUP BY account_id) SELECT b.account_id,COALESCE(a.actual,0)-b.budget AS variance FROM b LEFT JOIN a ON a.account_id=b.account_id"
         }
       ],
       "hints": [
-        "将要求拆成可独立核对的中间集合，并为递归确定起点与终点。",
-        "结合《WITH 与多个 CTE》：公用表表达式为当前语句中的具名查询结果，可在后续查询引用；多表达式用逗号连接。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nWITH b AS (SELECT account_id,□□□ AS budget FROM budgets GROUP BY account_id),a AS (SELECT account_id,SUM(amount) AS actual FROM transactions WHERE direction='expense' GROUP BY account_id) SELECT b.account_id,COALESCE(a.actual,0)-b.budget AS variance FROM b LEFT JOIN a ON a.account_id=b.account_id ORDER BY b.account_id"
+        "预算和交易是两张“一对多”的表，直接连接汇总会重复计算，要先各自汇总。",
+        "用 WITH 把预算和实际支出分别汇总成每个科目一行，再连接。",
+        "只保留预算存在的科目，所以预算汇总应是左连接的主表；没有支出的科目用 COALESCE 补 0。"
       ],
-      "explanation": "预算是期间金额合计，不能平均；先按相同科目粒度归并。\n执行思路：确认budgets、transactions的输入记录；先明确公用表表达式的中间数据及其粒度；按题设连接条件匹配数据，注意连接造成的行数变化；按筛选条件保留符合要求的记录，并考虑空值；按指定键分组后计算聚合值；输出account_id、variance列；遵循题设排序和并列规则。\n公开夹具实际返回 2 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：用反向比较并取 NOT 表达相同三值逻辑。",
+      "explanation": "先分别把预算与支出汇总到“每个科目一行”，再以预算为主做左连接，variance = COALESCE(实际,0) − 预算。先汇总再连接避免了一对多造成的重复。\n易错：预算汇总用了 AVG，而不是 SUM，多条预算记录的科目会算错。",
       "commonErrors": [
         {
-          "sql": "WITH b AS (SELECT account_id,AVG(budget_amount) AS budget FROM budgets GROUP BY account_id),a AS (SELECT account_id,SUM(amount) AS actual FROM transactions WHERE direction='expense' GROUP BY account_id) SELECT b.account_id,COALESCE(a.actual,0)-b.budget AS variance FROM b LEFT JOIN a ON a.account_id=b.account_id ORDER BY b.account_id",
-          "reason": "预算是期间金额合计，不能平均；先按相同科目粒度归并。",
+          "sql": "WITH b AS (SELECT account_id,AVG(budget_amount) AS budget FROM budgets GROUP BY account_id),a AS (SELECT account_id,SUM(amount) AS actual FROM transactions WHERE direction='expense' GROUP BY account_id) SELECT b.account_id,COALESCE(a.actual,0)-b.budget AS variance FROM b LEFT JOIN a ON a.account_id=b.account_id",
+          "reason": "预算应使用 SUM 汇总；AVG 会让多条预算记录的科目结果错误。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -868,24 +861,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0194/q0194-public.json",
-          "sha256": "3c4dde05dfe599f67e71f00475a4767e65776eea8558c1891c039bdaa77e9acf"
+          "sha256": "7f6d63099cc5c1535f43bb864410ed6c5d06824c410d8944c2f41c91cdb9c56f"
         },
         {
           "id": "q0194-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0194/q0194-boundary.json",
-          "sha256": "08af69bc5ae57f9df7017304e21772d88b1689b29daa98408149de73d6b3afb0"
+          "sha256": "ce39c5b9c3d6bf6592de6c6c1f480c17f322fe0eaae9912d4220d7787d7800ce"
         },
         {
           "id": "q0194-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0194/q0194-empty.json",
-          "sha256": "65ade43557089c4a1d290a17344f195879ac9a2c5a4baa4cb7dfddf022976b85"
+          "sha256": "06e590b53cc035d77449a97f81a99a0e221065ec275188e6192706b3938de4a2"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -922,7 +915,7 @@
             },
             "wrong": {
               "ran": true,
-              "match": true,
+              "match": false,
               "resultHash": "d129fee532d15d9114608587b3b39f010a36131222c7ac65872908df595bd565",
               "rows": 2
             }

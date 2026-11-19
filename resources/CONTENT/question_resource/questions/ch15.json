@@ -144,8 +144,8 @@
       "difficulty": "简单",
       "type": "独立编写",
       "title": "相邻月份销售绝对变化",
-      "context": "使用课程中小型月度销售数据练习相邻月份销售绝对变化。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "返回 monthly.month、sales、delta（本期减前一记录销售额，首月NULL），按月份升序。\n输出列名称及顺序：month, sales, delta。按题设排序；参考排序键：month。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "运营想看销售额逐月的变化量。",
+      "requirements": "返回月份 month、销售额 sales，以及本期销售额减去前一个月销售额的差 delta；第一个月没有前一期，delta 为 NULL。\n输出列名称及顺序：month, sales, delta。",
       "datasetId": "q0198-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -189,26 +189,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT month,sales,sales-LAG(sales) OVER(ORDER BY month) AS delta FROM monthly ORDER BY month",
-          "sqliteSql": "SELECT month,sales,sales-LAG(sales) OVER(ORDER BY month) AS delta FROM monthly ORDER BY month"
+          "mysqlSql": "SELECT month,sales,sales-LAG(sales) OVER(ORDER BY month) AS delta FROM monthly",
+          "sqliteSql": "SELECT month,sales,sales-LAG(sales) OVER(ORDER BY month) AS delta FROM monthly"
         },
         {
           "kind": "独立方法等价",
-          "mysqlSql": "WITH m AS (SELECT month,sales,LAG(sales) OVER(ORDER BY month) AS p FROM monthly) SELECT month,sales,sales-p AS delta FROM m ORDER BY month",
-          "sqliteSql": "WITH m AS (SELECT month,sales,LAG(sales) OVER(ORDER BY month) AS p FROM monthly) SELECT month,sales,sales-p AS delta FROM m ORDER BY month",
-          "explanation": "采用另一种关系运算或查询结构计算相同结果。"
+          "mysqlSql": "SELECT m.month,m.sales,m.sales-(SELECT p.sales FROM monthly p WHERE p.month<m.month ORDER BY p.month DESC LIMIT 1) AS delta FROM monthly m",
+          "sqliteSql": "SELECT m.month,m.sales,m.sales-(SELECT p.sales FROM monthly p WHERE p.month<m.month ORDER BY p.month DESC LIMIT 1) AS delta FROM monthly m"
         }
       ],
       "hints": [
-        "决定窗口内的分区、排序与范围，注意是否需要保留全部原行。",
-        "结合《LAG 与 LEAD》：LAG 获取分区中前一行，LEAD 获取后一行；可指定偏移和缺失默认值。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT month,sales,sales-□□□ OVER(ORDER BY month) AS delta FROM monthly ORDER BY month"
+        "“前一期”的值需要在不分组的前提下取到上一行。",
+        "LAG(列) OVER (ORDER BY 排序列) 取按排序顺序的上一行的值，第一行没有上一行时返回 NULL。",
+        "LAG 取前一行，LEAD 取后一行，别用反了。"
       ],
-      "explanation": "前一记录是LAG，LEAD 获取下一记录；方向决定差额。\n执行思路：确认monthly的输入记录；根据窗口分区、顺序及框架计算每行的分析值；输出month、sales、delta列；遵循题设排序和并列规则。\n公开夹具实际返回 4 行、3 列；完整结果见 expectedOutput。\n另一种可用写法：采用另一种关系运算或查询结构计算相同结果。",
+      "explanation": "LAG(sales) OVER (ORDER BY month) 按月份顺序取上一个月的销售额，当前销售额减去它就是变化量，第一个月没有上一期，结果是 NULL。\n易错：用 LEAD 取到的是下一个月，差值方向和含义都反了。",
       "commonErrors": [
         {
-          "sql": "SELECT month,sales,sales-LEAD(sales) OVER(ORDER BY month) AS delta FROM monthly ORDER BY month",
-          "reason": "前一记录是LAG，LEAD 获取下一记录；方向决定差额。",
+          "sql": "SELECT month,sales,sales-LEAD(sales) OVER(ORDER BY month) AS delta FROM monthly",
+          "reason": "LEAD 取的是下一期，差值含义和方向都反了。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -223,24 +222,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0198/q0198-public.json",
-          "sha256": "1d2ae668183c7eefc26026cb132d9144e83f8e7042803cdbbf0bfc6c0af83519"
+          "sha256": "4556969adf64106a8c16f1478e42efd2c946dd6ab6bd8cb677292a49cbc5fca7"
         },
         {
           "id": "q0198-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0198/q0198-boundary.json",
-          "sha256": "67434d6f8e4eebc2879957512fa4d425804b9b9da089b205eccf8d9dd456a613"
+          "sha256": "91aeeff3a1b6984e3c748ce0a6349871e5e60765ff01af8c09983306e146b8d6"
         },
         {
           "id": "q0198-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0198/q0198-empty.json",
-          "sha256": "5aaa267cdd28fc847347b97840f3af253eefed71f73caf1f8c44f047c095ebb9"
+          "sha256": "959261b54b4145ac4d6320e9153b11382393da9016ebbd739051ce1f88744d42"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -1593,8 +1592,8 @@
       "difficulty": "中等",
       "type": "独立编写",
       "title": "不同薪资档的连续名次",
-      "context": "使用课程中小型员工数据练习不同薪资档的连续名次。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "按薪资降序计算连续档位名次 tier，相同薪资同档，不跳号；输出 employee_id、salary、tier，按档位、编号升序。\n输出列名称及顺序：employee_id, salary, tier。按题设排序；参考排序键：tier,employee_id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "薪酬部门要给薪资划分连续的档位，薪资相同的员工同一档。",
+      "requirements": "按薪资从高到低计算连续档位名次 tier（相同薪资同档，名次不跳号），只处理薪资不为空的员工，输出 employee_id、salary、tier。\n输出列名称及顺序：employee_id, salary, tier。",
       "datasetId": "q0206-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -1638,26 +1637,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT employee_id,salary,DENSE_RANK() OVER(ORDER BY salary DESC) AS tier FROM employees WHERE salary IS NOT NULL ORDER BY tier,employee_id",
-          "sqliteSql": "SELECT employee_id,salary,DENSE_RANK() OVER(ORDER BY salary DESC) AS tier FROM employees WHERE salary IS NOT NULL ORDER BY tier,employee_id"
+          "mysqlSql": "SELECT employee_id,salary,DENSE_RANK() OVER(ORDER BY salary DESC) AS tier FROM employees WHERE salary IS NOT NULL",
+          "sqliteSql": "SELECT employee_id,salary,DENSE_RANK() OVER(ORDER BY salary DESC) AS tier FROM employees WHERE salary IS NOT NULL"
         },
         {
-          "kind": "关系结构等价",
-          "mysqlSql": "SELECT employee_id,salary,DENSE_RANK() OVER(ORDER BY salary DESC) AS tier FROM (SELECT * FROM employees) AS employees WHERE salary IS NOT NULL ORDER BY tier,employee_id",
-          "sqliteSql": "SELECT employee_id,salary,DENSE_RANK() OVER(ORDER BY salary DESC) AS tier FROM (SELECT * FROM employees) AS employees WHERE salary IS NOT NULL ORDER BY tier,employee_id",
-          "explanation": "先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。"
+          "kind": "独立方法等价",
+          "mysqlSql": "SELECT e.employee_id,e.salary,(SELECT COUNT(DISTINCT x.salary) FROM employees x WHERE x.salary>=e.salary) AS tier FROM employees e WHERE e.salary IS NOT NULL",
+          "sqliteSql": "SELECT e.employee_id,e.salary,(SELECT COUNT(DISTINCT x.salary) FROM employees x WHERE x.salary>=e.salary) AS tier FROM employees e WHERE e.salary IS NOT NULL"
         }
       ],
       "hints": [
-        "决定窗口内的分区、排序与范围，注意是否需要保留全部原行。",
-        "结合《ROW_NUMBER、RANK、DENSE_RANK》：ROW_NUMBER 给每行唯一序号；RANK 同值同名次并留空档；DENSE_RANK 同值同名次不留空档。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT employee_id,salary,□□□ OVER(ORDER BY salary DESC) AS tier FROM employees WHERE salary IS NOT NULL ORDER BY tier,employee_id"
+        "并列同名次、并且后面的名次不跳号，是哪一种排名函数的特点？",
+        "RANK 并列后会跳号（1,1,3），DENSE_RANK 不跳号（1,1,2）。",
+        "排序方向是薪资从高到低，OVER 里要写 ORDER BY salary DESC。"
       ],
-      "explanation": "DENSE_RANK 对不同薪资值编号，下一档不跳过。\n执行思路：确认employees的输入记录；按筛选条件保留符合要求的记录，并考虑空值；根据窗口分区、顺序及框架计算每行的分析值；输出employee_id、salary、tier列；遵循题设排序和并列规则。\n公开夹具实际返回 4 行、3 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
+      "explanation": "DENSE_RANK() OVER (ORDER BY salary DESC) 给相同薪资同一档位，并且下一档位紧接着加 1，不会跳号。\n易错：RANK 在并列之后会跳号，后面的名次会变成 3、4。",
       "commonErrors": [
         {
-          "sql": "SELECT employee_id,salary,RANK() OVER(ORDER BY salary DESC) AS tier FROM employees WHERE salary IS NOT NULL ORDER BY tier,employee_id",
-          "reason": "DENSE_RANK 对不同薪资值编号，下一档不跳过。",
+          "sql": "SELECT employee_id,salary,RANK() OVER(ORDER BY salary DESC) AS tier FROM employees WHERE salary IS NOT NULL",
+          "reason": "RANK 在并列后会跳号，不符合“连续档位”。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -1672,24 +1670,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0206/q0206-public.json",
-          "sha256": "b0eaa59b7c9244e3fb925fdacdbf0bdc3a84acb1ba62a81b70f1d6e4a6496a5d"
+          "sha256": "392d30f537a480e7a4515852a2344b1d4fefa37e1fb2059d2b6b6dfa7b0d44f5"
         },
         {
           "id": "q0206-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0206/q0206-boundary.json",
-          "sha256": "6eaca105595796f22222a41bc260b21d8686a7d4a254408a94dcf760c43237e3"
+          "sha256": "bdb64a3ec576b532a70997abeda99dc8f6e52df96f4c4c02fb5ca6d5e4bd28bf"
         },
         {
           "id": "q0206-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0206/q0206-empty.json",
-          "sha256": "3c5a603d817341bdeec6f9952c349489ac9ae37060d4738db000e3fc28ec2e73"
+          "sha256": "13e9c77565bb59ef4e9a72f21a355303b4e2c9eed1c79a48d5006e02adeb7a90"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -1708,7 +1706,7 @@
       "mysqlVerification": "未运行 MySQL 8.4",
       "validation": {
         "kind": "query",
-        "equivalentKind": "关系结构等价",
+        "equivalentKind": "独立方法等价",
         "fixtures": [
           {
             "fixtureId": "q0206-public",
@@ -1742,7 +1740,7 @@
             "equivalent": {
               "ran": true,
               "match": true,
-              "resultHash": "57a7ac1400245e94731e10eb5c3d82b43f9da3116a1db6eef474775b13af7e72",
+              "resultHash": "fbd723a0698907e637f38af709e6449b1bd34c3e31de6ca7ddd3b9bf5d362fdf",
               "rows": 6
             },
             "wrong": {
@@ -2845,8 +2843,8 @@
       "difficulty": "困难",
       "type": "独立编写",
       "title": "每门店最高单笔订单编号",
-      "context": "使用课程中小型订单数据练习每门店最高单笔订单编号。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "按每门店销售额降序、id升序唯一排名，保留第1名，输出 store_id、id、sales 按门店升序。\n输出列名称及顺序：store_id, id, sales。按题设排序；参考排序键：store_id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "门店管理想知道每家门店销售额最高的那一笔订单。",
+      "requirements": "在每家门店内按销售额从高到低（同额按订单 id 从小到大）给订单唯一排名，保留每家门店的第 1 名，输出 store_id、id、sales（忽略销售额为空的订单）。\n输出列名称及顺序：store_id, id, sales。",
       "datasetId": "q0216-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -2880,26 +2878,20 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "WITH a AS (SELECT store_id,id,sales,ROW_NUMBER() OVER(PARTITION BY store_id ORDER BY sales DESC,id) AS rn FROM orders WHERE sales IS NOT NULL) SELECT store_id,id,sales FROM a WHERE rn=1 ORDER BY store_id",
-          "sqliteSql": "WITH a AS (SELECT store_id,id,sales,ROW_NUMBER() OVER(PARTITION BY store_id ORDER BY sales DESC,id) AS rn FROM orders WHERE sales IS NOT NULL) SELECT store_id,id,sales FROM a WHERE rn=1 ORDER BY store_id"
-        },
-        {
-          "kind": "代数或函数等价",
-          "mysqlSql": "WITH a AS (SELECT store_id,id,sales,ROW_NUMBER() OVER(PARTITION BY store_id ORDER BY sales DESC,id) AS rn FROM orders WHERE sales IS NOT NULL) SELECT store_id,id,sales FROM a WHERE NOT (rn<>1) ORDER BY store_id",
-          "sqliteSql": "WITH a AS (SELECT store_id,id,sales,ROW_NUMBER() OVER(PARTITION BY store_id ORDER BY sales DESC,id) AS rn FROM orders WHERE sales IS NOT NULL) SELECT store_id,id,sales FROM a WHERE NOT (rn<>1) ORDER BY store_id",
-          "explanation": "用反向比较并取 NOT 表达相同三值逻辑。"
+          "mysqlSql": "WITH a AS (SELECT store_id,id,sales,ROW_NUMBER() OVER(PARTITION BY store_id ORDER BY sales DESC,id) AS rn FROM orders WHERE sales IS NOT NULL) SELECT store_id,id,sales FROM a WHERE rn=1",
+          "sqliteSql": "WITH a AS (SELECT store_id,id,sales,ROW_NUMBER() OVER(PARTITION BY store_id ORDER BY sales DESC,id) AS rn FROM orders WHERE sales IS NOT NULL) SELECT store_id,id,sales FROM a WHERE rn=1"
         }
       ],
       "hints": [
-        "决定窗口内的分区、排序与范围，注意是否需要保留全部原行。",
-        "结合《ROW_NUMBER、RANK、DENSE_RANK》：ROW_NUMBER 给每行唯一序号；RANK 同值同名次并留空档；DENSE_RANK 同值同名次不留空档。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nWITH a AS (SELECT store_id,id,sales,ROW_NUMBER() OVER(□□□ORDER BY sales DESC,id) AS rn FROM orders WHERE sales IS NOT NULL) SELECT store_id,id,sales FROM a WHERE rn=1 ORDER BY store_id"
+        "“每家门店各取第一名”要在每个门店内部单独排名。",
+        "ROW_NUMBER() OVER (PARTITION BY 分组列 ORDER BY …) 在每个分组内独立编号，PARTITION BY 就是分组。",
+        "排名用的 ORDER BY 要同时写销售额降序和 id 升序，保证名次唯一。"
       ],
-      "explanation": "全局排名只会保留一家门店；分区后每店选首条。\n执行思路：确认orders的输入记录；先明确公用表表达式的中间数据及其粒度；按筛选条件保留符合要求的记录，并考虑空值；根据窗口分区、顺序及框架计算每行的分析值；输出store_id、id、sales列；遵循题设排序和并列规则。\n公开夹具实际返回 2 行、3 列；完整结果见 expectedOutput。\n另一种可用写法：用反向比较并取 NOT 表达相同三值逻辑。",
+      "explanation": "PARTITION BY store_id 让每家门店各自从 1 开始编号，ORDER BY sales DESC, id 保证同额时名次也唯一，再用外层 WHERE rn=1 取出每家门店的第一名。\n易错：漏写 PARTITION BY，全部订单一起排名，只有全局第一名一条记录。",
       "commonErrors": [
         {
-          "sql": "WITH a AS (SELECT store_id,id,sales,ROW_NUMBER() OVER(ORDER BY sales DESC,id) AS rn FROM orders WHERE sales IS NOT NULL) SELECT store_id,id,sales FROM a WHERE rn=1 ORDER BY store_id",
-          "reason": "全局排名只会保留一家门店；分区后每店选首条。",
+          "sql": "WITH a AS (SELECT store_id,id,sales,ROW_NUMBER() OVER(ORDER BY sales DESC,id) AS rn FROM orders WHERE sales IS NOT NULL) SELECT store_id,id,sales FROM a WHERE rn=1",
+          "reason": "缺少 PARTITION BY store_id，所有订单一起排名，只会得到全局第一名。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -2914,24 +2906,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0216/q0216-public.json",
-          "sha256": "ef5197c14bf39c1c79878aae332fa15dc69e4964ec780bab93df9011e01d776e"
+          "sha256": "6bb6f07f0caca3326a2471abf94fa242fdd4f324e245861d9d96dc8afc4e9d37"
         },
         {
           "id": "q0216-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0216/q0216-boundary.json",
-          "sha256": "f88b19985c41c5ccf38012a397b41444661d4d12e3a5708b107c699ff4c04344"
+          "sha256": "94405eb636a039c6bb32a45cadcf63e06caa2a49a82542bd7969b654fd79c593"
         },
         {
           "id": "q0216-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0216/q0216-empty.json",
-          "sha256": "fa3a03144e5b71511860eb30dccbdc48049bde5b7416944c6dd675cb462d8aef"
+          "sha256": "1d04bc08a4ab9576aaf56500b188092dc48b3ac17c3c8e0ed5b205c7304339d6"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,

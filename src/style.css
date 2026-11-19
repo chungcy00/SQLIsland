@@ -2543,3 +2543,7 @@ td.cell-bad { background: var(--err-bg); color: var(--err); font-weight: 600; }
 .answer-support .reference-answer { background: var(--card); border: 1px solid var(--line); border-radius: var(--r-card); padding: 12px 16px; margin: 12px 0; }
 .answer-support .reference-answer > h3 { margin: 0 0 8px; font-size: var(--fs-sub); }
 .answer-support .reference-answer > pre { margin: 8px 0; }
+/* 运行/提交 与 提示/参考答案 两排按钮靠近，呈 2×2 */
+.quiz-details .question-execution { margin-bottom: 8px; }
+.quiz-details .answer-support { margin-top: 0; }
+.quiz-details .question-execution .actions, .quiz-details .answer-support > .actions { margin: 0; }

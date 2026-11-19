@@ -54,7 +54,7 @@
           4,
           "D",
           2,
-          3000
+          5500
         ]
       ]
     }
@@ -67,9 +67,14 @@
       "employee_id",
       "salary"
     ],
-    "rows": []
+    "rows": [
+      [
+        4,
+        5500
+      ]
+    ]
   },
-  "orderPolicy": "ordered",
+  "orderPolicy": "unordered_multiset",
   "columnPolicy": "exact_names_in_order",
   "numericTolerance": {
     "absolute": 1e-06,

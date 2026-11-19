@@ -342,8 +342,8 @@
       "difficulty": "简单",
       "type": "独立编写",
       "title": "老名单中流失的客户",
-      "context": "使用课程中小型新客户名单、旧客户名单数据练习老名单中流失的客户。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "编写 SQL，完成以下查询要求。\n旧名单有而新名单没有的不同 customer_id，按编号升序。\n输出列名称及顺序：customer_id。按题设排序；参考排序键：customer_id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "运营想找出老名单里已经流失的客户：旧名单有、新名单没有。",
+      "requirements": "返回在旧名单 old_customers 中出现、但没有出现在新名单 new_customers 中的不重复客户编号 customer_id。\n输出列名称及顺序：customer_id。",
       "datasetId": "q0178-lesson",
       "schemaVersion": 3,
       "contentVersion": "4.2.2",
@@ -369,26 +369,20 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT customer_id FROM old_customers EXCEPT SELECT customer_id FROM new_customers ORDER BY customer_id",
-          "sqliteSql": "SELECT customer_id FROM old_customers EXCEPT SELECT customer_id FROM new_customers ORDER BY customer_id"
-        },
-        {
-          "kind": "独立方法等价",
-          "mysqlSql": "SELECT DISTINCT a.customer_id FROM old_customers a WHERE NOT EXISTS(SELECT 1 FROM new_customers b WHERE a.customer_id=b.customer_id OR (a.customer_id IS NULL AND b.customer_id IS NULL)) ORDER BY a.customer_id",
-          "sqliteSql": "SELECT DISTINCT a.customer_id FROM old_customers a WHERE NOT EXISTS(SELECT 1 FROM new_customers b WHERE a.customer_id=b.customer_id OR (a.customer_id IS NULL AND b.customer_id IS NULL)) ORDER BY a.customer_id",
-          "explanation": "采用另一种关系运算或查询结构计算相同结果。"
+          "mysqlSql": "SELECT customer_id FROM old_customers EXCEPT SELECT customer_id FROM new_customers",
+          "sqliteSql": "SELECT customer_id FROM old_customers EXCEPT SELECT customer_id FROM new_customers"
         }
       ],
       "hints": [
-        "判断需求是保留重复、去重合并、求共同成员还是求差。",
-        "结合《差集与排序范围》：差集仅保留前一结果中未出现在后一结果的行。末尾 ORDER BY 作用于整个组合结果。",
-        "按题设编写投影、筛选及分组，使用运行检查列名、NULL、重复记录和排序。"
+        "这是“A 有而 B 没有”的差集关系。",
+        "EXCEPT 返回第一个查询中有、第二个查询中没有的行，并自动去重。",
+        "注意两个查询的先后顺序：谁在前面，谁就是被减数。"
       ],
-      "explanation": "差集有方向，旧减新和新减旧不是同一集合。\n执行思路：确认new_customers、old_customers的输入记录；输出customer_id列；遵循题设排序和并列规则。\n公开夹具实际返回 1 行、1 列；完整结果见 expectedOutput。\n另一种可用写法：采用另一种关系运算或查询结构计算相同结果。",
+      "explanation": "old_customers EXCEPT new_customers 得到只在旧名单中出现的编号，并自动去重。\n易错：把两个查询的顺序写反，得到的是新增的客户，而不是流失的客户。\n提示：集合运算把 NULL 视为相同的值，与 NOT EXISTS / NOT IN 对 NULL 的处理不同。",
       "commonErrors": [
         {
-          "sql": "SELECT customer_id FROM new_customers EXCEPT SELECT customer_id FROM old_customers ORDER BY customer_id",
-          "reason": "差集有方向，旧减新和新减旧不是同一集合。",
+          "sql": "SELECT customer_id FROM new_customers EXCEPT SELECT customer_id FROM old_customers",
+          "reason": "EXCEPT 的两个查询顺序写反了，得到的是新增客户，不是流失客户。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -403,24 +397,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0178/q0178-public.json",
-          "sha256": "9f421aca997bb6d43bf36acccb0fa1a9d32666580878c34d565961ec4ecdea9f"
+          "sha256": "098023e10a94aea75d1b2ce53c5e48a0e8e6954133716b2bab8df59a33a9fcd0"
         },
         {
           "id": "q0178-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0178/q0178-boundary.json",
-          "sha256": "e115c814a089d410bdcd983c729f331d8066a03cda9e7bfd2c4c5bab5f0c7f02"
+          "sha256": "0e60dff315f52a3995e089ed878b3c04b3eaaae4c0889ff3ff3aa8d4315f9cc4"
         },
         {
           "id": "q0178-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0178/q0178-empty.json",
-          "sha256": "2951de34892c1bb7e5412bbeea404e214ae06b87b5fc5bade912099130daa268"
+          "sha256": "d084677ea2db7ef8b1bbd13047127bf2fb46d26580e1b0b051a10af20c15cca3"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,

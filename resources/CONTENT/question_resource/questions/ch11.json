@@ -17,8 +17,8 @@
       "difficulty": "简单",
       "type": "独立编写",
       "title": "清除名称两侧空格",
-      "context": "使用课程中小型原始导入资料数据练习清除名称两侧空格。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "返回 raw_data 的 id、clean_name，仅删除名称两端普通空格，保留内部空格与NULL，按编号升序。\n输出列名称及顺序：id, clean_name。按题设排序；参考排序键：id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "导入的名称两侧带有多余空格，要清理后再使用。",
+      "requirements": "返回 raw_data 的 id 和清理后的名称 clean_name：只删除名称两端的普通空格，保留内部空格，NULL 保持 NULL。\n输出列名称及顺序：id, clean_name。",
       "datasetId": "q0151-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -65,26 +65,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT id,TRIM(name) AS clean_name FROM raw_data ORDER BY id",
-          "sqliteSql": "SELECT id,TRIM(name) AS clean_name FROM raw_data ORDER BY id"
+          "mysqlSql": "SELECT id,TRIM(name) AS clean_name FROM raw_data",
+          "sqliteSql": "SELECT id,TRIM(name) AS clean_name FROM raw_data"
         },
         {
-          "kind": "关系结构等价",
-          "mysqlSql": "SELECT id,TRIM(name) AS clean_name FROM (SELECT * FROM raw_data) AS raw_data ORDER BY id",
-          "sqliteSql": "SELECT id,TRIM(name) AS clean_name FROM (SELECT * FROM raw_data) AS raw_data ORDER BY id",
-          "explanation": "先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。"
+          "kind": "独立方法等价",
+          "mysqlSql": "SELECT id,LTRIM(RTRIM(name)) AS clean_name FROM raw_data",
+          "sqliteSql": "SELECT id,LTRIM(RTRIM(name)) AS clean_name FROM raw_data"
         }
       ],
       "hints": [
-        "明确字符位置、单位、替换方向和NULL处理，避免改写原字段。",
-        "结合《TRIM、REPLACE 与大小写》：TRIM 默认去除两端空格；REPLACE 替换匹配子串；LOWER/UPPER 转换大小写。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT id,□□□ AS clean_name FROM raw_data ORDER BY id"
+        "只处理两端，不处理中间。",
+        "TRIM(文本) 删除两端的空格；REPLACE 会处理所有位置的字符。",
+        "NULL 经过 TRIM 仍是 NULL，不需要额外处理。"
       ],
-      "explanation": "TRIM 处理两端，REPLACE 会删除中间也删除。\n执行思路：确认raw_data的输入记录；输出id、clean_name列；遵循题设排序和并列规则。\n公开夹具实际返回 6 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
+      "explanation": "TRIM(name) 去掉两端的空格，中间的空格不动，NULL 保持 NULL。\n易错：REPLACE(name,' ','') 会把所有空格都删掉，“Mask A”变成“MaskA”。\n另一种写法：LTRIM(RTRIM(name)) 分别去掉左右两端。",
       "commonErrors": [
         {
-          "sql": "SELECT id,REPLACE(name,' ','') AS clean_name FROM raw_data ORDER BY id",
-          "reason": "TRIM 处理两端，REPLACE 会删除中间也删除。",
+          "sql": "SELECT id,REPLACE(name,' ','') AS clean_name FROM raw_data",
+          "reason": "REPLACE 会删除所有空格，包括名称内部需要保留的空格。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -99,24 +98,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0151/q0151-public.json",
-          "sha256": "296cfac7ee0612969f7591cac3bf09fdbed3961cfd49d96d167d9b47347db166"
+          "sha256": "067643338517ceffc42fe8fc8e4df1ba090d00f53457f279a34a6b2f059d774a"
         },
         {
           "id": "q0151-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0151/q0151-boundary.json",
-          "sha256": "0d8168727663ad4e03d6f81e02e0ef05e1c77773e98f5fb14ab5e98578b27766"
+          "sha256": "7961d70e8f2ffdd23740faa53c765653237c52362359ce6c8fe8992a5b3a0bdc"
         },
         {
           "id": "q0151-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0151/q0151-empty.json",
-          "sha256": "d8daa2d141abed173f9c793abc4600b69addc25528c1a4875418afcf9da4f7db"
+          "sha256": "c46c8a5e2c7f6a990cbb60791cd20f5b7186e9932da94ff2252cef5854f3ff65"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -135,7 +134,7 @@
       "mysqlVerification": "未运行 MySQL 8.4",
       "validation": {
         "kind": "query",
-        "equivalentKind": "关系结构等价",
+        "equivalentKind": "独立方法等价",
         "fixtures": [
           {
             "fixtureId": "q0151-public",
@@ -222,8 +221,8 @@
       "difficulty": "简单",
       "type": "独立编写",
       "title": "原始类别统一大写",
-      "context": "使用课程中小型原始导入资料数据练习原始类别统一大写。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "输出 raw_data.id、normalized_category，类别去除两端普通空格后变成英文大写，NULL保持；按编号升序。\n输出列名称及顺序：id, normalized_category。按题设排序；参考排序键：id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "类别字段的大小写和空格不统一，要规范成大写再统计。",
+      "requirements": "输出 raw_data 的 id 和规范化后的类别 normalized_category：去掉两端空格后转成英文大写，NULL 保持 NULL。\n输出列名称及顺序：id, normalized_category。",
       "datasetId": "q0154-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -270,26 +269,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT id,UPPER(TRIM(category)) AS normalized_category FROM raw_data ORDER BY id",
-          "sqliteSql": "SELECT id,UPPER(TRIM(category)) AS normalized_category FROM raw_data ORDER BY id"
+          "mysqlSql": "SELECT id,UPPER(TRIM(category)) AS normalized_category FROM raw_data",
+          "sqliteSql": "SELECT id,UPPER(TRIM(category)) AS normalized_category FROM raw_data"
         },
         {
-          "kind": "关系结构等价",
-          "mysqlSql": "SELECT id,UPPER(TRIM(category)) AS normalized_category FROM (SELECT * FROM raw_data) AS raw_data ORDER BY id",
-          "sqliteSql": "SELECT id,UPPER(TRIM(category)) AS normalized_category FROM (SELECT * FROM raw_data) AS raw_data ORDER BY id",
-          "explanation": "先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。"
+          "kind": "代数或函数等价",
+          "mysqlSql": "SELECT id,TRIM(UPPER(category)) AS normalized_category FROM raw_data",
+          "sqliteSql": "SELECT id,TRIM(UPPER(category)) AS normalized_category FROM raw_data"
         }
       ],
       "hints": [
-        "明确字符位置、单位、替换方向和NULL处理，避免改写原字段。",
-        "结合《TRIM、REPLACE 与大小写》：TRIM 默认去除两端空格；REPLACE 替换匹配子串；LOWER/UPPER 转换大小写。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT id,□□□(TRIM(category)) AS normalized_category FROM raw_data ORDER BY id"
+        "两步处理：先去空格，再转大小写。",
+        "TRIM 去掉两端空格，UPPER 转大写，函数可以嵌套使用。",
+        "注意转换方向是大写，不是小写。"
       ],
-      "explanation": "标准化大小写应统一到本题指定的大写，而非小写。\n执行思路：确认raw_data的输入记录；输出id、normalized_category列；遵循题设排序和并列规则。\n公开夹具实际返回 6 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
+      "explanation": "UPPER(TRIM(category))：先 TRIM 再 UPPER，NULL 经过两个函数仍是 NULL。\n易错：用 LOWER 得到的是小写。",
       "commonErrors": [
         {
-          "sql": "SELECT id,LOWER(TRIM(category)) AS normalized_category FROM raw_data ORDER BY id",
-          "reason": "标准化大小写应统一到本题指定的大写，而非小写。",
+          "sql": "SELECT id,LOWER(TRIM(category)) AS normalized_category FROM raw_data",
+          "reason": "LOWER 转成了小写，题目要求大写。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -304,24 +302,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0154/q0154-public.json",
-          "sha256": "a7f14365e146898133419b436ad4db1145b17a5043afe1d82c70e8a0b8baeb87"
+          "sha256": "de3309c891392193fe463b6830eda981ee1bdb55110e459af2704b6274de8b09"
         },
         {
           "id": "q0154-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0154/q0154-boundary.json",
-          "sha256": "d2c085fd475654435750f7a56a9b59aa1d74b05b40eb6aa6450f0964516bbf4f"
+          "sha256": "0d251467efc63fd2374e26f3ce7cd8aabe0028ef05db02a061313ef801e61f16"
         },
         {
           "id": "q0154-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0154/q0154-empty.json",
-          "sha256": "dc91f67ebeb4d3eb0fcb4459b1015dc20d221be7cdbd1a719373c516df178e08"
+          "sha256": "cf89bbc5fd82044b312b94bc8716412ed580996f4c43e3176c026078b34922de"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -340,7 +338,7 @@
       "mysqlVerification": "未运行 MySQL 8.4",
       "validation": {
         "kind": "query",
-        "equivalentKind": "关系结构等价",
+        "equivalentKind": "代数或函数等价",
         "fixtures": [
           {
             "fixtureId": "q0154-public",
@@ -427,15 +425,15 @@
       "difficulty": "简单",
       "type": "代码填空",
       "title": "商品名称末尾两字符",
-      "context": "使用课程中小型商品数据练习商品名称末尾两字符。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "补全代码中的一个空位，使完整SQL满足以下要求。可输入具有相同语义的片段，提交后按完整代码执行结果核对。\n输出 product_id、suffix（商品名称最后两个字符），不足两个时返回现有字符，按编号升序。\n输出列名称及顺序：product_id, suffix。按题设排序；参考排序键：product_id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "商品名称的后缀用来做简单分组，要取名称最后两个字符。",
+      "requirements": "补全空位：取商品名称的最后两个字符作为 suffix；名称不足两个字符时返回现有字符。\n输出列名称及顺序：product_id, suffix。",
       "datasetId": "q0155-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
       "sourceTables": [
         "products"
       ],
-      "initialCode": "SELECT product_id,{{blank1}} AS suffix FROM products ORDER BY product_id",
+      "initialCode": "SELECT product_id,{{blank1}} AS suffix FROM products",
       "options": [],
       "acceptedBlanks": [
         {
@@ -483,26 +481,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT product_id,SUBSTRING(product_name,-2) AS suffix FROM products ORDER BY product_id",
-          "sqliteSql": "SELECT product_id,SUBSTRING(product_name,-2) AS suffix FROM products ORDER BY product_id"
+          "mysqlSql": "SELECT product_id,SUBSTRING(product_name,-2) AS suffix FROM products",
+          "sqliteSql": "SELECT product_id,SUBSTRING(product_name,-2) AS suffix FROM products"
         },
         {
-          "kind": "关系结构等价",
-          "mysqlSql": "SELECT product_id,SUBSTRING(product_name,-2) AS suffix FROM (SELECT * FROM products) AS products ORDER BY product_id",
-          "sqliteSql": "SELECT product_id,SUBSTRING(product_name,-2) AS suffix FROM (SELECT * FROM products) AS products ORDER BY product_id",
-          "explanation": "先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。"
+          "kind": "代数或函数等价",
+          "mysqlSql": "SELECT product_id,SUBSTR(product_name,-2) AS suffix FROM products",
+          "sqliteSql": "SELECT product_id,SUBSTR(product_name,-2) AS suffix FROM products"
         }
       ],
       "hints": [
-        "明确字符位置、单位、替换方向和NULL处理，避免改写原字段。",
-        "结合《SUBSTRING 截取文本》：从指定字符位置开始截取，位置从1开始；长度表示截取字符数。",
-        "回想空位所在子句的功能：SUBSTRING 截取文本；保留周围代码，填入实现题设的表达式。"
+        "要从字符串末尾往前数。",
+        "SUBSTRING(文本, 起点)：起点为负数时表示从末尾倒数第几个字符开始。",
+        "取最后两个字符，倒数的起点是 -2。"
       ],
-      "explanation": "负起始位置表示从末尾计数，不是从第二字符起截取。\n执行思路：确认products的输入记录；输出product_id、suffix列；遵循题设排序和并列规则。\n公开夹具实际返回 6 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
+      "explanation": "SUBSTRING(product_name,-2) 从倒数第 2 个字符开始一直取到末尾，名称只有一个字符时就返回它本身。\n易错：SUBSTRING(product_name,2) 是从第 2 个字符起取到末尾，得到的是去掉首字符后的整段。",
       "commonErrors": [
         {
-          "sql": "SELECT product_id,SUBSTRING(product_name,2) AS suffix FROM products ORDER BY product_id",
-          "reason": "负起始位置表示从末尾计数，不是从第二字符起截取。",
+          "sql": "SELECT product_id,SUBSTRING(product_name,2) AS suffix FROM products",
+          "reason": "正数 2 表示从第 2 个字符取到末尾，而不是取最后两个字符。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -517,24 +514,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0155/q0155-public.json",
-          "sha256": "ad5f794a59b424956e41b87284b5b7c0256d21be01da344d8345da3bf7fa8ba2"
+          "sha256": "550d204f9a481a37ad426f3e930465a53b354c88b8f2d10826551e1d45eab846"
         },
         {
           "id": "q0155-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0155/q0155-boundary.json",
-          "sha256": "9d3e3b15148c982aa31ca76cfab8ced12d86d01084a29d420989d9eef02290c8"
+          "sha256": "5819907ef837e750517226eecefc47f23d2c3844c5619c263c6389de12c8c5ab"
         },
         {
           "id": "q0155-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0155/q0155-empty.json",
-          "sha256": "6ffe50d55c5699dc5f038af2015ffcb5ca249dc97eeb460a254f947820d355c9"
+          "sha256": "a27556dd84de2468c72757c7b8532c85057d036fcad722d5f977853cd71b0e2c"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -553,7 +550,7 @@
       "mysqlVerification": "未运行 MySQL 8.4",
       "validation": {
         "kind": "query",
-        "equivalentKind": "关系结构等价",
+        "equivalentKind": "代数或函数等价",
         "fixtures": [
           {
             "fixtureId": "q0155-public",
@@ -765,15 +762,15 @@
       "difficulty": "中等",
       "type": "代码填空",
       "title": "商品与类别组合标签",
-      "context": "使用课程中小型商品数据练习商品与类别组合标签。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "补全代码中的一个空位，使完整SQL满足以下要求。可输入具有相同语义的片段，提交后按完整代码执行结果核对。\n输出 product_id、label（商品名称、一个冒号、类别），任一部分为NULL时整体NULL，按编号升序。\n输出列名称及顺序：product_id, label。按题设排序；参考排序键：product_id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "商品列表要显示成“名称:类别”的样子。",
+      "requirements": "补全空位：把商品名称、一个冒号和类别拼成 label；任一部分为 NULL 时整体为 NULL。\n输出列名称及顺序：product_id, label。",
       "datasetId": "q0158-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
       "sourceTables": [
         "products"
       ],
-      "initialCode": "SELECT product_id,{{blank1}} AS label FROM products ORDER BY product_id",
+      "initialCode": "SELECT product_id,{{blank1}} AS label FROM products",
       "options": [],
       "acceptedBlanks": [
         {
@@ -821,26 +818,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT product_id,CONCAT(product_name,':',category) AS label FROM products ORDER BY product_id",
-          "sqliteSql": "SELECT product_id,CONCAT(product_name,':',category) AS label FROM products ORDER BY product_id"
+          "mysqlSql": "SELECT product_id,CONCAT(product_name,':',category) AS label FROM products",
+          "sqliteSql": "SELECT product_id,CONCAT(product_name,':',category) AS label FROM products"
         },
         {
-          "kind": "关系结构等价",
-          "mysqlSql": "SELECT product_id,CONCAT(product_name,':',category) AS label FROM (SELECT * FROM products) AS products ORDER BY product_id",
-          "sqliteSql": "SELECT product_id,CONCAT(product_name,':',category) AS label FROM (SELECT * FROM products) AS products ORDER BY product_id",
-          "explanation": "先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。"
+          "kind": "代数或函数等价",
+          "mysqlSql": "SELECT product_id,CONCAT(product_name,CONCAT(':',category)) AS label FROM products",
+          "sqliteSql": "SELECT product_id,CONCAT(product_name,CONCAT(':',category)) AS label FROM products"
         }
       ],
       "hints": [
-        "明确字符位置、单位、替换方向和NULL处理，避免改写原字段。",
-        "结合《CONCAT 字符串拼接》：将多个字符串按给定次序连接，MySQL CONCAT 任一参数为 NULL 时返回 NULL。",
-        "回想空位所在子句的功能：CONCAT 字符串拼接；保留周围代码，填入实现题设的表达式。"
+        "要把三段内容连在一起：名称、冒号、类别。",
+        "CONCAT(a,b,c) 按顺序连接，任一参数为 NULL 时结果为 NULL。",
+        "注意顺序：名称在前，类别在后。"
       ],
-      "explanation": "拼接顺序由展示标签的业务规则决定，NULL需要传播。\n执行思路：确认products的输入记录；输出product_id、label列；遵循题设排序和并列规则。\n公开夹具实际返回 6 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
+      "explanation": "CONCAT(product_name,':',category) 按顺序拼接；任一参数为 NULL 时结果就是 NULL，符合题目要求。\n易错：把类别放到前面，会得到“类别:名称”。",
       "commonErrors": [
         {
-          "sql": "SELECT product_id,CONCAT(category,':',product_name) AS label FROM products ORDER BY product_id",
-          "reason": "拼接顺序由展示标签的业务规则决定，NULL需要传播。",
+          "sql": "SELECT product_id,CONCAT(category,':',product_name) AS label FROM products",
+          "reason": "拼接顺序反了：应该是名称在前、类别在后。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -855,24 +851,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0158/q0158-public.json",
-          "sha256": "63f42bcca153992715771c096fd5024492f2f76f0c0b0e69dd2a09bfbce054bc"
+          "sha256": "855088e0af3e0dbbf701712bd8bf4d61e17ca29fd465336e48247af464432dc0"
         },
         {
           "id": "q0158-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0158/q0158-boundary.json",
-          "sha256": "fccee3ac7a57c4e70d03c5d2256558cc9c6f768858175eebfefabf115ccc5cea"
+          "sha256": "1338a89ef017762be93ce557095975b3a3262493561fb236690cf1c473bfb02a"
         },
         {
           "id": "q0158-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0158/q0158-empty.json",
-          "sha256": "421b9bc8d2ba30096b672785cb9b63fd37097d872663c93dac0d9b7a32990fbc"
+          "sha256": "91642b4e8e116be69e9d4de7e3bed28f1d890021a76dd64fb56683c1ea3133b5"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -891,7 +887,7 @@
       "mysqlVerification": "未运行 MySQL 8.4",
       "validation": {
         "kind": "query",
-        "equivalentKind": "关系结构等价",
+        "equivalentKind": "代数或函数等价",
         "fixtures": [
           {
             "fixtureId": "q0158-public",
@@ -980,8 +976,8 @@
       "difficulty": "中等",
       "type": "独立编写",
       "title": "替换商品命名分隔符",
-      "context": "使用课程中小型商品数据练习替换商品命名分隔符。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "将 product_name 中每个下划线替换为空格，输出 product_id、display_name，按编号升序。\n输出列名称及顺序：product_id, display_name。按题设排序；参考排序键：product_id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "商品命名里用下划线分隔，展示时要换成空格。",
+      "requirements": "把 product_name 里的每个下划线替换成空格，输出 product_id 和 display_name。\n输出列名称及顺序：product_id, display_name。",
       "datasetId": "q0159-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -1028,26 +1024,20 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT product_id,REPLACE(product_name,'_',' ') AS display_name FROM products ORDER BY product_id",
-          "sqliteSql": "SELECT product_id,REPLACE(product_name,'_',' ') AS display_name FROM products ORDER BY product_id"
-        },
-        {
-          "kind": "关系结构等价",
-          "mysqlSql": "SELECT product_id,REPLACE(product_name,'_',' ') AS display_name FROM (SELECT * FROM products) AS products ORDER BY product_id",
-          "sqliteSql": "SELECT product_id,REPLACE(product_name,'_',' ') AS display_name FROM (SELECT * FROM products) AS products ORDER BY product_id",
-          "explanation": "先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。"
+          "mysqlSql": "SELECT product_id,REPLACE(product_name,'_',' ') AS display_name FROM products",
+          "sqliteSql": "SELECT product_id,REPLACE(product_name,'_',' ') AS display_name FROM products"
         }
       ],
       "hints": [
-        "明确字符位置、单位、替换方向和NULL处理，避免改写原字段。",
-        "结合《TRIM、REPLACE 与大小写》：TRIM 默认去除两端空格；REPLACE 替换匹配子串；LOWER/UPPER 转换大小写。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT product_id,□□□ AS display_name FROM products ORDER BY product_id"
+        "要把字符串里的某个字符换成另一个字符。",
+        "REPLACE(文本, 查找, 替换) 把文本中所有出现的“查找”替换成“替换”。",
+        "注意方向：查找的是下划线，替换成空格。"
       ],
-      "explanation": "替换参数依次为原字符串、被替换内容、新内容。\n执行思路：确认products的输入记录；输出product_id、display_name列；遵循题设排序和并列规则。\n公开夹具实际返回 6 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
+      "explanation": "REPLACE(product_name,'_',' ') 把每个下划线换成空格，没有下划线的名称保持不变。\n易错：把参数顺序写反（查找空格、替换成下划线），会把空格变成下划线。",
       "commonErrors": [
         {
-          "sql": "SELECT product_id,REPLACE(product_name,' ','_') AS display_name FROM products ORDER BY product_id",
-          "reason": "替换参数依次为原字符串、被替换内容、新内容。",
+          "sql": "SELECT product_id,REPLACE(product_name,' ','_') AS display_name FROM products",
+          "reason": "查找和替换的字符写反了，会把空格换成下划线。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -1062,24 +1052,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0159/q0159-public.json",
-          "sha256": "78649f94badc9f9424454b9ca034f8b759f981b440be7ff294348f5ca9c15d0f"
+          "sha256": "a4cf1db397991aa8d75c3f734fc8b05b45021ebcb63467d13016511fc44d8e0e"
         },
         {
           "id": "q0159-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0159/q0159-boundary.json",
-          "sha256": "33145ba43b047a00e6fb2c3b2c7aac83829918fb9a41a6fe3f85716eac610ff3"
+          "sha256": "d2489995a5e6edc46e8593639bacf224c6e2d8074587de0a5bbbac69d15bc8e6"
         },
         {
           "id": "q0159-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0159/q0159-empty.json",
-          "sha256": "3f1b4df8abf04f66bc6eefbf7788598e6a8a26e6b2b754db7273805aeadb7de2"
+          "sha256": "43436aeb19f73716aac4552692feea2e5a607645869c23684ea09e46eb91aa8e"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,

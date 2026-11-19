@@ -17,15 +17,15 @@
       "difficulty": "入门",
       "type": "代码纠错",
       "title": "将特殊代码转换为缺失",
-      "context": "使用课程中小型缺失值示例数据练习将特殊代码转换为缺失。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "下面提供的初始代码存在逻辑、语法或结构错误。请修改整段代码，使其满足以下要求。\n返回 id、normalized_value，将 value=0 转换为NULL，其他值不变，按编号升序（仅本题约定0是占位）。\n输出列名称及顺序：id, normalized_value。按题设排序；参考排序键：id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "某系统用 0 作为“没有数据”的占位值，分析时要把它还原成缺失。",
+      "requirements": "下面的代码想把占位的 0 转成 NULL、其他值保持不变，但结果不对。请修改代码，输出 id 和 normalized_value。本题约定 0 只是占位值。\n输出列名称及顺序：id, normalized_value。",
       "datasetId": "q0119-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
       "sourceTables": [
         "nullable_values"
       ],
-      "initialCode": "SELECT id,COALESCE(value,0) AS normalized_value FROM nullable_values ORDER BY id",
+      "initialCode": "SELECT id,COALESCE(value,0) AS normalized_value FROM nullable_values",
       "options": [],
       "acceptedBlanks": [],
       "expectedOutput": {
@@ -57,26 +57,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT id,NULLIF(value,0) AS normalized_value FROM nullable_values ORDER BY id",
-          "sqliteSql": "SELECT id,NULLIF(value,0) AS normalized_value FROM nullable_values ORDER BY id"
+          "mysqlSql": "SELECT id,NULLIF(value,0) AS normalized_value FROM nullable_values",
+          "sqliteSql": "SELECT id,NULLIF(value,0) AS normalized_value FROM nullable_values"
         },
         {
-          "kind": "关系结构等价",
-          "mysqlSql": "SELECT id,NULLIF(value,0) AS normalized_value FROM (SELECT * FROM nullable_values) AS nullable_values ORDER BY id",
-          "sqliteSql": "SELECT id,NULLIF(value,0) AS normalized_value FROM (SELECT * FROM nullable_values) AS nullable_values ORDER BY id",
-          "explanation": "先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。"
+          "kind": "独立方法等价",
+          "mysqlSql": "SELECT id,CASE WHEN value=0 THEN NULL ELSE value END AS normalized_value FROM nullable_values",
+          "sqliteSql": "SELECT id,CASE WHEN value=0 THEN NULL ELSE value END AS normalized_value FROM nullable_values"
         }
       ],
       "hints": [
-        "把业务规则按互斥条件顺序排列，并检查未满足条件的处理。",
-        "结合《NULLIF 与安全除法》：NULLIF(a,b) 相等时返回 NULL，否则返回 a；用来避免零作分母。",
-        "检查初始代码的 NULLIF(value,0) 对应的业务规则。NULLIF 把指定哨兵值变为NULL，COALESCE方向相反。"
+        "目标是“等于 0 时变成 NULL，否则保持原值”。",
+        "NULLIF(a, b) 在 a 等于 b 时返回 NULL，否则返回 a。",
+        "初始代码用的函数方向正好相反：它是把 NULL 变成 0，而不是把 0 变成 NULL。"
       ],
-      "explanation": "NULLIF 把指定哨兵值变为NULL，COALESCE方向相反。\n执行思路：确认nullable_values的输入记录；输出id、normalized_value列；遵循题设排序和并列规则。\n公开夹具实际返回 4 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
+      "explanation": "NULLIF(value,0) 在 value 等于 0 时返回 NULL，否则原样返回，正好把占位的 0 还原为缺失。\n初始代码用 COALESCE(value,0)，作用相反：把缺失值变成了 0。\n另一种写法：CASE WHEN value=0 THEN NULL ELSE value END。",
       "commonErrors": [
         {
-          "sql": "SELECT id,COALESCE(value,0) AS normalized_value FROM nullable_values ORDER BY id",
-          "reason": "NULLIF 把指定哨兵值变为NULL，COALESCE方向相反。",
+          "sql": "SELECT id,COALESCE(value,0) AS normalized_value FROM nullable_values",
+          "reason": "COALESCE 是把 NULL 换成 0，与题目“把 0 换成 NULL”方向相反。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -91,24 +90,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0119/q0119-public.json",
-          "sha256": "0bf0dabb8a9a3eba0c4587cf8d90e87fba64955e43c584d2147e0e3074392f27"
+          "sha256": "23b1457cd9aa6cd69d1b6a643142d4e518abc26cc5a1ecf7743c684c67c7d0cb"
         },
         {
           "id": "q0119-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0119/q0119-boundary.json",
-          "sha256": "b5c982c1c36b32dc336c1712cadfe67159876c0d0f553454b8e1f69c7f99e8fc"
+          "sha256": "25d44878e5a0e853b80d55154cf8886a5fed4dd1f5c31301df1cf6533268fe71"
         },
         {
           "id": "q0119-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0119/q0119-empty.json",
-          "sha256": "7722a4b69c5161716756b79213f4918ca10d444a034724648f1a617a4cbb3c88"
+          "sha256": "c79ba838a38791300b98a8cc55dce7391f1934f774ca9ead1b984c3c978ad9f1"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -127,7 +126,7 @@
       "mysqlVerification": "未运行 MySQL 8.4",
       "validation": {
         "kind": "query",
-        "equivalentKind": "关系结构等价",
+        "equivalentKind": "独立方法等价",
         "fixtures": [
           {
             "fixtureId": "q0119-public",
@@ -340,15 +339,15 @@
       "difficulty": "简单",
       "type": "代码填空",
       "title": "单位库存的售价比",
-      "context": "使用课程中小型商品数据练习单位库存的售价比。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "补全代码中的一个空位，使完整SQL满足以下要求。可输入具有相同语义的片段，提交后按完整代码执行结果核对。\n每商品返回 product_id、price_per_stock（price/stock，两位小数，库存0返回NULL），按编号升序。\n输出列名称及顺序：product_id, price_per_stock。按题设排序；参考排序键：product_id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "运营想比较每件商品“每单位库存对应的售价”，库存为 0 时无法计算。",
+      "requirements": "补全空位：计算 price 除以 stock（保留两位小数，列别名 price_per_stock），库存为 0 时返回 NULL。\n输出列名称及顺序：product_id, price_per_stock。",
       "datasetId": "q0121-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
       "sourceTables": [
         "products"
       ],
-      "initialCode": "SELECT product_id,ROUND({{blank1}}/NULLIF(stock,0),2) AS price_per_stock FROM products ORDER BY product_id",
+      "initialCode": "SELECT product_id,ROUND({{blank1}}/NULLIF(stock,0),2) AS price_per_stock FROM products",
       "options": [],
       "acceptedBlanks": [
         {
@@ -396,26 +395,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT product_id,ROUND(1.0*price/NULLIF(stock,0),2) AS price_per_stock FROM products ORDER BY product_id",
-          "sqliteSql": "SELECT product_id,ROUND(1.0*price/NULLIF(stock,0),2) AS price_per_stock FROM products ORDER BY product_id"
+          "mysqlSql": "SELECT product_id,ROUND(1.0*price/NULLIF(stock,0),2) AS price_per_stock FROM products",
+          "sqliteSql": "SELECT product_id,ROUND(1.0*price/NULLIF(stock,0),2) AS price_per_stock FROM products"
         },
         {
-          "kind": "关系结构等价",
-          "mysqlSql": "SELECT product_id,ROUND(1.0*price/NULLIF(stock,0),2) AS price_per_stock FROM (SELECT * FROM products) AS products ORDER BY product_id",
-          "sqliteSql": "SELECT product_id,ROUND(1.0*price/NULLIF(stock,0),2) AS price_per_stock FROM (SELECT * FROM products) AS products ORDER BY product_id",
-          "explanation": "先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。"
+          "kind": "代数或函数等价",
+          "mysqlSql": "SELECT product_id,ROUND(price*1.0/NULLIF(stock,0),2) AS price_per_stock FROM products",
+          "sqliteSql": "SELECT product_id,ROUND(price*1.0/NULLIF(stock,0),2) AS price_per_stock FROM products"
         }
       ],
       "hints": [
-        "把业务规则按互斥条件顺序排列，并检查未满足条件的处理。",
-        "结合《NULLIF 与安全除法》：NULLIF(a,b) 相等时返回 NULL，否则返回 a；用来避免零作分母。",
-        "回想空位所在子句的功能：NULLIF 与安全除法；保留周围代码，填入实现题设的表达式。"
+        "除数为 0 没有意义，库存为 0 的商品要返回 NULL。",
+        "NULLIF(stock,0) 在库存为 0 时返回 NULL，任何数除以 NULL 都得到 NULL。",
+        "被除数是价格；两个整数相除可能被截断，可以先乘以 1.0 保留小数。"
       ],
-      "explanation": "分子必须是售价，安全除法不改变业务口径。\n执行思路：确认products的输入记录；输出product_id、price_per_stock列；遵循题设排序和并列规则。\n公开夹具实际返回 6 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
+      "explanation": "NULLIF(stock,0) 把库存 0 变成 NULL，除以 NULL 得到 NULL，避免了除零。被除数写 1.0*price 让整数相除保留小数，再用 ROUND(…,2) 保留两位。\n易错：被除数写成 stock，得到的是 stock/stock（恒为 1 或 NULL），而不是价格比。",
       "commonErrors": [
         {
-          "sql": "SELECT product_id,ROUND(1.0*stock/NULLIF(stock,0),2) AS price_per_stock FROM products ORDER BY product_id",
-          "reason": "分子必须是售价，安全除法不改变业务口径。",
+          "sql": "SELECT product_id,ROUND(1.0*stock/NULLIF(stock,0),2) AS price_per_stock FROM products",
+          "reason": "被除数写成了 stock，结果恒为 1 或 NULL，而不是价格与库存的比。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -430,24 +428,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0121/q0121-public.json",
-          "sha256": "0119ee04fc4efced91e64f4ca4b3d425907f5f0c6c6efc45bb11660f5c9bfdbd"
+          "sha256": "582a26b61692dc687414c7cf8ec820dfb59d137e78559bdd909378be04111041"
         },
         {
           "id": "q0121-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0121/q0121-boundary.json",
-          "sha256": "0b1e842cb2bd16e974d753a46986fa12387fb19c02f632886285765ec6bb273a"
+          "sha256": "afc14d46b6510a8b3b1de960d969e2a0a27afc62a47516073adf094ade2d78bb"
         },
         {
           "id": "q0121-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0121/q0121-empty.json",
-          "sha256": "d2527ff918a7024f72995cb79c96e6a1a044ef8040ba85c82766ed4e15a7f0a0"
+          "sha256": "680bb4b1c47b775add1001ab5e09e7c232c8e2307e9ecf14b6d12f7527d884e5"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -466,7 +464,7 @@
       "mysqlVerification": "未运行 MySQL 8.4",
       "validation": {
         "kind": "query",
-        "equivalentKind": "关系结构等价",
+        "equivalentKind": "代数或函数等价",
         "fixtures": [
           {
             "fixtureId": "q0121-public",
@@ -555,15 +553,15 @@
       "difficulty": "简单",
       "type": "代码填空",
       "title": "薪资是否高于五千",
-      "context": "使用课程中小型员工数据练习薪资是否高于五千。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "补全代码中的一个空位，使完整SQL满足以下要求。可输入具有相同语义的片段，提交后按完整代码执行结果核对。\n输出 employee_id、flag，薪资严格大于5000为1，否则0，缺失也0；按员工编号升序。\n输出列名称及顺序：employee_id, flag。按题设排序；参考排序键：employee_id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "薪酬分析要把薪资高于 5000 的员工标记出来。",
+      "requirements": "补全空位：薪资严格大于 5000 的员工 flag 为 1，其余（包括薪资缺失）为 0。\n输出列名称及顺序：employee_id, flag。",
       "datasetId": "q0122-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
       "sourceTables": [
         "employees"
       ],
-      "initialCode": "SELECT employee_id,CASE WHEN {{blank1}} THEN 1 ELSE 0 END AS flag FROM employees ORDER BY employee_id",
+      "initialCode": "SELECT employee_id,CASE WHEN {{blank1}} THEN 1 ELSE 0 END AS flag FROM employees",
       "options": [],
       "acceptedBlanks": [
         {
@@ -604,26 +602,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT employee_id,CASE WHEN salary>5000 THEN 1 ELSE 0 END AS flag FROM employees ORDER BY employee_id",
-          "sqliteSql": "SELECT employee_id,CASE WHEN salary>5000 THEN 1 ELSE 0 END AS flag FROM employees ORDER BY employee_id"
+          "mysqlSql": "SELECT employee_id,CASE WHEN salary>5000 THEN 1 ELSE 0 END AS flag FROM employees",
+          "sqliteSql": "SELECT employee_id,CASE WHEN salary>5000 THEN 1 ELSE 0 END AS flag FROM employees"
         },
         {
           "kind": "代数或函数等价",
-          "mysqlSql": "SELECT employee_id,CASE WHEN NOT (salary<=5000) THEN 1 ELSE 0 END AS flag FROM employees ORDER BY employee_id",
-          "sqliteSql": "SELECT employee_id,CASE WHEN NOT (salary<=5000) THEN 1 ELSE 0 END AS flag FROM employees ORDER BY employee_id",
-          "explanation": "用反向比较并取 NOT 表达相同三值逻辑。"
+          "mysqlSql": "SELECT employee_id,CASE WHEN NOT (salary<=5000) THEN 1 ELSE 0 END AS flag FROM employees",
+          "sqliteSql": "SELECT employee_id,CASE WHEN NOT (salary<=5000) THEN 1 ELSE 0 END AS flag FROM employees"
         }
       ],
       "hints": [
-        "把业务规则按互斥条件顺序排列，并检查未满足条件的处理。",
-        "结合《IF 二选一》：MySQL IF(expr,a,b) 在 expr 为真时返回 a，否则返回 b；未知条件也走否定分支。",
-        "回想空位所在子句的功能：IF 二选一；保留周围代码，填入实现题设的表达式。"
+        "CASE WHEN 条件 THEN 值 ELSE 值 END：条件为真走 THEN，其余情况走 ELSE。",
+        "“严格大于”不包含 5000 本身。",
+        "薪资缺失（NULL）时条件结果是未知，会落入 ELSE，正好得到 0。"
       ],
-      "explanation": "条件二选一把未知归入否则分支，相等值符合否则。\n执行思路：确认employees的输入记录；输出employee_id、flag列；遵循题设排序和并列规则。\n公开夹具实际返回 4 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：用反向比较并取 NOT 表达相同三值逻辑。",
+      "explanation": "salary>5000 为真时返回 1；为假或未知（薪资为 NULL）时走 ELSE 返回 0，满足“缺失也记 0”。\n易错：写成 salary>=5000 会把薪资恰好为 5000 的员工标成 1。",
       "commonErrors": [
         {
-          "sql": "SELECT employee_id,CASE WHEN salary>=5000 THEN 1 ELSE 0 END AS flag FROM employees ORDER BY employee_id",
-          "reason": "条件二选一把未知归入否则分支，相等值符合否则。",
+          "sql": "SELECT employee_id,CASE WHEN salary>=5000 THEN 1 ELSE 0 END AS flag FROM employees",
+          "reason": ">= 把恰好 5000 的薪资也标成了 1，题目要求严格大于。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -638,24 +635,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0122/q0122-public.json",
-          "sha256": "f8e115581e8661039ba4a245f85cc455f6e49177f5484000c7fedcf5832a7118"
+          "sha256": "a9c8d5159d19a202ab1c16df278f1f4385f45ac2815278bd06d17418a400fb1b"
         },
         {
           "id": "q0122-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0122/q0122-boundary.json",
-          "sha256": "03a76a21312922e43d69cb44effd26496c149cbb42fc4644d30f64d927378e98"
+          "sha256": "63633f07148ddf338026864a95e42b19c85cdbce06566bd5f0098ce854a55a2f"
         },
         {
           "id": "q0122-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0122/q0122-empty.json",
-          "sha256": "2ecba610faa0856f925d3207a7caad208f30457cd31d659e560cdecaeb2a1448"
+          "sha256": "411905ac7639f801cb6323b5bdaec4a6e58f4d4549ea909f79ba30afb258f61b"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -761,8 +758,8 @@
       "difficulty": "简单",
       "type": "独立编写",
       "title": "明确没有匹配条件的分类",
-      "context": "使用课程中小型缺失值示例数据练习明确没有匹配条件的分类。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "仅 value=10 标“十”，0标“零”，未满足时返回NULL；输出 id、label 按编号升序。\n输出列名称及顺序：id, label。按题设排序；参考排序键：id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "把 value 为 10 和 0 的记录分别标成中文，其余保持未标注。",
+      "requirements": "value 等于 10 标“十”，等于 0 标“零”，都不满足时返回 NULL，输出 id 和 label。\n输出列名称及顺序：id, label。",
       "datasetId": "q0123-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -801,26 +798,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT id,CASE WHEN value=10 THEN '十' WHEN value=0 THEN '零' END AS label FROM nullable_values ORDER BY id",
-          "sqliteSql": "SELECT id,CASE WHEN value=10 THEN '十' WHEN value=0 THEN '零' END AS label FROM nullable_values ORDER BY id"
+          "mysqlSql": "SELECT id,CASE WHEN value=10 THEN '十' WHEN value=0 THEN '零' END AS label FROM nullable_values",
+          "sqliteSql": "SELECT id,CASE WHEN value=10 THEN '十' WHEN value=0 THEN '零' END AS label FROM nullable_values"
         },
         {
-          "kind": "代数或函数等价",
-          "mysqlSql": "SELECT id,CASE WHEN NOT (value<>10) THEN '十' WHEN value=0 THEN '零' END AS label FROM nullable_values ORDER BY id",
-          "sqliteSql": "SELECT id,CASE WHEN NOT (value<>10) THEN '十' WHEN value=0 THEN '零' END AS label FROM nullable_values ORDER BY id",
-          "explanation": "用反向比较并取 NOT 表达相同三值逻辑。"
+          "kind": "独立方法等价",
+          "mysqlSql": "SELECT id,CASE value WHEN 10 THEN '十' WHEN 0 THEN '零' END AS label FROM nullable_values",
+          "sqliteSql": "SELECT id,CASE value WHEN 10 THEN '十' WHEN 0 THEN '零' END AS label FROM nullable_values"
         }
       ],
       "hints": [
-        "把业务规则按互斥条件顺序排列，并检查未满足条件的处理。",
-        "结合《CASE WHEN 分类》：按顺序检查 WHEN，返回首个为真的分支；ELSE 提供默认结果。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT id,CASE WHEN value=10 THEN '十' □□□ END AS label FROM nullable_values ORDER BY id"
+        "CASE 可以依次判断多个条件，取第一个成立的分支。",
+        "没有写 ELSE 时，所有条件都不满足会返回 NULL，不需要额外处理。",
+        "NULL 与 10、0 比较的结果都是未知，不会命中任何分支，也不要把 IS NULL 当作“零”。"
       ],
-      "explanation": "CASE 无 ELSE 时未匹配返回NULL，零与缺失须分别处理。\n执行思路：确认nullable_values的输入记录；输出id、label列；遵循题设排序和并列规则。\n公开夹具实际返回 4 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：用反向比较并取 NOT 表达相同三值逻辑。",
+      "explanation": "CASE WHEN value=10 THEN '十' WHEN value=0 THEN '零' END：从上到下取第一个成立的分支；都不成立且没有 ELSE 时返回 NULL。\n易错：把 value IS NULL 当作“零”，会把缺失值错标成“零”，真正等于 0 的记录反而没有标签。\n另一种写法：简单 CASE value WHEN 10 THEN … WHEN 0 THEN … END。",
       "commonErrors": [
         {
-          "sql": "SELECT id,CASE WHEN value=10 THEN '十' WHEN value IS NULL THEN '零' END AS label FROM nullable_values ORDER BY id",
-          "reason": "CASE 无 ELSE 时未匹配返回NULL，零与缺失须分别处理。",
+          "sql": "SELECT id,CASE WHEN value=10 THEN '十' WHEN value IS NULL THEN '零' END AS label FROM nullable_values",
+          "reason": "缺失值（NULL）不等于 0，把它标成“零”是错的。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -835,24 +831,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0123/q0123-public.json",
-          "sha256": "bbbb61ef6174864a9a51597b4330d81ef694f0fe2c6295a5f32dd70856db7502"
+          "sha256": "96cd0ae910ec73850693e35056dde3c1f97ada2d2b1af51cc179f7b041d65f13"
         },
         {
           "id": "q0123-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0123/q0123-boundary.json",
-          "sha256": "65ffa0afeb7c38478970d5a1696188fae5307e0aec9892940dcec8fc23a5ce2e"
+          "sha256": "0e602f72855febec85b18e5f1d7ebf3f818ee009acdb2607520e4d4e6ad6eca0"
         },
         {
           "id": "q0123-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0123/q0123-empty.json",
-          "sha256": "523f3b3d34e1a130c9bf483247cc5e260cf37217a7e90a2fe429c81095471cdc"
+          "sha256": "dbd37e1ca753fc8bf89e30d7a4a371c54f42bf8384cceecf0d604b153a0dc298"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -871,7 +867,7 @@
       "mysqlVerification": "未运行 MySQL 8.4",
       "validation": {
         "kind": "query",
-        "equivalentKind": "代数或函数等价",
+        "equivalentKind": "独立方法等价",
         "fixtures": [
           {
             "fixtureId": "q0123-public",
@@ -959,8 +955,8 @@
       "difficulty": "简单",
       "type": "独立编写",
       "title": "销售订单金额标识",
-      "context": "使用课程中小型订单数据练习销售订单金额标识。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "销售额大于等于1000标“大额”，小于1000标“普通”，NULL标“未知”；返回 id、sales_band 按编号升序。\n输出列名称及顺序：id, sales_band。按题设排序；参考排序键：id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "销售分析要给订单金额分档：大额、普通、未知。",
+      "requirements": "销售额大于等于 1000 标“大额”，小于 1000 标“普通”，销售额为 NULL 标“未知”，输出 id 和 sales_band。\n输出列名称及顺序：id, sales_band。",
       "datasetId": "q0125-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -1003,26 +999,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT id,CASE WHEN sales IS NULL THEN '未知' WHEN sales>=1000 THEN '大额' ELSE '普通' END AS sales_band FROM orders ORDER BY id",
-          "sqliteSql": "SELECT id,CASE WHEN sales IS NULL THEN '未知' WHEN sales>=1000 THEN '大额' ELSE '普通' END AS sales_band FROM orders ORDER BY id"
+          "mysqlSql": "SELECT id,CASE WHEN sales IS NULL THEN '未知' WHEN sales>=1000 THEN '大额' ELSE '普通' END AS sales_band FROM orders",
+          "sqliteSql": "SELECT id,CASE WHEN sales IS NULL THEN '未知' WHEN sales>=1000 THEN '大额' ELSE '普通' END AS sales_band FROM orders"
         },
         {
-          "kind": "代数或函数等价",
-          "mysqlSql": "SELECT id,CASE WHEN sales IS NULL THEN '未知' WHEN NOT (sales<1000) THEN '大额' ELSE '普通' END AS sales_band FROM orders ORDER BY id",
-          "sqliteSql": "SELECT id,CASE WHEN sales IS NULL THEN '未知' WHEN NOT (sales<1000) THEN '大额' ELSE '普通' END AS sales_band FROM orders ORDER BY id",
-          "explanation": "用反向比较并取 NOT 表达相同三值逻辑。"
+          "kind": "独立方法等价",
+          "mysqlSql": "SELECT id,CASE WHEN sales>=1000 THEN '大额' WHEN sales<1000 THEN '普通' ELSE '未知' END AS sales_band FROM orders",
+          "sqliteSql": "SELECT id,CASE WHEN sales>=1000 THEN '大额' WHEN sales<1000 THEN '普通' ELSE '未知' END AS sales_band FROM orders"
         }
       ],
       "hints": [
-        "把业务规则按互斥条件顺序排列，并检查未满足条件的处理。",
-        "结合《CASE WHEN 分类》：按顺序检查 WHEN，返回首个为真的分支；ELSE 提供默认结果。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT id,CASE WHEN sales IS NULL THEN '未知' WHEN □□□ THEN '大额' ELSE '普通' END AS sales_band FROM orders ORDER BY id"
+        "三种情况要分开处理，NULL 需要单独判断。",
+        "CASE 按顺序取第一个成立的分支，先处理 IS NULL，再比较金额大小。",
+        "“大于等于 1000”包含 1000 本身；NULL 与数字比较的结果是未知。"
       ],
-      "explanation": "应先判断缺失，门槛1000包含相等。\n执行思路：确认orders的输入记录；输出id、sales_band列；遵循题设排序和并列规则。\n公开夹具实际返回 5 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：用反向比较并取 NOT 表达相同三值逻辑。",
+      "explanation": "先用 sales IS NULL 处理缺失，再用 sales>=1000 标大额，其余为普通。NULL 要单独判断，否则 NULL 比较为未知，会落入 ELSE 被错标为“普通”。\n易错：把 >= 写成 >，恰好 1000 的订单会被标成“普通”。\n另一种写法：先写 >=1000 和 <1000 两个分支，最后用 ELSE 兜底成“未知”。",
       "commonErrors": [
         {
-          "sql": "SELECT id,CASE WHEN sales IS NULL THEN '未知' WHEN sales>1000 THEN '大额' ELSE '普通' END AS sales_band FROM orders ORDER BY id",
-          "reason": "应先判断缺失，门槛1000包含相等。",
+          "sql": "SELECT id,CASE WHEN sales IS NULL THEN '未知' WHEN sales>1000 THEN '大额' ELSE '普通' END AS sales_band FROM orders",
+          "reason": ">1000 漏掉了恰好等于 1000 的订单，题目要求大于等于。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -1037,24 +1032,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0125/q0125-public.json",
-          "sha256": "4073d1bca0cb42773e326b36d76c4740002a22103ed7c45725770e109d59b44a"
+          "sha256": "767e0fd4a7ea10f1805cbf0516c2b1f4a77b3ae8760a447b4d51578fb94fa9d2"
         },
         {
           "id": "q0125-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0125/q0125-boundary.json",
-          "sha256": "c6d1931bab051b371bb0b30738fd0661ca48e447cc864d0303094ab117f55ca9"
+          "sha256": "2e0287e84e9dc844547773030d4338738fdaada61c6dbbe75e2afcbac5304e03"
         },
         {
           "id": "q0125-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0125/q0125-empty.json",
-          "sha256": "68236cf1c347456ae4bd324df298034d0154d487b66f2c5a00926924434e2063"
+          "sha256": "0ed5bf06ec49a2fa01d48d89c4a8e77fbdf2e9f638511a0fd3d6cb77294495db"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -1073,7 +1068,7 @@
       "mysqlVerification": "未运行 MySQL 8.4",
       "validation": {
         "kind": "query",
-        "equivalentKind": "代数或函数等价",
+        "equivalentKind": "独立方法等价",
         "fixtures": [
           {
             "fixtureId": "q0125-public",
@@ -1541,15 +1536,15 @@
       "difficulty": "中等",
       "type": "代码纠错",
       "title": "库存报警标签",
-      "context": "使用课程中小型商品数据练习库存报警标签。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "下面提供的初始代码存在逻辑、语法或结构错误。请修改整段代码，使其满足以下要求。\n库存0标“缺货”，1至49标“偏低”，50及以上标“充足”，NULL标“未知”；输出 product_id、alert 按编号升序。\n输出列名称及顺序：product_id, alert。按题设排序；参考排序键：product_id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "仓储要给库存打报警标签：缺货、偏低、充足，库存未知的单独标记。",
+      "requirements": "下面的代码想按库存打标签：库存 0 为“缺货”，1 至 49 为“偏低”，50 及以上为“充足”，库存为 NULL 为“未知”，但有的标签不对。请修改代码，输出 product_id 和 alert。\n输出列名称及顺序：product_id, alert。",
       "datasetId": "q0128-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
       "sourceTables": [
         "products"
       ],
-      "initialCode": "SELECT product_id,CASE WHEN stock IS NULL THEN '未知' WHEN stock<50 THEN '偏低' WHEN stock=0 THEN '缺货' ELSE '充足' END AS alert FROM products ORDER BY product_id",
+      "initialCode": "SELECT product_id,CASE WHEN stock IS NULL THEN '未知' WHEN stock<50 THEN '偏低' WHEN stock=0 THEN '缺货' ELSE '充足' END AS alert FROM products",
       "options": [],
       "acceptedBlanks": [],
       "expectedOutput": {
@@ -1589,26 +1584,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT product_id,CASE WHEN stock IS NULL THEN '未知' WHEN stock=0 THEN '缺货' WHEN stock<50 THEN '偏低' ELSE '充足' END AS alert FROM products ORDER BY product_id",
-          "sqliteSql": "SELECT product_id,CASE WHEN stock IS NULL THEN '未知' WHEN stock=0 THEN '缺货' WHEN stock<50 THEN '偏低' ELSE '充足' END AS alert FROM products ORDER BY product_id"
+          "mysqlSql": "SELECT product_id,CASE WHEN stock IS NULL THEN '未知' WHEN stock=0 THEN '缺货' WHEN stock<50 THEN '偏低' ELSE '充足' END AS alert FROM products",
+          "sqliteSql": "SELECT product_id,CASE WHEN stock IS NULL THEN '未知' WHEN stock=0 THEN '缺货' WHEN stock<50 THEN '偏低' ELSE '充足' END AS alert FROM products"
         },
         {
           "kind": "代数或函数等价",
-          "mysqlSql": "SELECT product_id,CASE WHEN stock IS NULL THEN '未知' WHEN NOT (stock<>0) THEN '缺货' WHEN stock<50 THEN '偏低' ELSE '充足' END AS alert FROM products ORDER BY product_id",
-          "sqliteSql": "SELECT product_id,CASE WHEN stock IS NULL THEN '未知' WHEN NOT (stock<>0) THEN '缺货' WHEN stock<50 THEN '偏低' ELSE '充足' END AS alert FROM products ORDER BY product_id",
-          "explanation": "用反向比较并取 NOT 表达相同三值逻辑。"
+          "mysqlSql": "SELECT product_id,CASE WHEN stock IS NULL THEN '未知' WHEN stock=0 THEN '缺货' WHEN stock BETWEEN 1 AND 49 THEN '偏低' ELSE '充足' END AS alert FROM products",
+          "sqliteSql": "SELECT product_id,CASE WHEN stock IS NULL THEN '未知' WHEN stock=0 THEN '缺货' WHEN stock BETWEEN 1 AND 49 THEN '偏低' ELSE '充足' END AS alert FROM products"
         }
       ],
       "hints": [
-        "把业务规则按互斥条件顺序排列，并检查未满足条件的处理。",
-        "结合《CASE WHEN 分类》：按顺序检查 WHEN，返回首个为真的分支；ELSE 提供默认结果。",
-        "检查初始代码的 WHEN stock=0 THEN '缺货' WHEN stock<50 THEN '偏低' 对应的业务规则。窄条件0必须放在广条件小于50之前。"
+        "CASE 从上到下取第一个成立的分支，分支的顺序会影响结果。",
+        "库存为 0 同时满足“小于 50”和“等于 0”，想想哪个条件应该先判断。",
+        "把更具体的条件放在更宽泛的条件前面。"
       ],
-      "explanation": "窄条件0必须放在广条件小于50之前。\n执行思路：确认products的输入记录；输出product_id、alert列；遵循题设排序和并列规则。\n公开夹具实际返回 6 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：用反向比较并取 NOT 表达相同三值逻辑。",
+      "explanation": "库存 0 既满足 stock=0 也满足 stock<50，CASE 取第一个成立的分支，所以必须先判断 stock=0，再判断 stock<50。初始代码把 stock<50 放在前面，库存 0 被标成“偏低”，“缺货”分支永远用不到。",
       "commonErrors": [
         {
-          "sql": "SELECT product_id,CASE WHEN stock IS NULL THEN '未知' WHEN stock<50 THEN '偏低' WHEN stock=0 THEN '缺货' ELSE '充足' END AS alert FROM products ORDER BY product_id",
-          "reason": "窄条件0必须放在广条件小于50之前。",
+          "sql": "SELECT product_id,CASE WHEN stock IS NULL THEN '未知' WHEN stock<50 THEN '偏低' WHEN stock=0 THEN '缺货' ELSE '充足' END AS alert FROM products",
+          "reason": "更宽泛的 stock<50 写在前面，库存为 0 的商品被标成“偏低”，“缺货”分支永远不会命中。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -1623,24 +1617,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0128/q0128-public.json",
-          "sha256": "379b3aed995ed2cd88ceec5251d07860db5d8e18d0c1f8458ea80ae654949a2e"
+          "sha256": "ad5c5d706b3e46268f31442a2de7a119508295ec807b9ecc927dd711ff4b4a96"
         },
         {
           "id": "q0128-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0128/q0128-boundary.json",
-          "sha256": "306a40db7d7d9de323e3f618f69d07370d0f07358adc3a1f5091992de29821c4"
+          "sha256": "9d6754541c5b8d60ee8d13508264ad55e062983c625a818b9792ec7d3838c8f8"
         },
         {
           "id": "q0128-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0128/q0128-empty.json",
-          "sha256": "cce403157c34eba36b475e477a5127acdbf98222a5401a76fd81ab3904f0182c"
+          "sha256": "314378991de202237cddd6c6b08e7f5a9cc5f86321adb9efa0b24b9c696959cb"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -1744,8 +1738,8 @@
       "difficulty": "中等",
       "type": "业务情景",
       "title": "门店一月二月销售并列展示",
-      "context": "区域经理想在同一行比较门店两个月份的销售额，以便发现业绩变化。",
-      "requirements": "按门店（orders 内出现的）返回 store_id、jan_sales、feb_sales，按日期月份条件分别求和，未匹配为0，按门店升序。\n输出列名称及顺序：store_id, jan_sales, feb_sales。按题设排序；参考排序键：store_id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "context": "财务想把每个门店一月和二月的销售额并排比较。",
+      "requirements": "按订单中出现的门店，返回 store_id、一月销售额 jan_sales 和二月销售额 feb_sales（按订单月份条件分别求和，没有符合的为 0）。\n输出列名称及顺序：store_id, jan_sales, feb_sales。",
       "datasetId": "q0130-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -1779,26 +1773,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT store_id,SUM(CASE WHEN SUBSTR(order_date,1,7)='2026-01' THEN COALESCE(sales,0) ELSE 0 END) AS jan_sales,SUM(CASE WHEN SUBSTR(order_date,1,7)='2026-02' THEN COALESCE(sales,0) ELSE 0 END) AS feb_sales FROM orders GROUP BY store_id ORDER BY store_id",
-          "sqliteSql": "SELECT store_id,SUM(CASE WHEN SUBSTR(order_date,1,7)='2026-01' THEN COALESCE(sales,0) ELSE 0 END) AS jan_sales,SUM(CASE WHEN SUBSTR(order_date,1,7)='2026-02' THEN COALESCE(sales,0) ELSE 0 END) AS feb_sales FROM orders GROUP BY store_id ORDER BY store_id"
+          "mysqlSql": "SELECT store_id,SUM(CASE WHEN SUBSTR(order_date,1,7)='2026-01' THEN COALESCE(sales,0) ELSE 0 END) AS jan_sales,SUM(CASE WHEN SUBSTR(order_date,1,7)='2026-02' THEN COALESCE(sales,0) ELSE 0 END) AS feb_sales FROM orders GROUP BY store_id",
+          "sqliteSql": "SELECT store_id,SUM(CASE WHEN SUBSTR(order_date,1,7)='2026-01' THEN COALESCE(sales,0) ELSE 0 END) AS jan_sales,SUM(CASE WHEN SUBSTR(order_date,1,7)='2026-02' THEN COALESCE(sales,0) ELSE 0 END) AS feb_sales FROM orders GROUP BY store_id"
         },
         {
-          "kind": "关系结构等价",
-          "mysqlSql": "SELECT store_id,SUM(CASE WHEN SUBSTR(order_date,1,7)='2026-01' THEN COALESCE(sales,0) ELSE 0 END) AS jan_sales,SUM(CASE WHEN SUBSTR(order_date,1,7)='2026-02' THEN COALESCE(sales,0) ELSE 0 END) AS feb_sales FROM (SELECT * FROM orders) AS orders GROUP BY store_id ORDER BY store_id",
-          "sqliteSql": "SELECT store_id,SUM(CASE WHEN SUBSTR(order_date,1,7)='2026-01' THEN COALESCE(sales,0) ELSE 0 END) AS jan_sales,SUM(CASE WHEN SUBSTR(order_date,1,7)='2026-02' THEN COALESCE(sales,0) ELSE 0 END) AS feb_sales FROM (SELECT * FROM orders) AS orders GROUP BY store_id ORDER BY store_id",
-          "explanation": "先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。"
+          "kind": "独立方法等价",
+          "mysqlSql": "SELECT store_id,SUM(CASE WHEN order_date>='2026-01-01' AND order_date<'2026-02-01' THEN COALESCE(sales,0) ELSE 0 END) AS jan_sales,SUM(CASE WHEN order_date>='2026-02-01' AND order_date<'2026-03-01' THEN COALESCE(sales,0) ELSE 0 END) AS feb_sales FROM orders GROUP BY store_id",
+          "sqliteSql": "SELECT store_id,SUM(CASE WHEN order_date>='2026-01-01' AND order_date<'2026-02-01' THEN COALESCE(sales,0) ELSE 0 END) AS jan_sales,SUM(CASE WHEN order_date>='2026-02-01' AND order_date<'2026-03-01' THEN COALESCE(sales,0) ELSE 0 END) AS feb_sales FROM orders GROUP BY store_id"
         }
       ],
       "hints": [
-        "把业务规则按互斥条件顺序排列，并检查未满足条件的处理。",
-        "结合《IF 与条件聚合》：MySQL IF(condition,a,b) 可用于简单二选一；CASE 更通用。SUM(CASE...) 可在同一查询统计不同子集。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT store_id,SUM(CASE WHEN SUBSTR(order_date,1,7)='2026-01' THEN COALESCE(sales,0) ELSE 0 END) AS jan_sales,SUM(CASE WHEN SUBSTR(order_date,1,7)='□□□' THEN COALESCE(sales,0) ELSE 0 END) AS feb_sales FROM orders GROUP BY store_id ORDER BY store_id"
+        "要在同一行并排显示两个月份，需要条件聚合：用 CASE 决定每一行算不算某个月。",
+        "SUM(CASE WHEN 条件 THEN 金额 ELSE 0 END) 只累加满足条件的金额，两个月各写一列。",
+        "两列的月份条件要分别对应一月和二月，不要写成同一个月。"
       ],
-      "explanation": "两个指标必须分别定义月份，不能重复使用一月条件。\n执行思路：确认orders的输入记录；按指定键分组后计算聚合值；输出store_id、jan_sales、feb_sales列；遵循题设排序和并列规则。\n公开夹具实际返回 2 行、3 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
+      "explanation": "对每个门店分组后，SUM(CASE WHEN 月份='2026-01' THEN 销售额 ELSE 0 END) 只累加一月的金额，二月同理；COALESCE(sales,0) 避免 NULL 影响累加。一次分组就得到两个月的并排结果。\n易错：两列写了相同的月份条件，二月一列会重复一月的数字。",
       "commonErrors": [
         {
-          "sql": "SELECT store_id,SUM(CASE WHEN SUBSTR(order_date,1,7)='2026-01' THEN COALESCE(sales,0) ELSE 0 END) AS jan_sales,SUM(CASE WHEN SUBSTR(order_date,1,7)='2026-01' THEN COALESCE(sales,0) ELSE 0 END) AS feb_sales FROM orders GROUP BY store_id ORDER BY store_id",
-          "reason": "两个指标必须分别定义月份，不能重复使用一月条件。",
+          "sql": "SELECT store_id,SUM(CASE WHEN SUBSTR(order_date,1,7)='2026-01' THEN COALESCE(sales,0) ELSE 0 END) AS jan_sales,SUM(CASE WHEN SUBSTR(order_date,1,7)='2026-01' THEN COALESCE(sales,0) ELSE 0 END) AS feb_sales FROM orders GROUP BY store_id",
+          "reason": "两列用了同一个月份条件，二月一列重复了一月的数字。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -1813,24 +1806,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0130/q0130-public.json",
-          "sha256": "cf549be11992b7076ca9439998a5cbc9c913e86c7be755784270bee2444c17c9"
+          "sha256": "92024234d9fc6901cec8f8c636a2bb8855161bd8afb09e58030c5e2427966039"
         },
         {
           "id": "q0130-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0130/q0130-boundary.json",
-          "sha256": "f65488984fa85ff172a3d4ea903c5c98a030618fde1c0a4f6112552a57f6b668"
+          "sha256": "5138dce384fc84ac2b4062bb86d1b72f47f7a3f1d865dd145741f944121db738"
         },
         {
           "id": "q0130-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0130/q0130-empty.json",
-          "sha256": "08f5a58f19b1a63449f8a4605f2fd70285e6be968d1079cb5d58a2917a605b79"
+          "sha256": "9156757591dfb6d50f8edd542f4687af891089f791ba7e2c12bf758d1edf2938"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -1849,7 +1842,7 @@
       "mysqlVerification": "未运行 MySQL 8.4",
       "validation": {
         "kind": "query",
-        "equivalentKind": "关系结构等价",
+        "equivalentKind": "独立方法等价",
         "fixtures": [
           {
             "fixtureId": "q0130-public",
