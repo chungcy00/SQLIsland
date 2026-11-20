@@ -1,0 +1,199 @@
+{
+  "schemaVersion": 1,
+  "id": "kp07-02",
+  "sourceBatch": "unified73",
+  "teachingKind": "syntax",
+  "conceptBlocks": [
+    {
+      "type": "paragraph",
+      "text": "WHERE 和 HAVING 都能排除数据，但处理对象不同。WHERE 在逻辑上先筛选输入行，决定哪些交易参与后续统计；HAVING 在分组聚合之后筛选统计结果。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "比如只统计二月订单，应先按日期筛行；如果要求类别销售合计超过1000，则必须等组内金额计算完成再判断。两个条件可以同时存在。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "将合计阈值误写为单笔金额阈值会改变分子和样本范围，得到完全不同的报告。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "聚合查询没有 GROUP BY 时也可以使用 HAVING 判断整体聚合结果，并非所有 HAVING 都必须配合显式分组。",
+      "emphasis": []
+    }
+  ],
+  "syntax": {
+    "purpose": "WHERE 筛选参与汇总的行；GROUP BY 划分统计组；HAVING 筛选汇总后的组；threshold 组级指标阈值。"
+  },
+  "dataDescriptions": {
+    "orders": "共 5 行；字段：id、category、sales、store_id、order_date、customer_id。"
+  },
+  "problem": "主管希望查看全部示例订单中销售总额超过1000的商品类别。这里1000是类别合计门槛，不是单笔订单金额门槛。",
+  "methodBlocks": [
+    {
+      "type": "paragraph",
+      "text": "先用 GROUP BY category 建立类别粒度，再用 SUM(sales) 计算每组总额。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "HAVING SUM(sales) > 1000 只保留合计达标的组，其中严格大于意味着等于1000不保留。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "若还需要限制二月销售，则先在 WHERE 中加入日期范围，再执行相同分组与组筛选。下面展示先筛单笔金额会产生何种差异。",
+      "emphasis": []
+    }
+  ],
+  "breakdown": [
+    {
+      "kind": "fragment",
+      "title": "指定来源",
+      "sql": "FROM orders",
+      "purpose": "从 orders 读取输入数据。",
+      "reason": "后面的子句都基于这里得到的行。"
+    },
+    {
+      "kind": "fragment",
+      "title": "分组",
+      "sql": "GROUP BY category",
+      "purpose": "按 category 把行归入各个分组。",
+      "reason": "聚合函数在每个分组内分别计算。"
+    },
+    {
+      "kind": "fragment",
+      "title": "筛选分组",
+      "sql": "HAVING SUM(sales) > 1000",
+      "purpose": "仅保留满足 SUM(sales) > 1000 的分组。",
+      "reason": "聚合值在分组之后才存在，所以要用 HAVING 而不是 WHERE。"
+    },
+    {
+      "kind": "fragment",
+      "title": "选择输出",
+      "sql": "SELECT category, SUM(sales) AS total_sales",
+      "purpose": "输出 category, SUM(sales) AS total_sales。",
+      "reason": "输出列的顺序与别名决定结果表的形状。"
+    },
+    {
+      "kind": "fragment",
+      "title": "排序",
+      "sql": "ORDER BY total_sales DESC;",
+      "purpose": "按 total_sales DESC 排列结果。",
+      "reason": "查询结果的默认行序没有保证，需要显式排序。"
+    }
+  ],
+  "completeCode": {
+    "mysqlSql": "SELECT category, SUM(sales) AS total_sales FROM orders GROUP BY category HAVING SUM(sales) > 1000 ORDER BY total_sales DESC;",
+    "sqliteSql": "SELECT category, SUM(sales) AS total_sales FROM orders GROUP BY category HAVING SUM(sales) > 1000 ORDER BY total_sales DESC;"
+  },
+  "expectedResult": {
+    "columns": [
+      "category",
+      "total_sales"
+    ],
+    "rows": [
+      [
+        "日用品",
+        1500
+      ],
+      [
+        "护肤品",
+        1400
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "resultBlocks": [
+    {
+      "type": "paragraph",
+      "text": "日用品1500、护肤品1400保留；化妆品700排除。护肤品的两笔订单都低于1000，但组内相加超过门槛，因此不能先筛单笔金额。结果仍为类别粒度。",
+      "emphasis": []
+    }
+  ],
+  "extensions": [
+    {
+      "label": "错误口径对照：先筛单笔",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "此查询语法有效，但回答的是不同问题，护肤品被错误排除。",
+          "emphasis": []
+        }
+      ],
+      "sql": "SELECT category, SUM(sales) AS total_sales FROM orders WHERE sales > 1000 GROUP BY category ORDER BY total_sales DESC;",
+      "result": {
+        "columns": [
+          "category",
+          "total_sales"
+        ],
+        "rows": [
+          [
+            "日用品",
+            1500
+          ]
+        ]
+      }
+    },
+    {
+      "label": "组合日期与组阈值",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "仅二月订单参与汇总，之后仍以类别合计超过1000筛选。",
+          "emphasis": []
+        }
+      ],
+      "sql": "SELECT category, SUM(sales) AS total_sales FROM orders WHERE order_date >= '2026-02-01' AND order_date < '2026-03-01' GROUP BY category HAVING SUM(sales) > 1000 ORDER BY total_sales DESC;",
+      "result": {
+        "columns": [
+          "category",
+          "total_sales"
+        ],
+        "rows": [
+          [
+            "日用品",
+            1500
+          ]
+        ]
+      }
+    }
+  ],
+  "cautions": {
+    "comparison": [
+      {
+        "type": "paragraph",
+        "text": "WHERE sales > 1000 筛选单笔金额；HAVING SUM(sales) > 1000 筛选类别合计，两者业务含义不同。",
+        "emphasis": []
+      }
+    ],
+    "example": [
+      {
+        "type": "paragraph",
+        "text": "WHERE SUM(sales) > 1000；或先使用 WHERE sales > 1000 再汇总以回答类别门槛问题。",
+        "emphasis": []
+      }
+    ],
+    "reason": [],
+    "correction": [
+      {
+        "type": "paragraph",
+        "text": "组级聚合阈值用 HAVING；明细日期、状态等条件放 WHERE。",
+        "emphasis": []
+      }
+    ],
+    "notes": [
+      {
+        "type": "paragraph",
+        "text": "逻辑教学顺序为来源、行筛选、分组聚合、组筛选、输出、排序，实际物理执行计划可能不同。",
+        "emphasis": []
+      }
+    ]
+  },
+  "sourcePath": "source/unified73/kp07-02.json",
+  "sourceSha256": "89604834cc0cdc75787dfe9faf4d4648ecc9a98058d1dea045e90e9368b0e280"
+}

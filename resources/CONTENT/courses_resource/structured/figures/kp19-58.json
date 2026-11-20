@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "id": "kp19-58",
+  "lessonSha256": "aabdd5c0e046d431cea1d12f473ada3146dd69da719116b511c7751e471cd874",
+  "figures": [
+    {
+      "id": "kp19-58-clauses",
+      "slot": "syntax",
+      "kind": "clause-map",
+      "title": "示例查询的几个部分",
+      "sql": "WITH billed AS (\n  SELECT x.po_item_id,SUM(x.quantity_billed) billed,SUM(x.quantity_billed*x.unit_price_cents) billed_cents\n  FROM supplier_invoice_items x JOIN supplier_invoices f ON f.supplier_invoice_id=x.supplier_invoice_id\n  WHERE f.invoice_date<='2025-12-31' GROUP BY x.po_item_id\n), checked AS (\n  SELECT v.po_item_id,v.po_id,v.supplier_id,v.product_id,v.quantity_ordered,v.accepted,\n    COALESCE(b.billed,0) billed,COALESCE(b.billed_cents,0) billed_cents,v.accepted*v.unit_price_cents expected_cents\n  FROM v_po_lines v LEFT JOIN billed b ON b.po_item_id=v.po_item_id\n  WHERE v.order_date BETWEEN '2025-01-01' AND '2025-12-31'\n)\nSELECT po_item_id,po_id,supplier_id,product_id,quantity_ordered,accepted,billed,billed_cents,expected_cents,\n  billed_cents-expected_cents variance_cents FROM checked\nWHERE quantity_ordered<>accepted OR accepted<>billed OR billed_cents<>expected_cents ORDER BY po_item_id",
+      "parts": [
+        {
+          "role": "cte",
+          "label": "中间结果",
+          "sql": "WITH billed AS (\n  SELECT x.po_item_id,SUM(x.quantity_billed) billed,SUM(x.quantity_billed*x.unit_price_cents) billed_cents\n  FROM supplier_invoice_items x JOIN supplier_invoices f ON f.supplier_invoice_id=x.supplier_invoice_id\n  WHERE f.invoice_date<='2025-12-31' GROUP BY x.po_item_id\n),",
+          "note": "先把名为 billed 的中间结果算出来，供后面的查询引用。"
+        },
+        {
+          "role": "cte",
+          "label": "中间结果",
+          "sql": "checked AS (\n  SELECT v.po_item_id,v.po_id,v.supplier_id,v.product_id,v.quantity_ordered,v.accepted,\n    COALESCE(b.billed,0) billed,COALESCE(b.billed_cents,0) billed_cents,v.accepted*v.unit_price_cents expected_cents\n  FROM v_po_lines v LEFT JOIN billed b ON b.po_item_id=v.po_item_id\n  WHERE v.order_date BETWEEN '2025-01-01' AND '2025-12-31'\n)",
+          "note": "先把名为 checked 的中间结果算出来，供后面的查询引用。"
+        },
+        {
+          "role": "select",
+          "label": "取数",
+          "sql": "SELECT po_item_id,po_id,supplier_id,product_id,quantity_ordered,accepted,billed,billed_cents,expected_cents,\n  billed_cents-expected_cents variance_cents",
+          "note": "输出查询需要的列与计算表达式。"
+        },
+        {
+          "role": "from",
+          "label": "来源",
+          "sql": "FROM checked",
+          "note": "从 checked 读取输入数据。"
+        },
+        {
+          "role": "where",
+          "label": "筛选",
+          "sql": "WHERE quantity_ordered<>accepted OR accepted<>billed OR billed_cents<>expected_cents",
+          "note": "仅保留满足条件的行。"
+        },
+        {
+          "role": "order",
+          "label": "排序",
+          "sql": "ORDER BY po_item_id",
+          "note": "按 po_item_id 排列结果。"
+        }
+      ]
+    }
+  ]
+}

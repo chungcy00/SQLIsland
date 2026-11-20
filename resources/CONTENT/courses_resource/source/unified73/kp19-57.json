@@ -1,0 +1,902 @@
+{
+  "id": "kp19-57",
+  "chapterId": "ch19",
+  "title": "供应商履约率与交付表现",
+  "learningObjective": "能够按采购行与供应商计算准时足量率、完整交付率、质量合格率，并定位逾期及未到齐记录。",
+  "prerequisites": [
+    "kp19-52",
+    "kp19-56"
+  ],
+  "concept": "采购行是履约计数单位，收货件数是质量计量单位。准时足量率=承诺日及之前累计合格数量达到订购量的采购行数÷到期采购行数；完整交付率=截至年底累计合格数量达到订购量的采购行数÷到期采购行数；质量合格率=合格件数÷实际收货件数。分批收货不能按收货单数计履约；零实收时质量率留空。",
+  "syntax": "SELECT supplier_id,COUNT(*) due_lines,ROUND(100.0*SUM(CASE WHEN on_time>=quantity_ordered THEN 1 ELSE 0 END)/COUNT(*),2) ontime_pct,ROUND(100.0*SUM(CASE WHEN accepted>=quantity_ordered THEN 1 ELSE 0 END)/COUNT(*),2) complete_pct,ROUND(100.0*SUM(accepted)/NULLIF(SUM(received),0),2) quality_pct FROM v_po_lines WHERE promised_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY supplier_id ORDER BY due_lines DESC, ontime_pct DESC, complete_pct DESC, quality_pct DESC",
+  "parameters": {
+    "统计截止日": "2025-12-31",
+    "金额": "整数马币分；比率按题设",
+    "输出粒度": "供应商"
+  },
+  "fixtureIds": [],
+  "datasetId": "procurement-v2",
+  "sourceTables": [
+    {
+      "name": "v_po_lines",
+      "columns": [
+        {
+          "name": "po_item_id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "po_id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "supplier_id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "warehouse_id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "order_date",
+          "type": "TEXT"
+        },
+        {
+          "name": "promised_date",
+          "type": "TEXT"
+        },
+        {
+          "name": "product_id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "quantity_ordered",
+          "type": "INTEGER"
+        },
+        {
+          "name": "unit_price_cents",
+          "type": "INTEGER"
+        },
+        {
+          "name": "ordered_cents",
+          "type": "派生"
+        },
+        {
+          "name": "received",
+          "type": "派生"
+        },
+        {
+          "name": "accepted",
+          "type": "派生"
+        },
+        {
+          "name": "on_time",
+          "type": "派生"
+        },
+        {
+          "name": "billed",
+          "type": "派生"
+        },
+        {
+          "name": "billed_cents",
+          "type": "派生"
+        }
+      ],
+      "rows": [
+        [
+          3077,
+          2633,
+          59,
+          3,
+          "2023-01-01",
+          "2023-01-06",
+          312,
+          33,
+          1076,
+          35508,
+          33,
+          33,
+          33,
+          33,
+          35508
+        ],
+        [
+          2479,
+          4775,
+          49,
+          1,
+          "2023-01-01",
+          "2023-01-19",
+          165,
+          10,
+          785,
+          7850,
+          10,
+          10,
+          0,
+          12,
+          9420
+        ],
+        [
+          9661,
+          4886,
+          2,
+          1,
+          "2023-01-01",
+          "2023-01-14",
+          413,
+          6,
+          1212,
+          7272,
+          6,
+          6,
+          6,
+          7,
+          8484
+        ]
+      ],
+      "previewOnly": true,
+      "rowCount": 9625
+    }
+  ],
+  "sourceTablesArePreview": true,
+  "mysqlSql": "SELECT supplier_id,COUNT(*) due_lines,ROUND(100.0*SUM(CASE WHEN on_time>=quantity_ordered THEN 1 ELSE 0 END)/COUNT(*),2) ontime_pct,ROUND(100.0*SUM(CASE WHEN accepted>=quantity_ordered THEN 1 ELSE 0 END)/COUNT(*),2) complete_pct,ROUND(100.0*SUM(accepted)/NULLIF(SUM(received),0),2) quality_pct FROM v_po_lines WHERE promised_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY supplier_id ORDER BY due_lines DESC, ontime_pct DESC, complete_pct DESC, quality_pct DESC",
+  "sqliteSql": "SELECT supplier_id,COUNT(*) due_lines,ROUND(100.0*SUM(CASE WHEN on_time>=quantity_ordered THEN 1 ELSE 0 END)/COUNT(*),2) ontime_pct,ROUND(100.0*SUM(CASE WHEN accepted>=quantity_ordered THEN 1 ELSE 0 END)/COUNT(*),2) complete_pct,ROUND(100.0*SUM(accepted)/NULLIF(SUM(received),0),2) quality_pct FROM v_po_lines WHERE promised_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY supplier_id ORDER BY due_lines DESC, ontime_pct DESC, complete_pct DESC, quality_pct DESC",
+  "executionSteps": [
+    "筛选期间到期采购行",
+    "按采购行累计合格与实收数量",
+    "标记准时及完整交付",
+    "按供应商计算三项比率"
+  ],
+  "useCase": "采购主管希望比较各供应商是否按承诺日期交足合格商品、截至年底是否最终交齐，以及到货质量是否稳定。统计2025年承诺到期的非取消采购行，截止2025-12-31；尚未到期的采购行不进入分母。",
+  "comparison": "准时率与完整率按采购行计数；质量率按件数加权；到齐日期不同于首次收货日期。",
+  "commonError": {
+    "example": "仅统计有收货的采购行，或将首次收货日期视作到齐日期。",
+    "correction": "保留无收货行，累计合格件数至订购量并核对承诺日期。"
+  },
+  "notes": "完整输出见 ../enterprise_reference/business_tasks/results/BP27.json；公开预览展示前12行。独立边界及场景仅在提交判题时使用。",
+  "compatibility": {
+    "status": "直接兼容（原生待验证）",
+    "detail": "本版本SQLite及sql.js WASM已实际复验，原生MySQL8.4尚未执行。"
+  },
+  "relatedQuestionIds": [
+    "q0277",
+    "q0278"
+  ],
+  "relatedFlashcardIds": [
+    "fc0142",
+    "fc0158",
+    "fc0175",
+    "fc0176"
+  ],
+  "relatedKnowledgePointIds": [
+    "kp07-01",
+    "kp08-01",
+    "kp14-01",
+    "kp15-01",
+    "kp06-01",
+    "kp09-01",
+    "kp10-01",
+    "kp12-01"
+  ],
+  "mysqlVerification": "未运行原生 MySQL 8.4",
+  "result": {
+    "columns": [
+      "supplier_id",
+      "due_lines",
+      "ontime_pct",
+      "complete_pct",
+      "quality_pct"
+    ],
+    "rows": [
+      [
+        49,
+        827,
+        64.33,
+        86.09,
+        98.61
+      ],
+      [
+        2,
+        555,
+        71.71,
+        84.68,
+        98.03
+      ],
+      [
+        48,
+        351,
+        37.04,
+        87.46,
+        99.08
+      ],
+      [
+        4,
+        217,
+        55.76,
+        87.1,
+        98.5
+      ],
+      [
+        29,
+        138,
+        70.29,
+        81.16,
+        97.56
+      ],
+      [
+        37,
+        119,
+        75.63,
+        93.28,
+        99.68
+      ],
+      [
+        30,
+        117,
+        55.56,
+        93.16,
+        99.72
+      ],
+      [
+        51,
+        95,
+        58.95,
+        80.0,
+        97.93
+      ],
+      [
+        43,
+        77,
+        44.16,
+        62.34,
+        92.32
+      ],
+      [
+        32,
+        66,
+        80.3,
+        90.91,
+        98.92
+      ],
+      [
+        16,
+        66,
+        51.52,
+        83.33,
+        98.87
+      ],
+      [
+        8,
+        58,
+        60.34,
+        65.52,
+        97.14
+      ],
+      [
+        1,
+        53,
+        49.06,
+        86.79,
+        99.86
+      ],
+      [
+        57,
+        48,
+        66.67,
+        87.5,
+        98.02
+      ],
+      [
+        23,
+        45,
+        42.22,
+        75.56,
+        98.56
+      ],
+      [
+        46,
+        40,
+        20.0,
+        85.0,
+        99.65
+      ],
+      [
+        20,
+        39,
+        51.28,
+        84.62,
+        99.58
+      ],
+      [
+        24,
+        38,
+        42.11,
+        76.32,
+        97.64
+      ],
+      [
+        28,
+        37,
+        37.84,
+        75.68,
+        98.13
+      ],
+      [
+        36,
+        36,
+        80.56,
+        97.22,
+        100.0
+      ],
+      [
+        47,
+        28,
+        25.0,
+        64.29,
+        95.5
+      ],
+      [
+        54,
+        27,
+        51.85,
+        55.56,
+        96.44
+      ],
+      [
+        44,
+        26,
+        61.54,
+        96.15,
+        100.0
+      ],
+      [
+        11,
+        24,
+        58.33,
+        75.0,
+        99.0
+      ],
+      [
+        9,
+        23,
+        52.17,
+        95.65,
+        99.84
+      ],
+      [
+        39,
+        22,
+        45.45,
+        72.73,
+        95.88
+      ],
+      [
+        22,
+        21,
+        33.33,
+        42.86,
+        91.86
+      ],
+      [
+        59,
+        18,
+        66.67,
+        100.0,
+        100.0
+      ],
+      [
+        41,
+        18,
+        33.33,
+        77.78,
+        98.05
+      ],
+      [
+        5,
+        17,
+        52.94,
+        52.94,
+        88.45
+      ],
+      [
+        7,
+        17,
+        47.06,
+        88.24,
+        100.0
+      ],
+      [
+        52,
+        17,
+        47.06,
+        70.59,
+        89.88
+      ],
+      [
+        26,
+        14,
+        28.57,
+        42.86,
+        92.23
+      ],
+      [
+        35,
+        14,
+        21.43,
+        57.14,
+        96.15
+      ],
+      [
+        3,
+        12,
+        50.0,
+        100.0,
+        100.0
+      ],
+      [
+        14,
+        11,
+        27.27,
+        27.27,
+        85.14
+      ],
+      [
+        53,
+        10,
+        70.0,
+        80.0,
+        97.56
+      ],
+      [
+        13,
+        9,
+        66.67,
+        100.0,
+        100.0
+      ],
+      [
+        33,
+        9,
+        66.67,
+        88.89,
+        100.0
+      ],
+      [
+        25,
+        9,
+        44.44,
+        66.67,
+        97.07
+      ],
+      [
+        15,
+        9,
+        44.44,
+        66.67,
+        95.57
+      ],
+      [
+        17,
+        9,
+        33.33,
+        100.0,
+        100.0
+      ],
+      [
+        27,
+        8,
+        75.0,
+        87.5,
+        99.78
+      ],
+      [
+        55,
+        7,
+        71.43,
+        85.71,
+        99.36
+      ],
+      [
+        38,
+        7,
+        71.43,
+        85.71,
+        96.55
+      ],
+      [
+        40,
+        7,
+        57.14,
+        71.43,
+        99.35
+      ],
+      [
+        58,
+        7,
+        42.86,
+        71.43,
+        99.84
+      ],
+      [
+        21,
+        7,
+        0.0,
+        100.0,
+        100.0
+      ],
+      [
+        56,
+        6,
+        83.33,
+        100.0,
+        100.0
+      ],
+      [
+        34,
+        6,
+        66.67,
+        66.67,
+        96.08
+      ],
+      [
+        50,
+        6,
+        50.0,
+        100.0,
+        100.0
+      ],
+      [
+        6,
+        5,
+        40.0,
+        60.0,
+        99.39
+      ],
+      [
+        12,
+        4,
+        75.0,
+        100.0,
+        100.0
+      ],
+      [
+        10,
+        3,
+        33.33,
+        100.0,
+        100.0
+      ],
+      [
+        31,
+        1,
+        100.0,
+        100.0,
+        100.0
+      ]
+    ],
+    "status": "SQLite实际执行（预览）",
+    "orderGuaranteed": true,
+    "totalRows": 55,
+    "fullResultPath": "../enterprise_reference/business_tasks/results/BP27.json"
+  },
+  "projectId": "procurement",
+  "taskId": "BP27",
+  "difficulty": "困难",
+  "crossGroup": null,
+  "mysqlVerificationScript": "../enterprise_reference/business_tasks/mysql_queries/BP27.sql",
+  "visualization": {
+    "kind": "stepFlow",
+    "steps": [
+      {
+        "id": "1",
+        "label": "按采购行预聚合收货"
+      },
+      {
+        "id": "2",
+        "label": "筛已到期"
+      },
+      {
+        "id": "3",
+        "label": "分别计算两种件数履约和质量指标"
+      }
+    ],
+    "sourceFixtureIds": [],
+    "resultColumns": [
+      "supplier_id",
+      "due_lines",
+      "ontime_pct",
+      "complete_pct",
+      "quality_pct"
+    ]
+  },
+  "primaryQuestionIds": [
+    "q0277"
+  ],
+  "primaryFlashcardIds": [
+    "fc0175",
+    "fc0176"
+  ],
+  "contentVersion": "4.2.1",
+  "mergedFrom": [
+    {
+      "id": "kp19-06",
+      "title": "采购：订购与收货差异"
+    },
+    {
+      "id": "kp19-28",
+      "title": "采购：供应商履约率"
+    },
+    {
+      "id": "kp19-29",
+      "title": "采购：交付延误与未到齐"
+    }
+  ],
+  "teaching": {
+    "problem": "采购主管希望比较各供应商是否按承诺日期交足合格商品、截至年底是否最终交齐，以及到货质量是否稳定。统计2025年承诺到期的非取消采购行，截止2025-12-31；尚未到期的采购行不进入分母。",
+    "codeExplanation": "原主查询使用已汇总至采购行的 v_po_lines，按承诺日期选择2025年到期采购行。每行的 on_time 是承诺日前（含当日）合格件数，accepted 是截止日合格件数，received 是截止日实收件数。用 CASE 产生0或1，再按供应商汇总；两项交付率以 COUNT(*) 为分母，质量率用合格总件数除以实收总件数，不平均各行质量率。构造该视图时，先把收货按采购行汇总，无收货以零计；截止日条件放在左连接或收货汇总内部，不能在外层 WHERE 删除无收货行。到齐日期先按日合计合格数量，再累计并取第一次达到订购量的日期。未到齐保留空日期，逾期以截止日减承诺日；提前到齐按零天处理。独立例子假设所有采购行均有效且到期、收货数量及合格数量非负。",
+    "resultExplanation": "教学数据中供应商1有3条到期行，仅第1行准时足量，准时率1÷3=33.33%；第1和第2行最终交齐，完整率2÷3=66.67%；实收21件、合格20件，质量率95.24%。供应商2有2条到期行，准时和完整率均为50%，实收8件全部合格，质量率100%。质量好不代表没有交付延误。第2行迟5天到齐；第3、5行截止日未到齐，逾期11天。原企业结果供应商1共53条到期行，准时49.06%、完整86.79%、质量99.86%；这些为原结果预览，未在本次重新执行。应结合订单规模、缺货影响和拒收原因判断改善优先级。",
+    "checkpoints": [
+      {
+        "name": "due_line_flags",
+        "label": "为到期采购行标记准时及到齐",
+        "sql": "SELECT po_item_id,supplier_id,quantity_ordered,received,accepted,\n CASE WHEN on_time>=quantity_ordered THEN 1 ELSE 0 END AS ontime_flag,\n CASE WHEN accepted>=quantity_ordered THEN 1 ELSE 0 END AS complete_flag\nFROM v_po_lines WHERE promised_date BETWEEN '2025-01-01' AND '2025-12-31' ORDER BY 1, 2, 3, 4, 5, 6, 7 LIMIT 3;",
+        "result": {
+          "columns": [
+            "po_item_id",
+            "supplier_id",
+            "quantity_ordered",
+            "received",
+            "accepted",
+            "ontime_flag",
+            "complete_flag"
+          ],
+          "rows": [
+            [
+              2,
+              48,
+              24,
+              24,
+              24,
+              1,
+              1
+            ],
+            [
+              3,
+              49,
+              13,
+              13,
+              13,
+              1,
+              1
+            ],
+            [
+              12,
+              57,
+              54,
+              54,
+              54,
+              1,
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "name": "supplier_totals",
+        "label": "按供应商累计行数、收货及接收数量",
+        "sql": "SELECT supplier_id,COUNT(*) AS due_lines,\n SUM(CASE WHEN on_time>=quantity_ordered THEN 1 ELSE 0 END) AS ontime_lines,\n SUM(CASE WHEN accepted>=quantity_ordered THEN 1 ELSE 0 END) AS complete_lines,\n SUM(accepted) AS accepted_units,SUM(received) AS received_units\nFROM v_po_lines WHERE promised_date BETWEEN '2025-01-01' AND '2025-12-31'\nGROUP BY supplier_id ORDER BY 1, 2, 3, 4, 5, 6 LIMIT 3;",
+        "result": {
+          "columns": [
+            "supplier_id",
+            "due_lines",
+            "ontime_lines",
+            "complete_lines",
+            "accepted_units",
+            "received_units"
+          ],
+          "rows": [
+            [
+              1,
+              53,
+              26,
+              46,
+              1438,
+              1440
+            ],
+            [
+              2,
+              555,
+              398,
+              470,
+              7957,
+              8117
+            ],
+            [
+              3,
+              12,
+              6,
+              12,
+              272,
+              272
+            ]
+          ]
+        }
+      }
+    ],
+    "mergedConcepts": [
+      {
+        "sourceId": "kp19-06",
+        "explanation": "一条采购行可有多次收货，先汇总实收和合格件数；无收货行仍保留。"
+      },
+      {
+        "sourceId": "kp19-28",
+        "explanation": "到期有效采购行为分母，承诺日前含当日累计合格量达到订购量才算准时足量；不是首次到货即准时。"
+      },
+      {
+        "sourceId": "kp19-29",
+        "explanation": "同日收货先汇总，累计合格量首次达到订购量时为到齐日期；未到齐留空，以截止日计算逾期。"
+      }
+    ],
+    "mergeExamples": [
+      {
+        "label": "分批收货汇总",
+        "explanation": "截止日限制放在左连接条件中，保留无收货记录。第一行实收11件，合格10件；第二行承诺日前仅合格4件。",
+        "sql": "WITH purchase_lines(line_id,supplier_id,ordered,promised) AS (\n VALUES (1,1,10,'2025-12-10'),(2,1,10,'2025-12-10'),(3,1,5,'2025-12-20'),(4,2,8,'2025-12-20'),(5,2,4,'2025-12-20')\n), receipts(line_id,receipt_date,received,accepted) AS (\n VALUES (1,'2025-12-05',6,6),(1,'2025-12-10',5,4),(2,'2025-12-09',4,4),(2,'2025-12-15',6,6),(4,'2025-12-20',8,8),(5,'2026-01-02',4,4)\n), totals AS (\n SELECT p.line_id,p.supplier_id,p.ordered,p.promised,\n COALESCE(SUM(r.received),0) received,COALESCE(SUM(r.accepted),0) accepted,\n COALESCE(SUM(CASE WHEN r.receipt_date<=p.promised THEN r.accepted ELSE 0 END),0) on_time\n FROM purchase_lines p LEFT JOIN receipts r ON r.line_id=p.line_id AND r.receipt_date<='2025-12-31'\n GROUP BY p.line_id,p.supplier_id,p.ordered,p.promised\n) SELECT line_id,ordered,received,accepted,on_time FROM totals ORDER BY ordered DESC, received DESC",
+        "result": {
+          "columns": [
+            "line_id",
+            "ordered",
+            "received",
+            "accepted",
+            "on_time"
+          ],
+          "rows": [
+            [
+              1,
+              10,
+              11,
+              10,
+              10
+            ],
+            [
+              2,
+              10,
+              10,
+              10,
+              4
+            ],
+            [
+              4,
+              8,
+              8,
+              8,
+              8
+            ],
+            [
+              3,
+              5,
+              0,
+              0,
+              0
+            ],
+            [
+              5,
+              4,
+              0,
+              0,
+              0
+            ]
+          ]
+        }
+      },
+      {
+        "label": "逐行判断履约",
+        "explanation": "分别判断准时足量和截止日完整，迟到但最终到齐属于完整而非准时。",
+        "sql": "WITH purchase_lines(line_id,supplier_id,ordered,promised) AS (\n VALUES (1,1,10,'2025-12-10'),(2,1,10,'2025-12-10'),(3,1,5,'2025-12-20'),(4,2,8,'2025-12-20'),(5,2,4,'2025-12-20')\n), receipts(line_id,receipt_date,received,accepted) AS (\n VALUES (1,'2025-12-05',6,6),(1,'2025-12-10',5,4),(2,'2025-12-09',4,4),(2,'2025-12-15',6,6),(4,'2025-12-20',8,8),(5,'2026-01-02',4,4)\n), totals AS (\n SELECT p.line_id,p.supplier_id,p.ordered,p.promised,\n COALESCE(SUM(r.received),0) received,COALESCE(SUM(r.accepted),0) accepted,\n COALESCE(SUM(CASE WHEN r.receipt_date<=p.promised THEN r.accepted ELSE 0 END),0) on_time\n FROM purchase_lines p LEFT JOIN receipts r ON r.line_id=p.line_id AND r.receipt_date<='2025-12-31'\n GROUP BY p.line_id,p.supplier_id,p.ordered,p.promised\n) SELECT line_id,CASE WHEN on_time>=ordered THEN 1 ELSE 0 END AS timely,CASE WHEN accepted>=ordered THEN 1 ELSE 0 END AS complete FROM totals ORDER BY timely DESC, complete DESC",
+        "result": {
+          "columns": [
+            "line_id",
+            "timely",
+            "complete"
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              1
+            ],
+            [
+              4,
+              1,
+              1
+            ],
+            [
+              2,
+              0,
+              1
+            ],
+            [
+              3,
+              0,
+              0
+            ],
+            [
+              5,
+              0,
+              0
+            ]
+          ]
+        }
+      },
+      {
+        "label": "完整供应商履约报表",
+        "explanation": "行数作为两项履约率的分母，质量合格率使用实际收货件数。",
+        "sql": "WITH purchase_lines(line_id,supplier_id,ordered,promised) AS (\n VALUES (1,1,10,'2025-12-10'),(2,1,10,'2025-12-10'),(3,1,5,'2025-12-20'),(4,2,8,'2025-12-20'),(5,2,4,'2025-12-20')\n), receipts(line_id,receipt_date,received,accepted) AS (\n VALUES (1,'2025-12-05',6,6),(1,'2025-12-10',5,4),(2,'2025-12-09',4,4),(2,'2025-12-15',6,6),(4,'2025-12-20',8,8),(5,'2026-01-02',4,4)\n), totals AS (\n SELECT p.line_id,p.supplier_id,p.ordered,p.promised,\n COALESCE(SUM(r.received),0) received,COALESCE(SUM(r.accepted),0) accepted,\n COALESCE(SUM(CASE WHEN r.receipt_date<=p.promised THEN r.accepted ELSE 0 END),0) on_time\n FROM purchase_lines p LEFT JOIN receipts r ON r.line_id=p.line_id AND r.receipt_date<='2025-12-31'\n GROUP BY p.line_id,p.supplier_id,p.ordered,p.promised\n) SELECT supplier_id,COUNT(*) due_lines,\n ROUND(100.0*SUM(CASE WHEN on_time>=ordered THEN 1 ELSE 0 END)/COUNT(*),2) ontime_pct,\n ROUND(100.0*SUM(CASE WHEN accepted>=ordered THEN 1 ELSE 0 END)/COUNT(*),2) complete_pct,\n ROUND(100.0*SUM(accepted)/NULLIF(SUM(received),0),2) quality_pct\n FROM totals GROUP BY supplier_id ORDER BY due_lines",
+        "result": {
+          "columns": [
+            "supplier_id",
+            "due_lines",
+            "ontime_pct",
+            "complete_pct",
+            "quality_pct"
+          ],
+          "rows": [
+            [
+              2,
+              2,
+              50.0,
+              50.0,
+              100.0
+            ],
+            [
+              1,
+              3,
+              33.33,
+              66.67,
+              95.24
+            ]
+          ]
+        }
+      },
+      {
+        "label": "到齐日期与逾期天数",
+        "explanation": "先按日聚合，再累计合格件数；未到齐以截止日计算逾期。准时到齐显示零天。",
+        "sql": "WITH purchase_lines(line_id,supplier_id,ordered,promised) AS (\n VALUES (1,1,10,'2025-12-10'),(2,1,10,'2025-12-10'),(3,1,5,'2025-12-20'),(4,2,8,'2025-12-20'),(5,2,4,'2025-12-20')\n), receipts(line_id,receipt_date,received,accepted) AS (\n VALUES (1,'2025-12-05',6,6),(1,'2025-12-10',5,4),(2,'2025-12-09',4,4),(2,'2025-12-15',6,6),(4,'2025-12-20',8,8),(5,'2026-01-02',4,4)\n), daily AS (\n SELECT line_id,receipt_date,SUM(accepted) accepted FROM receipts WHERE receipt_date<='2025-12-31' GROUP BY line_id,receipt_date\n), running AS (\n SELECT *,SUM(accepted) OVER(PARTITION BY line_id ORDER BY receipt_date ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) cumulative FROM daily\n), first_full AS (\n SELECT p.line_id,MIN(r.receipt_date) full_date FROM purchase_lines p LEFT JOIN running r ON r.line_id=p.line_id AND r.cumulative>=p.ordered GROUP BY p.line_id\n) SELECT p.line_id,f.full_date,MAX(0,CAST(julianday(COALESCE(f.full_date,'2025-12-31'))-julianday(p.promised) AS INTEGER)) late_days FROM purchase_lines p JOIN first_full f ON f.line_id=p.line_id ORDER BY full_date DESC",
+        "result": {
+          "columns": [
+            "line_id",
+            "full_date",
+            "late_days"
+          ],
+          "rows": [
+            [
+              4,
+              "2025-12-20",
+              0
+            ],
+            [
+              2,
+              "2025-12-15",
+              5
+            ],
+            [
+              1,
+              "2025-12-10",
+              0
+            ],
+            [
+              3,
+              null,
+              11
+            ],
+            [
+              5,
+              null,
+              11
+            ]
+          ]
+        }
+      }
+    ]
+  }
+}

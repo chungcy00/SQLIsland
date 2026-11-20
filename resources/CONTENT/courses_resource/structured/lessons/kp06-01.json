@@ -1,0 +1,185 @@
+{
+  "schemaVersion": 1,
+  "id": "kp06-01",
+  "sourceBatch": "unified73",
+  "teachingKind": "syntax",
+  "conceptBlocks": [
+    {
+      "type": "paragraph",
+      "text": "计数前先确认希望统计什么。一张订单表有五行，不代表五位客户；一列有四行，也不代表四个有效填报值。COUNT(*) 计算输入关系中的全部行，不检查任何指定字段是否缺失。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "COUNT(value) 只统计该字段非 NULL 的行，因此数值零仍然计入。COUNT(DISTINCT value) 在非空值中去重再计数，重复的10只算一次。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "三种写法都可以将多行压缩成一行统计结果；加上分组后则每组产生一个计数。若输入为空，三种计数均返回0。计数的对象与数据粒度必须一致：订单号用于数订单，客户号用于数客户；",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "若一笔订单有多行明细，直接数行会高估订单量。",
+      "emphasis": []
+    }
+  ],
+  "syntax": {
+    "purpose": "COUNT(*) 输入行数；COUNT(column_name) 指定列非空的行数；DISTINCT 对指定表达式的非空取值去重。"
+  },
+  "dataDescriptions": {
+    "nullable_values": "共 4 行；字段：id、value、note。"
+  },
+  "problem": "主管需要一份填报质量摘要：总共收到多少条记录、有多少条已填写数值、填写内容中有几种不同的数值。示例中 id 是记录编号，value 是待检查的数值，note 是备注。",
+  "methodBlocks": [
+    {
+      "type": "paragraph",
+      "text": "三个指标来自同一张表，可以在一次查询中同时计算。先观察 value 列，四行分别为 NULL、0、10、10；",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "COUNT(*) 不排除任何行，而 COUNT(value) 排除第一行。COUNT(DISTINCT value) 再将两个10视为一个取值。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "AS 为输出列赋予清晰的名称，方便报表使用。",
+      "emphasis": []
+    }
+  ],
+  "breakdown": [
+    {
+      "kind": "fragment",
+      "title": "指定来源",
+      "sql": "FROM nullable_values;",
+      "purpose": "从 nullable_values 读取输入数据。",
+      "reason": "后面的子句都基于这里得到的行。"
+    },
+    {
+      "kind": "fragment",
+      "title": "选择输出",
+      "sql": "SELECT COUNT(*) AS rows_count, COUNT(value) AS nonnull_count, COUNT(DISTINCT value) AS unique_count",
+      "purpose": "输出查询需要的列与计算表达式。",
+      "reason": "输出列的顺序与别名决定结果表的形状。"
+    }
+  ],
+  "completeCode": {
+    "mysqlSql": "SELECT COUNT(*) AS rows_count, COUNT(value) AS nonnull_count, COUNT(DISTINCT value) AS unique_count FROM nullable_values;",
+    "sqliteSql": "SELECT COUNT(*) AS rows_count, COUNT(value) AS nonnull_count, COUNT(DISTINCT value) AS unique_count FROM nullable_values;"
+  },
+  "expectedResult": {
+    "columns": [
+      "rows_count",
+      "nonnull_count",
+      "unique_count"
+    ],
+    "rows": [
+      [
+        4,
+        3,
+        2
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "resultBlocks": [
+    {
+      "type": "paragraph",
+      "text": "总行数4，有效值3，不同非空值2。缺失1条，零值是有效记录。若业务定义填写率为有效值数除以总记录数，本例为3/4；但不同数值个数不是不同客户数。查询没有删除或修改原数据。",
+      "emphasis": []
+    }
+  ],
+  "extensions": [
+    {
+      "label": "观察非空记录",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "排除缺失后仍保留零和两个重复值。",
+          "emphasis": []
+        }
+      ],
+      "sql": "SELECT id, value FROM nullable_values WHERE value IS NOT NULL ORDER BY value DESC;",
+      "result": {
+        "columns": [
+          "id",
+          "value"
+        ],
+        "rows": [
+          [
+            3,
+            10
+          ],
+          [
+            4,
+            10
+          ],
+          [
+            2,
+            0
+          ]
+        ]
+      }
+    },
+    {
+      "label": "观察不同非空取值",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "去重后只剩0和10；这正是不同取值计数的输入集合。",
+          "emphasis": []
+        }
+      ],
+      "sql": "SELECT DISTINCT value FROM nullable_values WHERE value IS NOT NULL ORDER BY value;",
+      "result": {
+        "columns": [
+          "value"
+        ],
+        "rows": [
+          [
+            0
+          ],
+          [
+            10
+          ]
+        ]
+      }
+    }
+  ],
+  "cautions": {
+    "comparison": [
+      {
+        "type": "paragraph",
+        "text": "COUNT(0) 统计非空常量在输入中出现的次数，与本例 COUNT(*) 相同，不是统计字段等于零的次数。",
+        "emphasis": []
+      }
+    ],
+    "example": [
+      {
+        "type": "paragraph",
+        "text": "把 COUNT(value) 当作总行数；或用 COUNT(0) 统计零值。",
+        "emphasis": []
+      }
+    ],
+    "reason": [],
+    "correction": [
+      {
+        "type": "paragraph",
+        "text": "总行数使用 COUNT(*)；零值计数先用 WHERE value = 0 筛选再 COUNT(*)。",
+        "emphasis": []
+      }
+    ],
+    "notes": [
+      {
+        "type": "paragraph",
+        "text": "真实业务中先确认一行代表订单还是明细；跨表连接后重新检查粒度。",
+        "emphasis": []
+      }
+    ]
+  },
+  "sourcePath": "source/unified73/kp06-01.json",
+  "sourceSha256": "226a264bb340741bdf54e277552b522b95355a6ac43391a0d51ba4c4eb66cd4a"
+}

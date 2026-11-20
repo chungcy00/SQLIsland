@@ -1,0 +1,218 @@
+{
+  "schemaVersion": 1,
+  "id": "kp04-02",
+  "sourceBatch": "unified73",
+  "teachingKind": "syntax",
+  "conceptBlocks": [
+    {
+      "type": "paragraph",
+      "text": "当查询结果很多时，LIMIT 限制最多返回多少行，OFFSET 指定跳过多少行。分页是在确定排序后截取结果。例如每页两条，第一页跳过0条，第二页跳过2条，第三页跳过4条；",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "一般偏移量为（页码减一）乘每页条数，页码从1开始。LIMIT 不会自动排序，也不会自动包含所有并列记录。若业务要求保留所有并列名次，不能直接用固定行数代替排名规则。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "分页依赖稳定排序；即使排序稳定，如果不同页查询之间数据发生变化，也可能重复或遗漏。高页码性能问题可后续了解，不属于本节重点。",
+      "emphasis": []
+    }
+  ],
+  "syntax": {
+    "purpose": "LIMIT 最多返回的行数；OFFSET 跳过的行数；ORDER BY 确定截取之前的排列顺序。"
+  },
+  "dataDescriptions": {
+    "products": "共 6 行；字段：product_id、product_name、category、price、stock。"
+  },
+  "problem": "商品管理页面每页显示两件商品，按价格从高到低排列，同价按商品名称升序。现在要读取第二页，而不是重新排序某个随机子集。",
+  "methodBlocks": [
+    {
+      "type": "paragraph",
+      "text": "先用上一节的价格降序、商品名称升序形成整个列表。OFFSET 2 跳过第1和第2条，LIMIT 2 只返回剩余列表的前两条。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "MySQL 另有 LIMIT offset,count 写法，本例 LIMIT 2,2 等价，但关键字形式更便于理解，也与本地兼容环境一致。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "补充例子显示第一页和第三页，方便核对相邻页边界。",
+      "emphasis": []
+    }
+  ],
+  "breakdown": [
+    {
+      "kind": "fragment",
+      "title": "指定来源",
+      "sql": "FROM products",
+      "purpose": "从 products 读取输入数据。",
+      "reason": "后面的子句都基于这里得到的行。"
+    },
+    {
+      "kind": "fragment",
+      "title": "选择输出",
+      "sql": "SELECT product_id, price",
+      "purpose": "输出 product_id, price。",
+      "reason": "输出列的顺序与别名决定结果表的形状。"
+    },
+    {
+      "kind": "fragment",
+      "title": "排序",
+      "sql": "ORDER BY price DESC, product_name",
+      "purpose": "按 price DESC, product_name 排列结果。",
+      "reason": "查询结果的默认行序没有保证，需要显式排序。"
+    },
+    {
+      "kind": "fragment",
+      "title": "截取行数",
+      "sql": "LIMIT 2 OFFSET 2;",
+      "purpose": "只返回 2 OFFSET 2 的行段。",
+      "reason": "先排序再截取，才能得到确定的行段。"
+    }
+  ],
+  "completeCode": {
+    "mysqlSql": "SELECT product_id, price FROM products ORDER BY price DESC, product_name LIMIT 2 OFFSET 2;",
+    "sqliteSql": "SELECT product_id, price FROM products ORDER BY price DESC, product_name LIMIT 2 OFFSET 2;"
+  },
+  "expectedResult": {
+    "columns": [
+      "product_id",
+      "price"
+    ],
+    "rows": [
+      [
+        5,
+        45
+      ],
+      [
+        3,
+        35
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "resultBlocks": [
+    {
+      "type": "paragraph",
+      "text": "完整排序为2、4、5、3、1、6，第二页因此返回编号5（45）和3（35）。第一页是2、4，第三页是1、6。固定数据下三个页面不重不漏；如果请求第四页，将没有记录。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "LIMIT 2 不保证返回两行，剩余不足时只返回实际存在的行。",
+      "emphasis": []
+    }
+  ],
+  "extensions": [
+    {
+      "label": "第一页",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "偏移0，读取排序后的前两条。",
+          "emphasis": []
+        }
+      ],
+      "sql": "SELECT product_id, price FROM products ORDER BY price DESC, product_name LIMIT 2 OFFSET 0;",
+      "result": {
+        "columns": [
+          "product_id",
+          "price"
+        ],
+        "rows": [
+          [
+            2,
+            89
+          ],
+          [
+            4,
+            65
+          ]
+        ]
+      }
+    },
+    {
+      "label": "第三页",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "偏移4，返回最后两条。",
+          "emphasis": []
+        }
+      ],
+      "sql": "SELECT product_id, price FROM products ORDER BY price DESC, product_name LIMIT 2 OFFSET 4;",
+      "result": {
+        "columns": [
+          "product_id",
+          "price"
+        ],
+        "rows": [
+          [
+            1,
+            15
+          ],
+          [
+            6,
+            15
+          ]
+        ]
+      }
+    },
+    {
+      "label": "超出数据范围",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "偏移6，已无剩余记录，因此返回空结果。",
+          "emphasis": []
+        }
+      ],
+      "sql": "SELECT product_id, price FROM products ORDER BY price DESC, product_name LIMIT 2 OFFSET 6;",
+      "result": {
+        "columns": [
+          "product_id",
+          "price"
+        ],
+        "rows": []
+      }
+    }
+  ],
+  "cautions": {
+    "comparison": [
+      {
+        "type": "paragraph",
+        "text": "LIMIT 截取行数，OFFSET 跳过行数；窗口排名按名次筛选，可能返回不同数量。",
+        "emphasis": []
+      }
+    ],
+    "example": [
+      {
+        "type": "paragraph",
+        "text": "SELECT product_id, price FROM products LIMIT 2; 并称其为最高价前两名。",
+        "emphasis": []
+      }
+    ],
+    "reason": [],
+    "correction": [
+      {
+        "type": "paragraph",
+        "text": "先用 ORDER BY price DESC, product_id ASC，再用 LIMIT 2。",
+        "emphasis": []
+      }
+    ],
+    "notes": [
+      {
+        "type": "paragraph",
+        "text": "在不同请求之间数据发生变化时，偏移分页仍可能出现重复或遗漏。",
+        "emphasis": []
+      }
+    ]
+  },
+  "sourcePath": "source/unified73/kp04-02.json",
+  "sourceSha256": "c79fe782c92d4d8df94dc052f8607eca6bbb9063ca04b2dd70e81471535ec10b"
+}

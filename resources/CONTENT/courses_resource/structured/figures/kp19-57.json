@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "id": "kp19-57",
+  "lessonSha256": "f8202801a52836af392da954b7add74e8c470a7c7358c8a10d2af90a10e65618",
+  "figures": [
+    {
+      "id": "kp19-57-clauses",
+      "slot": "syntax",
+      "kind": "clause-map",
+      "title": "示例查询的几个部分",
+      "sql": "SELECT supplier_id,COUNT(*) due_lines,ROUND(100.0*SUM(CASE WHEN on_time>=quantity_ordered THEN 1 ELSE 0 END)/COUNT(*),2) ontime_pct,ROUND(100.0*SUM(CASE WHEN accepted>=quantity_ordered THEN 1 ELSE 0 END)/COUNT(*),2) complete_pct,ROUND(100.0*SUM(accepted)/NULLIF(SUM(received),0),2) quality_pct FROM v_po_lines WHERE promised_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY supplier_id ORDER BY due_lines DESC, ontime_pct DESC, complete_pct DESC, quality_pct DESC",
+      "parts": [
+        {
+          "role": "select",
+          "label": "取数",
+          "sql": "SELECT supplier_id,COUNT(*) due_lines,ROUND(100.0*SUM(CASE WHEN on_time>=quantity_ordered THEN 1 ELSE 0 END)/COUNT(*),2) ontime_pct,ROUND(100.0*SUM(CASE WHEN accepted>=quantity_ordered THEN 1 ELSE 0 END)/COUNT(*),2) complete_pct,ROUND(100.0*SUM(accepted)/NULLIF(SUM(received),0),2) quality_pct",
+          "note": "输出查询需要的列与计算表达式。"
+        },
+        {
+          "role": "from",
+          "label": "来源",
+          "sql": "FROM v_po_lines",
+          "note": "从 v_po_lines 读取输入数据。"
+        },
+        {
+          "role": "where",
+          "label": "筛选",
+          "sql": "WHERE promised_date BETWEEN '2025-01-01' AND '2025-12-31'",
+          "note": "仅保留满足 promised_date BETWEEN '2025-01-01' AND '2025-12-31' 的行。"
+        },
+        {
+          "role": "group",
+          "label": "分组",
+          "sql": "GROUP BY supplier_id",
+          "note": "按 supplier_id 把行归入各个分组。"
+        },
+        {
+          "role": "order",
+          "label": "排序",
+          "sql": "ORDER BY due_lines DESC, ontime_pct DESC, complete_pct DESC, quality_pct DESC",
+          "note": "按指定顺序排列结果。"
+        }
+      ]
+    }
+  ]
+}

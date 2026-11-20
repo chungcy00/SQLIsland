@@ -1,0 +1,988 @@
+{
+  "schemaVersion": 1,
+  "id": "kp19-58",
+  "sourceBatch": "unified73",
+  "teachingKind": "business",
+  "conceptBlocks": [
+    {
+      "type": "paragraph",
+      "text": "三方核对比较订购数量、合格收货数量、原始开票数量及金额。应核金额=合格收货量×采购单价；金额差=原始开票金额−应核金额。数量不等或金额差非零均需复核，金额单位为分。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "后续贷项不在本题冲减。",
+      "emphasis": []
+    }
+  ],
+  "syntax": {
+    "purpose": "统计截止日 2025-12-31；金额 整数马币分；比率按题设；输出粒度 采购行。"
+  },
+  "dataDescriptions": {
+    "supplier_invoice_items": "共 3 行；字段：supplier_invoice_item_id、supplier_invoice_id、po_item_id、quantity_billed、unit_price_cents。",
+    "supplier_invoices": "共 3 行；字段：supplier_invoice_id、po_id、invoice_no、invoice_date、due_date。",
+    "v_po_lines": "共 3 行；字段：po_item_id、po_id、supplier_id、warehouse_id、order_date、promised_date、product_id、quantity_ordered、unit_price_cents、ordered_cents、received、accepted、on_time、billed、billed_cents。"
+  },
+  "problem": "采购主管需在2025年末逐采购行识别少收、超开票、未开票及金额异常。采购行是连接键；只纳入2025年非取消采购行，发票截止2025-12-31。",
+  "methodBlocks": [
+    {
+      "type": "paragraph",
+      "text": "原主查询从已汇总的 v_po_lines 获取采购与合格收货信息；",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "billed 将截止日前发票行按采购行分别合计数量和数量乘实际开票单价的金额，checked 左连接保证未开票仍保留，缺失开票量及金额补零。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "最终用三个 OR 条件识别差异，因此金额一致也可能存在数量异常。不能把收货明细和发票明细直接连接，否则多对多会放大金额。应核金额采用合格量而非订购量；",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "原始开票金额不扣贷项，净应付另见财务核对。补充库存核对以收货记录为键，先汇总关联入库流水，再比较合格接收量；无流水且全部拒收是正常情况。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "独立示例仅检查已有收货记录对应的流水，孤立流水需另做反向检查。",
+      "emphasis": []
+    }
+  ],
+  "breakdown": [
+    {
+      "kind": "runnable",
+      "title": "统一采购行的开票数量和金额",
+      "sql": "WITH billed AS (\n  SELECT x.po_item_id,SUM(x.quantity_billed) billed,SUM(x.quantity_billed*x.unit_price_cents) billed_cents\n  FROM supplier_invoice_items x JOIN supplier_invoices f ON f.supplier_invoice_id=x.supplier_invoice_id\n  WHERE f.invoice_date<='2025-12-31' GROUP BY x.po_item_id\n)\nSELECT * FROM billed ORDER BY 1, 2, 3 LIMIT 3;",
+      "purpose": "统一采购行的开票数量和金额（billed）的实际执行结果。",
+      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "sourceTables": [
+        {
+          "name": "supplier_invoice_items",
+          "columns": [
+            {
+              "name": "supplier_invoice_item_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "supplier_invoice_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "po_item_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "quantity_billed",
+              "type": "INTEGER"
+            },
+            {
+              "name": "unit_price_cents",
+              "type": "INTEGER"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              619,
+              216,
+              4961
+            ],
+            [
+              2,
+              1,
+              2386,
+              36,
+              1477
+            ],
+            [
+              3,
+              1,
+              5546,
+              172,
+              2740
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 9459
+        },
+        {
+          "name": "supplier_invoices",
+          "columns": [
+            {
+              "name": "supplier_invoice_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "po_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "invoice_no",
+              "type": "TEXT"
+            },
+            {
+              "name": "invoice_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "due_date",
+              "type": "TEXT"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              "INV-E287130F3A",
+              "2025-03-13",
+              "2025-05-12"
+            ],
+            [
+              2,
+              2,
+              "INV-E9FE93C319",
+              "2025-03-26",
+              "2025-05-25"
+            ],
+            [
+              3,
+              3,
+              "INV-B4BFEAA92E",
+              "2024-02-10",
+              "2024-04-10"
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 4739
+        },
+        {
+          "name": "v_po_lines",
+          "columns": [
+            {
+              "name": "po_item_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "po_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "supplier_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "warehouse_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "order_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "promised_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "product_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "quantity_ordered",
+              "type": "INTEGER"
+            },
+            {
+              "name": "unit_price_cents",
+              "type": "INTEGER"
+            },
+            {
+              "name": "ordered_cents",
+              "type": "派生"
+            },
+            {
+              "name": "received",
+              "type": "派生"
+            },
+            {
+              "name": "accepted",
+              "type": "派生"
+            },
+            {
+              "name": "on_time",
+              "type": "派生"
+            },
+            {
+              "name": "billed",
+              "type": "派生"
+            },
+            {
+              "name": "billed_cents",
+              "type": "派生"
+            }
+          ],
+          "rows": [
+            [
+              3077,
+              2633,
+              59,
+              3,
+              "2023-01-01",
+              "2023-01-06",
+              312,
+              33,
+              1076,
+              35508,
+              33,
+              33,
+              33,
+              33,
+              35508
+            ],
+            [
+              2479,
+              4775,
+              49,
+              1,
+              "2023-01-01",
+              "2023-01-19",
+              165,
+              10,
+              785,
+              7850,
+              10,
+              10,
+              0,
+              12,
+              9420
+            ],
+            [
+              9661,
+              4886,
+              2,
+              1,
+              "2023-01-01",
+              "2023-01-14",
+              413,
+              6,
+              1212,
+              7272,
+              6,
+              6,
+              6,
+              7,
+              8484
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 9625
+        }
+      ],
+      "result": {
+        "columns": [
+          "po_item_id",
+          "billed",
+          "billed_cents"
+        ],
+        "rows": [
+          [
+            1,
+            29,
+            33785
+          ],
+          [
+            2,
+            24,
+            121560
+          ],
+          [
+            3,
+            13,
+            4758
+          ]
+        ]
+      }
+    },
+    {
+      "kind": "runnable",
+      "title": "连接订购、收货与发票",
+      "sql": "WITH billed AS (\n  SELECT x.po_item_id,SUM(x.quantity_billed) billed,SUM(x.quantity_billed*x.unit_price_cents) billed_cents\n  FROM supplier_invoice_items x JOIN supplier_invoices f ON f.supplier_invoice_id=x.supplier_invoice_id\n  WHERE f.invoice_date<='2025-12-31' GROUP BY x.po_item_id\n), checked AS (\n  SELECT v.po_item_id,v.po_id,v.supplier_id,v.product_id,v.quantity_ordered,v.accepted,\n    COALESCE(b.billed,0) billed,COALESCE(b.billed_cents,0) billed_cents,v.accepted*v.unit_price_cents expected_cents\n  FROM v_po_lines v LEFT JOIN billed b ON b.po_item_id=v.po_item_id\n  WHERE v.order_date BETWEEN '2025-01-01' AND '2025-12-31'\n)\nSELECT * FROM checked ORDER BY 1, 2, 3, 4, 5, 6, 7, 8, 9 LIMIT 3;",
+      "purpose": "连接订购、收货与发票（checked）的实际执行结果。",
+      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "sourceTables": [
+        {
+          "name": "supplier_invoice_items",
+          "columns": [
+            {
+              "name": "supplier_invoice_item_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "supplier_invoice_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "po_item_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "quantity_billed",
+              "type": "INTEGER"
+            },
+            {
+              "name": "unit_price_cents",
+              "type": "INTEGER"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              619,
+              216,
+              4961
+            ],
+            [
+              2,
+              1,
+              2386,
+              36,
+              1477
+            ],
+            [
+              3,
+              1,
+              5546,
+              172,
+              2740
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 9459
+        },
+        {
+          "name": "supplier_invoices",
+          "columns": [
+            {
+              "name": "supplier_invoice_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "po_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "invoice_no",
+              "type": "TEXT"
+            },
+            {
+              "name": "invoice_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "due_date",
+              "type": "TEXT"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              "INV-E287130F3A",
+              "2025-03-13",
+              "2025-05-12"
+            ],
+            [
+              2,
+              2,
+              "INV-E9FE93C319",
+              "2025-03-26",
+              "2025-05-25"
+            ],
+            [
+              3,
+              3,
+              "INV-B4BFEAA92E",
+              "2024-02-10",
+              "2024-04-10"
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 4739
+        },
+        {
+          "name": "v_po_lines",
+          "columns": [
+            {
+              "name": "po_item_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "po_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "supplier_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "warehouse_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "order_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "promised_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "product_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "quantity_ordered",
+              "type": "INTEGER"
+            },
+            {
+              "name": "unit_price_cents",
+              "type": "INTEGER"
+            },
+            {
+              "name": "ordered_cents",
+              "type": "派生"
+            },
+            {
+              "name": "received",
+              "type": "派生"
+            },
+            {
+              "name": "accepted",
+              "type": "派生"
+            },
+            {
+              "name": "on_time",
+              "type": "派生"
+            },
+            {
+              "name": "billed",
+              "type": "派生"
+            },
+            {
+              "name": "billed_cents",
+              "type": "派生"
+            }
+          ],
+          "rows": [
+            [
+              3077,
+              2633,
+              59,
+              3,
+              "2023-01-01",
+              "2023-01-06",
+              312,
+              33,
+              1076,
+              35508,
+              33,
+              33,
+              33,
+              33,
+              35508
+            ],
+            [
+              2479,
+              4775,
+              49,
+              1,
+              "2023-01-01",
+              "2023-01-19",
+              165,
+              10,
+              785,
+              7850,
+              10,
+              10,
+              0,
+              12,
+              9420
+            ],
+            [
+              9661,
+              4886,
+              2,
+              1,
+              "2023-01-01",
+              "2023-01-14",
+              413,
+              6,
+              1212,
+              7272,
+              6,
+              6,
+              6,
+              7,
+              8484
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 9625
+        }
+      ],
+      "result": {
+        "columns": [
+          "po_item_id",
+          "po_id",
+          "supplier_id",
+          "product_id",
+          "quantity_ordered",
+          "accepted",
+          "billed",
+          "billed_cents",
+          "expected_cents"
+        ],
+        "rows": [
+          [
+            2,
+            2369,
+            48,
+            357,
+            24,
+            24,
+            24,
+            121560,
+            121560
+          ],
+          [
+            3,
+            432,
+            49,
+            389,
+            13,
+            13,
+            13,
+            4758,
+            4758
+          ],
+          [
+            4,
+            2254,
+            47,
+            16,
+            77,
+            0,
+            0,
+            0,
+            0
+          ]
+        ]
+      }
+    }
+  ],
+  "completeCode": {
+    "mysqlSql": "WITH billed AS (\n  SELECT x.po_item_id,SUM(x.quantity_billed) billed,SUM(x.quantity_billed*x.unit_price_cents) billed_cents\n  FROM supplier_invoice_items x JOIN supplier_invoices f ON f.supplier_invoice_id=x.supplier_invoice_id\n  WHERE f.invoice_date<='2025-12-31' GROUP BY x.po_item_id\n), checked AS (\n  SELECT v.po_item_id,v.po_id,v.supplier_id,v.product_id,v.quantity_ordered,v.accepted,\n    COALESCE(b.billed,0) billed,COALESCE(b.billed_cents,0) billed_cents,v.accepted*v.unit_price_cents expected_cents\n  FROM v_po_lines v LEFT JOIN billed b ON b.po_item_id=v.po_item_id\n  WHERE v.order_date BETWEEN '2025-01-01' AND '2025-12-31'\n)\nSELECT po_item_id,po_id,supplier_id,product_id,quantity_ordered,accepted,billed,billed_cents,expected_cents,\n  billed_cents-expected_cents variance_cents FROM checked\nWHERE quantity_ordered<>accepted OR accepted<>billed OR billed_cents<>expected_cents ORDER BY po_item_id",
+    "sqliteSql": "WITH billed AS (\n  SELECT x.po_item_id,SUM(x.quantity_billed) billed,SUM(x.quantity_billed*x.unit_price_cents) billed_cents\n  FROM supplier_invoice_items x JOIN supplier_invoices f ON f.supplier_invoice_id=x.supplier_invoice_id\n  WHERE f.invoice_date<='2025-12-31' GROUP BY x.po_item_id\n), checked AS (\n  SELECT v.po_item_id,v.po_id,v.supplier_id,v.product_id,v.quantity_ordered,v.accepted,\n    COALESCE(b.billed,0) billed,COALESCE(b.billed_cents,0) billed_cents,v.accepted*v.unit_price_cents expected_cents\n  FROM v_po_lines v LEFT JOIN billed b ON b.po_item_id=v.po_item_id\n  WHERE v.order_date BETWEEN '2025-01-01' AND '2025-12-31'\n)\nSELECT po_item_id,po_id,supplier_id,product_id,quantity_ordered,accepted,billed,billed_cents,expected_cents,\n  billed_cents-expected_cents variance_cents FROM checked\nWHERE quantity_ordered<>accepted OR accepted<>billed OR billed_cents<>expected_cents ORDER BY po_item_id"
+  },
+  "expectedResult": {
+    "columns": [
+      "po_item_id",
+      "po_id",
+      "supplier_id",
+      "product_id",
+      "quantity_ordered",
+      "accepted",
+      "billed",
+      "billed_cents",
+      "expected_cents",
+      "variance_cents"
+    ],
+    "rows": [
+      [
+        4,
+        2254,
+        47,
+        16,
+        77,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        22,
+        1301,
+        35,
+        202,
+        8,
+        7,
+        7,
+        39326,
+        39326,
+        0
+      ],
+      [
+        23,
+        2987,
+        32,
+        370,
+        13,
+        13,
+        15,
+        42210,
+        36582,
+        5628
+      ],
+      [
+        30,
+        3518,
+        5,
+        416,
+        9,
+        8,
+        8,
+        23320,
+        23320,
+        0
+      ],
+      [
+        46,
+        3827,
+        49,
+        374,
+        9,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        50,
+        3478,
+        2,
+        421,
+        14,
+        8,
+        8,
+        7840,
+        7840,
+        0
+      ],
+      [
+        53,
+        1252,
+        49,
+        32,
+        7,
+        7,
+        7,
+        2464,
+        1638,
+        826
+      ],
+      [
+        57,
+        4146,
+        9,
+        461,
+        18,
+        18,
+        18,
+        61380,
+        59886,
+        1494
+      ],
+      [
+        59,
+        1313,
+        2,
+        413,
+        12,
+        11,
+        11,
+        16478,
+        16478,
+        0
+      ],
+      [
+        67,
+        2262,
+        2,
+        413,
+        12,
+        11,
+        11,
+        14685,
+        14685,
+        0
+      ],
+      [
+        93,
+        2428,
+        48,
+        413,
+        8,
+        8,
+        10,
+        13980,
+        11184,
+        2796
+      ],
+      [
+        97,
+        1412,
+        48,
+        413,
+        17,
+        17,
+        20,
+        28680,
+        24378,
+        4302
+      ]
+    ],
+    "status": "SQLite实际执行（预览）",
+    "orderGuaranteed": true,
+    "totalRows": 928,
+    "fullResultPath": "../enterprise_reference/business_tasks/results/BP28.json"
+  },
+  "resultBlocks": [
+    {
+      "type": "paragraph",
+      "text": "教学数据中第2行订8收7票7，金额差0但仍需复核；第3行订5收0票0（次年发票不计），金额差0仍有少收；第4行订4收4票5，多开100分；",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "第5行订2收2票2但开票单价550分高于采购500分，差100分。第1行两批收货和两张发票完全一致，不出现。库存核对示例第12号少入库1件，第41号少4件；",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "第31号全部拒收且无入库不异常。原企业预览采购行4订77收0票0，行22订8收7票7，行23订13收13票15、金额差5628分。原企业数据未在本次重新执行。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "差异可能源于在途、分批交付或价格录入，不能直接定性。",
+      "emphasis": []
+    }
+  ],
+  "extensions": [
+    {
+      "label": "合格收货汇总",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "按采购行合计合格件数；第3行全部拒收，合格量为零。",
+          "emphasis": []
+        }
+      ],
+      "sql": "WITH po(id,ordered,price) AS (VALUES (1,10,100),(2,8,200),(3,5,300),(4,4,100),(5,2,500)),\nreceipts(rid,id,accepted,day) AS (VALUES (11,1,6,'2025-12-01'),(12,1,4,'2025-12-02'),(21,2,7,'2025-12-03'),(31,3,0,'2025-12-04'),(41,4,4,'2025-12-05'),(51,5,2,'2025-12-06')),\ninvoices(id,qty,price,day) AS (VALUES (1,6,100,'2025-12-01'),(1,4,100,'2025-12-03'),(2,7,200,'2025-12-05'),(4,5,100,'2025-12-06'),(5,2,550,'2025-12-07'),(3,5,300,'2026-01-01')),\nr AS (SELECT id,SUM(accepted) accepted FROM receipts WHERE day<='2025-12-31' GROUP BY id),\nb AS (SELECT id,SUM(qty) billed,SUM(qty*price) billed_cents FROM invoices WHERE day<='2025-12-31' GROUP BY id),\nc AS (SELECT po.id,ordered,COALESCE(r.accepted,0) accepted,COALESCE(b.billed,0) billed,COALESCE(b.billed_cents,0) billed_cents,COALESCE(r.accepted,0)*po.price expected_cents FROM po LEFT JOIN r ON r.id=po.id LEFT JOIN b ON b.id=po.id)\nSELECT * FROM r ORDER BY accepted DESC;",
+      "result": {
+        "columns": [
+          "id",
+          "accepted"
+        ],
+        "rows": [
+          [
+            1,
+            10
+          ],
+          [
+            2,
+            7
+          ],
+          [
+            4,
+            4
+          ],
+          [
+            5,
+            2
+          ],
+          [
+            3,
+            0
+          ]
+        ]
+      }
+    },
+    {
+      "label": "开票汇总",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "只累计截止日及以前的原始发票行，第3行次年开票不计入。",
+          "emphasis": []
+        }
+      ],
+      "sql": "WITH po(id,ordered,price) AS (VALUES (1,10,100),(2,8,200),(3,5,300),(4,4,100),(5,2,500)),\nreceipts(rid,id,accepted,day) AS (VALUES (11,1,6,'2025-12-01'),(12,1,4,'2025-12-02'),(21,2,7,'2025-12-03'),(31,3,0,'2025-12-04'),(41,4,4,'2025-12-05'),(51,5,2,'2025-12-06')),\ninvoices(id,qty,price,day) AS (VALUES (1,6,100,'2025-12-01'),(1,4,100,'2025-12-03'),(2,7,200,'2025-12-05'),(4,5,100,'2025-12-06'),(5,2,550,'2025-12-07'),(3,5,300,'2026-01-01')),\nr AS (SELECT id,SUM(accepted) accepted FROM receipts WHERE day<='2025-12-31' GROUP BY id),\nb AS (SELECT id,SUM(qty) billed,SUM(qty*price) billed_cents FROM invoices WHERE day<='2025-12-31' GROUP BY id),\nc AS (SELECT po.id,ordered,COALESCE(r.accepted,0) accepted,COALESCE(b.billed,0) billed,COALESCE(b.billed_cents,0) billed_cents,COALESCE(r.accepted,0)*po.price expected_cents FROM po LEFT JOIN r ON r.id=po.id LEFT JOIN b ON b.id=po.id)\nSELECT * FROM b ORDER BY billed;",
+      "result": {
+        "columns": [
+          "id",
+          "billed",
+          "billed_cents"
+        ],
+        "rows": [
+          [
+            5,
+            2,
+            1100
+          ],
+          [
+            4,
+            5,
+            500
+          ],
+          [
+            2,
+            7,
+            1400
+          ],
+          [
+            1,
+            10,
+            1000
+          ]
+        ]
+      }
+    },
+    {
+      "label": "完整三方核对",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "第2行少收一件但金额一致；第3行未合格收货亦未开票；第4行多开一件；第5行数量一致但价格偏高。第1行完全匹配，不输出。",
+          "emphasis": []
+        }
+      ],
+      "sql": "WITH po(id,ordered,price) AS (VALUES (1,10,100),(2,8,200),(3,5,300),(4,4,100),(5,2,500)),\nreceipts(rid,id,accepted,day) AS (VALUES (11,1,6,'2025-12-01'),(12,1,4,'2025-12-02'),(21,2,7,'2025-12-03'),(31,3,0,'2025-12-04'),(41,4,4,'2025-12-05'),(51,5,2,'2025-12-06')),\ninvoices(id,qty,price,day) AS (VALUES (1,6,100,'2025-12-01'),(1,4,100,'2025-12-03'),(2,7,200,'2025-12-05'),(4,5,100,'2025-12-06'),(5,2,550,'2025-12-07'),(3,5,300,'2026-01-01')),\nr AS (SELECT id,SUM(accepted) accepted FROM receipts WHERE day<='2025-12-31' GROUP BY id),\nb AS (SELECT id,SUM(qty) billed,SUM(qty*price) billed_cents FROM invoices WHERE day<='2025-12-31' GROUP BY id),\nc AS (SELECT po.id,ordered,COALESCE(r.accepted,0) accepted,COALESCE(b.billed,0) billed,COALESCE(b.billed_cents,0) billed_cents,COALESCE(r.accepted,0)*po.price expected_cents FROM po LEFT JOIN r ON r.id=po.id LEFT JOIN b ON b.id=po.id)\nSELECT *,billed_cents-expected_cents variance_cents FROM c WHERE ordered<>accepted OR accepted<>billed OR billed_cents<>expected_cents ORDER BY ordered;",
+      "result": {
+        "columns": [
+          "id",
+          "ordered",
+          "accepted",
+          "billed",
+          "billed_cents",
+          "expected_cents",
+          "variance_cents"
+        ],
+        "rows": [
+          [
+            5,
+            2,
+            2,
+            2,
+            1100,
+            1000,
+            100
+          ],
+          [
+            4,
+            4,
+            4,
+            5,
+            500,
+            400,
+            100
+          ],
+          [
+            3,
+            5,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            2,
+            8,
+            7,
+            7,
+            1400,
+            1400,
+            0
+          ]
+        ]
+      }
+    },
+    {
+      "label": "收货与库存流水核对",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "按收货记录编号汇总入库，全部拒收且无入库视为正常；第12号少入库一件，第41号未入库。",
+          "emphasis": []
+        }
+      ],
+      "sql": "WITH receipts(rid,accepted) AS (VALUES (11,6),(12,4),(31,0),(41,4)), movements(rid,qty) AS (VALUES (11,2),(11,4),(12,3)), m AS (SELECT rid,SUM(qty) qty FROM movements GROUP BY rid) SELECT r.rid,r.accepted,COALESCE(m.qty,0) stocked,COALESCE(m.qty,0)-r.accepted difference FROM receipts r LEFT JOIN m ON m.rid=r.rid WHERE COALESCE(m.qty,0)<>r.accepted ORDER BY r.rid;",
+      "result": {
+        "columns": [
+          "rid",
+          "accepted",
+          "stocked",
+          "difference"
+        ],
+        "rows": [
+          [
+            12,
+            4,
+            3,
+            -1
+          ],
+          [
+            41,
+            4,
+            0,
+            -4
+          ]
+        ]
+      }
+    }
+  ],
+  "cautions": {
+    "comparison": [
+      {
+        "type": "paragraph",
+        "text": "三方核对检查订购、合格收货与原始开票；库存核对检查合格收货是否正确入库；付款核对检查净应付及实付。",
+        "emphasis": []
+      }
+    ],
+    "example": [
+      {
+        "type": "paragraph",
+        "text": "直接连接多笔收货与多张发票后汇总，或只检查金额差。",
+        "emphasis": []
+      }
+    ],
+    "reason": [],
+    "correction": [
+      {
+        "type": "paragraph",
+        "text": "按采购行预聚合，数量与金额分别检查。",
+        "emphasis": []
+      }
+    ],
+    "notes": [
+      {
+        "type": "paragraph",
+        "text": "完整输出见 ../enterprise_reference/business_tasks/results/BP28.json；公开预览展示前12行。",
+        "emphasis": []
+      },
+      {
+        "type": "paragraph",
+        "text": "独立边界及场景仅在提交判题时使用。",
+        "emphasis": []
+      }
+    ]
+  },
+  "sourcePath": "source/unified73/kp19-58.json",
+  "sourceSha256": "13f7cfa73e85a776c7548dcbdef1b1a0e8b605efa72d42c46d78e061da6b0a35"
+}

@@ -1,0 +1,190 @@
+{
+  "schemaVersion": 1,
+  "id": "kp04-02",
+  "lessonSha256": "7a3c90aea0050a3e11ae0c09d29bae1643219a71a3e16c10eb963f6a18d4187f",
+  "figures": [
+    {
+      "id": "kp04-02-clauses",
+      "slot": "syntax",
+      "kind": "clause-map",
+      "title": "示例查询的几个部分",
+      "sql": "SELECT product_id, price FROM products ORDER BY price DESC, product_name LIMIT 2 OFFSET 2;",
+      "parts": [
+        {
+          "role": "select",
+          "label": "取数",
+          "sql": "SELECT product_id, price",
+          "note": "输出 product_id, price。"
+        },
+        {
+          "role": "from",
+          "label": "来源",
+          "sql": "FROM products",
+          "note": "从 products 读取输入数据。"
+        },
+        {
+          "role": "order",
+          "label": "排序",
+          "sql": "ORDER BY price DESC, product_name",
+          "note": "按 price DESC, product_name 排列结果。"
+        },
+        {
+          "role": "limit",
+          "label": "截取",
+          "sql": "LIMIT 2 OFFSET 2;",
+          "note": "只返回 2 OFFSET 2 的行段。"
+        }
+      ]
+    },
+    {
+      "id": "kp04-02-flow",
+      "slot": "breakdown",
+      "kind": "stage-flow",
+      "merge": "breakdown",
+      "title": "每一步的数据变化",
+      "steps": [
+        {
+          "label": "FROM products",
+          "sql": "SELECT * FROM products",
+          "columns": [
+            "product_id",
+            "product_name",
+            "category",
+            "price",
+            "stock"
+          ],
+          "rows": [
+            [
+              1,
+              "Mask",
+              "护肤品",
+              15,
+              150
+            ],
+            [
+              2,
+              "Serum",
+              "护肤品",
+              89,
+              40
+            ],
+            [
+              3,
+              "Cleanser",
+              "护肤品",
+              35,
+              200
+            ],
+            [
+              4,
+              "Cream",
+              "化妆品",
+              65,
+              180
+            ],
+            [
+              5,
+              "Sunscreen",
+              "化妆品",
+              45,
+              80
+            ],
+            [
+              6,
+              "Soap_1",
+              "日用品",
+              15,
+              0
+            ]
+          ]
+        },
+        {
+          "label": "SELECT product_id, price",
+          "sql": "SELECT product_id, price FROM products",
+          "columns": [
+            "product_id",
+            "price"
+          ],
+          "rows": [
+            [
+              1,
+              15
+            ],
+            [
+              2,
+              89
+            ],
+            [
+              3,
+              35
+            ],
+            [
+              4,
+              65
+            ],
+            [
+              5,
+              45
+            ],
+            [
+              6,
+              15
+            ]
+          ]
+        },
+        {
+          "label": "ORDER BY price DESC, product_name",
+          "sql": "SELECT product_id, price FROM products ORDER BY price DESC, product_name",
+          "columns": [
+            "product_id",
+            "price"
+          ],
+          "rows": [
+            [
+              2,
+              89
+            ],
+            [
+              4,
+              65
+            ],
+            [
+              5,
+              45
+            ],
+            [
+              3,
+              35
+            ],
+            [
+              1,
+              15
+            ],
+            [
+              6,
+              15
+            ]
+          ]
+        },
+        {
+          "label": "LIMIT 2 OFFSET 2;",
+          "sql": "SELECT product_id, price FROM products ORDER BY price DESC, product_name LIMIT 2 OFFSET 2;",
+          "columns": [
+            "product_id",
+            "price"
+          ],
+          "rows": [
+            [
+              5,
+              45
+            ],
+            [
+              3,
+              35
+            ]
+          ]
+        }
+      ]
+    }
+  ]
+}

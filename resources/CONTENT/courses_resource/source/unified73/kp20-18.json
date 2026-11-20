@@ -1,0 +1,560 @@
+{
+  "id": "kp20-18",
+  "chapterId": "ch20",
+  "title": "渠道广告后的贡献利润",
+  "learningObjective": "独立构建渠道贡献报表，区分毛利与贡献、贡献金额与比率，解释退款及成本冲回并识别归因遗漏。",
+  "prerequisites": [],
+  "concept": "按2025年线上订单会话来源汇总净销售及毛利，并与同年广告支出对齐；广告后贡献为毛利减广告，贡献率以净销售为分母。保留全部渠道。",
+  "syntax": "WITH a AS (SELECT s.source_id,SUM(o.net_cents) net,SUM(o.net_cents-o.cost_cents) gross FROM v_order_net o JOIN customer_sessions s ON s.session_id=o.session_id WHERE o.channel='online' AND o.order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY s.source_id), b AS (SELECT source_id,SUM(spend_cents) spend FROM marketing_campaigns WHERE month_key BETWEEN '2025-01' AND '2025-12' GROUP BY source_id) SELECT t.source_id,COALESCE(a.net,0) net_cents,COALESCE(a.gross,0) gross_cents,COALESCE(b.spend,0) spend_cents,COALESCE(a.gross,0)-COALESCE(b.spend,0) contribution_cents,ROUND(100.0*(COALESCE(a.gross,0)-COALESCE(b.spend,0))/NULLIF(a.net,0),2) contribution_pct FROM traffic_sources t LEFT JOIN a ON a.source_id=t.source_id LEFT JOIN b ON b.source_id=t.source_id ORDER BY contribution_cents DESC",
+  "parameters": {
+    "统计截止日": "2025-12-31",
+    "金额": "整数马币分",
+    "输出粒度": "渠道"
+  },
+  "fixtureIds": [],
+  "datasetId": "enterprise-v2",
+  "sourceTables": [
+    {
+      "name": "customer_sessions",
+      "columns": [
+        {
+          "name": "session_id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "customer_id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "source_id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "session_date",
+          "type": "TEXT"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          1901,
+          1,
+          "2024-08-24"
+        ],
+        [
+          2,
+          3000,
+          1,
+          "2025-11-09"
+        ],
+        [
+          3,
+          3682,
+          4,
+          "2024-07-29"
+        ]
+      ],
+      "previewOnly": true,
+      "rowCount": 50000
+    },
+    {
+      "name": "marketing_campaigns",
+      "columns": [
+        {
+          "name": "campaign_id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "source_id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "month_key",
+          "type": "TEXT"
+        },
+        {
+          "name": "spend_cents",
+          "type": "INTEGER"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          1,
+          "2023-01",
+          0
+        ],
+        [
+          2,
+          2,
+          "2023-01",
+          349637
+        ],
+        [
+          3,
+          3,
+          "2023-01",
+          173632
+        ]
+      ],
+      "previewOnly": true,
+      "rowCount": 180
+    },
+    {
+      "name": "traffic_sources",
+      "columns": [
+        {
+          "name": "source_id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "source_name",
+          "type": "TEXT"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          "自然访问"
+        ],
+        [
+          2,
+          "搜索广告"
+        ],
+        [
+          3,
+          "社交媒体"
+        ]
+      ],
+      "previewOnly": true,
+      "rowCount": 5
+    },
+    {
+      "name": "v_order_net",
+      "columns": [
+        {
+          "name": "order_id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "store_id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "customer_id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "session_id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "channel",
+          "type": "TEXT"
+        },
+        {
+          "name": "order_date",
+          "type": "TEXT"
+        },
+        {
+          "name": "net_cents",
+          "type": "派生"
+        },
+        {
+          "name": "cost_cents",
+          "type": "派生"
+        }
+      ],
+      "rows": [
+        [
+          2,
+          4,
+          null,
+          null,
+          "store",
+          "2025-10-02",
+          300,
+          268
+        ],
+        [
+          3,
+          4,
+          2256,
+          null,
+          "store",
+          "2025-06-09",
+          1310,
+          618
+        ],
+        [
+          5,
+          4,
+          4644,
+          null,
+          "store",
+          "2024-07-24",
+          16670,
+          8477
+        ]
+      ],
+      "previewOnly": true,
+      "rowCount": 23325
+    }
+  ],
+  "sourceTablesArePreview": true,
+  "mysqlSql": "WITH a AS (SELECT s.source_id,SUM(o.net_cents) net,SUM(o.net_cents-o.cost_cents) gross FROM v_order_net o JOIN customer_sessions s ON s.session_id=o.session_id WHERE o.channel='online' AND o.order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY s.source_id), b AS (SELECT source_id,SUM(spend_cents) spend FROM marketing_campaigns WHERE month_key BETWEEN '2025-01' AND '2025-12' GROUP BY source_id) SELECT t.source_id,COALESCE(a.net,0) net_cents,COALESCE(a.gross,0) gross_cents,COALESCE(b.spend,0) spend_cents,COALESCE(a.gross,0)-COALESCE(b.spend,0) contribution_cents,ROUND(100.0*(COALESCE(a.gross,0)-COALESCE(b.spend,0))/NULLIF(a.net,0),2) contribution_pct FROM traffic_sources t LEFT JOIN a ON a.source_id=t.source_id LEFT JOIN b ON b.source_id=t.source_id ORDER BY contribution_cents DESC",
+  "sqliteSql": "WITH a AS (SELECT s.source_id,SUM(o.net_cents) net,SUM(o.net_cents-o.cost_cents) gross FROM v_order_net o JOIN customer_sessions s ON s.session_id=o.session_id WHERE o.channel='online' AND o.order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY s.source_id), b AS (SELECT source_id,SUM(spend_cents) spend FROM marketing_campaigns WHERE month_key BETWEEN '2025-01' AND '2025-12' GROUP BY source_id) SELECT t.source_id,COALESCE(a.net,0) net_cents,COALESCE(a.gross,0) gross_cents,COALESCE(b.spend,0) spend_cents,COALESCE(a.gross,0)-COALESCE(b.spend,0) contribution_cents,ROUND(100.0*(COALESCE(a.gross,0)-COALESCE(b.spend,0))/NULLIF(a.net,0),2) contribution_pct FROM traffic_sources t LEFT JOIN a ON a.source_id=t.source_id LEFT JOIN b ON b.source_id=t.source_id ORDER BY contribution_cents DESC",
+  "executionSteps": [
+    "按渠道汇总线上净销售与毛利",
+    "独立汇总同期广告支出",
+    "左连接渠道并计算贡献",
+    "核查退款及归因缺失"
+  ],
+  "useCase": "渠道负责人希望比较2025年线上订单按会话归因的净销售、毛利及扣除当年广告费后的贡献，识别高销售但广告后亏损的渠道，并分析退款风险。",
+  "comparison": "毛利率、广告后贡献率及广告投入产出比的分子不同；广告后贡献不是最终净利润。退款率采用折后扣退款前销售额。",
+  "commonError": {
+    "example": "直接连接订单与广告明细；用净销售作为退款率分母；把广告后贡献当作净利润。",
+    "correction": "分别聚合；先确认退款前口径及成本冲回；明确未扣其他费用。"
+  },
+  "notes": "原主查询及 BP44.json 结果保持不变。新增独立示例在 SQLite 内执行，未重新验证企业完整数据、原生 MySQL 或浏览器。",
+  "compatibility": {
+    "status": "直接兼容（原生待验证）",
+    "detail": "本版本SQLite及sql.js WASM已实际复验，原生MySQL8.4尚未执行。"
+  },
+  "relatedQuestionIds": [
+    "q0294"
+  ],
+  "relatedFlashcardIds": [
+    "fc0194",
+    "fc0196"
+  ],
+  "relatedKnowledgePointIds": [
+    "kp07-01",
+    "kp08-01",
+    "kp14-01",
+    "kp15-01"
+  ],
+  "mysqlVerification": "未运行原生 MySQL 8.4",
+  "result": {
+    "columns": [
+      "source_id",
+      "net_cents",
+      "gross_cents",
+      "spend_cents",
+      "contribution_cents",
+      "contribution_pct"
+    ],
+    "rows": [
+      [
+        1,
+        27221835,
+        10543653,
+        0,
+        10543653,
+        38.73
+      ],
+      [
+        4,
+        9277495,
+        3535735,
+        435753,
+        3099982,
+        33.41
+      ],
+      [
+        2,
+        14170254,
+        5427044,
+        2877981,
+        2549063,
+        17.99
+      ],
+      [
+        3,
+        9027392,
+        3475284,
+        2608823,
+        866461,
+        9.6
+      ],
+      [
+        5,
+        3621116,
+        1396494,
+        1247280,
+        149214,
+        4.12
+      ]
+    ],
+    "status": "SQLite实际执行（预览）",
+    "orderGuaranteed": true,
+    "totalRows": 5,
+    "fullResultPath": "../enterprise_reference/business_tasks/results/BP44.json"
+  },
+  "projectId": "enterprise",
+  "taskId": "BP44",
+  "difficulty": "困难",
+  "crossGroup": "电商＋财务",
+  "mysqlVerificationScript": "../enterprise_reference/business_tasks/mysql_queries/BP44.sql",
+  "visualization": {
+    "kind": "stepFlow",
+    "steps": [
+      {
+        "id": "1",
+        "label": "独立归因毛利与支出"
+      },
+      {
+        "id": "2",
+        "label": "连接渠道"
+      },
+      {
+        "id": "3",
+        "label": "计算贡献"
+      }
+    ],
+    "sourceFixtureIds": [],
+    "resultColumns": [
+      "source_id",
+      "net_cents",
+      "gross_cents",
+      "spend_cents",
+      "contribution_cents",
+      "contribution_pct"
+    ]
+  },
+  "primaryQuestionIds": [
+    "q0294"
+  ],
+  "primaryFlashcardIds": [
+    "fc0194",
+    "fc0196"
+  ],
+  "contentVersion": "4.2.1",
+  "mergedFrom": [
+    {
+      "id": "kp20-20",
+      "title": "退款影响与渠道利润风险"
+    }
+  ],
+  "teaching": {
+    "problem": "渠道负责人希望比较2025年线上订单按会话归因的净销售、毛利及扣除当年广告费后的贡献，识别高销售但广告后亏损的渠道，并分析退款风险。",
+    "codeExplanation": "a 从订单净额视图连接会话，按订单日期选定2025年线上订单，按来源汇总净额及净额减成本。会话编号须唯一；丢失会话的订单不进入内连接结果。b 按广告月份独立汇总支出，避免同渠道多笔订单与多笔广告直接相乘。以渠道主档左连接两份汇总，无记录且确认数据完整时补零。贡献金额=毛利−广告支出；贡献率以净销售为分母，NULLIF 防止零分母，乘100.0 后再四舍五入。无销售但有广告的渠道仍显示负贡献。按金额而非比率降序排列。同一报告期使用订单日期与广告月份，并非要求会话也发生在该年；来源归因不证明广告导致销售。退款专题回到折后扣退款前的金额与原销售成本，分别汇总退款与实际冲回成本；净成本已冲回时不能再次加回。先核实退款统计截止和成本冲回口径。",
+    "resultExplanation": "渠道1净销售1000分，毛利400分，无广告支出，贡献400分、贡献率40%。渠道2净销售800分、毛利350分，但广告支出400分，贡献−50分、贡献率−6.25%。渠道3无销售仍支出100分，贡献−100分，贡献率为空；渠道4无记录但主档保留，贡献0、比率为空。退款示例中渠道1折后销售1000、成本600、退款200、成本冲回120，退款率20%，毛利由400降至320，下降80而非200。缺少会话示例有2笔、200分未归因，应另行核查。原企业结果渠道1贡献10543653分、贡献率38.73%，只是广告后贡献，不是净利润；零广告也不意味着没有其他获客成本。",
+    "checkpoints": [
+      {
+        "name": "a",
+        "label": "按渠道汇总净销售与毛利",
+        "sql": "WITH a AS (SELECT s.source_id,SUM(o.net_cents) net,SUM(o.net_cents-o.cost_cents) gross FROM v_order_net o JOIN customer_sessions s ON s.session_id=o.session_id WHERE o.channel='online' AND o.order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY s.source_id)\nSELECT * FROM a ORDER BY 1, 2, 3 LIMIT 3;",
+        "result": {
+          "columns": [
+            "source_id",
+            "net",
+            "gross"
+          ],
+          "rows": [
+            [
+              1,
+              27221835,
+              10543653
+            ],
+            [
+              2,
+              14170254,
+              5427044
+            ],
+            [
+              3,
+              9027392,
+              3475284
+            ]
+          ]
+        }
+      },
+      {
+        "name": "b",
+        "label": "按渠道汇总广告开支",
+        "sql": "WITH a AS (SELECT s.source_id,SUM(o.net_cents) net,SUM(o.net_cents-o.cost_cents) gross FROM v_order_net o JOIN customer_sessions s ON s.session_id=o.session_id WHERE o.channel='online' AND o.order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY s.source_id), b AS (SELECT source_id,SUM(spend_cents) spend FROM marketing_campaigns WHERE month_key BETWEEN '2025-01' AND '2025-12' GROUP BY source_id)\nSELECT * FROM b ORDER BY 1, 2 LIMIT 3;",
+        "result": {
+          "columns": [
+            "source_id",
+            "spend"
+          ],
+          "rows": [
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              2877981
+            ],
+            [
+              3,
+              2608823
+            ]
+          ]
+        }
+      }
+    ],
+    "mergedConcepts": [
+      {
+        "sourceId": "kp20-20",
+        "explanation": "退款率使用折后扣退款前销售额；退款前后毛利比较纳入实际退货成本冲回，净销售成本已调整时不重复扣减；无有效分母留空。"
+      }
+    ],
+    "mergeExamples": [
+      {
+        "label": "按渠道汇总净销售与毛利",
+        "explanation": "线上订单按会话来源归因；排除线下与跨年订单。",
+        "sql": "WITH traffic_sources(source_id) AS (SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4),\ncustomer_sessions(session_id,source_id) AS (SELECT 11,1 UNION ALL SELECT 12,2),\nv_order_net(order_id,session_id,channel,order_date,net_cents,cost_cents) AS (\n SELECT 1,11,'online','2025-01-10',600,350 UNION ALL\n SELECT 2,11,'online','2025-02-10',400,250 UNION ALL\n SELECT 3,12,'online','2025-03-10',800,450 UNION ALL\n SELECT 4,12,'store','2025-03-10',999,100 UNION ALL\n SELECT 5,12,'online','2024-12-31',999,100),\nmarketing_campaigns(source_id,month_key,spend_cents) AS (\n SELECT 2,'2025-01',200 UNION ALL SELECT 2,'2025-02',200 UNION ALL\n SELECT 3,'2025-03',100 UNION ALL SELECT 2,'2024-12',999),\na AS (SELECT s.source_id,SUM(o.net_cents) net,SUM(o.net_cents-o.cost_cents) gross FROM v_order_net o JOIN customer_sessions s ON s.session_id=o.session_id WHERE o.channel='online' AND o.order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY s.source_id)\nSELECT * FROM a ORDER BY net",
+        "result": {
+          "columns": [
+            "source_id",
+            "net",
+            "gross"
+          ],
+          "rows": [
+            [
+              2,
+              800,
+              350
+            ],
+            [
+              1,
+              1000,
+              400
+            ]
+          ]
+        }
+      },
+      {
+        "label": "按渠道汇总广告支出",
+        "explanation": "两笔渠道2广告累计400；渠道3虽无销售仍有支出。",
+        "sql": "WITH traffic_sources(source_id) AS (SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4),\ncustomer_sessions(session_id,source_id) AS (SELECT 11,1 UNION ALL SELECT 12,2),\nv_order_net(order_id,session_id,channel,order_date,net_cents,cost_cents) AS (\n SELECT 1,11,'online','2025-01-10',600,350 UNION ALL\n SELECT 2,11,'online','2025-02-10',400,250 UNION ALL\n SELECT 3,12,'online','2025-03-10',800,450 UNION ALL\n SELECT 4,12,'store','2025-03-10',999,100 UNION ALL\n SELECT 5,12,'online','2024-12-31',999,100),\nmarketing_campaigns(source_id,month_key,spend_cents) AS (\n SELECT 2,'2025-01',200 UNION ALL SELECT 2,'2025-02',200 UNION ALL\n SELECT 3,'2025-03',100 UNION ALL SELECT 2,'2024-12',999),\nb AS (SELECT source_id,SUM(spend_cents) spend FROM marketing_campaigns WHERE month_key BETWEEN '2025-01' AND '2025-12' GROUP BY source_id)\nSELECT * FROM b ORDER BY spend",
+        "result": {
+          "columns": [
+            "source_id",
+            "spend"
+          ],
+          "rows": [
+            [
+              3,
+              100
+            ],
+            [
+              2,
+              400
+            ]
+          ]
+        }
+      },
+      {
+        "label": "完整广告后贡献报表",
+        "explanation": "先分别聚合，再连接主档。贡献为毛利减广告；净销售为零时比率为空。",
+        "sql": "WITH traffic_sources(source_id) AS (SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4),\ncustomer_sessions(session_id,source_id) AS (SELECT 11,1 UNION ALL SELECT 12,2),\nv_order_net(order_id,session_id,channel,order_date,net_cents,cost_cents) AS (\n SELECT 1,11,'online','2025-01-10',600,350 UNION ALL\n SELECT 2,11,'online','2025-02-10',400,250 UNION ALL\n SELECT 3,12,'online','2025-03-10',800,450 UNION ALL\n SELECT 4,12,'store','2025-03-10',999,100 UNION ALL\n SELECT 5,12,'online','2024-12-31',999,100),\nmarketing_campaigns(source_id,month_key,spend_cents) AS (\n SELECT 2,'2025-01',200 UNION ALL SELECT 2,'2025-02',200 UNION ALL\n SELECT 3,'2025-03',100 UNION ALL SELECT 2,'2024-12',999),\na AS (SELECT s.source_id,SUM(o.net_cents) net,SUM(o.net_cents-o.cost_cents) gross FROM v_order_net o JOIN customer_sessions s ON s.session_id=o.session_id WHERE o.channel='online' AND o.order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY s.source_id),\nb AS (SELECT source_id,SUM(spend_cents) spend FROM marketing_campaigns WHERE month_key BETWEEN '2025-01' AND '2025-12' GROUP BY source_id)\nSELECT t.source_id,COALESCE(a.net,0) net_cents,COALESCE(a.gross,0) gross_cents,COALESCE(b.spend,0) spend_cents,COALESCE(a.gross,0)-COALESCE(b.spend,0) contribution_cents,ROUND(100.0*(COALESCE(a.gross,0)-COALESCE(b.spend,0))/NULLIF(a.net,0),2) contribution_pct FROM traffic_sources t LEFT JOIN a ON a.source_id=t.source_id LEFT JOIN b ON b.source_id=t.source_id ORDER BY contribution_cents DESC",
+        "result": {
+          "columns": [
+            "source_id",
+            "net_cents",
+            "gross_cents",
+            "spend_cents",
+            "contribution_cents",
+            "contribution_pct"
+          ],
+          "rows": [
+            [
+              1,
+              1000,
+              400,
+              0,
+              400,
+              40.0
+            ],
+            [
+              4,
+              0,
+              0,
+              0,
+              0,
+              null
+            ],
+            [
+              2,
+              800,
+              350,
+              400,
+              -50,
+              -6.25
+            ],
+            [
+              3,
+              0,
+              0,
+              100,
+              -100,
+              null
+            ]
+          ]
+        }
+      },
+      {
+        "label": "退款率与退款前后毛利",
+        "explanation": "退款率分母为折后扣退款前销售；退货成本加回须依据实际成本冲回，示例假设全部可冲回。",
+        "sql": "WITH sources(id) AS (SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3),\nlines(source_id,discounted_cents,original_cost,refund_cents,returned_cost) AS (\n SELECT 1,1000,600,200,120 UNION ALL SELECT 2,800,450,0,0),\na AS (SELECT source_id,SUM(discounted_cents) before_sales,SUM(refund_cents) refunded,SUM(original_cost) before_cost,SUM(returned_cost) cost_reversed FROM lines GROUP BY source_id),\nz AS (SELECT id,COALESCE(before_sales,0) before_sales,COALESCE(refunded,0) refunded,COALESCE(before_cost,0) before_cost,COALESCE(cost_reversed,0) cost_reversed FROM sources LEFT JOIN a ON id=source_id)\nSELECT id,before_sales,refunded,ROUND(100.0*refunded/NULLIF(before_sales,0),2) refund_pct,before_sales-before_cost gross_before,before_sales-refunded-before_cost+cost_reversed gross_after FROM z ORDER BY before_sales",
+        "result": {
+          "columns": [
+            "id",
+            "before_sales",
+            "refunded",
+            "refund_pct",
+            "gross_before",
+            "gross_after"
+          ],
+          "rows": [
+            [
+              3,
+              0,
+              0,
+              null,
+              0,
+              0
+            ],
+            [
+              2,
+              800,
+              0,
+              0.0,
+              350,
+              350
+            ],
+            [
+              1,
+              1000,
+              200,
+              20.0,
+              400,
+              320
+            ]
+          ]
+        }
+      },
+      {
+        "label": "归因缺失检查",
+        "explanation": "左连接会话，检查本年线上订单没有有效来源的笔数金额；独立示例不把缺失渠道归为自然访问。",
+        "sql": "WITH sessions(session_id,source_id) AS (SELECT 11,1), orders(order_id,session_id,net_cents) AS (SELECT 1,11,600 UNION ALL SELECT 2,NULL,150 UNION ALL SELECT 3,99,50) SELECT COUNT(*) missing_orders,SUM(net_cents) missing_net FROM orders o LEFT JOIN sessions s ON s.session_id=o.session_id WHERE s.source_id IS NULL",
+        "result": {
+          "columns": [
+            "missing_orders",
+            "missing_net"
+          ],
+          "rows": [
+            [
+              2,
+              200
+            ]
+          ]
+        }
+      }
+    ]
+  }
+}

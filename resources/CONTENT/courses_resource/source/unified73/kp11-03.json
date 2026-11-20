@@ -1,0 +1,225 @@
+{
+  "id": "kp11-03",
+  "chapterId": "ch11",
+  "title": "文本清洗与格式统一",
+  "learningObjective": "能选择适当的文本清洗函数，识别清洗后的潜在重复而不破坏有效信息。",
+  "prerequisites": [
+    "kp11-02"
+  ],
+  "concept": "导入数据中同一名称可能出现首尾空格、类别大小写不一致、分隔符不统一。TRIM 默认去除两端普通空格，不会清除所有类型空白；REPLACE 替换指定子串的全部匹配；LOWER 与 UPPER 调整大小写，在比较和分组前可用来统一约定。清洗规则取决于字段含义：内部空格可能是姓名或名称的一部分，不能一律删除。清洗不会自动去重，也不会自动修复金额或缺失值。",
+  "syntax": "LOWER(TRIM(str)); REPLACE(str,old,new)",
+  "parameters": {
+    "str": "待处理文本",
+    "old": "匹配的子串",
+    "new": "替换文本"
+  },
+  "fixtureIds": [
+    "lesson-raw_data"
+  ],
+  "sourceTables": [
+    {
+      "name": "raw_data",
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "name",
+          "type": "TEXT",
+          "mysqlType": "VARCHAR(160) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_bin",
+          "sqliteType": "TEXT"
+        },
+        {
+          "name": "amount",
+          "type": "TEXT",
+          "mysqlType": "VARCHAR(160) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_bin",
+          "sqliteType": "TEXT"
+        },
+        {
+          "name": "category",
+          "type": "TEXT",
+          "mysqlType": "VARCHAR(160) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_bin",
+          "sqliteType": "TEXT"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          "  Mask ",
+          "15",
+          "SKIN"
+        ],
+        [
+          2,
+          "Mask",
+          "15",
+          "skin"
+        ],
+        [
+          3,
+          "Serum",
+          null,
+          "Skin"
+        ],
+        [
+          4,
+          "Soap",
+          "-5",
+          "HOME"
+        ],
+        [
+          5,
+          "Cream",
+          "0",
+          "makeup"
+        ],
+        [
+          6,
+          "",
+          "20",
+          "HOME"
+        ]
+      ]
+    }
+  ],
+  "mysqlSql": "SELECT id, TRIM(name) AS clean_name, LOWER(category) AS clean_category, REPLACE(name,' ','') AS no_spaces FROM raw_data ORDER BY name DESC;",
+  "sqliteSql": "SELECT id, TRIM(name) AS clean_name, LOWER(category) AS clean_category, REPLACE(name,' ','') AS no_spaces FROM raw_data ORDER BY name DESC;",
+  "executionSteps": [
+    "清理名称首尾空格",
+    "统一类别大小写",
+    "对比删除所有普通空格"
+  ],
+  "useCase": "汇总两套系统的商品资料前，数据分析师要统一名称和类别格式。raw_data 的 id 是原始记录标识，name 是名称，amount 是文本金额，category 是类别。本节只处理文本，不负责金额转换。",
+  "comparison": "TRIM 清理边缘；REPLACE 可改变内部；大小写转换不等于统一业务分类。",
+  "commonError": {
+    "example": "用 REPLACE 删除合法姓名中的所有空格，或清洗后直接删除名称相同的记录。",
+    "correction": "优先 TRIM，明确替换规则；先审查重复候选再决定去重键。"
+  },
+  "notes": "本例仅验证 ASCII 大小写及普通空格，Unicode 大小写与排序规则存在引擎差异。",
+  "compatibility": {
+    "status": "直接兼容",
+    "detail": "仅在本示例数据与语义范围验证；不代表全部 MySQL 语法兼容。"
+  },
+  "relatedQuestionIds": [
+    "q0151",
+    "q0154",
+    "q0159"
+  ],
+  "relatedFlashcardIds": [
+    "fc0082",
+    "fc0083",
+    "fc0085"
+  ],
+  "relatedKnowledgePointIds": [
+    "kp02-01",
+    "kp05-01"
+  ],
+  "mysqlVerification": "未运行原生 MySQL 8.4",
+  "result": {
+    "columns": [
+      "id",
+      "clean_name",
+      "clean_category",
+      "no_spaces"
+    ],
+    "rows": [
+      [
+        4,
+        "Soap",
+        "home",
+        "Soap"
+      ],
+      [
+        3,
+        "Serum",
+        "skin",
+        "Serum"
+      ],
+      [
+        2,
+        "Mask",
+        "skin",
+        "Mask"
+      ],
+      [
+        5,
+        "Cream",
+        "makeup",
+        "Cream"
+      ],
+      [
+        1,
+        "Mask",
+        "skin",
+        "Mask"
+      ],
+      [
+        6,
+        "",
+        "home",
+        ""
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "mysqlVerificationScript": "validation/mysql/kp11-03.sql",
+  "primaryQuestionIds": [
+    "q0151",
+    "q0154",
+    "q0159"
+  ],
+  "primaryFlashcardIds": [
+    "fc0082",
+    "fc0083",
+    "fc0085"
+  ],
+  "teaching": {
+    "problem": "汇总两套系统的商品资料前，数据分析师要统一名称和类别格式。raw_data 的 id 是原始记录标识，name 是名称，amount 是文本金额，category 是类别。本节只处理文本，不负责金额转换。",
+    "codeExplanation": "TRIM(name) 移除边缘空格，LOWER(category) 将 ASCII 类别统一为小写；REPLACE(name,' ','') 另外展示删除全部普通空格的效果。三个表达式各自从原始数据取得输入，不会相互覆盖。若需要识别重复，可在规范化结果上按名称和类别分组再统计，但必须确认是否为同一业务记录。",
+    "resultExplanation": "前两行由不同书写方式变为相同名称 Mask 与类别 skin，仍是两条原始记录。第6行空名称仍为空字符串；它没有自动变为 NULL。需要明确缺失规则后才进行后续处理。",
+    "checkpoints": [],
+    "mergedConcepts": [],
+    "mergeExamples": [
+      {
+        "label": "内部空格对照",
+        "explanation": "TRIM 保留内部空格；REPLACE 删除全部匹配的普通空格。",
+        "sql": "SELECT TRIM('  A B  ') AS trimmed, REPLACE('  A B  ',' ','') AS removed;",
+        "result": {
+          "columns": [
+            "trimmed",
+            "removed"
+          ],
+          "rows": [
+            [
+              "A B",
+              "AB"
+            ]
+          ]
+        }
+      },
+      {
+        "label": "识别清洗后重复候选",
+        "explanation": "按规范化名称和类别统计，只说明存在重复候选，不证明应删除。",
+        "sql": "SELECT TRIM(name) AS clean_name,LOWER(category) AS clean_category,COUNT(*) AS n FROM raw_data GROUP BY TRIM(name),LOWER(category) HAVING COUNT(*)>1 ORDER BY clean_name,clean_category;",
+        "result": {
+          "columns": [
+            "clean_name",
+            "clean_category",
+            "n"
+          ],
+          "rows": [
+            [
+              "Mask",
+              "skin",
+              2
+            ]
+          ]
+        }
+      }
+    ]
+  }
+}

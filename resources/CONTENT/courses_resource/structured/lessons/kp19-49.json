@@ -1,0 +1,794 @@
+{
+  "schemaVersion": 1,
+  "id": "kp19-49",
+  "sourceBatch": "unified73",
+  "teachingKind": "business",
+  "conceptBlocks": [
+    {
+      "type": "paragraph",
+      "text": "银行原始支出为负，净支出取负号后求和；退款冲回减少净支出。每真实参考号一行，无参考号银行行按独立编号保留。差额=银行净支出−账簿费用。",
+      "emphasis": []
+    }
+  ],
+  "syntax": {
+    "purpose": "统计截止日 2025-12-31；金额 整数马币分；比率按题设；输出粒度 对账参考号。"
+  },
+  "dataDescriptions": {
+    "bank_transactions": "共 3 行；字段：bank_id、transaction_date、reference_no、amount_cents。",
+    "v_expenses": "共 3 行；字段：entry_id、entry_date、department_id、store_id、reference_no、account_id、expense_cents。"
+  },
+  "problem": "财务人员核对2025年费用凭证与银行交易。先匹配参考号再回查单据，不以金额相等代替匹配。",
+  "methodBlocks": [
+    {
+      "type": "paragraph",
+      "text": "a 按真实凭证号汇总，b 按参考号及缺失类型汇总。k 用 UNION 保留双方全部键；两个 LEFT JOIN 保留单侧记录。缺失侧金额保持空值，仅计算差额时补零。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "合成显示名不是连接键，类型标识参与连接，避免真实 BANK-4 与银行编号4碰撞。",
+      "emphasis": []
+    }
+  ],
+  "breakdown": [
+    {
+      "kind": "runnable",
+      "title": "汇总账簿金额",
+      "sql": "WITH a AS (\n  SELECT 0 unreferenced, reference_no ref, SUM(expense_cents) ledger\n  FROM v_expenses WHERE entry_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY reference_no\n)\nSELECT * FROM a ORDER BY 1, 2, 3 LIMIT 3;",
+      "purpose": "汇总账簿金额（a）的实际执行结果。",
+      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "sourceTables": [
+        {
+          "name": "bank_transactions",
+          "columns": [
+            {
+              "name": "bank_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "transaction_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "reference_no",
+              "type": "TEXT"
+            },
+            {
+              "name": "amount_cents",
+              "type": "INTEGER"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              "2025-06-12",
+              "J000001",
+              -13842
+            ],
+            [
+              2,
+              "2025-12-06",
+              "J000002",
+              -64705
+            ],
+            [
+              3,
+              "2025-12-16",
+              "J000004",
+              -228009
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 17931
+        },
+        {
+          "name": "v_expenses",
+          "columns": [
+            {
+              "name": "entry_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "entry_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "department_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "store_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "reference_no",
+              "type": "TEXT"
+            },
+            {
+              "name": "account_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "expense_cents",
+              "type": "派生"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              "2025-06-02",
+              4,
+              null,
+              "J000001",
+              4,
+              13842
+            ],
+            [
+              2,
+              "2025-12-04",
+              1,
+              null,
+              "J000002",
+              4,
+              65928
+            ],
+            [
+              3,
+              "2023-04-04",
+              1,
+              null,
+              "J000003",
+              4,
+              21203
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 18000
+        }
+      ],
+      "result": {
+        "columns": [
+          "unreferenced",
+          "ref",
+          "ledger"
+        ],
+        "rows": [
+          [
+            0,
+            "J000001",
+            13842
+          ],
+          [
+            0,
+            "J000002",
+            65928
+          ],
+          [
+            0,
+            "J000004",
+            228009
+          ]
+        ]
+      }
+    },
+    {
+      "kind": "runnable",
+      "title": "汇总银行金额",
+      "sql": "WITH a AS (\n  SELECT 0 unreferenced, reference_no ref, SUM(expense_cents) ledger\n  FROM v_expenses WHERE entry_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY reference_no\n), b AS (\n  SELECT CASE WHEN reference_no IS NULL THEN 1 ELSE 0 END unreferenced,\n    COALESCE(reference_no,CAST(bank_id AS CHAR)) ref, SUM(-amount_cents) bank\n  FROM bank_transactions WHERE transaction_date BETWEEN '2025-01-01' AND '2025-12-31'\n  GROUP BY CASE WHEN reference_no IS NULL THEN 1 ELSE 0 END,COALESCE(reference_no,CAST(bank_id AS CHAR))\n)\nSELECT * FROM b ORDER BY 1, 2, 3 LIMIT 3;",
+      "purpose": "汇总银行金额（b）的实际执行结果。",
+      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "sourceTables": [
+        {
+          "name": "bank_transactions",
+          "columns": [
+            {
+              "name": "bank_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "transaction_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "reference_no",
+              "type": "TEXT"
+            },
+            {
+              "name": "amount_cents",
+              "type": "INTEGER"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              "2025-06-12",
+              "J000001",
+              -13842
+            ],
+            [
+              2,
+              "2025-12-06",
+              "J000002",
+              -64705
+            ],
+            [
+              3,
+              "2025-12-16",
+              "J000004",
+              -228009
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 17931
+        },
+        {
+          "name": "v_expenses",
+          "columns": [
+            {
+              "name": "entry_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "entry_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "department_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "store_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "reference_no",
+              "type": "TEXT"
+            },
+            {
+              "name": "account_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "expense_cents",
+              "type": "派生"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              "2025-06-02",
+              4,
+              null,
+              "J000001",
+              4,
+              13842
+            ],
+            [
+              2,
+              "2025-12-04",
+              1,
+              null,
+              "J000002",
+              4,
+              65928
+            ],
+            [
+              3,
+              "2023-04-04",
+              1,
+              null,
+              "J000003",
+              4,
+              21203
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 18000
+        }
+      ],
+      "result": {
+        "columns": [
+          "unreferenced",
+          "ref",
+          "bank"
+        ],
+        "rows": [
+          [
+            0,
+            "BANK-086E2C1C",
+            2809
+          ],
+          [
+            0,
+            "BANK-1051D348",
+            2129
+          ],
+          [
+            0,
+            "BANK-137B5891",
+            1805
+          ]
+        ]
+      }
+    },
+    {
+      "kind": "runnable",
+      "title": "合并双方参考号",
+      "sql": "WITH a AS (\n  SELECT 0 unreferenced, reference_no ref, SUM(expense_cents) ledger\n  FROM v_expenses WHERE entry_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY reference_no\n), b AS (\n  SELECT CASE WHEN reference_no IS NULL THEN 1 ELSE 0 END unreferenced,\n    COALESCE(reference_no,CAST(bank_id AS CHAR)) ref, SUM(-amount_cents) bank\n  FROM bank_transactions WHERE transaction_date BETWEEN '2025-01-01' AND '2025-12-31'\n  GROUP BY CASE WHEN reference_no IS NULL THEN 1 ELSE 0 END,COALESCE(reference_no,CAST(bank_id AS CHAR))\n), k AS (\n  SELECT unreferenced,ref FROM a UNION SELECT unreferenced,ref FROM b\n)\nSELECT * FROM k ORDER BY 1, 2 LIMIT 3;",
+      "purpose": "合并双方参考号（k）的实际执行结果。",
+      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "sourceTables": [
+        {
+          "name": "bank_transactions",
+          "columns": [
+            {
+              "name": "bank_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "transaction_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "reference_no",
+              "type": "TEXT"
+            },
+            {
+              "name": "amount_cents",
+              "type": "INTEGER"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              "2025-06-12",
+              "J000001",
+              -13842
+            ],
+            [
+              2,
+              "2025-12-06",
+              "J000002",
+              -64705
+            ],
+            [
+              3,
+              "2025-12-16",
+              "J000004",
+              -228009
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 17931
+        },
+        {
+          "name": "v_expenses",
+          "columns": [
+            {
+              "name": "entry_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "entry_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "department_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "store_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "reference_no",
+              "type": "TEXT"
+            },
+            {
+              "name": "account_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "expense_cents",
+              "type": "派生"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              "2025-06-02",
+              4,
+              null,
+              "J000001",
+              4,
+              13842
+            ],
+            [
+              2,
+              "2025-12-04",
+              1,
+              null,
+              "J000002",
+              4,
+              65928
+            ],
+            [
+              3,
+              "2023-04-04",
+              1,
+              null,
+              "J000003",
+              4,
+              21203
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 18000
+        }
+      ],
+      "result": {
+        "columns": [
+          "unreferenced",
+          "ref"
+        ],
+        "rows": [
+          [
+            0,
+            "BANK-086E2C1C"
+          ],
+          [
+            0,
+            "BANK-1051D348"
+          ],
+          [
+            0,
+            "BANK-137B5891"
+          ]
+        ]
+      }
+    }
+  ],
+  "completeCode": {
+    "mysqlSql": "WITH a AS (\n  SELECT 0 unreferenced, reference_no ref, SUM(expense_cents) ledger\n  FROM v_expenses WHERE entry_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY reference_no\n), b AS (\n  SELECT CASE WHEN reference_no IS NULL THEN 1 ELSE 0 END unreferenced,\n    COALESCE(reference_no,CAST(bank_id AS CHAR)) ref, SUM(-amount_cents) bank\n  FROM bank_transactions WHERE transaction_date BETWEEN '2025-01-01' AND '2025-12-31'\n  GROUP BY CASE WHEN reference_no IS NULL THEN 1 ELSE 0 END,COALESCE(reference_no,CAST(bank_id AS CHAR))\n), k AS (\n  SELECT unreferenced,ref FROM a UNION SELECT unreferenced,ref FROM b\n)\nSELECT CASE WHEN k.unreferenced=1 THEN CONCAT('BANK-',k.ref) ELSE k.ref END ref,\n  a.ledger ledger_cents,b.bank bank_cents,COALESCE(b.bank,0)-COALESCE(a.ledger,0) difference_cents,\n  CASE WHEN a.ref IS NULL THEN 'bank_only' WHEN b.ref IS NULL THEN 'ledger_only' ELSE 'difference' END issue,\n  CASE WHEN k.unreferenced=1 THEN 'unreferenced_bank' ELSE 'reference' END reference_kind\nFROM k LEFT JOIN a ON a.ref=k.ref AND a.unreferenced=k.unreferenced\nLEFT JOIN b ON b.ref=k.ref AND b.unreferenced=k.unreferenced\nWHERE a.ref IS NULL OR b.ref IS NULL OR a.ledger<>b.bank ORDER BY ref,reference_kind",
+    "sqliteSql": "WITH a AS (\n  SELECT 0 unreferenced, reference_no ref, SUM(expense_cents) ledger\n  FROM v_expenses WHERE entry_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY reference_no\n), b AS (\n  SELECT CASE WHEN reference_no IS NULL THEN 1 ELSE 0 END unreferenced,\n    COALESCE(reference_no,CAST(bank_id AS CHAR)) ref, SUM(-amount_cents) bank\n  FROM bank_transactions WHERE transaction_date BETWEEN '2025-01-01' AND '2025-12-31'\n  GROUP BY CASE WHEN reference_no IS NULL THEN 1 ELSE 0 END,COALESCE(reference_no,CAST(bank_id AS CHAR))\n), k AS (\n  SELECT unreferenced,ref FROM a UNION SELECT unreferenced,ref FROM b\n)\nSELECT CASE WHEN k.unreferenced=1 THEN CONCAT('BANK-',k.ref) ELSE k.ref END ref,\n  a.ledger ledger_cents,b.bank bank_cents,COALESCE(b.bank,0)-COALESCE(a.ledger,0) difference_cents,\n  CASE WHEN a.ref IS NULL THEN 'bank_only' WHEN b.ref IS NULL THEN 'ledger_only' ELSE 'difference' END issue,\n  CASE WHEN k.unreferenced=1 THEN 'unreferenced_bank' ELSE 'reference' END reference_kind\nFROM k LEFT JOIN a ON a.ref=k.ref AND a.unreferenced=k.unreferenced\nLEFT JOIN b ON b.ref=k.ref AND b.unreferenced=k.unreferenced\nWHERE a.ref IS NULL OR b.ref IS NULL OR a.ledger<>b.bank ORDER BY ref,reference_kind"
+  },
+  "expectedResult": {
+    "columns": [
+      "ref",
+      "ledger_cents",
+      "bank_cents",
+      "difference_cents",
+      "issue",
+      "reference_kind"
+    ],
+    "rows": [
+      [
+        "BANK-086E2C1C",
+        null,
+        2809,
+        2809,
+        "bank_only",
+        "reference"
+      ],
+      [
+        "BANK-1051D348",
+        null,
+        2129,
+        2129,
+        "bank_only",
+        "reference"
+      ],
+      [
+        "BANK-137B5891",
+        null,
+        1805,
+        1805,
+        "bank_only",
+        "reference"
+      ],
+      [
+        "BANK-17888",
+        null,
+        723,
+        723,
+        "bank_only",
+        "unreferenced_bank"
+      ],
+      [
+        "BANK-17889",
+        null,
+        879,
+        879,
+        "bank_only",
+        "unreferenced_bank"
+      ],
+      [
+        "BANK-17891",
+        null,
+        929,
+        929,
+        "bank_only",
+        "unreferenced_bank"
+      ],
+      [
+        "BANK-17892",
+        null,
+        1212,
+        1212,
+        "bank_only",
+        "unreferenced_bank"
+      ],
+      [
+        "BANK-17896",
+        null,
+        788,
+        788,
+        "bank_only",
+        "unreferenced_bank"
+      ],
+      [
+        "BANK-17901",
+        null,
+        395,
+        395,
+        "bank_only",
+        "unreferenced_bank"
+      ],
+      [
+        "BANK-17902",
+        null,
+        494,
+        494,
+        "bank_only",
+        "unreferenced_bank"
+      ],
+      [
+        "BANK-17904",
+        null,
+        308,
+        308,
+        "bank_only",
+        "unreferenced_bank"
+      ],
+      [
+        "BANK-17906",
+        null,
+        1169,
+        1169,
+        "bank_only",
+        "unreferenced_bank"
+      ]
+    ],
+    "status": "SQLite实际执行（预览）",
+    "orderGuaranteed": true,
+    "totalRows": 1182,
+    "fullResultPath": "../enterprise_reference/business_tasks/results/BP19.json"
+  },
+  "resultBlocks": [
+    {
+      "type": "paragraph",
+      "text": "A 的1000支出及100退款合为900，与账簿一致；B 仅账簿500，C 银行600与账簿700差−100；D 仅银行300。两个无编号银行行各自保留。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "真实 BANK-4 已匹配，合成 BANK-4 仍独立。",
+      "emphasis": []
+    }
+  ],
+  "extensions": [
+    {
+      "label": "凭证净额",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "A 的冲销减少费用。",
+          "emphasis": []
+        }
+      ],
+      "sql": "WITH v_expenses(reference_no,entry_date,expense_cents) AS (VALUES ('A','2025-01-01',1000),('A','2025-01-02',-100),('B','2025-02-01',500),('C','2025-03-01',700),('BANK-4','2025-01-01',200)),\nbank_transactions(bank_id,reference_no,transaction_date,amount_cents) AS (VALUES (1,'A','2025-01-01',-1000),(2,'A','2025-01-02',100),(3,'C','2025-03-01',-600),(4,NULL,'2025-01-01',-80),(5,'D','2025-02-01',-300),(6,'BANK-4','2025-01-01',-200),(7,NULL,'2025-02-01',-20)),\na AS (SELECT 0 unreferenced,reference_no ref,SUM(expense_cents) ledger FROM v_expenses WHERE entry_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY reference_no) SELECT ref,ledger FROM a ORDER BY ref",
+      "result": {
+        "columns": [
+          "ref",
+          "ledger"
+        ],
+        "rows": [
+          [
+            "A",
+            900
+          ],
+          [
+            "B",
+            500
+          ],
+          [
+            "BANK-4",
+            200
+          ],
+          [
+            "C",
+            700
+          ]
+        ]
+      }
+    },
+    {
+      "label": "银行净支出",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "退款为正流水，转为负支出；空号独立分组。",
+          "emphasis": []
+        }
+      ],
+      "sql": "WITH v_expenses(reference_no,entry_date,expense_cents) AS (VALUES ('A','2025-01-01',1000),('A','2025-01-02',-100),('B','2025-02-01',500),('C','2025-03-01',700),('BANK-4','2025-01-01',200)),\nbank_transactions(bank_id,reference_no,transaction_date,amount_cents) AS (VALUES (1,'A','2025-01-01',-1000),(2,'A','2025-01-02',100),(3,'C','2025-03-01',-600),(4,NULL,'2025-01-01',-80),(5,'D','2025-02-01',-300),(6,'BANK-4','2025-01-01',-200),(7,NULL,'2025-02-01',-20)),\nb AS (SELECT CASE WHEN reference_no IS NULL THEN 1 ELSE 0 END unreferenced,COALESCE(reference_no,CAST(bank_id AS CHAR)) ref,SUM(-amount_cents) bank FROM bank_transactions WHERE transaction_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY CASE WHEN reference_no IS NULL THEN 1 ELSE 0 END,COALESCE(reference_no,CAST(bank_id AS CHAR))) SELECT unreferenced,ref,bank FROM b ORDER BY 1,2",
+      "result": {
+        "columns": [
+          "unreferenced",
+          "ref",
+          "bank"
+        ],
+        "rows": [
+          [
+            0,
+            "A",
+            900
+          ],
+          [
+            0,
+            "BANK-4",
+            200
+          ],
+          [
+            0,
+            "C",
+            600
+          ],
+          [
+            0,
+            "D",
+            300
+          ],
+          [
+            1,
+            "4",
+            80
+          ],
+          [
+            1,
+            "7",
+            20
+          ]
+        ]
+      }
+    },
+    {
+      "label": "完整对账",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "保留单侧及金额不符，已匹配的记录不输出。",
+          "emphasis": []
+        }
+      ],
+      "sql": "WITH v_expenses(reference_no,entry_date,expense_cents) AS (VALUES ('A','2025-01-01',1000),('A','2025-01-02',-100),('B','2025-02-01',500),('C','2025-03-01',700),('BANK-4','2025-01-01',200)),\nbank_transactions(bank_id,reference_no,transaction_date,amount_cents) AS (VALUES (1,'A','2025-01-01',-1000),(2,'A','2025-01-02',100),(3,'C','2025-03-01',-600),(4,NULL,'2025-01-01',-80),(5,'D','2025-02-01',-300),(6,'BANK-4','2025-01-01',-200),(7,NULL,'2025-02-01',-20)),\na AS (SELECT 0 unreferenced,reference_no ref,SUM(expense_cents) ledger FROM v_expenses WHERE entry_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY reference_no),\nb AS (SELECT CASE WHEN reference_no IS NULL THEN 1 ELSE 0 END unreferenced,COALESCE(reference_no,CAST(bank_id AS CHAR)) ref,SUM(-amount_cents) bank FROM bank_transactions WHERE transaction_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY CASE WHEN reference_no IS NULL THEN 1 ELSE 0 END,COALESCE(reference_no,CAST(bank_id AS CHAR))),\nk AS (SELECT unreferenced,ref FROM a UNION SELECT unreferenced,ref FROM b)\nSELECT CASE WHEN k.unreferenced=1 THEN 'BANK-'||k.ref ELSE k.ref END ref,a.ledger ledger_cents,b.bank bank_cents,COALESCE(b.bank,0)-COALESCE(a.ledger,0) difference_cents,CASE WHEN a.ref IS NULL THEN 'bank_only' WHEN b.ref IS NULL THEN 'ledger_only' ELSE 'difference' END issue,CASE WHEN k.unreferenced=1 THEN 'unreferenced_bank' ELSE 'reference' END reference_kind FROM k LEFT JOIN a ON a.ref=k.ref AND a.unreferenced=k.unreferenced LEFT JOIN b ON b.ref=k.ref AND b.unreferenced=k.unreferenced WHERE a.ref IS NULL OR b.ref IS NULL OR a.ledger<>b.bank ORDER BY ref,reference_kind",
+      "result": {
+        "columns": [
+          "ref",
+          "ledger_cents",
+          "bank_cents",
+          "difference_cents",
+          "issue",
+          "reference_kind"
+        ],
+        "rows": [
+          [
+            "B",
+            500,
+            null,
+            -500,
+            "ledger_only",
+            "reference"
+          ],
+          [
+            "BANK-4",
+            null,
+            80,
+            80,
+            "bank_only",
+            "unreferenced_bank"
+          ],
+          [
+            "BANK-7",
+            null,
+            20,
+            20,
+            "bank_only",
+            "unreferenced_bank"
+          ],
+          [
+            "C",
+            700,
+            600,
+            -100,
+            "difference",
+            "reference"
+          ],
+          [
+            "D",
+            null,
+            300,
+            300,
+            "bank_only",
+            "reference"
+          ]
+        ]
+      }
+    },
+    {
+      "label": "同显示名不同键",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "真实 BANK-4 和合成 BANK-4 不得合并。",
+          "emphasis": []
+        }
+      ],
+      "sql": "WITH v_expenses(reference_no,entry_date,expense_cents) AS (VALUES ('A','2025-01-01',1000),('A','2025-01-02',-100),('B','2025-02-01',500),('C','2025-03-01',700),('BANK-4','2025-01-01',200)),\nbank_transactions(bank_id,reference_no,transaction_date,amount_cents) AS (VALUES (1,'A','2025-01-01',-1000),(2,'A','2025-01-02',100),(3,'C','2025-03-01',-600),(4,NULL,'2025-01-01',-80),(5,'D','2025-02-01',-300),(6,'BANK-4','2025-01-01',-200),(7,NULL,'2025-02-01',-20)),\na AS (SELECT 0 unreferenced,reference_no ref,SUM(expense_cents) ledger FROM v_expenses WHERE entry_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY reference_no),\nb AS (SELECT CASE WHEN reference_no IS NULL THEN 1 ELSE 0 END unreferenced,COALESCE(reference_no,CAST(bank_id AS CHAR)) ref,SUM(-amount_cents) bank FROM bank_transactions WHERE transaction_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY CASE WHEN reference_no IS NULL THEN 1 ELSE 0 END,COALESCE(reference_no,CAST(bank_id AS CHAR))),\nk AS (SELECT unreferenced,ref FROM a UNION SELECT unreferenced,ref FROM b) SELECT unreferenced,ref FROM k WHERE ref IN ('BANK-4','4') ORDER BY 1",
+      "result": {
+        "columns": [
+          "unreferenced",
+          "ref"
+        ],
+        "rows": [
+          [
+            0,
+            "BANK-4"
+          ],
+          [
+            1,
+            "4"
+          ]
+        ]
+      }
+    }
+  ],
+  "cautions": {
+    "comparison": [
+      {
+        "type": "paragraph",
+        "text": "金额相同不是同笔交易的充分证据；时间差也不等于漏记。",
+        "emphasis": []
+      }
+    ],
+    "example": [
+      {
+        "type": "paragraph",
+        "text": "逐笔取绝对值并只做内连接。",
+        "emphasis": []
+      }
+    ],
+    "reason": [],
+    "correction": [
+      {
+        "type": "paragraph",
+        "text": "按带符号金额汇总，使用全量键及缺失类型。",
+        "emphasis": []
+      }
+    ],
+    "notes": [
+      {
+        "type": "paragraph",
+        "text": "完整输出见 ../enterprise_reference/business_tasks/results/BP19.json；公开预览展示前12行。",
+        "emphasis": []
+      },
+      {
+        "type": "paragraph",
+        "text": "独立边界及场景仅在提交判题时使用。",
+        "emphasis": []
+      }
+    ]
+  },
+  "sourcePath": "source/unified73/kp19-49.json",
+  "sourceSha256": "d96556a01a67c65e74558c97d3006123b963b033f1d41abfb7a0baf2557a5a49"
+}

@@ -1,0 +1,178 @@
+{
+  "schemaVersion": 1,
+  "id": "kp13-02",
+  "sourceBatch": "unified73",
+  "teachingKind": "syntax",
+  "conceptBlocks": [
+    {
+      "type": "paragraph",
+      "text": "交集返回两个结果中共同存在的行；差集返回左侧存在且右侧不存在的行。默认均去重。差集不可交换左右侧；交集的成员不取决于方向。集合运算比较对应的整行，不等于普通等号处理空值的逻辑。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "原生 MySQL 8.4 支持两类运算，SQLite 不支持其 ALL 形式；组合运算宜用具名表达式明确范围。",
+      "emphasis": []
+    }
+  ],
+  "syntax": {
+    "purpose": "INTERSECT 共同成员；EXCEPT 左侧独有成员。"
+  },
+  "dataDescriptions": {
+    "old_customers": "共 4 行；字段：customer_id、customer_name。",
+    "new_customers": "共 3 行；字段：customer_id、customer_name。"
+  },
+  "problem": "对比两期客户名单，识别两期共同出现、仅旧名单出现及仅新名单出现的客户。不直接将名单差异断言为真实流失或新增消费。",
+  "methodBlocks": [
+    {
+      "type": "paragraph",
+      "text": "INTERSECT 在两边都存在的编号中去重。EXCEPT 先规定左侧基准，再排除右侧出现者；改变顺序即可计算另一方向。末尾 ORDER BY 为整体排序。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "若旧系统不支持集合运算，可按业务键使用 EXISTS 或 NOT EXISTS，并处理去重与空值规则。",
+      "emphasis": []
+    }
+  ],
+  "breakdown": [
+    {
+      "kind": "fragment",
+      "title": "选择输出",
+      "sql": "SELECT customer_id, customer_name FROM old_customers",
+      "purpose": "输出 customer_id, customer_name FROM old_customers。",
+      "reason": "输出列的顺序与别名决定结果表的形状。"
+    },
+    {
+      "kind": "fragment",
+      "title": "合并结果",
+      "sql": "INTERSECT",
+      "purpose": "用 INTERSECT 合并前后两个查询的结果。",
+      "reason": "两侧输出列的数量和含义必须一致。"
+    },
+    {
+      "kind": "fragment",
+      "title": "选择输出",
+      "sql": "SELECT customer_id, customer_name FROM new_customers",
+      "purpose": "输出 customer_id, customer_name FROM new_customers。",
+      "reason": "输出列的顺序与别名决定结果表的形状。"
+    },
+    {
+      "kind": "fragment",
+      "title": "排序",
+      "sql": "ORDER BY customer_name;",
+      "purpose": "按 customer_name 排列结果。",
+      "reason": "查询结果的默认行序没有保证，需要显式排序。"
+    }
+  ],
+  "completeCode": {
+    "mysqlSql": "SELECT customer_id, customer_name FROM old_customers INTERSECT SELECT customer_id, customer_name FROM new_customers ORDER BY customer_name;",
+    "sqliteSql": "SELECT customer_id, customer_name FROM old_customers INTERSECT SELECT customer_id, customer_name FROM new_customers ORDER BY customer_name;"
+  },
+  "expectedResult": {
+    "columns": [
+      "customer_id",
+      "customer_name"
+    ],
+    "rows": [
+      [
+        3,
+        "王"
+      ],
+      [
+        2,
+        "陈"
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "resultBlocks": [
+    {
+      "type": "paragraph",
+      "text": "共同编号2、3；仅旧名单编号1，仅新名单编号4。重复旧编号2并不改变默认交集结果。",
+      "emphasis": []
+    }
+  ],
+  "extensions": [
+    {
+      "label": "旧名单独有",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "保留来源课程原差集查询。",
+          "emphasis": []
+        }
+      ],
+      "sql": "SELECT customer_id, customer_name FROM old_customers EXCEPT SELECT customer_id, customer_name FROM new_customers ORDER BY customer_name;",
+      "result": {
+        "columns": [
+          "customer_id",
+          "customer_name"
+        ],
+        "rows": [
+          [
+            1,
+            "林"
+          ]
+        ]
+      }
+    },
+    {
+      "label": "新名单独有",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "交换左右侧得到另一方向。",
+          "emphasis": []
+        }
+      ],
+      "sql": "SELECT customer_id, customer_name FROM new_customers EXCEPT SELECT customer_id, customer_name FROM old_customers ORDER BY customer_name;",
+      "result": {
+        "columns": [
+          "customer_id",
+          "customer_name"
+        ],
+        "rows": [
+          [
+            4,
+            "李"
+          ]
+        ]
+      }
+    }
+  ],
+  "cautions": {
+    "comparison": [
+      {
+        "type": "paragraph",
+        "text": "INTERSECT 找共同项；EXCEPT 有明确方向。",
+        "emphasis": []
+      }
+    ],
+    "example": [
+      {
+        "type": "paragraph",
+        "text": "把差集写成寻找共同客户，或认为交换两侧不改变结果。",
+        "emphasis": []
+      }
+    ],
+    "reason": [],
+    "correction": [
+      {
+        "type": "paragraph",
+        "text": "选用 INTERSECT 找共同项；差集分别运行两个方向。",
+        "emphasis": []
+      }
+    ],
+    "notes": [
+      {
+        "type": "paragraph",
+        "text": "混用不同集合运算时先封装为独立查询，避免引擎优先级差异。",
+        "emphasis": []
+      }
+    ]
+  },
+  "sourcePath": "source/unified73/kp13-02.json",
+  "sourceSha256": "095f3ff835cde6714fd118f706024f9bd60c6f099113d630d1baf37f1e18606d"
+}

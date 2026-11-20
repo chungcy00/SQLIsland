@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "id": "kp20-01",
+  "lessonSha256": "d9895093b1be4e4e0f93dd806b44de19042106f3b821acc53ce22915cc28aac1",
+  "figures": [
+    {
+      "id": "kp20-01-clauses",
+      "slot": "syntax",
+      "kind": "clause-map",
+      "title": "示例查询的几个部分",
+      "sql": "WITH totals AS (\n SELECT s.store_id, COALESCE(SUM(o.net_cents),0) net_cents\n FROM stores s LEFT JOIN v_order_net o ON o.store_id=s.store_id\n  AND o.channel='store' AND o.order_date BETWEEN '2025-01-01' AND '2025-12-31'\n GROUP BY s.store_id\n)\nSELECT store_id,net_cents,ROUND(100.0*net_cents/NULLIF(SUM(net_cents) OVER(),0),2) sales_pct\nFROM totals ORDER BY net_cents DESC",
+      "parts": [
+        {
+          "role": "cte",
+          "label": "中间结果",
+          "sql": "WITH totals AS (\n SELECT s.store_id, COALESCE(SUM(o.net_cents),0) net_cents\n FROM stores s LEFT JOIN v_order_net o ON o.store_id=s.store_id\n  AND o.channel='store' AND o.order_date BETWEEN '2025-01-01' AND '2025-12-31'\n GROUP BY s.store_id\n)",
+          "note": "先把名为 totals 的中间结果算出来，供后面的查询引用。"
+        },
+        {
+          "role": "select",
+          "label": "取数",
+          "sql": "SELECT store_id,net_cents,ROUND(100.0*net_cents/NULLIF(SUM(net_cents) OVER(),0),2) sales_pct",
+          "note": "输出查询需要的列与计算表达式。"
+        },
+        {
+          "role": "from",
+          "label": "来源",
+          "sql": "FROM totals",
+          "note": "从 totals 读取输入数据。"
+        },
+        {
+          "role": "order",
+          "label": "排序",
+          "sql": "ORDER BY net_cents DESC",
+          "note": "按 net_cents DESC 排列结果。"
+        }
+      ]
+    }
+  ]
+}

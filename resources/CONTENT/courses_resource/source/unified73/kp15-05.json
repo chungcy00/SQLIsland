@@ -1,0 +1,248 @@
+{
+  "id": "kp15-05",
+  "chapterId": "ch15",
+  "title": "移动平均与环比",
+  "learningObjective": "计算连续月份的移动平均及销售环比，处理不足窗口和无定义比率。",
+  "prerequisites": [
+    "kp15-04"
+  ],
+  "concept": "移动平均平滑短期波动；环比比较本期与上一自然期的变化率。三行窗口只有在每月一行且日期连续时才代表三个月。首两月可按已有行计算，也可按严格完整窗口口径返回空值，必须明确。",
+  "syntax": "AVG(v) OVER(ORDER BY month ROWS BETWEEN 2 PRECEDING AND CURRENT ROW)",
+  "parameters": {
+    "2 PRECEDING": "前两行",
+    "CURRENT ROW": "包含当前行"
+  },
+  "fixtureIds": [
+    "lesson-monthly"
+  ],
+  "sourceTables": [
+    {
+      "name": "monthly",
+      "columns": [
+        {
+          "name": "month",
+          "type": "TEXT",
+          "mysqlType": "VARCHAR(160) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_bin",
+          "sqliteType": "TEXT"
+        },
+        {
+          "name": "sales",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        }
+      ],
+      "rows": [
+        [
+          "2026-01",
+          1000
+        ],
+        [
+          "2026-02",
+          1500
+        ],
+        [
+          "2026-03",
+          1500
+        ],
+        [
+          "2026-04",
+          900
+        ]
+      ]
+    }
+  ],
+  "mysqlSql": "WITH m AS (SELECT month,sales,LAG(sales) OVER(ORDER BY month) AS prev,AVG(sales) OVER(ORDER BY month ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) AS moving_avg FROM monthly) SELECT month,ROUND(moving_avg,2) AS avg3,ROUND(100.0*(sales-prev)/NULLIF(prev,0),2) AS growth_pct FROM m ORDER BY month;",
+  "sqliteSql": "WITH m AS (SELECT month,sales,LAG(sales) OVER(ORDER BY month) AS prev,AVG(sales) OVER(ORDER BY month ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) AS moving_avg FROM monthly) SELECT month,ROUND(moving_avg,2) AS avg3,ROUND(100.0*(sales-prev)/NULLIF(prev,0),2) AS growth_pct FROM m ORDER BY month;",
+  "executionSteps": [
+    "取得上期销售与移动平均",
+    "计算安全环比",
+    "按月展示结果"
+  ],
+  "useCase": "月度销售报表按连续月份统计，移动平均允许不足三个月取已有记录，环比为百分数，首月和零分母不计算。",
+  "comparison": "移动平均描述平滑水平，不是增长率。",
+  "commonError": {
+    "example": "把本期当分母，或将首期环比填成0。",
+    "correction": "使用上期非零值为分母；无上期保留空值。"
+  },
+  "notes": "月份缺失先补时间轴；未知销售不能自动当作零。",
+  "compatibility": {
+    "status": "直接兼容",
+    "detail": "仅在本示例数据与语义范围验证；不代表全部 MySQL 语法兼容。"
+  },
+  "relatedQuestionIds": [
+    "q0203",
+    "q0214",
+    "q0220"
+  ],
+  "relatedFlashcardIds": [
+    "fc0111",
+    "fc0118"
+  ],
+  "relatedKnowledgePointIds": [
+    "kp04-01",
+    "kp06-01",
+    "kp07-01",
+    "kp14-01"
+  ],
+  "mysqlVerification": "未运行原生 MySQL 8.4",
+  "result": {
+    "columns": [
+      "month",
+      "avg3",
+      "growth_pct"
+    ],
+    "rows": [
+      [
+        "2026-01",
+        1000.0,
+        null
+      ],
+      [
+        "2026-02",
+        1250.0,
+        50.0
+      ],
+      [
+        "2026-03",
+        1333.33,
+        0.0
+      ],
+      [
+        "2026-04",
+        1300.0,
+        -40.0
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "visualization": {
+    "kind": "stepFlow",
+    "steps": [
+      {
+        "id": "1",
+        "label": "按月计算前三行窗口均值"
+      },
+      {
+        "id": "2",
+        "label": "取上期销售"
+      },
+      {
+        "id": "3",
+        "label": "计算环比百分数"
+      }
+    ],
+    "sourceFixtureIds": [
+      "lesson-monthly"
+    ],
+    "resultColumns": [
+      "month",
+      "avg3",
+      "growth_pct"
+    ]
+  },
+  "mysqlVerificationScript": "validation/mysql/kp15-05.sql",
+  "primaryQuestionIds": [
+    "q0203",
+    "q0214",
+    "q0220"
+  ],
+  "primaryFlashcardIds": [
+    "fc0111",
+    "fc0118"
+  ],
+  "teaching": {
+    "problem": "月度销售报表按连续月份统计，移动平均允许不足三个月取已有记录，环比为百分数，首月和零分母不计算。",
+    "codeExplanation": "内层公用表表达式同时计算 LAG 和 AVG。外层使用 100.0*(sales-prev)/NULLIF(prev,0)；先减后除，分母为上期，最后舍入。严格三月口径还需要检查窗口内有效值数。",
+    "resultExplanation": "二月均值1250，环比50%；三月均值1333.33，环比0%；四月均值1300，环比-40%。首月环比未知。",
+    "checkpoints": [
+      {
+        "name": "m",
+        "label": "逐月补充上期销售与移动平均",
+        "sql": "WITH m AS (SELECT month,sales,LAG(sales) OVER(ORDER BY month) AS prev,AVG(sales) OVER(ORDER BY month ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) AS moving_avg FROM monthly) SELECT * FROM m ORDER BY month;",
+        "result": {
+          "columns": [
+            "month",
+            "sales",
+            "prev",
+            "moving_avg"
+          ],
+          "rows": [
+            [
+              "2026-01",
+              1000,
+              null,
+              1000.0
+            ],
+            [
+              "2026-02",
+              1500,
+              1000,
+              1250.0
+            ],
+            [
+              "2026-03",
+              1500,
+              1500,
+              1333.3333333333333
+            ],
+            [
+              "2026-04",
+              900,
+              1500,
+              1300.0
+            ]
+          ]
+        }
+      }
+    ],
+    "mergedConcepts": [],
+    "mergeExamples": [
+      {
+        "label": "严格完整窗口",
+        "explanation": "仅在三个有效月均存在时给出平均。",
+        "sql": "SELECT month,CASE WHEN COUNT(sales) OVER w=3 THEN ROUND(AVG(sales) OVER w,2) END AS full_avg FROM monthly WINDOW w AS (ORDER BY month ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) ORDER BY month;",
+        "result": {
+          "columns": [
+            "month",
+            "full_avg"
+          ],
+          "rows": [
+            [
+              "2026-01",
+              null
+            ],
+            [
+              "2026-02",
+              null
+            ],
+            [
+              "2026-03",
+              1333.33
+            ],
+            [
+              "2026-04",
+              1300.0
+            ]
+          ]
+        }
+      },
+      {
+        "label": "零分母",
+        "explanation": "上期为零时，即使本期为正也不能计算普通环比。",
+        "sql": "SELECT 100.0*(100-0)/NULLIF(0,0) AS growth_pct;",
+        "result": {
+          "columns": [
+            "growth_pct"
+          ],
+          "rows": [
+            [
+              null
+            ]
+          ]
+        }
+      }
+    ]
+  }
+}

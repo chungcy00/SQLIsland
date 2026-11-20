@@ -1,0 +1,248 @@
+{
+  "id": "kp07-02",
+  "chapterId": "ch07",
+  "title": "HAVING 与 WHERE",
+  "learningObjective": "能够区分明细行筛选与汇总组筛选，并正确组合两种条件以实现业务需求。",
+  "prerequisites": [
+    "kp07-01"
+  ],
+  "concept": "WHERE 和 HAVING 都能排除数据，但处理对象不同。WHERE 在逻辑上先筛选输入行，决定哪些交易参与后续统计；HAVING 在分组聚合之后筛选统计结果。比如只统计二月订单，应先按日期筛行；如果要求类别销售合计超过1000，则必须等组内金额计算完成再判断。两个条件可以同时存在。将合计阈值误写为单笔金额阈值会改变分子和样本范围，得到完全不同的报告。聚合查询没有 GROUP BY 时也可以使用 HAVING 判断整体聚合结果，并非所有 HAVING 都必须配合显式分组。",
+  "syntax": "SELECT group_key, SUM(metric) FROM table_name WHERE row_condition GROUP BY group_key HAVING SUM(metric) > threshold;",
+  "parameters": {
+    "WHERE": "筛选参与汇总的行",
+    "GROUP BY": "划分统计组",
+    "HAVING": "筛选汇总后的组",
+    "threshold": "组级指标阈值"
+  },
+  "fixtureIds": [
+    "lesson-orders"
+  ],
+  "sourceTables": [
+    {
+      "name": "orders",
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "category",
+          "type": "TEXT",
+          "mysqlType": "VARCHAR(160) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_bin",
+          "sqliteType": "TEXT"
+        },
+        {
+          "name": "sales",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "store_id",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "order_date",
+          "type": "TEXT",
+          "mysqlType": "DATE",
+          "sqliteType": "TEXT"
+        },
+        {
+          "name": "customer_id",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          "护肤品",
+          800,
+          1,
+          "2026-01-03",
+          1
+        ],
+        [
+          2,
+          "化妆品",
+          400,
+          2,
+          "2026-01-10",
+          2
+        ],
+        [
+          3,
+          "护肤品",
+          600,
+          1,
+          "2026-02-02",
+          1
+        ],
+        [
+          4,
+          "化妆品",
+          300,
+          2,
+          "2026-02-15",
+          null
+        ],
+        [
+          5,
+          "日用品",
+          1500,
+          1,
+          "2026-02-20",
+          3
+        ]
+      ]
+    }
+  ],
+  "mysqlSql": "SELECT category, SUM(sales) AS total_sales FROM orders GROUP BY category HAVING SUM(sales) > 1000 ORDER BY total_sales DESC;",
+  "sqliteSql": "SELECT category, SUM(sales) AS total_sales FROM orders GROUP BY category HAVING SUM(sales) > 1000 ORDER BY total_sales DESC;",
+  "executionSteps": [
+    "读取有效订单",
+    "按类别计算销售额",
+    "筛选合计超过1000的组",
+    "排序输出"
+  ],
+  "useCase": "主管希望查看全部示例订单中销售总额超过1000的商品类别。这里1000是类别合计门槛，不是单笔订单金额门槛。",
+  "comparison": "WHERE sales > 1000 筛选单笔金额；HAVING SUM(sales) > 1000 筛选类别合计，两者业务含义不同。",
+  "commonError": {
+    "example": "WHERE SUM(sales) > 1000；或先使用 WHERE sales > 1000 再汇总以回答类别门槛问题。",
+    "correction": "组级聚合阈值用 HAVING；明细日期、状态等条件放 WHERE。"
+  },
+  "notes": "逻辑教学顺序为来源、行筛选、分组聚合、组筛选、输出、排序，实际物理执行计划可能不同。",
+  "compatibility": {
+    "status": "直接兼容",
+    "detail": "仅在本示例数据与语义范围验证；不代表全部 MySQL 语法兼容。"
+  },
+  "relatedQuestionIds": [
+    "q0076",
+    "q0084",
+    "q0087",
+    "q0089",
+    "q0090",
+    "q0093"
+  ],
+  "relatedFlashcardIds": [
+    "fc0046",
+    "fc0047"
+  ],
+  "relatedKnowledgePointIds": [
+    "kp02-01",
+    "kp05-01",
+    "kp06-01"
+  ],
+  "mysqlVerification": "未运行原生 MySQL 8.4",
+  "result": {
+    "columns": [
+      "category",
+      "total_sales"
+    ],
+    "rows": [
+      [
+        "日用品",
+        1500
+      ],
+      [
+        "护肤品",
+        1400
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "visualization": {
+    "kind": "stepFlow",
+    "steps": [
+      {
+        "id": "1",
+        "label": "读取5行"
+      },
+      {
+        "id": "2",
+        "label": "按类别分组"
+      },
+      {
+        "id": "3",
+        "label": "计算总量"
+      },
+      {
+        "id": "4",
+        "label": "移除700的组"
+      },
+      {
+        "id": "5",
+        "label": "排序"
+      }
+    ],
+    "sourceFixtureIds": [
+      "lesson-orders"
+    ],
+    "resultColumns": [
+      "category",
+      "total_sales"
+    ]
+  },
+  "mysqlVerificationScript": "validation/mysql/kp07-02.sql",
+  "primaryQuestionIds": [
+    "q0076",
+    "q0084",
+    "q0087",
+    "q0089",
+    "q0090",
+    "q0093"
+  ],
+  "primaryFlashcardIds": [
+    "fc0046",
+    "fc0047"
+  ],
+  "teaching": {
+    "problem": "主管希望查看全部示例订单中销售总额超过1000的商品类别。这里1000是类别合计门槛，不是单笔订单金额门槛。",
+    "codeExplanation": "先用 GROUP BY category 建立类别粒度，再用 SUM(sales) 计算每组总额。HAVING SUM(sales) > 1000 只保留合计达标的组，其中严格大于意味着等于1000不保留。若还需要限制二月销售，则先在 WHERE 中加入日期范围，再执行相同分组与组筛选。下面展示先筛单笔金额会产生何种差异。",
+    "resultExplanation": "日用品1500、护肤品1400保留；化妆品700排除。护肤品的两笔订单都低于1000，但组内相加超过门槛，因此不能先筛单笔金额。结果仍为类别粒度。",
+    "checkpoints": [],
+    "mergedConcepts": [],
+    "mergeExamples": [
+      {
+        "label": "错误口径对照：先筛单笔",
+        "explanation": "此查询语法有效，但回答的是不同问题，护肤品被错误排除。",
+        "sql": "SELECT category, SUM(sales) AS total_sales FROM orders WHERE sales > 1000 GROUP BY category ORDER BY total_sales DESC;",
+        "result": {
+          "columns": [
+            "category",
+            "total_sales"
+          ],
+          "rows": [
+            [
+              "日用品",
+              1500
+            ]
+          ]
+        }
+      },
+      {
+        "label": "组合日期与组阈值",
+        "explanation": "仅二月订单参与汇总，之后仍以类别合计超过1000筛选。",
+        "sql": "SELECT category, SUM(sales) AS total_sales FROM orders WHERE order_date >= '2026-02-01' AND order_date < '2026-03-01' GROUP BY category HAVING SUM(sales) > 1000 ORDER BY total_sales DESC;",
+        "result": {
+          "columns": [
+            "category",
+            "total_sales"
+          ],
+          "rows": [
+            [
+              "日用品",
+              1500
+            ]
+          ]
+        }
+      }
+    ]
+  }
+}

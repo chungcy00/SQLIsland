@@ -1,0 +1,262 @@
+{
+  "id": "kp07-03",
+  "chapterId": "ch07",
+  "title": "多字段分组与严格分组",
+  "learningObjective": "能够根据目标报表确定联合分组键，解释统计粒度，并避免输出没有确定来源的非聚合字段。",
+  "prerequisites": [
+    "kp07-02"
+  ],
+  "concept": "当一份报表需要同时区分多个业务维度时，分组键必须包含这些维度。例如每家门店内各类别的销售额，结果的一行代表门店与类别的组合，而不是单独一个门店或类别。GROUP BY store_id, category 按联合键分组，只有两个字段都相同的记录才归入同一组。增加分组键通常使统计粒度更细，删除键通常合并原有组，但实际组数取决于数据。严格分组要求输出的非聚合表达式属于分组键，或能够由分组键唯一决定，或符合数据库允许的单值限制。MySQL 默认严格分组模式会拒绝多数来源不确定的裸列，SQLite 可能接受并返回某个输入行的值；能运行不代表结果有明确业务含义。",
+  "syntax": "SELECT key_a, key_b, SUM(metric) FROM table_name GROUP BY key_a, key_b;",
+  "parameters": {
+    "key_a, key_b": "共同决定结果粒度的维度",
+    "SUM(metric)": "对联合组内数值求和"
+  },
+  "fixtureIds": [
+    "lesson-orders"
+  ],
+  "sourceTables": [
+    {
+      "name": "orders",
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "category",
+          "type": "TEXT",
+          "mysqlType": "VARCHAR(160) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_bin",
+          "sqliteType": "TEXT"
+        },
+        {
+          "name": "sales",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "store_id",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "order_date",
+          "type": "TEXT",
+          "mysqlType": "DATE",
+          "sqliteType": "TEXT"
+        },
+        {
+          "name": "customer_id",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          "护肤品",
+          800,
+          1,
+          "2026-01-03",
+          1
+        ],
+        [
+          2,
+          "化妆品",
+          400,
+          2,
+          "2026-01-10",
+          2
+        ],
+        [
+          3,
+          "护肤品",
+          600,
+          1,
+          "2026-02-02",
+          1
+        ],
+        [
+          4,
+          "化妆品",
+          300,
+          2,
+          "2026-02-15",
+          null
+        ],
+        [
+          5,
+          "日用品",
+          1500,
+          1,
+          "2026-02-20",
+          3
+        ]
+      ]
+    }
+  ],
+  "mysqlSql": "SELECT store_id, category, SUM(sales) AS total FROM orders GROUP BY store_id, category ORDER BY total DESC;",
+  "sqliteSql": "SELECT store_id, category, SUM(sales) AS total FROM orders GROUP BY store_id, category ORDER BY total DESC;",
+  "executionSteps": [
+    "确定门店与类别联合键",
+    "计算每组销售额",
+    "按合计排序"
+  ],
+  "useCase": "管理层希望比较各门店不同商品类别的销售表现，避免将不同门店的同类商品混为一个金额。示例数据目前门店1经营两类，门店2只有化妆品；这只是订单中实际出现的组合。",
+  "comparison": "分组键顺序不改变联合键的成员资格；排序需要独立指定。函数依赖是严格分组的合法例外，但不是任意裸列的理由。",
+  "commonError": {
+    "example": "SELECT category, id, SUM(sales) FROM orders GROUP BY category；一个类别可能有多个订单编号。",
+    "correction": "如果目标为类别汇总，移除 id 或使用有明确含义的 COUNT(*)；只有确实需要订单粒度时才将 id 加入分组。"
+  },
+  "notes": "不能仅因为 SQLite 能返回裸列就认为 MySQL 兼容；原生严格模式尚未实测。",
+  "compatibility": {
+    "status": "直接兼容",
+    "detail": "仅在本示例数据与语义范围验证；不代表全部 MySQL 语法兼容。"
+  },
+  "relatedQuestionIds": [
+    "q0077",
+    "q0085",
+    "q0086",
+    "q0091"
+  ],
+  "relatedFlashcardIds": [
+    "fc0048",
+    "fc0050"
+  ],
+  "relatedKnowledgePointIds": [
+    "kp02-01",
+    "kp05-01",
+    "kp06-01"
+  ],
+  "mysqlVerification": "未运行原生 MySQL 8.4",
+  "result": {
+    "columns": [
+      "store_id",
+      "category",
+      "total"
+    ],
+    "rows": [
+      [
+        1,
+        "日用品",
+        1500
+      ],
+      [
+        1,
+        "护肤品",
+        1400
+      ],
+      [
+        2,
+        "化妆品",
+        700
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "visualization": {
+    "kind": "stepFlow",
+    "steps": [
+      {
+        "id": "1",
+        "label": "构造门店与类别组合"
+      },
+      {
+        "id": "2",
+        "label": "组内求和"
+      },
+      {
+        "id": "3",
+        "label": "按金额排序"
+      }
+    ],
+    "sourceFixtureIds": [
+      "lesson-orders"
+    ],
+    "resultColumns": [
+      "store_id",
+      "category",
+      "total"
+    ]
+  },
+  "mysqlVerificationScript": "validation/mysql/kp07-03.sql",
+  "primaryQuestionIds": [
+    "q0077",
+    "q0085",
+    "q0086",
+    "q0091"
+  ],
+  "primaryFlashcardIds": [
+    "fc0048",
+    "fc0050"
+  ],
+  "teaching": {
+    "problem": "管理层希望比较各门店不同商品类别的销售表现，避免将不同门店的同类商品混为一个金额。示例数据目前门店1经营两类，门店2只有化妆品；这只是订单中实际出现的组合。",
+    "codeExplanation": "SELECT 中保留 store_id 和 category，GROUP BY 中也列出这两个字段，SUM(sales) 汇总组合内的订单。主查询按照金额降序排序；本例金额均不同，若生产环境需要完整稳定排序，可再加 category。不要把订单 id 任意加入结果，因为同一组可能对应多个订单编号。若主管还想看订单数量，可以增加 COUNT(*)，而非随意输出一个订单编号。",
+    "resultExplanation": "门店1日用品1500、门店1护肤品1400、门店2化妆品700，共三个实际存在的联合组。本例与单类别分组恰好同为三组，不表示增加分组维度永远不影响数量。删除类别键后变为两个门店组。",
+    "checkpoints": [],
+    "mergedConcepts": [],
+    "mergeExamples": [
+      {
+        "label": "查看每个联合组的订单数",
+        "explanation": "同时输出组键与两个有明确含义的聚合指标。",
+        "sql": "SELECT store_id, category, COUNT(*) AS order_count, SUM(sales) AS total FROM orders GROUP BY store_id, category ORDER BY category DESC;",
+        "result": {
+          "columns": [
+            "store_id",
+            "category",
+            "order_count",
+            "total"
+          ],
+          "rows": [
+            [
+              1,
+              "日用品",
+              1,
+              1500
+            ],
+            [
+              1,
+              "护肤品",
+              2,
+              1400
+            ],
+            [
+              2,
+              "化妆品",
+              2,
+              700
+            ]
+          ]
+        }
+      },
+      {
+        "label": "减少一个分组维度",
+        "explanation": "去掉类别后，同一门店的类别金额合并为门店合计。",
+        "sql": "SELECT store_id, SUM(sales) AS total FROM orders GROUP BY store_id ORDER BY total;",
+        "result": {
+          "columns": [
+            "store_id",
+            "total"
+          ],
+          "rows": [
+            [
+              2,
+              700
+            ],
+            [
+              1,
+              2900
+            ]
+          ]
+        }
+      }
+    ]
+  }
+}

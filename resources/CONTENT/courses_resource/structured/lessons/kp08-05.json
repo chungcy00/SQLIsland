@@ -1,0 +1,236 @@
+{
+  "schemaVersion": 1,
+  "id": "kp08-05",
+  "sourceBatch": "unified73",
+  "teachingKind": "syntax",
+  "conceptBlocks": [
+    {
+      "type": "paragraph",
+      "text": "连接后的行数取决于键的匹配基数。若客户有2笔订单及3次联系记录，两类明细直接按客户编号连接会得到6对记录，每笔订单重复3次；直接对销售额求和会放大金额。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "预聚合是先在各自事实表中按共同键独立计算指标，使每张汇总表在目标键上至多一行，再连接主档或其他汇总表。只对金额 DISTINCT 去重并不能修复问题：两笔不同订单可能金额相同。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "应先确定目标粒度、检查键的唯一性、核对连接前后总额，再决定是否需要预聚合。",
+      "emphasis": []
+    }
+  ],
+  "syntax": {
+    "purpose": "totals 客户粒度的中间汇总；COALESCE 根据口径将无匹配的汇总额显示为零。"
+  },
+  "dataDescriptions": {
+    "customers": "共 4 行；字段：customer_id、customer_name。",
+    "orders": "共 5 行；字段：id、category、sales、store_id、order_date、customer_id。"
+  },
+  "problem": "主管要生成每位登记客户的累计销售额，并计划以后加入联系次数等其他指标。订单是交易粒度，客户主档是客户粒度。本次金额为示例销售额，匿名订单排除；无订单客户显示0，假定记录完整。",
+  "methodBlocks": [
+    {
+      "type": "paragraph",
+      "text": "先从订单表筛出登记客户，再 GROUP BY customer_id 得到客户粒度的总额。公共表表达式 totals 保存这个中间结果，仅在当前查询有效。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "随后从客户主档左连接 totals；因为客户键在双方汇总关系中唯一，每位客户只返回一行。COALESCE 将没有订单汇总的客户显示为0。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "若将来加入联系记录，同样先按客户汇总联系次数，再连接。",
+      "emphasis": []
+    }
+  ],
+  "breakdown": [
+    {
+      "kind": "fragment",
+      "title": "计算 totals",
+      "sql": "WITH totals AS (SELECT customer_id,SUM(sales) AS total FROM orders WHERE customer_id IS NOT NULL GROUP BY customer_id)",
+      "purpose": "先把名为 totals 的中间结果算出来，供后面的查询引用。",
+      "reason": "公用表表达式只在当前语句内有效，便于把复杂查询分层表达。"
+    },
+    {
+      "kind": "fragment",
+      "title": "指定来源",
+      "sql": "FROM customers c LEFT JOIN totals t ON c.customer_id=t.customer_id",
+      "purpose": "读取查询需要的输入数据。",
+      "reason": "后面的子句都基于这里得到的行。"
+    },
+    {
+      "kind": "fragment",
+      "title": "选择输出",
+      "sql": "SELECT c.customer_id,COALESCE(t.total,0) AS total",
+      "purpose": "输出 c.customer_id,COALESCE(t.total,0) AS total。",
+      "reason": "输出列的顺序与别名决定结果表的形状。"
+    },
+    {
+      "kind": "fragment",
+      "title": "排序",
+      "sql": "ORDER BY total DESC;",
+      "purpose": "按 total DESC 排列结果。",
+      "reason": "查询结果的默认行序没有保证，需要显式排序。"
+    }
+  ],
+  "completeCode": {
+    "mysqlSql": "WITH totals AS (SELECT customer_id,SUM(sales) AS total FROM orders WHERE customer_id IS NOT NULL GROUP BY customer_id) SELECT c.customer_id,COALESCE(t.total,0) AS total FROM customers c LEFT JOIN totals t ON c.customer_id=t.customer_id ORDER BY total DESC;",
+    "sqliteSql": "WITH totals AS (SELECT customer_id,SUM(sales) AS total FROM orders WHERE customer_id IS NOT NULL GROUP BY customer_id) SELECT c.customer_id,COALESCE(t.total,0) AS total FROM customers c LEFT JOIN totals t ON c.customer_id=t.customer_id ORDER BY total DESC;"
+  },
+  "expectedResult": {
+    "columns": [
+      "customer_id",
+      "total"
+    ],
+    "rows": [
+      [
+        3,
+        1500
+      ],
+      [
+        1,
+        1400
+      ],
+      [
+        2,
+        400
+      ],
+      [
+        4,
+        0
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "resultBlocks": [
+    {
+      "type": "paragraph",
+      "text": "预聚合得到3行，最终表4行。客户1金额1400，客户2为400，客户3为1500，客户4为0；登记销售总额3300，匿名订单300未进入此统计。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "若直接连接三次联系记录，客户1销售额会被错误放大至4200。",
+      "emphasis": []
+    }
+  ],
+  "extensions": [
+    {
+      "label": "按客户预聚合",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "先计算目标粒度的汇总，检查每个客户只出现一次。",
+          "emphasis": []
+        }
+      ],
+      "sql": "SELECT customer_id,SUM(sales) AS total FROM orders WHERE customer_id IS NOT NULL GROUP BY customer_id ORDER BY total DESC;",
+      "result": {
+        "columns": [
+          "customer_id",
+          "total"
+        ],
+        "rows": [
+          [
+            3,
+            1500
+          ],
+          [
+            1,
+            1400
+          ],
+          [
+            2,
+            400
+          ]
+        ]
+      }
+    },
+    {
+      "label": "错误明细连接对照",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "两笔订单乘三次联系，金额被重复累计；这是有意展示的错误业务口径。",
+          "emphasis": []
+        }
+      ],
+      "sql": "WITH contacts AS (SELECT 1 AS customer_id,1 AS contact_id UNION ALL SELECT 1,2 UNION ALL SELECT 1,3) SELECT o.customer_id,COUNT(*) AS joined_rows,SUM(o.sales) AS inflated_total FROM orders o JOIN contacts c ON o.customer_id=c.customer_id GROUP BY o.customer_id;",
+      "result": {
+        "columns": [
+          "customer_id",
+          "joined_rows",
+          "inflated_total"
+        ],
+        "rows": [
+          [
+            1,
+            6,
+            4200
+          ]
+        ]
+      }
+    },
+    {
+      "label": "正确预聚合两个明细",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "分别汇总后再连接，客户1的销售额和联系数均保持正确；内连接仅显示两个来源均存在的客户。",
+          "emphasis": []
+        }
+      ],
+      "sql": "WITH contacts AS (SELECT 1 AS customer_id,1 AS contact_id UNION ALL SELECT 1,2 UNION ALL SELECT 1,3), sales_totals AS (SELECT customer_id,SUM(sales) AS total FROM orders WHERE customer_id IS NOT NULL GROUP BY customer_id), contact_totals AS (SELECT customer_id,COUNT(*) AS contact_count FROM contacts GROUP BY customer_id) SELECT s.customer_id,s.total,c.contact_count FROM sales_totals s JOIN contact_totals c ON s.customer_id=c.customer_id ORDER BY total DESC;",
+      "result": {
+        "columns": [
+          "customer_id",
+          "total",
+          "contact_count"
+        ],
+        "rows": [
+          [
+            1,
+            1400,
+            3
+          ]
+        ]
+      }
+    }
+  ],
+  "cautions": {
+    "comparison": [
+      {
+        "type": "paragraph",
+        "text": "预聚合解决统计粒度不一致；DISTINCT 只能按选定值去重，无法识别交易业务身份。",
+        "emphasis": []
+      }
+    ],
+    "example": [
+      {
+        "type": "paragraph",
+        "text": "用 SUM(DISTINCT sales) 修复连接膨胀。",
+        "emphasis": []
+      }
+    ],
+    "reason": [],
+    "correction": [
+      {
+        "type": "paragraph",
+        "text": "分别按共同业务键预聚合，再检查汇总键唯一和连接前后金额。",
+        "emphasis": []
+      }
+    ],
+    "notes": [
+      {
+        "type": "paragraph",
+        "text": "联系记录是教学内联数据，未新增正式夹具。",
+        "emphasis": []
+      }
+    ]
+  },
+  "sourcePath": "source/unified73/kp08-05.json",
+  "sourceSha256": "027b96c83a1b5bf35cbd5fa7c61f484eb85f765c7da64e770c7349997a48f5f6"
+}

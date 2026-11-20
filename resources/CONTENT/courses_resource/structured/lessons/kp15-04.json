@@ -1,0 +1,217 @@
+{
+  "schemaVersion": 1,
+  "id": "kp15-04",
+  "sourceBatch": "unified73",
+  "teachingKind": "advanced",
+  "conceptBlocks": [
+    {
+      "type": "paragraph",
+      "text": "窗口帧是在分区内为当前行选出的计算范围。ROWS 按排序后具体行位置确定边界；RANGE 在本例的截至当前值边界包含全部同值行。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "带排序的聚合窗口默认帧可能包含并列，因此应显式写出业务需要的帧。",
+      "emphasis": []
+    }
+  ],
+  "syntax": {
+    "purpose": "UNBOUNDED PRECEDING 分区起点；CURRENT ROW 当前行或当前排序值边界，取决于帧类型。"
+  },
+  "dataDescriptions": {
+    "monthly": "共 4 行；字段：month、sales。"
+  },
+  "problem": "月报需要从一月起累计到当前月；另需理解按薪资排序时同薪记录的累计差异。",
+  "methodBlocks": [
+    {
+      "type": "paragraph",
+      "text": "月份唯一时，ROWS 从首行累计至本行。对于同薪示例，RANGE 使用薪资作为排序值，把同薪员工一起计入；ROWS 增加员工编号作为决胜键，使逐人累计可复现。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "不能为了稳定输出给 RANGE 随意加唯一键。",
+      "emphasis": []
+    }
+  ],
+  "breakdown": [
+    {
+      "kind": "fragment",
+      "title": "指定来源",
+      "sql": "FROM monthly",
+      "purpose": "从 monthly 读取输入数据。",
+      "reason": "后面的子句都基于这里得到的行。"
+    },
+    {
+      "kind": "fragment",
+      "title": "选择输出",
+      "sql": "SELECT month,sales,SUM(sales) OVER(ORDER BY month ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS cumulative",
+      "purpose": "输出查询需要的列与计算表达式。",
+      "reason": "输出列的顺序与别名决定结果表的形状。"
+    },
+    {
+      "kind": "fragment",
+      "title": "排序",
+      "sql": "ORDER BY month;",
+      "purpose": "按 month 排列结果。",
+      "reason": "查询结果的默认行序没有保证，需要显式排序。"
+    }
+  ],
+  "completeCode": {
+    "mysqlSql": "SELECT month,sales,SUM(sales) OVER(ORDER BY month ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS cumulative FROM monthly ORDER BY month;",
+    "sqliteSql": "SELECT month,sales,SUM(sales) OVER(ORDER BY month ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS cumulative FROM monthly ORDER BY month;"
+  },
+  "expectedResult": {
+    "columns": [
+      "month",
+      "sales",
+      "cumulative"
+    ],
+    "rows": [
+      [
+        "2026-01",
+        1000,
+        1000
+      ],
+      [
+        "2026-02",
+        1500,
+        2500
+      ],
+      [
+        "2026-03",
+        1500,
+        4000
+      ],
+      [
+        "2026-04",
+        900,
+        4900
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "resultBlocks": [
+    {
+      "type": "paragraph",
+      "text": "月累计依次为1000、2500、4000、4900。并列实例中两个5000同值行的 RANGE 均为13000，而逐人累计分别为8000和13000。",
+      "emphasis": []
+    }
+  ],
+  "extensions": [
+    {
+      "label": "同薪并列原始示例",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "内联员工数据与来源课程一致，无需新增正式课程数据表。",
+          "emphasis": []
+        }
+      ],
+      "sql": "WITH employees AS (SELECT 1 AS employee_id,8000 AS salary UNION ALL SELECT 2,5000 UNION ALL SELECT 3,5000 UNION ALL SELECT 4,3000) SELECT employee_id,salary,SUM(salary) OVER(ORDER BY salary RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS range_sum,SUM(salary) OVER(ORDER BY salary,employee_id ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS row_sum FROM employees ORDER BY salary;",
+      "result": {
+        "columns": [
+          "employee_id",
+          "salary",
+          "range_sum",
+          "row_sum"
+        ],
+        "rows": [
+          [
+            4,
+            3000,
+            3000,
+            3000
+          ],
+          [
+            2,
+            5000,
+            13000,
+            8000
+          ],
+          [
+            3,
+            5000,
+            13000,
+            13000
+          ],
+          [
+            1,
+            8000,
+            21000,
+            21000
+          ]
+        ]
+      }
+    },
+    {
+      "label": "最近两行窗口",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "当前行与上一行构成最多两行的滑动窗口。",
+          "emphasis": []
+        }
+      ],
+      "sql": "SELECT month,SUM(sales) OVER(ORDER BY month ROWS BETWEEN 1 PRECEDING AND CURRENT ROW) AS last_two FROM monthly ORDER BY month;",
+      "result": {
+        "columns": [
+          "month",
+          "last_two"
+        ],
+        "rows": [
+          [
+            "2026-01",
+            1000
+          ],
+          [
+            "2026-02",
+            2500
+          ],
+          [
+            "2026-03",
+            3000
+          ],
+          [
+            "2026-04",
+            2400
+          ]
+        ]
+      }
+    }
+  ],
+  "cautions": {
+    "comparison": [
+      {
+        "type": "paragraph",
+        "text": "同值档累计与逐笔累计是不同业务问题。",
+        "emphasis": []
+      }
+    ],
+    "example": [
+      {
+        "type": "paragraph",
+        "text": "省略帧后假定同值行一定逐笔增加。",
+        "emphasis": []
+      }
+    ],
+    "reason": [],
+    "correction": [
+      {
+        "type": "paragraph",
+        "text": "逐笔采用 ROWS 加稳定决胜键；按同值档累计采用明确的 RANGE。",
+        "emphasis": []
+      }
+    ],
+    "notes": [
+      {
+        "type": "paragraph",
+        "text": "按年度重置累计时需分区；本例只验证所示帧，不推广至所有范围偏移。",
+        "emphasis": []
+      }
+    ]
+  },
+  "sourcePath": "source/unified73/kp15-04.json",
+  "sourceSha256": "e7b882e2ff3cd40719bdf3f07876ac64530969398b8d668f69e4f3deaef2a138"
+}

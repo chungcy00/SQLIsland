@@ -1,0 +1,202 @@
+{
+  "id": "kp12-04",
+  "chapterId": "ch12",
+  "title": "日期区间与月边界",
+  "learningObjective": "用左闭右开区间建立完整且不重叠的月报。",
+  "prerequisites": [
+    "kp12-03"
+  ],
+  "concept": "半开区间含起点、不含终点。月报终点用下一月第一天，而不是当月最后一天午夜，可覆盖最后一天任意时刻。相邻区间无重叠，也无需猜测数据精度。保持日期字段裸列比较通常有利于索引范围检索，但实际性能由执行计划决定。",
+  "syntax": "WHERE day >= start AND day < next_start",
+  "parameters": {
+    "start": "包含的开始边界",
+    "next_start": "排除的结束边界"
+  },
+  "fixtureIds": [
+    "lesson-orders"
+  ],
+  "sourceTables": [
+    {
+      "name": "orders",
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "category",
+          "type": "TEXT",
+          "mysqlType": "VARCHAR(160) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_bin",
+          "sqliteType": "TEXT"
+        },
+        {
+          "name": "sales",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "store_id",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "order_date",
+          "type": "TEXT",
+          "mysqlType": "DATE",
+          "sqliteType": "TEXT"
+        },
+        {
+          "name": "customer_id",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          "护肤品",
+          800,
+          1,
+          "2026-01-03",
+          1
+        ],
+        [
+          2,
+          "化妆品",
+          400,
+          2,
+          "2026-01-10",
+          2
+        ],
+        [
+          3,
+          "护肤品",
+          600,
+          1,
+          "2026-02-02",
+          1
+        ],
+        [
+          4,
+          "化妆品",
+          300,
+          2,
+          "2026-02-15",
+          null
+        ],
+        [
+          5,
+          "日用品",
+          1500,
+          1,
+          "2026-02-20",
+          3
+        ]
+      ]
+    }
+  ],
+  "mysqlSql": "SELECT SUM(sales) AS feb_sales FROM orders WHERE order_date >= '2026-02-01' AND order_date < '2026-03-01';",
+  "sqliteSql": "SELECT SUM(sales) AS feb_sales FROM orders WHERE order_date >= '2026-02-01' AND order_date < '2026-03-01';",
+  "executionSteps": [
+    "确定二月月初及三月月初",
+    "筛选区间内订单",
+    "汇总销售额"
+  ],
+  "useCase": "统计2026年2月订单销售额；按订单日期归属，忽略一月及三月记录，不排除匿名订单。",
+  "comparison": "月键生成不等于日期范围筛选。",
+  "commonError": {
+    "example": "使用 <= 当月最后一天的日期字符串筛选含时分秒的数据。",
+    "correction": "改用 < 下一月第一天。"
+  },
+  "notes": "时区及日期类型需与项目实际口径一致。",
+  "compatibility": {
+    "status": "直接兼容",
+    "detail": "仅在本示例数据与语义范围验证；不代表全部 MySQL 语法兼容。"
+  },
+  "relatedQuestionIds": [
+    "q0172"
+  ],
+  "relatedFlashcardIds": [
+    "fc0090",
+    "fc0095"
+  ],
+  "relatedKnowledgePointIds": [
+    "kp03-01",
+    "kp06-01"
+  ],
+  "mysqlVerification": "未运行原生 MySQL 8.4",
+  "result": {
+    "columns": [
+      "feb_sales"
+    ],
+    "rows": [
+      [
+        2400
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "mysqlVerificationScript": "validation/mysql/kp12-04.sql",
+  "primaryQuestionIds": [
+    "q0172"
+  ],
+  "primaryFlashcardIds": [
+    "fc0090",
+    "fc0095"
+  ],
+  "teaching": {
+    "problem": "统计2026年2月订单销售额；按订单日期归属，忽略一月及三月记录，不排除匿名订单。",
+    "codeExplanation": "两个条件用 AND 连接。第一个保留月初及之后，第二个排除下月月初及之后。先查看筛选明细再求和；本地 ISO 日期文本适合本示例的字典序比较。",
+    "resultExplanation": "二月订单3、4、5的金额600、300、1500合计2400。无交易月份的 SUM 可能返回 NULL，是否填零取决于业务。",
+    "checkpoints": [],
+    "mergedConcepts": [],
+    "mergeExamples": [
+      {
+        "label": "查看筛选明细",
+        "explanation": "确认三笔交易后再汇总。",
+        "sql": "SELECT id,sales FROM orders WHERE order_date >= '2026-02-01' AND order_date < '2026-03-01' ORDER BY sales DESC;",
+        "result": {
+          "columns": [
+            "id",
+            "sales"
+          ],
+          "rows": [
+            [
+              5,
+              1500
+            ],
+            [
+              3,
+              600
+            ],
+            [
+              4,
+              300
+            ]
+          ]
+        }
+      },
+      {
+        "label": "验证时间边界",
+        "explanation": "最后一天交易必须保留，下一月零时必须排除。",
+        "sql": "WITH d(t) AS (SELECT '2026-02-28 23:59:59' UNION ALL SELECT '2026-03-01 00:00:00') SELECT t FROM d WHERE t >= '2026-02-01' AND t < '2026-03-01' ORDER BY t;",
+        "result": {
+          "columns": [
+            "t"
+          ],
+          "rows": [
+            [
+              "2026-02-28 23:59:59"
+            ]
+          ]
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,271 @@
+{
+  "schemaVersion": 1,
+  "id": "kp09-02",
+  "sourceBatch": "unified73",
+  "teachingKind": "syntax",
+  "conceptBlocks": [
+    {
+      "type": "paragraph",
+      "text": "条件聚合将业务条件转换为每行的数值，再使用聚合函数统计指定子集。SUM(CASE WHEN 条件 THEN 1 ELSE 0 END) 对命中条件的行累加1；",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "COUNT(CASE WHEN 条件 THEN 1 END) 则利用 COUNT 忽略 NULL 特性。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "不能用 COUNT(CASE WHEN 条件 THEN 1 ELSE 0 END)，因为0也是非空值。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "MySQL IF(条件,真值,假值) 适用于二选一，未知条件也进入假值分支，不应随意将其称为零。CASE 更便于表达多分类及跨库兼容。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "若使用非互斥条件，多个指标可能同时计入同一行，合计不一定等于记录总数；空输入时 SUM 返回 NULL，而 COUNT 返回0。",
+      "emphasis": []
+    }
+  ],
+  "syntax": {
+    "purpose": "p 需要统计的业务条件；a、b 条件真或非真时的返回值；SUM 累计各行的命中标记。"
+  },
+  "dataDescriptions": {
+    "products": "共 6 行；字段：product_id、product_name、category、price、stock。"
+  },
+  "problem": "主管希望一行报表同时显示库存小于50和大于等于50的商品数量。本例第一类包含缺货商品，库存0也需要关注；假定库存已知非负。若要严格沿用上一课缺货与低库存分开标签，条件必须重写为互斥的三类。",
+  "methodBlocks": [
+    {
+      "type": "paragraph",
+      "text": "先对每件商品判断 stock<50 与 stock>=50；条件分别转换为1或0，再由 SUM 汇总。低库存关注组为编号2和6，正常组为其余4件。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "若只想显示二选一标签，可用 MySQL IF；兼容写法为 CASE WHEN ... THEN ... ELSE ... END。未知值在普通比较中不为真，必须明确是否单列统计。",
+      "emphasis": []
+    }
+  ],
+  "breakdown": [
+    {
+      "kind": "fragment",
+      "title": "指定来源",
+      "sql": "FROM products;",
+      "purpose": "从 products 读取输入数据。",
+      "reason": "后面的子句都基于这里得到的行。"
+    },
+    {
+      "kind": "fragment",
+      "title": "选择输出",
+      "sql": "SELECT SUM(CASE WHEN stock<50 THEN 1 ELSE 0 END) AS low_count, SUM(CASE WHEN stock>=50 THEN 1 ELSE 0 END) AS normal_count",
+      "purpose": "输出查询需要的列与计算表达式。",
+      "reason": "输出列的顺序与别名决定结果表的形状。"
+    }
+  ],
+  "completeCode": {
+    "mysqlSql": "SELECT SUM(CASE WHEN stock<50 THEN 1 ELSE 0 END) AS low_count, SUM(CASE WHEN stock>=50 THEN 1 ELSE 0 END) AS normal_count FROM products;",
+    "sqliteSql": "SELECT SUM(CASE WHEN stock<50 THEN 1 ELSE 0 END) AS low_count, SUM(CASE WHEN stock>=50 THEN 1 ELSE 0 END) AS normal_count FROM products;"
+  },
+  "expectedResult": {
+    "columns": [
+      "low_count",
+      "normal_count"
+    ],
+    "rows": [
+      [
+        2,
+        4
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "resultBlocks": [
+    {
+      "type": "paragraph",
+      "text": "两项计数为2和4，本例恰好覆盖全部6件商品。注意 low_count 包含库存0，不能直接解释为上一课定义的1至49的低库存数。在正式报表中应明确未知库存是否另计，避免漏报。",
+      "emphasis": []
+    }
+  ],
+  "extensions": [
+    {
+      "label": "观察逐行命中标记",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "先形成标记再聚合，直观理解每个计数来源。",
+          "emphasis": []
+        }
+      ],
+      "sql": "SELECT product_id,CASE WHEN stock<50 THEN 1 ELSE 0 END AS low_flag,CASE WHEN stock>=50 THEN 1 ELSE 0 END AS normal_flag FROM products ORDER BY product_name DESC;",
+      "result": {
+        "columns": [
+          "product_id",
+          "low_flag",
+          "normal_flag"
+        ],
+        "rows": [
+          [
+            5,
+            0,
+            1
+          ],
+          [
+            6,
+            1,
+            0
+          ],
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            1,
+            0,
+            1
+          ],
+          [
+            4,
+            0,
+            1
+          ],
+          [
+            3,
+            0,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "label": "两种计数对照",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "错误写法的0仍被计数。",
+          "emphasis": []
+        }
+      ],
+      "sql": "SELECT COUNT(CASE WHEN stock<50 THEN 1 END) AS correct_count, COUNT(CASE WHEN stock<50 THEN 1 ELSE 0 END) AS wrong_count FROM products;",
+      "result": {
+        "columns": [
+          "correct_count",
+          "wrong_count"
+        ],
+        "rows": [
+          [
+            2,
+            6
+          ]
+        ]
+      }
+    },
+    {
+      "label": "来源课二选一兼容示例",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "保留原来源课四行数据和结果，以内联数据实现独立运行；原生写法 IF(value>0,'正值','非正值或缺失') 尚未执行。",
+          "emphasis": []
+        }
+      ],
+      "sql": "WITH nullable_values AS (SELECT 1 AS id,NULL AS value UNION ALL SELECT 2,0 UNION ALL SELECT 3,10 UNION ALL SELECT 4,10) SELECT id,CASE WHEN value>0 THEN '正值' ELSE '非正值或缺失' END AS label FROM nullable_values ORDER BY label;",
+      "result": {
+        "columns": [
+          "id",
+          "label"
+        ],
+        "rows": [
+          [
+            3,
+            "正值"
+          ],
+          [
+            4,
+            "正值"
+          ],
+          [
+            1,
+            "非正值或缺失"
+          ],
+          [
+            2,
+            "非正值或缺失"
+          ]
+        ]
+      }
+    },
+    {
+      "label": "明确区分未知与零",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "在二选一不足以表达业务类别时，改用多分支。",
+          "emphasis": []
+        }
+      ],
+      "sql": "WITH samples AS (SELECT 1 AS id,NULL AS value UNION ALL SELECT 2,0 UNION ALL SELECT 3,10 UNION ALL SELECT 4,-1) SELECT id,CASE WHEN value IS NULL THEN '未知' WHEN value=0 THEN '零值' WHEN value>0 THEN '正值' ELSE '负值' END AS label FROM samples ORDER BY label DESC;",
+      "result": {
+        "columns": [
+          "id",
+          "label"
+        ],
+        "rows": [
+          [
+            2,
+            "零值"
+          ],
+          [
+            4,
+            "负值"
+          ],
+          [
+            3,
+            "正值"
+          ],
+          [
+            1,
+            "未知"
+          ]
+        ]
+      }
+    }
+  ],
+  "cautions": {
+    "comparison": [
+      {
+        "type": "paragraph",
+        "text": "COUNT 忽略 NULL，但不忽略0；CASE 支持多分支，MySQL IF 只做二选一。",
+        "emphasis": []
+      }
+    ],
+    "example": [
+      {
+        "type": "paragraph",
+        "text": "COUNT(CASE WHEN stock<50 THEN 1 ELSE 0 END)；IF(value>0,'正值','零值') 把未知或负值归入零。",
+        "emphasis": []
+      }
+    ],
+    "reason": [],
+    "correction": [
+      {
+        "type": "paragraph",
+        "text": "使用 SUM(CASE WHEN ... THEN 1 ELSE 0 END) 或省略 COUNT 内的 ELSE；未知值用 IS NULL 明确分类。",
+        "emphasis": []
+      }
+    ],
+    "notes": [
+      {
+        "type": "paragraph",
+        "text": "本地使用 CASE 验证 IF 的等价逻辑，未执行原生 MySQL IF。",
+        "emphasis": []
+      }
+    ]
+  },
+  "sourcePath": "source/unified73/kp09-02.json",
+  "sourceSha256": "74f9e216b173ec7956bdc30664469b9fcb444a47ece84bcbc17650032e7a3ebd"
+}

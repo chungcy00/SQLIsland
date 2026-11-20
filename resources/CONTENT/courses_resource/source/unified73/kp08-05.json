@@ -1,0 +1,309 @@
+{
+  "id": "kp08-05",
+  "chapterId": "ch08",
+  "title": "连接膨胀与预聚合",
+  "learningObjective": "能够识别一对多与多明细连接造成的重复计量，按共同业务键预聚合并核对结果。",
+  "prerequisites": [
+    "kp08-04"
+  ],
+  "concept": "连接后的行数取决于键的匹配基数。若客户有2笔订单及3次联系记录，两类明细直接按客户编号连接会得到6对记录，每笔订单重复3次；直接对销售额求和会放大金额。预聚合是先在各自事实表中按共同键独立计算指标，使每张汇总表在目标键上至多一行，再连接主档或其他汇总表。只对金额 DISTINCT 去重并不能修复问题：两笔不同订单可能金额相同。应先确定目标粒度、检查键的唯一性、核对连接前后总额，再决定是否需要预聚合。",
+  "syntax": "WITH totals AS (SELECT customer_id,SUM(sales) AS total FROM orders GROUP BY customer_id) SELECT ... FROM customers LEFT JOIN totals ON ...;",
+  "parameters": {
+    "totals": "客户粒度的中间汇总",
+    "COALESCE": "根据口径将无匹配的汇总额显示为零"
+  },
+  "fixtureIds": [
+    "lesson-customers",
+    "lesson-orders"
+  ],
+  "sourceTables": [
+    {
+      "name": "customers",
+      "columns": [
+        {
+          "name": "customer_id",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "customer_name",
+          "type": "TEXT",
+          "mysqlType": "VARCHAR(160) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_bin",
+          "sqliteType": "TEXT"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          "林"
+        ],
+        [
+          2,
+          "陈"
+        ],
+        [
+          3,
+          "王"
+        ],
+        [
+          4,
+          "李"
+        ]
+      ]
+    },
+    {
+      "name": "orders",
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "category",
+          "type": "TEXT",
+          "mysqlType": "VARCHAR(160) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_bin",
+          "sqliteType": "TEXT"
+        },
+        {
+          "name": "sales",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "store_id",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "order_date",
+          "type": "TEXT",
+          "mysqlType": "DATE",
+          "sqliteType": "TEXT"
+        },
+        {
+          "name": "customer_id",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          "护肤品",
+          800,
+          1,
+          "2026-01-03",
+          1
+        ],
+        [
+          2,
+          "化妆品",
+          400,
+          2,
+          "2026-01-10",
+          2
+        ],
+        [
+          3,
+          "护肤品",
+          600,
+          1,
+          "2026-02-02",
+          1
+        ],
+        [
+          4,
+          "化妆品",
+          300,
+          2,
+          "2026-02-15",
+          null
+        ],
+        [
+          5,
+          "日用品",
+          1500,
+          1,
+          "2026-02-20",
+          3
+        ]
+      ]
+    }
+  ],
+  "mysqlSql": "WITH totals AS (SELECT customer_id,SUM(sales) AS total FROM orders WHERE customer_id IS NOT NULL GROUP BY customer_id) SELECT c.customer_id,COALESCE(t.total,0) AS total FROM customers c LEFT JOIN totals t ON c.customer_id=t.customer_id ORDER BY total DESC;",
+  "sqliteSql": "WITH totals AS (SELECT customer_id,SUM(sales) AS total FROM orders WHERE customer_id IS NOT NULL GROUP BY customer_id) SELECT c.customer_id,COALESCE(t.total,0) AS total FROM customers c LEFT JOIN totals t ON c.customer_id=t.customer_id ORDER BY total DESC;",
+  "executionSteps": [
+    "按客户汇总订单",
+    "核对每个客户只有一行",
+    "连接客户主档"
+  ],
+  "useCase": "主管要生成每位登记客户的累计销售额，并计划以后加入联系次数等其他指标。订单是交易粒度，客户主档是客户粒度。本次金额为示例销售额，匿名订单排除；无订单客户显示0，假定记录完整。",
+  "comparison": "预聚合解决统计粒度不一致；DISTINCT 只能按选定值去重，无法识别交易业务身份。",
+  "commonError": {
+    "example": "用 SUM(DISTINCT sales) 修复连接膨胀。",
+    "correction": "分别按共同业务键预聚合，再检查汇总键唯一和连接前后金额。"
+  },
+  "notes": "联系记录是教学内联数据，未新增正式夹具。",
+  "compatibility": {
+    "status": "直接兼容",
+    "detail": "仅在本示例数据与语义范围验证；不代表全部 MySQL 语法兼容。"
+  },
+  "relatedQuestionIds": [
+    "q0095",
+    "q0114",
+    "q0116",
+    "q0117",
+    "q0118"
+  ],
+  "relatedFlashcardIds": [
+    "fc0056",
+    "fc0060"
+  ],
+  "relatedKnowledgePointIds": [
+    "kp01-01",
+    "kp03-01",
+    "kp07-01"
+  ],
+  "mysqlVerification": "未运行原生 MySQL 8.4",
+  "result": {
+    "columns": [
+      "customer_id",
+      "total"
+    ],
+    "rows": [
+      [
+        3,
+        1500
+      ],
+      [
+        1,
+        1400
+      ],
+      [
+        2,
+        400
+      ],
+      [
+        4,
+        0
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "visualization": {
+    "kind": "stepFlow",
+    "steps": [
+      {
+        "id": "1",
+        "label": "按客户聚合订单"
+      },
+      {
+        "id": "2",
+        "label": "确保每客户一个汇总行"
+      },
+      {
+        "id": "3",
+        "label": "连接客户表"
+      }
+    ],
+    "sourceFixtureIds": [
+      "lesson-customers",
+      "lesson-orders"
+    ],
+    "resultColumns": [
+      "customer_id",
+      "total"
+    ]
+  },
+  "mysqlVerificationScript": "validation/mysql/kp08-05.sql",
+  "primaryQuestionIds": [
+    "q0095",
+    "q0114",
+    "q0116",
+    "q0117",
+    "q0118"
+  ],
+  "primaryFlashcardIds": [
+    "fc0056",
+    "fc0060"
+  ],
+  "teaching": {
+    "problem": "主管要生成每位登记客户的累计销售额，并计划以后加入联系次数等其他指标。订单是交易粒度，客户主档是客户粒度。本次金额为示例销售额，匿名订单排除；无订单客户显示0，假定记录完整。",
+    "codeExplanation": "先从订单表筛出登记客户，再 GROUP BY customer_id 得到客户粒度的总额。公共表表达式 totals 保存这个中间结果，仅在当前查询有效。随后从客户主档左连接 totals；因为客户键在双方汇总关系中唯一，每位客户只返回一行。COALESCE 将没有订单汇总的客户显示为0。若将来加入联系记录，同样先按客户汇总联系次数，再连接。",
+    "resultExplanation": "预聚合得到3行，最终表4行。客户1金额1400，客户2为400，客户3为1500，客户4为0；登记销售总额3300，匿名订单300未进入此统计。若直接连接三次联系记录，客户1销售额会被错误放大至4200。",
+    "checkpoints": [],
+    "mergedConcepts": [],
+    "mergeExamples": [
+      {
+        "label": "按客户预聚合",
+        "explanation": "先计算目标粒度的汇总，检查每个客户只出现一次。",
+        "sql": "SELECT customer_id,SUM(sales) AS total FROM orders WHERE customer_id IS NOT NULL GROUP BY customer_id ORDER BY total DESC;",
+        "result": {
+          "columns": [
+            "customer_id",
+            "total"
+          ],
+          "rows": [
+            [
+              3,
+              1500
+            ],
+            [
+              1,
+              1400
+            ],
+            [
+              2,
+              400
+            ]
+          ]
+        }
+      },
+      {
+        "label": "错误明细连接对照",
+        "explanation": "两笔订单乘三次联系，金额被重复累计；这是有意展示的错误业务口径。",
+        "sql": "WITH contacts AS (SELECT 1 AS customer_id,1 AS contact_id UNION ALL SELECT 1,2 UNION ALL SELECT 1,3) SELECT o.customer_id,COUNT(*) AS joined_rows,SUM(o.sales) AS inflated_total FROM orders o JOIN contacts c ON o.customer_id=c.customer_id GROUP BY o.customer_id;",
+        "result": {
+          "columns": [
+            "customer_id",
+            "joined_rows",
+            "inflated_total"
+          ],
+          "rows": [
+            [
+              1,
+              6,
+              4200
+            ]
+          ]
+        }
+      },
+      {
+        "label": "正确预聚合两个明细",
+        "explanation": "分别汇总后再连接，客户1的销售额和联系数均保持正确；内连接仅显示两个来源均存在的客户。",
+        "sql": "WITH contacts AS (SELECT 1 AS customer_id,1 AS contact_id UNION ALL SELECT 1,2 UNION ALL SELECT 1,3), sales_totals AS (SELECT customer_id,SUM(sales) AS total FROM orders WHERE customer_id IS NOT NULL GROUP BY customer_id), contact_totals AS (SELECT customer_id,COUNT(*) AS contact_count FROM contacts GROUP BY customer_id) SELECT s.customer_id,s.total,c.contact_count FROM sales_totals s JOIN contact_totals c ON s.customer_id=c.customer_id ORDER BY total DESC;",
+        "result": {
+          "columns": [
+            "customer_id",
+            "total",
+            "contact_count"
+          ],
+          "rows": [
+            [
+              1,
+              1400,
+              3
+            ]
+          ]
+        }
+      }
+    ]
+  }
+}

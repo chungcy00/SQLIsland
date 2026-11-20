@@ -1,0 +1,188 @@
+{
+  "schemaVersion": 1,
+  "id": "kp04-01",
+  "sourceBatch": "unified73",
+  "teachingKind": "syntax",
+  "conceptBlocks": [
+    {
+      "type": "paragraph",
+      "text": "排序只改变返回记录的排列顺序，不会自动减少行数、修改数据或计算名次。没有 ORDER BY 时，数据库不保证查询输出的顺序。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "ASC 表示升序，DESC 表示降序，省略方向通常为升序。多列排序按从左到右的优先级比较：先按第一列排序，只有第一列相同才比较第二列。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "若全部排序字段仍相同，则这些记录的相对顺序没有保证。需要可复现的排行榜或分页时，应加上稳定且唯一的决胜字段。空值的默认排序位置及文本排序规则可能因数据库而异。",
+      "emphasis": []
+    }
+  ],
+  "syntax": {
+    "purpose": "ORDER BY 定义输出排序；key1 主要排序字段；key2 主字段相同后的次级排序字段；DESC 降序；ASC 升序。"
+  },
+  "dataDescriptions": {
+    "products": "共 6 行；字段：product_id、product_name、category、price、stock。"
+  },
+  "problem": "主管要求一张商品价格榜，先看高价商品；同价商品按商品名称升序展示，以便每次导出一致。",
+  "methodBlocks": [
+    {
+      "type": "paragraph",
+      "text": "FROM products 指定来源，SELECT 返回编号与单价。ORDER BY price DESC 将最高价格放在前面，product_name 仅在单价相同时决定先后。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "Mask 与 Soap_1 的价格同为15，按名称升序 Mask 先显示。每个排序字段的方向单独指定。为了看出区别，补充示例只改变次级排序方向，不改变主要价格排序。",
+      "emphasis": []
+    }
+  ],
+  "breakdown": [
+    {
+      "kind": "fragment",
+      "title": "指定来源",
+      "sql": "FROM products",
+      "purpose": "从 products 读取输入数据。",
+      "reason": "后面的子句都基于这里得到的行。"
+    },
+    {
+      "kind": "fragment",
+      "title": "选择输出",
+      "sql": "SELECT product_id, price",
+      "purpose": "输出 product_id, price。",
+      "reason": "输出列的顺序与别名决定结果表的形状。"
+    },
+    {
+      "kind": "fragment",
+      "title": "排序",
+      "sql": "ORDER BY price DESC, product_name;",
+      "purpose": "按 price DESC, product_name 排列结果。",
+      "reason": "查询结果的默认行序没有保证，需要显式排序。"
+    }
+  ],
+  "completeCode": {
+    "mysqlSql": "SELECT product_id, price FROM products ORDER BY price DESC, product_name;",
+    "sqliteSql": "SELECT product_id, price FROM products ORDER BY price DESC, product_name;"
+  },
+  "expectedResult": {
+    "columns": [
+      "product_id",
+      "price"
+    ],
+    "rows": [
+      [
+        2,
+        89
+      ],
+      [
+        4,
+        65
+      ],
+      [
+        5,
+        45
+      ],
+      [
+        3,
+        35
+      ],
+      [
+        1,
+        15
+      ],
+      [
+        6,
+        15
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "resultBlocks": [
+    {
+      "type": "paragraph",
+      "text": "原6行全部保留，排序顺序为2、4、5、3、1、6。若将次级方向改为降序，最后两条交换位置。结果只是逐商品排序，不是计算销售排名；如需名次列，后续窗口函数章节会介绍。",
+      "emphasis": []
+    }
+  ],
+  "extensions": [
+    {
+      "label": "改变并列决胜方向",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "价格仍降序，但同价时 Soap_1 先于 Mask。",
+          "emphasis": []
+        }
+      ],
+      "sql": "SELECT product_id, price FROM products ORDER BY price DESC, product_name DESC;",
+      "result": {
+        "columns": [
+          "product_id",
+          "price"
+        ],
+        "rows": [
+          [
+            2,
+            89
+          ],
+          [
+            4,
+            65
+          ],
+          [
+            5,
+            45
+          ],
+          [
+            3,
+            35
+          ],
+          [
+            6,
+            15
+          ],
+          [
+            1,
+            15
+          ]
+        ]
+      }
+    }
+  ],
+  "cautions": {
+    "comparison": [
+      {
+        "type": "paragraph",
+        "text": "ORDER BY 改变顺序；GROUP BY 改变统计粒度；排名函数生成名次。",
+        "emphasis": []
+      }
+    ],
+    "example": [
+      {
+        "type": "paragraph",
+        "text": "ORDER BY price, product_id DESC 期待两列都降序。",
+        "emphasis": []
+      }
+    ],
+    "reason": [],
+    "correction": [
+      {
+        "type": "paragraph",
+        "text": "分别指定 price DESC, product_id DESC。",
+        "emphasis": []
+      }
+    ],
+    "notes": [
+      {
+        "type": "paragraph",
+        "text": "示例编号唯一且非空；分页要求所有排序键组合能确定唯一顺序。",
+        "emphasis": []
+      }
+    ]
+  },
+  "sourcePath": "source/unified73/kp04-01.json",
+  "sourceSha256": "4c547c34bc6c6fac1f14d36dbe0b51e2e9f255669f6dfc340f58b7a081f3206c"
+}

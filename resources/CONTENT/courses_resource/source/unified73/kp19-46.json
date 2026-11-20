@@ -1,0 +1,774 @@
+{
+  "id": "kp19-46",
+  "chapterId": "ch19",
+  "title": "预算与实际费用差异",
+  "learningObjective": "能够按部门及费用科目计算预算偏差，并识别超支与预算遗漏。",
+  "prerequisites": [
+    "kp19-42",
+    "kp19-50"
+  ],
+  "concept": "预算是计划值，实际费用是已入账费用净额。冲销应保留负号。差额=实际−预算；偏差率=差额÷预算×100%。先统一期间、科目与部门粒度，否则明细连接会成倍放大金额。",
+  "syntax": "WITH b AS (SELECT department_id,account_id,SUM(budget_cents) budget FROM budgets WHERE month_key BETWEEN '2025-01' AND '2025-12' GROUP BY department_id,account_id), a AS (SELECT department_id,account_id,SUM(expense_cents) actual FROM v_expenses WHERE entry_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY department_id,account_id) SELECT b.department_id,b.account_id,b.budget budget_cents,COALESCE(a.actual,0) actual_cents,COALESCE(a.actual,0)-b.budget variance_cents,ROUND(100.0*(COALESCE(a.actual,0)-b.budget)/NULLIF(b.budget,0),2) variance_pct,CASE WHEN COALESCE(a.actual,0)>b.budget*1.1 THEN 1 ELSE 0 END over_budget FROM b LEFT JOIN a ON a.department_id=b.department_id AND a.account_id=b.account_id ORDER BY budget_cents DESC",
+  "parameters": {
+    "统计截止日": "2025-12-31",
+    "金额": "整数马币分；比率按题设",
+    "输出粒度": "部门×科目"
+  },
+  "fixtureIds": [],
+  "datasetId": "finance-v2",
+  "sourceTables": [
+    {
+      "name": "budgets",
+      "columns": [
+        {
+          "name": "budget_id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "department_id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "account_id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "month_key",
+          "type": "TEXT"
+        },
+        {
+          "name": "budget_cents",
+          "type": "INTEGER"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          1,
+          1,
+          "2023-01",
+          6251896
+        ],
+        [
+          2,
+          1,
+          2,
+          "2023-01",
+          1343563
+        ],
+        [
+          3,
+          1,
+          3,
+          "2023-01",
+          2082804
+        ]
+      ],
+      "previewOnly": true,
+      "rowCount": 1260
+    },
+    {
+      "name": "v_expenses",
+      "columns": [
+        {
+          "name": "entry_id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "entry_date",
+          "type": "TEXT"
+        },
+        {
+          "name": "department_id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "store_id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "reference_no",
+          "type": "TEXT"
+        },
+        {
+          "name": "account_id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "expense_cents",
+          "type": "派生"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          "2025-06-02",
+          4,
+          null,
+          "J000001",
+          4,
+          13842
+        ],
+        [
+          2,
+          "2025-12-04",
+          1,
+          null,
+          "J000002",
+          4,
+          65928
+        ],
+        [
+          3,
+          "2023-04-04",
+          1,
+          null,
+          "J000003",
+          4,
+          21203
+        ]
+      ],
+      "previewOnly": true,
+      "rowCount": 18000
+    }
+  ],
+  "sourceTablesArePreview": true,
+  "mysqlSql": "WITH b AS (SELECT department_id,account_id,SUM(budget_cents) budget FROM budgets WHERE month_key BETWEEN '2025-01' AND '2025-12' GROUP BY department_id,account_id), a AS (SELECT department_id,account_id,SUM(expense_cents) actual FROM v_expenses WHERE entry_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY department_id,account_id) SELECT b.department_id,b.account_id,b.budget budget_cents,COALESCE(a.actual,0) actual_cents,COALESCE(a.actual,0)-b.budget variance_cents,ROUND(100.0*(COALESCE(a.actual,0)-b.budget)/NULLIF(b.budget,0),2) variance_pct,CASE WHEN COALESCE(a.actual,0)>b.budget*1.1 THEN 1 ELSE 0 END over_budget FROM b LEFT JOIN a ON a.department_id=b.department_id AND a.account_id=b.account_id ORDER BY budget_cents DESC",
+  "sqliteSql": "WITH b AS (SELECT department_id,account_id,SUM(budget_cents) budget FROM budgets WHERE month_key BETWEEN '2025-01' AND '2025-12' GROUP BY department_id,account_id), a AS (SELECT department_id,account_id,SUM(expense_cents) actual FROM v_expenses WHERE entry_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY department_id,account_id) SELECT b.department_id,b.account_id,b.budget budget_cents,COALESCE(a.actual,0) actual_cents,COALESCE(a.actual,0)-b.budget variance_cents,ROUND(100.0*(COALESCE(a.actual,0)-b.budget)/NULLIF(b.budget,0),2) variance_pct,CASE WHEN COALESCE(a.actual,0)>b.budget*1.1 THEN 1 ELSE 0 END over_budget FROM b LEFT JOIN a ON a.department_id=b.department_id AND a.account_id=b.account_id ORDER BY budget_cents DESC",
+  "executionSteps": [
+    "独立汇总预算",
+    "独立汇总费用",
+    "按部门科目连接",
+    "计算差额及超支标记"
+  ],
+  "useCase": "财务主管检查2025年预算执行。每部门每科目一行，以预算为保留侧；无发生额视作零的前提是账务来源完整。超过预算110%才标记，恰好110%不标记；零预算的偏差率为空，但正实际费用仍触发标记。无预算实际费用另行检查。",
+  "comparison": "年度差额可抵消各月超支；费用偏差不是收入偏差，正差额通常代表超支。",
+  "commonError": {
+    "example": "按部门直接连接预算月行和实际凭证行后求和，或用 ABS 汇总费用。",
+    "correction": "先分别按相同粒度汇总，保留冲销方向；另行查无预算费用。"
+  },
+  "notes": "完整输出见 ../enterprise_reference/business_tasks/results/BP16.json；公开预览展示前12行。独立边界及场景仅在提交判题时使用。",
+  "compatibility": {
+    "status": "直接兼容（原生待验证）",
+    "detail": "本版本SQLite及sql.js WASM已实际复验，原生MySQL8.4尚未执行。"
+  },
+  "relatedQuestionIds": [
+    "q0266",
+    "q0269"
+  ],
+  "relatedFlashcardIds": [
+    "fc0144",
+    "fc0164"
+  ],
+  "relatedKnowledgePointIds": [
+    "kp07-01",
+    "kp08-01",
+    "kp14-01",
+    "kp15-01",
+    "kp06-01",
+    "kp09-01",
+    "kp10-01",
+    "kp12-01"
+  ],
+  "mysqlVerification": "未运行原生 MySQL 8.4",
+  "result": {
+    "columns": [
+      "department_id",
+      "account_id",
+      "budget_cents",
+      "actual_cents",
+      "variance_cents",
+      "variance_pct",
+      "over_budget"
+    ],
+    "rows": [
+      [
+        1,
+        1,
+        75531604,
+        119790619,
+        44259015,
+        58.6,
+        1
+      ],
+      [
+        4,
+        1,
+        44543733,
+        34468393,
+        -10075340,
+        -22.62,
+        0
+      ],
+      [
+        2,
+        1,
+        37622639,
+        30641834,
+        -6980805,
+        -18.55,
+        0
+      ],
+      [
+        7,
+        1,
+        33563364,
+        25360979,
+        -8202385,
+        -24.44,
+        0
+      ],
+      [
+        1,
+        3,
+        28150106,
+        80473954,
+        52323848,
+        185.87,
+        1
+      ],
+      [
+        3,
+        1,
+        26075834,
+        12216110,
+        -13859724,
+        -53.15,
+        0
+      ],
+      [
+        1,
+        5,
+        20123292,
+        47269485,
+        27146193,
+        134.9,
+        1
+      ],
+      [
+        5,
+        1,
+        18593872,
+        7283000,
+        -11310872,
+        -60.83,
+        0
+      ],
+      [
+        4,
+        3,
+        16325655,
+        31463066,
+        15137411,
+        92.72,
+        1
+      ],
+      [
+        1,
+        2,
+        15311324,
+        60436999,
+        45125675,
+        294.72,
+        1
+      ],
+      [
+        2,
+        3,
+        14121950,
+        17143940,
+        3021990,
+        21.4,
+        1
+      ],
+      [
+        6,
+        1,
+        12075081,
+        2072496,
+        -10002585,
+        -82.84,
+        0
+      ],
+      [
+        7,
+        3,
+        11604108,
+        16810873,
+        5206765,
+        44.87,
+        1
+      ],
+      [
+        4,
+        5,
+        11438580,
+        15519388,
+        4080808,
+        35.68,
+        1
+      ],
+      [
+        2,
+        5,
+        9936470,
+        13368099,
+        3431629,
+        34.54,
+        1
+      ],
+      [
+        7,
+        5,
+        9570223,
+        9823371,
+        253148,
+        2.65,
+        0
+      ],
+      [
+        3,
+        3,
+        9200771,
+        6464477,
+        -2736294,
+        -29.74,
+        0
+      ],
+      [
+        4,
+        2,
+        8400047,
+        18587569,
+        10187522,
+        121.28,
+        1
+      ],
+      [
+        1,
+        4,
+        7474257,
+        42552368,
+        35078111,
+        469.32,
+        1
+      ],
+      [
+        2,
+        2,
+        6775170,
+        13453542,
+        6678372,
+        98.57,
+        1
+      ],
+      [
+        7,
+        2,
+        6573731,
+        10200928,
+        3627197,
+        55.18,
+        1
+      ],
+      [
+        5,
+        3,
+        6411036,
+        4035127,
+        -2375909,
+        -37.06,
+        0
+      ],
+      [
+        3,
+        5,
+        6241493,
+        5463478,
+        -778015,
+        -12.47,
+        0
+      ],
+      [
+        3,
+        2,
+        5169773,
+        5654817,
+        485044,
+        9.38,
+        0
+      ],
+      [
+        5,
+        5,
+        4986547,
+        3044597,
+        -1941950,
+        -38.94,
+        0
+      ],
+      [
+        4,
+        4,
+        4600620,
+        12159888,
+        7559268,
+        164.31,
+        1
+      ],
+      [
+        6,
+        3,
+        4188675,
+        1819957,
+        -2368718,
+        -56.55,
+        0
+      ],
+      [
+        2,
+        4,
+        3698699,
+        8914028,
+        5215329,
+        141.0,
+        1
+      ],
+      [
+        5,
+        2,
+        3698469,
+        2884811,
+        -813658,
+        -22.0,
+        0
+      ],
+      [
+        6,
+        5,
+        3311073,
+        1552304,
+        -1758769,
+        -53.12,
+        0
+      ],
+      [
+        7,
+        4,
+        3279836,
+        7327362,
+        4047526,
+        123.41,
+        1
+      ],
+      [
+        3,
+        4,
+        2486328,
+        3682617,
+        1196289,
+        48.11,
+        1
+      ],
+      [
+        6,
+        2,
+        2366904,
+        1263965,
+        -1102939,
+        -46.6,
+        0
+      ],
+      [
+        5,
+        4,
+        1713585,
+        2018557,
+        304972,
+        17.8,
+        1
+      ],
+      [
+        6,
+        4,
+        1242706,
+        1256973,
+        14267,
+        1.15,
+        0
+      ]
+    ],
+    "status": "SQLite实际执行（预览）",
+    "orderGuaranteed": true,
+    "totalRows": 35,
+    "fullResultPath": "../enterprise_reference/business_tasks/results/BP16.json"
+  },
+  "projectId": "finance",
+  "taskId": "BP16",
+  "difficulty": "中等",
+  "crossGroup": null,
+  "mysqlVerificationScript": "../enterprise_reference/business_tasks/mysql_queries/BP16.sql",
+  "visualization": {
+    "kind": "stepFlow",
+    "steps": [
+      {
+        "id": "1",
+        "label": "预算单独聚合"
+      },
+      {
+        "id": "2",
+        "label": "费用独立聚合"
+      },
+      {
+        "id": "3",
+        "label": "合并并计算差异"
+      }
+    ],
+    "sourceFixtureIds": [],
+    "resultColumns": [
+      "department_id",
+      "account_id",
+      "budget_cents",
+      "actual_cents",
+      "variance_cents",
+      "variance_pct",
+      "over_budget"
+    ]
+  },
+  "primaryQuestionIds": [
+    "q0266"
+  ],
+  "primaryFlashcardIds": [
+    "fc0144",
+    "fc0164"
+  ],
+  "contentVersion": "4.2.1",
+  "mergedFrom": [
+    {
+      "id": "kp19-19",
+      "title": "财务：费用分类汇总"
+    },
+    {
+      "id": "kp19-22",
+      "title": "财务：预算与实际差异"
+    }
+  ],
+  "teaching": {
+    "problem": "财务主管检查2025年预算执行。每部门每科目一行，以预算为保留侧；无发生额视作零的前提是账务来源完整。超过预算110%才标记，恰好110%不标记；零预算的偏差率为空，但正实际费用仍触发标记。无预算实际费用另行检查。",
+    "codeExplanation": "SUM 分别汇总两种事实；LEFT JOIN 使用两个维度键；COALESCE 只处理没有匹配的实际汇总；NULLIF 防止零分母；CASE 采用严格大于条件。按月分析时两侧都加月份键，不能只对一侧加月份。",
+    "resultExplanation": "部门1科目1实际23000、预算20000，超支15%；科目2无费用，差额−5000。部门2科目1零预算发生200，偏差率不可定义但应关注；科目2恰好110%不标记。部门3无预算实际400未进入主报表，需补充异常清单。企业预览部门1科目1偏差58.6%，不能凭此认定浪费。",
+    "checkpoints": [
+      {
+        "name": "b",
+        "label": "汇总各部门科目预算",
+        "sql": "WITH b AS (SELECT department_id,account_id,SUM(budget_cents) budget FROM budgets WHERE month_key BETWEEN '2025-01' AND '2025-12' GROUP BY department_id,account_id)\nSELECT * FROM b ORDER BY 1, 2, 3 LIMIT 3;",
+        "result": {
+          "columns": [
+            "department_id",
+            "account_id",
+            "budget"
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              75531604
+            ],
+            [
+              1,
+              2,
+              15311324
+            ],
+            [
+              1,
+              3,
+              28150106
+            ]
+          ]
+        }
+      },
+      {
+        "name": "a",
+        "label": "汇总各部门科目实际费用",
+        "sql": "WITH b AS (SELECT department_id,account_id,SUM(budget_cents) budget FROM budgets WHERE month_key BETWEEN '2025-01' AND '2025-12' GROUP BY department_id,account_id), a AS (SELECT department_id,account_id,SUM(expense_cents) actual FROM v_expenses WHERE entry_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY department_id,account_id)\nSELECT * FROM a ORDER BY 1, 2, 3 LIMIT 3;",
+        "result": {
+          "columns": [
+            "department_id",
+            "account_id",
+            "actual"
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              119790619
+            ],
+            [
+              1,
+              2,
+              60436999
+            ],
+            [
+              1,
+              3,
+              80473954
+            ]
+          ]
+        }
+      }
+    ],
+    "mergedConcepts": [
+      {
+        "sourceId": "kp19-19",
+        "explanation": "按会计科目和期间归集费用，保留冲销方向。"
+      },
+      {
+        "sourceId": "kp19-22",
+        "explanation": "月报必须保留双方月份键，年度先统一汇总粒度。"
+      }
+    ],
+    "mergeExamples": [
+      {
+        "label": "年度预算汇总",
+        "explanation": "每个部门科目一行。",
+        "sql": "WITH budgets(department_id,account_id,month_key,budget_cents) AS (\n SELECT 1,1,'2025-01',10000 UNION ALL SELECT 1,1,'2025-02',10000\n UNION ALL SELECT 1,2,'2025-01',5000 UNION ALL SELECT 2,1,'2025-01',0\n UNION ALL SELECT 2,2,'2025-01',10000\n), v_expenses(department_id,account_id,entry_date,expense_cents) AS (\n SELECT 1,1,'2025-01-10',13000 UNION ALL SELECT 1,1,'2025-02-10',11000\n UNION ALL SELECT 1,1,'2025-02-15',-1000 UNION ALL SELECT 2,1,'2025-01-10',200\n UNION ALL SELECT 2,2,'2025-01-10',11000 UNION ALL SELECT 3,1,'2025-01-10',400\n) SELECT department_id,account_id,SUM(budget_cents) budget FROM budgets GROUP BY department_id,account_id ORDER BY 1,2",
+        "result": {
+          "columns": [
+            "department_id",
+            "account_id",
+            "budget"
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              20000
+            ],
+            [
+              1,
+              2,
+              5000
+            ],
+            [
+              2,
+              1,
+              0
+            ],
+            [
+              2,
+              2,
+              10000
+            ]
+          ]
+        }
+      },
+      {
+        "label": "年度实际汇总",
+        "explanation": "负值冲销减少累计费用。",
+        "sql": "WITH budgets(department_id,account_id,month_key,budget_cents) AS (\n SELECT 1,1,'2025-01',10000 UNION ALL SELECT 1,1,'2025-02',10000\n UNION ALL SELECT 1,2,'2025-01',5000 UNION ALL SELECT 2,1,'2025-01',0\n UNION ALL SELECT 2,2,'2025-01',10000\n), v_expenses(department_id,account_id,entry_date,expense_cents) AS (\n SELECT 1,1,'2025-01-10',13000 UNION ALL SELECT 1,1,'2025-02-10',11000\n UNION ALL SELECT 1,1,'2025-02-15',-1000 UNION ALL SELECT 2,1,'2025-01-10',200\n UNION ALL SELECT 2,2,'2025-01-10',11000 UNION ALL SELECT 3,1,'2025-01-10',400\n) SELECT department_id,account_id,SUM(expense_cents) actual FROM v_expenses GROUP BY department_id,account_id ORDER BY 1,2",
+        "result": {
+          "columns": [
+            "department_id",
+            "account_id",
+            "actual"
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              23000
+            ],
+            [
+              2,
+              1,
+              200
+            ],
+            [
+              2,
+              2,
+              11000
+            ],
+            [
+              3,
+              1,
+              400
+            ]
+          ]
+        }
+      },
+      {
+        "label": "完整偏差查询",
+        "explanation": "保留预算清单，零预算及严格超支边界。",
+        "sql": "WITH budgets(department_id,account_id,month_key,budget_cents) AS (\n SELECT 1,1,'2025-01',10000 UNION ALL SELECT 1,1,'2025-02',10000\n UNION ALL SELECT 1,2,'2025-01',5000 UNION ALL SELECT 2,1,'2025-01',0\n UNION ALL SELECT 2,2,'2025-01',10000\n), v_expenses(department_id,account_id,entry_date,expense_cents) AS (\n SELECT 1,1,'2025-01-10',13000 UNION ALL SELECT 1,1,'2025-02-10',11000\n UNION ALL SELECT 1,1,'2025-02-15',-1000 UNION ALL SELECT 2,1,'2025-01-10',200\n UNION ALL SELECT 2,2,'2025-01-10',11000 UNION ALL SELECT 3,1,'2025-01-10',400\n), b AS (SELECT department_id,account_id,SUM(budget_cents) budget FROM budgets WHERE month_key BETWEEN '2025-01' AND '2025-12' GROUP BY department_id,account_id), a AS (SELECT department_id,account_id,SUM(expense_cents) actual FROM v_expenses WHERE entry_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY department_id,account_id) SELECT b.department_id,b.account_id,b.budget budget_cents,COALESCE(a.actual,0) actual_cents,COALESCE(a.actual,0)-b.budget variance_cents,ROUND(100.0*(COALESCE(a.actual,0)-b.budget)/NULLIF(b.budget,0),2) variance_pct,CASE WHEN COALESCE(a.actual,0)>b.budget*1.1 THEN 1 ELSE 0 END over_budget FROM b LEFT JOIN a ON a.department_id=b.department_id AND a.account_id=b.account_id ORDER BY budget_cents DESC",
+        "result": {
+          "columns": [
+            "department_id",
+            "account_id",
+            "budget_cents",
+            "actual_cents",
+            "variance_cents",
+            "variance_pct",
+            "over_budget"
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              20000,
+              23000,
+              3000,
+              15.0,
+              1
+            ],
+            [
+              2,
+              2,
+              10000,
+              11000,
+              1000,
+              10.0,
+              0
+            ],
+            [
+              1,
+              2,
+              5000,
+              0,
+              -5000,
+              -100.0,
+              0
+            ],
+            [
+              2,
+              1,
+              0,
+              200,
+              200,
+              null,
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "label": "无预算实际费用",
+        "explanation": "反存在判断找到主报表未覆盖的组合。",
+        "sql": "WITH budgets(department_id,account_id,month_key,budget_cents) AS (\n SELECT 1,1,'2025-01',10000 UNION ALL SELECT 1,1,'2025-02',10000\n UNION ALL SELECT 1,2,'2025-01',5000 UNION ALL SELECT 2,1,'2025-01',0\n UNION ALL SELECT 2,2,'2025-01',10000\n), v_expenses(department_id,account_id,entry_date,expense_cents) AS (\n SELECT 1,1,'2025-01-10',13000 UNION ALL SELECT 1,1,'2025-02-10',11000\n UNION ALL SELECT 1,1,'2025-02-15',-1000 UNION ALL SELECT 2,1,'2025-01-10',200\n UNION ALL SELECT 2,2,'2025-01-10',11000 UNION ALL SELECT 3,1,'2025-01-10',400\n) SELECT a.department_id,a.account_id,SUM(a.expense_cents) actual FROM v_expenses a WHERE NOT EXISTS (SELECT 1 FROM budgets b WHERE b.department_id=a.department_id AND b.account_id=a.account_id) GROUP BY a.department_id,a.account_id ORDER BY 1,2",
+        "result": {
+          "columns": [
+            "department_id",
+            "account_id",
+            "actual"
+          ],
+          "rows": [
+            [
+              3,
+              1,
+              400
+            ]
+          ]
+        }
+      }
+    ]
+  }
+}

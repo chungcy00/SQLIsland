@@ -1,0 +1,220 @@
+{
+  "schemaVersion": 1,
+  "id": "kp16-03",
+  "sourceBatch": "unified73",
+  "teachingKind": "advanced",
+  "conceptBlocks": [
+    {
+      "type": "paragraph",
+      "text": "类型转换解决数据如何参与计算；类别标准化解决不同写法是否代表同一业务类别。转换前应验证输入格式与允许范围；映射规则应明确未知类别处理。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "SQLite 的 DECIMAL 类型亲和性不等于 MySQL 的精确十进制类型。",
+      "emphasis": []
+    }
+  ],
+  "syntax": {
+    "purpose": "expr 已核验的数值文本；condition 标准化后的类别匹配条件。"
+  },
+  "dataDescriptions": {
+    "raw_data": "共 6 行；字段：id、name、amount、category。"
+  },
+  "problem": "将不同系统导入的金额和类别转换为报表口径。本例金额为合法整数文本或空值，类别字典包含护肤品、日用品、化妆品。",
+  "methodBlocks": [
+    {
+      "type": "paragraph",
+      "text": "CAST 将金额转换为可计算值；LOWER(TRIM(category)) 先生成标准比较键，CASE 将已知键映射为中文类别，其他标为待分类。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "生产金额应采用真正的精确十进制或经过设计的整数分；不得把未知类别默认归为已知类别。",
+      "emphasis": []
+    }
+  ],
+  "breakdown": [
+    {
+      "kind": "fragment",
+      "title": "指定来源",
+      "sql": "FROM raw_data",
+      "purpose": "从 raw_data 读取输入数据。",
+      "reason": "后面的子句都基于这里得到的行。"
+    },
+    {
+      "kind": "fragment",
+      "title": "选择输出",
+      "sql": "SELECT id,CAST(amount AS DECIMAL(12,2)) AS numeric_amount,CASE WHEN LOWER(TRIM(category))='skin' THEN '护肤品' WHEN LOWER(TRIM(category))='home' THEN '日用品' WHEN LOWER(TRIM(category))='makeup' THEN '化妆品' ELSE '待分类' END AS clean_category",
+      "purpose": "输出查询需要的列与计算表达式。",
+      "reason": "输出列的顺序与别名决定结果表的形状。"
+    },
+    {
+      "kind": "fragment",
+      "title": "排序",
+      "sql": "ORDER BY name DESC;",
+      "purpose": "按 name DESC 排列结果。",
+      "reason": "查询结果的默认行序没有保证，需要显式排序。"
+    }
+  ],
+  "completeCode": {
+    "mysqlSql": "SELECT id,CAST(amount AS DECIMAL(12,2)) AS numeric_amount,CASE WHEN LOWER(TRIM(category))='skin' THEN '护肤品' WHEN LOWER(TRIM(category))='home' THEN '日用品' WHEN LOWER(TRIM(category))='makeup' THEN '化妆品' ELSE '待分类' END AS clean_category FROM raw_data ORDER BY name DESC;",
+    "sqliteSql": "SELECT id,CAST(amount AS DECIMAL(12,2)) AS numeric_amount,CASE WHEN LOWER(TRIM(category))='skin' THEN '护肤品' WHEN LOWER(TRIM(category))='home' THEN '日用品' WHEN LOWER(TRIM(category))='makeup' THEN '化妆品' ELSE '待分类' END AS clean_category FROM raw_data ORDER BY name DESC;"
+  },
+  "expectedResult": {
+    "columns": [
+      "id",
+      "numeric_amount",
+      "clean_category"
+    ],
+    "rows": [
+      [
+        4,
+        -5,
+        "日用品"
+      ],
+      [
+        3,
+        null,
+        "护肤品"
+      ],
+      [
+        2,
+        15,
+        "护肤品"
+      ],
+      [
+        5,
+        0,
+        "化妆品"
+      ],
+      [
+        1,
+        15,
+        "护肤品"
+      ],
+      [
+        6,
+        20,
+        "日用品"
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "resultBlocks": [
+    {
+      "type": "paragraph",
+      "text": "前三行统一为护肤品；编号3金额仍为空，编号4保留负数，编号5保留零。六行不改变粒度，清洗不等于去重。",
+      "emphasis": []
+    }
+  ],
+  "extensions": [
+    {
+      "label": "保留原类别与标准键",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "先核对映射依据，避免清洗后无法追查。",
+          "emphasis": []
+        }
+      ],
+      "sql": "SELECT id,category,LOWER(TRIM(category)) AS normalized FROM raw_data ORDER BY name DESC;",
+      "result": {
+        "columns": [
+          "id",
+          "category",
+          "normalized"
+        ],
+        "rows": [
+          [
+            4,
+            "HOME",
+            "home"
+          ],
+          [
+            3,
+            "Skin",
+            "skin"
+          ],
+          [
+            2,
+            "skin",
+            "skin"
+          ],
+          [
+            5,
+            "makeup",
+            "makeup"
+          ],
+          [
+            1,
+            "SKIN",
+            "skin"
+          ],
+          [
+            6,
+            "HOME",
+            "home"
+          ]
+        ]
+      }
+    },
+    {
+      "label": "非法文本转换反例",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "仅展示本地数据库的风险：非法文本可能转成零，不能视作校验成功。",
+          "emphasis": []
+        }
+      ],
+      "sql": "SELECT CAST('abc' AS DECIMAL(12,2)) AS converted,CAST('0' AS DECIMAL(12,2)) AS legitimate_zero;",
+      "result": {
+        "columns": [
+          "converted",
+          "legitimate_zero"
+        ],
+        "rows": [
+          [
+            0,
+            0
+          ]
+        ]
+      }
+    }
+  ],
+  "cautions": {
+    "comparison": [
+      {
+        "type": "paragraph",
+        "text": "类型转换不保证格式合法，类别映射不代表记录通过全部质量检查。",
+        "emphasis": []
+      }
+    ],
+    "example": [
+      {
+        "type": "paragraph",
+        "text": "CAST 任意文本后直接汇总并忽略转换异常。",
+        "emphasis": []
+      }
+    ],
+    "reason": [],
+    "correction": [
+      {
+        "type": "paragraph",
+        "text": "先验证合法格式与范围，隔离非法值，保留原值及转换状态。",
+        "emphasis": []
+      }
+    ],
+    "notes": [
+      {
+        "type": "paragraph",
+        "text": "示例类别大小写仅涉及 ASCII；本地数值精度与原生数据库不同。",
+        "emphasis": []
+      }
+    ]
+  },
+  "sourcePath": "source/unified73/kp16-03.json",
+  "sourceSha256": "9439572e1816cf6070db33275d2bfe4f7e51a5460a60bc51b86bbe21e201486a"
+}

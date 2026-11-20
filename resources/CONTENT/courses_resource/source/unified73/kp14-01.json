@@ -1,0 +1,270 @@
+{
+  "id": "kp14-01",
+  "chapterId": "ch14",
+  "title": "公用表表达式与多步骤查询",
+  "learningObjective": "拆解多层查询、独立检查中间结果，理解表达式的作用域。",
+  "prerequisites": [],
+  "concept": "公用表表达式是当前语句内命名的查询结果，不是持久表，也不保证物理物化。可以在后续表达式中引用前面已经定义的关系，将复杂分析拆解为可核查的逻辑步骤。每个表达式应明确一行代表什么，以及指标计算口径。递归形式另有起始项、递归项和终止条件，可处理层级结构；本面试精简版只需了解其用途，不展开递归语法教学。",
+  "syntax": "WITH a AS (SELECT ...), b AS (SELECT ... FROM a) SELECT ... FROM b;",
+  "parameters": {
+    "a,b": "当前语句内的表达式名称",
+    "AS": "定义表达式查询"
+  },
+  "fixtureIds": [
+    "lesson-orders"
+  ],
+  "sourceTables": [
+    {
+      "name": "orders",
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "category",
+          "type": "TEXT",
+          "mysqlType": "VARCHAR(160) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_bin",
+          "sqliteType": "TEXT"
+        },
+        {
+          "name": "sales",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "store_id",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "order_date",
+          "type": "TEXT",
+          "mysqlType": "DATE",
+          "sqliteType": "TEXT"
+        },
+        {
+          "name": "customer_id",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          "护肤品",
+          800,
+          1,
+          "2026-01-03",
+          1
+        ],
+        [
+          2,
+          "化妆品",
+          400,
+          2,
+          "2026-01-10",
+          2
+        ],
+        [
+          3,
+          "护肤品",
+          600,
+          1,
+          "2026-02-02",
+          1
+        ],
+        [
+          4,
+          "化妆品",
+          300,
+          2,
+          "2026-02-15",
+          null
+        ],
+        [
+          5,
+          "日用品",
+          1500,
+          1,
+          "2026-02-20",
+          3
+        ]
+      ]
+    }
+  ],
+  "mysqlSql": "WITH totals AS (SELECT category,SUM(sales) AS total FROM orders GROUP BY category), qualified AS (SELECT category,total FROM totals WHERE total>1000) SELECT * FROM qualified ORDER BY total DESC;",
+  "sqliteSql": "WITH totals AS (SELECT category,SUM(sales) AS total FROM orders GROUP BY category), qualified AS (SELECT category,total FROM totals WHERE total>1000) SELECT * FROM qualified ORDER BY total DESC;",
+  "executionSteps": [
+    "按类别汇总销售额",
+    "保留总额超过1000的类别",
+    "输出并排序"
+  ],
+  "useCase": "主管需要列出销售额严格超过1000的商品类别。以全部五笔订单为统计范围，按类别汇总金额，再筛选类别；不先排除单笔小额订单。",
+  "comparison": "具名表达式提高复杂查询可读性；简单查询可直接分组筛选。",
+  "commonError": {
+    "example": "同一语句连续写两个 WITH，或在下一条独立语句引用先前的表达式。",
+    "correction": "一个 WITH 后以逗号分隔多个定义，并在同一语句引用。"
+  },
+  "notes": "不保证性能更好；原生优化器可能合并或物化。14-02 已删除，仅保留递归概念简介。",
+  "compatibility": {
+    "status": "直接兼容",
+    "detail": "仅在本示例数据与语义范围验证；不代表全部 MySQL 语法兼容。"
+  },
+  "relatedQuestionIds": [
+    "q0188",
+    "q0189",
+    "q0190",
+    "q0192",
+    "q0194",
+    "q0195"
+  ],
+  "relatedFlashcardIds": [
+    "fc0103",
+    "fc0104",
+    "fc0107"
+  ],
+  "relatedKnowledgePointIds": [
+    "kp08-01",
+    "kp10-01"
+  ],
+  "mysqlVerification": "未运行原生 MySQL 8.4",
+  "result": {
+    "columns": [
+      "category",
+      "total"
+    ],
+    "rows": [
+      [
+        "日用品",
+        1500
+      ],
+      [
+        "护肤品",
+        1400
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "visualization": {
+    "kind": "stepFlow",
+    "steps": [
+      {
+        "id": "1",
+        "label": "先汇总类别"
+      },
+      {
+        "id": "2",
+        "label": "再筛高销售类别"
+      },
+      {
+        "id": "3",
+        "label": "最后输出"
+      }
+    ],
+    "sourceFixtureIds": [
+      "lesson-orders"
+    ],
+    "resultColumns": [
+      "category",
+      "total"
+    ]
+  },
+  "mysqlVerificationScript": "validation/mysql/kp14-01.sql",
+  "primaryQuestionIds": [
+    "q0188",
+    "q0189",
+    "q0190",
+    "q0192",
+    "q0194",
+    "q0195"
+  ],
+  "primaryFlashcardIds": [
+    "fc0103",
+    "fc0104",
+    "fc0107"
+  ],
+  "teaching": {
+    "problem": "主管需要列出销售额严格超过1000的商品类别。以全部五笔订单为统计范围，按类别汇总金额，再筛选类别；不先排除单笔小额订单。",
+    "codeExplanation": "先定义 totals，GROUP BY category 将订单粒度变为类别粒度，SUM 计算总额。然后定义 qualified，从 totals 读取类别级别结果，使用 WHERE 筛选已计算的 total。此处 WHERE 作用于中间关系的普通列，而非原订单层的聚合表达式。最后 SELECT 从 qualified 输出并按金额降序。每个独立检查查询都包含其所需定义；这里描述的是逻辑构建而非优化器物理顺序。",
+    "resultExplanation": "五笔订单变成三类汇总：日用品1500、护肤品1400、化妆品700；通过阈值的前两类保留，最终两行。与直接 HAVING 的业务结果一致。",
+    "checkpoints": [
+      {
+        "name": "totals",
+        "label": "类别销售汇总",
+        "sql": "WITH totals AS (SELECT category,SUM(sales) AS total FROM orders GROUP BY category) SELECT * FROM totals ORDER BY total DESC;",
+        "result": {
+          "columns": [
+            "category",
+            "total"
+          ],
+          "rows": [
+            [
+              "日用品",
+              1500
+            ],
+            [
+              "护肤品",
+              1400
+            ],
+            [
+              "化妆品",
+              700
+            ]
+          ]
+        }
+      },
+      {
+        "name": "qualified",
+        "label": "保留符合阈值的类别",
+        "sql": "WITH totals AS (SELECT category,SUM(sales) AS total FROM orders GROUP BY category), qualified AS (SELECT category,total FROM totals WHERE total>1000) SELECT * FROM qualified ORDER BY total DESC;",
+        "result": {
+          "columns": [
+            "category",
+            "total"
+          ],
+          "rows": [
+            [
+              "日用品",
+              1500
+            ],
+            [
+              "护肤品",
+              1400
+            ]
+          ]
+        }
+      }
+    ],
+    "mergedConcepts": [],
+    "mergeExamples": [
+      {
+        "label": "单层分组筛选对照",
+        "explanation": "简单条件可以直接使用 HAVING，不必人为增加表达式。",
+        "sql": "SELECT category,SUM(sales) AS total FROM orders GROUP BY category HAVING SUM(sales)>1000 ORDER BY total DESC;",
+        "result": {
+          "columns": [
+            "category",
+            "total"
+          ],
+          "rows": [
+            [
+              "日用品",
+              1500
+            ],
+            [
+              "护肤品",
+              1400
+            ]
+          ]
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,143 @@
+{
+  "schemaVersion": 1,
+  "id": "kp12-03",
+  "sourceBatch": "unified73",
+  "teachingKind": "function",
+  "conceptBlocks": [
+    {
+      "type": "paragraph",
+      "text": "日期差忽略时分秒，比较日期部分；完整经过单位差则考虑时间部分并截取完整单位。两种函数参数方向不同。业务账龄应指定固定截止日，负值可表示未到期，不能一律取绝对值。",
+      "emphasis": []
+    }
+  ],
+  "syntax": {
+    "purpose": "DAY 完整天数单位；start_date,end_date 起止值。"
+  },
+  "dataDescriptions": {},
+  "problem": "应付账款核查以固定截止日计算经过天数。示例从2026年1月31日至2月3日，不包括起始日作为额外一天。",
+  "methodBlocks": [
+    {
+      "type": "paragraph",
+      "text": "DATEDIFF 的结束日期在前；TIMESTAMPDIFF 的开始时间在前。当地兼容查询使用 julianday 差值；",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "有时分秒的日期差先 date()，完整小时差需注意浮点误差，本例用整秒差除以3600。",
+      "emphasis": []
+    }
+  ],
+  "breakdown": [
+    {
+      "kind": "fragment",
+      "title": "选择输出",
+      "sql": "SELECT DATEDIFF('2026-02-03','2026-01-31') AS days, TIMESTAMPDIFF(DAY,'2026-01-31','2026-02-03') AS elapsed;",
+      "purpose": "输出查询需要的列与计算表达式。",
+      "reason": "输出列的顺序与别名决定结果表的形状。"
+    }
+  ],
+  "completeCode": {
+    "mysqlSql": "SELECT DATEDIFF('2026-02-03','2026-01-31') AS days, TIMESTAMPDIFF(DAY,'2026-01-31','2026-02-03') AS elapsed;",
+    "sqliteSql": "SELECT CAST(julianday('2026-02-03')-julianday('2026-01-31') AS INTEGER) AS days, CAST(julianday('2026-02-03')-julianday('2026-01-31') AS INTEGER) AS elapsed;"
+  },
+  "expectedResult": {
+    "columns": [
+      "days",
+      "elapsed"
+    ],
+    "rows": [
+      [
+        3,
+        3
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "resultBlocks": [
+    {
+      "type": "paragraph",
+      "text": "两种计算在纯日期例中均为3天；跨午夜两分钟的日期差为1，完整小时差为0。",
+      "emphasis": []
+    }
+  ],
+  "extensions": [
+    {
+      "label": "跨午夜比较",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "日期跨一天，实际仅经过两分钟。",
+          "emphasis": []
+        }
+      ],
+      "sql": "SELECT CAST(julianday(date('2026-02-03 00:01:00'))-julianday(date('2026-02-02 23:59:00')) AS INTEGER) AS date_days,CAST((CAST(strftime('%s','2026-02-03 00:01:00') AS INTEGER)-CAST(strftime('%s','2026-02-02 23:59:00') AS INTEGER))/3600 AS INTEGER) AS full_hours;",
+      "result": {
+        "columns": [
+          "date_days",
+          "full_hours"
+        ],
+        "rows": [
+          [
+            1,
+            0
+          ]
+        ]
+      }
+    },
+    {
+      "label": "保留未到期方向",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "截止日在到期日之前，差值为负。",
+          "emphasis": []
+        }
+      ],
+      "sql": "SELECT CAST(julianday('2026-02-03')-julianday('2026-02-05') AS INTEGER) AS overdue_days;",
+      "result": {
+        "columns": [
+          "overdue_days"
+        ],
+        "rows": [
+          [
+            -2
+          ]
+        ]
+      }
+    }
+  ],
+  "cautions": {
+    "comparison": [
+      {
+        "type": "paragraph",
+        "text": "日期差不是完整时间单位差。",
+        "emphasis": []
+      }
+    ],
+    "example": [
+      {
+        "type": "paragraph",
+        "text": "将起止日期顺序写反或用绝对值掩盖未到期。",
+        "emphasis": []
+      }
+    ],
+    "reason": [],
+    "correction": [
+      {
+        "type": "paragraph",
+        "text": "按函数定义排列参数，保留方向。",
+        "emphasis": []
+      }
+    ],
+    "notes": [
+      {
+        "type": "paragraph",
+        "text": "不将本地例推广为所有月份、时区及高精度时间戳的等价实现。",
+        "emphasis": []
+      }
+    ]
+  },
+  "sourcePath": "source/unified73/kp12-03.json",
+  "sourceSha256": "d7c4dc65e89abaf403edae07a49e50d2b25be51b98952aa8c2f7bb15141b8946"
+}

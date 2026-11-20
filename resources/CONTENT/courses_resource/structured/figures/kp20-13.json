@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "id": "kp20-13",
+  "lessonSha256": "9db7dfe5fc7801628ddf6e8f75884a0bfd68b937538308850465c22d08d19666",
+  "figures": [
+    {
+      "id": "kp20-13-clauses",
+      "slot": "syntax",
+      "kind": "clause-map",
+      "title": "示例查询的几个部分",
+      "sql": "WITH a AS (SELECT order_id,SUM(amount_cents) paid FROM payments WHERE status='settled' AND payment_date<='2025-12-31' GROUP BY order_id), b AS (SELECT i.order_id,SUM(r.refund_cents) refunded FROM returns r JOIN order_items i ON i.order_item_id=r.order_item_id WHERE r.return_date<='2025-12-31' GROUP BY i.order_id) SELECT o.order_id,o.net_cents,COALESCE(a.paid,0)-COALESCE(b.refunded,0) cash_net_cents,COALESCE(a.paid,0)-COALESCE(b.refunded,0)-o.net_cents difference_cents FROM v_order_net o LEFT JOIN a ON a.order_id=o.order_id LEFT JOIN b ON b.order_id=o.order_id WHERE o.order_date BETWEEN '2025-01-01' AND '2025-12-31' AND COALESCE(a.paid,0)-COALESCE(b.refunded,0)<>o.net_cents ORDER BY difference_cents DESC",
+      "parts": [
+        {
+          "role": "cte",
+          "label": "中间结果",
+          "sql": "WITH a AS (SELECT order_id,SUM(amount_cents) paid FROM payments WHERE status='settled' AND payment_date<='2025-12-31' GROUP BY order_id),",
+          "note": "先把名为 a 的中间结果算出来，供后面的查询引用。"
+        },
+        {
+          "role": "cte",
+          "label": "中间结果",
+          "sql": "b AS (SELECT i.order_id,SUM(r.refund_cents) refunded FROM returns r JOIN order_items i ON i.order_item_id=r.order_item_id WHERE r.return_date<='2025-12-31' GROUP BY i.order_id)",
+          "note": "先把名为 b 的中间结果算出来，供后面的查询引用。"
+        },
+        {
+          "role": "select",
+          "label": "取数",
+          "sql": "SELECT o.order_id,o.net_cents,COALESCE(a.paid,0)-COALESCE(b.refunded,0) cash_net_cents,COALESCE(a.paid,0)-COALESCE(b.refunded,0)-o.net_cents difference_cents",
+          "note": "输出查询需要的列与计算表达式。"
+        },
+        {
+          "role": "from",
+          "label": "来源",
+          "sql": "FROM v_order_net o LEFT JOIN a ON a.order_id=o.order_id LEFT JOIN b ON b.order_id=o.order_id",
+          "note": "读取查询需要的输入数据。"
+        },
+        {
+          "role": "where",
+          "label": "筛选",
+          "sql": "WHERE o.order_date BETWEEN '2025-01-01' AND '2025-12-31' AND COALESCE(a.paid,0)-COALESCE(b.refunded,0)<>o.net_cents",
+          "note": "仅保留满足条件的行。"
+        },
+        {
+          "role": "order",
+          "label": "排序",
+          "sql": "ORDER BY difference_cents DESC",
+          "note": "按 difference_cents DESC 排列结果。"
+        }
+      ]
+    }
+  ]
+}

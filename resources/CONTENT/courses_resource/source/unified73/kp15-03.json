@@ -1,0 +1,225 @@
+{
+  "id": "kp15-03",
+  "chapterId": "ch15",
+  "title": "前后行取值",
+  "learningObjective": "获取上期与下期记录，识别时间断档。",
+  "prerequisites": [
+    "kp15-02"
+  ],
+  "concept": "LAG 与 LEAD 按窗口排序后的行位置偏移，不直接理解日历。默认偏移一行，找不到目标行时默认返回空值；指定默认值只处理越界，不能自动填补目标行原有空值。",
+  "syntax": "LAG(v,1) OVER(ORDER BY month); LEAD(v,1) OVER(ORDER BY month)",
+  "parameters": {
+    "v": "要读取的指标",
+    "1": "偏移行数",
+    "month": "时间排序键"
+  },
+  "fixtureIds": [
+    "lesson-monthly"
+  ],
+  "sourceTables": [
+    {
+      "name": "monthly",
+      "columns": [
+        {
+          "name": "month",
+          "type": "TEXT",
+          "mysqlType": "VARCHAR(160) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_bin",
+          "sqliteType": "TEXT"
+        },
+        {
+          "name": "sales",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        }
+      ],
+      "rows": [
+        [
+          "2026-01",
+          1000
+        ],
+        [
+          "2026-02",
+          1500
+        ],
+        [
+          "2026-03",
+          1500
+        ],
+        [
+          "2026-04",
+          900
+        ]
+      ]
+    }
+  ],
+  "mysqlSql": "SELECT month,sales,LAG(sales) OVER(ORDER BY month) AS previous_sales,LEAD(sales) OVER(ORDER BY month) AS next_sales FROM monthly ORDER BY month;",
+  "sqliteSql": "SELECT month,sales,LAG(sales) OVER(ORDER BY month) AS previous_sales,LEAD(sales) OVER(ORDER BY month) AS next_sales FROM monthly ORDER BY month;",
+  "executionSteps": [
+    "按月份排列",
+    "读取前后相邻行",
+    "检查首尾与缺月"
+  ],
+  "useCase": "月度销售趋势需比较相邻月份，数据表已为每月一行且月份连续。",
+  "comparison": "前一行不一定是上一个自然月。",
+  "commonError": {
+    "example": "删去二月后仍把三月的上一行叫做二月。",
+    "correction": "先补足月份骨架，按业务定义无交易与缺报的区别。"
+  },
+  "notes": "优化器的实际运行方式不等同逐行人工模拟。",
+  "compatibility": {
+    "status": "直接兼容",
+    "detail": "仅在本示例数据与语义范围验证；不代表全部 MySQL 语法兼容。"
+  },
+  "relatedQuestionIds": [
+    "q0198",
+    "q0202",
+    "q0209"
+  ],
+  "relatedFlashcardIds": [
+    "fc0113",
+    "fc0120"
+  ],
+  "relatedKnowledgePointIds": [
+    "kp04-01",
+    "kp06-01",
+    "kp07-01",
+    "kp14-01"
+  ],
+  "mysqlVerification": "未运行原生 MySQL 8.4",
+  "result": {
+    "columns": [
+      "month",
+      "sales",
+      "previous_sales",
+      "next_sales"
+    ],
+    "rows": [
+      [
+        "2026-01",
+        1000,
+        null,
+        1500
+      ],
+      [
+        "2026-02",
+        1500,
+        1000,
+        1500
+      ],
+      [
+        "2026-03",
+        1500,
+        1500,
+        900
+      ],
+      [
+        "2026-04",
+        900,
+        1500,
+        null
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "visualization": {
+    "kind": "stepFlow",
+    "steps": [
+      {
+        "id": "1",
+        "label": "月份排序"
+      },
+      {
+        "id": "2",
+        "label": "每行读取相邻行指标"
+      },
+      {
+        "id": "3",
+        "label": "边界返回NULL"
+      }
+    ],
+    "sourceFixtureIds": [
+      "lesson-monthly"
+    ],
+    "resultColumns": [
+      "month",
+      "sales",
+      "previous_sales",
+      "next_sales"
+    ]
+  },
+  "mysqlVerificationScript": "validation/mysql/kp15-03.sql",
+  "primaryQuestionIds": [
+    "q0198",
+    "q0202",
+    "q0209"
+  ],
+  "primaryFlashcardIds": [
+    "fc0113",
+    "fc0120"
+  ],
+  "teaching": {
+    "problem": "月度销售趋势需比较相邻月份，数据表已为每月一行且月份连续。",
+    "codeExplanation": "LAG 读取上一行，LEAD 读取下一行。先验证月份唯一、连续，再将相邻行解释为上月。多门店报表应按门店分区；否则上一行可能来自另一家店。",
+    "resultExplanation": "一月无上期，四月无下期；二月上期为1000，三月上期为1500。",
+    "checkpoints": [],
+    "mergedConcepts": [],
+    "mergeExamples": [
+      {
+        "label": "缺月对照",
+        "explanation": "先筛除二月，再计算相邻行，三月前一行变成一月。",
+        "sql": "SELECT month,LAG(month) OVER(ORDER BY month) AS previous_month FROM monthly WHERE month<>'2026-02' ORDER BY month;",
+        "result": {
+          "columns": [
+            "month",
+            "previous_month"
+          ],
+          "rows": [
+            [
+              "2026-01",
+              null
+            ],
+            [
+              "2026-03",
+              "2026-01"
+            ],
+            [
+              "2026-04",
+              "2026-03"
+            ]
+          ]
+        }
+      },
+      {
+        "label": "越界默认值",
+        "explanation": "仅演示默认参数，不表示首月前真实销售为零。",
+        "sql": "SELECT month,LAG(sales,1,0) OVER(ORDER BY month) AS prev FROM monthly ORDER BY month;",
+        "result": {
+          "columns": [
+            "month",
+            "prev"
+          ],
+          "rows": [
+            [
+              "2026-01",
+              0
+            ],
+            [
+              "2026-02",
+              1000
+            ],
+            [
+              "2026-03",
+              1500
+            ],
+            [
+              "2026-04",
+              1500
+            ]
+          ]
+        }
+      }
+    ]
+  }
+}

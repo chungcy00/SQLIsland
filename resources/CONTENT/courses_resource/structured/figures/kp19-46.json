@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "id": "kp19-46",
+  "lessonSha256": "6ba12d69f71ca0b8ac7832bef6719338c6d12492be5913ec7b175f59556a4303",
+  "figures": [
+    {
+      "id": "kp19-46-clauses",
+      "slot": "syntax",
+      "kind": "clause-map",
+      "title": "示例查询的几个部分",
+      "sql": "WITH b AS (SELECT department_id,account_id,SUM(budget_cents) budget FROM budgets WHERE month_key BETWEEN '2025-01' AND '2025-12' GROUP BY department_id,account_id), a AS (SELECT department_id,account_id,SUM(expense_cents) actual FROM v_expenses WHERE entry_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY department_id,account_id) SELECT b.department_id,b.account_id,b.budget budget_cents,COALESCE(a.actual,0) actual_cents,COALESCE(a.actual,0)-b.budget variance_cents,ROUND(100.0*(COALESCE(a.actual,0)-b.budget)/NULLIF(b.budget,0),2) variance_pct,CASE WHEN COALESCE(a.actual,0)>b.budget*1.1 THEN 1 ELSE 0 END over_budget FROM b LEFT JOIN a ON a.department_id=b.department_id AND a.account_id=b.account_id ORDER BY budget_cents DESC",
+      "parts": [
+        {
+          "role": "cte",
+          "label": "中间结果",
+          "sql": "WITH b AS (SELECT department_id,account_id,SUM(budget_cents) budget FROM budgets WHERE month_key BETWEEN '2025-01' AND '2025-12' GROUP BY department_id,account_id),",
+          "note": "先把名为 b 的中间结果算出来，供后面的查询引用。"
+        },
+        {
+          "role": "cte",
+          "label": "中间结果",
+          "sql": "a AS (SELECT department_id,account_id,SUM(expense_cents) actual FROM v_expenses WHERE entry_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY department_id,account_id)",
+          "note": "先把名为 a 的中间结果算出来，供后面的查询引用。"
+        },
+        {
+          "role": "select",
+          "label": "取数",
+          "sql": "SELECT b.department_id,b.account_id,b.budget budget_cents,COALESCE(a.actual,0) actual_cents,COALESCE(a.actual,0)-b.budget variance_cents,ROUND(100.0*(COALESCE(a.actual,0)-b.budget)/NULLIF(b.budget,0),2) variance_pct,CASE WHEN COALESCE(a.actual,0)>b.budget*1.1 THEN 1 ELSE 0 END over_budget",
+          "note": "输出查询需要的列与计算表达式。"
+        },
+        {
+          "role": "from",
+          "label": "来源",
+          "sql": "FROM b LEFT JOIN a ON a.department_id=b.department_id AND a.account_id=b.account_id",
+          "note": "读取查询需要的输入数据。"
+        },
+        {
+          "role": "order",
+          "label": "排序",
+          "sql": "ORDER BY budget_cents DESC",
+          "note": "按 budget_cents DESC 排列结果。"
+        }
+      ]
+    }
+  ]
+}

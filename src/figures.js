@@ -13,7 +13,7 @@ function truthTable(figure, lesson) {
   }).join("")}</tbody></table>${figure.caption ? `<div class="fig-caption">${esc(figure.caption)}</div>` : ""}`;
 }
 function clauseMap(figure) {
-  return `<ol class="fig-clauses">${figure.parts.map((part) => `<li class="fig-clause ${part.role}"><span class="fig-clause-tag">${esc(part.label)}</span><code>${esc(part.sql)}</code><small>${esc(part.note)}</small></li>`).join("")}</ol>`;
+  return `<ol class="fig-clauses">${figure.parts.map((part) => `<li class="fig-clause ${part.role}"><span class="fig-clause-tag">${esc(part.label)}</span><code>${esc(part.sql.length > 160 ? part.sql.slice(0, 150).trimEnd() + " …" : part.sql)}</code><small>${esc(part.note)}</small></li>`).join("")}</ol>`;
 }
 // 行数变化并入“分步执行”：返回第 index 步的行数徽章与数据变化表。
 const scroll = (html) => `<div class="fig-scroll">${html}</div>`;

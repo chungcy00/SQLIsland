@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "id": "kp16-01",
+  "lessonSha256": "d6910eb2b6eee3f77f80d05c5f9208f9e592e45bd871bbd3c84e91ee1d96aa0b",
+  "figures": [
+    {
+      "id": "kp16-01-clauses",
+      "slot": "syntax",
+      "kind": "clause-map",
+      "title": "示例查询的几个部分",
+      "sql": "SELECT TRIM(name) AS clean_name,amount,LOWER(category) AS clean_category,COUNT(*) AS duplicate_count FROM raw_data GROUP BY TRIM(name),amount,LOWER(category) HAVING COUNT(*)>1;",
+      "parts": [
+        {
+          "role": "select",
+          "label": "取数",
+          "sql": "SELECT TRIM(name) AS clean_name,amount,LOWER(category) AS clean_category,COUNT(*) AS duplicate_count",
+          "note": "输出查询需要的列与计算表达式。"
+        },
+        {
+          "role": "from",
+          "label": "来源",
+          "sql": "FROM raw_data",
+          "note": "从 raw_data 读取输入数据。"
+        },
+        {
+          "role": "group",
+          "label": "分组",
+          "sql": "GROUP BY TRIM(name),amount,LOWER(category)",
+          "note": "按 TRIM(name),amount,LOWER(category) 把行归入各个分组。"
+        },
+        {
+          "role": "having",
+          "label": "分组后筛选",
+          "sql": "HAVING COUNT(*)>1;",
+          "note": "仅保留满足 COUNT(*)>1 的分组。"
+        }
+      ]
+    }
+  ]
+}

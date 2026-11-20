@@ -1,0 +1,216 @@
+{
+  "id": "kp03-04",
+  "chapterId": "ch03",
+  "title": "LIKE、通配符与转义",
+  "learningObjective": "能够按前缀、后缀、包含或字符长度进行文本匹配，并正确查询字面上的通配符。",
+  "prerequisites": [
+    "kp03-03"
+  ],
+  "concept": "文本相等比较要求字段符合指定值，而 LIKE 根据模式判断文本是否符合某种结构。百分号 % 匹配零个或多个字符，下划线 _ 匹配恰好一个字符。模式通常要匹配整个字符串，因此前缀搜索把百分号放在末尾，后缀搜索放在开头，包含搜索则两边都放。当业务要求找出实际包含下划线或百分号的名称时，必须把通配符转义。本例通过 ESCAPE 指定感叹号为转义字符，!_ 表示普通下划线，!% 表示普通百分号，!! 表示感叹号本身。大小写敏感性受数据库和排序规则影响，不能从一个本地例子推断全部数据库表现。",
+  "syntax": "WHERE column_name LIKE 'pattern' ESCAPE '!'",
+  "parameters": {
+    "LIKE": "按模式匹配文本",
+    "%": "零个或多个字符",
+    "_": "恰好一个字符",
+    "ESCAPE": "指定转义字符"
+  },
+  "fixtureIds": [
+    "lesson-products"
+  ],
+  "sourceTables": [
+    {
+      "name": "products",
+      "columns": [
+        {
+          "name": "product_id",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "product_name",
+          "type": "TEXT",
+          "mysqlType": "VARCHAR(160) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_bin",
+          "sqliteType": "TEXT"
+        },
+        {
+          "name": "category",
+          "type": "TEXT",
+          "mysqlType": "VARCHAR(160) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_bin",
+          "sqliteType": "TEXT"
+        },
+        {
+          "name": "price",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "stock",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          "Mask",
+          "护肤品",
+          15,
+          150
+        ],
+        [
+          2,
+          "Serum",
+          "护肤品",
+          89,
+          40
+        ],
+        [
+          3,
+          "Cleanser",
+          "护肤品",
+          35,
+          200
+        ],
+        [
+          4,
+          "Cream",
+          "化妆品",
+          65,
+          180
+        ],
+        [
+          5,
+          "Sunscreen",
+          "化妆品",
+          45,
+          80
+        ],
+        [
+          6,
+          "Soap_1",
+          "日用品",
+          15,
+          0
+        ]
+      ]
+    }
+  ],
+  "mysqlSql": "SELECT product_name FROM products WHERE product_name LIKE '%!_%' ESCAPE '!' ORDER BY product_name DESC;",
+  "sqliteSql": "SELECT product_name FROM products WHERE product_name LIKE '%!_%' ESCAPE '!' ORDER BY product_name DESC;",
+  "executionSteps": [
+    "构造包含字面下划线的模式",
+    "逐行匹配名称",
+    "输出符合条件的商品"
+  ],
+  "useCase": "商品主数据管理员需要找出名称含下划线的商品，检查是否仍有旧的命名格式。只需查找真实存在的下划线，而不是任意字符。",
+  "comparison": "等号用于相等比较，LIKE 用于模式匹配；下划线不是默认的字面字符。",
+  "commonError": {
+    "example": "LIKE '%_%' 期待仅找到下划线。",
+    "correction": "LIKE '%!_%' ESCAPE '!'"
+  },
+  "notes": "本例匹配标点；其他文本的大小写与 Unicode 行为应在目标数据库复验。",
+  "compatibility": {
+    "status": "直接兼容",
+    "detail": "仅在本示例数据与语义范围验证；不代表全部 MySQL 语法兼容。"
+  },
+  "relatedQuestionIds": [
+    "q0023",
+    "q0026",
+    "q0032",
+    "q0033",
+    "q0041"
+  ],
+  "relatedFlashcardIds": [
+    "fc0016",
+    "fc0021"
+  ],
+  "relatedKnowledgePointIds": [],
+  "mysqlVerification": "未运行原生 MySQL 8.4",
+  "result": {
+    "columns": [
+      "product_name"
+    ],
+    "rows": [
+      [
+        "Soap_1"
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "mysqlVerificationScript": "validation/mysql/kp03-04.sql",
+  "primaryQuestionIds": [
+    "q0023",
+    "q0026",
+    "q0032",
+    "q0033",
+    "q0041"
+  ],
+  "primaryFlashcardIds": [
+    "fc0016",
+    "fc0021"
+  ],
+  "teaching": {
+    "problem": "商品主数据管理员需要找出名称含下划线的商品，检查是否仍有旧的命名格式。只需查找真实存在的下划线，而不是任意字符。",
+    "codeExplanation": "product_name LIKE '%!_%' 中，两侧百分号允许任意前后缀；ESCAPE '!' 让紧随其后的下划线按普通字符匹配。SELECT 返回需要核查的名称。主例不需要分组或替换内容，因为当前任务只要求找出记录。补充例子展示前缀匹配和错误模式的区别。",
+    "resultExplanation": "六个商品中仅 Soap_1 命中。未转义的下划线可以匹配任何一个字符，因此普通非空名称也可能全部命中。找到下划线不代表名称一定错误，还要核对命名规范。",
+    "checkpoints": [],
+    "mergedConcepts": [],
+    "mergeExamples": [
+      {
+        "label": "前缀匹配",
+        "explanation": "找以大写 S 开头的示例名称；本数据没有大小写对立样本。",
+        "sql": "SELECT product_name FROM products WHERE product_name LIKE 'S%' ORDER BY product_name DESC;",
+        "result": {
+          "columns": [
+            "product_name"
+          ],
+          "rows": [
+            [
+              "Sunscreen"
+            ],
+            [
+              "Soap_1"
+            ],
+            [
+              "Serum"
+            ]
+          ]
+        }
+      },
+      {
+        "label": "错误模式对照",
+        "explanation": "故意不转义下划线，观察全部非空名称均被匹配。",
+        "sql": "SELECT product_name FROM products WHERE product_name LIKE '%_%' ORDER BY product_name DESC;",
+        "result": {
+          "columns": [
+            "product_name"
+          ],
+          "rows": [
+            [
+              "Sunscreen"
+            ],
+            [
+              "Soap_1"
+            ],
+            [
+              "Serum"
+            ],
+            [
+              "Mask"
+            ],
+            [
+              "Cream"
+            ],
+            [
+              "Cleanser"
+            ]
+          ]
+        }
+      }
+    ]
+  }
+}

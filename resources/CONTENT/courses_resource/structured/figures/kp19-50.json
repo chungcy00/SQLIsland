@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "id": "kp19-50",
+  "lessonSha256": "430601994dc833dc4bb266edb1945144e46534111a6aa2fd3247cc3b55cf5c17",
+  "figures": [
+    {
+      "id": "kp19-50-clauses",
+      "slot": "syntax",
+      "kind": "clause-map",
+      "title": "示例查询的几个部分",
+      "sql": "WITH f AS (\n  SELECT x.supplier_invoice_id,SUM(x.quantity_billed*x.unit_price_cents) face,\n    SUM(x.quantity_billed*p.unit_price_cents) expected\n  FROM supplier_invoice_items x JOIN purchase_order_items p ON p.po_item_id=x.po_item_id\n  GROUP BY x.supplier_invoice_id\n), a AS (\n  SELECT v.*,f.face,f.expected,COUNT(*) OVER(PARTITION BY supplier_id,invoice_no) copies,\n    AVG(f.face) OVER(PARTITION BY supplier_id) avg_bill\n  FROM v_invoice_balance v JOIN f ON f.supplier_invoice_id=v.supplier_invoice_id\n), z AS (\n  SELECT a.*,CASE WHEN copies>1 THEN 1 ELSE 0 END duplicate_flag,\n    CASE WHEN face>2*avg_bill THEN 1 ELSE 0 END large_flag,\n    CASE WHEN balance_cents<0 THEN 1 ELSE 0 END overpay_flag,\n    CASE WHEN ABS(face-expected)>100 THEN 1 ELSE 0 END mismatch_flag FROM a\n)\nSELECT supplier_invoice_id,supplier_id,billed_cents,duplicate_flag,large_flag,overpay_flag,mismatch_flag,\n  duplicate_flag+large_flag+overpay_flag+mismatch_flag flags FROM z\nWHERE duplicate_flag+large_flag+overpay_flag+mismatch_flag>0 ORDER BY flags DESC,supplier_invoice_id",
+      "parts": [
+        {
+          "role": "cte",
+          "label": "中间结果",
+          "sql": "WITH f AS (\n  SELECT x.supplier_invoice_id,SUM(x.quantity_billed*x.unit_price_cents) face,\n    SUM(x.quantity_billed*p.unit_price_cents) expected\n  FROM supplier_invoice_items x JOIN purchase_order_items p ON p.po_item_id=x.po_item_id\n  GROUP BY x.supplier_invoice_id\n),",
+          "note": "先把名为 f 的中间结果算出来，供后面的查询引用。"
+        },
+        {
+          "role": "cte",
+          "label": "中间结果",
+          "sql": "a AS (\n  SELECT v.*,f.face,f.expected,COUNT(*) OVER(PARTITION BY supplier_id,invoice_no) copies,\n    AVG(f.face) OVER(PARTITION BY supplier_id) avg_bill\n  FROM v_invoice_balance v JOIN f ON f.supplier_invoice_id=v.supplier_invoice_id\n),",
+          "note": "先把名为 a 的中间结果算出来，供后面的查询引用。"
+        },
+        {
+          "role": "cte",
+          "label": "中间结果",
+          "sql": "z AS (\n  SELECT a.*,CASE WHEN copies>1 THEN 1 ELSE 0 END duplicate_flag,\n    CASE WHEN face>2*avg_bill THEN 1 ELSE 0 END large_flag,\n    CASE WHEN balance_cents<0 THEN 1 ELSE 0 END overpay_flag,\n    CASE WHEN ABS(face-expected)>100 THEN 1 ELSE 0 END mismatch_flag FROM a\n)",
+          "note": "先把名为 z 的中间结果算出来，供后面的查询引用。"
+        },
+        {
+          "role": "select",
+          "label": "取数",
+          "sql": "SELECT supplier_invoice_id,supplier_id,billed_cents,duplicate_flag,large_flag,overpay_flag,mismatch_flag,\n  duplicate_flag+large_flag+overpay_flag+mismatch_flag flags",
+          "note": "输出查询需要的列与计算表达式。"
+        },
+        {
+          "role": "from",
+          "label": "来源",
+          "sql": "FROM z",
+          "note": "从 z 读取输入数据。"
+        },
+        {
+          "role": "where",
+          "label": "筛选",
+          "sql": "WHERE duplicate_flag+large_flag+overpay_flag+mismatch_flag>0",
+          "note": "仅保留满足 duplicate_flag+large_flag+overpay_flag+mismatch_flag>0 的行。"
+        },
+        {
+          "role": "order",
+          "label": "排序",
+          "sql": "ORDER BY flags DESC,supplier_invoice_id",
+          "note": "按 flags DESC,supplier_invoice_id 排列结果。"
+        }
+      ]
+    }
+  ]
+}

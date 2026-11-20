@@ -1,0 +1,284 @@
+{
+  "id": "kp15-01",
+  "chapterId": "ch15",
+  "title": "窗口聚合与分区",
+  "learningObjective": "区分分组聚合与窗口聚合，计算明细占所在组的比例。",
+  "prerequisites": [],
+  "concept": "分区是窗口计算的边界，不是输出分组。普通聚合把多行压缩成汇总行；窗口聚合在筛选后的输入行上附加计算值。没有分区时整个输入构成一个分区；本例没有窗口排序，因此每笔订单看见所在类别的全部订单。",
+  "syntax": "SUM(v) OVER (PARTITION BY key)",
+  "parameters": {
+    "v": "指标字段",
+    "key": "决定分区的维度"
+  },
+  "fixtureIds": [
+    "lesson-orders"
+  ],
+  "sourceTables": [
+    {
+      "name": "orders",
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "category",
+          "type": "TEXT",
+          "mysqlType": "VARCHAR(160) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_bin",
+          "sqliteType": "TEXT"
+        },
+        {
+          "name": "sales",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "store_id",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "order_date",
+          "type": "TEXT",
+          "mysqlType": "DATE",
+          "sqliteType": "TEXT"
+        },
+        {
+          "name": "customer_id",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          "护肤品",
+          800,
+          1,
+          "2026-01-03",
+          1
+        ],
+        [
+          2,
+          "化妆品",
+          400,
+          2,
+          "2026-01-10",
+          2
+        ],
+        [
+          3,
+          "护肤品",
+          600,
+          1,
+          "2026-02-02",
+          1
+        ],
+        [
+          4,
+          "化妆品",
+          300,
+          2,
+          "2026-02-15",
+          null
+        ],
+        [
+          5,
+          "日用品",
+          1500,
+          1,
+          "2026-02-20",
+          3
+        ]
+      ]
+    }
+  ],
+  "mysqlSql": "SELECT id,category,sales,SUM(sales) OVER(PARTITION BY category) AS category_total FROM orders ORDER BY sales DESC;",
+  "sqliteSql": "SELECT id,category,sales,SUM(sales) OVER(PARTITION BY category) AS category_total FROM orders ORDER BY sales DESC;",
+  "executionSteps": [
+    "按类别划分窗口",
+    "计算各类别总额",
+    "保留订单明细"
+  ],
+  "useCase": "销售分析需同时查看每笔订单及所在类别的总销售额，统计范围为全部五笔订单。",
+  "comparison": "GROUP BY 改变行粒度；窗口聚合本身不合并行。",
+  "commonError": {
+    "example": "把每行的 category_total 再求和作为总销售额。",
+    "correction": "直接汇总原 sales，或者先恢复一类一行。"
+  },
+  "notes": "同层 WHERE 不能引用窗口结果；先在内层计算再筛选。",
+  "compatibility": {
+    "status": "直接兼容",
+    "detail": "仅在本示例数据与语义范围验证；不代表全部 MySQL 语法兼容。"
+  },
+  "relatedQuestionIds": [
+    "q0199",
+    "q0200",
+    "q0201",
+    "q0204"
+  ],
+  "relatedFlashcardIds": [
+    "fc0110",
+    "fc0112",
+    "fc0119"
+  ],
+  "relatedKnowledgePointIds": [
+    "kp04-01",
+    "kp06-01",
+    "kp07-01",
+    "kp14-01"
+  ],
+  "mysqlVerification": "未运行原生 MySQL 8.4",
+  "result": {
+    "columns": [
+      "id",
+      "category",
+      "sales",
+      "category_total"
+    ],
+    "rows": [
+      [
+        5,
+        "日用品",
+        1500,
+        1500
+      ],
+      [
+        1,
+        "护肤品",
+        800,
+        1400
+      ],
+      [
+        3,
+        "护肤品",
+        600,
+        1400
+      ],
+      [
+        2,
+        "化妆品",
+        400,
+        700
+      ],
+      [
+        4,
+        "化妆品",
+        300,
+        700
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "visualization": {
+    "kind": "stepFlow",
+    "steps": [
+      {
+        "id": "1",
+        "label": "按类别建立窗口"
+      },
+      {
+        "id": "2",
+        "label": "各窗口计算总额"
+      },
+      {
+        "id": "3",
+        "label": "把总额写回每一行"
+      }
+    ],
+    "sourceFixtureIds": [
+      "lesson-orders"
+    ],
+    "resultColumns": [
+      "id",
+      "category",
+      "sales",
+      "category_total"
+    ]
+  },
+  "mysqlVerificationScript": "validation/mysql/kp15-01.sql",
+  "primaryQuestionIds": [
+    "q0199",
+    "q0200",
+    "q0201",
+    "q0204"
+  ],
+  "primaryFlashcardIds": [
+    "fc0110",
+    "fc0112",
+    "fc0119"
+  ],
+  "teaching": {
+    "problem": "销售分析需同时查看每笔订单及所在类别的总销售额，统计范围为全部五笔订单。",
+    "codeExplanation": "订单编号是明细粒度。SUM 计算类别金额，OVER 指定窗口语义，PARTITION BY category 让不同类别互不影响。先比较普通分组的输出，再计算明细贡献率；分母为类别总额而非全表金额，使用 NULLIF 防止零分母。",
+    "resultExplanation": "仍为五行。护肤品两笔分别为800和600，均对应1400；化妆品对应700；日用品对应1500。重复出现的类别总额不能再直接求和。",
+    "checkpoints": [],
+    "mergedConcepts": [],
+    "mergeExamples": [
+      {
+        "label": "普通聚合对照",
+        "explanation": "五行缩为三类。",
+        "sql": "SELECT category,SUM(sales) AS total FROM orders GROUP BY category ORDER BY total DESC;",
+        "result": {
+          "columns": [
+            "category",
+            "total"
+          ],
+          "rows": [
+            [
+              "日用品",
+              1500
+            ],
+            [
+              "护肤品",
+              1400
+            ],
+            [
+              "化妆品",
+              700
+            ]
+          ]
+        }
+      },
+      {
+        "label": "类别内贡献率",
+        "explanation": "每笔金额除以其类别合计，结果为百分数。",
+        "sql": "SELECT id,ROUND(100.0*sales/NULLIF(SUM(sales) OVER(PARTITION BY category),0),2) AS share_pct FROM orders ORDER BY sales DESC;",
+        "result": {
+          "columns": [
+            "id",
+            "share_pct"
+          ],
+          "rows": [
+            [
+              5,
+              100.0
+            ],
+            [
+              1,
+              57.14
+            ],
+            [
+              3,
+              42.86
+            ],
+            [
+              2,
+              57.14
+            ],
+            [
+              4,
+              42.86
+            ]
+          ]
+        }
+      }
+    ]
+  }
+}

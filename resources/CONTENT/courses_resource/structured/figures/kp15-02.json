@@ -1,0 +1,161 @@
+{
+  "schemaVersion": 1,
+  "id": "kp15-02",
+  "lessonSha256": "eff4024b537e883305e44c588eb8a333bb96134abdfa2c443e06035590788b96",
+  "figures": [
+    {
+      "id": "kp15-02-clauses",
+      "slot": "syntax",
+      "kind": "clause-map",
+      "title": "示例查询的几个部分",
+      "sql": "SELECT employee_id,salary,ROW_NUMBER() OVER(ORDER BY salary DESC,employee_id) AS rn,RANK() OVER(ORDER BY salary DESC) AS rnk,DENSE_RANK() OVER(ORDER BY salary DESC) AS dense_rnk FROM employees ORDER BY rn;",
+      "parts": [
+        {
+          "role": "select",
+          "label": "取数",
+          "sql": "SELECT employee_id,salary,ROW_NUMBER() OVER(ORDER BY salary DESC,employee_id) AS rn,RANK() OVER(ORDER BY salary DESC) AS rnk,DENSE_RANK() OVER(ORDER BY salary DESC) AS dense_rnk",
+          "note": "输出查询需要的列与计算表达式。"
+        },
+        {
+          "role": "from",
+          "label": "来源",
+          "sql": "FROM employees",
+          "note": "从 employees 读取输入数据。"
+        },
+        {
+          "role": "order",
+          "label": "排序",
+          "sql": "ORDER BY rn;",
+          "note": "按 rn 排列结果。"
+        }
+      ]
+    },
+    {
+      "id": "kp15-02-flow",
+      "slot": "breakdown",
+      "kind": "stage-flow",
+      "merge": "breakdown",
+      "title": "每一步的数据变化",
+      "steps": [
+        {
+          "label": "FROM employees",
+          "sql": "SELECT * FROM employees",
+          "columns": [
+            "employee_id",
+            "employee_name",
+            "manager_id",
+            "salary"
+          ],
+          "rows": [
+            [
+              1,
+              "A",
+              null,
+              8000
+            ],
+            [
+              2,
+              "B",
+              1,
+              5000
+            ],
+            [
+              3,
+              "C",
+              1,
+              5000
+            ],
+            [
+              4,
+              "D",
+              2,
+              3000
+            ]
+          ]
+        },
+        {
+          "label": "SELECT employee_id,salary,ROW_NUMBER() OVER(ORDER BY salary DESC,employee_id) AS rn,RANK() OVER(ORDER BY salary DESC) AS rnk,DENSE_RANK() OVER(ORDER BY salary DESC) AS dense_rnk",
+          "sql": "SELECT employee_id,salary,ROW_NUMBER() OVER(ORDER BY salary DESC,employee_id) AS rn,RANK() OVER(ORDER BY salary DESC) AS rnk,DENSE_RANK() OVER(ORDER BY salary DESC) AS dense_rnk FROM employees",
+          "columns": [
+            "employee_id",
+            "salary",
+            "rn",
+            "rnk",
+            "dense_rnk"
+          ],
+          "rows": [
+            [
+              1,
+              8000,
+              1,
+              1,
+              1
+            ],
+            [
+              2,
+              5000,
+              2,
+              2,
+              2
+            ],
+            [
+              3,
+              5000,
+              3,
+              2,
+              2
+            ],
+            [
+              4,
+              3000,
+              4,
+              4,
+              3
+            ]
+          ]
+        },
+        {
+          "label": "ORDER BY rn;",
+          "sql": "SELECT employee_id,salary,ROW_NUMBER() OVER(ORDER BY salary DESC,employee_id) AS rn,RANK() OVER(ORDER BY salary DESC) AS rnk,DENSE_RANK() OVER(ORDER BY salary DESC) AS dense_rnk FROM employees ORDER BY rn;",
+          "columns": [
+            "employee_id",
+            "salary",
+            "rn",
+            "rnk",
+            "dense_rnk"
+          ],
+          "rows": [
+            [
+              1,
+              8000,
+              1,
+              1,
+              1
+            ],
+            [
+              2,
+              5000,
+              2,
+              2,
+              2
+            ],
+            [
+              3,
+              5000,
+              3,
+              2,
+              2
+            ],
+            [
+              4,
+              3000,
+              4,
+              4,
+              3
+            ]
+          ]
+        }
+      ]
+    }
+  ]
+}

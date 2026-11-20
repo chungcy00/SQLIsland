@@ -1,0 +1,201 @@
+{
+  "id": "kp13-02",
+  "chapterId": "ch13",
+  "title": "交集与差集",
+  "learningObjective": "比较两个名单的共同成员、单侧成员，并理解差集方向。",
+  "prerequisites": [
+    "kp13-01"
+  ],
+  "concept": "交集返回两个结果中共同存在的行；差集返回左侧存在且右侧不存在的行。默认均去重。差集不可交换左右侧；交集的成员不取决于方向。集合运算比较对应的整行，不等于普通等号处理空值的逻辑。原生 MySQL 8.4 支持两类运算，SQLite 不支持其 ALL 形式；组合运算宜用具名表达式明确范围。",
+  "syntax": "SELECT col FROM a INTERSECT SELECT col FROM b; SELECT col FROM a EXCEPT SELECT col FROM b;",
+  "parameters": {
+    "INTERSECT": "共同成员",
+    "EXCEPT": "左侧独有成员"
+  },
+  "fixtureIds": [
+    "lesson-old_customers",
+    "lesson-new_customers"
+  ],
+  "sourceTables": [
+    {
+      "name": "old_customers",
+      "columns": [
+        {
+          "name": "customer_id",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "customer_name",
+          "type": "TEXT",
+          "mysqlType": "VARCHAR(40) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_bin",
+          "sqliteType": "TEXT"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          "林"
+        ],
+        [
+          2,
+          "陈"
+        ],
+        [
+          2,
+          "陈"
+        ],
+        [
+          3,
+          "王"
+        ]
+      ]
+    },
+    {
+      "name": "new_customers",
+      "columns": [
+        {
+          "name": "customer_id",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "customer_name",
+          "type": "TEXT",
+          "mysqlType": "VARCHAR(40) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_bin",
+          "sqliteType": "TEXT"
+        }
+      ],
+      "rows": [
+        [
+          2,
+          "陈"
+        ],
+        [
+          3,
+          "王"
+        ],
+        [
+          4,
+          "李"
+        ]
+      ]
+    }
+  ],
+  "mysqlSql": "SELECT customer_id, customer_name FROM old_customers INTERSECT SELECT customer_id, customer_name FROM new_customers ORDER BY customer_name;",
+  "sqliteSql": "SELECT customer_id, customer_name FROM old_customers INTERSECT SELECT customer_id, customer_name FROM new_customers ORDER BY customer_name;",
+  "executionSteps": [
+    "确定新旧名单的比较键",
+    "计算共同或单侧成员",
+    "按客户姓名排序"
+  ],
+  "useCase": "对比两期客户名单，识别两期共同出现、仅旧名单出现及仅新名单出现的客户。不直接将名单差异断言为真实流失或新增消费。",
+  "comparison": "INTERSECT 找共同项；EXCEPT 有明确方向。",
+  "commonError": {
+    "example": "把差集写成寻找共同客户，或认为交换两侧不改变结果。",
+    "correction": "选用 INTERSECT 找共同项；差集分别运行两个方向。"
+  },
+  "notes": "混用不同集合运算时先封装为独立查询，避免引擎优先级差异。",
+  "compatibility": {
+    "status": "直接兼容",
+    "detail": "仅在本示例数据与语义范围验证；不代表全部 MySQL 语法兼容。"
+  },
+  "relatedQuestionIds": [
+    "q0177",
+    "q0178"
+  ],
+  "relatedFlashcardIds": [
+    "fc0099",
+    "fc0100",
+    "fc0101"
+  ],
+  "relatedKnowledgePointIds": [
+    "kp02-01",
+    "kp08-01"
+  ],
+  "mysqlVerification": "未运行原生 MySQL 8.4",
+  "result": {
+    "columns": [
+      "customer_id",
+      "customer_name"
+    ],
+    "rows": [
+      [
+        3,
+        "王"
+      ],
+      [
+        2,
+        "陈"
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "mysqlVerificationScript": "validation/mysql/kp13-02.sql",
+  "primaryQuestionIds": [
+    "q0177",
+    "q0178"
+  ],
+  "primaryFlashcardIds": [
+    "fc0099",
+    "fc0100",
+    "fc0101"
+  ],
+  "mergedFrom": [
+    {
+      "id": "kp13-03",
+      "title": "差集与排序范围"
+    }
+  ],
+  "teaching": {
+    "problem": "对比两期客户名单，识别两期共同出现、仅旧名单出现及仅新名单出现的客户。不直接将名单差异断言为真实流失或新增消费。",
+    "codeExplanation": "INTERSECT 在两边都存在的编号中去重。EXCEPT 先规定左侧基准，再排除右侧出现者；改变顺序即可计算另一方向。末尾 ORDER BY 为整体排序。若旧系统不支持集合运算，可按业务键使用 EXISTS 或 NOT EXISTS，并处理去重与空值规则。",
+    "resultExplanation": "共同编号2、3；仅旧名单编号1，仅新名单编号4。重复旧编号2并不改变默认交集结果。",
+    "checkpoints": [],
+    "mergedConcepts": [
+      {
+        "sourceId": "kp13-03",
+        "explanation": "完整保留差集方向、整体排序和原始差集示例。"
+      }
+    ],
+    "mergeExamples": [
+      {
+        "label": "旧名单独有",
+        "explanation": "保留来源课程原差集查询。",
+        "sql": "SELECT customer_id, customer_name FROM old_customers EXCEPT SELECT customer_id, customer_name FROM new_customers ORDER BY customer_name;",
+        "result": {
+          "columns": [
+            "customer_id",
+            "customer_name"
+          ],
+          "rows": [
+            [
+              1,
+              "林"
+            ]
+          ]
+        }
+      },
+      {
+        "label": "新名单独有",
+        "explanation": "交换左右侧得到另一方向。",
+        "sql": "SELECT customer_id, customer_name FROM new_customers EXCEPT SELECT customer_id, customer_name FROM old_customers ORDER BY customer_name;",
+        "result": {
+          "columns": [
+            "customer_id",
+            "customer_name"
+          ],
+          "rows": [
+            [
+              4,
+              "李"
+            ]
+          ]
+        }
+      }
+    ]
+  }
+}

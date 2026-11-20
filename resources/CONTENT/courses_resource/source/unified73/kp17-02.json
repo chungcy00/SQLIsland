@@ -1,0 +1,209 @@
+{
+  "id": "kp17-02",
+  "chapterId": "ch17",
+  "title": "数据修改与事务基础",
+  "learningObjective": "能够安全定位修改对象，并通过事务保证成组操作的一致性。",
+  "prerequisites": [
+    "kp17-01"
+  ],
+  "concept": "新增操作产生行，修改操作改变满足条件的行，删除操作移除满足条件的行。事务将多条数据修改作为一个逻辑单位；提交使本次事务结果生效，回滚撤销尚未提交的事务修改。原子性意味着同一逻辑任务全部成功或全部撤销，但必须使用支持事务的存储引擎并正确处理错误。回滚不是备份，也不能撤销已提交的修改。",
+  "syntax": "INSERT INTO t(cols) VALUES(vals);\nUPDATE t SET col=val WHERE p;\nDELETE FROM t WHERE p;\nSTART TRANSACTION; ... COMMIT; -- 或 ROLLBACK",
+  "parameters": {
+    "cols,vals": "列与对应值",
+    "p": "目标条件",
+    "COMMIT": "确认事务",
+    "ROLLBACK": "撤销未提交修改"
+  },
+  "fixtureIds": [],
+  "sourceTables": [],
+  "mysqlSql": "SELECT id,qty FROM demo_stock ORDER BY qty DESC;",
+  "sqliteSql": "SELECT id,qty FROM demo_stock ORDER BY qty DESC;",
+  "executionSteps": [
+    "确认目标记录",
+    "新增及修改库存",
+    "删除指定记录",
+    "核对并提交或回滚"
+  ],
+  "useCase": "个人库存实验室需要更新商品数量并移除测试记录；发货时库存扣减和发货记录应同时成功。",
+  "comparison": "UPDATE 或 DELETE 不带 WHERE 通常影响全表；事务回滚与删除已提交的数据是不同概念。",
+  "commonError": {
+    "example": "UPDATE demo_stock SET qty=25;",
+    "correction": "先 SELECT WHERE id=2 核对，再 UPDATE demo_stock SET qty=25 WHERE id=2;"
+  },
+  "notes": "只在隔离副本执行。MySQL InnoDB 支持事务；多种 DDL 隐式提交，不把结构操作混入可回滚的业务事务。",
+  "compatibility": {
+    "status": "直接兼容",
+    "detail": "仅在本示例数据与语义范围验证；不代表全部 MySQL 语法兼容。"
+  },
+  "relatedQuestionIds": [
+    "q0232",
+    "q0235"
+  ],
+  "relatedFlashcardIds": [
+    "fc0129",
+    "fc0131",
+    "fc0133",
+    "fc0135"
+  ],
+  "relatedKnowledgePointIds": [
+    "kp01-01",
+    "kp03-01"
+  ],
+  "mysqlVerification": "未运行原生 MySQL 8.4",
+  "setupSql": "CREATE TABLE demo_stock(id INT PRIMARY KEY,qty INT); INSERT INTO demo_stock VALUES(1,10),(2,20),(3,30); UPDATE demo_stock SET qty=25 WHERE id=2; DELETE FROM demo_stock WHERE id=3;",
+  "result": {
+    "columns": [
+      "id",
+      "qty"
+    ],
+    "rows": [
+      [
+        2,
+        25
+      ],
+      [
+        1,
+        10
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "mysqlVerificationScript": "validation/mysql/kp17-02.sql",
+  "primaryQuestionIds": [
+    "q0232",
+    "q0235"
+  ],
+  "primaryFlashcardIds": [
+    "fc0129",
+    "fc0131",
+    "fc0133",
+    "fc0135"
+  ],
+  "mergedFrom": [
+    {
+      "id": "kp17-04",
+      "title": "事务、COMMIT 与 ROLLBACK"
+    }
+  ],
+  "teaching": {
+    "problem": "个人库存实验室需要更新商品数量并移除测试记录；发货时库存扣减和发货记录应同时成功。",
+    "codeExplanation": "先用与修改完全相同的 WHERE 执行 SELECT，确认目标编号及原值；随后使用明确列名插入，按主键更新和删除，最后查询剩余行。事务示例先将10改为99后回滚，再改为12并提交。发货示例将库存扣减和写入发货表放在同一事务；若核对不通过，回滚两项。SQLite 使用 BEGIN TRANSACTION，MySQL 使用 START TRANSACTION。真实应用还要检查受影响行数、并发变化和异常，不能只依赖预览。",
+    "resultExplanation": "主查询剩两行：编号1库存10，编号2库存25。编号3已删除。事务对照中回滚恢复10，提交后为12；发货回滚则同时恢复库存并撤销发货记录。",
+    "checkpoints": [],
+    "mergedConcepts": [
+      {
+        "sourceId": "kp17-04",
+        "explanation": "保留原始回滚与提交对照，同时演示两表写入的原子性；回滚不能撤销已提交操作。"
+      }
+    ],
+    "mergeExamples": [
+      {
+        "label": "修改前预览",
+        "explanation": "预先确认唯一目标。",
+        "sql": "CREATE TABLE demo_stock(id INTEGER PRIMARY KEY,qty INTEGER NOT NULL CHECK(qty>=0));\nINSERT INTO demo_stock VALUES (1,10),(2,20),(3,30);\n\nSELECT id,qty FROM demo_stock WHERE id=2;",
+        "result": {
+          "columns": [
+            "id",
+            "qty"
+          ],
+          "rows": [
+            [
+              2,
+              20
+            ]
+          ]
+        }
+      },
+      {
+        "label": "新增修改删除完整演练",
+        "explanation": "编号2改变，编号3消失，编号1不变。",
+        "sql": "CREATE TABLE demo_stock(id INTEGER PRIMARY KEY,qty INTEGER NOT NULL CHECK(qty>=0));\nINSERT INTO demo_stock VALUES (1,10),(2,20),(3,30);\nUPDATE demo_stock SET qty=25 WHERE id=2;\nDELETE FROM demo_stock WHERE id=3;\nSELECT id,qty FROM demo_stock ORDER BY qty DESC;",
+        "result": {
+          "columns": [
+            "id",
+            "qty"
+          ],
+          "rows": [
+            [
+              2,
+              25
+            ],
+            [
+              1,
+              10
+            ]
+          ]
+        }
+      },
+      {
+        "label": "回滚恢复原值",
+        "explanation": "回滚撤销99，恢复10。",
+        "sql": "CREATE TABLE demo_stock(id INTEGER PRIMARY KEY,qty INTEGER NOT NULL);\nINSERT INTO demo_stock VALUES(1,10);\nBEGIN TRANSACTION;\nUPDATE demo_stock SET qty=99 WHERE id=1;\nROLLBACK;\nSELECT id,qty FROM demo_stock;",
+        "result": {
+          "columns": [
+            "id",
+            "qty"
+          ],
+          "rows": [
+            [
+              1,
+              10
+            ]
+          ]
+        }
+      },
+      {
+        "label": "回滚后重新修改并提交",
+        "explanation": "新事务提交12，之前回滚的99不再出现。",
+        "sql": "CREATE TABLE demo_stock(id INTEGER PRIMARY KEY,qty INTEGER NOT NULL);\nINSERT INTO demo_stock VALUES(1,10);\nBEGIN TRANSACTION;\nUPDATE demo_stock SET qty=99 WHERE id=1;\nROLLBACK;\nBEGIN TRANSACTION;\nUPDATE demo_stock SET qty=12 WHERE id=1;\nCOMMIT;\nSELECT id,qty FROM demo_stock;",
+        "result": {
+          "columns": [
+            "id",
+            "qty"
+          ],
+          "rows": [
+            [
+              1,
+              12
+            ]
+          ]
+        }
+      },
+      {
+        "label": "发货事务回滚",
+        "explanation": "两张表的修改一起撤销。",
+        "sql": "CREATE TABLE demo_stock(id INTEGER PRIMARY KEY,qty INTEGER NOT NULL CHECK(qty>=0));\nCREATE TABLE shipment(id INTEGER PRIMARY KEY,qty INTEGER NOT NULL);\nINSERT INTO demo_stock VALUES(1,20);\nBEGIN TRANSACTION;\nUPDATE demo_stock SET qty=qty-5 WHERE id=1;\nINSERT INTO shipment VALUES(1,5);\nROLLBACK;\nSELECT qty,(SELECT COUNT(*) FROM shipment) AS shipments FROM demo_stock WHERE id=1;",
+        "result": {
+          "columns": [
+            "qty",
+            "shipments"
+          ],
+          "rows": [
+            [
+              20,
+              0
+            ]
+          ]
+        }
+      },
+      {
+        "label": "发货事务提交",
+        "explanation": "两张表的修改一起提交。",
+        "sql": "CREATE TABLE demo_stock(id INTEGER PRIMARY KEY,qty INTEGER NOT NULL CHECK(qty>=0));\nCREATE TABLE shipment(id INTEGER PRIMARY KEY,qty INTEGER NOT NULL);\nINSERT INTO demo_stock VALUES(1,20);\nBEGIN TRANSACTION;\nUPDATE demo_stock SET qty=qty-5 WHERE id=1;\nINSERT INTO shipment VALUES(1,5);\nCOMMIT;\nSELECT qty,(SELECT COUNT(*) FROM shipment) AS shipments FROM demo_stock WHERE id=1;",
+        "result": {
+          "columns": [
+            "qty",
+            "shipments"
+          ],
+          "rows": [
+            [
+              15,
+              1
+            ]
+          ]
+        }
+      }
+    ]
+  }
+}

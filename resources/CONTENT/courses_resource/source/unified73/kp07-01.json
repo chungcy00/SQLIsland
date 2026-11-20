@@ -1,0 +1,250 @@
+{
+  "id": "kp07-01",
+  "chapterId": "ch07",
+  "title": "GROUP BY 分组",
+  "learningObjective": "能够将明细数据按业务维度汇总，确定输出粒度，并解释聚合前后的行数变化。",
+  "prerequisites": [],
+  "concept": "分组是把具有相同分组键的记录归入同一组，再对每组分别计算统计指标。例如订单表中每行是一笔订单，主管想知道每类商品总销售额时，输出应改成每类商品一行。GROUP BY category 将相同类别的记录放进同一组，SUM(sales) 分别计算各组销售额。分组键决定结果粒度，聚合函数决定指标。没有分组的聚合通常得到一个整体统计值，有分组就得到每个存在的组的统计值。NULL 分组键会形成一个组；原表不存在的类别不会凭空生成零销售组。分组本身不保证结果顺序，需要显式排序。",
+  "syntax": "SELECT group_key, SUM(metric) FROM table_name GROUP BY group_key;",
+  "parameters": {
+    "group_key": "决定统计粒度的维度",
+    "metric": "需要汇总的数值",
+    "GROUP BY": "按键划分记录"
+  },
+  "fixtureIds": [
+    "lesson-orders"
+  ],
+  "sourceTables": [
+    {
+      "name": "orders",
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "category",
+          "type": "TEXT",
+          "mysqlType": "VARCHAR(160) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_bin",
+          "sqliteType": "TEXT"
+        },
+        {
+          "name": "sales",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "store_id",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "order_date",
+          "type": "TEXT",
+          "mysqlType": "DATE",
+          "sqliteType": "TEXT"
+        },
+        {
+          "name": "customer_id",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          "护肤品",
+          800,
+          1,
+          "2026-01-03",
+          1
+        ],
+        [
+          2,
+          "化妆品",
+          400,
+          2,
+          "2026-01-10",
+          2
+        ],
+        [
+          3,
+          "护肤品",
+          600,
+          1,
+          "2026-02-02",
+          1
+        ],
+        [
+          4,
+          "化妆品",
+          300,
+          2,
+          "2026-02-15",
+          null
+        ],
+        [
+          5,
+          "日用品",
+          1500,
+          1,
+          "2026-02-20",
+          3
+        ]
+      ]
+    }
+  ],
+  "mysqlSql": "SELECT category, SUM(sales) AS total_sales FROM orders GROUP BY category ORDER BY total_sales DESC;",
+  "sqliteSql": "SELECT category, SUM(sales) AS total_sales FROM orders GROUP BY category ORDER BY total_sales DESC;",
+  "executionSteps": [
+    "按商品类别划分订单",
+    "计算各组销售合计",
+    "按销售额降序排列"
+  ],
+  "useCase": "经营会议需要各商品类别的销售额汇总，而不是逐笔订单明细。orders 中 category 表示类别，sales 表示每笔订单销售金额。本例统计全部五笔订单，不限制日期。",
+  "comparison": "DISTINCT 只提取不同组合，不会汇总组内金额；GROUP BY 配合 SUM 计算指标。",
+  "commonError": {
+    "example": "SELECT category, SUM(sales) FROM orders 却未写 GROUP BY。",
+    "correction": "明确按 category 分组，再求和；不要依赖数据库对非聚合列的任意选择。"
+  },
+  "notes": "只有实际出现的组会输出；需要完整类别与零销售时应结合维度表。",
+  "compatibility": {
+    "status": "直接兼容",
+    "detail": "仅在本示例数据与语义范围验证；不代表全部 MySQL 语法兼容。"
+  },
+  "relatedQuestionIds": [
+    "q0078",
+    "q0081",
+    "q0082",
+    "q0083"
+  ],
+  "relatedFlashcardIds": [
+    "fc0044",
+    "fc0045",
+    "fc0049"
+  ],
+  "relatedKnowledgePointIds": [
+    "kp02-01",
+    "kp05-01",
+    "kp06-01"
+  ],
+  "mysqlVerification": "未运行原生 MySQL 8.4",
+  "result": {
+    "columns": [
+      "category",
+      "total_sales"
+    ],
+    "rows": [
+      [
+        "日用品",
+        1500
+      ],
+      [
+        "护肤品",
+        1400
+      ],
+      [
+        "化妆品",
+        700
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "visualization": {
+    "kind": "stepFlow",
+    "steps": [
+      {
+        "id": "1",
+        "label": "护肤品800+600=1400"
+      },
+      {
+        "id": "2",
+        "label": "化妆品400+300=700"
+      },
+      {
+        "id": "3",
+        "label": "日用品1500"
+      },
+      {
+        "id": "4",
+        "label": "按总额降序"
+      }
+    ],
+    "sourceFixtureIds": [
+      "lesson-orders"
+    ],
+    "resultColumns": [
+      "category",
+      "total_sales"
+    ]
+  },
+  "mysqlVerificationScript": "validation/mysql/kp07-01.sql",
+  "primaryQuestionIds": [
+    "q0078",
+    "q0081",
+    "q0082",
+    "q0083"
+  ],
+  "primaryFlashcardIds": [
+    "fc0044",
+    "fc0045",
+    "fc0049"
+  ],
+  "teaching": {
+    "problem": "经营会议需要各商品类别的销售额汇总，而不是逐笔订单明细。orders 中 category 表示类别，sales 表示每笔订单销售金额。本例统计全部五笔订单，不限制日期。",
+    "codeExplanation": "先确认维度为 category，指标为 SUM(sales)。护肤品包含800和600，化妆品包含400和300，日用品包含1500。SELECT 同时输出组键与合计，AS total_sales 命名该指标，ORDER BY total_sales DESC 将金额大的类别排在前面。若改为按门店统计，只需要改变分组维度及输出字段，指标计算方法不变。",
+    "resultExplanation": "五笔订单变为三条类别汇总：日用品1500、护肤品1400、化妆品700。三个组总和为3600，与原销售合计一致。日用品销售额最高，但不能据此判断利润最高或销量最多。",
+    "checkpoints": [],
+    "mergedConcepts": [],
+    "mergeExamples": [
+      {
+        "label": "先认识分组维度",
+        "explanation": "先查看实际存在的类别，尚未计算销售额。",
+        "sql": "SELECT DISTINCT category FROM orders ORDER BY category;",
+        "result": {
+          "columns": [
+            "category"
+          ],
+          "rows": [
+            [
+              "化妆品"
+            ],
+            [
+              "护肤品"
+            ],
+            [
+              "日用品"
+            ]
+          ]
+        }
+      },
+      {
+        "label": "换成门店维度",
+        "explanation": "同一个求和指标可以按不同维度统计，结果变为每个门店一行。",
+        "sql": "SELECT store_id, SUM(sales) AS total_sales FROM orders GROUP BY store_id ORDER BY total_sales;",
+        "result": {
+          "columns": [
+            "store_id",
+            "total_sales"
+          ],
+          "rows": [
+            [
+              2,
+              700
+            ],
+            [
+              1,
+              2900
+            ]
+          ]
+        }
+      }
+    ]
+  }
+}

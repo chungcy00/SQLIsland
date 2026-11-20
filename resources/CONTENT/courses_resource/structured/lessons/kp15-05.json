@@ -1,0 +1,245 @@
+{
+  "schemaVersion": 1,
+  "id": "kp15-05",
+  "sourceBatch": "unified73",
+  "teachingKind": "advanced",
+  "conceptBlocks": [
+    {
+      "type": "paragraph",
+      "text": "移动平均平滑短期波动；环比比较本期与上一自然期的变化率。三行窗口只有在每月一行且日期连续时才代表三个月。首两月可按已有行计算，也可按严格完整窗口口径返回空值，必须明确。",
+      "emphasis": []
+    }
+  ],
+  "syntax": {
+    "purpose": "2 PRECEDING 前两行；CURRENT ROW 包含当前行。"
+  },
+  "dataDescriptions": {
+    "monthly": "共 4 行；字段：month、sales。"
+  },
+  "problem": "月度销售报表按连续月份统计，移动平均允许不足三个月取已有记录，环比为百分数，首月和零分母不计算。",
+  "methodBlocks": [
+    {
+      "type": "paragraph",
+      "text": "内层公用表表达式同时计算 LAG 和 AVG。外层使用 100.0*(sales-prev)/NULLIF(prev,0)；先减后除，分母为上期，最后舍入。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "严格三月口径还需要检查窗口内有效值数。",
+      "emphasis": []
+    }
+  ],
+  "breakdown": [
+    {
+      "kind": "runnable",
+      "title": "逐月补充上期销售与移动平均",
+      "sql": "WITH m AS (SELECT month,sales,LAG(sales) OVER(ORDER BY month) AS prev,AVG(sales) OVER(ORDER BY month ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) AS moving_avg FROM monthly) SELECT * FROM m ORDER BY month;",
+      "purpose": "逐月补充上期销售与移动平均（m）的实际执行结果。",
+      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "sourceTables": [
+        {
+          "name": "monthly",
+          "columns": [
+            {
+              "name": "month",
+              "type": "TEXT",
+              "mysqlType": "VARCHAR(160) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_bin",
+              "sqliteType": "TEXT"
+            },
+            {
+              "name": "sales",
+              "type": "INTEGER",
+              "mysqlType": "INT",
+              "sqliteType": "INTEGER"
+            }
+          ],
+          "rows": [
+            [
+              "2026-01",
+              1000
+            ],
+            [
+              "2026-02",
+              1500
+            ],
+            [
+              "2026-03",
+              1500
+            ],
+            [
+              "2026-04",
+              900
+            ]
+          ]
+        }
+      ],
+      "result": {
+        "columns": [
+          "month",
+          "sales",
+          "prev",
+          "moving_avg"
+        ],
+        "rows": [
+          [
+            "2026-01",
+            1000,
+            null,
+            1000.0
+          ],
+          [
+            "2026-02",
+            1500,
+            1000,
+            1250.0
+          ],
+          [
+            "2026-03",
+            1500,
+            1500,
+            1333.3333333333333
+          ],
+          [
+            "2026-04",
+            900,
+            1500,
+            1300.0
+          ]
+        ]
+      }
+    }
+  ],
+  "completeCode": {
+    "mysqlSql": "WITH m AS (SELECT month,sales,LAG(sales) OVER(ORDER BY month) AS prev,AVG(sales) OVER(ORDER BY month ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) AS moving_avg FROM monthly) SELECT month,ROUND(moving_avg,2) AS avg3,ROUND(100.0*(sales-prev)/NULLIF(prev,0),2) AS growth_pct FROM m ORDER BY month;",
+    "sqliteSql": "WITH m AS (SELECT month,sales,LAG(sales) OVER(ORDER BY month) AS prev,AVG(sales) OVER(ORDER BY month ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) AS moving_avg FROM monthly) SELECT month,ROUND(moving_avg,2) AS avg3,ROUND(100.0*(sales-prev)/NULLIF(prev,0),2) AS growth_pct FROM m ORDER BY month;"
+  },
+  "expectedResult": {
+    "columns": [
+      "month",
+      "avg3",
+      "growth_pct"
+    ],
+    "rows": [
+      [
+        "2026-01",
+        1000.0,
+        null
+      ],
+      [
+        "2026-02",
+        1250.0,
+        50.0
+      ],
+      [
+        "2026-03",
+        1333.33,
+        0.0
+      ],
+      [
+        "2026-04",
+        1300.0,
+        -40.0
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "resultBlocks": [
+    {
+      "type": "paragraph",
+      "text": "二月均值1250，环比50%；三月均值1333.33，环比0%；四月均值1300，环比-40%。首月环比未知。",
+      "emphasis": []
+    }
+  ],
+  "extensions": [
+    {
+      "label": "严格完整窗口",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "仅在三个有效月均存在时给出平均。",
+          "emphasis": []
+        }
+      ],
+      "sql": "SELECT month,CASE WHEN COUNT(sales) OVER w=3 THEN ROUND(AVG(sales) OVER w,2) END AS full_avg FROM monthly WINDOW w AS (ORDER BY month ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) ORDER BY month;",
+      "result": {
+        "columns": [
+          "month",
+          "full_avg"
+        ],
+        "rows": [
+          [
+            "2026-01",
+            null
+          ],
+          [
+            "2026-02",
+            null
+          ],
+          [
+            "2026-03",
+            1333.33
+          ],
+          [
+            "2026-04",
+            1300.0
+          ]
+        ]
+      }
+    },
+    {
+      "label": "零分母",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "上期为零时，即使本期为正也不能计算普通环比。",
+          "emphasis": []
+        }
+      ],
+      "sql": "SELECT 100.0*(100-0)/NULLIF(0,0) AS growth_pct;",
+      "result": {
+        "columns": [
+          "growth_pct"
+        ],
+        "rows": [
+          [
+            null
+          ]
+        ]
+      }
+    }
+  ],
+  "cautions": {
+    "comparison": [
+      {
+        "type": "paragraph",
+        "text": "移动平均描述平滑水平，不是增长率。",
+        "emphasis": []
+      }
+    ],
+    "example": [
+      {
+        "type": "paragraph",
+        "text": "把本期当分母，或将首期环比填成0。",
+        "emphasis": []
+      }
+    ],
+    "reason": [],
+    "correction": [
+      {
+        "type": "paragraph",
+        "text": "使用上期非零值为分母；无上期保留空值。",
+        "emphasis": []
+      }
+    ],
+    "notes": [
+      {
+        "type": "paragraph",
+        "text": "月份缺失先补时间轴；未知销售不能自动当作零。",
+        "emphasis": []
+      }
+    ]
+  },
+  "sourcePath": "source/unified73/kp15-05.json",
+  "sourceSha256": "1bc12ca1f19e1b720f428a8c85abc404952f5e4dc04d33551ef0cb7817cd76a7"
+}

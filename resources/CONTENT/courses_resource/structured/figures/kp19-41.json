@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "id": "kp19-41",
+  "lessonSha256": "2463314a23acc66beee614df0ee9ea741c483cc555ead1694b2725eb0c92a8b0",
+  "figures": [
+    {
+      "id": "kp19-41-clauses",
+      "slot": "syntax",
+      "kind": "clause-map",
+      "title": "示例查询的几个部分",
+      "sql": "WITH a AS (SELECT *,ROW_NUMBER() OVER(PARTITION BY customer_id ORDER BY order_date,order_id) rn FROM v_order_net WHERE channel='online') SELECT CASE WHEN rn=1 THEN 'new' ELSE 'returning' END segment,COUNT(DISTINCT customer_id) customers,COUNT(*) orders,SUM(net_cents) net_cents,ROUND(1.0*SUM(net_cents)/COUNT(*),2) avg_order_cents FROM a WHERE order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY CASE WHEN rn=1 THEN 'new' ELSE 'returning' END ORDER BY segment",
+      "parts": [
+        {
+          "role": "cte",
+          "label": "中间结果",
+          "sql": "WITH a AS (SELECT *,ROW_NUMBER() OVER(PARTITION BY customer_id ORDER BY order_date,order_id) rn FROM v_order_net WHERE channel='online')",
+          "note": "先把名为 a 的中间结果算出来，供后面的查询引用。"
+        },
+        {
+          "role": "select",
+          "label": "取数",
+          "sql": "SELECT CASE WHEN rn=1 THEN 'new' ELSE 'returning' END segment,COUNT(DISTINCT customer_id) customers,COUNT(*) orders,SUM(net_cents) net_cents,ROUND(1.0*SUM(net_cents)/COUNT(*),2) avg_order_cents",
+          "note": "输出查询需要的列与计算表达式。"
+        },
+        {
+          "role": "from",
+          "label": "来源",
+          "sql": "FROM a",
+          "note": "从 a 读取输入数据。"
+        },
+        {
+          "role": "where",
+          "label": "筛选",
+          "sql": "WHERE order_date BETWEEN '2025-01-01' AND '2025-12-31'",
+          "note": "仅保留满足 order_date BETWEEN '2025-01-01' AND '2025-12-31' 的行。"
+        },
+        {
+          "role": "group",
+          "label": "分组",
+          "sql": "GROUP BY CASE WHEN rn=1 THEN 'new' ELSE 'returning' END",
+          "note": "按 CASE WHEN rn=1 THEN 'new' ELSE 'returning' END 把行归入各个分组。"
+        },
+        {
+          "role": "order",
+          "label": "排序",
+          "sql": "ORDER BY segment",
+          "note": "按 segment 排列结果。"
+        }
+      ]
+    }
+  ]
+}

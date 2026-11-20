@@ -1,0 +1,236 @@
+{
+  "id": "kp10-04",
+  "chapterId": "ch10",
+  "title": "NOT EXISTS 与 NOT IN",
+  "learningObjective": "能查找无匹配记录，理解空值如何影响反向成员判断。",
+  "prerequisites": [
+    "kp10-03"
+  ],
+  "concept": "反向匹配用于找出有主档却没有交易的对象，例如未购买客户、未收货采购单。NOT EXISTS 在没有满足相关条件的行时为真。NOT IN 在候选集合出现 NULL 时，未匹配值的比较可能为未知；WHERE 不保留未知，因此结果可能少于预期。对非空客户主键，本例用 NOT EXISTS 最直接。若外层键也允许空值，需要另外定义缺失键的业务处理规则。",
+  "syntax": "WHERE NOT EXISTS (SELECT 1 FROM b WHERE b.key=a.key)",
+  "parameters": {
+    "NOT EXISTS": "没有符合条件的内层记录",
+    "NOT IN": "不属于候选集合，须考虑 NULL"
+  },
+  "fixtureIds": [
+    "lesson-customers",
+    "lesson-orders"
+  ],
+  "sourceTables": [
+    {
+      "name": "customers",
+      "columns": [
+        {
+          "name": "customer_id",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "customer_name",
+          "type": "TEXT",
+          "mysqlType": "VARCHAR(160) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_bin",
+          "sqliteType": "TEXT"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          "林"
+        ],
+        [
+          2,
+          "陈"
+        ],
+        [
+          3,
+          "王"
+        ],
+        [
+          4,
+          "李"
+        ]
+      ]
+    },
+    {
+      "name": "orders",
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "category",
+          "type": "TEXT",
+          "mysqlType": "VARCHAR(160) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_bin",
+          "sqliteType": "TEXT"
+        },
+        {
+          "name": "sales",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "store_id",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "order_date",
+          "type": "TEXT",
+          "mysqlType": "DATE",
+          "sqliteType": "TEXT"
+        },
+        {
+          "name": "customer_id",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          "护肤品",
+          800,
+          1,
+          "2026-01-03",
+          1
+        ],
+        [
+          2,
+          "化妆品",
+          400,
+          2,
+          "2026-01-10",
+          2
+        ],
+        [
+          3,
+          "护肤品",
+          600,
+          1,
+          "2026-02-02",
+          1
+        ],
+        [
+          4,
+          "化妆品",
+          300,
+          2,
+          "2026-02-15",
+          null
+        ],
+        [
+          5,
+          "日用品",
+          1500,
+          1,
+          "2026-02-20",
+          3
+        ]
+      ]
+    }
+  ],
+  "mysqlSql": "SELECT c.customer_id FROM customers c WHERE NOT EXISTS (SELECT 1 FROM orders o WHERE o.customer_id=c.customer_id) ORDER BY customer_name DESC;",
+  "sqliteSql": "SELECT c.customer_id FROM customers c WHERE NOT EXISTS (SELECT 1 FROM orders o WHERE o.customer_id=c.customer_id) ORDER BY customer_name DESC;",
+  "executionSteps": [
+    "检查各客户的匹配订单",
+    "保留不存在匹配的客户"
+  ],
+  "useCase": "主管要求列出从未购买的登记客户。订单4的客户编号为空，表示本例有匿名交易；它不能作为已知客户的购买证据。",
+  "comparison": "NOT EXISTS 与排除 NULL 后的 NOT IN 在本例非空外层键条件下等价。",
+  "commonError": {
+    "example": "WHERE customer_id NOT IN (SELECT customer_id FROM orders)",
+    "correction": "改用 NOT EXISTS，或内层明确 WHERE customer_id IS NOT NULL。"
+  },
+  "notes": "外层可空键时两种写法不一定等价。",
+  "compatibility": {
+    "status": "直接兼容",
+    "detail": "仅在本示例数据与语义范围验证；不代表全部 MySQL 语法兼容。"
+  },
+  "relatedQuestionIds": [
+    "q0131",
+    "q0144",
+    "q0145",
+    "q0146",
+    "q0148",
+    "q0150"
+  ],
+  "relatedFlashcardIds": [
+    "fc0074",
+    "fc0076",
+    "fc0078"
+  ],
+  "relatedKnowledgePointIds": [
+    "kp03-01",
+    "kp05-01",
+    "kp08-01"
+  ],
+  "mysqlVerification": "未运行原生 MySQL 8.4",
+  "result": {
+    "columns": [
+      "customer_id"
+    ],
+    "rows": [
+      [
+        4
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "mysqlVerificationScript": "validation/mysql/kp10-04.sql",
+  "primaryQuestionIds": [
+    "q0131",
+    "q0144",
+    "q0145",
+    "q0146",
+    "q0148",
+    "q0150"
+  ],
+  "primaryFlashcardIds": [
+    "fc0074",
+    "fc0076",
+    "fc0078"
+  ],
+  "teaching": {
+    "problem": "主管要求列出从未购买的登记客户。订单4的客户编号为空，表示本例有匿名交易；它不能作为已知客户的购买证据。",
+    "codeExplanation": "外层逐个客户进行逻辑判断，内层只检查同一客户编号。客户4没有匹配行，所以 NOT EXISTS 为真。若使用 NOT IN，候选编号为1、2、1、NULL、3；客户4与已知编号均不相等，但与 NULL 比较未知。应在子查询明确过滤 NULL 后再使用 NOT IN。",
+    "resultExplanation": "最终仅客户4入选；不等同于所有未交易人员，因为名单范围只包括客户主档。错误写法返回空结果，容易误判所有客户都买过。",
+    "checkpoints": [],
+    "mergedConcepts": [],
+    "mergeExamples": [
+      {
+        "label": "含空值的错误对照",
+        "explanation": "没有报错，但未知条件导致没有任何客户返回。",
+        "sql": "SELECT customer_id FROM customers WHERE customer_id NOT IN (SELECT customer_id FROM orders) ORDER BY customer_name DESC;",
+        "result": {
+          "columns": [
+            "customer_id"
+          ],
+          "rows": []
+        }
+      },
+      {
+        "label": "排除候选空值",
+        "explanation": "已知外层主键非空，因此本例与 NOT EXISTS 返回相同结果。",
+        "sql": "SELECT customer_id FROM customers WHERE customer_id NOT IN (SELECT customer_id FROM orders WHERE customer_id IS NOT NULL) ORDER BY customer_name DESC;",
+        "result": {
+          "columns": [
+            "customer_id"
+          ],
+          "rows": [
+            [
+              4
+            ]
+          ]
+        }
+      }
+    ]
+  }
+}

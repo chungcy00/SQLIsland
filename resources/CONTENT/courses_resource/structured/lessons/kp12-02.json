@@ -1,0 +1,197 @@
+{
+  "schemaVersion": 1,
+  "id": "kp12-02",
+  "sourceBatch": "unified73",
+  "teachingKind": "function",
+  "conceptBlocks": [
+    {
+      "type": "paragraph",
+      "text": "日期格式化产生用于展示或分组的文本键，年份与月份提取产生数值字段。相同月份编号可能来自不同年份，故跨年报表应使用年份与月份组合；派生日期字段本身不改变记录粒度，分组才改变粒度。",
+      "emphasis": []
+    }
+  ],
+  "syntax": {
+    "purpose": "day 有效日期；%Y-%m 四位年份、两位月份。"
+  },
+  "dataDescriptions": {
+    "orders": "共 5 行；字段：id、category、sales、store_id、order_date、customer_id。"
+  },
+  "problem": "分析员需生成月度销售报表；每笔订单归属其订单日期所在月份，不按付款日期或设备当前日期统计。",
+  "methodBlocks": [
+    {
+      "type": "paragraph",
+      "text": "原生 DATE_FORMAT 生成 YYYY-MM，YEAR 与 MONTH 取数值部分。本地 strftime 可生成对应文本，CAST 转为整数。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "先核对派生键，再用 GROUP BY 汇总金额；跨年不能只按月份编号。",
+      "emphasis": []
+    }
+  ],
+  "breakdown": [
+    {
+      "kind": "fragment",
+      "title": "指定来源",
+      "sql": "FROM orders",
+      "purpose": "从 orders 读取输入数据。",
+      "reason": "后面的子句都基于这里得到的行。"
+    },
+    {
+      "kind": "fragment",
+      "title": "选择输出",
+      "sql": "SELECT id, DATE_FORMAT(order_date,'%Y-%m') AS month, YEAR(order_date) AS year_no, MONTH(order_date) AS month_no",
+      "purpose": "输出查询需要的列与计算表达式。",
+      "reason": "输出列的顺序与别名决定结果表的形状。"
+    },
+    {
+      "kind": "fragment",
+      "title": "排序",
+      "sql": "ORDER BY sales DESC;",
+      "purpose": "按 sales DESC 排列结果。",
+      "reason": "查询结果的默认行序没有保证，需要显式排序。"
+    }
+  ],
+  "completeCode": {
+    "mysqlSql": "SELECT id, DATE_FORMAT(order_date,'%Y-%m') AS month, YEAR(order_date) AS year_no, MONTH(order_date) AS month_no FROM orders ORDER BY sales DESC;",
+    "sqliteSql": "SELECT id, strftime('%Y-%m',order_date) AS month, CAST(strftime('%Y',order_date) AS INTEGER) AS year_no, CAST(strftime('%m',order_date) AS INTEGER) AS month_no FROM orders ORDER BY sales DESC;"
+  },
+  "expectedResult": {
+    "columns": [
+      "id",
+      "month",
+      "year_no",
+      "month_no"
+    ],
+    "rows": [
+      [
+        5,
+        "2026-02",
+        2026,
+        2
+      ],
+      [
+        1,
+        "2026-01",
+        2026,
+        1
+      ],
+      [
+        3,
+        "2026-02",
+        2026,
+        2
+      ],
+      [
+        2,
+        "2026-01",
+        2026,
+        1
+      ],
+      [
+        4,
+        "2026-02",
+        2026,
+        2
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "resultBlocks": [
+    {
+      "type": "paragraph",
+      "text": "五笔订单仍返回五行；一月两笔合计1200，二月三笔合计2400。",
+      "emphasis": []
+    }
+  ],
+  "extensions": [
+    {
+      "label": "按月汇总",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "以完整年月键分组。",
+          "emphasis": []
+        }
+      ],
+      "sql": "SELECT strftime('%Y-%m',order_date) AS month,SUM(sales) AS total FROM orders GROUP BY strftime('%Y-%m',order_date) ORDER BY month;",
+      "result": {
+        "columns": [
+          "month",
+          "total"
+        ],
+        "rows": [
+          [
+            "2026-01",
+            1200
+          ],
+          [
+            "2026-02",
+            2400
+          ]
+        ]
+      }
+    },
+    {
+      "label": "跨年月份对照",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "两个一月具有相同月份数字，不是同一统计期间。",
+          "emphasis": []
+        }
+      ],
+      "sql": "WITH d(t) AS (SELECT '2025-01-01' UNION ALL SELECT '2026-01-01') SELECT strftime('%Y-%m',t) AS month,CAST(strftime('%m',t) AS INTEGER) AS month_no FROM d ORDER BY month;",
+      "result": {
+        "columns": [
+          "month",
+          "month_no"
+        ],
+        "rows": [
+          [
+            "2025-01",
+            1
+          ],
+          [
+            "2026-01",
+            1
+          ]
+        ]
+      }
+    }
+  ],
+  "cautions": {
+    "comparison": [
+      {
+        "type": "paragraph",
+        "text": "格式化用于生成标签，日期区间用于筛选。",
+        "emphasis": []
+      }
+    ],
+    "example": [
+      {
+        "type": "paragraph",
+        "text": "只按 MONTH(order_date) 分组跨年交易。",
+        "emphasis": []
+      }
+    ],
+    "reason": [],
+    "correction": [
+      {
+        "type": "paragraph",
+        "text": "同时使用年份和月份或完整年月键。",
+        "emphasis": []
+      }
+    ],
+    "notes": [
+      {
+        "type": "paragraph",
+        "text": "原生与本地格式符并非完全等价；本例仅验证指定格式。",
+        "emphasis": []
+      }
+    ]
+  },
+  "sourcePath": "source/unified73/kp12-02.json",
+  "sourceSha256": "339fdecf0cf38090421ae8e702dcb36bba8ad73c2934ee9542adbaa93f61e209"
+}

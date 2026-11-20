@@ -1,0 +1,980 @@
+{
+  "schemaVersion": 1,
+  "id": "kp20-21",
+  "sourceBatch": "unified73",
+  "teachingKind": "business",
+  "conceptBlocks": [
+    {
+      "type": "paragraph",
+      "text": "按2025年线下销售与员工月历史门店分别汇总；总工作分钟=出勤分钟+加班分钟（本库两者分别记录）；每小时销售=净销售×60÷总分钟，人工占比=人工成本÷净销售×100%。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "保留所有门店，分母为零返回空值。",
+      "emphasis": []
+    }
+  ],
+  "syntax": {
+    "purpose": "统计截止日 2025-12-31；金额 马币分；输出粒度 门店。"
+  },
+  "dataDescriptions": {
+    "stores": "共 3 行；字段：store_id、store_name、city、fulfillment_warehouse_id。",
+    "v_sales_lines": "共 3 行；字段：order_item_id、order_id、store_id、customer_id、session_id、channel、order_date、product_id、promotion_id、net_qty、net_cents、cost_cents、discount_cents、refund_cents。",
+    "v_staff_month": "共 3 行；字段：employee_id、month_key、department_id、position_id、store_id、base_cents、bonus_cents、overtime_minutes、worked_minutes、labor_cents。"
+  },
+  "problem": "区域经理需要比较2025年各实体门店每小时销售及人工费用占净销售的比例，并判断成本偏高究竟来自加班、人力配置还是销售偏低。员工可能跨月调店，必须按员工月记录的历史门店归属计算。",
+  "methodBlocks": [
+    {
+      "type": "paragraph",
+      "text": "a 以订单日期、线下渠道过滤销售明细，再按门店求净销售合计；退款已体现在净额中。b 以员工月记录的月份及当月门店归属过滤，分别求人工成本和工作分钟；不能用当前门店替代历史归属。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "人工成本直接取视图中的 labor_cents，不再额外加工资或奖金。先让两个汇总各自每门店一行，再连接门店主档，否则多笔销售和多名员工相乘会放大金额。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "COALESCE 在确认无记录代表无业务时补零；工时用分钟除60，计算人效时直接用未舍入分钟作分母，人工占比使用净销售而非毛利作分母；两个 NULLIF 分别防止除零。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "合并来源19-54按历史部门月份独立汇总员工基本工资、奖金及加班估算成本，示例按176小时/月、1.5倍时薪×加班分钟÷60，先求总成本再除总出勤加加班小时。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "该参数只是课程模型，不是法定薪资规则。若出勤字段已经包含加班，不应再次加总；人工成本若包含其他福利也要统一口径。",
+      "emphasis": []
+    }
+  ],
+  "breakdown": [
+    {
+      "kind": "runnable",
+      "title": "按门店汇总净销售",
+      "sql": "WITH a AS (SELECT store_id,SUM(net_cents) net FROM v_sales_lines WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY store_id)\nSELECT * FROM a ORDER BY 1, 2 LIMIT 3;",
+      "purpose": "按门店汇总净销售（a）的实际执行结果。",
+      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "sourceTables": [
+        {
+          "name": "stores",
+          "columns": [
+            {
+              "name": "store_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "store_name",
+              "type": "TEXT"
+            },
+            {
+              "name": "city",
+              "type": "TEXT"
+            },
+            {
+              "name": "fulfillment_warehouse_id",
+              "type": "INTEGER"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              "河滨生活馆",
+              "古晋",
+              1
+            ],
+            [
+              2,
+              "埔奕家居馆",
+              "美里",
+              2
+            ],
+            [
+              3,
+              "蕉赖家庭店",
+              "吉隆坡",
+              3
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 12
+        },
+        {
+          "name": "v_sales_lines",
+          "columns": [
+            {
+              "name": "order_item_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "order_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "store_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "customer_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "session_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "channel",
+              "type": "TEXT"
+            },
+            {
+              "name": "order_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "product_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "promotion_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "net_qty",
+              "type": "派生"
+            },
+            {
+              "name": "net_cents",
+              "type": "派生"
+            },
+            {
+              "name": "cost_cents",
+              "type": "派生"
+            },
+            {
+              "name": "discount_cents",
+              "type": "INTEGER"
+            },
+            {
+              "name": "refund_cents",
+              "type": "派生"
+            }
+          ],
+          "rows": [
+            [
+              53709,
+              2,
+              4,
+              null,
+              null,
+              "store",
+              "2025-10-02",
+              287,
+              null,
+              1,
+              300,
+              268,
+              0,
+              0
+            ],
+            [
+              55177,
+              2,
+              4,
+              null,
+              null,
+              "store",
+              "2025-10-02",
+              158,
+              null,
+              0,
+              0,
+              0,
+              0,
+              1810
+            ],
+            [
+              29478,
+              3,
+              4,
+              2256,
+              null,
+              "store",
+              "2025-06-09",
+              59,
+              null,
+              1,
+              1310,
+              618,
+              0,
+              0
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 64627
+        },
+        {
+          "name": "v_staff_month",
+          "columns": [
+            {
+              "name": "employee_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "month_key",
+              "type": "TEXT"
+            },
+            {
+              "name": "department_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "position_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "store_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "base_cents",
+              "type": "INTEGER"
+            },
+            {
+              "name": "bonus_cents",
+              "type": "INTEGER"
+            },
+            {
+              "name": "overtime_minutes",
+              "type": "派生"
+            },
+            {
+              "name": "worked_minutes",
+              "type": "派生"
+            },
+            {
+              "name": "labor_cents",
+              "type": "派生"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              "2024-12",
+              1,
+              2,
+              3,
+              117077,
+              0,
+              375,
+              4320,
+              123313.0
+            ],
+            [
+              1,
+              "2025-01",
+              1,
+              2,
+              3,
+              350005,
+              0,
+              255,
+              10560,
+              362683.0
+            ],
+            [
+              1,
+              "2025-02",
+              1,
+              2,
+              3,
+              350005,
+              0,
+              660,
+              10560,
+              382818.0
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 3892
+        }
+      ],
+      "result": {
+        "columns": [
+          "store_id",
+          "net"
+        ],
+        "rows": [
+          [
+            1,
+            3909544
+          ],
+          [
+            2,
+            4244313
+          ],
+          [
+            3,
+            2422875
+          ]
+        ]
+      }
+    },
+    {
+      "kind": "runnable",
+      "title": "按门店汇总人工及工作分钟",
+      "sql": "WITH a AS (SELECT store_id,SUM(net_cents) net FROM v_sales_lines WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY store_id), b AS (SELECT store_id,SUM(labor_cents) labor,SUM(worked_minutes+overtime_minutes) minutes_worked FROM v_staff_month WHERE month_key BETWEEN '2025-01' AND '2025-12' AND store_id IS NOT NULL GROUP BY store_id)\nSELECT * FROM b ORDER BY 1, 2, 3 LIMIT 3;",
+      "purpose": "按门店汇总人工及工作分钟（b）的实际执行结果。",
+      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "sourceTables": [
+        {
+          "name": "stores",
+          "columns": [
+            {
+              "name": "store_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "store_name",
+              "type": "TEXT"
+            },
+            {
+              "name": "city",
+              "type": "TEXT"
+            },
+            {
+              "name": "fulfillment_warehouse_id",
+              "type": "INTEGER"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              "河滨生活馆",
+              "古晋",
+              1
+            ],
+            [
+              2,
+              "埔奕家居馆",
+              "美里",
+              2
+            ],
+            [
+              3,
+              "蕉赖家庭店",
+              "吉隆坡",
+              3
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 12
+        },
+        {
+          "name": "v_sales_lines",
+          "columns": [
+            {
+              "name": "order_item_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "order_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "store_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "customer_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "session_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "channel",
+              "type": "TEXT"
+            },
+            {
+              "name": "order_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "product_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "promotion_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "net_qty",
+              "type": "派生"
+            },
+            {
+              "name": "net_cents",
+              "type": "派生"
+            },
+            {
+              "name": "cost_cents",
+              "type": "派生"
+            },
+            {
+              "name": "discount_cents",
+              "type": "INTEGER"
+            },
+            {
+              "name": "refund_cents",
+              "type": "派生"
+            }
+          ],
+          "rows": [
+            [
+              53709,
+              2,
+              4,
+              null,
+              null,
+              "store",
+              "2025-10-02",
+              287,
+              null,
+              1,
+              300,
+              268,
+              0,
+              0
+            ],
+            [
+              55177,
+              2,
+              4,
+              null,
+              null,
+              "store",
+              "2025-10-02",
+              158,
+              null,
+              0,
+              0,
+              0,
+              0,
+              1810
+            ],
+            [
+              29478,
+              3,
+              4,
+              2256,
+              null,
+              "store",
+              "2025-06-09",
+              59,
+              null,
+              1,
+              1310,
+              618,
+              0,
+              0
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 64627
+        },
+        {
+          "name": "v_staff_month",
+          "columns": [
+            {
+              "name": "employee_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "month_key",
+              "type": "TEXT"
+            },
+            {
+              "name": "department_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "position_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "store_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "base_cents",
+              "type": "INTEGER"
+            },
+            {
+              "name": "bonus_cents",
+              "type": "INTEGER"
+            },
+            {
+              "name": "overtime_minutes",
+              "type": "派生"
+            },
+            {
+              "name": "worked_minutes",
+              "type": "派生"
+            },
+            {
+              "name": "labor_cents",
+              "type": "派生"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              "2024-12",
+              1,
+              2,
+              3,
+              117077,
+              0,
+              375,
+              4320,
+              123313.0
+            ],
+            [
+              1,
+              "2025-01",
+              1,
+              2,
+              3,
+              350005,
+              0,
+              255,
+              10560,
+              362683.0
+            ],
+            [
+              1,
+              "2025-02",
+              1,
+              2,
+              3,
+              350005,
+              0,
+              660,
+              10560,
+              382818.0
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 3892
+        }
+      ],
+      "result": {
+        "columns": [
+          "store_id",
+          "labor",
+          "minutes_worked"
+        ],
+        "rows": [
+          [
+            1,
+            20412334,
+            759660
+          ],
+          [
+            2,
+            13069124,
+            449340
+          ],
+          [
+            3,
+            15944353,
+            508035
+          ]
+        ]
+      }
+    }
+  ],
+  "completeCode": {
+    "mysqlSql": "WITH a AS (SELECT store_id,SUM(net_cents) net FROM v_sales_lines WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY store_id), b AS (SELECT store_id,SUM(labor_cents) labor,SUM(worked_minutes+overtime_minutes) minutes_worked FROM v_staff_month WHERE month_key BETWEEN '2025-01' AND '2025-12' AND store_id IS NOT NULL GROUP BY store_id) SELECT s.store_id,COALESCE(a.net,0) net_cents,COALESCE(b.labor,0) labor_cents,ROUND(1.0*COALESCE(b.minutes_worked,0)/60,2) worked_hours,ROUND(60.0*COALESCE(a.net,0)/NULLIF(b.minutes_worked,0),2) sales_per_hour_cents,ROUND(100.0*COALESCE(b.labor,0)/NULLIF(a.net,0),2) labor_pct FROM stores s LEFT JOIN a ON a.store_id=s.store_id LEFT JOIN b ON b.store_id=s.store_id ORDER BY net_cents DESC",
+    "sqliteSql": "WITH a AS (SELECT store_id,SUM(net_cents) net FROM v_sales_lines WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY store_id), b AS (SELECT store_id,SUM(labor_cents) labor,SUM(worked_minutes+overtime_minutes) minutes_worked FROM v_staff_month WHERE month_key BETWEEN '2025-01' AND '2025-12' AND store_id IS NOT NULL GROUP BY store_id) SELECT s.store_id,COALESCE(a.net,0) net_cents,COALESCE(b.labor,0) labor_cents,ROUND(1.0*COALESCE(b.minutes_worked,0)/60,2) worked_hours,ROUND(60.0*COALESCE(a.net,0)/NULLIF(b.minutes_worked,0),2) sales_per_hour_cents,ROUND(100.0*COALESCE(b.labor,0)/NULLIF(a.net,0),2) labor_pct FROM stores s LEFT JOIN a ON a.store_id=s.store_id LEFT JOIN b ON b.store_id=s.store_id ORDER BY net_cents DESC"
+  },
+  "expectedResult": {
+    "columns": [
+      "store_id",
+      "net_cents",
+      "labor_cents",
+      "worked_hours",
+      "sales_per_hour_cents",
+      "labor_pct"
+    ],
+    "rows": [
+      [
+        6,
+        6969441,
+        74045903.0,
+        40516.25,
+        172.02,
+        1062.44
+      ],
+      [
+        7,
+        5693507,
+        18326233.0,
+        13035.75,
+        436.76,
+        321.88
+      ],
+      [
+        5,
+        5373344,
+        33699996.0,
+        18788.0,
+        286.0,
+        627.17
+      ],
+      [
+        2,
+        4244313,
+        13069124.0,
+        7489.0,
+        566.74,
+        307.92
+      ],
+      [
+        1,
+        3909544,
+        20412334.0,
+        12661.0,
+        308.79,
+        522.12
+      ],
+      [
+        12,
+        3718711,
+        21883972.0,
+        12920.25,
+        287.82,
+        588.48
+      ],
+      [
+        11,
+        3591126,
+        17819766.0,
+        10957.0,
+        327.75,
+        496.22
+      ],
+      [
+        10,
+        3167056,
+        11969477.0,
+        7631.0,
+        415.03,
+        377.94
+      ],
+      [
+        9,
+        2598900,
+        4762259.0,
+        2685.5,
+        967.75,
+        183.24
+      ],
+      [
+        4,
+        2496443,
+        20029940.0,
+        13334.25,
+        187.22,
+        802.34
+      ],
+      [
+        3,
+        2422875,
+        15944353.0,
+        8467.25,
+        286.15,
+        658.08
+      ],
+      [
+        8,
+        2231300,
+        20639043.0,
+        13414.0,
+        166.34,
+        924.98
+      ]
+    ],
+    "status": "SQLite实际执行（预览）",
+    "orderGuaranteed": true,
+    "totalRows": 12,
+    "fullResultPath": "../enterprise_reference/business_tasks/results/BP47.json"
+  },
+  "resultBlocks": [
+    {
+      "type": "paragraph",
+      "text": "示例门店1净销售100000分，人工50000分，1200分钟=20小时，每小时5000分，人工占比50%；门店2每小时3000分、人工占比100%。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "门店3有销售但没有工时，人工占比50%仍可计算，人效为空；门店4有5小时却无销售，人效为0、人工占比为空；门店5无任何业务记录，两比率均为空。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "门店1、2组合人效4333.33分/小时，不能用两个门店的简单平均4000。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "部门10一月工资352000、奖金10000、加班4500，总人工366500分，355小时，人工每小时1032.39分。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "原企业门店1人工占比522.12%、人效308.79分/小时；超过100%不是计算错误的充分证据，应核对成本、销售数据完整性与业务口径，再判断经营风险。高人效不等于高净利润。",
+      "emphasis": []
+    }
+  ],
+  "extensions": [
+    {
+      "label": "按门店汇总线下净销售",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "排除线上及跨年销售。",
+          "emphasis": []
+        }
+      ],
+      "sql": "WITH stores(store_id) AS (SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5),\nv_sales_lines(store_id,channel,order_date,net_cents) AS (\n SELECT 1,'store','2025-01-01',60000 UNION ALL SELECT 1,'store','2025-02-01',40000 UNION ALL SELECT 2,'store','2025-01-01',30000 UNION ALL SELECT 3,'store','2025-01-01',20000 UNION ALL SELECT 1,'online','2025-01-01',99999 UNION ALL SELECT 1,'store','2024-12-31',99999),\nv_staff_month(employee_id,store_id,month_key,labor_cents,worked_minutes,overtime_minutes) AS (\n SELECT 1,1,'2025-01',30000,540,60 UNION ALL SELECT 2,1,'2025-01',20000,540,60 UNION ALL SELECT 1,2,'2025-02',30000,600,0 UNION ALL SELECT 4,4,'2025-01',12000,300,0 UNION ALL SELECT 5,3,'2025-01',10000,0,0 UNION ALL SELECT 6,NULL,'2025-01',9000,600,0 UNION ALL SELECT 1,1,'2024-12',99999,600,0),\na AS (SELECT store_id,SUM(net_cents) net FROM v_sales_lines WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY store_id) SELECT * FROM a ORDER BY net",
+      "result": {
+        "columns": [
+          "store_id",
+          "net"
+        ],
+        "rows": [
+          [
+            3,
+            20000
+          ],
+          [
+            2,
+            30000
+          ],
+          [
+            1,
+            100000
+          ]
+        ]
+      }
+    },
+    {
+      "label": "按历史门店汇总人工和工时",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "员工1在一月属于门店1、二月属于门店2；无归属与跨年记录排除。",
+          "emphasis": []
+        }
+      ],
+      "sql": "WITH stores(store_id) AS (SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5),\nv_sales_lines(store_id,channel,order_date,net_cents) AS (\n SELECT 1,'store','2025-01-01',60000 UNION ALL SELECT 1,'store','2025-02-01',40000 UNION ALL SELECT 2,'store','2025-01-01',30000 UNION ALL SELECT 3,'store','2025-01-01',20000 UNION ALL SELECT 1,'online','2025-01-01',99999 UNION ALL SELECT 1,'store','2024-12-31',99999),\nv_staff_month(employee_id,store_id,month_key,labor_cents,worked_minutes,overtime_minutes) AS (\n SELECT 1,1,'2025-01',30000,540,60 UNION ALL SELECT 2,1,'2025-01',20000,540,60 UNION ALL SELECT 1,2,'2025-02',30000,600,0 UNION ALL SELECT 4,4,'2025-01',12000,300,0 UNION ALL SELECT 5,3,'2025-01',10000,0,0 UNION ALL SELECT 6,NULL,'2025-01',9000,600,0 UNION ALL SELECT 1,1,'2024-12',99999,600,0),\nb AS (SELECT store_id,SUM(labor_cents) labor,SUM(worked_minutes+overtime_minutes) minutes_worked FROM v_staff_month WHERE month_key BETWEEN '2025-01' AND '2025-12' AND store_id IS NOT NULL GROUP BY store_id) SELECT * FROM b ORDER BY labor DESC",
+      "result": {
+        "columns": [
+          "store_id",
+          "labor",
+          "minutes_worked"
+        ],
+        "rows": [
+          [
+            1,
+            50000,
+            1200
+          ],
+          [
+            2,
+            30000,
+            600
+          ],
+          [
+            4,
+            12000,
+            300
+          ],
+          [
+            3,
+            10000,
+            0
+          ]
+        ]
+      }
+    },
+    {
+      "label": "完整门店人效报表",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "保留所有门店，两个分母分别判断。",
+          "emphasis": []
+        }
+      ],
+      "sql": "WITH stores(store_id) AS (SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5),\nv_sales_lines(store_id,channel,order_date,net_cents) AS (\n SELECT 1,'store','2025-01-01',60000 UNION ALL SELECT 1,'store','2025-02-01',40000 UNION ALL SELECT 2,'store','2025-01-01',30000 UNION ALL SELECT 3,'store','2025-01-01',20000 UNION ALL SELECT 1,'online','2025-01-01',99999 UNION ALL SELECT 1,'store','2024-12-31',99999),\nv_staff_month(employee_id,store_id,month_key,labor_cents,worked_minutes,overtime_minutes) AS (\n SELECT 1,1,'2025-01',30000,540,60 UNION ALL SELECT 2,1,'2025-01',20000,540,60 UNION ALL SELECT 1,2,'2025-02',30000,600,0 UNION ALL SELECT 4,4,'2025-01',12000,300,0 UNION ALL SELECT 5,3,'2025-01',10000,0,0 UNION ALL SELECT 6,NULL,'2025-01',9000,600,0 UNION ALL SELECT 1,1,'2024-12',99999,600,0),\na AS (SELECT store_id,SUM(net_cents) net FROM v_sales_lines WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY store_id), b AS (SELECT store_id,SUM(labor_cents) labor,SUM(worked_minutes+overtime_minutes) minutes_worked FROM v_staff_month WHERE month_key BETWEEN '2025-01' AND '2025-12' AND store_id IS NOT NULL GROUP BY store_id) SELECT s.store_id,COALESCE(a.net,0) net_cents,COALESCE(b.labor,0) labor_cents,ROUND(1.0*COALESCE(b.minutes_worked,0)/60,2) worked_hours,ROUND(60.0*COALESCE(a.net,0)/NULLIF(b.minutes_worked,0),2) sales_per_hour_cents,ROUND(100.0*COALESCE(b.labor,0)/NULLIF(a.net,0),2) labor_pct FROM stores s LEFT JOIN a ON a.store_id=s.store_id LEFT JOIN b ON b.store_id=s.store_id ORDER BY labor_cents DESC",
+      "result": {
+        "columns": [
+          "store_id",
+          "net_cents",
+          "labor_cents",
+          "worked_hours",
+          "sales_per_hour_cents",
+          "labor_pct"
+        ],
+        "rows": [
+          [
+            1,
+            100000,
+            50000,
+            20.0,
+            5000.0,
+            50.0
+          ],
+          [
+            2,
+            30000,
+            30000,
+            10.0,
+            3000.0,
+            100.0
+          ],
+          [
+            4,
+            0,
+            12000,
+            5.0,
+            0.0,
+            null
+          ],
+          [
+            3,
+            20000,
+            10000,
+            0.0,
+            null,
+            50.0
+          ],
+          [
+            5,
+            0,
+            0,
+            0.0,
+            null,
+            null
+          ]
+        ]
+      }
+    },
+    {
+      "label": "部门月度人工成本与加班拆分",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "按每月176小时、1.5倍时薪估算加班；实际薪资政策可能不同。",
+          "emphasis": []
+        }
+      ],
+      "sql": "WITH staff(employee_id,department_id,month_key,base_cents,bonus_cents,worked_minutes,overtime_minutes) AS (\n SELECT 1,10,'2025-01',176000,10000,10560,120 UNION ALL SELECT 2,10,'2025-01',176000,0,10560,60 UNION ALL SELECT 1,20,'2025-02',176000,0,10560,0),\n calc AS (SELECT *,1.5*base_cents/176*overtime_minutes/60 AS overtime_cents FROM staff)\nSELECT department_id,month_key,SUM(base_cents) base_total,SUM(bonus_cents) bonus_total,ROUND(SUM(overtime_cents),2) overtime_total,ROUND(SUM(base_cents+bonus_cents+overtime_cents),2) labor_total,ROUND(SUM(worked_minutes+overtime_minutes)/60.0,2) hours,ROUND(SUM(base_cents+bonus_cents+overtime_cents)/NULLIF(SUM(worked_minutes+overtime_minutes)/60.0,0),2) labor_per_hour FROM calc GROUP BY department_id,month_key ORDER BY month_key DESC",
+      "result": {
+        "columns": [
+          "department_id",
+          "month_key",
+          "base_total",
+          "bonus_total",
+          "overtime_total",
+          "labor_total",
+          "hours",
+          "labor_per_hour"
+        ],
+        "rows": [
+          [
+            20,
+            "2025-02",
+            176000,
+            0,
+            0.0,
+            176000.0,
+            176.0,
+            1000.0
+          ],
+          [
+            10,
+            "2025-01",
+            352000,
+            10000,
+            4500.0,
+            366500.0,
+            355.0,
+            1032.39
+          ]
+        ]
+      }
+    },
+    {
+      "label": "总量比率与平均比率比较",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "组合人效必须用总销售除总工时；示例仅比较门店1和2。",
+          "emphasis": []
+        }
+      ],
+      "sql": "WITH stores(store_id) AS (SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5),\nv_sales_lines(store_id,channel,order_date,net_cents) AS (\n SELECT 1,'store','2025-01-01',60000 UNION ALL SELECT 1,'store','2025-02-01',40000 UNION ALL SELECT 2,'store','2025-01-01',30000 UNION ALL SELECT 3,'store','2025-01-01',20000 UNION ALL SELECT 1,'online','2025-01-01',99999 UNION ALL SELECT 1,'store','2024-12-31',99999),\nv_staff_month(employee_id,store_id,month_key,labor_cents,worked_minutes,overtime_minutes) AS (\n SELECT 1,1,'2025-01',30000,540,60 UNION ALL SELECT 2,1,'2025-01',20000,540,60 UNION ALL SELECT 1,2,'2025-02',30000,600,0 UNION ALL SELECT 4,4,'2025-01',12000,300,0 UNION ALL SELECT 5,3,'2025-01',10000,0,0 UNION ALL SELECT 6,NULL,'2025-01',9000,600,0 UNION ALL SELECT 1,1,'2024-12',99999,600,0),\na AS (SELECT store_id,SUM(net_cents) net FROM v_sales_lines WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY store_id), b AS (SELECT store_id,SUM(labor_cents) labor,SUM(worked_minutes+overtime_minutes) minutes_worked FROM v_staff_month WHERE month_key BETWEEN '2025-01' AND '2025-12' AND store_id IS NOT NULL GROUP BY store_id) SELECT ROUND(60.0*SUM(a.net)/SUM(b.minutes_worked),2) weighted_sales_per_hour,ROUND(AVG(60.0*a.net/b.minutes_worked),2) simple_average FROM a JOIN b ON a.store_id=b.store_id WHERE a.store_id IN (1,2)",
+      "result": {
+        "columns": [
+          "weighted_sales_per_hour",
+          "simple_average"
+        ],
+        "rows": [
+          [
+            4333.33,
+            4000.0
+          ]
+        ]
+      }
+    }
+  ],
+  "cautions": {
+    "comparison": [
+      {
+        "type": "paragraph",
+        "text": "每小时销售衡量销售产出，人工占比衡量销售中人工负担，部门每小时人工成本衡量人力投入。组合比率先汇总分子分母。",
+        "emphasis": []
+      }
+    ],
+    "example": [
+      {
+        "type": "paragraph",
+        "text": "直接连接销售与员工月明细、按当前门店回填历史数据、把加班重复计入工时或人工成本。",
+        "emphasis": []
+      }
+    ],
+    "reason": [],
+    "correction": [
+      {
+        "type": "paragraph",
+        "text": "独立预聚合并使用历史归属；确认视图字段口径；分别保护两个分母。",
+        "emphasis": []
+      }
+    ],
+    "notes": [
+      {
+        "type": "paragraph",
+        "text": "原主查询及 BP47.json 结果保留。独立示例仅在 SQLite 验证；未复验完整企业数据库、原生 MySQL、浏览器。来源19-54按现行合并映射整合，未逐篇复核旧课文。",
+        "emphasis": []
+      }
+    ]
+  },
+  "sourcePath": "source/unified73/kp20-21.json",
+  "sourceSha256": "433693a6e8abb33b7d4643632b66836757926b37e8c850af4fd2fe9a38fc26ef"
+}

@@ -1,0 +1,154 @@
+{
+  "schemaVersion": 1,
+  "id": "kp12-01",
+  "sourceBatch": "unified73",
+  "teachingKind": "function",
+  "conceptBlocks": [
+    {
+      "type": "paragraph",
+      "text": "舍入改变输出精度，绝对值去掉方向但保留幅度，两者都不是数据类型转换。计算比率时分子和分母决定业务意义；整数商用于完整单位数量，余数表示剩余量。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "MySQL 的 / 可保留小数，DIV 截去小数部分；SQLite 两个整数相除可能截断。金额通常使用精确十进制或整数分，先计算再按业务要求舍入。",
+      "emphasis": []
+    }
+  ],
+  "syntax": {
+    "purpose": "x 待处理数值；d 舍入位数；a,b 被除数、除数。"
+  },
+  "dataDescriptions": {},
+  "problem": "财务报表将12.346显示为两位小数，偏差-25另需显示幅度；包装业务有7件商品，每箱2件，区分平均箱数与完整箱数。",
+  "methodBlocks": [
+    {
+      "type": "paragraph",
+      "text": "ROUND(12.346,2) 保留两位；ABS(-25) 得25但不能判断超支还是节省。小数除法在本地通过7.0提升类型，完整箱数使用整数商，余数通过 % 计算。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "比率分母可能为零时使用 NULLIF，不能把无定义比率直接当零。",
+      "emphasis": []
+    }
+  ],
+  "breakdown": [
+    {
+      "kind": "fragment",
+      "title": "选择输出",
+      "sql": "SELECT ROUND(12.346,2) AS rounded, ABS(-25) AS magnitude;",
+      "purpose": "输出 ROUND(12.346,2) AS rounded, ABS(-25) AS magnitude。",
+      "reason": "输出列的顺序与别名决定结果表的形状。"
+    }
+  ],
+  "completeCode": {
+    "mysqlSql": "SELECT ROUND(12.346,2) AS rounded, ABS(-25) AS magnitude;",
+    "sqliteSql": "SELECT ROUND(12.346,2) AS rounded, ABS(-25) AS magnitude;"
+  },
+  "expectedResult": {
+    "columns": [
+      "rounded",
+      "magnitude"
+    ],
+    "rows": [
+      [
+        12.35,
+        25
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "resultBlocks": [
+    {
+      "type": "paragraph",
+      "text": "金额显示为12.35，偏差幅度25。7件可装3个完整箱，剩1件；3.5是数学商而非实际完整箱数。",
+      "emphasis": []
+    }
+  ],
+  "extensions": [
+    {
+      "label": "小数商、整数商与余数",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "本例对应原生 7/2、7 DIV 2、MOD(7,2)。",
+          "emphasis": []
+        }
+      ],
+      "sql": "SELECT 7.0/2 AS quotient, CAST(7/2 AS INTEGER) AS integer_part, 7%2 AS remainder;",
+      "result": {
+        "columns": [
+          "quotient",
+          "integer_part",
+          "remainder"
+        ],
+        "rows": [
+          [
+            3.5,
+            3,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "label": "舍入时点与零分母",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "逐笔舍入再汇总可能不同于汇总后舍入；零分母结果无定义。",
+          "emphasis": []
+        }
+      ],
+      "sql": "SELECT ROUND(1.234+1.234,2) AS final_round, ROUND(1.234,2)+ROUND(1.234,2) AS early_round, 7.0/NULLIF(0,0) AS safe_ratio;",
+      "result": {
+        "columns": [
+          "final_round",
+          "early_round",
+          "safe_ratio"
+        ],
+        "rows": [
+          [
+            2.47,
+            2.46,
+            null
+          ]
+        ]
+      }
+    }
+  ],
+  "cautions": {
+    "comparison": [
+      {
+        "type": "paragraph",
+        "text": "ABS 与 ROUND 解决不同问题；整数商不等于四舍五入。",
+        "emphasis": []
+      }
+    ],
+    "example": [
+      {
+        "type": "paragraph",
+        "text": "直接使用整数除法期待小数，或认为显示两位即已保证精确金额。",
+        "emphasis": []
+      }
+    ],
+    "reason": [],
+    "correction": [
+      {
+        "type": "paragraph",
+        "text": "本地使用 1.0 提升类型；原生使用精确十进制，并明确舍入时点。",
+        "emphasis": []
+      }
+    ],
+    "notes": [
+      {
+        "type": "paragraph",
+        "text": "负数、浮点中点、溢出及精度规则需按引擎另测。",
+        "emphasis": []
+      }
+    ]
+  },
+  "sourcePath": "source/unified73/kp12-01.json",
+  "sourceSha256": "827b3a7256f34d4339b77c85eaea262154c0910ea4f9bc1f48a28ff2c16a8bc3"
+}

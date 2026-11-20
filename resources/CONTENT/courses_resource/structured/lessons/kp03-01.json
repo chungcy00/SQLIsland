@@ -1,0 +1,222 @@
+{
+  "schemaVersion": 1,
+  "id": "kp03-01",
+  "sourceBatch": "unified73",
+  "teachingKind": "syntax",
+  "conceptBlocks": [
+    {
+      "type": "paragraph",
+      "text": "筛选是从一批记录中选出符合条件的部分，而不是修改或删除源数据。WHERE 对输入中的每一行判断条件，只保留判断结果为真的行。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "例如商品价格必须在某个范围，分析师需要明确临界值是否算合格。等于使用 =，不等于使用 <>（也可用 !=），大于和小于分别使用 >、<，带等号的 >=、<= 包含边界。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "多个条件可以同时约束同一行。筛选前后通常仍是一行一个商品，只是行数改变。若字段为空，普通比较通常得到未知，不能认为它自动满足“不等于”。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "日期、文本和金额比较还必须确认字段类型及单位。",
+      "emphasis": []
+    }
+  ],
+  "syntax": {
+    "purpose": "SELECT 选择结果字段；FROM 指定输入表；WHERE 只保留条件为真的记录；condition 比较表达式，可组合多个条件。"
+  },
+  "dataDescriptions": {
+    "products": "共 6 行；字段：product_id、product_name、category、price、stock。"
+  },
+  "problem": "采购主管需要列出单价在35至65之间（包含35和65）的商品，作为价格带核查清单。只需要商品编号和单价，不需要修改商品资料。",
+  "methodBlocks": [
+    {
+      "type": "paragraph",
+      "text": "先从 products 读取商品表；price 是单件售价而非库存金额。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "price >= 35 排除价格低于35的记录，price <= 65 排除高于65的记录，AND 要求两者同时成立。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "SELECT 仅展示商品编号与单价，ORDER BY price DESC 使输出顺序确定。下方补充示例先单独应用下界，再观察加入上界的变化。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "逻辑上的逐步筛选是教学拆解，不代表数据库必然按该物理顺序执行。",
+      "emphasis": []
+    }
+  ],
+  "breakdown": [
+    {
+      "kind": "fragment",
+      "title": "指定来源",
+      "sql": "FROM products",
+      "purpose": "从 products 读取输入数据。",
+      "reason": "后面的子句都基于这里得到的行。"
+    },
+    {
+      "kind": "fragment",
+      "title": "筛选行",
+      "sql": "WHERE price >= 35 AND price <= 65",
+      "purpose": "仅保留满足 price >= 35 AND price <= 65 的行。",
+      "reason": "条件结果为真才保留；未知（NULL）的行会被排除。"
+    },
+    {
+      "kind": "fragment",
+      "title": "选择输出",
+      "sql": "SELECT product_id, price",
+      "purpose": "输出 product_id, price。",
+      "reason": "输出列的顺序与别名决定结果表的形状。"
+    },
+    {
+      "kind": "fragment",
+      "title": "排序",
+      "sql": "ORDER BY price DESC;",
+      "purpose": "按 price DESC 排列结果。",
+      "reason": "查询结果的默认行序没有保证，需要显式排序。"
+    }
+  ],
+  "completeCode": {
+    "mysqlSql": "SELECT product_id, price FROM products WHERE price >= 35 AND price <= 65 ORDER BY price DESC;",
+    "sqliteSql": "SELECT product_id, price FROM products WHERE price >= 35 AND price <= 65 ORDER BY price DESC;"
+  },
+  "expectedResult": {
+    "columns": [
+      "product_id",
+      "price"
+    ],
+    "rows": [
+      [
+        4,
+        65
+      ],
+      [
+        5,
+        45
+      ],
+      [
+        3,
+        35
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "resultBlocks": [
+    {
+      "type": "paragraph",
+      "text": "原表6行，最终3行，编号3、4、5的价格分别为35、65、45。35和65均保留；编号2价格89被上界排除，编号1、6价格15被下界排除。结果仍是商品粒度，不是价格区间汇总。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "不能仅凭这个清单判断商品是否畅销。",
+      "emphasis": []
+    }
+  ],
+  "extensions": [
+    {
+      "label": "先检查下界",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "保留单价至少35的商品，此时89仍在结果内，说明只设下界并不完整。",
+          "emphasis": []
+        }
+      ],
+      "sql": "SELECT product_id, price FROM products WHERE price >= 35 ORDER BY price DESC;",
+      "result": {
+        "columns": [
+          "product_id",
+          "price"
+        ],
+        "rows": [
+          [
+            2,
+            89
+          ],
+          [
+            4,
+            65
+          ],
+          [
+            5,
+            45
+          ],
+          [
+            3,
+            35
+          ]
+        ]
+      }
+    },
+    {
+      "label": "对比半开区间",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "如果业务规定65不包含，改用小于65，编号4消失。",
+          "emphasis": []
+        }
+      ],
+      "sql": "SELECT product_id, price FROM products WHERE price >= 35 AND price < 65 ORDER BY price DESC;",
+      "result": {
+        "columns": [
+          "product_id",
+          "price"
+        ],
+        "rows": [
+          [
+            5,
+            45
+          ],
+          [
+            3,
+            35
+          ]
+        ]
+      }
+    }
+  ],
+  "cautions": {
+    "comparison": [
+      {
+        "type": "paragraph",
+        "text": "WHERE 筛选明细行；HAVING 通常用于分组后的筛选，后续章节详讲。闭区间包含两端，半开区间只包含其中一端。",
+        "emphasis": []
+      }
+    ],
+    "example": [
+      {
+        "type": "paragraph",
+        "text": "WHERE price => 35；或使用 price > 35 却希望包含35。",
+        "emphasis": []
+      }
+    ],
+    "reason": [],
+    "correction": [
+      {
+        "type": "paragraph",
+        "text": "使用 price >= 35；根据业务明确是否包含边界。",
+        "emphasis": []
+      }
+    ],
+    "notes": [
+      {
+        "type": "paragraph",
+        "text": "不把未知价格当零；本例数值均已知。",
+        "emphasis": []
+      }
+    ]
+  },
+  "sourcePath": "source/unified73/kp03-01.json",
+  "sourceSha256": "667cda60cd63e47a958fbc097d6cfcca90324d6936cce91995878cb8c351bc05"
+}

@@ -1,0 +1,272 @@
+{
+  "schemaVersion": 1,
+  "id": "kp13-01",
+  "sourceBatch": "unified73",
+  "teachingKind": "syntax",
+  "conceptBlocks": [
+    {
+      "type": "paragraph",
+      "text": "集合合并是纵向叠加查询结果，不是横向连接字段。各分支列数相同、位置及业务含义对应。UNION ALL 保留全部行，UNION 对全部输出列去重，包括同样的空值组合。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "添加来源列会改变整行去重规则；如需保留来源又按客户去重，应另按客户汇总。整个集合的排序写在末尾。",
+      "emphasis": []
+    }
+  ],
+  "syntax": {
+    "purpose": "col 位置及语义对应的字段；ALL 保留重复记录。"
+  },
+  "dataDescriptions": {
+    "old_customers": "共 4 行；字段：customer_id、customer_name。",
+    "new_customers": "共 3 行；字段：customer_id、customer_name。"
+  },
+  "problem": "客户运营要合并新旧两批名单。旧名单4行，新名单3行；编号2重复录入且跨批出现，编号3跨批出现。统计唯一客户时以客户编号为键。",
+  "methodBlocks": [
+    {
+      "type": "paragraph",
+      "text": "主查询使用 UNION ALL，故不改变输入记录的重复次数；改为 UNION 后对编号与姓名的组合去重。如果需要知道来自哪一批，在分支中显式加来源标签并另外做客户级统计。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "末尾 ORDER BY 对整个组合结果生效，不是仅排序后一批。",
+      "emphasis": []
+    }
+  ],
+  "breakdown": [
+    {
+      "kind": "fragment",
+      "title": "选择输出",
+      "sql": "SELECT customer_id, customer_name FROM old_customers",
+      "purpose": "输出 customer_id, customer_name FROM old_customers。",
+      "reason": "输出列的顺序与别名决定结果表的形状。"
+    },
+    {
+      "kind": "fragment",
+      "title": "合并结果",
+      "sql": "UNION ALL",
+      "purpose": "用 UNION ALL 合并前后两个查询的结果。",
+      "reason": "两侧输出列的数量和含义必须一致。"
+    },
+    {
+      "kind": "fragment",
+      "title": "选择输出",
+      "sql": "SELECT customer_id, customer_name FROM new_customers",
+      "purpose": "输出 customer_id, customer_name FROM new_customers。",
+      "reason": "输出列的顺序与别名决定结果表的形状。"
+    },
+    {
+      "kind": "fragment",
+      "title": "排序",
+      "sql": "ORDER BY customer_name;",
+      "purpose": "按 customer_name 排列结果。",
+      "reason": "查询结果的默认行序没有保证，需要显式排序。"
+    }
+  ],
+  "completeCode": {
+    "mysqlSql": "SELECT customer_id, customer_name FROM old_customers UNION ALL SELECT customer_id, customer_name FROM new_customers ORDER BY customer_name;",
+    "sqliteSql": "SELECT customer_id, customer_name FROM old_customers UNION ALL SELECT customer_id, customer_name FROM new_customers ORDER BY customer_name;"
+  },
+  "expectedResult": {
+    "columns": [
+      "customer_id",
+      "customer_name"
+    ],
+    "rows": [
+      [
+        4,
+        "李"
+      ],
+      [
+        1,
+        "林"
+      ],
+      [
+        3,
+        "王"
+      ],
+      [
+        3,
+        "王"
+      ],
+      [
+        2,
+        "陈"
+      ],
+      [
+        2,
+        "陈"
+      ],
+      [
+        2,
+        "陈"
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "resultBlocks": [
+    {
+      "type": "paragraph",
+      "text": "保留重复时7行；唯一客户清单4行。编号2出现3次并不证明其有3次消费，名单记录不是订单。",
+      "emphasis": []
+    }
+  ],
+  "extensions": [
+    {
+      "label": "唯一客户清单",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "合并来源课程的原查询，按整行（单列编号）去重。",
+          "emphasis": []
+        }
+      ],
+      "sql": "SELECT customer_id, customer_name FROM old_customers UNION SELECT customer_id, customer_name FROM new_customers ORDER BY customer_name;",
+      "result": {
+        "columns": [
+          "customer_id",
+          "customer_name"
+        ],
+        "rows": [
+          [
+            4,
+            "李"
+          ],
+          [
+            1,
+            "林"
+          ],
+          [
+            3,
+            "王"
+          ],
+          [
+            2,
+            "陈"
+          ]
+        ]
+      }
+    },
+    {
+      "label": "带来源的合并",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "客户2、3的来源不同，整行不同，仍会保留跨来源记录。",
+          "emphasis": []
+        }
+      ],
+      "sql": "SELECT customer_id,customer_name,'old' AS source FROM old_customers UNION SELECT customer_id,customer_name,'new' AS source FROM new_customers ORDER BY source DESC, customer_name;",
+      "result": {
+        "columns": [
+          "customer_id",
+          "customer_name",
+          "source"
+        ],
+        "rows": [
+          [
+            1,
+            "林",
+            "old"
+          ],
+          [
+            3,
+            "王",
+            "old"
+          ],
+          [
+            2,
+            "陈",
+            "old"
+          ],
+          [
+            4,
+            "李",
+            "new"
+          ],
+          [
+            3,
+            "王",
+            "new"
+          ],
+          [
+            2,
+            "陈",
+            "new"
+          ]
+        ]
+      }
+    },
+    {
+      "label": "先限制分支再整体排序",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "先选旧名单编号最高的一条，然后合并新名单；最终排序独立于分支排序。",
+          "emphasis": []
+        }
+      ],
+      "sql": "SELECT customer_id, customer_name FROM (SELECT customer_id, customer_name FROM old_customers ORDER BY customer_name DESC LIMIT 1) AS a UNION ALL SELECT customer_id, customer_name FROM new_customers ORDER BY customer_name;",
+      "result": {
+        "columns": [
+          "customer_id",
+          "customer_name"
+        ],
+        "rows": [
+          [
+            4,
+            "李"
+          ],
+          [
+            3,
+            "王"
+          ],
+          [
+            2,
+            "陈"
+          ],
+          [
+            2,
+            "陈"
+          ]
+        ]
+      }
+    }
+  ],
+  "cautions": {
+    "comparison": [
+      {
+        "type": "paragraph",
+        "text": "连接按条件组合列；集合合并按列位置叠加行。",
+        "emphasis": []
+      }
+    ],
+    "example": [
+      {
+        "type": "paragraph",
+        "text": "加入来源字段后仍以 UNION 期待每客户唯一。",
+        "emphasis": []
+      }
+    ],
+    "reason": [],
+    "correction": [
+      {
+        "type": "paragraph",
+        "text": "仅输出客户键去重，或外层按客户键聚合。",
+        "emphasis": []
+      }
+    ],
+    "notes": [
+      {
+        "type": "paragraph",
+        "text": "原生与本地隐式类型、文本排序及混合集合优先级可能不同。",
+        "emphasis": []
+      }
+    ]
+  },
+  "sourcePath": "source/unified73/kp13-01.json",
+  "sourceSha256": "5b8363646bdd08a34d9d9a67e90501993447604ef2ed396411569d1b5fb7ae5a"
+}

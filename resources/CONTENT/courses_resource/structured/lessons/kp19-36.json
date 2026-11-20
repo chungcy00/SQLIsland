@@ -1,0 +1,962 @@
+{
+  "schemaVersion": 1,
+  "id": "kp19-36",
+  "sourceBatch": "unified73",
+  "teachingKind": "business",
+  "conceptBlocks": [
+    {
+      "type": "paragraph",
+      "text": "积压表示资金占用相对需求偏高；滞销表示观察期内无销售或销售极慢；缺货风险表示库存不足以覆盖预计需求。库存覆盖天数=期末数量÷期间日均销售出库量。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "该指标描述按历史速度能卖多久，不等于实际售罄日期。",
+      "emphasis": []
+    }
+  ],
+  "syntax": {
+    "purpose": "统计截止日 2025-12-31；金额 整数马币分；比率按题设；输出粒度 仓库×商品。"
+  },
+  "dataDescriptions": {
+    "inventory_snapshots": "共 3 行；字段：snapshot_id、warehouse_id、product_id、snapshot_date、quantity、unit_cost_cents。",
+    "products": "共 3 行；字段：product_id、category_id、product_name、list_price_cents、reorder_level、active、discontinued_date。",
+    "stock_movements": "共 3 行；字段：movement_id、warehouse_id、product_id、movement_date、movement_type、quantity_delta、unit_cost_cents、order_item_id、receipt_id、return_id、transfer_id、adjustment_id。"
+  },
+  "problem": "主案例：2025-10-03至12-31共90天，按仓库商品计算毛销售出库数量（不扣退货），期末有效商品，库存成本价值严格大于500000分、销量严格小于20件。确认流水完整后无销售记0，零销量的覆盖天数为空。补充双向规则另用12-02至12-31共30天：销量至少30且可用量不足15日需求为缺货风险；销量不超过3且成本库存至少300000分为积压。示例假设快照数量等于可用量，实际须扣预留并按业务定义可售数量。",
+  "methodBlocks": [
+    {
+      "type": "paragraph",
+      "text": "s 按仓库商品汇总 sale 类型，数量取负号成为正销量；不要加退货或期外数据。库存快照以同仓同商品左接销售汇总，保留零销量商品。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "主查询先限定有效状态与快照日，再用成本价值及销量阈值筛选。补充查询单独计算30日销量，不得把90日销量代入30日规则；缺货判断用数量比较 15×销量/30，避免除零。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "补货阈值则来自商品自身，不是所有商品固定同一数量。",
+      "emphasis": []
+    }
+  ],
+  "breakdown": [
+    {
+      "kind": "runnable",
+      "title": "按仓库商品汇总期间出库量",
+      "sql": "WITH s AS (SELECT warehouse_id,product_id,SUM(-quantity_delta) sold FROM stock_movements WHERE movement_type='sale' AND movement_date BETWEEN '2025-10-03' AND '2025-12-31' GROUP BY warehouse_id,product_id)\nSELECT * FROM s ORDER BY 1, 2, 3 LIMIT 3;",
+      "purpose": "按仓库商品汇总期间出库量（s）的实际执行结果。",
+      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "sourceTables": [
+        {
+          "name": "inventory_snapshots",
+          "columns": [
+            {
+              "name": "snapshot_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "warehouse_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "product_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "snapshot_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "quantity",
+              "type": "INTEGER"
+            },
+            {
+              "name": "unit_cost_cents",
+              "type": "INTEGER"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              1,
+              "2023-01-31",
+              2,
+              3341
+            ],
+            [
+              2,
+              1,
+              2,
+              "2023-01-31",
+              3,
+              647
+            ],
+            [
+              3,
+              1,
+              3,
+              "2023-01-31",
+              11,
+              514
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 54000
+        },
+        {
+          "name": "products",
+          "columns": [
+            {
+              "name": "product_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "category_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "product_name",
+              "type": "TEXT"
+            },
+            {
+              "name": "list_price_cents",
+              "type": "INTEGER"
+            },
+            {
+              "name": "reorder_level",
+              "type": "INTEGER"
+            },
+            {
+              "name": "active",
+              "type": "INTEGER"
+            },
+            {
+              "name": "discontinued_date",
+              "type": "TEXT"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              7,
+              "Nusa 休闲长裤 XL",
+              4450,
+              2,
+              1,
+              null
+            ],
+            [
+              2,
+              11,
+              "Bumi 成猫粮 中号",
+              970,
+              4,
+              1,
+              null
+            ],
+            [
+              3,
+              4,
+              "青禾 香米 500g",
+              1060,
+              2,
+              1,
+              null
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 500
+        },
+        {
+          "name": "stock_movements",
+          "columns": [
+            {
+              "name": "movement_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "warehouse_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "product_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "movement_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "movement_type",
+              "type": "TEXT"
+            },
+            {
+              "name": "quantity_delta",
+              "type": "INTEGER"
+            },
+            {
+              "name": "unit_cost_cents",
+              "type": "INTEGER"
+            },
+            {
+              "name": "order_item_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "receipt_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "return_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "transfer_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "adjustment_id",
+              "type": "INTEGER"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              184,
+              "2023-01-01",
+              "sale",
+              -1,
+              849,
+              19675,
+              null,
+              null,
+              null,
+              null
+            ],
+            [
+              2,
+              1,
+              160,
+              "2023-01-01",
+              "sale",
+              -1,
+              249,
+              27253,
+              null,
+              null,
+              null,
+              null
+            ],
+            [
+              3,
+              1,
+              228,
+              "2023-01-01",
+              "sale",
+              -1,
+              529,
+              29205,
+              null,
+              null,
+              null,
+              null
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 85098
+        }
+      ],
+      "result": {
+        "columns": [
+          "warehouse_id",
+          "product_id",
+          "sold"
+        ],
+        "rows": [
+          [
+            1,
+            2,
+            1
+          ],
+          [
+            1,
+            3,
+            9
+          ],
+          [
+            1,
+            4,
+            5
+          ]
+        ]
+      }
+    }
+  ],
+  "completeCode": {
+    "mysqlSql": "WITH s AS (SELECT warehouse_id,product_id,SUM(-quantity_delta) sold FROM stock_movements WHERE movement_type='sale' AND movement_date BETWEEN '2025-10-03' AND '2025-12-31' GROUP BY warehouse_id,product_id) SELECT i.warehouse_id,i.product_id,i.quantity,COALESCE(s.sold,0) sold_units,i.quantity*i.unit_cost_cents stock_value_cents,ROUND(90.0*i.quantity/NULLIF(s.sold,0),2) cover_days FROM inventory_snapshots i JOIN products p ON p.product_id=i.product_id LEFT JOIN s ON s.warehouse_id=i.warehouse_id AND s.product_id=i.product_id WHERE p.active=1 AND i.snapshot_date='2025-12-31' AND i.quantity*i.unit_cost_cents>500000 AND COALESCE(s.sold,0)<20 ORDER BY stock_value_cents DESC, product_name",
+    "sqliteSql": "WITH s AS (SELECT warehouse_id,product_id,SUM(-quantity_delta) sold FROM stock_movements WHERE movement_type='sale' AND movement_date BETWEEN '2025-10-03' AND '2025-12-31' GROUP BY warehouse_id,product_id) SELECT i.warehouse_id,i.product_id,i.quantity,COALESCE(s.sold,0) sold_units,i.quantity*i.unit_cost_cents stock_value_cents,ROUND(90.0*i.quantity/NULLIF(s.sold,0),2) cover_days FROM inventory_snapshots i JOIN products p ON p.product_id=i.product_id LEFT JOIN s ON s.warehouse_id=i.warehouse_id AND s.product_id=i.product_id WHERE p.active=1 AND i.snapshot_date='2025-12-31' AND i.quantity*i.unit_cost_cents>500000 AND COALESCE(s.sold,0)<20 ORDER BY stock_value_cents DESC, product_name"
+  },
+  "expectedResult": {
+    "columns": [
+      "warehouse_id",
+      "product_id",
+      "quantity",
+      "sold_units",
+      "stock_value_cents",
+      "cover_days"
+    ],
+    "rows": [
+      [
+        3,
+        339,
+        282,
+        9,
+        2856378,
+        2820.0
+      ],
+      [
+        3,
+        22,
+        245,
+        16,
+        2843960,
+        1378.13
+      ],
+      [
+        3,
+        399,
+        259,
+        9,
+        2208234,
+        2590.0
+      ],
+      [
+        3,
+        218,
+        114,
+        0,
+        1929564,
+        null
+      ],
+      [
+        1,
+        317,
+        275,
+        7,
+        1708575,
+        3535.71
+      ],
+      [
+        1,
+        22,
+        129,
+        1,
+        1497432,
+        11610.0
+      ],
+      [
+        1,
+        339,
+        135,
+        2,
+        1367415,
+        6075.0
+      ],
+      [
+        3,
+        331,
+        120,
+        4,
+        1365840,
+        2700.0
+      ],
+      [
+        3,
+        6,
+        300,
+        1,
+        1326300,
+        27000.0
+      ],
+      [
+        1,
+        153,
+        115,
+        2,
+        1280640,
+        5175.0
+      ],
+      [
+        1,
+        487,
+        156,
+        0,
+        1241448,
+        null
+      ],
+      [
+        3,
+        487,
+        156,
+        4,
+        1241448,
+        3510.0
+      ],
+      [
+        3,
+        289,
+        133,
+        17,
+        1107358,
+        704.12
+      ],
+      [
+        3,
+        149,
+        157,
+        7,
+        1061477,
+        2018.57
+      ],
+      [
+        1,
+        127,
+        180,
+        6,
+        1045800,
+        2700.0
+      ],
+      [
+        2,
+        129,
+        160,
+        0,
+        1011520,
+        null
+      ],
+      [
+        2,
+        339,
+        98,
+        2,
+        992642,
+        4410.0
+      ],
+      [
+        2,
+        317,
+        159,
+        14,
+        987867,
+        1022.14
+      ],
+      [
+        1,
+        166,
+        138,
+        1,
+        957030,
+        12420.0
+      ],
+      [
+        1,
+        399,
+        112,
+        8,
+        954912,
+        1260.0
+      ],
+      [
+        3,
+        408,
+        168,
+        11,
+        944832,
+        1374.55
+      ],
+      [
+        1,
+        394,
+        153,
+        10,
+        941103,
+        1377.0
+      ],
+      [
+        1,
+        129,
+        148,
+        8,
+        935656,
+        1665.0
+      ],
+      [
+        2,
+        127,
+        160,
+        12,
+        929600,
+        1200.0
+      ],
+      [
+        3,
+        77,
+        193,
+        10,
+        921575,
+        1737.0
+      ],
+      [
+        1,
+        490,
+        212,
+        4,
+        899092,
+        4770.0
+      ],
+      [
+        3,
+        166,
+        128,
+        5,
+        887680,
+        2304.0
+      ],
+      [
+        3,
+        37,
+        75,
+        1,
+        886650,
+        6750.0
+      ],
+      [
+        1,
+        20,
+        85,
+        0,
+        848470,
+        null
+      ],
+      [
+        1,
+        331,
+        72,
+        3,
+        819504,
+        2160.0
+      ],
+      [
+        2,
+        22,
+        68,
+        0,
+        789344,
+        null
+      ],
+      [
+        3,
+        69,
+        38,
+        0,
+        741494,
+        null
+      ],
+      [
+        3,
+        357,
+        141,
+        4,
+        719382,
+        3172.5
+      ],
+      [
+        3,
+        322,
+        253,
+        13,
+        691955,
+        1751.54
+      ],
+      [
+        3,
+        481,
+        158,
+        11,
+        672132,
+        1292.73
+      ],
+      [
+        3,
+        20,
+        64,
+        0,
+        638848,
+        null
+      ],
+      [
+        2,
+        264,
+        157,
+        4,
+        636321,
+        3532.5
+      ],
+      [
+        2,
+        394,
+        103,
+        3,
+        633553,
+        3090.0
+      ],
+      [
+        3,
+        47,
+        67,
+        11,
+        620286,
+        548.18
+      ],
+      [
+        2,
+        231,
+        213,
+        2,
+        614718,
+        9585.0
+      ],
+      [
+        3,
+        448,
+        104,
+        4,
+        601224,
+        2340.0
+      ],
+      [
+        1,
+        140,
+        139,
+        7,
+        600480,
+        1787.14
+      ],
+      [
+        2,
+        218,
+        35,
+        0,
+        592410,
+        null
+      ],
+      [
+        3,
+        288,
+        110,
+        14,
+        590260,
+        707.14
+      ],
+      [
+        3,
+        411,
+        100,
+        8,
+        589100,
+        1125.0
+      ],
+      [
+        3,
+        445,
+        140,
+        10,
+        578900,
+        1260.0
+      ],
+      [
+        3,
+        266,
+        94,
+        19,
+        577066,
+        445.26
+      ],
+      [
+        2,
+        415,
+        118,
+        2,
+        564512,
+        5310.0
+      ],
+      [
+        1,
+        208,
+        61,
+        4,
+        559980,
+        1372.5
+      ],
+      [
+        3,
+        208,
+        60,
+        3,
+        550800,
+        1800.0
+      ],
+      [
+        3,
+        48,
+        102,
+        8,
+        550698,
+        1147.5
+      ],
+      [
+        3,
+        4,
+        170,
+        14,
+        547400,
+        1092.86
+      ],
+      [
+        1,
+        157,
+        191,
+        14,
+        519902,
+        1227.86
+      ],
+      [
+        1,
+        218,
+        30,
+        0,
+        507780,
+        null
+      ]
+    ],
+    "status": "SQLite实际执行（预览）",
+    "orderGuaranteed": true,
+    "totalRows": 54,
+    "fullResultPath": "../enterprise_reference/business_tasks/results/BP06.json"
+  },
+  "resultBlocks": [
+    {
+      "type": "paragraph",
+      "text": "主示例商品1库存价值600000分、销量10、覆盖900天；商品2价值560000分、销量0、覆盖天数空，仍是滞销候选。商品4虽然高库存但已停用，排除；",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "商品5价值400000分未达到90日规则。30日规则下商品3销量40、库存5，低于20件需求，属于缺货风险；商品1、2、5为积压候选。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "原企业预览仓3商品339库存282件、90日销量9、覆盖2820天，需要核对季节备货、在途及数据完整性，不代表必然积压。",
+      "emphasis": []
+    }
+  ],
+  "extensions": [
+    {
+      "label": "小型示例：90日毛出库",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "排除10月1日销售及退货。",
+          "emphasis": []
+        }
+      ],
+      "sql": "WITH products(product_id,active,reorder_level) AS (SELECT 1,1,10 UNION ALL SELECT 2,1,5 UNION ALL SELECT 3,1,20 UNION ALL SELECT 4,0,5 UNION ALL SELECT 5,1,10),\ninventory_snapshots(warehouse_id,product_id,snapshot_date,quantity,unit_cost_cents) AS (SELECT 1,1,'2025-12-31',100,6000 UNION ALL SELECT 1,2,'2025-12-31',70,8000 UNION ALL SELECT 1,3,'2025-12-31',5,1000 UNION ALL SELECT 1,4,'2025-12-31',100,9000 UNION ALL SELECT 1,5,'2025-12-31',50,8000),\nstock_movements(warehouse_id,product_id,movement_type,movement_date,quantity_delta) AS (SELECT 1,1,'sale','2025-11-01',-10 UNION ALL SELECT 1,3,'sale','2025-12-10',-40 UNION ALL SELECT 1,4,'sale','2025-12-01',-1 UNION ALL SELECT 1,5,'sale','2025-12-03',-3 UNION ALL SELECT 1,1,'return','2025-12-20',2 UNION ALL SELECT 1,2,'sale','2025-10-01',-50),\ns AS (SELECT warehouse_id,product_id,SUM(-quantity_delta) sold FROM stock_movements WHERE movement_type='sale' AND movement_date BETWEEN '2025-10-03' AND '2025-12-31' GROUP BY warehouse_id,product_id)\nSELECT * FROM s ORDER BY sold DESC;",
+      "result": {
+        "columns": [
+          "warehouse_id",
+          "product_id",
+          "sold"
+        ],
+        "rows": [
+          [
+            1,
+            3,
+            40
+          ],
+          [
+            1,
+            1,
+            10
+          ],
+          [
+            1,
+            5,
+            3
+          ],
+          [
+            1,
+            4,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "label": "小型示例：完整积压筛选",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "满足严格金额与销量门槛的两件商品。",
+          "emphasis": []
+        }
+      ],
+      "sql": "WITH products(product_id,active,reorder_level) AS (SELECT 1,1,10 UNION ALL SELECT 2,1,5 UNION ALL SELECT 3,1,20 UNION ALL SELECT 4,0,5 UNION ALL SELECT 5,1,10),\ninventory_snapshots(warehouse_id,product_id,snapshot_date,quantity,unit_cost_cents) AS (SELECT 1,1,'2025-12-31',100,6000 UNION ALL SELECT 1,2,'2025-12-31',70,8000 UNION ALL SELECT 1,3,'2025-12-31',5,1000 UNION ALL SELECT 1,4,'2025-12-31',100,9000 UNION ALL SELECT 1,5,'2025-12-31',50,8000),\nstock_movements(warehouse_id,product_id,movement_type,movement_date,quantity_delta) AS (SELECT 1,1,'sale','2025-11-01',-10 UNION ALL SELECT 1,3,'sale','2025-12-10',-40 UNION ALL SELECT 1,4,'sale','2025-12-01',-1 UNION ALL SELECT 1,5,'sale','2025-12-03',-3 UNION ALL SELECT 1,1,'return','2025-12-20',2 UNION ALL SELECT 1,2,'sale','2025-10-01',-50),\ns AS (SELECT warehouse_id,product_id,SUM(-quantity_delta) sold FROM stock_movements WHERE movement_type='sale' AND movement_date BETWEEN '2025-10-03' AND '2025-12-31' GROUP BY warehouse_id,product_id)\nSELECT i.warehouse_id,i.product_id,i.quantity,COALESCE(s.sold,0) sold_units,i.quantity*i.unit_cost_cents stock_value_cents,ROUND(90.0*i.quantity/NULLIF(s.sold,0),2) cover_days FROM inventory_snapshots i JOIN products p ON p.product_id=i.product_id LEFT JOIN s ON s.warehouse_id=i.warehouse_id AND s.product_id=i.product_id WHERE p.active=1 AND i.snapshot_date='2025-12-31' AND i.quantity*i.unit_cost_cents>500000 AND COALESCE(s.sold,0)<20 ORDER BY stock_value_cents DESC;",
+      "result": {
+        "columns": [
+          "warehouse_id",
+          "product_id",
+          "quantity",
+          "sold_units",
+          "stock_value_cents",
+          "cover_days"
+        ],
+        "rows": [
+          [
+            1,
+            1,
+            100,
+            10,
+            600000,
+            900.0
+          ],
+          [
+            1,
+            2,
+            70,
+            0,
+            560000,
+            null
+          ]
+        ]
+      }
+    },
+    {
+      "label": "小型示例：商品补货阈值",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "商品3库存低于自身阈值。",
+          "emphasis": []
+        }
+      ],
+      "sql": "WITH products(product_id,active,reorder_level) AS (SELECT 1,1,10 UNION ALL SELECT 2,1,5 UNION ALL SELECT 3,1,20 UNION ALL SELECT 4,0,5 UNION ALL SELECT 5,1,10),\ninventory_snapshots(warehouse_id,product_id,snapshot_date,quantity,unit_cost_cents) AS (SELECT 1,1,'2025-12-31',100,6000 UNION ALL SELECT 1,2,'2025-12-31',70,8000 UNION ALL SELECT 1,3,'2025-12-31',5,1000 UNION ALL SELECT 1,4,'2025-12-31',100,9000 UNION ALL SELECT 1,5,'2025-12-31',50,8000),\nstock_movements(warehouse_id,product_id,movement_type,movement_date,quantity_delta) AS (SELECT 1,1,'sale','2025-11-01',-10 UNION ALL SELECT 1,3,'sale','2025-12-10',-40 UNION ALL SELECT 1,4,'sale','2025-12-01',-1 UNION ALL SELECT 1,5,'sale','2025-12-03',-3 UNION ALL SELECT 1,1,'return','2025-12-20',2 UNION ALL SELECT 1,2,'sale','2025-10-01',-50),\ns AS (SELECT warehouse_id,product_id,SUM(-quantity_delta) sold FROM stock_movements WHERE movement_type='sale' AND movement_date BETWEEN '2025-10-03' AND '2025-12-31' GROUP BY warehouse_id,product_id)\nSELECT i.product_id,i.quantity,p.reorder_level FROM inventory_snapshots i JOIN products p ON p.product_id=i.product_id WHERE p.active=1 AND i.snapshot_date='2025-12-31' AND i.quantity<=p.reorder_level ORDER BY quantity DESC;",
+      "result": {
+        "columns": [
+          "product_id",
+          "quantity",
+          "reorder_level"
+        ],
+        "rows": [
+          [
+            3,
+            5,
+            20
+          ]
+        ]
+      }
+    },
+    {
+      "label": "小型示例：30日双向预警",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "近30日销量和库存价值重新计算，商品3缺货。",
+          "emphasis": []
+        }
+      ],
+      "sql": "WITH products(product_id,active,reorder_level) AS (SELECT 1,1,10 UNION ALL SELECT 2,1,5 UNION ALL SELECT 3,1,20 UNION ALL SELECT 4,0,5 UNION ALL SELECT 5,1,10),\ninventory_snapshots(warehouse_id,product_id,snapshot_date,quantity,unit_cost_cents) AS (SELECT 1,1,'2025-12-31',100,6000 UNION ALL SELECT 1,2,'2025-12-31',70,8000 UNION ALL SELECT 1,3,'2025-12-31',5,1000 UNION ALL SELECT 1,4,'2025-12-31',100,9000 UNION ALL SELECT 1,5,'2025-12-31',50,8000),\nstock_movements(warehouse_id,product_id,movement_type,movement_date,quantity_delta) AS (SELECT 1,1,'sale','2025-11-01',-10 UNION ALL SELECT 1,3,'sale','2025-12-10',-40 UNION ALL SELECT 1,4,'sale','2025-12-01',-1 UNION ALL SELECT 1,5,'sale','2025-12-03',-3 UNION ALL SELECT 1,1,'return','2025-12-20',2 UNION ALL SELECT 1,2,'sale','2025-10-01',-50),\ns30 AS (SELECT warehouse_id,product_id,SUM(-quantity_delta) sold FROM stock_movements WHERE movement_type='sale' AND movement_date BETWEEN '2025-12-02' AND '2025-12-31' GROUP BY warehouse_id,product_id)\nSELECT i.product_id,COALESCE(s30.sold,0) sold30,i.quantity, i.quantity*i.unit_cost_cents stock_value,CASE WHEN COALESCE(s30.sold,0)>=30 AND i.quantity<15.0*s30.sold/30 THEN '缺货风险' WHEN COALESCE(s30.sold,0)<=3 AND i.quantity*i.unit_cost_cents>=300000 THEN '积压候选' ELSE '其他' END AS risk FROM inventory_snapshots i JOIN products p ON p.product_id=i.product_id LEFT JOIN s30 ON s30.warehouse_id=i.warehouse_id AND s30.product_id=i.product_id WHERE p.active=1 AND i.snapshot_date='2025-12-31' ORDER BY quantity DESC;",
+      "result": {
+        "columns": [
+          "product_id",
+          "sold30",
+          "quantity",
+          "stock_value",
+          "risk"
+        ],
+        "rows": [
+          [
+            1,
+            0,
+            100,
+            600000,
+            "积压候选"
+          ],
+          [
+            2,
+            0,
+            70,
+            560000,
+            "积压候选"
+          ],
+          [
+            5,
+            3,
+            50,
+            400000,
+            "积压候选"
+          ],
+          [
+            3,
+            40,
+            5,
+            5000,
+            "缺货风险"
+          ]
+        ]
+      }
+    }
+  ],
+  "cautions": {
+    "comparison": [
+      {
+        "type": "paragraph",
+        "text": "覆盖天数高不是充分证据，零销量也不是零天；不同观察期的规则不能混用。",
+        "emphasis": []
+      }
+    ],
+    "example": [
+      {
+        "type": "paragraph",
+        "text": "使用全公司销量匹配单仓库存，或者将无销量覆盖天数填0。",
+        "emphasis": []
+      }
+    ],
+    "reason": [],
+    "correction": [
+      {
+        "type": "paragraph",
+        "text": "按仓库商品匹配并保留 NULL；分别计算90日和30日指标。",
+        "emphasis": []
+      }
+    ],
+    "notes": [
+      {
+        "type": "paragraph",
+        "text": "完整输出见 ../enterprise_reference/business_tasks/results/BP06.json；公开预览展示前12行。",
+        "emphasis": []
+      },
+      {
+        "type": "paragraph",
+        "text": "独立边界及场景仅在提交判题时使用。",
+        "emphasis": []
+      }
+    ]
+  },
+  "sourcePath": "source/unified73/kp19-36.json",
+  "sourceSha256": "fd9d7a355e3be40c4bca65102a1ed4935b1edf4c1d208b0d8652b3e95613bd81"
+}

@@ -1,0 +1,99 @@
+{
+  "schemaVersion": 1,
+  "id": "kp08-01",
+  "lessonSha256": "c39943d253144a5f1ae2992c61b569fc855568b665fb9d8fe7290e529fb79833",
+  "figures": [
+    {
+      "id": "kp08-01-clauses",
+      "slot": "syntax",
+      "kind": "clause-map",
+      "title": "示例查询的几个部分",
+      "sql": "SELECT o.id, c.customer_name FROM orders o INNER JOIN customers c ON o.customer_id=c.customer_id ORDER BY sales DESC;",
+      "parts": [
+        {
+          "role": "select",
+          "label": "取数",
+          "sql": "SELECT o.id, c.customer_name",
+          "note": "输出 o.id, c.customer_name。"
+        },
+        {
+          "role": "from",
+          "label": "来源",
+          "sql": "FROM orders o INNER JOIN customers c ON o.customer_id=c.customer_id",
+          "note": "读取查询需要的输入数据。"
+        },
+        {
+          "role": "order",
+          "label": "排序",
+          "sql": "ORDER BY sales DESC;",
+          "note": "按 sales DESC 排列结果。"
+        }
+      ]
+    },
+    {
+      "id": "kp08-01-flow",
+      "slot": "breakdown",
+      "kind": "stage-flow",
+      "merge": "breakdown",
+      "title": "每一步的数据变化",
+      "steps": [
+        {
+          "label": "FROM orders o INNER JOIN customers c ON o.customer_id=c.customer_id",
+          "skip": true
+        },
+        {
+          "label": "SELECT o.id, c.customer_name",
+          "sql": "SELECT o.id, c.customer_name FROM orders o INNER JOIN customers c ON o.customer_id=c.customer_id",
+          "columns": [
+            "id",
+            "customer_name"
+          ],
+          "rows": [
+            [
+              1,
+              "林"
+            ],
+            [
+              2,
+              "陈"
+            ],
+            [
+              3,
+              "林"
+            ],
+            [
+              5,
+              "王"
+            ]
+          ]
+        },
+        {
+          "label": "ORDER BY sales DESC;",
+          "sql": "SELECT o.id, c.customer_name FROM orders o INNER JOIN customers c ON o.customer_id=c.customer_id ORDER BY sales DESC;",
+          "columns": [
+            "id",
+            "customer_name"
+          ],
+          "rows": [
+            [
+              5,
+              "王"
+            ],
+            [
+              1,
+              "林"
+            ],
+            [
+              3,
+              "林"
+            ],
+            [
+              2,
+              "陈"
+            ]
+          ]
+        }
+      ]
+    }
+  ]
+}

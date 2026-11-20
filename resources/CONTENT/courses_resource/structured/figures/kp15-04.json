@@ -1,0 +1,131 @@
+{
+  "schemaVersion": 1,
+  "id": "kp15-04",
+  "lessonSha256": "2cb50b8ebac1e6ba1a9ce713fda2c748aad163b2d50d6aebd1d7a04b05e2ed40",
+  "figures": [
+    {
+      "id": "kp15-04-clauses",
+      "slot": "syntax",
+      "kind": "clause-map",
+      "title": "示例查询的几个部分",
+      "sql": "SELECT month,sales,SUM(sales) OVER(ORDER BY month ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS cumulative FROM monthly ORDER BY month;",
+      "parts": [
+        {
+          "role": "select",
+          "label": "取数",
+          "sql": "SELECT month,sales,SUM(sales) OVER(ORDER BY month ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS cumulative",
+          "note": "输出查询需要的列与计算表达式。"
+        },
+        {
+          "role": "from",
+          "label": "来源",
+          "sql": "FROM monthly",
+          "note": "从 monthly 读取输入数据。"
+        },
+        {
+          "role": "order",
+          "label": "排序",
+          "sql": "ORDER BY month;",
+          "note": "按 month 排列结果。"
+        }
+      ]
+    },
+    {
+      "id": "kp15-04-flow",
+      "slot": "breakdown",
+      "kind": "stage-flow",
+      "merge": "breakdown",
+      "title": "每一步的数据变化",
+      "steps": [
+        {
+          "label": "FROM monthly",
+          "sql": "SELECT * FROM monthly",
+          "columns": [
+            "month",
+            "sales"
+          ],
+          "rows": [
+            [
+              "2026-01",
+              1000
+            ],
+            [
+              "2026-02",
+              1500
+            ],
+            [
+              "2026-03",
+              1500
+            ],
+            [
+              "2026-04",
+              900
+            ]
+          ]
+        },
+        {
+          "label": "SELECT month,sales,SUM(sales) OVER(ORDER BY month ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS cumulative",
+          "sql": "SELECT month,sales,SUM(sales) OVER(ORDER BY month ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS cumulative FROM monthly",
+          "columns": [
+            "month",
+            "sales",
+            "cumulative"
+          ],
+          "rows": [
+            [
+              "2026-01",
+              1000,
+              1000
+            ],
+            [
+              "2026-02",
+              1500,
+              2500
+            ],
+            [
+              "2026-03",
+              1500,
+              4000
+            ],
+            [
+              "2026-04",
+              900,
+              4900
+            ]
+          ]
+        },
+        {
+          "label": "ORDER BY month;",
+          "sql": "SELECT month,sales,SUM(sales) OVER(ORDER BY month ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS cumulative FROM monthly ORDER BY month;",
+          "columns": [
+            "month",
+            "sales",
+            "cumulative"
+          ],
+          "rows": [
+            [
+              "2026-01",
+              1000,
+              1000
+            ],
+            [
+              "2026-02",
+              1500,
+              2500
+            ],
+            [
+              "2026-03",
+              1500,
+              4000
+            ],
+            [
+              "2026-04",
+              900,
+              4900
+            ]
+          ]
+        }
+      ]
+    }
+  ]
+}

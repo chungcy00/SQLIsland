@@ -1,0 +1,198 @@
+{
+  "schemaVersion": 1,
+  "id": "kp15-03",
+  "sourceBatch": "unified73",
+  "teachingKind": "advanced",
+  "conceptBlocks": [
+    {
+      "type": "paragraph",
+      "text": "LAG 与 LEAD 按窗口排序后的行位置偏移，不直接理解日历。默认偏移一行，找不到目标行时默认返回空值；指定默认值只处理越界，不能自动填补目标行原有空值。",
+      "emphasis": []
+    }
+  ],
+  "syntax": {
+    "purpose": "v 要读取的指标；1 偏移行数；month 时间排序键。"
+  },
+  "dataDescriptions": {
+    "monthly": "共 4 行；字段：month、sales。"
+  },
+  "problem": "月度销售趋势需比较相邻月份，数据表已为每月一行且月份连续。",
+  "methodBlocks": [
+    {
+      "type": "paragraph",
+      "text": "LAG 读取上一行，LEAD 读取下一行。先验证月份唯一、连续，再将相邻行解释为上月。多门店报表应按门店分区；否则上一行可能来自另一家店。",
+      "emphasis": []
+    }
+  ],
+  "breakdown": [
+    {
+      "kind": "fragment",
+      "title": "指定来源",
+      "sql": "FROM monthly",
+      "purpose": "从 monthly 读取输入数据。",
+      "reason": "后面的子句都基于这里得到的行。"
+    },
+    {
+      "kind": "fragment",
+      "title": "选择输出",
+      "sql": "SELECT month,sales,LAG(sales) OVER(ORDER BY month) AS previous_sales,LEAD(sales) OVER(ORDER BY month) AS next_sales",
+      "purpose": "输出查询需要的列与计算表达式。",
+      "reason": "输出列的顺序与别名决定结果表的形状。"
+    },
+    {
+      "kind": "fragment",
+      "title": "排序",
+      "sql": "ORDER BY month;",
+      "purpose": "按 month 排列结果。",
+      "reason": "查询结果的默认行序没有保证，需要显式排序。"
+    }
+  ],
+  "completeCode": {
+    "mysqlSql": "SELECT month,sales,LAG(sales) OVER(ORDER BY month) AS previous_sales,LEAD(sales) OVER(ORDER BY month) AS next_sales FROM monthly ORDER BY month;",
+    "sqliteSql": "SELECT month,sales,LAG(sales) OVER(ORDER BY month) AS previous_sales,LEAD(sales) OVER(ORDER BY month) AS next_sales FROM monthly ORDER BY month;"
+  },
+  "expectedResult": {
+    "columns": [
+      "month",
+      "sales",
+      "previous_sales",
+      "next_sales"
+    ],
+    "rows": [
+      [
+        "2026-01",
+        1000,
+        null,
+        1500
+      ],
+      [
+        "2026-02",
+        1500,
+        1000,
+        1500
+      ],
+      [
+        "2026-03",
+        1500,
+        1500,
+        900
+      ],
+      [
+        "2026-04",
+        900,
+        1500,
+        null
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "resultBlocks": [
+    {
+      "type": "paragraph",
+      "text": "一月无上期，四月无下期；二月上期为1000，三月上期为1500。",
+      "emphasis": []
+    }
+  ],
+  "extensions": [
+    {
+      "label": "缺月对照",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "先筛除二月，再计算相邻行，三月前一行变成一月。",
+          "emphasis": []
+        }
+      ],
+      "sql": "SELECT month,LAG(month) OVER(ORDER BY month) AS previous_month FROM monthly WHERE month<>'2026-02' ORDER BY month;",
+      "result": {
+        "columns": [
+          "month",
+          "previous_month"
+        ],
+        "rows": [
+          [
+            "2026-01",
+            null
+          ],
+          [
+            "2026-03",
+            "2026-01"
+          ],
+          [
+            "2026-04",
+            "2026-03"
+          ]
+        ]
+      }
+    },
+    {
+      "label": "越界默认值",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "仅演示默认参数，不表示首月前真实销售为零。",
+          "emphasis": []
+        }
+      ],
+      "sql": "SELECT month,LAG(sales,1,0) OVER(ORDER BY month) AS prev FROM monthly ORDER BY month;",
+      "result": {
+        "columns": [
+          "month",
+          "prev"
+        ],
+        "rows": [
+          [
+            "2026-01",
+            0
+          ],
+          [
+            "2026-02",
+            1000
+          ],
+          [
+            "2026-03",
+            1500
+          ],
+          [
+            "2026-04",
+            1500
+          ]
+        ]
+      }
+    }
+  ],
+  "cautions": {
+    "comparison": [
+      {
+        "type": "paragraph",
+        "text": "前一行不一定是上一个自然月。",
+        "emphasis": []
+      }
+    ],
+    "example": [
+      {
+        "type": "paragraph",
+        "text": "删去二月后仍把三月的上一行叫做二月。",
+        "emphasis": []
+      }
+    ],
+    "reason": [],
+    "correction": [
+      {
+        "type": "paragraph",
+        "text": "先补足月份骨架，按业务定义无交易与缺报的区别。",
+        "emphasis": []
+      }
+    ],
+    "notes": [
+      {
+        "type": "paragraph",
+        "text": "优化器的实际运行方式不等同逐行人工模拟。",
+        "emphasis": []
+      }
+    ]
+  },
+  "sourcePath": "source/unified73/kp15-03.json",
+  "sourceSha256": "19f877624ebd16dba577ab28b953423f74b07de9a9f05d334ee0ae30b6a2ef15"
+}

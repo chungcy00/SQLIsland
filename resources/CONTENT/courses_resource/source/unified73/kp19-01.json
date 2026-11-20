@@ -1,0 +1,614 @@
+{
+  "id": "kp19-01",
+  "chapterId": "ch19",
+  "title": "门店净销售、利润与目标达成",
+  "learningObjective": "独立计算门店净额、毛利及目标达成率，避免多粒度连接造成重复。",
+  "prerequisites": [
+    "kp19-57"
+  ],
+  "concept": "净销售是扣除折扣、退款后的有效销售额；毛利为净销售减退货冲减后成本，不是扣除租金等费用的净利润。金额使用整数分。目标和订单明细不是同一粒度，须先预聚合。",
+  "syntax": "WITH a AS (SELECT store_id,SUM(net_cents) net,SUM(cost_cents) cost FROM v_sales_lines WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY store_id), b AS (SELECT store_id,SUM(target_cents) target FROM sales_targets WHERE month_key BETWEEN '2025-01' AND '2025-12' GROUP BY store_id) SELECT s.store_id,COALESCE(a.net,0) net_cents,COALESCE(a.net-a.cost,0) gross_cents,ROUND(100.0*(a.net-a.cost)/NULLIF(a.net,0),2) margin_pct,b.target target_cents,ROUND(100.0*COALESCE(a.net,0)/NULLIF(b.target,0),2) achievement_pct FROM stores s LEFT JOIN a ON a.store_id=s.store_id LEFT JOIN b ON b.store_id=s.store_id ORDER BY net_cents DESC",
+  "parameters": {
+    "统计截止日": "2025-12-31",
+    "金额": "整数马币分；比率按题设",
+    "输出粒度": "门店"
+  },
+  "fixtureIds": [],
+  "sourceTables": [
+    {
+      "name": "sales_targets",
+      "columns": [
+        {
+          "name": "target_id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "store_id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "month_key",
+          "type": "TEXT"
+        },
+        {
+          "name": "target_cents",
+          "type": "INTEGER"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          1,
+          "2023-01",
+          2181521
+        ],
+        [
+          2,
+          1,
+          "2023-02",
+          2287646
+        ],
+        [
+          3,
+          1,
+          "2023-03",
+          1961490
+        ]
+      ],
+      "previewOnly": true,
+      "rowCount": 432
+    },
+    {
+      "name": "stores",
+      "columns": [
+        {
+          "name": "store_id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "store_name",
+          "type": "TEXT"
+        },
+        {
+          "name": "city",
+          "type": "TEXT"
+        },
+        {
+          "name": "fulfillment_warehouse_id",
+          "type": "INTEGER"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          "河滨生活馆",
+          "古晋",
+          1
+        ],
+        [
+          2,
+          "埔奕家居馆",
+          "美里",
+          2
+        ],
+        [
+          3,
+          "蕉赖家庭店",
+          "吉隆坡",
+          3
+        ]
+      ],
+      "previewOnly": true,
+      "rowCount": 12
+    },
+    {
+      "name": "v_sales_lines",
+      "columns": [
+        {
+          "name": "order_item_id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "order_id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "store_id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "customer_id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "session_id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "channel",
+          "type": "TEXT"
+        },
+        {
+          "name": "order_date",
+          "type": "TEXT"
+        },
+        {
+          "name": "product_id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "promotion_id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "net_qty",
+          "type": "派生"
+        },
+        {
+          "name": "net_cents",
+          "type": "派生"
+        },
+        {
+          "name": "cost_cents",
+          "type": "派生"
+        },
+        {
+          "name": "discount_cents",
+          "type": "INTEGER"
+        },
+        {
+          "name": "refund_cents",
+          "type": "派生"
+        }
+      ],
+      "rows": [
+        [
+          53709,
+          2,
+          4,
+          null,
+          null,
+          "store",
+          "2025-10-02",
+          287,
+          null,
+          1,
+          300,
+          268,
+          0,
+          0
+        ],
+        [
+          55177,
+          2,
+          4,
+          null,
+          null,
+          "store",
+          "2025-10-02",
+          158,
+          null,
+          0,
+          0,
+          0,
+          0,
+          1810
+        ],
+        [
+          29478,
+          3,
+          4,
+          2256,
+          null,
+          "store",
+          "2025-06-09",
+          59,
+          null,
+          1,
+          1310,
+          618,
+          0,
+          0
+        ]
+      ],
+      "previewOnly": true,
+      "rowCount": 64627
+    }
+  ],
+  "mysqlSql": "WITH a AS (SELECT store_id,SUM(net_cents) net,SUM(cost_cents) cost FROM v_sales_lines WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY store_id), b AS (SELECT store_id,SUM(target_cents) target FROM sales_targets WHERE month_key BETWEEN '2025-01' AND '2025-12' GROUP BY store_id) SELECT s.store_id,COALESCE(a.net,0) net_cents,COALESCE(a.net-a.cost,0) gross_cents,ROUND(100.0*(a.net-a.cost)/NULLIF(a.net,0),2) margin_pct,b.target target_cents,ROUND(100.0*COALESCE(a.net,0)/NULLIF(b.target,0),2) achievement_pct FROM stores s LEFT JOIN a ON a.store_id=s.store_id LEFT JOIN b ON b.store_id=s.store_id ORDER BY net_cents DESC",
+  "sqliteSql": "WITH a AS (SELECT store_id,SUM(net_cents) net,SUM(cost_cents) cost FROM v_sales_lines WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY store_id), b AS (SELECT store_id,SUM(target_cents) target FROM sales_targets WHERE month_key BETWEEN '2025-01' AND '2025-12' GROUP BY store_id) SELECT s.store_id,COALESCE(a.net,0) net_cents,COALESCE(a.net-a.cost,0) gross_cents,ROUND(100.0*(a.net-a.cost)/NULLIF(a.net,0),2) margin_pct,b.target target_cents,ROUND(100.0*COALESCE(a.net,0)/NULLIF(b.target,0),2) achievement_pct FROM stores s LEFT JOIN a ON a.store_id=s.store_id LEFT JOIN b ON b.store_id=s.store_id ORDER BY net_cents DESC",
+  "executionSteps": [
+    "按门店汇总销售与成本",
+    "独立累计月目标",
+    "连接门店主档",
+    "计算毛利及比率"
+  ],
+  "useCase": "区域经理核对2025年有效线下订单，退款截至年底并归属原订单日期；每门店一行，无销售门店保留。净额和目标为零时分别不计算对应比率。",
+  "comparison": "毛利率衡量盈利结构，目标达成率衡量计划完成；不能互换。",
+  "commonError": {
+    "example": "直接连接目标月表与订单明细后求和。",
+    "correction": "先将各事实表聚合到门店粒度再连接；保留缺目标与零目标的区别。"
+  },
+  "notes": "完整输出见 ../enterprise_reference/business_tasks/results/BP01.json；公开预览展示前12行。独立边界及场景仅在提交判题时使用。",
+  "compatibility": {
+    "status": "直接兼容（原生待验证）",
+    "detail": "本版本SQLite及sql.js WASM已实际复验，原生MySQL8.4尚未执行。"
+  },
+  "relatedQuestionIds": [
+    "q0251",
+    "q0253",
+    "q0282"
+  ],
+  "relatedFlashcardIds": [
+    "fc0146",
+    "fc0149",
+    "fc0151"
+  ],
+  "relatedKnowledgePointIds": [
+    "kp06-01",
+    "kp07-01",
+    "kp08-01",
+    "kp09-01",
+    "kp10-01",
+    "kp12-01",
+    "kp14-01",
+    "kp15-01"
+  ],
+  "mysqlVerification": "未运行原生 MySQL 8.4",
+  "result": {
+    "columns": [
+      "store_id",
+      "net_cents",
+      "gross_cents",
+      "margin_pct",
+      "target_cents",
+      "achievement_pct"
+    ],
+    "rows": [
+      [
+        6,
+        6969441,
+        2741661,
+        39.34,
+        69312500,
+        10.06
+      ],
+      [
+        7,
+        5693507,
+        2205227,
+        38.73,
+        62193957,
+        9.15
+      ],
+      [
+        5,
+        5373344,
+        2121391,
+        39.48,
+        65368327,
+        8.22
+      ],
+      [
+        2,
+        4244313,
+        1648352,
+        38.84,
+        41668727,
+        10.19
+      ],
+      [
+        1,
+        3909544,
+        1559185,
+        39.88,
+        40293000,
+        9.7
+      ],
+      [
+        12,
+        3718711,
+        1442294,
+        38.78,
+        42565796,
+        8.74
+      ],
+      [
+        11,
+        3591126,
+        1411633,
+        39.31,
+        26005035,
+        13.81
+      ],
+      [
+        10,
+        3167056,
+        1216199,
+        38.4,
+        32419295,
+        9.77
+      ],
+      [
+        9,
+        2598900,
+        1013522,
+        39.0,
+        35417426,
+        7.34
+      ],
+      [
+        4,
+        2496443,
+        985357,
+        39.47,
+        18416544,
+        13.56
+      ],
+      [
+        3,
+        2422875,
+        965035,
+        39.83,
+        16716511,
+        14.49
+      ],
+      [
+        8,
+        2231300,
+        873943,
+        39.17,
+        20027456,
+        11.14
+      ]
+    ],
+    "status": "SQLite实际执行（预览）",
+    "orderGuaranteed": true,
+    "totalRows": 12,
+    "fullResultPath": "../enterprise_reference/business_tasks/results/BP01.json"
+  },
+  "projectId": "retail",
+  "visualization": {
+    "kind": "stepFlow",
+    "steps": [
+      {
+        "id": "1",
+        "label": "先限制有效订单"
+      },
+      {
+        "id": "2",
+        "label": "连接明细"
+      },
+      {
+        "id": "3",
+        "label": "计算净额"
+      },
+      {
+        "id": "4",
+        "label": "门店1合计340，其他门店0"
+      }
+    ],
+    "sourceFixtureIds": [
+      "lesson-retail_orders",
+      "lesson-order_items",
+      "lesson-stores"
+    ],
+    "resultColumns": [
+      "store_id",
+      "net_sales"
+    ]
+  },
+  "mysqlVerificationScript": "../enterprise_reference/business_tasks/mysql_queries/BP01.sql",
+  "primaryQuestionIds": [
+    "q0251"
+  ],
+  "primaryFlashcardIds": [
+    "fc0146",
+    "fc0149"
+  ],
+  "mergedFrom": [
+    {
+      "id": "kp19-07",
+      "title": "零售：类别销售表现"
+    },
+    {
+      "id": "kp19-31",
+      "title": "门店净销售、利润与目标达成"
+    }
+  ],
+  "taskId": "BP01",
+  "datasetId": "retail-v2",
+  "difficulty": "中等",
+  "teaching": {
+    "problem": "区域经理核对2025年有效线下订单，退款截至年底并归属原订单日期；每门店一行，无销售门店保留。净额和目标为零时分别不计算对应比率。",
+    "codeExplanation": "原查询的 sales lines 视图已处理有效订单及退款，因此不能再次减退款。a 汇总净额与成本，b 汇总同期目标，两个结果均为一店一行。主档左连接保证无销售门店仍存在。分母分别为净额和目标；先计算再舍入。示例第一店净额10000、成本6000，目标12500。若要诊断类别贡献，在销售层按门店和类别分组，不能将门店目标复制到各类别。",
+    "resultExplanation": "小型示例门店1毛利4000、毛利率40%、目标达成80%；门店2达成100%、毛利率30%；门店3无销售且目标为零，两种比率均未定义。原企业预览门店1达成9.7%、毛利率39.88%；仅提示偏差，不能单凭此判断管理失误。",
+    "checkpoints": [
+      {
+        "name": "a",
+        "label": "按门店汇总净销售与成本",
+        "sql": "WITH a AS (SELECT store_id,SUM(net_cents) net,SUM(cost_cents) cost FROM v_sales_lines WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY store_id)\nSELECT * FROM a ORDER BY 1, 2, 3 LIMIT 3;",
+        "result": {
+          "columns": [
+            "store_id",
+            "net",
+            "cost"
+          ],
+          "rows": [
+            [
+              1,
+              3909544,
+              2350359
+            ],
+            [
+              2,
+              4244313,
+              2595961
+            ],
+            [
+              3,
+              2422875,
+              1457840
+            ]
+          ]
+        }
+      },
+      {
+        "name": "b",
+        "label": "按门店合并月度目标",
+        "sql": "WITH a AS (SELECT store_id,SUM(net_cents) net,SUM(cost_cents) cost FROM v_sales_lines WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY store_id), b AS (SELECT store_id,SUM(target_cents) target FROM sales_targets WHERE month_key BETWEEN '2025-01' AND '2025-12' GROUP BY store_id)\nSELECT * FROM b ORDER BY 1, 2 LIMIT 3;",
+        "result": {
+          "columns": [
+            "store_id",
+            "target"
+          ],
+          "rows": [
+            [
+              1,
+              40293000
+            ],
+            [
+              2,
+              41668727
+            ],
+            [
+              3,
+              16716511
+            ]
+          ]
+        }
+      }
+    ],
+    "mergedConcepts": [
+      {
+        "sourceId": "kp19-07",
+        "explanation": "门店类别销售拆分：按门店×类别汇总有效净额，门店目标不能直接分配到类别。"
+      },
+      {
+        "sourceId": "kp19-31",
+        "explanation": "净销售及毛利口径：2025有效线下订单、退款归属原订单日期、截止年底，成本同步冲回。"
+      }
+    ],
+    "mergeExamples": [
+      {
+        "label": "小型示例：独立汇总销售",
+        "explanation": "内联的四笔明细含一笔线上订单，排除后按门店聚合。",
+        "sql": "WITH stores AS (SELECT 1 store_id UNION ALL SELECT 2 UNION ALL SELECT 3),\nv_sales_lines AS (SELECT 1 store_id, '2025-01-03' order_date, 'store' channel, 1 category_id, 8000 net_cents, 5000 cost_cents UNION ALL SELECT 1,'2025-02-03','store',2,2000,1000 UNION ALL SELECT 1,'2025-02-05','online',1,9000,4000 UNION ALL SELECT 2,'2025-01-04','store',1,5000,3500),\nsales_targets AS (SELECT 1 store_id,'2025-01' month_key,5000 target_cents UNION ALL SELECT 1,'2025-02',7500 UNION ALL SELECT 2,'2025-01',5000 UNION ALL SELECT 3,'2025-01',0),\na AS (SELECT store_id,SUM(net_cents) net,SUM(cost_cents) cost FROM v_sales_lines WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY store_id),\nb AS (SELECT store_id,SUM(target_cents) target FROM sales_targets WHERE month_key BETWEEN '2025-01' AND '2025-12' GROUP BY store_id) SELECT * FROM a ORDER BY net;",
+        "result": {
+          "columns": [
+            "store_id",
+            "net",
+            "cost"
+          ],
+          "rows": [
+            [
+              2,
+              5000,
+              3500
+            ],
+            [
+              1,
+              10000,
+              6000
+            ]
+          ]
+        }
+      },
+      {
+        "label": "小型示例：汇总目标",
+        "explanation": "门店1两个月目标相加，而不是乘上订单数。",
+        "sql": "WITH stores AS (SELECT 1 store_id UNION ALL SELECT 2 UNION ALL SELECT 3),\nv_sales_lines AS (SELECT 1 store_id, '2025-01-03' order_date, 'store' channel, 1 category_id, 8000 net_cents, 5000 cost_cents UNION ALL SELECT 1,'2025-02-03','store',2,2000,1000 UNION ALL SELECT 1,'2025-02-05','online',1,9000,4000 UNION ALL SELECT 2,'2025-01-04','store',1,5000,3500),\nsales_targets AS (SELECT 1 store_id,'2025-01' month_key,5000 target_cents UNION ALL SELECT 1,'2025-02',7500 UNION ALL SELECT 2,'2025-01',5000 UNION ALL SELECT 3,'2025-01',0),\na AS (SELECT store_id,SUM(net_cents) net,SUM(cost_cents) cost FROM v_sales_lines WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY store_id),\nb AS (SELECT store_id,SUM(target_cents) target FROM sales_targets WHERE month_key BETWEEN '2025-01' AND '2025-12' GROUP BY store_id) SELECT * FROM b ORDER BY target;",
+        "result": {
+          "columns": [
+            "store_id",
+            "target"
+          ],
+          "rows": [
+            [
+              3,
+              0
+            ],
+            [
+              2,
+              5000
+            ],
+            [
+              1,
+              12500
+            ]
+          ]
+        }
+      },
+      {
+        "label": "小型示例：完整门店查询",
+        "explanation": "左连接两份汇总并计算指标。",
+        "sql": "WITH stores AS (SELECT 1 store_id UNION ALL SELECT 2 UNION ALL SELECT 3),\nv_sales_lines AS (SELECT 1 store_id, '2025-01-03' order_date, 'store' channel, 1 category_id, 8000 net_cents, 5000 cost_cents UNION ALL SELECT 1,'2025-02-03','store',2,2000,1000 UNION ALL SELECT 1,'2025-02-05','online',1,9000,4000 UNION ALL SELECT 2,'2025-01-04','store',1,5000,3500),\nsales_targets AS (SELECT 1 store_id,'2025-01' month_key,5000 target_cents UNION ALL SELECT 1,'2025-02',7500 UNION ALL SELECT 2,'2025-01',5000 UNION ALL SELECT 3,'2025-01',0),\na AS (SELECT store_id,SUM(net_cents) net,SUM(cost_cents) cost FROM v_sales_lines WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY store_id),\nb AS (SELECT store_id,SUM(target_cents) target FROM sales_targets WHERE month_key BETWEEN '2025-01' AND '2025-12' GROUP BY store_id) SELECT s.store_id,COALESCE(a.net,0) net_cents,COALESCE(a.net-a.cost,0) gross_cents,ROUND(100.0*(a.net-a.cost)/NULLIF(a.net,0),2) margin_pct,b.target target_cents,ROUND(100.0*COALESCE(a.net,0)/NULLIF(b.target,0),2) achievement_pct FROM stores s LEFT JOIN a ON a.store_id=s.store_id LEFT JOIN b ON b.store_id=s.store_id ORDER BY net_cents;",
+        "result": {
+          "columns": [
+            "store_id",
+            "net_cents",
+            "gross_cents",
+            "margin_pct",
+            "target_cents",
+            "achievement_pct"
+          ],
+          "rows": [
+            [
+              3,
+              0,
+              0,
+              null,
+              0,
+              null
+            ],
+            [
+              2,
+              5000,
+              1500,
+              30.0,
+              5000,
+              100.0
+            ],
+            [
+              1,
+              10000,
+              4000,
+              40.0,
+              12500,
+              80.0
+            ]
+          ]
+        }
+      },
+      {
+        "label": "小型示例：类别拆分",
+        "explanation": "只拆销售，避免复制目标。",
+        "sql": "WITH stores AS (SELECT 1 store_id UNION ALL SELECT 2 UNION ALL SELECT 3),\nv_sales_lines AS (SELECT 1 store_id, '2025-01-03' order_date, 'store' channel, 1 category_id, 8000 net_cents, 5000 cost_cents UNION ALL SELECT 1,'2025-02-03','store',2,2000,1000 UNION ALL SELECT 1,'2025-02-05','online',1,9000,4000 UNION ALL SELECT 2,'2025-01-04','store',1,5000,3500),\nsales_targets AS (SELECT 1 store_id,'2025-01' month_key,5000 target_cents UNION ALL SELECT 1,'2025-02',7500 UNION ALL SELECT 2,'2025-01',5000 UNION ALL SELECT 3,'2025-01',0),\na AS (SELECT store_id,SUM(net_cents) net,SUM(cost_cents) cost FROM v_sales_lines WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY store_id),\nb AS (SELECT store_id,SUM(target_cents) target FROM sales_targets WHERE month_key BETWEEN '2025-01' AND '2025-12' GROUP BY store_id) SELECT store_id,category_id,SUM(net_cents) AS net FROM v_sales_lines WHERE channel='store' GROUP BY store_id,category_id ORDER BY net DESC;",
+        "result": {
+          "columns": [
+            "store_id",
+            "category_id",
+            "net"
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              8000
+            ],
+            [
+              2,
+              1,
+              5000
+            ],
+            [
+              1,
+              2,
+              2000
+            ]
+          ]
+        }
+      }
+    ]
+  }
+}

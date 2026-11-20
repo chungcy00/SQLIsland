@@ -1,0 +1,171 @@
+{
+  "schemaVersion": 1,
+  "id": "kp07-02",
+  "lessonSha256": "a152a7623f72576df48ab8fbae744c4da898525cc9f7ef1b351841cd6aa4291e",
+  "figures": [
+    {
+      "id": "kp07-02-clauses",
+      "slot": "syntax",
+      "kind": "clause-map",
+      "title": "示例查询的几个部分",
+      "sql": "SELECT category, SUM(sales) AS total_sales FROM orders GROUP BY category HAVING SUM(sales) > 1000 ORDER BY total_sales DESC;",
+      "parts": [
+        {
+          "role": "select",
+          "label": "取数",
+          "sql": "SELECT category, SUM(sales) AS total_sales",
+          "note": "输出 category, SUM(sales) AS total_sales。"
+        },
+        {
+          "role": "from",
+          "label": "来源",
+          "sql": "FROM orders",
+          "note": "从 orders 读取输入数据。"
+        },
+        {
+          "role": "group",
+          "label": "分组",
+          "sql": "GROUP BY category",
+          "note": "按 category 把行归入各个分组。"
+        },
+        {
+          "role": "having",
+          "label": "分组后筛选",
+          "sql": "HAVING SUM(sales) > 1000",
+          "note": "仅保留满足 SUM(sales) > 1000 的分组。"
+        },
+        {
+          "role": "order",
+          "label": "排序",
+          "sql": "ORDER BY total_sales DESC;",
+          "note": "按 total_sales DESC 排列结果。"
+        }
+      ]
+    },
+    {
+      "id": "kp07-02-flow",
+      "slot": "breakdown",
+      "kind": "stage-flow",
+      "merge": "breakdown",
+      "title": "每一步的数据变化",
+      "steps": [
+        {
+          "label": "FROM orders",
+          "sql": "SELECT * FROM orders",
+          "columns": [
+            "id",
+            "category",
+            "sales",
+            "store_id",
+            "order_date",
+            "customer_id"
+          ],
+          "rows": [
+            [
+              1,
+              "护肤品",
+              800,
+              1,
+              "2026-01-03",
+              1
+            ],
+            [
+              2,
+              "化妆品",
+              400,
+              2,
+              "2026-01-10",
+              2
+            ],
+            [
+              3,
+              "护肤品",
+              600,
+              1,
+              "2026-02-02",
+              1
+            ],
+            [
+              4,
+              "化妆品",
+              300,
+              2,
+              "2026-02-15",
+              null
+            ],
+            [
+              5,
+              "日用品",
+              1500,
+              1,
+              "2026-02-20",
+              3
+            ]
+          ]
+        },
+        {
+          "label": "GROUP BY category",
+          "sql": "SELECT category, SUM(sales) AS total_sales FROM orders GROUP BY category",
+          "columns": [
+            "category",
+            "total_sales"
+          ],
+          "rows": [
+            [
+              "化妆品",
+              700
+            ],
+            [
+              "护肤品",
+              1400
+            ],
+            [
+              "日用品",
+              1500
+            ]
+          ]
+        },
+        {
+          "label": "HAVING SUM(sales) > 1000",
+          "sql": "SELECT category, SUM(sales) AS total_sales FROM orders GROUP BY category HAVING SUM(sales) > 1000",
+          "columns": [
+            "category",
+            "total_sales"
+          ],
+          "rows": [
+            [
+              "护肤品",
+              1400
+            ],
+            [
+              "日用品",
+              1500
+            ]
+          ]
+        },
+        {
+          "label": "SELECT category, SUM(sales) AS total_sales",
+          "skip": true
+        },
+        {
+          "label": "ORDER BY total_sales DESC;",
+          "sql": "SELECT category, SUM(sales) AS total_sales FROM orders GROUP BY category HAVING SUM(sales) > 1000 ORDER BY total_sales DESC;",
+          "columns": [
+            "category",
+            "total_sales"
+          ],
+          "rows": [
+            [
+              "日用品",
+              1500
+            ],
+            [
+              "护肤品",
+              1400
+            ]
+          ]
+        }
+      ]
+    }
+  ]
+}

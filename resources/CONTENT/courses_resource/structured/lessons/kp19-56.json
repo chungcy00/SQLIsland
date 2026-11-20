@@ -1,0 +1,639 @@
+{
+  "schemaVersion": 1,
+  "id": "kp19-56",
+  "sourceBatch": "unified73",
+  "teachingKind": "business",
+  "conceptBlocks": [
+    {
+      "type": "paragraph",
+      "text": "合同差价衡量履约价格偏离，历史变动率衡量同供应商同商品的成交价波动。承诺成本=订购数量×成交单价；加权单价=总采购金额÷总订购量。历史基准须在报告期过滤前计算。",
+      "emphasis": []
+    }
+  ],
+  "syntax": {
+    "purpose": "统计截止日 2025-12-31；金额 整数马币分；比率按题设；输出粒度 采购行。"
+  },
+  "dataDescriptions": {
+    "purchase_order_items": "共 3 行；字段：po_item_id、po_id、product_id、contract_id、quantity_ordered、unit_price_cents。",
+    "purchase_orders": "共 3 行；字段：po_id、supplier_id、warehouse_id、order_date、promised_date、status、order_priority、cancellation_date。",
+    "supplier_contracts": "共 3 行；字段：contract_id、supplier_id、product_id、start_date、end_date、unit_price_cents。"
+  },
+  "problem": "采购分析师需要找出成交价格偏离合同或历史价格的采购行，并评估供应商比价机会。所有金额以马币分表示；采购承诺不是已收货或已付款金额。",
+  "methodBlocks": [
+    {
+      "type": "paragraph",
+      "text": "原企业查询先连接采购行、采购订单及合同，排除取消订单。窗口按供应商和商品分区，以订单日期及行编号确定先后；这样同日多行仍按同一规则排列。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "先取历史上一行，再筛2025年，避免第一笔年度采购丢失上年基准。合同差价=成交单价−合同单价；",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "历史变动率=(成交单价−上一采购行单价)/上一采购行单价×100，分母为零或缺失时留空。跨供应商比较采用数量加权价，先汇总金额与数量，不能直接平均单价。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "采购承诺金额采用已批准的订购数量×成交单价；不同的审批状态需按业务规则分别处理。",
+      "emphasis": []
+    }
+  ],
+  "breakdown": [
+    {
+      "kind": "runnable",
+      "title": "在采购行匹配合同并取历史上一笔价格",
+      "sql": "WITH a AS (SELECT i.po_item_id,p.supplier_id,i.product_id,p.order_date,i.unit_price_cents,c.unit_price_cents contract_cents,LAG(i.unit_price_cents) OVER(PARTITION BY p.supplier_id,i.product_id ORDER BY p.order_date,i.po_item_id) previous_cents FROM purchase_order_items i JOIN purchase_orders p ON p.po_id=i.po_id JOIN supplier_contracts c ON c.contract_id=i.contract_id WHERE p.status<>'cancelled')\nSELECT * FROM a ORDER BY 1, 2, 3, 4, 5, 6, 7 LIMIT 3;",
+      "purpose": "在采购行匹配合同并取历史上一笔价格（a）的实际执行结果。",
+      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "sourceTables": [
+        {
+          "name": "purchase_order_items",
+          "columns": [
+            {
+              "name": "po_item_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "po_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "product_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "contract_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "quantity_ordered",
+              "type": "INTEGER"
+            },
+            {
+              "name": "unit_price_cents",
+              "type": "INTEGER"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              2114,
+              254,
+              2214,
+              29,
+              1165
+            ],
+            [
+              2,
+              2369,
+              357,
+              3123,
+              24,
+              5065
+            ],
+            [
+              3,
+              432,
+              389,
+              3410,
+              13,
+              366
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 9993
+        },
+        {
+          "name": "purchase_orders",
+          "columns": [
+            {
+              "name": "po_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "supplier_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "warehouse_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "order_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "promised_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "status",
+              "type": "TEXT"
+            },
+            {
+              "name": "order_priority",
+              "type": "TEXT"
+            },
+            {
+              "name": "cancellation_date",
+              "type": "TEXT"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              51,
+              3,
+              "2025-02-13",
+              "2025-03-03",
+              "placed",
+              "normal",
+              null
+            ],
+            [
+              2,
+              28,
+              3,
+              "2025-02-20",
+              "2025-03-11",
+              "placed",
+              "normal",
+              null
+            ],
+            [
+              3,
+              15,
+              3,
+              "2024-01-08",
+              "2024-01-13",
+              "placed",
+              "normal",
+              null
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 5000
+        },
+        {
+          "name": "supplier_contracts",
+          "columns": [
+            {
+              "name": "contract_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "supplier_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "product_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "start_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "end_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "unit_price_cents",
+              "type": "INTEGER"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              50,
+              1,
+              "2023-01-01",
+              "2023-10-16",
+              3057
+            ],
+            [
+              2,
+              50,
+              1,
+              "2023-10-17",
+              "2024-03-25",
+              3114
+            ],
+            [
+              3,
+              50,
+              1,
+              "2024-03-26",
+              "2024-11-29",
+              3316
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 4405
+        }
+      ],
+      "result": {
+        "columns": [
+          "po_item_id",
+          "supplier_id",
+          "product_id",
+          "order_date",
+          "unit_price_cents",
+          "contract_cents",
+          "previous_cents"
+        ],
+        "rows": [
+          [
+            1,
+            4,
+            254,
+            "2024-10-17",
+            1165,
+            1165,
+            1165
+          ],
+          [
+            2,
+            48,
+            357,
+            "2025-04-15",
+            5065,
+            5065,
+            4755
+          ],
+          [
+            3,
+            49,
+            389,
+            "2025-10-10",
+            366,
+            366,
+            366
+          ]
+        ]
+      }
+    }
+  ],
+  "completeCode": {
+    "mysqlSql": "WITH a AS (SELECT i.po_item_id,p.supplier_id,i.product_id,p.order_date,i.unit_price_cents,c.unit_price_cents contract_cents,LAG(i.unit_price_cents) OVER(PARTITION BY p.supplier_id,i.product_id ORDER BY p.order_date,i.po_item_id) previous_cents FROM purchase_order_items i JOIN purchase_orders p ON p.po_id=i.po_id JOIN supplier_contracts c ON c.contract_id=i.contract_id WHERE p.status<>'cancelled') SELECT po_item_id,supplier_id,product_id,unit_price_cents,contract_cents,unit_price_cents-contract_cents contract_variance_cents,previous_cents,ROUND(100.0*(unit_price_cents-previous_cents)/NULLIF(previous_cents,0),2) change_pct FROM a WHERE order_date BETWEEN '2025-01-01' AND '2025-12-31' ORDER BY po_item_id",
+    "sqliteSql": "WITH a AS (SELECT i.po_item_id,p.supplier_id,i.product_id,p.order_date,i.unit_price_cents,c.unit_price_cents contract_cents,LAG(i.unit_price_cents) OVER(PARTITION BY p.supplier_id,i.product_id ORDER BY p.order_date,i.po_item_id) previous_cents FROM purchase_order_items i JOIN purchase_orders p ON p.po_id=i.po_id JOIN supplier_contracts c ON c.contract_id=i.contract_id WHERE p.status<>'cancelled') SELECT po_item_id,supplier_id,product_id,unit_price_cents,contract_cents,unit_price_cents-contract_cents contract_variance_cents,previous_cents,ROUND(100.0*(unit_price_cents-previous_cents)/NULLIF(previous_cents,0),2) change_pct FROM a WHERE order_date BETWEEN '2025-01-01' AND '2025-12-31' ORDER BY po_item_id"
+  },
+  "expectedResult": {
+    "columns": [
+      "po_item_id",
+      "supplier_id",
+      "product_id",
+      "unit_price_cents",
+      "contract_cents",
+      "contract_variance_cents",
+      "previous_cents",
+      "change_pct"
+    ],
+    "rows": [
+      [
+        2,
+        48,
+        357,
+        5065,
+        5065,
+        0,
+        4755,
+        6.52
+      ],
+      [
+        3,
+        49,
+        389,
+        366,
+        366,
+        0,
+        366,
+        0.0
+      ],
+      [
+        4,
+        47,
+        16,
+        1120,
+        1120,
+        0,
+        null,
+        null
+      ],
+      [
+        12,
+        57,
+        290,
+        1218,
+        1224,
+        -6,
+        1208,
+        0.83
+      ],
+      [
+        16,
+        49,
+        12,
+        398,
+        398,
+        0,
+        398,
+        0.0
+      ],
+      [
+        22,
+        35,
+        202,
+        5618,
+        5692,
+        -74,
+        5373,
+        4.56
+      ],
+      [
+        23,
+        32,
+        370,
+        2814,
+        2761,
+        53,
+        2657,
+        5.91
+      ],
+      [
+        26,
+        2,
+        90,
+        3830,
+        3830,
+        0,
+        3796,
+        0.9
+      ],
+      [
+        27,
+        2,
+        415,
+        4128,
+        4128,
+        0,
+        4128,
+        0.0
+      ],
+      [
+        28,
+        30,
+        153,
+        8690,
+        8690,
+        0,
+        8594,
+        1.12
+      ],
+      [
+        30,
+        5,
+        416,
+        2915,
+        2915,
+        0,
+        3069,
+        -5.02
+      ],
+      [
+        33,
+        30,
+        169,
+        1517,
+        1517,
+        0,
+        1448,
+        4.77
+      ]
+    ],
+    "status": "SQLite实际执行（预览）",
+    "orderGuaranteed": true,
+    "totalRows": 3469,
+    "fullResultPath": "../enterprise_reference/business_tasks/results/BP26.json"
+  },
+  "resultBlocks": [
+    {
+      "type": "paragraph",
+      "text": "小型示例中第2行成交120分，合同110分，差10分；较上一行100分上涨20%。第3行90分，较合同低20分，较上一行下降25%。供应商2首次采购无历史基准，不等于涨幅0%。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "供应商1商品10的加权价为(20×120+10×90)/30=110分，供应商2为100分，溢价10%。应进一步核查同规格、币种、税费、运费和采购批量。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "原企业结果前3行分别为采购行2、3、4；第2行合同差为0但历史涨幅6.52%，说明两个基准回答不同问题。企业结果为原仓库预览，本次未重跑。",
+      "emphasis": []
+    }
+  ],
+  "extensions": [
+    {
+      "label": "历史价格基准",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "先排除取消行，再在同供应商同商品内按日期和编号取上一行。",
+          "emphasis": []
+        }
+      ],
+      "sql": "WITH purchase_lines(id,supplier_id,product_id,order_date,qty,price,contract_price,status) AS (\n VALUES (1,1,10,'2024-12-20',10,100,100,'approved'),\n (2,1,10,'2025-01-05',20,120,110,'approved'),\n (3,1,10,'2025-02-05',10,90,110,'approved'),\n (4,2,10,'2025-01-06',30,100,100,'approved'),\n (5,1,10,'2025-01-10',99,500,110,'cancelled'),\n (6,2,20,'2025-02-03',5,200,200,'approved')\n), valid AS (SELECT * FROM purchase_lines WHERE status<>'cancelled'), history AS (SELECT *, LAG(price) OVER(PARTITION BY supplier_id,product_id ORDER BY order_date,id) previous_price FROM valid) SELECT id,price,previous_price FROM history ORDER BY price DESC",
+      "result": {
+        "columns": [
+          "id",
+          "price",
+          "previous_price"
+        ],
+        "rows": [
+          [
+            6,
+            200,
+            null
+          ],
+          [
+            2,
+            120,
+            100
+          ],
+          [
+            1,
+            100,
+            null
+          ],
+          [
+            4,
+            100,
+            null
+          ],
+          [
+            3,
+            90,
+            120
+          ]
+        ]
+      }
+    },
+    {
+      "label": "完整价格差异",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "保留历史后才筛选2025年，比较合同与历史两个不同基准。",
+          "emphasis": []
+        }
+      ],
+      "sql": "WITH purchase_lines(id,supplier_id,product_id,order_date,qty,price,contract_price,status) AS (\n VALUES (1,1,10,'2024-12-20',10,100,100,'approved'),\n (2,1,10,'2025-01-05',20,120,110,'approved'),\n (3,1,10,'2025-02-05',10,90,110,'approved'),\n (4,2,10,'2025-01-06',30,100,100,'approved'),\n (5,1,10,'2025-01-10',99,500,110,'cancelled'),\n (6,2,20,'2025-02-03',5,200,200,'approved')\n), valid AS (SELECT * FROM purchase_lines WHERE status<>'cancelled'), history AS (SELECT *, LAG(price) OVER(PARTITION BY supplier_id,product_id ORDER BY order_date,id) previous_price FROM valid) SELECT id,price,contract_price,price-contract_price AS variance,previous_price,ROUND(100.0*(price-previous_price)/NULLIF(previous_price,0),2) AS change_pct FROM history WHERE order_date BETWEEN '2025-01-01' AND '2025-12-31' ORDER BY price DESC",
+      "result": {
+        "columns": [
+          "id",
+          "price",
+          "contract_price",
+          "variance",
+          "previous_price",
+          "change_pct"
+        ],
+        "rows": [
+          [
+            6,
+            200,
+            200,
+            0,
+            null,
+            null
+          ],
+          [
+            2,
+            120,
+            110,
+            10,
+            100,
+            20.0
+          ],
+          [
+            4,
+            100,
+            100,
+            0,
+            null,
+            null
+          ],
+          [
+            3,
+            90,
+            110,
+            -20,
+            120,
+            -25.0
+          ]
+        ]
+      }
+    },
+    {
+      "label": "采购承诺成本",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "以有效且已批准的订购数量乘成交单价，金额单位为分。",
+          "emphasis": []
+        }
+      ],
+      "sql": "WITH purchase_lines(id,supplier_id,product_id,order_date,qty,price,contract_price,status) AS (\n VALUES (1,1,10,'2024-12-20',10,100,100,'approved'),\n (2,1,10,'2025-01-05',20,120,110,'approved'),\n (3,1,10,'2025-02-05',10,90,110,'approved'),\n (4,2,10,'2025-01-06',30,100,100,'approved'),\n (5,1,10,'2025-01-10',99,500,110,'cancelled'),\n (6,2,20,'2025-02-03',5,200,200,'approved')\n), valid AS (SELECT * FROM purchase_lines WHERE status<>'cancelled') SELECT supplier_id,SUM(qty*price) AS committed_cents FROM valid WHERE status='approved' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY supplier_id ORDER BY committed_cents DESC",
+      "result": {
+        "columns": [
+          "supplier_id",
+          "committed_cents"
+        ],
+        "rows": [
+          [
+            2,
+            4000
+          ],
+          [
+            1,
+            3300
+          ]
+        ]
+      }
+    },
+    {
+      "label": "跨供应商加权比价",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "先按商品供应商汇总，再比较至少两家供应商的商品；保留未舍入的价格计算溢价。",
+          "emphasis": []
+        }
+      ],
+      "sql": "WITH purchase_lines(id,supplier_id,product_id,order_date,qty,price,contract_price,status) AS (\n VALUES (1,1,10,'2024-12-20',10,100,100,'approved'),\n (2,1,10,'2025-01-05',20,120,110,'approved'),\n (3,1,10,'2025-02-05',10,90,110,'approved'),\n (4,2,10,'2025-01-06',30,100,100,'approved'),\n (5,1,10,'2025-01-10',99,500,110,'cancelled'),\n (6,2,20,'2025-02-03',5,200,200,'approved')\n), valid AS (SELECT * FROM purchase_lines WHERE status<>'cancelled'), w AS (SELECT product_id,supplier_id,1.0*SUM(qty*price)/NULLIF(SUM(qty),0) weighted_price FROM valid WHERE order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY product_id,supplier_id), b AS (SELECT *,MIN(weighted_price) OVER(PARTITION BY product_id) cheapest,COUNT(weighted_price) OVER(PARTITION BY product_id) suppliers FROM w) SELECT product_id,supplier_id,ROUND(weighted_price,2) weighted_price,ROUND(100.0*(weighted_price-cheapest)/NULLIF(cheapest,0),2) premium_pct FROM b WHERE suppliers>=2 ORDER BY weighted_price",
+      "result": {
+        "columns": [
+          "product_id",
+          "supplier_id",
+          "weighted_price",
+          "premium_pct"
+        ],
+        "rows": [
+          [
+            10,
+            2,
+            100.0,
+            0.0
+          ],
+          [
+            10,
+            1,
+            110.0,
+            10.0
+          ]
+        ]
+      }
+    }
+  ],
+  "cautions": {
+    "comparison": [
+      {
+        "type": "paragraph",
+        "text": "合同差价不是采购总成本差额；跨供应商比较需统一商品规格与成本口径。",
+        "emphasis": []
+      }
+    ],
+    "example": [
+      {
+        "type": "paragraph",
+        "text": "先筛2025年再用 LAG，或直接平均各次采购单价。",
+        "emphasis": []
+      }
+    ],
+    "reason": [],
+    "correction": [
+      {
+        "type": "paragraph",
+        "text": "保留历史后计算窗口；按总金额除以总数量计算加权价。",
+        "emphasis": []
+      }
+    ],
+    "notes": [
+      {
+        "type": "paragraph",
+        "text": "完整输出见 ../enterprise_reference/business_tasks/results/BP26.json；公开预览展示前12行。",
+        "emphasis": []
+      },
+      {
+        "type": "paragraph",
+        "text": "独立边界及场景仅在提交判题时使用。",
+        "emphasis": []
+      }
+    ]
+  },
+  "sourcePath": "source/unified73/kp19-56.json",
+  "sourceSha256": "329ef7768d14bf0c57bfcad4591f7ec23e291a2dad796c20eb7460e1052886e6"
+}

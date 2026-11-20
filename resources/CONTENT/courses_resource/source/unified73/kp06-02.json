@@ -1,0 +1,170 @@
+{
+  "id": "kp06-02",
+  "chapterId": "ch06",
+  "title": "SUM 与 AVG",
+  "learningObjective": "能够计算有效数值的总和与均值，说明平均值分母，并在业务允许时正确区分缺失与补零。",
+  "prerequisites": [
+    "kp06-01"
+  ],
+  "concept": "SUM 将非空数值相加，AVG 计算非空数值的算术平均。平均值不是将总和机械地除以表的行数：如果记录缺失，默认分母只包括已知数值。零本身是真实数值，既参与求和也进入平均值分母。若没有任何非空输入，SUM 和 AVG 返回 NULL，而不是自动返回零；这与 COUNT 不同。业务上必须明确平均的是订单金额、门店营收还是商品价格，统计对象改变时，平均值含义也改变。多个组的平均值不能直接再平均，除非组大小相同或符合另行规定的等权口径；总体平均应合并总和及有效计数。",
+  "syntax": "SELECT SUM(column_name), AVG(column_name) FROM table_name;",
+  "parameters": {
+    "SUM": "非空数值合计",
+    "AVG": "非空数值的算术平均",
+    "column_name": "数值表达式或字段"
+  },
+  "fixtureIds": [
+    "lesson-nullable_values"
+  ],
+  "sourceTables": [
+    {
+      "name": "nullable_values",
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "value",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "note",
+          "type": "TEXT",
+          "mysqlType": "VARCHAR(160) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_bin",
+          "sqliteType": "TEXT"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          null,
+          null
+        ],
+        [
+          2,
+          0,
+          ""
+        ],
+        [
+          3,
+          10,
+          "ok"
+        ],
+        [
+          4,
+          10,
+          "ok"
+        ]
+      ]
+    }
+  ],
+  "mysqlSql": "SELECT SUM(value) AS total, AVG(value) AS mean FROM nullable_values;",
+  "sqliteSql": "SELECT SUM(value) AS total, AVG(value) AS mean FROM nullable_values;",
+  "executionSteps": [
+    "确认有效数值",
+    "计算非空数值总和",
+    "按有效值个数求平均"
+  ],
+  "useCase": "分析员需要汇报已填写的数值总量及平均水平。数据表包含未知值、真实零以及两条数值10的记录；未知值不得默认为零。",
+  "comparison": "AVG(value) 和 AVG(COALESCE(value,0)) 并不等价；前者排除缺失，后者把缺失计为零。",
+  "commonError": {
+    "example": "SUM(value)/COUNT(*) 被当作普通平均值。",
+    "correction": "使用 AVG(value)；若采用手工公式，分母用 COUNT(value)，并处理零分母及整数除法。"
+  },
+  "notes": "金额计算需要确认精度；本例不要求将原始平均值提前舍入。",
+  "compatibility": {
+    "status": "直接兼容",
+    "detail": "仅在本示例数据与语义范围验证；不代表全部 MySQL 语法兼容。"
+  },
+  "relatedQuestionIds": [
+    "q0062",
+    "q0068",
+    "q0072",
+    "q0075"
+  ],
+  "relatedFlashcardIds": [
+    "fc0037",
+    "fc0039",
+    "fc0041",
+    "fc0043"
+  ],
+  "relatedKnowledgePointIds": [],
+  "mysqlVerification": "未运行原生 MySQL 8.4",
+  "result": {
+    "columns": [
+      "total",
+      "mean"
+    ],
+    "rows": [
+      [
+        20,
+        6.666666666666667
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "mysqlVerificationScript": "validation/mysql/kp06-02.sql",
+  "primaryQuestionIds": [
+    "q0062",
+    "q0068",
+    "q0072",
+    "q0075"
+  ],
+  "primaryFlashcardIds": [
+    "fc0037",
+    "fc0039",
+    "fc0041",
+    "fc0043"
+  ],
+  "teaching": {
+    "problem": "分析员需要汇报已填写的数值总量及平均水平。数据表包含未知值、真实零以及两条数值10的记录；未知值不得默认为零。",
+    "codeExplanation": "SUM(value) 计算0+10+10，AVG(value) 将同一总和除以三个有效值。两个函数都忽略第一行缺失值。若需要核对平均值分母，可以同时查询 COUNT(value)；如果业务明确规定未填报等于零，则先使用 COALESCE 将缺失值转为0，再求平均，但此时指标口径已经改变。",
+    "resultExplanation": "总和20，平均约6.67。缺失不进入分母，真实零进入分母。补零后的均值为5，两者差异来自统计口径而非计算错误。不能根据此样例断定缺失记录的实际数值。",
+    "checkpoints": [],
+    "mergedConcepts": [],
+    "mergeExamples": [
+      {
+        "label": "核对分母",
+        "explanation": "将总记录数和非空数放在一起，可以看清普通平均值的分母。",
+        "sql": "SELECT SUM(value) AS total, COUNT(value) AS valid_count, COUNT(*) AS row_count FROM nullable_values;",
+        "result": {
+          "columns": [
+            "total",
+            "valid_count",
+            "row_count"
+          ],
+          "rows": [
+            [
+              20,
+              3,
+              4
+            ]
+          ]
+        }
+      },
+      {
+        "label": "补零口径对照",
+        "explanation": "仅作为另一种业务口径的对照，不能默认采用。",
+        "sql": "SELECT AVG(COALESCE(value,0)) AS filled_mean, AVG(value) AS valid_mean FROM nullable_values;",
+        "result": {
+          "columns": [
+            "filled_mean",
+            "valid_mean"
+          ],
+          "rows": [
+            [
+              5.0,
+              6.666666666666667
+            ]
+          ]
+        }
+      }
+    ]
+  }
+}

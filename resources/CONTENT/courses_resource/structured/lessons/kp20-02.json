@@ -1,0 +1,2962 @@
+{
+  "schemaVersion": 1,
+  "id": "kp20-02",
+  "sourceBatch": "unified73",
+  "teachingKind": "business",
+  "conceptBlocks": [
+    {
+      "type": "paragraph",
+      "text": "时间序列分析先确定时间粒度及连续时间轴，再把实际业务金额汇总至相同粒度。环比=(本期金额−上一期金额)÷上一期金额×100%。上一期为零或缺失时百分比留空；",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "上一期为零但本期有金额时，金额差仍可计算。窗口函数取的是排序后的上一行，不会自动识别缺失自然月。",
+      "emphasis": []
+    }
+  ],
+  "syntax": {
+    "purpose": "统计期间 2025年；渠道 线下门店；输出粒度 自然月；金额 马币分。"
+  },
+  "dataDescriptions": {
+    "stores": "共 3 行；字段：store_id、store_name、city、fulfillment_warehouse_id。",
+    "customers": "共 4 行；字段：customer_id、customer_name、signup_date、region、member_since_date。",
+    "calendar_days": "共 12 行；字段：day、month_key、day_index。",
+    "orders": "共 11 行；字段：order_id、store_id、customer_id、session_id、order_date、channel、status、cancellation_reason。",
+    "order_items": "共 15 行；字段：order_item_id、order_id、product_id、promotion_id、quantity、unit_price_cents、discount_cents、unit_cost_cents。",
+    "returns": "共 2 行；字段：return_id、order_item_id、return_date、quantity、refund_cents。"
+  },
+  "problem": "经营主管需要一份2025年线下月度净销售报表，包含无销售月份、上期净销售、金额变化与环比百分比。来源数据完整才允许将无交易解释为零；系统漏传、未关账、未来月份不能直接补零。金额采用马币分。",
+  "methodBlocks": [
+    {
+      "type": "paragraph",
+      "text": "原查询的 months 通过 DISTINCT 将日历日期归并成唯一月份；sales 根据日期前三段中的年月（前7个字符）聚合净额，渠道及年度过滤仅作用于交易。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "complete 用月份轴左连接销售汇总，COALESCE 把无匹配金额补成0；若数据不完整，应另外标注缺失而非补零。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "previous 在月份连续且唯一的结果上按月排序取 LAG，第一行无上一行所以为空。最终金额差直接相减，百分比以 NULLIF 保护零分母，再 ROUND 保留两位。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "不能先删除无销售月份再使用窗口函数，也不能把金额增加理解成从零增长100%。原案例只读取2025年月份，因此1月没有历史基准；",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "若面试要求比较2024年12月，应同时扩大日历与销售历史范围，在窗口计算之后再筛报告期。跨年示例独立展示该顺序。",
+      "emphasis": []
+    }
+  ],
+  "breakdown": [
+    {
+      "kind": "runnable",
+      "title": "从日期维度提取自然月",
+      "sql": "WITH months AS (\n SELECT DISTINCT month_key FROM calendar_days WHERE month_key BETWEEN '2025-01' AND '2025-12'\n)\nSELECT * FROM months ORDER BY 1 LIMIT 3;",
+      "purpose": "从日期维度提取自然月（months）的实际执行结果。",
+      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "sourceTables": [
+        {
+          "name": "stores",
+          "columns": [
+            {
+              "name": "store_id",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            },
+            {
+              "name": "store_name",
+              "sqliteType": "TEXT",
+              "type": "TEXT"
+            },
+            {
+              "name": "city",
+              "sqliteType": "TEXT",
+              "type": "TEXT"
+            },
+            {
+              "name": "fulfillment_warehouse_id",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              "门店1",
+              "古晋",
+              1
+            ],
+            [
+              2,
+              "门店2",
+              "古晋",
+              1
+            ],
+            [
+              3,
+              "门店3",
+              "古晋",
+              1
+            ]
+          ]
+        },
+        {
+          "name": "customers",
+          "columns": [
+            {
+              "name": "customer_id",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            },
+            {
+              "name": "customer_name",
+              "sqliteType": "TEXT",
+              "type": "TEXT"
+            },
+            {
+              "name": "signup_date",
+              "sqliteType": "TEXT",
+              "type": "TEXT"
+            },
+            {
+              "name": "region",
+              "sqliteType": "TEXT",
+              "type": "TEXT"
+            },
+            {
+              "name": "member_since_date",
+              "sqliteType": "TEXT",
+              "type": "TEXT"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              "客户1",
+              "2024-01-01",
+              null,
+              null
+            ],
+            [
+              2,
+              "客户2",
+              "2024-01-01",
+              null,
+              null
+            ],
+            [
+              3,
+              "客户3",
+              "2024-01-01",
+              null,
+              null
+            ],
+            [
+              4,
+              "客户4",
+              "2024-01-01",
+              null,
+              null
+            ]
+          ]
+        },
+        {
+          "name": "calendar_days",
+          "columns": [
+            {
+              "name": "day",
+              "sqliteType": "TEXT",
+              "type": "TEXT"
+            },
+            {
+              "name": "month_key",
+              "sqliteType": "TEXT",
+              "type": "TEXT"
+            },
+            {
+              "name": "day_index",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            }
+          ],
+          "rows": [
+            [
+              "2025-01-01",
+              "2025-01",
+              1
+            ],
+            [
+              "2025-02-01",
+              "2025-02",
+              2
+            ],
+            [
+              "2025-03-01",
+              "2025-03",
+              3
+            ],
+            [
+              "2025-04-01",
+              "2025-04",
+              4
+            ],
+            [
+              "2025-05-01",
+              "2025-05",
+              5
+            ],
+            [
+              "2025-06-01",
+              "2025-06",
+              6
+            ],
+            [
+              "2025-07-01",
+              "2025-07",
+              7
+            ],
+            [
+              "2025-08-01",
+              "2025-08",
+              8
+            ],
+            [
+              "2025-09-01",
+              "2025-09",
+              9
+            ],
+            [
+              "2025-10-01",
+              "2025-10",
+              10
+            ],
+            [
+              "2025-11-01",
+              "2025-11",
+              11
+            ],
+            [
+              "2025-12-01",
+              "2025-12",
+              12
+            ]
+          ]
+        },
+        {
+          "name": "orders",
+          "columns": [
+            {
+              "name": "order_id",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            },
+            {
+              "name": "store_id",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            },
+            {
+              "name": "customer_id",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            },
+            {
+              "name": "session_id",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            },
+            {
+              "name": "order_date",
+              "sqliteType": "TEXT",
+              "type": "TEXT"
+            },
+            {
+              "name": "channel",
+              "sqliteType": "TEXT",
+              "type": "TEXT"
+            },
+            {
+              "name": "status",
+              "sqliteType": "TEXT",
+              "type": "TEXT"
+            },
+            {
+              "name": "cancellation_reason",
+              "sqliteType": "TEXT",
+              "type": "TEXT"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              null,
+              null,
+              "2025-01-02",
+              "store",
+              "completed",
+              null
+            ],
+            [
+              2,
+              1,
+              null,
+              null,
+              "2025-03-02",
+              "store",
+              "completed",
+              null
+            ],
+            [
+              3,
+              2,
+              null,
+              null,
+              "2025-03-03",
+              "store",
+              "completed",
+              null
+            ],
+            [
+              4,
+              1,
+              null,
+              null,
+              "2024-12-31",
+              "store",
+              "completed",
+              null
+            ],
+            [
+              5,
+              null,
+              1,
+              5,
+              "2025-01-02",
+              "online",
+              "completed",
+              null
+            ],
+            [
+              6,
+              null,
+              1,
+              6,
+              "2025-03-02",
+              "online",
+              "completed",
+              null
+            ],
+            [
+              7,
+              null,
+              2,
+              7,
+              "2025-03-03",
+              "online",
+              "completed",
+              null
+            ],
+            [
+              8,
+              null,
+              2,
+              8,
+              "2025-04-03",
+              "online",
+              "completed",
+              null
+            ],
+            [
+              9,
+              null,
+              3,
+              9,
+              "2025-05-03",
+              "online",
+              "cancelled",
+              "客户取消"
+            ],
+            [
+              10,
+              null,
+              4,
+              10,
+              "2025-06-03",
+              "online",
+              "pending",
+              null
+            ],
+            [
+              11,
+              null,
+              3,
+              11,
+              "2026-01-01",
+              "online",
+              "completed",
+              null
+            ]
+          ]
+        },
+        {
+          "name": "order_items",
+          "columns": [
+            {
+              "name": "order_item_id",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            },
+            {
+              "name": "order_id",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            },
+            {
+              "name": "product_id",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            },
+            {
+              "name": "promotion_id",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            },
+            {
+              "name": "quantity",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            },
+            {
+              "name": "unit_price_cents",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            },
+            {
+              "name": "discount_cents",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            },
+            {
+              "name": "unit_cost_cents",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              1,
+              null,
+              2,
+              100,
+              0,
+              10
+            ],
+            [
+              2,
+              1,
+              2,
+              null,
+              1,
+              100,
+              0,
+              10
+            ],
+            [
+              3,
+              1,
+              3,
+              null,
+              1,
+              100,
+              0,
+              10
+            ],
+            [
+              4,
+              1,
+              4,
+              null,
+              1,
+              100,
+              0,
+              10
+            ],
+            [
+              5,
+              2,
+              5,
+              null,
+              1,
+              50,
+              0,
+              10
+            ],
+            [
+              6,
+              3,
+              1,
+              null,
+              1,
+              80,
+              0,
+              10
+            ],
+            [
+              7,
+              4,
+              1,
+              null,
+              1,
+              900,
+              0,
+              10
+            ],
+            [
+              8,
+              5,
+              1,
+              null,
+              1,
+              70,
+              0,
+              10
+            ],
+            [
+              9,
+              5,
+              2,
+              null,
+              1,
+              30,
+              0,
+              10
+            ],
+            [
+              10,
+              6,
+              2,
+              null,
+              1,
+              60,
+              0,
+              10
+            ],
+            [
+              11,
+              7,
+              1,
+              null,
+              1,
+              40,
+              0,
+              10
+            ],
+            [
+              12,
+              8,
+              2,
+              null,
+              1,
+              20,
+              0,
+              10
+            ],
+            [
+              13,
+              9,
+              1,
+              null,
+              1,
+              200,
+              0,
+              10
+            ],
+            [
+              14,
+              10,
+              1,
+              null,
+              1,
+              200,
+              0,
+              10
+            ],
+            [
+              15,
+              11,
+              1,
+              null,
+              1,
+              200,
+              0,
+              10
+            ]
+          ]
+        },
+        {
+          "name": "returns",
+          "columns": [
+            {
+              "name": "return_id",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            },
+            {
+              "name": "order_item_id",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            },
+            {
+              "name": "return_date",
+              "sqliteType": "TEXT",
+              "type": "TEXT"
+            },
+            {
+              "name": "quantity",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            },
+            {
+              "name": "refund_cents",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              "2025-02-01",
+              1,
+              100
+            ],
+            [
+              2,
+              12,
+              "2025-04-05",
+              1,
+              20
+            ]
+          ]
+        }
+      ],
+      "result": {
+        "columns": [
+          "month_key"
+        ],
+        "rows": [
+          [
+            "2025-01"
+          ],
+          [
+            "2025-02"
+          ],
+          [
+            "2025-03"
+          ]
+        ]
+      }
+    },
+    {
+      "kind": "runnable",
+      "title": "按自然月汇总有效订单",
+      "sql": "WITH months AS (\n SELECT DISTINCT month_key FROM calendar_days WHERE month_key BETWEEN '2025-01' AND '2025-12'\n), sales AS (\n SELECT SUBSTR(order_date,1,7) month_key,SUM(net_cents) net_cents FROM v_order_net\n WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY SUBSTR(order_date,1,7)\n)\nSELECT * FROM sales ORDER BY 1, 2 LIMIT 3;",
+      "purpose": "按自然月汇总有效订单（sales）的实际执行结果。",
+      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "sourceTables": [
+        {
+          "name": "stores",
+          "columns": [
+            {
+              "name": "store_id",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            },
+            {
+              "name": "store_name",
+              "sqliteType": "TEXT",
+              "type": "TEXT"
+            },
+            {
+              "name": "city",
+              "sqliteType": "TEXT",
+              "type": "TEXT"
+            },
+            {
+              "name": "fulfillment_warehouse_id",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              "门店1",
+              "古晋",
+              1
+            ],
+            [
+              2,
+              "门店2",
+              "古晋",
+              1
+            ],
+            [
+              3,
+              "门店3",
+              "古晋",
+              1
+            ]
+          ]
+        },
+        {
+          "name": "customers",
+          "columns": [
+            {
+              "name": "customer_id",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            },
+            {
+              "name": "customer_name",
+              "sqliteType": "TEXT",
+              "type": "TEXT"
+            },
+            {
+              "name": "signup_date",
+              "sqliteType": "TEXT",
+              "type": "TEXT"
+            },
+            {
+              "name": "region",
+              "sqliteType": "TEXT",
+              "type": "TEXT"
+            },
+            {
+              "name": "member_since_date",
+              "sqliteType": "TEXT",
+              "type": "TEXT"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              "客户1",
+              "2024-01-01",
+              null,
+              null
+            ],
+            [
+              2,
+              "客户2",
+              "2024-01-01",
+              null,
+              null
+            ],
+            [
+              3,
+              "客户3",
+              "2024-01-01",
+              null,
+              null
+            ],
+            [
+              4,
+              "客户4",
+              "2024-01-01",
+              null,
+              null
+            ]
+          ]
+        },
+        {
+          "name": "calendar_days",
+          "columns": [
+            {
+              "name": "day",
+              "sqliteType": "TEXT",
+              "type": "TEXT"
+            },
+            {
+              "name": "month_key",
+              "sqliteType": "TEXT",
+              "type": "TEXT"
+            },
+            {
+              "name": "day_index",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            }
+          ],
+          "rows": [
+            [
+              "2025-01-01",
+              "2025-01",
+              1
+            ],
+            [
+              "2025-02-01",
+              "2025-02",
+              2
+            ],
+            [
+              "2025-03-01",
+              "2025-03",
+              3
+            ],
+            [
+              "2025-04-01",
+              "2025-04",
+              4
+            ],
+            [
+              "2025-05-01",
+              "2025-05",
+              5
+            ],
+            [
+              "2025-06-01",
+              "2025-06",
+              6
+            ],
+            [
+              "2025-07-01",
+              "2025-07",
+              7
+            ],
+            [
+              "2025-08-01",
+              "2025-08",
+              8
+            ],
+            [
+              "2025-09-01",
+              "2025-09",
+              9
+            ],
+            [
+              "2025-10-01",
+              "2025-10",
+              10
+            ],
+            [
+              "2025-11-01",
+              "2025-11",
+              11
+            ],
+            [
+              "2025-12-01",
+              "2025-12",
+              12
+            ]
+          ]
+        },
+        {
+          "name": "orders",
+          "columns": [
+            {
+              "name": "order_id",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            },
+            {
+              "name": "store_id",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            },
+            {
+              "name": "customer_id",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            },
+            {
+              "name": "session_id",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            },
+            {
+              "name": "order_date",
+              "sqliteType": "TEXT",
+              "type": "TEXT"
+            },
+            {
+              "name": "channel",
+              "sqliteType": "TEXT",
+              "type": "TEXT"
+            },
+            {
+              "name": "status",
+              "sqliteType": "TEXT",
+              "type": "TEXT"
+            },
+            {
+              "name": "cancellation_reason",
+              "sqliteType": "TEXT",
+              "type": "TEXT"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              null,
+              null,
+              "2025-01-02",
+              "store",
+              "completed",
+              null
+            ],
+            [
+              2,
+              1,
+              null,
+              null,
+              "2025-03-02",
+              "store",
+              "completed",
+              null
+            ],
+            [
+              3,
+              2,
+              null,
+              null,
+              "2025-03-03",
+              "store",
+              "completed",
+              null
+            ],
+            [
+              4,
+              1,
+              null,
+              null,
+              "2024-12-31",
+              "store",
+              "completed",
+              null
+            ],
+            [
+              5,
+              null,
+              1,
+              5,
+              "2025-01-02",
+              "online",
+              "completed",
+              null
+            ],
+            [
+              6,
+              null,
+              1,
+              6,
+              "2025-03-02",
+              "online",
+              "completed",
+              null
+            ],
+            [
+              7,
+              null,
+              2,
+              7,
+              "2025-03-03",
+              "online",
+              "completed",
+              null
+            ],
+            [
+              8,
+              null,
+              2,
+              8,
+              "2025-04-03",
+              "online",
+              "completed",
+              null
+            ],
+            [
+              9,
+              null,
+              3,
+              9,
+              "2025-05-03",
+              "online",
+              "cancelled",
+              "客户取消"
+            ],
+            [
+              10,
+              null,
+              4,
+              10,
+              "2025-06-03",
+              "online",
+              "pending",
+              null
+            ],
+            [
+              11,
+              null,
+              3,
+              11,
+              "2026-01-01",
+              "online",
+              "completed",
+              null
+            ]
+          ]
+        },
+        {
+          "name": "order_items",
+          "columns": [
+            {
+              "name": "order_item_id",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            },
+            {
+              "name": "order_id",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            },
+            {
+              "name": "product_id",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            },
+            {
+              "name": "promotion_id",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            },
+            {
+              "name": "quantity",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            },
+            {
+              "name": "unit_price_cents",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            },
+            {
+              "name": "discount_cents",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            },
+            {
+              "name": "unit_cost_cents",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              1,
+              null,
+              2,
+              100,
+              0,
+              10
+            ],
+            [
+              2,
+              1,
+              2,
+              null,
+              1,
+              100,
+              0,
+              10
+            ],
+            [
+              3,
+              1,
+              3,
+              null,
+              1,
+              100,
+              0,
+              10
+            ],
+            [
+              4,
+              1,
+              4,
+              null,
+              1,
+              100,
+              0,
+              10
+            ],
+            [
+              5,
+              2,
+              5,
+              null,
+              1,
+              50,
+              0,
+              10
+            ],
+            [
+              6,
+              3,
+              1,
+              null,
+              1,
+              80,
+              0,
+              10
+            ],
+            [
+              7,
+              4,
+              1,
+              null,
+              1,
+              900,
+              0,
+              10
+            ],
+            [
+              8,
+              5,
+              1,
+              null,
+              1,
+              70,
+              0,
+              10
+            ],
+            [
+              9,
+              5,
+              2,
+              null,
+              1,
+              30,
+              0,
+              10
+            ],
+            [
+              10,
+              6,
+              2,
+              null,
+              1,
+              60,
+              0,
+              10
+            ],
+            [
+              11,
+              7,
+              1,
+              null,
+              1,
+              40,
+              0,
+              10
+            ],
+            [
+              12,
+              8,
+              2,
+              null,
+              1,
+              20,
+              0,
+              10
+            ],
+            [
+              13,
+              9,
+              1,
+              null,
+              1,
+              200,
+              0,
+              10
+            ],
+            [
+              14,
+              10,
+              1,
+              null,
+              1,
+              200,
+              0,
+              10
+            ],
+            [
+              15,
+              11,
+              1,
+              null,
+              1,
+              200,
+              0,
+              10
+            ]
+          ]
+        },
+        {
+          "name": "returns",
+          "columns": [
+            {
+              "name": "return_id",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            },
+            {
+              "name": "order_item_id",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            },
+            {
+              "name": "return_date",
+              "sqliteType": "TEXT",
+              "type": "TEXT"
+            },
+            {
+              "name": "quantity",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            },
+            {
+              "name": "refund_cents",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              "2025-02-01",
+              1,
+              100
+            ],
+            [
+              2,
+              12,
+              "2025-04-05",
+              1,
+              20
+            ]
+          ]
+        }
+      ],
+      "result": {
+        "columns": [
+          "month_key",
+          "net_cents"
+        ],
+        "rows": [
+          [
+            "2025-01",
+            400
+          ],
+          [
+            "2025-03",
+            130
+          ]
+        ]
+      }
+    },
+    {
+      "kind": "runnable",
+      "title": "补全没有订单的月份",
+      "sql": "WITH months AS (\n SELECT DISTINCT month_key FROM calendar_days WHERE month_key BETWEEN '2025-01' AND '2025-12'\n), sales AS (\n SELECT SUBSTR(order_date,1,7) month_key,SUM(net_cents) net_cents FROM v_order_net\n WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY SUBSTR(order_date,1,7)\n), complete AS (\n SELECT m.month_key,COALESCE(s.net_cents,0) net_cents FROM months m LEFT JOIN sales s ON m.month_key=s.month_key\n)\nSELECT * FROM complete ORDER BY 1, 2 LIMIT 3;",
+      "purpose": "补全没有订单的月份（complete）的实际执行结果。",
+      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "sourceTables": [
+        {
+          "name": "stores",
+          "columns": [
+            {
+              "name": "store_id",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            },
+            {
+              "name": "store_name",
+              "sqliteType": "TEXT",
+              "type": "TEXT"
+            },
+            {
+              "name": "city",
+              "sqliteType": "TEXT",
+              "type": "TEXT"
+            },
+            {
+              "name": "fulfillment_warehouse_id",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              "门店1",
+              "古晋",
+              1
+            ],
+            [
+              2,
+              "门店2",
+              "古晋",
+              1
+            ],
+            [
+              3,
+              "门店3",
+              "古晋",
+              1
+            ]
+          ]
+        },
+        {
+          "name": "customers",
+          "columns": [
+            {
+              "name": "customer_id",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            },
+            {
+              "name": "customer_name",
+              "sqliteType": "TEXT",
+              "type": "TEXT"
+            },
+            {
+              "name": "signup_date",
+              "sqliteType": "TEXT",
+              "type": "TEXT"
+            },
+            {
+              "name": "region",
+              "sqliteType": "TEXT",
+              "type": "TEXT"
+            },
+            {
+              "name": "member_since_date",
+              "sqliteType": "TEXT",
+              "type": "TEXT"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              "客户1",
+              "2024-01-01",
+              null,
+              null
+            ],
+            [
+              2,
+              "客户2",
+              "2024-01-01",
+              null,
+              null
+            ],
+            [
+              3,
+              "客户3",
+              "2024-01-01",
+              null,
+              null
+            ],
+            [
+              4,
+              "客户4",
+              "2024-01-01",
+              null,
+              null
+            ]
+          ]
+        },
+        {
+          "name": "calendar_days",
+          "columns": [
+            {
+              "name": "day",
+              "sqliteType": "TEXT",
+              "type": "TEXT"
+            },
+            {
+              "name": "month_key",
+              "sqliteType": "TEXT",
+              "type": "TEXT"
+            },
+            {
+              "name": "day_index",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            }
+          ],
+          "rows": [
+            [
+              "2025-01-01",
+              "2025-01",
+              1
+            ],
+            [
+              "2025-02-01",
+              "2025-02",
+              2
+            ],
+            [
+              "2025-03-01",
+              "2025-03",
+              3
+            ],
+            [
+              "2025-04-01",
+              "2025-04",
+              4
+            ],
+            [
+              "2025-05-01",
+              "2025-05",
+              5
+            ],
+            [
+              "2025-06-01",
+              "2025-06",
+              6
+            ],
+            [
+              "2025-07-01",
+              "2025-07",
+              7
+            ],
+            [
+              "2025-08-01",
+              "2025-08",
+              8
+            ],
+            [
+              "2025-09-01",
+              "2025-09",
+              9
+            ],
+            [
+              "2025-10-01",
+              "2025-10",
+              10
+            ],
+            [
+              "2025-11-01",
+              "2025-11",
+              11
+            ],
+            [
+              "2025-12-01",
+              "2025-12",
+              12
+            ]
+          ]
+        },
+        {
+          "name": "orders",
+          "columns": [
+            {
+              "name": "order_id",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            },
+            {
+              "name": "store_id",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            },
+            {
+              "name": "customer_id",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            },
+            {
+              "name": "session_id",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            },
+            {
+              "name": "order_date",
+              "sqliteType": "TEXT",
+              "type": "TEXT"
+            },
+            {
+              "name": "channel",
+              "sqliteType": "TEXT",
+              "type": "TEXT"
+            },
+            {
+              "name": "status",
+              "sqliteType": "TEXT",
+              "type": "TEXT"
+            },
+            {
+              "name": "cancellation_reason",
+              "sqliteType": "TEXT",
+              "type": "TEXT"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              null,
+              null,
+              "2025-01-02",
+              "store",
+              "completed",
+              null
+            ],
+            [
+              2,
+              1,
+              null,
+              null,
+              "2025-03-02",
+              "store",
+              "completed",
+              null
+            ],
+            [
+              3,
+              2,
+              null,
+              null,
+              "2025-03-03",
+              "store",
+              "completed",
+              null
+            ],
+            [
+              4,
+              1,
+              null,
+              null,
+              "2024-12-31",
+              "store",
+              "completed",
+              null
+            ],
+            [
+              5,
+              null,
+              1,
+              5,
+              "2025-01-02",
+              "online",
+              "completed",
+              null
+            ],
+            [
+              6,
+              null,
+              1,
+              6,
+              "2025-03-02",
+              "online",
+              "completed",
+              null
+            ],
+            [
+              7,
+              null,
+              2,
+              7,
+              "2025-03-03",
+              "online",
+              "completed",
+              null
+            ],
+            [
+              8,
+              null,
+              2,
+              8,
+              "2025-04-03",
+              "online",
+              "completed",
+              null
+            ],
+            [
+              9,
+              null,
+              3,
+              9,
+              "2025-05-03",
+              "online",
+              "cancelled",
+              "客户取消"
+            ],
+            [
+              10,
+              null,
+              4,
+              10,
+              "2025-06-03",
+              "online",
+              "pending",
+              null
+            ],
+            [
+              11,
+              null,
+              3,
+              11,
+              "2026-01-01",
+              "online",
+              "completed",
+              null
+            ]
+          ]
+        },
+        {
+          "name": "order_items",
+          "columns": [
+            {
+              "name": "order_item_id",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            },
+            {
+              "name": "order_id",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            },
+            {
+              "name": "product_id",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            },
+            {
+              "name": "promotion_id",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            },
+            {
+              "name": "quantity",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            },
+            {
+              "name": "unit_price_cents",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            },
+            {
+              "name": "discount_cents",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            },
+            {
+              "name": "unit_cost_cents",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              1,
+              null,
+              2,
+              100,
+              0,
+              10
+            ],
+            [
+              2,
+              1,
+              2,
+              null,
+              1,
+              100,
+              0,
+              10
+            ],
+            [
+              3,
+              1,
+              3,
+              null,
+              1,
+              100,
+              0,
+              10
+            ],
+            [
+              4,
+              1,
+              4,
+              null,
+              1,
+              100,
+              0,
+              10
+            ],
+            [
+              5,
+              2,
+              5,
+              null,
+              1,
+              50,
+              0,
+              10
+            ],
+            [
+              6,
+              3,
+              1,
+              null,
+              1,
+              80,
+              0,
+              10
+            ],
+            [
+              7,
+              4,
+              1,
+              null,
+              1,
+              900,
+              0,
+              10
+            ],
+            [
+              8,
+              5,
+              1,
+              null,
+              1,
+              70,
+              0,
+              10
+            ],
+            [
+              9,
+              5,
+              2,
+              null,
+              1,
+              30,
+              0,
+              10
+            ],
+            [
+              10,
+              6,
+              2,
+              null,
+              1,
+              60,
+              0,
+              10
+            ],
+            [
+              11,
+              7,
+              1,
+              null,
+              1,
+              40,
+              0,
+              10
+            ],
+            [
+              12,
+              8,
+              2,
+              null,
+              1,
+              20,
+              0,
+              10
+            ],
+            [
+              13,
+              9,
+              1,
+              null,
+              1,
+              200,
+              0,
+              10
+            ],
+            [
+              14,
+              10,
+              1,
+              null,
+              1,
+              200,
+              0,
+              10
+            ],
+            [
+              15,
+              11,
+              1,
+              null,
+              1,
+              200,
+              0,
+              10
+            ]
+          ]
+        },
+        {
+          "name": "returns",
+          "columns": [
+            {
+              "name": "return_id",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            },
+            {
+              "name": "order_item_id",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            },
+            {
+              "name": "return_date",
+              "sqliteType": "TEXT",
+              "type": "TEXT"
+            },
+            {
+              "name": "quantity",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            },
+            {
+              "name": "refund_cents",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              "2025-02-01",
+              1,
+              100
+            ],
+            [
+              2,
+              12,
+              "2025-04-05",
+              1,
+              20
+            ]
+          ]
+        }
+      ],
+      "result": {
+        "columns": [
+          "month_key",
+          "net_cents"
+        ],
+        "rows": [
+          [
+            "2025-01",
+            400
+          ],
+          [
+            "2025-02",
+            0
+          ],
+          [
+            "2025-03",
+            130
+          ]
+        ]
+      }
+    },
+    {
+      "kind": "runnable",
+      "title": "在连续月份上计算上一月净销售",
+      "sql": "WITH months AS (\n SELECT DISTINCT month_key FROM calendar_days WHERE month_key BETWEEN '2025-01' AND '2025-12'\n), sales AS (\n SELECT SUBSTR(order_date,1,7) month_key,SUM(net_cents) net_cents FROM v_order_net\n WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY SUBSTR(order_date,1,7)\n), complete AS (\n SELECT m.month_key,COALESCE(s.net_cents,0) net_cents FROM months m LEFT JOIN sales s ON m.month_key=s.month_key\n), previous AS (\n SELECT month_key,net_cents,LAG(net_cents) OVER(ORDER BY month_key) previous_net_cents FROM complete\n)\nSELECT * FROM previous ORDER BY 1, 2, 3 LIMIT 3;",
+      "purpose": "在连续月份上计算上一月净销售（previous）的实际执行结果。",
+      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "sourceTables": [
+        {
+          "name": "stores",
+          "columns": [
+            {
+              "name": "store_id",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            },
+            {
+              "name": "store_name",
+              "sqliteType": "TEXT",
+              "type": "TEXT"
+            },
+            {
+              "name": "city",
+              "sqliteType": "TEXT",
+              "type": "TEXT"
+            },
+            {
+              "name": "fulfillment_warehouse_id",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              "门店1",
+              "古晋",
+              1
+            ],
+            [
+              2,
+              "门店2",
+              "古晋",
+              1
+            ],
+            [
+              3,
+              "门店3",
+              "古晋",
+              1
+            ]
+          ]
+        },
+        {
+          "name": "customers",
+          "columns": [
+            {
+              "name": "customer_id",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            },
+            {
+              "name": "customer_name",
+              "sqliteType": "TEXT",
+              "type": "TEXT"
+            },
+            {
+              "name": "signup_date",
+              "sqliteType": "TEXT",
+              "type": "TEXT"
+            },
+            {
+              "name": "region",
+              "sqliteType": "TEXT",
+              "type": "TEXT"
+            },
+            {
+              "name": "member_since_date",
+              "sqliteType": "TEXT",
+              "type": "TEXT"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              "客户1",
+              "2024-01-01",
+              null,
+              null
+            ],
+            [
+              2,
+              "客户2",
+              "2024-01-01",
+              null,
+              null
+            ],
+            [
+              3,
+              "客户3",
+              "2024-01-01",
+              null,
+              null
+            ],
+            [
+              4,
+              "客户4",
+              "2024-01-01",
+              null,
+              null
+            ]
+          ]
+        },
+        {
+          "name": "calendar_days",
+          "columns": [
+            {
+              "name": "day",
+              "sqliteType": "TEXT",
+              "type": "TEXT"
+            },
+            {
+              "name": "month_key",
+              "sqliteType": "TEXT",
+              "type": "TEXT"
+            },
+            {
+              "name": "day_index",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            }
+          ],
+          "rows": [
+            [
+              "2025-01-01",
+              "2025-01",
+              1
+            ],
+            [
+              "2025-02-01",
+              "2025-02",
+              2
+            ],
+            [
+              "2025-03-01",
+              "2025-03",
+              3
+            ],
+            [
+              "2025-04-01",
+              "2025-04",
+              4
+            ],
+            [
+              "2025-05-01",
+              "2025-05",
+              5
+            ],
+            [
+              "2025-06-01",
+              "2025-06",
+              6
+            ],
+            [
+              "2025-07-01",
+              "2025-07",
+              7
+            ],
+            [
+              "2025-08-01",
+              "2025-08",
+              8
+            ],
+            [
+              "2025-09-01",
+              "2025-09",
+              9
+            ],
+            [
+              "2025-10-01",
+              "2025-10",
+              10
+            ],
+            [
+              "2025-11-01",
+              "2025-11",
+              11
+            ],
+            [
+              "2025-12-01",
+              "2025-12",
+              12
+            ]
+          ]
+        },
+        {
+          "name": "orders",
+          "columns": [
+            {
+              "name": "order_id",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            },
+            {
+              "name": "store_id",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            },
+            {
+              "name": "customer_id",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            },
+            {
+              "name": "session_id",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            },
+            {
+              "name": "order_date",
+              "sqliteType": "TEXT",
+              "type": "TEXT"
+            },
+            {
+              "name": "channel",
+              "sqliteType": "TEXT",
+              "type": "TEXT"
+            },
+            {
+              "name": "status",
+              "sqliteType": "TEXT",
+              "type": "TEXT"
+            },
+            {
+              "name": "cancellation_reason",
+              "sqliteType": "TEXT",
+              "type": "TEXT"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              null,
+              null,
+              "2025-01-02",
+              "store",
+              "completed",
+              null
+            ],
+            [
+              2,
+              1,
+              null,
+              null,
+              "2025-03-02",
+              "store",
+              "completed",
+              null
+            ],
+            [
+              3,
+              2,
+              null,
+              null,
+              "2025-03-03",
+              "store",
+              "completed",
+              null
+            ],
+            [
+              4,
+              1,
+              null,
+              null,
+              "2024-12-31",
+              "store",
+              "completed",
+              null
+            ],
+            [
+              5,
+              null,
+              1,
+              5,
+              "2025-01-02",
+              "online",
+              "completed",
+              null
+            ],
+            [
+              6,
+              null,
+              1,
+              6,
+              "2025-03-02",
+              "online",
+              "completed",
+              null
+            ],
+            [
+              7,
+              null,
+              2,
+              7,
+              "2025-03-03",
+              "online",
+              "completed",
+              null
+            ],
+            [
+              8,
+              null,
+              2,
+              8,
+              "2025-04-03",
+              "online",
+              "completed",
+              null
+            ],
+            [
+              9,
+              null,
+              3,
+              9,
+              "2025-05-03",
+              "online",
+              "cancelled",
+              "客户取消"
+            ],
+            [
+              10,
+              null,
+              4,
+              10,
+              "2025-06-03",
+              "online",
+              "pending",
+              null
+            ],
+            [
+              11,
+              null,
+              3,
+              11,
+              "2026-01-01",
+              "online",
+              "completed",
+              null
+            ]
+          ]
+        },
+        {
+          "name": "order_items",
+          "columns": [
+            {
+              "name": "order_item_id",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            },
+            {
+              "name": "order_id",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            },
+            {
+              "name": "product_id",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            },
+            {
+              "name": "promotion_id",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            },
+            {
+              "name": "quantity",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            },
+            {
+              "name": "unit_price_cents",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            },
+            {
+              "name": "discount_cents",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            },
+            {
+              "name": "unit_cost_cents",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              1,
+              null,
+              2,
+              100,
+              0,
+              10
+            ],
+            [
+              2,
+              1,
+              2,
+              null,
+              1,
+              100,
+              0,
+              10
+            ],
+            [
+              3,
+              1,
+              3,
+              null,
+              1,
+              100,
+              0,
+              10
+            ],
+            [
+              4,
+              1,
+              4,
+              null,
+              1,
+              100,
+              0,
+              10
+            ],
+            [
+              5,
+              2,
+              5,
+              null,
+              1,
+              50,
+              0,
+              10
+            ],
+            [
+              6,
+              3,
+              1,
+              null,
+              1,
+              80,
+              0,
+              10
+            ],
+            [
+              7,
+              4,
+              1,
+              null,
+              1,
+              900,
+              0,
+              10
+            ],
+            [
+              8,
+              5,
+              1,
+              null,
+              1,
+              70,
+              0,
+              10
+            ],
+            [
+              9,
+              5,
+              2,
+              null,
+              1,
+              30,
+              0,
+              10
+            ],
+            [
+              10,
+              6,
+              2,
+              null,
+              1,
+              60,
+              0,
+              10
+            ],
+            [
+              11,
+              7,
+              1,
+              null,
+              1,
+              40,
+              0,
+              10
+            ],
+            [
+              12,
+              8,
+              2,
+              null,
+              1,
+              20,
+              0,
+              10
+            ],
+            [
+              13,
+              9,
+              1,
+              null,
+              1,
+              200,
+              0,
+              10
+            ],
+            [
+              14,
+              10,
+              1,
+              null,
+              1,
+              200,
+              0,
+              10
+            ],
+            [
+              15,
+              11,
+              1,
+              null,
+              1,
+              200,
+              0,
+              10
+            ]
+          ]
+        },
+        {
+          "name": "returns",
+          "columns": [
+            {
+              "name": "return_id",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            },
+            {
+              "name": "order_item_id",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            },
+            {
+              "name": "return_date",
+              "sqliteType": "TEXT",
+              "type": "TEXT"
+            },
+            {
+              "name": "quantity",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            },
+            {
+              "name": "refund_cents",
+              "sqliteType": "INTEGER",
+              "type": "INTEGER"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              "2025-02-01",
+              1,
+              100
+            ],
+            [
+              2,
+              12,
+              "2025-04-05",
+              1,
+              20
+            ]
+          ]
+        }
+      ],
+      "result": {
+        "columns": [
+          "month_key",
+          "net_cents",
+          "previous_net_cents"
+        ],
+        "rows": [
+          [
+            "2025-01",
+            400,
+            null
+          ],
+          [
+            "2025-02",
+            0,
+            400
+          ],
+          [
+            "2025-03",
+            130,
+            0
+          ]
+        ]
+      }
+    }
+  ],
+  "completeCode": {
+    "mysqlSql": "WITH months AS (\n SELECT DISTINCT month_key FROM calendar_days WHERE month_key BETWEEN '2025-01' AND '2025-12'\n), sales AS (\n SELECT SUBSTR(order_date,1,7) month_key,SUM(net_cents) net_cents FROM v_order_net\n WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY SUBSTR(order_date,1,7)\n), complete AS (\n SELECT m.month_key,COALESCE(s.net_cents,0) net_cents FROM months m LEFT JOIN sales s ON m.month_key=s.month_key\n), previous AS (\n SELECT month_key,net_cents,LAG(net_cents) OVER(ORDER BY month_key) previous_net_cents FROM complete\n)\nSELECT month_key,net_cents,previous_net_cents,net_cents-previous_net_cents change_cents,\n ROUND(100.0*(net_cents-previous_net_cents)/NULLIF(previous_net_cents,0),2) change_pct\nFROM previous ORDER BY month_key",
+    "sqliteSql": "WITH months AS (\n SELECT DISTINCT month_key FROM calendar_days WHERE month_key BETWEEN '2025-01' AND '2025-12'\n), sales AS (\n SELECT SUBSTR(order_date,1,7) month_key,SUM(net_cents) net_cents FROM v_order_net\n WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY SUBSTR(order_date,1,7)\n), complete AS (\n SELECT m.month_key,COALESCE(s.net_cents,0) net_cents FROM months m LEFT JOIN sales s ON m.month_key=s.month_key\n), previous AS (\n SELECT month_key,net_cents,LAG(net_cents) OVER(ORDER BY month_key) previous_net_cents FROM complete\n)\nSELECT month_key,net_cents,previous_net_cents,net_cents-previous_net_cents change_cents,\n ROUND(100.0*(net_cents-previous_net_cents)/NULLIF(previous_net_cents,0),2) change_pct\nFROM previous ORDER BY month_key"
+  },
+  "expectedResult": {
+    "columns": [
+      "month_key",
+      "net_cents",
+      "previous_net_cents",
+      "change_cents",
+      "change_pct"
+    ],
+    "rows": [
+      [
+        "2025-01",
+        400,
+        null,
+        null,
+        null
+      ],
+      [
+        "2025-02",
+        0,
+        400,
+        -400,
+        -100.0
+      ],
+      [
+        "2025-03",
+        130,
+        0,
+        130,
+        null
+      ],
+      [
+        "2025-04",
+        0,
+        130,
+        -130,
+        -100.0
+      ],
+      [
+        "2025-05",
+        0,
+        0,
+        0,
+        null
+      ],
+      [
+        "2025-06",
+        0,
+        0,
+        0,
+        null
+      ],
+      [
+        "2025-07",
+        0,
+        0,
+        0,
+        null
+      ],
+      [
+        "2025-08",
+        0,
+        0,
+        0,
+        null
+      ],
+      [
+        "2025-09",
+        0,
+        0,
+        0,
+        null
+      ],
+      [
+        "2025-10",
+        0,
+        0,
+        0,
+        null
+      ],
+      [
+        "2025-11",
+        0,
+        0,
+        0,
+        null
+      ],
+      [
+        "2025-12",
+        0,
+        0,
+        0,
+        null
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": true
+  },
+  "resultBlocks": [
+    {
+      "type": "paragraph",
+      "text": "原课程前3个月净额依次400、0、130分。本次独立内联例子复现该结果，且明确4月至12月为无交易月份。2月由400降至0，金额差−400、环比−100%；",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "3月从0增至130，金额差130，环比为空；4月由130降至0，环比−100%；5月两个相邻月份均为0，金额差0但环比仍为空。原案例首月缺失上期，金额差及百分比均为空；",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "跨年示例提供上年12月200分后，1月400分的环比为100%。净销售为负时数学比率仍可计算，但可能不符合常规增长解读，需单独说明退款或冲销。连续时间轴不自动证明数据完整。",
+      "emphasis": []
+    }
+  ],
+  "extensions": [
+    {
+      "label": "连续月份轴",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "日期维度可能每日一行，先去重得到12个月。",
+          "emphasis": []
+        }
+      ],
+      "sql": "WITH calendar_days(month_key) AS (VALUES\n ('2025-01'),('2025-01'),('2025-02'),('2025-03'),('2025-04'),('2025-05'),('2025-06'),('2025-07'),('2025-08'),('2025-09'),('2025-10'),('2025-11'),('2025-12')),\nv_order_net(channel,order_date,net_cents) AS (VALUES\n ('store','2025-01-02',400),('store','2025-03-02',50),('store','2025-03-03',80),('online','2025-02-04',200),('store','2024-12-31',900)),\nmonths AS (\n SELECT DISTINCT month_key FROM calendar_days WHERE month_key BETWEEN '2025-01' AND '2025-12'\n), sales AS (\n SELECT SUBSTR(order_date,1,7) month_key,SUM(net_cents) net_cents FROM v_order_net\n WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY SUBSTR(order_date,1,7)\n), complete AS (\n SELECT m.month_key,COALESCE(s.net_cents,0) net_cents FROM months m LEFT JOIN sales s ON m.month_key=s.month_key\n), previous AS (\n SELECT month_key,net_cents,LAG(net_cents) OVER(ORDER BY month_key) previous_net_cents FROM complete\n)\nSELECT month_key FROM months ORDER BY month_key;",
+      "result": {
+        "columns": [
+          "month_key"
+        ],
+        "rows": [
+          [
+            "2025-01"
+          ],
+          [
+            "2025-02"
+          ],
+          [
+            "2025-03"
+          ],
+          [
+            "2025-04"
+          ],
+          [
+            "2025-05"
+          ],
+          [
+            "2025-06"
+          ],
+          [
+            "2025-07"
+          ],
+          [
+            "2025-08"
+          ],
+          [
+            "2025-09"
+          ],
+          [
+            "2025-10"
+          ],
+          [
+            "2025-11"
+          ],
+          [
+            "2025-12"
+          ]
+        ]
+      }
+    },
+    {
+      "label": "月度净销售汇总",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "限定线下及2025年；3月两笔50和80合计130，2月线上订单不计。",
+          "emphasis": []
+        }
+      ],
+      "sql": "WITH calendar_days(month_key) AS (VALUES\n ('2025-01'),('2025-01'),('2025-02'),('2025-03'),('2025-04'),('2025-05'),('2025-06'),('2025-07'),('2025-08'),('2025-09'),('2025-10'),('2025-11'),('2025-12')),\nv_order_net(channel,order_date,net_cents) AS (VALUES\n ('store','2025-01-02',400),('store','2025-03-02',50),('store','2025-03-03',80),('online','2025-02-04',200),('store','2024-12-31',900)),\nmonths AS (\n SELECT DISTINCT month_key FROM calendar_days WHERE month_key BETWEEN '2025-01' AND '2025-12'\n), sales AS (\n SELECT SUBSTR(order_date,1,7) month_key,SUM(net_cents) net_cents FROM v_order_net\n WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY SUBSTR(order_date,1,7)\n), complete AS (\n SELECT m.month_key,COALESCE(s.net_cents,0) net_cents FROM months m LEFT JOIN sales s ON m.month_key=s.month_key\n), previous AS (\n SELECT month_key,net_cents,LAG(net_cents) OVER(ORDER BY month_key) previous_net_cents FROM complete\n)\nSELECT * FROM sales ORDER BY month_key;",
+      "result": {
+        "columns": [
+          "month_key",
+          "net_cents"
+        ],
+        "rows": [
+          [
+            "2025-01",
+            400
+          ],
+          [
+            "2025-03",
+            130
+          ]
+        ]
+      }
+    },
+    {
+      "label": "补齐缺失月份",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "以月份轴为左表；在来源完整的假设下，无销售月补零。",
+          "emphasis": []
+        }
+      ],
+      "sql": "WITH calendar_days(month_key) AS (VALUES\n ('2025-01'),('2025-01'),('2025-02'),('2025-03'),('2025-04'),('2025-05'),('2025-06'),('2025-07'),('2025-08'),('2025-09'),('2025-10'),('2025-11'),('2025-12')),\nv_order_net(channel,order_date,net_cents) AS (VALUES\n ('store','2025-01-02',400),('store','2025-03-02',50),('store','2025-03-03',80),('online','2025-02-04',200),('store','2024-12-31',900)),\nmonths AS (\n SELECT DISTINCT month_key FROM calendar_days WHERE month_key BETWEEN '2025-01' AND '2025-12'\n), sales AS (\n SELECT SUBSTR(order_date,1,7) month_key,SUM(net_cents) net_cents FROM v_order_net\n WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY SUBSTR(order_date,1,7)\n), complete AS (\n SELECT m.month_key,COALESCE(s.net_cents,0) net_cents FROM months m LEFT JOIN sales s ON m.month_key=s.month_key\n), previous AS (\n SELECT month_key,net_cents,LAG(net_cents) OVER(ORDER BY month_key) previous_net_cents FROM complete\n)\nSELECT * FROM complete ORDER BY month_key;",
+      "result": {
+        "columns": [
+          "month_key",
+          "net_cents"
+        ],
+        "rows": [
+          [
+            "2025-01",
+            400
+          ],
+          [
+            "2025-02",
+            0
+          ],
+          [
+            "2025-03",
+            130
+          ],
+          [
+            "2025-04",
+            0
+          ],
+          [
+            "2025-05",
+            0
+          ],
+          [
+            "2025-06",
+            0
+          ],
+          [
+            "2025-07",
+            0
+          ],
+          [
+            "2025-08",
+            0
+          ],
+          [
+            "2025-09",
+            0
+          ],
+          [
+            "2025-10",
+            0
+          ],
+          [
+            "2025-11",
+            0
+          ],
+          [
+            "2025-12",
+            0
+          ]
+        ]
+      }
+    },
+    {
+      "label": "完整环比报表",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "先补齐再取上一行。2月比1月下降100%；3月从0恢复130，百分比不可定义；5月至12月金额不变但零分母仍留空。",
+          "emphasis": []
+        }
+      ],
+      "sql": "WITH calendar_days(month_key) AS (VALUES\n ('2025-01'),('2025-01'),('2025-02'),('2025-03'),('2025-04'),('2025-05'),('2025-06'),('2025-07'),('2025-08'),('2025-09'),('2025-10'),('2025-11'),('2025-12')),\nv_order_net(channel,order_date,net_cents) AS (VALUES\n ('store','2025-01-02',400),('store','2025-03-02',50),('store','2025-03-03',80),('online','2025-02-04',200),('store','2024-12-31',900)),\nmonths AS (\n SELECT DISTINCT month_key FROM calendar_days WHERE month_key BETWEEN '2025-01' AND '2025-12'\n), sales AS (\n SELECT SUBSTR(order_date,1,7) month_key,SUM(net_cents) net_cents FROM v_order_net\n WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY SUBSTR(order_date,1,7)\n), complete AS (\n SELECT m.month_key,COALESCE(s.net_cents,0) net_cents FROM months m LEFT JOIN sales s ON m.month_key=s.month_key\n), previous AS (\n SELECT month_key,net_cents,LAG(net_cents) OVER(ORDER BY month_key) previous_net_cents FROM complete\n)\nSELECT month_key,net_cents,previous_net_cents,net_cents-previous_net_cents change_cents,\n ROUND(100.0*(net_cents-previous_net_cents)/NULLIF(previous_net_cents,0),2) change_pct\nFROM previous ORDER BY month_key;",
+      "result": {
+        "columns": [
+          "month_key",
+          "net_cents",
+          "previous_net_cents",
+          "change_cents",
+          "change_pct"
+        ],
+        "rows": [
+          [
+            "2025-01",
+            400,
+            null,
+            null,
+            null
+          ],
+          [
+            "2025-02",
+            0,
+            400,
+            -400,
+            -100.0
+          ],
+          [
+            "2025-03",
+            130,
+            0,
+            130,
+            null
+          ],
+          [
+            "2025-04",
+            0,
+            130,
+            -130,
+            -100.0
+          ],
+          [
+            "2025-05",
+            0,
+            0,
+            0,
+            null
+          ],
+          [
+            "2025-06",
+            0,
+            0,
+            0,
+            null
+          ],
+          [
+            "2025-07",
+            0,
+            0,
+            0,
+            null
+          ],
+          [
+            "2025-08",
+            0,
+            0,
+            0,
+            null
+          ],
+          [
+            "2025-09",
+            0,
+            0,
+            0,
+            null
+          ],
+          [
+            "2025-10",
+            0,
+            0,
+            0,
+            null
+          ],
+          [
+            "2025-11",
+            0,
+            0,
+            0,
+            null
+          ],
+          [
+            "2025-12",
+            0,
+            0,
+            0,
+            null
+          ]
+        ]
+      }
+    },
+    {
+      "label": "跨年基准与报告期筛选",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "先保留2024年12月，再取上期，最后筛2025年。1月较上年12月增长100%；2月下降100%。",
+          "emphasis": []
+        }
+      ],
+      "sql": "WITH monthly(month_key,net_cents) AS (VALUES ('2024-12',200),('2025-01',400),('2025-02',0)),\nprevious AS (SELECT *,LAG(net_cents) OVER(ORDER BY month_key) previous_net_cents FROM monthly)\nSELECT month_key,net_cents,previous_net_cents,net_cents-previous_net_cents change_cents,\nROUND(100.0*(net_cents-previous_net_cents)/NULLIF(previous_net_cents,0),2) change_pct\nFROM previous WHERE month_key >= '2025-01' ORDER BY month_key;",
+      "result": {
+        "columns": [
+          "month_key",
+          "net_cents",
+          "previous_net_cents",
+          "change_cents",
+          "change_pct"
+        ],
+        "rows": [
+          [
+            "2025-01",
+            400,
+            200,
+            200,
+            100.0
+          ],
+          [
+            "2025-02",
+            0,
+            400,
+            -400,
+            -100.0
+          ]
+        ]
+      }
+    }
+  ],
+  "cautions": {
+    "comparison": [
+      {
+        "type": "paragraph",
+        "text": "环比比较相邻自然月；同比比较上一年同月，连续月轴可使用偏移12行；金额差不需要除法，零基数时仍可求差。原案例没有同比历史范围。",
+        "emphasis": []
+      }
+    ],
+    "example": [
+      {
+        "type": "paragraph",
+        "text": "只对有销售的月份使用 LAG，或将零分母的环比补为0%。",
+        "emphasis": []
+      }
+    ],
+    "reason": [],
+    "correction": [
+      {
+        "type": "paragraph",
+        "text": "先建立完整月份轴并核实数据完整性，再计算窗口；零分母保留 NULL，跨年报告最后筛选展示期。",
+        "emphasis": []
+      }
+    ],
+    "notes": [
+      {
+        "type": "paragraph",
+        "text": "原课程主查询、结果、数据来源均保留。独立示例直接内联净销售金额，未重建原订单退款视图；原生数据库及浏览器未验证。",
+        "emphasis": []
+      }
+    ]
+  },
+  "sourcePath": "source/unified73/kp20-02.json",
+  "sourceSha256": "c8e34ed274f882e71ff619218a872f657fbd128651a1d50ff860fa4e827e2fce"
+}

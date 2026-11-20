@@ -1,0 +1,828 @@
+{
+  "schemaVersion": 1,
+  "id": "kp20-13",
+  "sourceBatch": "unified73",
+  "teachingKind": "business",
+  "conceptBlocks": [
+    {
+      "type": "paragraph",
+      "text": "订单净销售属于业务收入指标，成功收款扣实际退款是资金事件净额；二者按订单及一致截止口径核对。差额为净现金减净销售。",
+      "emphasis": []
+    }
+  ],
+  "syntax": {
+    "purpose": "统计期间 2025年；截止日 2025-12-31；金额 马币分；输出粒度 订单。"
+  },
+  "dataDescriptions": {
+    "order_items": "共 3 行；字段：order_item_id、order_id、product_id、promotion_id、quantity、unit_price_cents、discount_cents、unit_cost_cents。",
+    "payments": "共 3 行；字段：payment_id、order_id、payment_date、amount_cents、status。",
+    "returns": "共 3 行；字段：return_id、order_item_id、return_date、quantity、refund_cents。",
+    "v_order_net": "共 3 行；字段：order_id、store_id、customer_id、session_id、channel、order_date、net_cents、cost_cents。"
+  },
+  "problem": "财务需要核对2025年已完成订单的净销售与截至2025年12月31日成功收款扣实际退款后的现金净额。每个订单一行，只列差额非零的订单。",
+  "methodBlocks": [
+    {
+      "type": "paragraph",
+      "text": "先在付款表按状态及截止日期筛选成功收款，再按订单汇总；同一订单可能拆分支付，失败重试不计。退款表通过订单明细定位订单，按退款发生日期筛选并汇总。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "两个汇总表各自最多每订单一行，才与订单净额视图左连接；否则两笔付款与两笔退款相乘为四行。缺失资金事件在本题完整记录假设下补零。净现金=付款−退款，差额=净现金−净销售。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "最后筛选订单日期和非零差额，按差额从大到小排序。截止日期只设上限，允许跨期预收；净销售视图的退款截止口径需核实，不能默认为与现金事件相同。",
+      "emphasis": []
+    }
+  ],
+  "breakdown": [
+    {
+      "kind": "runnable",
+      "title": "按订单汇集成功收款",
+      "sql": "WITH a AS (SELECT order_id,SUM(amount_cents) paid FROM payments WHERE status='settled' AND payment_date<='2025-12-31' GROUP BY order_id) SELECT * FROM a ORDER BY 1, 2 LIMIT 3;",
+      "purpose": "按订单汇集成功收款（a）的实际执行结果。",
+      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "sourceTables": [
+        {
+          "name": "order_items",
+          "columns": [
+            {
+              "name": "order_item_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "order_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "product_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "promotion_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "quantity",
+              "type": "INTEGER"
+            },
+            {
+              "name": "unit_price_cents",
+              "type": "INTEGER"
+            },
+            {
+              "name": "discount_cents",
+              "type": "INTEGER"
+            },
+            {
+              "name": "unit_cost_cents",
+              "type": "INTEGER"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              10962,
+              64,
+              null,
+              1,
+              790,
+              0,
+              368
+            ],
+            [
+              2,
+              8118,
+              413,
+              null,
+              3,
+              2440,
+              0,
+              1414
+            ],
+            [
+              3,
+              26242,
+              494,
+              null,
+              1,
+              750,
+              0,
+              318
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 90074
+        },
+        {
+          "name": "payments",
+          "columns": [
+            {
+              "name": "payment_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "order_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "payment_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "amount_cents",
+              "type": "INTEGER"
+            },
+            {
+              "name": "status",
+              "type": "TEXT"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              3442,
+              "2023-01-01",
+              22200,
+              "settled"
+            ],
+            [
+              2,
+              5930,
+              "2023-01-01",
+              18444,
+              "failed"
+            ],
+            [
+              3,
+              5930,
+              "2023-01-01",
+              18444,
+              "settled"
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 28816
+        },
+        {
+          "name": "returns",
+          "columns": [
+            {
+              "name": "return_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "order_item_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "return_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "quantity",
+              "type": "INTEGER"
+            },
+            {
+              "name": "refund_cents",
+              "type": "INTEGER"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              4682,
+              "2023-01-19",
+              1,
+              5940
+            ],
+            [
+              2,
+              79414,
+              "2023-01-26",
+              1,
+              3880
+            ],
+            [
+              3,
+              24744,
+              "2023-01-15",
+              1,
+              2180
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 5063
+        },
+        {
+          "name": "v_order_net",
+          "columns": [
+            {
+              "name": "order_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "store_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "customer_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "session_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "channel",
+              "type": "TEXT"
+            },
+            {
+              "name": "order_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "net_cents",
+              "type": "派生"
+            },
+            {
+              "name": "cost_cents",
+              "type": "派生"
+            }
+          ],
+          "rows": [
+            [
+              2,
+              4,
+              null,
+              null,
+              "store",
+              "2025-10-02",
+              300,
+              268
+            ],
+            [
+              3,
+              4,
+              2256,
+              null,
+              "store",
+              "2025-06-09",
+              1310,
+              618
+            ],
+            [
+              5,
+              4,
+              4644,
+              null,
+              "store",
+              "2024-07-24",
+              16670,
+              8477
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 23325
+        }
+      ],
+      "result": {
+        "columns": [
+          "order_id",
+          "paid"
+        ],
+        "rows": [
+          [
+            2,
+            2110
+          ],
+          [
+            3,
+            1310
+          ],
+          [
+            5,
+            17090
+          ]
+        ]
+      }
+    },
+    {
+      "kind": "runnable",
+      "title": "按订单汇集退款金额",
+      "sql": "WITH a AS (SELECT order_id,SUM(amount_cents) paid FROM payments WHERE status='settled' AND payment_date<='2025-12-31' GROUP BY order_id), b AS (SELECT i.order_id,SUM(r.refund_cents) refunded FROM returns r JOIN order_items i ON i.order_item_id=r.order_item_id WHERE r.return_date<='2025-12-31' GROUP BY i.order_id) SELECT * FROM b ORDER BY 1, 2 LIMIT 3;",
+      "purpose": "按订单汇集退款金额（b）的实际执行结果。",
+      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "sourceTables": [
+        {
+          "name": "order_items",
+          "columns": [
+            {
+              "name": "order_item_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "order_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "product_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "promotion_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "quantity",
+              "type": "INTEGER"
+            },
+            {
+              "name": "unit_price_cents",
+              "type": "INTEGER"
+            },
+            {
+              "name": "discount_cents",
+              "type": "INTEGER"
+            },
+            {
+              "name": "unit_cost_cents",
+              "type": "INTEGER"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              10962,
+              64,
+              null,
+              1,
+              790,
+              0,
+              368
+            ],
+            [
+              2,
+              8118,
+              413,
+              null,
+              3,
+              2440,
+              0,
+              1414
+            ],
+            [
+              3,
+              26242,
+              494,
+              null,
+              1,
+              750,
+              0,
+              318
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 90074
+        },
+        {
+          "name": "payments",
+          "columns": [
+            {
+              "name": "payment_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "order_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "payment_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "amount_cents",
+              "type": "INTEGER"
+            },
+            {
+              "name": "status",
+              "type": "TEXT"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              3442,
+              "2023-01-01",
+              22200,
+              "settled"
+            ],
+            [
+              2,
+              5930,
+              "2023-01-01",
+              18444,
+              "failed"
+            ],
+            [
+              3,
+              5930,
+              "2023-01-01",
+              18444,
+              "settled"
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 28816
+        },
+        {
+          "name": "returns",
+          "columns": [
+            {
+              "name": "return_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "order_item_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "return_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "quantity",
+              "type": "INTEGER"
+            },
+            {
+              "name": "refund_cents",
+              "type": "INTEGER"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              4682,
+              "2023-01-19",
+              1,
+              5940
+            ],
+            [
+              2,
+              79414,
+              "2023-01-26",
+              1,
+              3880
+            ],
+            [
+              3,
+              24744,
+              "2023-01-15",
+              1,
+              2180
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 5063
+        },
+        {
+          "name": "v_order_net",
+          "columns": [
+            {
+              "name": "order_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "store_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "customer_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "session_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "channel",
+              "type": "TEXT"
+            },
+            {
+              "name": "order_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "net_cents",
+              "type": "派生"
+            },
+            {
+              "name": "cost_cents",
+              "type": "派生"
+            }
+          ],
+          "rows": [
+            [
+              2,
+              4,
+              null,
+              null,
+              "store",
+              "2025-10-02",
+              300,
+              268
+            ],
+            [
+              3,
+              4,
+              2256,
+              null,
+              "store",
+              "2025-06-09",
+              1310,
+              618
+            ],
+            [
+              5,
+              4,
+              4644,
+              null,
+              "store",
+              "2024-07-24",
+              16670,
+              8477
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 23325
+        }
+      ],
+      "result": {
+        "columns": [
+          "order_id",
+          "refunded"
+        ],
+        "rows": [
+          [
+            2,
+            1810
+          ],
+          [
+            5,
+            420
+          ],
+          [
+            15,
+            3231
+          ]
+        ]
+      }
+    }
+  ],
+  "completeCode": {
+    "mysqlSql": "WITH a AS (SELECT order_id,SUM(amount_cents) paid FROM payments WHERE status='settled' AND payment_date<='2025-12-31' GROUP BY order_id), b AS (SELECT i.order_id,SUM(r.refund_cents) refunded FROM returns r JOIN order_items i ON i.order_item_id=r.order_item_id WHERE r.return_date<='2025-12-31' GROUP BY i.order_id) SELECT o.order_id,o.net_cents,COALESCE(a.paid,0)-COALESCE(b.refunded,0) cash_net_cents,COALESCE(a.paid,0)-COALESCE(b.refunded,0)-o.net_cents difference_cents FROM v_order_net o LEFT JOIN a ON a.order_id=o.order_id LEFT JOIN b ON b.order_id=o.order_id WHERE o.order_date BETWEEN '2025-01-01' AND '2025-12-31' AND COALESCE(a.paid,0)-COALESCE(b.refunded,0)<>o.net_cents ORDER BY difference_cents DESC",
+    "sqliteSql": "WITH a AS (SELECT order_id,SUM(amount_cents) paid FROM payments WHERE status='settled' AND payment_date<='2025-12-31' GROUP BY order_id), b AS (SELECT i.order_id,SUM(r.refund_cents) refunded FROM returns r JOIN order_items i ON i.order_item_id=r.order_item_id WHERE r.return_date<='2025-12-31' GROUP BY i.order_id) SELECT o.order_id,o.net_cents,COALESCE(a.paid,0)-COALESCE(b.refunded,0) cash_net_cents,COALESCE(a.paid,0)-COALESCE(b.refunded,0)-o.net_cents difference_cents FROM v_order_net o LEFT JOIN a ON a.order_id=o.order_id LEFT JOIN b ON b.order_id=o.order_id WHERE o.order_date BETWEEN '2025-01-01' AND '2025-12-31' AND COALESCE(a.paid,0)-COALESCE(b.refunded,0)<>o.net_cents ORDER BY difference_cents DESC"
+  },
+  "expectedResult": {
+    "columns": [
+      "order_id",
+      "net_cents",
+      "cash_net_cents",
+      "difference_cents"
+    ],
+    "rows": [],
+    "status": "SQLite实际执行（预览）",
+    "orderGuaranteed": true,
+    "totalRows": 0,
+    "fullResultPath": "../enterprise_reference/business_tasks/results/BP39.json"
+  },
+  "resultBlocks": [
+    {
+      "type": "paragraph",
+      "text": "示例订单1成功收款1000分，实际退款200分，净现金800分，与净销售一致；订单2少收50分；订单3现金比净销售多100分，可能涉及跨期退款；",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "订单4截止日没有成功收款，差额−300分；订单5两端为零，不输出。正负差额只是核对线索，并非直接认定会计错误。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "原企业结果引用显示零行，说明该基准库在既定查询口径下无差额，不代表所有资金流水均已核查，也不代表查询未执行。",
+      "emphasis": []
+    }
+  ],
+  "extensions": [
+    {
+      "label": "成功付款汇总",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "拆分付款相加，失败和截止日后付款排除。",
+          "emphasis": []
+        }
+      ],
+      "sql": "WITH v_order_net(order_id,order_date,net_cents) AS (VALUES (1,'2025-02-01',800),(2,'2025-03-01',500),(3,'2025-04-01',400),(4,'2025-05-01',300),(5,'2025-06-01',0),(6,'2024-12-31',100)),\npayments(order_id,payment_date,amount_cents,status) AS (VALUES (1,'2025-02-01',600,'settled'),(1,'2025-02-02',400,'settled'),(1,'2025-02-01',1000,'failed'),(2,'2025-03-01',450,'settled'),(3,'2025-04-01',500,'settled'),(4,'2026-01-01',300,'settled'),(6,'2024-12-31',100,'settled')),\norder_items(order_item_id,order_id) AS (VALUES (11,1),(12,1),(31,3)),\nreturns(order_item_id,return_date,refund_cents) AS (VALUES (11,'2025-02-03',100),(12,'2025-02-04',100),(31,'2026-01-01',100)),\na AS (SELECT order_id,SUM(amount_cents) paid FROM payments WHERE status='settled' AND payment_date<='2025-12-31' GROUP BY order_id) SELECT * FROM a ORDER BY paid DESC",
+      "result": {
+        "columns": [
+          "order_id",
+          "paid"
+        ],
+        "rows": [
+          [
+            1,
+            1000
+          ],
+          [
+            3,
+            500
+          ],
+          [
+            2,
+            450
+          ],
+          [
+            6,
+            100
+          ]
+        ]
+      }
+    },
+    {
+      "label": "退款汇总",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "通过订单明细找到订单，截止日后退款排除。",
+          "emphasis": []
+        }
+      ],
+      "sql": "WITH v_order_net(order_id,order_date,net_cents) AS (VALUES (1,'2025-02-01',800),(2,'2025-03-01',500),(3,'2025-04-01',400),(4,'2025-05-01',300),(5,'2025-06-01',0),(6,'2024-12-31',100)),\npayments(order_id,payment_date,amount_cents,status) AS (VALUES (1,'2025-02-01',600,'settled'),(1,'2025-02-02',400,'settled'),(1,'2025-02-01',1000,'failed'),(2,'2025-03-01',450,'settled'),(3,'2025-04-01',500,'settled'),(4,'2026-01-01',300,'settled'),(6,'2024-12-31',100,'settled')),\norder_items(order_item_id,order_id) AS (VALUES (11,1),(12,1),(31,3)),\nreturns(order_item_id,return_date,refund_cents) AS (VALUES (11,'2025-02-03',100),(12,'2025-02-04',100),(31,'2026-01-01',100)),\nb AS (SELECT i.order_id,SUM(r.refund_cents) refunded FROM returns r JOIN order_items i ON i.order_item_id=r.order_item_id WHERE r.return_date<='2025-12-31' GROUP BY i.order_id) SELECT * FROM b ORDER BY refunded DESC",
+      "result": {
+        "columns": [
+          "order_id",
+          "refunded"
+        ],
+        "rows": [
+          [
+            1,
+            200
+          ]
+        ]
+      }
+    },
+    {
+      "label": "全部订单核对",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "保留未收款订单，净现金=成功收款−实际退款，差额=净现金−净销售。",
+          "emphasis": []
+        }
+      ],
+      "sql": "WITH v_order_net(order_id,order_date,net_cents) AS (VALUES (1,'2025-02-01',800),(2,'2025-03-01',500),(3,'2025-04-01',400),(4,'2025-05-01',300),(5,'2025-06-01',0),(6,'2024-12-31',100)),\npayments(order_id,payment_date,amount_cents,status) AS (VALUES (1,'2025-02-01',600,'settled'),(1,'2025-02-02',400,'settled'),(1,'2025-02-01',1000,'failed'),(2,'2025-03-01',450,'settled'),(3,'2025-04-01',500,'settled'),(4,'2026-01-01',300,'settled'),(6,'2024-12-31',100,'settled')),\norder_items(order_item_id,order_id) AS (VALUES (11,1),(12,1),(31,3)),\nreturns(order_item_id,return_date,refund_cents) AS (VALUES (11,'2025-02-03',100),(12,'2025-02-04',100),(31,'2026-01-01',100)),\na AS (SELECT order_id,SUM(amount_cents) paid FROM payments WHERE status='settled' AND payment_date<='2025-12-31' GROUP BY order_id),\nb AS (SELECT i.order_id,SUM(r.refund_cents) refunded FROM returns r JOIN order_items i ON i.order_item_id=r.order_item_id WHERE r.return_date<='2025-12-31' GROUP BY i.order_id),\nz AS (SELECT o.order_id,o.net_cents,COALESCE(a.paid,0)-COALESCE(b.refunded,0) cash_net_cents,COALESCE(a.paid,0)-COALESCE(b.refunded,0)-o.net_cents difference_cents FROM v_order_net o LEFT JOIN a ON a.order_id=o.order_id LEFT JOIN b ON b.order_id=o.order_id WHERE o.order_date BETWEEN '2025-01-01' AND '2025-12-31') SELECT * FROM z ORDER BY net_cents",
+      "result": {
+        "columns": [
+          "order_id",
+          "net_cents",
+          "cash_net_cents",
+          "difference_cents"
+        ],
+        "rows": [
+          [
+            5,
+            0,
+            0,
+            0
+          ],
+          [
+            4,
+            300,
+            0,
+            -300
+          ],
+          [
+            3,
+            400,
+            500,
+            100
+          ],
+          [
+            2,
+            500,
+            450,
+            -50
+          ],
+          [
+            1,
+            800,
+            800,
+            0
+          ]
+        ]
+      }
+    },
+    {
+      "label": "差异订单清单",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "在完整核对后筛选非零差额。",
+          "emphasis": []
+        }
+      ],
+      "sql": "WITH v_order_net(order_id,order_date,net_cents) AS (VALUES (1,'2025-02-01',800),(2,'2025-03-01',500),(3,'2025-04-01',400),(4,'2025-05-01',300),(5,'2025-06-01',0),(6,'2024-12-31',100)),\npayments(order_id,payment_date,amount_cents,status) AS (VALUES (1,'2025-02-01',600,'settled'),(1,'2025-02-02',400,'settled'),(1,'2025-02-01',1000,'failed'),(2,'2025-03-01',450,'settled'),(3,'2025-04-01',500,'settled'),(4,'2026-01-01',300,'settled'),(6,'2024-12-31',100,'settled')),\norder_items(order_item_id,order_id) AS (VALUES (11,1),(12,1),(31,3)),\nreturns(order_item_id,return_date,refund_cents) AS (VALUES (11,'2025-02-03',100),(12,'2025-02-04',100),(31,'2026-01-01',100)),\na AS (SELECT order_id,SUM(amount_cents) paid FROM payments WHERE status='settled' AND payment_date<='2025-12-31' GROUP BY order_id),\nb AS (SELECT i.order_id,SUM(r.refund_cents) refunded FROM returns r JOIN order_items i ON i.order_item_id=r.order_item_id WHERE r.return_date<='2025-12-31' GROUP BY i.order_id),\nz AS (SELECT o.order_id,o.net_cents,COALESCE(a.paid,0)-COALESCE(b.refunded,0) cash_net_cents,COALESCE(a.paid,0)-COALESCE(b.refunded,0)-o.net_cents difference_cents FROM v_order_net o LEFT JOIN a ON a.order_id=o.order_id LEFT JOIN b ON b.order_id=o.order_id WHERE o.order_date BETWEEN '2025-01-01' AND '2025-12-31') SELECT * FROM z WHERE difference_cents<>0 ORDER BY net_cents",
+      "result": {
+        "columns": [
+          "order_id",
+          "net_cents",
+          "cash_net_cents",
+          "difference_cents"
+        ],
+        "rows": [
+          [
+            4,
+            300,
+            0,
+            -300
+          ],
+          [
+            3,
+            400,
+            500,
+            100
+          ],
+          [
+            2,
+            500,
+            450,
+            -50
+          ]
+        ]
+      }
+    },
+    {
+      "label": "重复连接风险",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "订单1两笔成功付款与两笔退款直接连接形成四行，金额均翻倍；不能用去重金额修复。",
+          "emphasis": []
+        }
+      ],
+      "sql": "WITH v_order_net(order_id,order_date,net_cents) AS (VALUES (1,'2025-02-01',800),(2,'2025-03-01',500),(3,'2025-04-01',400),(4,'2025-05-01',300),(5,'2025-06-01',0),(6,'2024-12-31',100)),\npayments(order_id,payment_date,amount_cents,status) AS (VALUES (1,'2025-02-01',600,'settled'),(1,'2025-02-02',400,'settled'),(1,'2025-02-01',1000,'failed'),(2,'2025-03-01',450,'settled'),(3,'2025-04-01',500,'settled'),(4,'2026-01-01',300,'settled'),(6,'2024-12-31',100,'settled')),\norder_items(order_item_id,order_id) AS (VALUES (11,1),(12,1),(31,3)),\nreturns(order_item_id,return_date,refund_cents) AS (VALUES (11,'2025-02-03',100),(12,'2025-02-04',100),(31,'2026-01-01',100)) SELECT p.order_id,COUNT(*) joined_rows,SUM(p.amount_cents) paid,SUM(r.refund_cents) refunded FROM payments p JOIN order_items i ON i.order_id=p.order_id JOIN returns r ON r.order_item_id=i.order_item_id WHERE p.order_id=1 AND p.status='settled' GROUP BY p.order_id",
+      "result": {
+        "columns": [
+          "order_id",
+          "joined_rows",
+          "paid",
+          "refunded"
+        ],
+        "rows": [
+          [
+            1,
+            4,
+            2000,
+            400
+          ]
+        ]
+      }
+    }
+  ],
+  "cautions": {
+    "comparison": [
+      {
+        "type": "paragraph",
+        "text": "净销售不等于现金流，也不等于会计确认收入；时点、手续费、预收及退款状态须按业务定义核实。",
+        "emphasis": []
+      }
+    ],
+    "example": [
+      {
+        "type": "paragraph",
+        "text": "直接连接付款与退款明细或纳入失败付款。",
+        "emphasis": []
+      }
+    ],
+    "reason": [],
+    "correction": [
+      {
+        "type": "paragraph",
+        "text": "分别预聚合，按订单连接，限定成功状态与截止日期。",
+        "emphasis": []
+      }
+    ],
+    "notes": [
+      {
+        "type": "paragraph",
+        "text": "原企业查询及结果不变，引用 BP39.json 的零行结果。独立示例使用 SQLite 内联数据；未重新执行企业库、原生数据库或浏览器。",
+        "emphasis": []
+      }
+    ]
+  },
+  "sourcePath": "source/unified73/kp20-13.json",
+  "sourceSha256": "ceb8a7f5da930db09eb20bcfecbf61aa0d78e57d915f07ea410b5100ba48633f"
+}

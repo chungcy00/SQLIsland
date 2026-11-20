@@ -1,0 +1,349 @@
+{
+  "id": "kp08-02",
+  "chapterId": "ch08",
+  "title": "LEFT JOIN 与 RIGHT JOIN",
+  "learningObjective": "能够根据业务要求确定保留侧、识别未匹配记录，并正确统计零订单客户。",
+  "prerequisites": [
+    "kp08-01",
+    "kp08-05"
+  ],
+  "concept": "外连接在返回匹配行对之外，还保留指定一侧没有匹配的行。LEFT JOIN 保留左表，RIGHT JOIN 保留右表；另一侧的输出字段用 NULL 补齐。保留侧有多条匹配时依然会生成多行，并非保证行数不变。若业务需要所有客户（含未购买者），客户必须是保留侧。判断是否匹配应使用匹配侧原本非空的主键，而不是可能缺失的备注或金额。统计匹配数量时，COUNT(订单主键) 忽略补出的空值；COUNT(*) 会把补齐行也统计在内。右连接交换表的位置即可改写为左连接，不能直接只替换关键字而不检查保留侧。",
+  "syntax": "FROM a LEFT JOIN b ON a.key=b.key;\nFROM b RIGHT JOIN a ON b.key=a.key;",
+  "parameters": {
+    "a": "需要完整保留的表",
+    "b": "用来匹配的表",
+    "ON": "连接条件"
+  },
+  "fixtureIds": [
+    "lesson-customers",
+    "lesson-orders"
+  ],
+  "sourceTables": [
+    {
+      "name": "customers",
+      "columns": [
+        {
+          "name": "customer_id",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "customer_name",
+          "type": "TEXT",
+          "mysqlType": "VARCHAR(160) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_bin",
+          "sqliteType": "TEXT"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          "林"
+        ],
+        [
+          2,
+          "陈"
+        ],
+        [
+          3,
+          "王"
+        ],
+        [
+          4,
+          "李"
+        ]
+      ]
+    },
+    {
+      "name": "orders",
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "category",
+          "type": "TEXT",
+          "mysqlType": "VARCHAR(160) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_bin",
+          "sqliteType": "TEXT"
+        },
+        {
+          "name": "sales",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "store_id",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "order_date",
+          "type": "TEXT",
+          "mysqlType": "DATE",
+          "sqliteType": "TEXT"
+        },
+        {
+          "name": "customer_id",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          "护肤品",
+          800,
+          1,
+          "2026-01-03",
+          1
+        ],
+        [
+          2,
+          "化妆品",
+          400,
+          2,
+          "2026-01-10",
+          2
+        ],
+        [
+          3,
+          "护肤品",
+          600,
+          1,
+          "2026-02-02",
+          1
+        ],
+        [
+          4,
+          "化妆品",
+          300,
+          2,
+          "2026-02-15",
+          null
+        ],
+        [
+          5,
+          "日用品",
+          1500,
+          1,
+          "2026-02-20",
+          3
+        ]
+      ]
+    }
+  ],
+  "mysqlSql": "SELECT c.customer_id, o.id AS order_id, o.sales FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id ORDER BY o.sales DESC;",
+  "sqliteSql": "SELECT c.customer_id, o.id AS order_id, o.sales FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id ORDER BY o.sales DESC;",
+  "executionSteps": [
+    "以客户主档为保留侧",
+    "匹配订单并补齐未匹配行",
+    "查看订单编号"
+  ],
+  "useCase": "客户运营需要完整的客户订单关系，包含从未购买的客户，以便后续分析客户覆盖率。客户表有4位客户，订单表有匿名订单及重复购买记录；订单编号用于确认是否存在真实匹配。",
+  "comparison": "右连接与交换左右表后的左连接等价；交叉连接则主动生成全部组合，不承担保留未匹配记录的职责。",
+  "commonError": {
+    "example": "COUNT(*) 将无订单客户计为1，或 WHERE o.id IS NOT NULL 删除未匹配客户。",
+    "correction": "使用 COUNT(o.id)；要保留无订单客户就不要在 WHERE 排除补齐行。"
+  },
+  "notes": "RIGHT JOIN 的本地执行需要 SQLite 3.39 或以上；较旧环境优先使用交换表后的 LEFT JOIN。",
+  "compatibility": {
+    "status": "直接兼容",
+    "detail": "仅在本示例数据与语义范围验证；不代表全部 MySQL 语法兼容。"
+  },
+  "relatedQuestionIds": [
+    "q0094",
+    "q0099",
+    "q0101",
+    "q0102",
+    "q0107",
+    "q0109"
+  ],
+  "relatedFlashcardIds": [
+    "fc0054",
+    "fc0057"
+  ],
+  "relatedKnowledgePointIds": [
+    "kp01-01",
+    "kp03-01",
+    "kp07-01"
+  ],
+  "mysqlVerification": "未运行原生 MySQL 8.4",
+  "result": {
+    "columns": [
+      "customer_id",
+      "order_id",
+      "sales"
+    ],
+    "rows": [
+      [
+        3,
+        5,
+        1500
+      ],
+      [
+        1,
+        1,
+        800
+      ],
+      [
+        1,
+        3,
+        600
+      ],
+      [
+        2,
+        2,
+        400
+      ],
+      [
+        4,
+        null,
+        null
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "visualization": {
+    "kind": "stepFlow",
+    "steps": [
+      {
+        "id": "1",
+        "label": "客户1匹配两笔"
+      },
+      {
+        "id": "2",
+        "label": "客户2和3各一笔"
+      },
+      {
+        "id": "3",
+        "label": "客户4没有匹配，补NULL"
+      }
+    ],
+    "sourceFixtureIds": [
+      "lesson-customers",
+      "lesson-orders"
+    ],
+    "resultColumns": [
+      "customer_id",
+      "order_id"
+    ]
+  },
+  "mysqlVerificationScript": "validation/mysql/kp08-02.sql",
+  "primaryQuestionIds": [
+    "q0094",
+    "q0099",
+    "q0101",
+    "q0102",
+    "q0107",
+    "q0109"
+  ],
+  "primaryFlashcardIds": [
+    "fc0054",
+    "fc0057"
+  ],
+  "mergedFrom": [
+    {
+      "id": "kp08-06",
+      "title": "RIGHT JOIN 与 CROSS JOIN 实操"
+    }
+  ],
+  "teaching": {
+    "problem": "客户运营需要完整的客户订单关系，包含从未购买的客户，以便后续分析客户覆盖率。客户表有4位客户，订单表有匿名订单及重复购买记录；订单编号用于确认是否存在真实匹配。",
+    "codeExplanation": "将 customers 放在 LEFT JOIN 左边，按客户编号与订单配对。客户1有两条匹配，客户2、3各一条；客户4没有匹配仍产生一条补齐行。匿名订单不属于保留侧，因而不返回。AS 将订单 id 命名为 order_id 以明确含义。若从订单出发写 RIGHT JOIN customers，保留的客户集合相同。",
+    "resultExplanation": "四位客户产生5行关系记录。客户4的 NULL 不代表真实订单，后续计算其订单数量应为0。若只要未下单客户，在连接后筛选 o.id IS NULL 即可；不要先使用内连接。",
+    "checkpoints": [],
+    "mergedConcepts": [
+      {
+        "sourceId": "kp08-06",
+        "explanation": "保留右侧、交换表改写左连接、按非空订单键统计以及外连接后错误过滤均已融入概念与示例。交叉连接部分归入 kp08-04。"
+      }
+    ],
+    "mergeExamples": [
+      {
+        "label": "来源课右连接计数",
+        "explanation": "右侧客户全部保留，通过订单非空编号统计真实订单数。",
+        "sql": "SELECT c.customer_id,COUNT(o.id) AS matched_orders FROM orders o RIGHT JOIN customers c ON o.customer_id=c.customer_id GROUP BY c.customer_id ORDER BY matched_orders;",
+        "result": {
+          "columns": [
+            "customer_id",
+            "matched_orders"
+          ],
+          "rows": [
+            [
+              4,
+              0
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              1,
+              2
+            ]
+          ]
+        }
+      },
+      {
+        "label": "交换为左连接并核对计数",
+        "explanation": "同一保留侧得到相同匹配数；客户4的补齐行导致 COUNT(*) 为1。",
+        "sql": "SELECT c.customer_id, COUNT(o.id) AS matched_orders, COUNT(*) AS joined_rows FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id GROUP BY c.customer_id ORDER BY matched_orders;",
+        "result": {
+          "columns": [
+            "customer_id",
+            "matched_orders",
+            "joined_rows"
+          ],
+          "rows": [
+            [
+              4,
+              0,
+              1
+            ],
+            [
+              2,
+              1,
+              1
+            ],
+            [
+              3,
+              1,
+              1
+            ],
+            [
+              1,
+              2,
+              2
+            ]
+          ]
+        }
+      },
+      {
+        "label": "只找未购买客户",
+        "explanation": "检查匹配侧非空主键的补齐值，而不是客户的可空属性。",
+        "sql": "SELECT c.customer_id FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id WHERE o.id IS NULL ORDER BY customer_name DESC;",
+        "result": {
+          "columns": [
+            "customer_id"
+          ],
+          "rows": [
+            [
+              4
+            ]
+          ]
+        }
+      }
+    ]
+  }
+}

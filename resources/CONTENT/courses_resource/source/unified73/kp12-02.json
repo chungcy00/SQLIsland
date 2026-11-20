@@ -1,0 +1,236 @@
+{
+  "id": "kp12-02",
+  "chapterId": "ch12",
+  "title": "日期格式、年份和月份",
+  "learningObjective": "生成跨年不混淆的月份键，并区分文本日期标签与数值日期部分。",
+  "prerequisites": [
+    "kp12-01"
+  ],
+  "concept": "日期格式化产生用于展示或分组的文本键，年份与月份提取产生数值字段。相同月份编号可能来自不同年份，故跨年报表应使用年份与月份组合；派生日期字段本身不改变记录粒度，分组才改变粒度。",
+  "syntax": "DATE_FORMAT(day,'%Y-%m'); YEAR(day); MONTH(day)",
+  "parameters": {
+    "day": "有效日期",
+    "%Y-%m": "四位年份、两位月份"
+  },
+  "fixtureIds": [
+    "lesson-orders"
+  ],
+  "sourceTables": [
+    {
+      "name": "orders",
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "category",
+          "type": "TEXT",
+          "mysqlType": "VARCHAR(160) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_bin",
+          "sqliteType": "TEXT"
+        },
+        {
+          "name": "sales",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "store_id",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "order_date",
+          "type": "TEXT",
+          "mysqlType": "DATE",
+          "sqliteType": "TEXT"
+        },
+        {
+          "name": "customer_id",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          "护肤品",
+          800,
+          1,
+          "2026-01-03",
+          1
+        ],
+        [
+          2,
+          "化妆品",
+          400,
+          2,
+          "2026-01-10",
+          2
+        ],
+        [
+          3,
+          "护肤品",
+          600,
+          1,
+          "2026-02-02",
+          1
+        ],
+        [
+          4,
+          "化妆品",
+          300,
+          2,
+          "2026-02-15",
+          null
+        ],
+        [
+          5,
+          "日用品",
+          1500,
+          1,
+          "2026-02-20",
+          3
+        ]
+      ]
+    }
+  ],
+  "mysqlSql": "SELECT id, DATE_FORMAT(order_date,'%Y-%m') AS month, YEAR(order_date) AS year_no, MONTH(order_date) AS month_no FROM orders ORDER BY sales DESC;",
+  "sqliteSql": "SELECT id, strftime('%Y-%m',order_date) AS month, CAST(strftime('%Y',order_date) AS INTEGER) AS year_no, CAST(strftime('%m',order_date) AS INTEGER) AS month_no FROM orders ORDER BY sales DESC;",
+  "executionSteps": [
+    "读取订单日期",
+    "派生年月键和日期部分",
+    "按需要汇总月份"
+  ],
+  "useCase": "分析员需生成月度销售报表；每笔订单归属其订单日期所在月份，不按付款日期或设备当前日期统计。",
+  "comparison": "格式化用于生成标签，日期区间用于筛选。",
+  "commonError": {
+    "example": "只按 MONTH(order_date) 分组跨年交易。",
+    "correction": "同时使用年份和月份或完整年月键。"
+  },
+  "notes": "原生与本地格式符并非完全等价；本例仅验证指定格式。",
+  "compatibility": {
+    "status": "转换执行",
+    "detail": "需要明确转换或原生环境验证。"
+  },
+  "relatedQuestionIds": [
+    "q0162",
+    "q0171"
+  ],
+  "relatedFlashcardIds": [
+    "fc0088",
+    "fc0091"
+  ],
+  "relatedKnowledgePointIds": [
+    "kp03-01",
+    "kp06-01"
+  ],
+  "mysqlVerification": "未运行原生 MySQL 8.4",
+  "result": {
+    "columns": [
+      "id",
+      "month",
+      "year_no",
+      "month_no"
+    ],
+    "rows": [
+      [
+        5,
+        "2026-02",
+        2026,
+        2
+      ],
+      [
+        1,
+        "2026-01",
+        2026,
+        1
+      ],
+      [
+        3,
+        "2026-02",
+        2026,
+        2
+      ],
+      [
+        2,
+        "2026-01",
+        2026,
+        1
+      ],
+      [
+        4,
+        "2026-02",
+        2026,
+        2
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "mysqlVerificationScript": "validation/mysql/kp12-02.sql",
+  "primaryQuestionIds": [
+    "q0162",
+    "q0171"
+  ],
+  "primaryFlashcardIds": [
+    "fc0088",
+    "fc0091"
+  ],
+  "teaching": {
+    "problem": "分析员需生成月度销售报表；每笔订单归属其订单日期所在月份，不按付款日期或设备当前日期统计。",
+    "codeExplanation": "原生 DATE_FORMAT 生成 YYYY-MM，YEAR 与 MONTH 取数值部分。本地 strftime 可生成对应文本，CAST 转为整数。先核对派生键，再用 GROUP BY 汇总金额；跨年不能只按月份编号。",
+    "resultExplanation": "五笔订单仍返回五行；一月两笔合计1200，二月三笔合计2400。",
+    "checkpoints": [],
+    "mergedConcepts": [],
+    "mergeExamples": [
+      {
+        "label": "按月汇总",
+        "explanation": "以完整年月键分组。",
+        "sql": "SELECT strftime('%Y-%m',order_date) AS month,SUM(sales) AS total FROM orders GROUP BY strftime('%Y-%m',order_date) ORDER BY month;",
+        "result": {
+          "columns": [
+            "month",
+            "total"
+          ],
+          "rows": [
+            [
+              "2026-01",
+              1200
+            ],
+            [
+              "2026-02",
+              2400
+            ]
+          ]
+        }
+      },
+      {
+        "label": "跨年月份对照",
+        "explanation": "两个一月具有相同月份数字，不是同一统计期间。",
+        "sql": "WITH d(t) AS (SELECT '2025-01-01' UNION ALL SELECT '2026-01-01') SELECT strftime('%Y-%m',t) AS month,CAST(strftime('%m',t) AS INTEGER) AS month_no FROM d ORDER BY month;",
+        "result": {
+          "columns": [
+            "month",
+            "month_no"
+          ],
+          "rows": [
+            [
+              "2025-01",
+              1
+            ],
+            [
+              "2026-01",
+              1
+            ]
+          ]
+        }
+      }
+    ]
+  }
+}

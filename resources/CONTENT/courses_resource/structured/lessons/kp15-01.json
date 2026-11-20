@@ -1,0 +1,218 @@
+{
+  "schemaVersion": 1,
+  "id": "kp15-01",
+  "sourceBatch": "unified73",
+  "teachingKind": "advanced",
+  "conceptBlocks": [
+    {
+      "type": "paragraph",
+      "text": "分区是窗口计算的边界，不是输出分组。普通聚合把多行压缩成汇总行；窗口聚合在筛选后的输入行上附加计算值。没有分区时整个输入构成一个分区；",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "本例没有窗口排序，因此每笔订单看见所在类别的全部订单。",
+      "emphasis": []
+    }
+  ],
+  "syntax": {
+    "purpose": "v 指标字段；key 决定分区的维度。"
+  },
+  "dataDescriptions": {
+    "orders": "共 5 行；字段：id、category、sales、store_id、order_date、customer_id。"
+  },
+  "problem": "销售分析需同时查看每笔订单及所在类别的总销售额，统计范围为全部五笔订单。",
+  "methodBlocks": [
+    {
+      "type": "paragraph",
+      "text": "订单编号是明细粒度。SUM 计算类别金额，OVER 指定窗口语义，PARTITION BY category 让不同类别互不影响。先比较普通分组的输出，再计算明细贡献率；",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "分母为类别总额而非全表金额，使用 NULLIF 防止零分母。",
+      "emphasis": []
+    }
+  ],
+  "breakdown": [
+    {
+      "kind": "fragment",
+      "title": "指定来源",
+      "sql": "FROM orders",
+      "purpose": "从 orders 读取输入数据。",
+      "reason": "后面的子句都基于这里得到的行。"
+    },
+    {
+      "kind": "fragment",
+      "title": "选择输出",
+      "sql": "SELECT id,category,sales,SUM(sales) OVER(PARTITION BY category) AS category_total",
+      "purpose": "输出查询需要的列与计算表达式。",
+      "reason": "输出列的顺序与别名决定结果表的形状。"
+    },
+    {
+      "kind": "fragment",
+      "title": "排序",
+      "sql": "ORDER BY sales DESC;",
+      "purpose": "按 sales DESC 排列结果。",
+      "reason": "查询结果的默认行序没有保证，需要显式排序。"
+    }
+  ],
+  "completeCode": {
+    "mysqlSql": "SELECT id,category,sales,SUM(sales) OVER(PARTITION BY category) AS category_total FROM orders ORDER BY sales DESC;",
+    "sqliteSql": "SELECT id,category,sales,SUM(sales) OVER(PARTITION BY category) AS category_total FROM orders ORDER BY sales DESC;"
+  },
+  "expectedResult": {
+    "columns": [
+      "id",
+      "category",
+      "sales",
+      "category_total"
+    ],
+    "rows": [
+      [
+        5,
+        "日用品",
+        1500,
+        1500
+      ],
+      [
+        1,
+        "护肤品",
+        800,
+        1400
+      ],
+      [
+        3,
+        "护肤品",
+        600,
+        1400
+      ],
+      [
+        2,
+        "化妆品",
+        400,
+        700
+      ],
+      [
+        4,
+        "化妆品",
+        300,
+        700
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "resultBlocks": [
+    {
+      "type": "paragraph",
+      "text": "仍为五行。护肤品两笔分别为800和600，均对应1400；化妆品对应700；日用品对应1500。重复出现的类别总额不能再直接求和。",
+      "emphasis": []
+    }
+  ],
+  "extensions": [
+    {
+      "label": "普通聚合对照",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "五行缩为三类。",
+          "emphasis": []
+        }
+      ],
+      "sql": "SELECT category,SUM(sales) AS total FROM orders GROUP BY category ORDER BY total DESC;",
+      "result": {
+        "columns": [
+          "category",
+          "total"
+        ],
+        "rows": [
+          [
+            "日用品",
+            1500
+          ],
+          [
+            "护肤品",
+            1400
+          ],
+          [
+            "化妆品",
+            700
+          ]
+        ]
+      }
+    },
+    {
+      "label": "类别内贡献率",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "每笔金额除以其类别合计，结果为百分数。",
+          "emphasis": []
+        }
+      ],
+      "sql": "SELECT id,ROUND(100.0*sales/NULLIF(SUM(sales) OVER(PARTITION BY category),0),2) AS share_pct FROM orders ORDER BY sales DESC;",
+      "result": {
+        "columns": [
+          "id",
+          "share_pct"
+        ],
+        "rows": [
+          [
+            5,
+            100.0
+          ],
+          [
+            1,
+            57.14
+          ],
+          [
+            3,
+            42.86
+          ],
+          [
+            2,
+            57.14
+          ],
+          [
+            4,
+            42.86
+          ]
+        ]
+      }
+    }
+  ],
+  "cautions": {
+    "comparison": [
+      {
+        "type": "paragraph",
+        "text": "GROUP BY 改变行粒度；窗口聚合本身不合并行。",
+        "emphasis": []
+      }
+    ],
+    "example": [
+      {
+        "type": "paragraph",
+        "text": "把每行的 category_total 再求和作为总销售额。",
+        "emphasis": []
+      }
+    ],
+    "reason": [],
+    "correction": [
+      {
+        "type": "paragraph",
+        "text": "直接汇总原 sales，或者先恢复一类一行。",
+        "emphasis": []
+      }
+    ],
+    "notes": [
+      {
+        "type": "paragraph",
+        "text": "同层 WHERE 不能引用窗口结果；先在内层计算再筛选。",
+        "emphasis": []
+      }
+    ]
+  },
+  "sourcePath": "source/unified73/kp15-01.json",
+  "sourceSha256": "5a9d8817f0766da5cae8a49cba20b302e9b935ec0288f54b00fcd6efe713d7f0"
+}

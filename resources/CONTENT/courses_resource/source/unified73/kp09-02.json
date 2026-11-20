@@ -1,0 +1,301 @@
+{
+  "id": "kp09-02",
+  "chapterId": "ch09",
+  "title": "IF 与条件聚合",
+  "learningObjective": "能够使用二选一表达式和条件聚合在同一张报表计算多个指标，并解释零值与未知条件。",
+  "prerequisites": [
+    "kp09-01",
+    "kp09-03"
+  ],
+  "concept": "条件聚合将业务条件转换为每行的数值，再使用聚合函数统计指定子集。SUM(CASE WHEN 条件 THEN 1 ELSE 0 END) 对命中条件的行累加1；COUNT(CASE WHEN 条件 THEN 1 END) 则利用 COUNT 忽略 NULL 特性。不能用 COUNT(CASE WHEN 条件 THEN 1 ELSE 0 END)，因为0也是非空值。MySQL IF(条件,真值,假值) 适用于二选一，未知条件也进入假值分支，不应随意将其称为零。CASE 更便于表达多分类及跨库兼容。若使用非互斥条件，多个指标可能同时计入同一行，合计不一定等于记录总数；空输入时 SUM 返回 NULL，而 COUNT 返回0。",
+  "syntax": "SUM(CASE WHEN p THEN 1 ELSE 0 END);\nCOUNT(CASE WHEN p THEN 1 END);\nIF(p,a,b) -- MySQL",
+  "parameters": {
+    "p": "需要统计的业务条件",
+    "a、b": "条件真或非真时的返回值",
+    "SUM": "累计各行的命中标记"
+  },
+  "fixtureIds": [
+    "lesson-products"
+  ],
+  "sourceTables": [
+    {
+      "name": "products",
+      "columns": [
+        {
+          "name": "product_id",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "product_name",
+          "type": "TEXT",
+          "mysqlType": "VARCHAR(160) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_bin",
+          "sqliteType": "TEXT"
+        },
+        {
+          "name": "category",
+          "type": "TEXT",
+          "mysqlType": "VARCHAR(160) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_bin",
+          "sqliteType": "TEXT"
+        },
+        {
+          "name": "price",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "stock",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          "Mask",
+          "护肤品",
+          15,
+          150
+        ],
+        [
+          2,
+          "Serum",
+          "护肤品",
+          89,
+          40
+        ],
+        [
+          3,
+          "Cleanser",
+          "护肤品",
+          35,
+          200
+        ],
+        [
+          4,
+          "Cream",
+          "化妆品",
+          65,
+          180
+        ],
+        [
+          5,
+          "Sunscreen",
+          "化妆品",
+          45,
+          80
+        ],
+        [
+          6,
+          "Soap_1",
+          "日用品",
+          15,
+          0
+        ]
+      ]
+    }
+  ],
+  "mysqlSql": "SELECT SUM(CASE WHEN stock<50 THEN 1 ELSE 0 END) AS low_count, SUM(CASE WHEN stock>=50 THEN 1 ELSE 0 END) AS normal_count FROM products;",
+  "sqliteSql": "SELECT SUM(CASE WHEN stock<50 THEN 1 ELSE 0 END) AS low_count, SUM(CASE WHEN stock>=50 THEN 1 ELSE 0 END) AS normal_count FROM products;",
+  "executionSteps": [
+    "按条件生成0或1",
+    "分别进行求和",
+    "核对各类别计数"
+  ],
+  "useCase": "主管希望一行报表同时显示库存小于50和大于等于50的商品数量。本例第一类包含缺货商品，库存0也需要关注；假定库存已知非负。若要严格沿用上一课缺货与低库存分开标签，条件必须重写为互斥的三类。",
+  "comparison": "COUNT 忽略 NULL，但不忽略0；CASE 支持多分支，MySQL IF 只做二选一。",
+  "commonError": {
+    "example": "COUNT(CASE WHEN stock<50 THEN 1 ELSE 0 END)；IF(value>0,'正值','零值') 把未知或负值归入零。",
+    "correction": "使用 SUM(CASE WHEN ... THEN 1 ELSE 0 END) 或省略 COUNT 内的 ELSE；未知值用 IS NULL 明确分类。"
+  },
+  "notes": "本地使用 CASE 验证 IF 的等价逻辑，未执行原生 MySQL IF。",
+  "compatibility": {
+    "status": "直接兼容",
+    "detail": "仅在本示例数据与语义范围验证；不代表全部 MySQL 语法兼容。"
+  },
+  "relatedQuestionIds": [
+    "q0122",
+    "q0126",
+    "q0127",
+    "q0130"
+  ],
+  "relatedFlashcardIds": [
+    "fc0064",
+    "fc0065",
+    "fc0066"
+  ],
+  "relatedKnowledgePointIds": [
+    "kp03-01",
+    "kp05-01",
+    "kp06-01"
+  ],
+  "mysqlVerification": "未运行原生 MySQL 8.4",
+  "result": {
+    "columns": [
+      "low_count",
+      "normal_count"
+    ],
+    "rows": [
+      [
+        2,
+        4
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "mysqlVerificationScript": "validation/mysql/kp09-02.sql",
+  "primaryQuestionIds": [
+    "q0122",
+    "q0126",
+    "q0127",
+    "q0130"
+  ],
+  "primaryFlashcardIds": [
+    "fc0064",
+    "fc0065",
+    "fc0066"
+  ],
+  "mergedFrom": [
+    {
+      "id": "kp09-04",
+      "title": "IF 二选一"
+    }
+  ],
+  "teaching": {
+    "problem": "主管希望一行报表同时显示库存小于50和大于等于50的商品数量。本例第一类包含缺货商品，库存0也需要关注；假定库存已知非负。若要严格沿用上一课缺货与低库存分开标签，条件必须重写为互斥的三类。",
+    "codeExplanation": "先对每件商品判断 stock<50 与 stock>=50；条件分别转换为1或0，再由 SUM 汇总。低库存关注组为编号2和6，正常组为其余4件。若只想显示二选一标签，可用 MySQL IF；兼容写法为 CASE WHEN ... THEN ... ELSE ... END。未知值在普通比较中不为真，必须明确是否单列统计。",
+    "resultExplanation": "两项计数为2和4，本例恰好覆盖全部6件商品。注意 low_count 包含库存0，不能直接解释为上一课定义的1至49的低库存数。在正式报表中应明确未知库存是否另计，避免漏报。",
+    "checkpoints": [],
+    "mergedConcepts": [
+      {
+        "sourceId": "kp09-04",
+        "explanation": "IF 二选一、未知条件进入第三参数、与 CASE 的区别、原缺失数据示例及错误分类修正均融入正文。"
+      }
+    ],
+    "mergeExamples": [
+      {
+        "label": "观察逐行命中标记",
+        "explanation": "先形成标记再聚合，直观理解每个计数来源。",
+        "sql": "SELECT product_id,CASE WHEN stock<50 THEN 1 ELSE 0 END AS low_flag,CASE WHEN stock>=50 THEN 1 ELSE 0 END AS normal_flag FROM products ORDER BY product_name DESC;",
+        "result": {
+          "columns": [
+            "product_id",
+            "low_flag",
+            "normal_flag"
+          ],
+          "rows": [
+            [
+              5,
+              0,
+              1
+            ],
+            [
+              6,
+              1,
+              0
+            ],
+            [
+              2,
+              1,
+              0
+            ],
+            [
+              1,
+              0,
+              1
+            ],
+            [
+              4,
+              0,
+              1
+            ],
+            [
+              3,
+              0,
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "label": "两种计数对照",
+        "explanation": "错误写法的0仍被计数。",
+        "sql": "SELECT COUNT(CASE WHEN stock<50 THEN 1 END) AS correct_count, COUNT(CASE WHEN stock<50 THEN 1 ELSE 0 END) AS wrong_count FROM products;",
+        "result": {
+          "columns": [
+            "correct_count",
+            "wrong_count"
+          ],
+          "rows": [
+            [
+              2,
+              6
+            ]
+          ]
+        }
+      },
+      {
+        "label": "来源课二选一兼容示例",
+        "explanation": "保留原来源课四行数据和结果，以内联数据实现独立运行；原生写法 IF(value>0,'正值','非正值或缺失') 尚未执行。",
+        "sql": "WITH nullable_values AS (SELECT 1 AS id,NULL AS value UNION ALL SELECT 2,0 UNION ALL SELECT 3,10 UNION ALL SELECT 4,10) SELECT id,CASE WHEN value>0 THEN '正值' ELSE '非正值或缺失' END AS label FROM nullable_values ORDER BY label;",
+        "result": {
+          "columns": [
+            "id",
+            "label"
+          ],
+          "rows": [
+            [
+              3,
+              "正值"
+            ],
+            [
+              4,
+              "正值"
+            ],
+            [
+              1,
+              "非正值或缺失"
+            ],
+            [
+              2,
+              "非正值或缺失"
+            ]
+          ]
+        }
+      },
+      {
+        "label": "明确区分未知与零",
+        "explanation": "在二选一不足以表达业务类别时，改用多分支。",
+        "sql": "WITH samples AS (SELECT 1 AS id,NULL AS value UNION ALL SELECT 2,0 UNION ALL SELECT 3,10 UNION ALL SELECT 4,-1) SELECT id,CASE WHEN value IS NULL THEN '未知' WHEN value=0 THEN '零值' WHEN value>0 THEN '正值' ELSE '负值' END AS label FROM samples ORDER BY label DESC;",
+        "result": {
+          "columns": [
+            "id",
+            "label"
+          ],
+          "rows": [
+            [
+              2,
+              "零值"
+            ],
+            [
+              4,
+              "负值"
+            ],
+            [
+              3,
+              "正值"
+            ],
+            [
+              1,
+              "未知"
+            ]
+          ]
+        }
+      }
+    ]
+  }
+}

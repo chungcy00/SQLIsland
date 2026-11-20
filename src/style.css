@@ -2769,3 +2769,8 @@ nav .nav-svg { color: var(--primary); }
 
 /* 小节标题右侧的按钮：文字右缘与内容右缘对齐（保留 44 高的点击区，向右外延 8px 抵消内边距） */
 .section-heading > button, .section-heading > .small-button { margin-right: -8px; }
+
+.fig-clause.having { --clause: #2a7478; }
+.fig-clause.limit { --clause: #7f6a1f; }
+.fig-clause.cte { --clause: #38607f; }
+.fig-clause.setop { --clause: #9c5f1e; }

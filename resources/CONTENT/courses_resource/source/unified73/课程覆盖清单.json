@@ -1,0 +1,482 @@
+[
+  {
+    "id": "kp01-01",
+    "title": "数据库、表、行与列",
+    "batch": "第一批7节",
+    "included": false
+  },
+  {
+    "id": "kp01-02",
+    "title": "数据类型与数据字典",
+    "batch": "第一批7节",
+    "included": false
+  },
+  {
+    "id": "kp01-03",
+    "title": "主键、外键和一对多",
+    "batch": "第一批7节",
+    "included": false
+  },
+  {
+    "id": "kp02-01",
+    "title": "基础查询、表达式与别名",
+    "batch": "第一批7节",
+    "included": false
+  },
+  {
+    "id": "kp02-02",
+    "title": "DISTINCT 去重",
+    "batch": "第一批7节",
+    "included": false
+  },
+  {
+    "id": "kp03-01",
+    "title": "WHERE 与比较运算",
+    "batch": "第二批6节",
+    "included": true
+  },
+  {
+    "id": "kp03-02",
+    "title": "AND、OR、NOT 与优先级",
+    "batch": "第二批6节",
+    "included": true
+  },
+  {
+    "id": "kp03-03",
+    "title": "IN 与 BETWEEN",
+    "batch": "第二批6节",
+    "included": true
+  },
+  {
+    "id": "kp03-04",
+    "title": "LIKE、通配符与转义",
+    "batch": "第二批6节",
+    "included": true
+  },
+  {
+    "id": "kp04-01",
+    "title": "ORDER BY 多列排序",
+    "batch": "第二批6节",
+    "included": true
+  },
+  {
+    "id": "kp04-02",
+    "title": "LIMIT 与 OFFSET",
+    "batch": "第二批6节",
+    "included": true
+  },
+  {
+    "id": "kp05-01",
+    "title": "空值判断与三值逻辑",
+    "batch": "第一批7节",
+    "included": false
+  },
+  {
+    "id": "kp05-02",
+    "title": "空值替换与候选值选择",
+    "batch": "第一批7节",
+    "included": false
+  },
+  {
+    "id": "kp06-01",
+    "title": "COUNT 的三个形式",
+    "batch": "第三批6节",
+    "included": true
+  },
+  {
+    "id": "kp06-02",
+    "title": "SUM 与 AVG",
+    "batch": "第三批6节",
+    "included": true
+  },
+  {
+    "id": "kp06-03",
+    "title": "MIN 与 MAX",
+    "batch": "第三批6节",
+    "included": true
+  },
+  {
+    "id": "kp07-01",
+    "title": "GROUP BY 分组",
+    "batch": "第三批6节",
+    "included": true
+  },
+  {
+    "id": "kp07-02",
+    "title": "HAVING 与 WHERE",
+    "batch": "第三批6节",
+    "included": true
+  },
+  {
+    "id": "kp07-03",
+    "title": "多字段分组与严格分组",
+    "batch": "第三批6节",
+    "included": true
+  },
+  {
+    "id": "kp08-01",
+    "title": "INNER JOIN 与 ON",
+    "batch": "第四批8节",
+    "included": true
+  },
+  {
+    "id": "kp08-02",
+    "title": "LEFT JOIN 与 RIGHT JOIN",
+    "batch": "第四批8节",
+    "included": true
+  },
+  {
+    "id": "kp08-03",
+    "title": "外连接的 ON 与 WHERE",
+    "batch": "第四批8节",
+    "included": true
+  },
+  {
+    "id": "kp08-04",
+    "title": "CROSS JOIN 与自连接",
+    "batch": "第四批8节",
+    "included": true
+  },
+  {
+    "id": "kp08-05",
+    "title": "连接膨胀与预聚合",
+    "batch": "第四批8节",
+    "included": true
+  },
+  {
+    "id": "kp09-01",
+    "title": "CASE WHEN 分类",
+    "batch": "第四批8节",
+    "included": true
+  },
+  {
+    "id": "kp09-02",
+    "title": "IF 与条件聚合",
+    "batch": "第四批8节",
+    "included": true
+  },
+  {
+    "id": "kp09-03",
+    "title": "NULLIF 与安全除法",
+    "batch": "第四批8节",
+    "included": true
+  },
+  {
+    "id": "kp10-01",
+    "title": "标量子查询",
+    "batch": "第五批7节",
+    "included": true
+  },
+  {
+    "id": "kp10-02",
+    "title": "IN 与多行子查询",
+    "batch": "第五批7节",
+    "included": true
+  },
+  {
+    "id": "kp10-03",
+    "title": "相关子查询与 EXISTS",
+    "batch": "第五批7节",
+    "included": true
+  },
+  {
+    "id": "kp10-04",
+    "title": "NOT EXISTS 与 NOT IN",
+    "batch": "第五批7节",
+    "included": true
+  },
+  {
+    "id": "kp11-01",
+    "title": "CONCAT 字符串拼接",
+    "batch": "第五批7节",
+    "included": true
+  },
+  {
+    "id": "kp11-02",
+    "title": "文本截取、字符数与字节数",
+    "batch": "第五批7节",
+    "included": true
+  },
+  {
+    "id": "kp11-03",
+    "title": "文本清洗与格式统一",
+    "batch": "第五批7节",
+    "included": true
+  },
+  {
+    "id": "kp12-01",
+    "title": "数值计算、除法与精度处理",
+    "batch": "第六批7节",
+    "included": true
+  },
+  {
+    "id": "kp12-02",
+    "title": "日期格式、年份和月份",
+    "batch": "第六批7节",
+    "included": true
+  },
+  {
+    "id": "kp12-03",
+    "title": "日期差与时间单位差",
+    "batch": "第六批7节",
+    "included": true
+  },
+  {
+    "id": "kp12-04",
+    "title": "日期区间与月边界",
+    "batch": "第六批7节",
+    "included": true
+  },
+  {
+    "id": "kp13-01",
+    "title": "结果集合合并",
+    "batch": "第六批7节",
+    "included": true
+  },
+  {
+    "id": "kp13-02",
+    "title": "交集与差集",
+    "batch": "第六批7节",
+    "included": true
+  },
+  {
+    "id": "kp14-01",
+    "title": "公用表表达式与多步骤查询",
+    "batch": "第六批7节",
+    "included": true
+  },
+  {
+    "id": "kp15-01",
+    "title": "窗口聚合与分区",
+    "batch": "第七批8节",
+    "included": true
+  },
+  {
+    "id": "kp15-02",
+    "title": "序号、排名与连续排名",
+    "batch": "第七批8节",
+    "included": true
+  },
+  {
+    "id": "kp15-03",
+    "title": "前后行取值",
+    "batch": "第七批8节",
+    "included": true
+  },
+  {
+    "id": "kp15-04",
+    "title": "窗口边界与累计计算",
+    "batch": "第七批8节",
+    "included": true
+  },
+  {
+    "id": "kp15-05",
+    "title": "移动平均与环比",
+    "batch": "第七批8节",
+    "included": true
+  },
+  {
+    "id": "kp16-01",
+    "title": "识别重复与去重规则",
+    "batch": "第七批8节",
+    "included": true
+  },
+  {
+    "id": "kp16-02",
+    "title": "缺失与异常检测",
+    "batch": "第七批8节",
+    "included": true
+  },
+  {
+    "id": "kp16-03",
+    "title": "类型转换与类别标准化",
+    "batch": "第七批8节",
+    "included": true
+  },
+  {
+    "id": "kp17-01",
+    "title": "数据表操作与完整性约束",
+    "batch": "第八批3节",
+    "included": true
+  },
+  {
+    "id": "kp17-02",
+    "title": "数据修改与事务基础",
+    "batch": "第八批3节",
+    "included": true
+  },
+  {
+    "id": "kp18-01",
+    "title": "索引与查询优化基础",
+    "batch": "第八批3节",
+    "included": true
+  },
+  {
+    "id": "kp19-01",
+    "title": "门店净销售、利润与目标达成",
+    "batch": "第九批甲组3节",
+    "included": true
+  },
+  {
+    "id": "kp19-32",
+    "title": "销售趋势、同比与环比",
+    "batch": "第九批甲组3节",
+    "included": true
+  },
+  {
+    "id": "kp19-33",
+    "title": "高销售低毛利商品诊断",
+    "batch": "第九批甲组3节",
+    "included": true
+  },
+  {
+    "id": "kp19-02",
+    "title": "库存周转率、周转天数与库存金额",
+    "batch": "第九批乙组3节",
+    "included": true
+  },
+  {
+    "id": "kp19-36",
+    "title": "库存积压、滞销与缺货预警",
+    "batch": "第九批乙组3节",
+    "included": true
+  },
+  {
+    "id": "kp19-03",
+    "title": "客户复购率与统计粒度",
+    "batch": "第九批乙组3节",
+    "included": true
+  },
+  {
+    "id": "kp19-41",
+    "title": "新老客户收入与客单价",
+    "batch": "第九批丙组3节",
+    "included": true
+  },
+  {
+    "id": "kp19-42",
+    "title": "客户消费分层",
+    "batch": "第九批丙组3节",
+    "included": true
+  },
+  {
+    "id": "kp19-43",
+    "title": "客户留存与同期群分析",
+    "batch": "第九批丙组3节",
+    "included": true
+  },
+  {
+    "id": "kp19-46",
+    "title": "预算与实际费用差异",
+    "batch": "第十批甲组3节",
+    "included": true
+  },
+  {
+    "id": "kp19-47",
+    "title": "供应商发票与付款核对",
+    "batch": "第十批甲组3节",
+    "included": true
+  },
+  {
+    "id": "kp19-48",
+    "title": "应付账款账龄",
+    "batch": "第十批甲组3节",
+    "included": true
+  },
+  {
+    "id": "kp19-49",
+    "title": "银行流水与凭证对账",
+    "batch": "第十批乙组3节",
+    "included": true
+  },
+  {
+    "id": "kp19-50",
+    "title": "多规则异常交易筛查",
+    "batch": "第十批乙组3节",
+    "included": true
+  },
+  {
+    "id": "kp19-52",
+    "title": "人员规模变动与离职率",
+    "batch": "第十批乙组3节",
+    "included": true
+  },
+  {
+    "id": "kp19-56",
+    "title": "采购成本与价格差异",
+    "batch": "第十批丙组第一节",
+    "included": true
+  },
+  {
+    "id": "kp19-57",
+    "title": "供应商履约率与交付表现",
+    "batch": "第十批丙组第二节",
+    "included": true
+  },
+  {
+    "id": "kp19-58",
+    "title": "采购、收货与发票三方核对",
+    "batch": "第十批丙组第三节",
+    "included": true
+  },
+  {
+    "id": "kp20-01",
+    "title": "多表汇总与贡献率",
+    "batch": "第十一批甲组第一节",
+    "included": true
+  },
+  {
+    "id": "kp20-02",
+    "title": "时间序列与缺失月份",
+    "batch": "第十一批甲组第二节",
+    "included": true
+  },
+  {
+    "id": "kp20-03",
+    "title": "分组内排名与前N名",
+    "batch": "第十一批甲组第三节",
+    "included": true
+  },
+  {
+    "id": "kp20-06",
+    "title": "商品销售贡献与库存资金占用错配",
+    "batch": "第十一批乙组第一节",
+    "included": true
+  },
+  {
+    "id": "kp20-08",
+    "title": "销售毛利与库存投资回报",
+    "batch": "第十一批乙组第二节",
+    "included": true
+  },
+  {
+    "id": "kp20-13",
+    "title": "订单结算与收入核对",
+    "batch": "第十一批乙组第三节",
+    "included": true
+  },
+  {
+    "id": "kp20-15",
+    "title": "采购承诺、收货、开票及付款敞口",
+    "batch": "第十一批丙组第一节",
+    "included": true
+  },
+  {
+    "id": "kp20-18",
+    "title": "渠道广告后的贡献利润",
+    "batch": "第十一批丙组第二节",
+    "included": true
+  },
+  {
+    "id": "kp20-21",
+    "title": "门店人效及人工占比",
+    "batch": "第十一批丁组第一节",
+    "included": true
+  },
+  {
+    "id": "kp20-23",
+    "title": "月度经营汇总表",
+    "batch": "第十一批丁组第二节",
+    "included": true
+  }
+]

@@ -1,0 +1,252 @@
+{
+  "id": "kp15-02",
+  "chapterId": "ch15",
+  "title": "序号、排名与连续排名",
+  "learningObjective": "根据是否接受并列及结果数量选择排名函数。",
+  "prerequisites": [
+    "kp15-01"
+  ],
+  "concept": "序号为每行分配唯一位置，普通排名让并列共享名次且跳过被占用位置，连续排名按不同排序值连续编号。窗口排序决定名次，外层排序决定展示顺序。排名范围由分区决定。",
+  "syntax": "ROW_NUMBER() OVER(ORDER BY v DESC, id); RANK() OVER(ORDER BY v DESC); DENSE_RANK() OVER(ORDER BY v DESC)",
+  "parameters": {
+    "v": "排名指标",
+    "id": "唯一决胜键，仅用于需要确定行序时"
+  },
+  "fixtureIds": [
+    "lesson-employees"
+  ],
+  "sourceTables": [
+    {
+      "name": "employees",
+      "columns": [
+        {
+          "name": "employee_id",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "employee_name",
+          "type": "TEXT",
+          "mysqlType": "VARCHAR(160) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_bin",
+          "sqliteType": "TEXT"
+        },
+        {
+          "name": "manager_id",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "salary",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          "A",
+          null,
+          8000
+        ],
+        [
+          2,
+          "B",
+          1,
+          5000
+        ],
+        [
+          3,
+          "C",
+          1,
+          5000
+        ],
+        [
+          4,
+          "D",
+          2,
+          3000
+        ]
+      ]
+    }
+  ],
+  "mysqlSql": "SELECT employee_id,salary,ROW_NUMBER() OVER(ORDER BY salary DESC,employee_id) AS rn,RANK() OVER(ORDER BY salary DESC) AS rnk,DENSE_RANK() OVER(ORDER BY salary DESC) AS dense_rnk FROM employees ORDER BY rn;",
+  "sqliteSql": "SELECT employee_id,salary,ROW_NUMBER() OVER(ORDER BY salary DESC,employee_id) AS rn,RANK() OVER(ORDER BY salary DESC) AS rnk,DENSE_RANK() OVER(ORDER BY salary DESC) AS dense_rnk FROM employees ORDER BY rn;",
+  "executionSteps": [
+    "按薪资降序比较",
+    "分别计算三种名次",
+    "按序号输出"
+  ],
+  "useCase": "人事报表需按薪资排名，同时说明并列薪资是否应占用相同名次。",
+  "comparison": "固定最多两人使用序号；保留第二名的全部并列者使用普通排名。",
+  "commonError": {
+    "example": "在同层 WHERE 使用窗口函数，或给普通排名添加唯一编号导致并列消失。",
+    "correction": "内层计算排名后外层筛选；并列函数只使用定义并列的业务排序键。"
+  },
+  "notes": "若分组取前若干名，在窗口中添加分区；外层仍显式排序。",
+  "compatibility": {
+    "status": "直接兼容",
+    "detail": "仅在本示例数据与语义范围验证；不代表全部 MySQL 语法兼容。"
+  },
+  "relatedQuestionIds": [
+    "q0196",
+    "q0206",
+    "q0207",
+    "q0216",
+    "q0217",
+    "q0218",
+    "q0219"
+  ],
+  "relatedFlashcardIds": [
+    "fc0114",
+    "fc0115",
+    "fc0119"
+  ],
+  "relatedKnowledgePointIds": [
+    "kp04-01",
+    "kp06-01",
+    "kp07-01",
+    "kp14-01"
+  ],
+  "mysqlVerification": "未运行原生 MySQL 8.4",
+  "result": {
+    "columns": [
+      "employee_id",
+      "salary",
+      "rn",
+      "rnk",
+      "dense_rnk"
+    ],
+    "rows": [
+      [
+        1,
+        8000,
+        1,
+        1,
+        1
+      ],
+      [
+        2,
+        5000,
+        2,
+        2,
+        2
+      ],
+      [
+        3,
+        5000,
+        3,
+        2,
+        2
+      ],
+      [
+        4,
+        3000,
+        4,
+        4,
+        3
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "visualization": {
+    "kind": "stepFlow",
+    "steps": [
+      {
+        "id": "1",
+        "label": "8000排名1"
+      },
+      {
+        "id": "2",
+        "label": "两个5000并列2"
+      },
+      {
+        "id": "3",
+        "label": "3000的普通排名4、密集排名3"
+      }
+    ],
+    "sourceFixtureIds": [
+      "lesson-employees"
+    ],
+    "resultColumns": [
+      "employee_id",
+      "salary",
+      "rn",
+      "rnk",
+      "dense_rnk"
+    ]
+  },
+  "mysqlVerificationScript": "validation/mysql/kp15-02.sql",
+  "primaryQuestionIds": [
+    "q0196",
+    "q0206",
+    "q0207",
+    "q0216",
+    "q0217",
+    "q0218",
+    "q0219"
+  ],
+  "primaryFlashcardIds": [
+    "fc0114",
+    "fc0115",
+    "fc0119"
+  ],
+  "teaching": {
+    "problem": "人事报表需按薪资排名，同时说明并列薪资是否应占用相同名次。",
+    "codeExplanation": "两个5000同薪。ROW_NUMBER 增加编号使顺序确定；RANK 和 DENSE_RANK 不添加编号，否则会破坏同薪并列。筛选前若干名需先在公用表表达式中生成名次。",
+    "resultExplanation": "员工2及3的序号是2和3，普通排名均为2，员工4的普通排名为4，连续排名为3。",
+    "checkpoints": [],
+    "mergedConcepts": [],
+    "mergeExamples": [
+      {
+        "label": "固定两人",
+        "explanation": "序号小于等于2只返回两人。",
+        "sql": "WITH r AS (SELECT employee_id,ROW_NUMBER() OVER(ORDER BY salary DESC,employee_id) AS rn FROM employees) SELECT employee_id,rn FROM r WHERE rn<=2 ORDER BY rn;",
+        "result": {
+          "columns": [
+            "employee_id",
+            "rn"
+          ],
+          "rows": [
+            [
+              1,
+              1
+            ],
+            [
+              2,
+              2
+            ]
+          ]
+        }
+      },
+      {
+        "label": "保留并列第二名",
+        "explanation": "普通排名小于等于2返回三人。",
+        "sql": "WITH r AS (SELECT employee_id,RANK() OVER(ORDER BY salary DESC) AS rnk FROM employees) SELECT employee_id,rnk FROM r WHERE rnk<=2 ORDER BY rnk;",
+        "result": {
+          "columns": [
+            "employee_id",
+            "rnk"
+          ],
+          "rows": [
+            [
+              1,
+              1
+            ],
+            [
+              2,
+              2
+            ],
+            [
+              3,
+              2
+            ]
+          ]
+        }
+      }
+    ]
+  }
+}

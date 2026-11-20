@@ -1,0 +1,239 @@
+{
+  "id": "kp16-02",
+  "chapterId": "ch16",
+  "title": "缺失与异常检测",
+  "learningObjective": "将数据质量规则转换为可审查标签，区分缺失、异常和合法零值。",
+  "prerequisites": [
+    "kp16-01"
+  ],
+  "concept": "缺失代表数据未提供；异常是违反规则或需要核实的记录。负金额可能是退款，零金额可能是赠品，不应自动纠正。条件分类只返回首个命中的标签；多异常审计可以为每项规则生成独立标记。",
+  "syntax": "CASE WHEN condition THEN label ELSE other END",
+  "parameters": {
+    "condition": "已经定义的数据质量规则"
+  },
+  "fixtureIds": [
+    "lesson-raw_data"
+  ],
+  "sourceTables": [
+    {
+      "name": "raw_data",
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "name",
+          "type": "TEXT",
+          "mysqlType": "VARCHAR(160) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_bin",
+          "sqliteType": "TEXT"
+        },
+        {
+          "name": "amount",
+          "type": "TEXT",
+          "mysqlType": "VARCHAR(160) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_bin",
+          "sqliteType": "TEXT"
+        },
+        {
+          "name": "category",
+          "type": "TEXT",
+          "mysqlType": "VARCHAR(160) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_bin",
+          "sqliteType": "TEXT"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          "  Mask ",
+          "15",
+          "SKIN"
+        ],
+        [
+          2,
+          "Mask",
+          "15",
+          "skin"
+        ],
+        [
+          3,
+          "Serum",
+          null,
+          "Skin"
+        ],
+        [
+          4,
+          "Soap",
+          "-5",
+          "HOME"
+        ],
+        [
+          5,
+          "Cream",
+          "0",
+          "makeup"
+        ],
+        [
+          6,
+          "",
+          "20",
+          "HOME"
+        ]
+      ]
+    }
+  ],
+  "mysqlSql": "SELECT id,CASE WHEN name IS NULL OR TRIM(name)='' THEN '名称缺失' WHEN amount IS NULL THEN '金额缺失' WHEN CAST(amount AS DECIMAL(12,2))<0 THEN '负金额待核' ELSE '通过' END AS quality FROM raw_data ORDER BY name DESC;",
+  "sqliteSql": "SELECT id,CASE WHEN name IS NULL OR TRIM(name)='' THEN '名称缺失' WHEN amount IS NULL THEN '金额缺失' WHEN CAST(amount AS DECIMAL(12,2))<0 THEN '负金额待核' ELSE '通过' END AS quality FROM raw_data ORDER BY name DESC;",
+  "executionSteps": [
+    "检查名称与金额缺失",
+    "检查负金额",
+    "按规则标记并汇总"
+  ],
+  "useCase": "导入数据中金额文本已知为合法整数或空值，检查名称缺失、金额缺失及负金额。零值暂视为允许。",
+  "comparison": "单一分类适合汇总首要原因；独立标记适合同时检出多个问题。",
+  "commonError": {
+    "example": "把负金额直接改为0，或依赖 CAST 判断非法文本是否合法。",
+    "correction": "保留原值，建立符合业务的数据格式检查与人工复核。"
+  },
+  "notes": "普通 TRIM 不覆盖所有 Unicode 空白；样例不含非法数字。",
+  "compatibility": {
+    "status": "直接兼容",
+    "detail": "仅在本示例数据与语义范围验证；不代表全部 MySQL 语法兼容。"
+  },
+  "relatedQuestionIds": [
+    "q0222",
+    "q0223"
+  ],
+  "relatedFlashcardIds": [
+    "fc0123",
+    "fc0127"
+  ],
+  "relatedKnowledgePointIds": [
+    "kp05-01",
+    "kp09-01",
+    "kp11-01",
+    "kp15-01"
+  ],
+  "mysqlVerification": "未运行原生 MySQL 8.4",
+  "result": {
+    "columns": [
+      "id",
+      "quality"
+    ],
+    "rows": [
+      [
+        4,
+        "负金额待核"
+      ],
+      [
+        3,
+        "金额缺失"
+      ],
+      [
+        2,
+        "通过"
+      ],
+      [
+        5,
+        "通过"
+      ],
+      [
+        1,
+        "通过"
+      ],
+      [
+        6,
+        "名称缺失"
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "mysqlVerificationScript": "validation/mysql/kp16-02.sql",
+  "primaryQuestionIds": [
+    "q0222",
+    "q0223"
+  ],
+  "primaryFlashcardIds": [
+    "fc0123",
+    "fc0127"
+  ],
+  "teaching": {
+    "problem": "导入数据中金额文本已知为合法整数或空值，检查名称缺失、金额缺失及负金额。零值暂视为允许。",
+    "codeExplanation": "先判断名称为空或去除普通空格后为空，再判断金额是否缺失，最后比较转换后的金额。保留原始编号用于回查。实际来源若可能含非法数字文本，必须先验证格式，不能把转换结果零当成合法输入。",
+    "resultExplanation": "编号3金额缺失，4负金额待核，6名称缺失；1、2、5通过本组规则。通过不等于已经完成全部质量审核。",
+    "checkpoints": [],
+    "mergedConcepts": [],
+    "mergeExamples": [
+      {
+        "label": "独立质量标记",
+        "explanation": "三个标记可同时为1。",
+        "sql": "SELECT id,CASE WHEN name IS NULL OR TRIM(name)='' THEN 1 ELSE 0 END AS missing_name,CASE WHEN amount IS NULL THEN 1 ELSE 0 END AS missing_amount,CASE WHEN CAST(amount AS DECIMAL(12,2))<0 THEN 1 ELSE 0 END AS negative_amount FROM raw_data ORDER BY name DESC;",
+        "result": {
+          "columns": [
+            "id",
+            "missing_name",
+            "missing_amount",
+            "negative_amount"
+          ],
+          "rows": [
+            [
+              4,
+              0,
+              0,
+              1
+            ],
+            [
+              3,
+              0,
+              1,
+              0
+            ],
+            [
+              2,
+              0,
+              0,
+              0
+            ],
+            [
+              5,
+              0,
+              0,
+              0
+            ],
+            [
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              6,
+              1,
+              0,
+              0
+            ]
+          ]
+        }
+      },
+      {
+        "label": "统计缺失数量",
+        "explanation": "按各规则独立汇总，不将计数相加解释为唯一异常记录数。",
+        "sql": "SELECT SUM(CASE WHEN name IS NULL OR TRIM(name)='' THEN 1 ELSE 0 END) AS missing_names,SUM(CASE WHEN amount IS NULL THEN 1 ELSE 0 END) AS missing_amounts FROM raw_data;",
+        "result": {
+          "columns": [
+            "missing_names",
+            "missing_amounts"
+          ],
+          "rows": [
+            [
+              1,
+              1
+            ]
+          ]
+        }
+      }
+    ]
+  }
+}

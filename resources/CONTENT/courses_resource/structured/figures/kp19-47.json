@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "id": "kp19-47",
+  "lessonSha256": "88c4436f392df2a898703ae373ba1585a74adab5039a8a0a7a01e54259161b22",
+  "figures": [
+    {
+      "id": "kp19-47-clauses",
+      "slot": "syntax",
+      "kind": "clause-map",
+      "title": "示例查询的几个部分",
+      "sql": "SELECT supplier_invoice_id,supplier_id,billed_cents,paid_cents,balance_cents,CASE WHEN balance_cents=0 THEN 'paid' WHEN paid_cents=0 THEN 'unpaid' WHEN balance_cents>0 THEN 'partial' ELSE 'overpaid' END payment_state FROM v_invoice_balance ORDER BY balance_cents DESC,supplier_invoice_id",
+      "parts": [
+        {
+          "role": "select",
+          "label": "取数",
+          "sql": "SELECT supplier_invoice_id,supplier_id,billed_cents,paid_cents,balance_cents,CASE WHEN balance_cents=0 THEN 'paid' WHEN paid_cents=0 THEN 'unpaid' WHEN balance_cents>0 THEN 'partial' ELSE 'overpaid' END payment_state",
+          "note": "输出查询需要的列与计算表达式。"
+        },
+        {
+          "role": "from",
+          "label": "来源",
+          "sql": "FROM v_invoice_balance",
+          "note": "从 v_invoice_balance 读取输入数据。"
+        },
+        {
+          "role": "order",
+          "label": "排序",
+          "sql": "ORDER BY balance_cents DESC,supplier_invoice_id",
+          "note": "按 balance_cents DESC,supplier_invoice_id 排列结果。"
+        }
+      ]
+    }
+  ]
+}

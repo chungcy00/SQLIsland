@@ -78,3 +78,5 @@ scripts/order_by_lib.py
 scripts/qrun.mjs
 scripts/revise-order-by-*.py
 scripts/revise-question-order.py
+scripts/convert-lessons.py
+scripts/convert_lessons_lib.py

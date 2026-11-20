@@ -12,7 +12,7 @@ const converted = all.filter(k=>k.presentation);
 const revisionFile = await readJson(path.join(root,'structured/revisions.json'));
 const revisions = revisionFile.revisions;
 test('archived source, saved blocks and original course fields agree for the imported batch', async () => {
-  assert.equal(all.length,80);assert.equal(status.converted.length,7);assert.equal(status.pending.length,73);
+  assert.equal(all.length,80);assert.equal(status.converted.length,80);assert.equal(status.pending.length,0);
   for (const k of converted) {
     validateStructuredLesson(k,k.presentation);
     assert.equal(k.teaching.presentation,undefined);

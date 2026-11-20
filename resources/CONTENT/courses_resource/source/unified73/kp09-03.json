@@ -1,0 +1,246 @@
+{
+  "id": "kp09-03",
+  "chapterId": "ch09",
+  "title": "NULLIF 与安全除法",
+  "learningObjective": "能够识别无定义的比率，处理零分母与整数除法，并解释结果的空值含义。",
+  "prerequisites": [
+    "kp09-02"
+  ],
+  "concept": "NULLIF(a,b) 比较两个表达式；相等时返回 NULL，否则返回第一个表达式。用于除法时，可将零分母转换为 NULL，从而让无定义的结果明确显示为空。与 IFNULL 或 COALESCE 的方向不同，后者将缺失值替换为其他值。计算比率前必须确定分子、分母、统计范围及单位；不要因为分母为零就自动报告0%。SQLite 中两个整数相除可能截断小数，乘以1.0可使示例进行实数除法；MySQL 的 / 与整数除法 DIV 不同，具体精度仍由数据类型和引擎决定。ROUND 用于最终展示，而不是在聚合前随意舍入。",
+  "syntax": "ROUND(1.0 * numerator / NULLIF(denominator,0), 2)",
+  "parameters": {
+    "numerator": "分子",
+    "denominator": "分母",
+    "NULLIF": "相等时返回空值",
+    "ROUND": "结果保留指定小数位"
+  },
+  "fixtureIds": [
+    "lesson-products"
+  ],
+  "sourceTables": [
+    {
+      "name": "products",
+      "columns": [
+        {
+          "name": "product_id",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "product_name",
+          "type": "TEXT",
+          "mysqlType": "VARCHAR(160) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_bin",
+          "sqliteType": "TEXT"
+        },
+        {
+          "name": "category",
+          "type": "TEXT",
+          "mysqlType": "VARCHAR(160) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_bin",
+          "sqliteType": "TEXT"
+        },
+        {
+          "name": "price",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "stock",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          "Mask",
+          "护肤品",
+          15,
+          150
+        ],
+        [
+          2,
+          "Serum",
+          "护肤品",
+          89,
+          40
+        ],
+        [
+          3,
+          "Cleanser",
+          "护肤品",
+          35,
+          200
+        ],
+        [
+          4,
+          "Cream",
+          "化妆品",
+          65,
+          180
+        ],
+        [
+          5,
+          "Sunscreen",
+          "化妆品",
+          45,
+          80
+        ],
+        [
+          6,
+          "Soap_1",
+          "日用品",
+          15,
+          0
+        ]
+      ]
+    }
+  ],
+  "mysqlSql": "SELECT product_id, ROUND(1.0*price/NULLIF(stock,0),2) AS ratio FROM products ORDER BY ratio DESC;",
+  "sqliteSql": "SELECT product_id, ROUND(1.0*price/NULLIF(stock,0),2) AS ratio FROM products ORDER BY ratio DESC;",
+  "executionSteps": [
+    "检查零分母",
+    "按小数计算比率",
+    "保留两位小数"
+  ],
+  "useCase": "本例使用商品单价除以库存数量演示除法边界，输出仅为语法练习，不是库存周转率或实际经营指标。实际业务中可将相同方法用于利润率、转化率等已明确定义的指标。",
+  "comparison": "NULLIF 将指定值转为空；IFNULL/COALESCE 将空值转为候选值。",
+  "commonError": {
+    "example": "直接整数相除导致截断，或将分母为零的结果不加说明填0。",
+    "correction": "使用小数运算及 NULLIF，按业务需要保留无定义标记。"
+  },
+  "notes": "SQLite 与 MySQL 对小数类型及舍入的细节不同，本地验证结果不能代替原生验证。",
+  "compatibility": {
+    "status": "直接兼容",
+    "detail": "仅在本示例数据与语义范围验证；不代表全部 MySQL 语法兼容。"
+  },
+  "relatedQuestionIds": [
+    "q0119",
+    "q0121"
+  ],
+  "relatedFlashcardIds": [
+    "fc0067"
+  ],
+  "relatedKnowledgePointIds": [
+    "kp03-01",
+    "kp05-01",
+    "kp06-01"
+  ],
+  "mysqlVerification": "未运行原生 MySQL 8.4",
+  "result": {
+    "columns": [
+      "product_id",
+      "ratio"
+    ],
+    "rows": [
+      [
+        2,
+        2.23
+      ],
+      [
+        5,
+        0.56
+      ],
+      [
+        4,
+        0.36
+      ],
+      [
+        3,
+        0.17
+      ],
+      [
+        1,
+        0.1
+      ],
+      [
+        6,
+        null
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "mysqlVerificationScript": "validation/mysql/kp09-03.sql",
+  "primaryQuestionIds": [
+    "q0119",
+    "q0121"
+  ],
+  "primaryFlashcardIds": [
+    "fc0067"
+  ],
+  "teaching": {
+    "problem": "本例使用商品单价除以库存数量演示除法边界，输出仅为语法练习，不是库存周转率或实际经营指标。实际业务中可将相同方法用于利润率、转化率等已明确定义的指标。",
+    "codeExplanation": "先计算 NULLIF(stock,0)：库存为0的记录得到 NULL，其余保持原数值。分子乘1.0后相除，避免 SQLite 整数截断；NULL 分母使结果仍为 NULL。最后 ROUND 保留两位小数的数值精度，实际界面是否补足尾随零由格式化处理。",
+    "resultExplanation": "编号6无有效分母，结果为空；其他5件返回比率。结果为空并不表示真实比率为0；若制作经营报表应解释是无定义还是输入缺失。原例不是库存经营指标，不据此对商品进行经营评价。",
+    "checkpoints": [],
+    "mergedConcepts": [],
+    "mergeExamples": [
+      {
+        "label": "检查安全分母",
+        "explanation": "在相除之前观察零分母怎样转换。",
+        "sql": "SELECT product_id,stock,NULLIF(stock,0) AS safe_stock FROM products ORDER BY stock DESC;",
+        "result": {
+          "columns": [
+            "product_id",
+            "stock",
+            "safe_stock"
+          ],
+          "rows": [
+            [
+              3,
+              200,
+              200
+            ],
+            [
+              4,
+              180,
+              180
+            ],
+            [
+              1,
+              150,
+              150
+            ],
+            [
+              5,
+              80,
+              80
+            ],
+            [
+              2,
+              40,
+              40
+            ],
+            [
+              6,
+              0,
+              null
+            ]
+          ]
+        }
+      },
+      {
+        "label": "整数与小数除法对照",
+        "explanation": "本地兼容执行层按 MySQL 习惯把 / 当作小数除法，所以 7/2 也得到 3.5（列名 integer_result 只是示例别名）；MySQL 要取整数商应使用 DIV，本地兼容执行暂不支持。",
+        "sql": "SELECT 7/2 AS integer_result,1.0*7/2 AS real_result,1.0*7/NULLIF(0,0) AS undefined_result;",
+        "result": {
+          "columns": [
+            "integer_result",
+            "real_result",
+            "undefined_result"
+          ],
+          "rows": [
+            [
+              3.5,
+              3.5,
+              null
+            ]
+          ]
+        }
+      }
+    ]
+  }
+}

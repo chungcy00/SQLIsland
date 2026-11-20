@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "id": "kp20-02",
+  "lessonSha256": "bcd19b27efa5166ee0f2026e9c32e66d437e107c517b119cf44b48d374eaa701",
+  "figures": [
+    {
+      "id": "kp20-02-clauses",
+      "slot": "syntax",
+      "kind": "clause-map",
+      "title": "示例查询的几个部分",
+      "sql": "WITH months AS (\n SELECT DISTINCT month_key FROM calendar_days WHERE month_key BETWEEN '2025-01' AND '2025-12'\n), sales AS (\n SELECT SUBSTR(order_date,1,7) month_key,SUM(net_cents) net_cents FROM v_order_net\n WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY SUBSTR(order_date,1,7)\n), complete AS (\n SELECT m.month_key,COALESCE(s.net_cents,0) net_cents FROM months m LEFT JOIN sales s ON m.month_key=s.month_key\n), previous AS (\n SELECT month_key,net_cents,LAG(net_cents) OVER(ORDER BY month_key) previous_net_cents FROM complete\n)\nSELECT month_key,net_cents,previous_net_cents,net_cents-previous_net_cents change_cents,\n ROUND(100.0*(net_cents-previous_net_cents)/NULLIF(previous_net_cents,0),2) change_pct\nFROM previous ORDER BY month_key",
+      "parts": [
+        {
+          "role": "cte",
+          "label": "中间结果",
+          "sql": "WITH months AS (\n SELECT DISTINCT month_key FROM calendar_days WHERE month_key BETWEEN '2025-01' AND '2025-12'\n),",
+          "note": "先把名为 months 的中间结果算出来，供后面的查询引用。"
+        },
+        {
+          "role": "cte",
+          "label": "中间结果",
+          "sql": "sales AS (\n SELECT SUBSTR(order_date,1,7) month_key,SUM(net_cents) net_cents FROM v_order_net\n WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY SUBSTR(order_date,1,7)\n),",
+          "note": "先把名为 sales 的中间结果算出来，供后面的查询引用。"
+        },
+        {
+          "role": "cte",
+          "label": "中间结果",
+          "sql": "complete AS (\n SELECT m.month_key,COALESCE(s.net_cents,0) net_cents FROM months m LEFT JOIN sales s ON m.month_key=s.month_key\n),",
+          "note": "先把名为 complete 的中间结果算出来，供后面的查询引用。"
+        },
+        {
+          "role": "cte",
+          "label": "中间结果",
+          "sql": "previous AS (\n SELECT month_key,net_cents,LAG(net_cents) OVER(ORDER BY month_key) previous_net_cents FROM complete\n)",
+          "note": "先把名为 previous 的中间结果算出来，供后面的查询引用。"
+        },
+        {
+          "role": "select",
+          "label": "取数",
+          "sql": "SELECT month_key,net_cents,previous_net_cents,net_cents-previous_net_cents change_cents,\n ROUND(100.0*(net_cents-previous_net_cents)/NULLIF(previous_net_cents,0),2) change_pct",
+          "note": "输出查询需要的列与计算表达式。"
+        },
+        {
+          "role": "from",
+          "label": "来源",
+          "sql": "FROM previous",
+          "note": "从 previous 读取输入数据。"
+        },
+        {
+          "role": "order",
+          "label": "排序",
+          "sql": "ORDER BY month_key",
+          "note": "按 month_key 排列结果。"
+        }
+      ]
+    }
+  ]
+}

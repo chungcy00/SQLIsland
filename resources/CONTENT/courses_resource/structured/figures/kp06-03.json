@@ -1,0 +1,106 @@
+{
+  "schemaVersion": 1,
+  "id": "kp06-03",
+  "lessonSha256": "8ee771deb7c2110055d3f8a131423c01f13df5bfff7df010fc658e065fd1149b",
+  "figures": [
+    {
+      "id": "kp06-03-clauses",
+      "slot": "syntax",
+      "kind": "clause-map",
+      "title": "示例查询的几个部分",
+      "sql": "SELECT MIN(price) AS min_price, MAX(price) AS max_price FROM products;",
+      "parts": [
+        {
+          "role": "select",
+          "label": "取数",
+          "sql": "SELECT MIN(price) AS min_price, MAX(price) AS max_price",
+          "note": "输出 MIN(price) AS min_price, MAX(price) AS max_price。"
+        },
+        {
+          "role": "from",
+          "label": "来源",
+          "sql": "FROM products;",
+          "note": "从 products 读取输入数据。"
+        }
+      ]
+    },
+    {
+      "id": "kp06-03-flow",
+      "slot": "breakdown",
+      "kind": "stage-flow",
+      "merge": "breakdown",
+      "title": "每一步的数据变化",
+      "steps": [
+        {
+          "label": "FROM products;",
+          "sql": "SELECT * FROM products;",
+          "columns": [
+            "product_id",
+            "product_name",
+            "category",
+            "price",
+            "stock"
+          ],
+          "rows": [
+            [
+              1,
+              "Mask",
+              "护肤品",
+              15,
+              150
+            ],
+            [
+              2,
+              "Serum",
+              "护肤品",
+              89,
+              40
+            ],
+            [
+              3,
+              "Cleanser",
+              "护肤品",
+              35,
+              200
+            ],
+            [
+              4,
+              "Cream",
+              "化妆品",
+              65,
+              180
+            ],
+            [
+              5,
+              "Sunscreen",
+              "化妆品",
+              45,
+              80
+            ],
+            [
+              6,
+              "Soap_1",
+              "日用品",
+              15,
+              0
+            ]
+          ]
+        },
+        {
+          "label": "SELECT MIN(price) AS min_price, MAX(price) AS max_price",
+          "sql": "SELECT MIN(price) AS min_price, MAX(price) AS max_price FROM products;",
+          "columns": [
+            "min_price",
+            "max_price"
+          ],
+          "rows": [
+            [
+              15,
+              89
+            ]
+          ]
+        }
+      ]
+    }
+  ]
+}

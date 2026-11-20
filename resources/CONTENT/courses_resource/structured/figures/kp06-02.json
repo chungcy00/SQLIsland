@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "id": "kp06-02",
+  "lessonSha256": "6cda5d9bbce7af9c307cbda2c5659abd36abb9ff8e3aab141c1a0e9d2aad943c",
+  "figures": [
+    {
+      "id": "kp06-02-clauses",
+      "slot": "syntax",
+      "kind": "clause-map",
+      "title": "示例查询的几个部分",
+      "sql": "SELECT SUM(value) AS total, AVG(value) AS mean FROM nullable_values;",
+      "parts": [
+        {
+          "role": "select",
+          "label": "取数",
+          "sql": "SELECT SUM(value) AS total, AVG(value) AS mean",
+          "note": "输出 SUM(value) AS total, AVG(value) AS mean。"
+        },
+        {
+          "role": "from",
+          "label": "来源",
+          "sql": "FROM nullable_values;",
+          "note": "从 nullable_values 读取输入数据。"
+        }
+      ]
+    },
+    {
+      "id": "kp06-02-flow",
+      "slot": "breakdown",
+      "kind": "stage-flow",
+      "merge": "breakdown",
+      "title": "每一步的数据变化",
+      "steps": [
+        {
+          "label": "FROM nullable_values;",
+          "sql": "SELECT * FROM nullable_values;",
+          "columns": [
+            "id",
+            "value",
+            "note"
+          ],
+          "rows": [
+            [
+              1,
+              null,
+              null
+            ],
+            [
+              2,
+              0,
+              ""
+            ],
+            [
+              3,
+              10,
+              "ok"
+            ],
+            [
+              4,
+              10,
+              "ok"
+            ]
+          ]
+        },
+        {
+          "label": "SELECT SUM(value) AS total, AVG(value) AS mean",
+          "sql": "SELECT SUM(value) AS total, AVG(value) AS mean FROM nullable_values;",
+          "columns": [
+            "total",
+            "mean"
+          ],
+          "rows": [
+            [
+              20,
+              6.666666666666667
+            ]
+          ]
+        }
+      ]
+    }
+  ]
+}

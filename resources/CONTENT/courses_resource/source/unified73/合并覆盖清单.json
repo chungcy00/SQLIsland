@@ -1,0 +1,277 @@
+[
+  {
+    "source": "kp01-04",
+    "target": "kp05-01",
+    "included": false
+  },
+  {
+    "source": "kp02-03",
+    "target": "kp02-01",
+    "included": false
+  },
+  {
+    "source": "kp08-06",
+    "target": "kp08-02",
+    "included": true
+  },
+  {
+    "source": "kp08-06",
+    "target": "kp08-04",
+    "included": true
+  },
+  {
+    "source": "kp08-07",
+    "target": "kp08-04",
+    "included": true
+  },
+  {
+    "source": "kp09-04",
+    "target": "kp09-02",
+    "included": true
+  },
+  {
+    "source": "kp11-04",
+    "target": "kp11-02",
+    "included": true
+  },
+  {
+    "source": "kp12-05",
+    "target": "kp12-01",
+    "included": true
+  },
+  {
+    "source": "kp13-03",
+    "target": "kp13-01",
+    "included": true
+  },
+  {
+    "source": "kp13-03",
+    "target": "kp13-02",
+    "included": true
+  },
+  {
+    "source": "kp13-04",
+    "target": "kp13-01",
+    "included": true
+  },
+  {
+    "source": "kp15-06",
+    "target": "kp15-04",
+    "included": true
+  },
+  {
+    "source": "kp17-03",
+    "target": "kp17-01",
+    "included": true
+  },
+  {
+    "source": "kp17-04",
+    "target": "kp17-02",
+    "included": true
+  },
+  {
+    "source": "kp17-05",
+    "target": "kp17-01",
+    "included": true
+  },
+  {
+    "source": "kp18-02",
+    "target": "kp18-01",
+    "included": true
+  },
+  {
+    "source": "kp18-03",
+    "target": "kp18-01",
+    "included": true
+  },
+  {
+    "source": "kp19-04",
+    "target": "kp19-48",
+    "included": true
+  },
+  {
+    "source": "kp19-05",
+    "target": "kp19-52",
+    "included": true
+  },
+  {
+    "source": "kp19-06",
+    "target": "kp19-57",
+    "included": true
+  },
+  {
+    "source": "kp19-07",
+    "target": "kp19-01",
+    "included": true
+  },
+  {
+    "source": "kp19-08",
+    "target": "kp19-32",
+    "included": true
+  },
+  {
+    "source": "kp19-09",
+    "target": "kp20-03",
+    "included": true
+  },
+  {
+    "source": "kp19-10",
+    "target": "kp20-01",
+    "included": true
+  },
+  {
+    "source": "kp19-11",
+    "target": "kp19-36",
+    "included": true
+  },
+  {
+    "source": "kp19-12",
+    "target": "kp19-36",
+    "included": true
+  },
+  {
+    "source": "kp19-13",
+    "target": "kp19-36",
+    "included": true
+  },
+  {
+    "source": "kp19-14",
+    "target": "kp19-02",
+    "included": true
+  },
+  {
+    "source": "kp19-15",
+    "target": "kp19-41",
+    "included": true
+  },
+  {
+    "source": "kp19-16",
+    "target": "kp19-42",
+    "included": true
+  },
+  {
+    "source": "kp19-17",
+    "target": "kp19-43",
+    "included": true
+  },
+  {
+    "source": "kp19-18",
+    "target": "kp19-42",
+    "included": true
+  },
+  {
+    "source": "kp19-19",
+    "target": "kp19-46",
+    "included": true
+  },
+  {
+    "source": "kp19-20",
+    "target": "kp19-32",
+    "included": true
+  },
+  {
+    "source": "kp19-21",
+    "target": "kp19-50",
+    "included": true
+  },
+  {
+    "source": "kp19-22",
+    "target": "kp19-46",
+    "included": true
+  },
+  {
+    "source": "kp19-23",
+    "target": "kp20-03",
+    "included": true
+  },
+  {
+    "source": "kp19-24",
+    "target": "kp19-52",
+    "included": true
+  },
+  {
+    "source": "kp19-27",
+    "target": "kp19-56",
+    "included": true
+  },
+  {
+    "source": "kp19-28",
+    "target": "kp19-57",
+    "included": true
+  },
+  {
+    "source": "kp19-29",
+    "target": "kp19-57",
+    "included": true
+  },
+  {
+    "source": "kp19-30",
+    "target": "kp19-47",
+    "included": true
+  },
+  {
+    "source": "kp19-31",
+    "target": "kp19-01",
+    "included": true
+  },
+  {
+    "source": "kp19-35",
+    "target": "kp20-23",
+    "included": true
+  },
+  {
+    "source": "kp19-37",
+    "target": "kp19-02",
+    "included": true
+  },
+  {
+    "source": "kp19-51",
+    "target": "kp19-52",
+    "included": true
+  },
+  {
+    "source": "kp19-54",
+    "target": "kp20-21",
+    "included": true
+  },
+  {
+    "source": "kp19-59",
+    "target": "kp19-56",
+    "included": true
+  },
+  {
+    "source": "kp20-04",
+    "target": "kp19-50",
+    "included": true
+  },
+  {
+    "source": "kp20-05",
+    "target": "kp19-36",
+    "included": true
+  },
+  {
+    "source": "kp20-10",
+    "target": "kp19-58",
+    "included": true
+  },
+  {
+    "source": "kp20-12",
+    "target": "kp20-23",
+    "included": true
+  },
+  {
+    "source": "kp20-14",
+    "target": "kp20-23",
+    "included": true
+  },
+  {
+    "source": "kp20-16",
+    "target": "kp20-15",
+    "included": true
+  },
+  {
+    "source": "kp20-20",
+    "target": "kp20-18",
+    "included": true
+  }
+]

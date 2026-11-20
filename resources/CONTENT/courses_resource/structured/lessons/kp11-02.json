@@ -1,0 +1,196 @@
+{
+  "schemaVersion": 1,
+  "id": "kp11-02",
+  "sourceBatch": "unified73",
+  "teachingKind": "function",
+  "conceptBlocks": [
+    {
+      "type": "paragraph",
+      "text": "截取函数从指定字符位置提取一段文本，常规正向位置从1开始。固定长度前缀适合编码规则明确的字段；若分隔符位置变化，应先定位分隔符。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "字符长度用于限制名称字符数，字节长度用于存储或接口传输预算。MySQL CHAR_LENGTH 统计字符，LENGTH 统计字节；",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "SQLite length 对文本统计字符，对 BLOB 统计字节。在 UTF-8 中古晋是两个字符、六个字节。字符数也不必然等于视觉字形数量。",
+      "emphasis": []
+    }
+  ],
+  "syntax": {
+    "purpose": "str 待处理文本；pos 从1起的正向字符位置；len 截取字符数。"
+  },
+  "dataDescriptions": {
+    "products": "共 6 行；字段：product_id、product_name、category、price、stock。"
+  },
+  "problem": "采购分类表需要展示名称前三个字符作为临时前缀，另外接口要求核对中文名称的编码字节长度。products 每行一件商品；实际编码是否可按前三字符分组需要业务确认。",
+  "methodBlocks": [
+    {
+      "type": "paragraph",
+      "text": "SUBSTRING(product_name,1,3) 从首字符开始提取最多三个字符，AS prefix 标记结果。如果字符串不足三个字符，只返回剩余字符。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "长度验证使用 MySQL CHAR_LENGTH 与 LENGTH；兼容环境使用 length(text) 与 length(CAST(text AS BLOB))。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "不要直接把字节数作为截取字符数。",
+      "emphasis": []
+    }
+  ],
+  "breakdown": [
+    {
+      "kind": "fragment",
+      "title": "指定来源",
+      "sql": "FROM products",
+      "purpose": "从 products 读取输入数据。",
+      "reason": "后面的子句都基于这里得到的行。"
+    },
+    {
+      "kind": "fragment",
+      "title": "选择输出",
+      "sql": "SELECT product_id, SUBSTRING(product_name,1,3) AS prefix",
+      "purpose": "输出 product_id, SUBSTRING(product_name,1,3) AS prefix。",
+      "reason": "输出列的顺序与别名决定结果表的形状。"
+    },
+    {
+      "kind": "fragment",
+      "title": "排序",
+      "sql": "ORDER BY prefix DESC;",
+      "purpose": "按 prefix DESC 排列结果。",
+      "reason": "查询结果的默认行序没有保证，需要显式排序。"
+    }
+  ],
+  "completeCode": {
+    "mysqlSql": "SELECT product_id, SUBSTRING(product_name,1,3) AS prefix FROM products ORDER BY prefix DESC;",
+    "sqliteSql": "SELECT product_id, SUBSTRING(product_name,1,3) AS prefix FROM products ORDER BY prefix DESC;"
+  },
+  "expectedResult": {
+    "columns": [
+      "product_id",
+      "prefix"
+    ],
+    "rows": [
+      [
+        5,
+        "Sun"
+      ],
+      [
+        6,
+        "Soa"
+      ],
+      [
+        2,
+        "Ser"
+      ],
+      [
+        1,
+        "Mas"
+      ],
+      [
+        4,
+        "Cre"
+      ],
+      [
+        3,
+        "Cle"
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "resultBlocks": [
+    {
+      "type": "paragraph",
+      "text": "六件商品分别得到 Mas、Ser、Cle、Cre、Sun、Soa，行数保持不变。中文长度样例返回2与6；这是编码层面的差异，不表示中文名称有六个字符。",
+      "emphasis": []
+    }
+  ],
+  "extensions": [
+    {
+      "label": "来源课：字符数与字节数",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "保留原样例；原生写法 SELECT CHAR_LENGTH('古晋') AS chars, LENGTH('古晋') AS bytes; 下方为兼容写法。",
+          "emphasis": []
+        }
+      ],
+      "sql": "SELECT length('古晋') AS chars, length(CAST('古晋' AS BLOB)) AS bytes;",
+      "result": {
+        "columns": [
+          "chars",
+          "bytes"
+        ],
+        "rows": [
+          [
+            2,
+            6
+          ]
+        ]
+      }
+    },
+    {
+      "label": "中文字符截取与短文本",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "按字符位置截取，不按字节切割；不足长度仍返回现有字符。",
+          "emphasis": []
+        }
+      ],
+      "sql": "SELECT SUBSTRING('古晋门店',2,2) AS part,SUBSTRING('A',1,3) AS short_text;",
+      "result": {
+        "columns": [
+          "part",
+          "short_text"
+        ],
+        "rows": [
+          [
+            "晋门",
+            "A"
+          ]
+        ]
+      }
+    }
+  ],
+  "cautions": {
+    "comparison": [
+      {
+        "type": "paragraph",
+        "text": "文本截取不是按分隔符拆分；字符计数不是字节计数。",
+        "emphasis": []
+      }
+    ],
+    "example": [
+      {
+        "type": "paragraph",
+        "text": "SUBSTRING(product_name,0,3) 期待前三字符，或把 MySQL LENGTH 当字符计数。",
+        "emphasis": []
+      }
+    ],
+    "reason": [],
+    "correction": [
+      {
+        "type": "paragraph",
+        "text": "正向起始位置写1；字符长度使用 CHAR_LENGTH，兼容环境使用 length(text)。",
+        "emphasis": []
+      }
+    ],
+    "notes": [
+      {
+        "type": "paragraph",
+        "text": "负位置、零位置、特殊字符及字符集差异需要单独验证；本例 UTF-8。",
+        "emphasis": []
+      }
+    ]
+  },
+  "sourcePath": "source/unified73/kp11-02.json",
+  "sourceSha256": "8aadd79cf576b14cc97b8e8bb11a64b11ec11a0ecab1424ce30ef32e0e8a1392"
+}

@@ -1,0 +1,600 @@
+{
+  "id": "kp19-33",
+  "chapterId": "ch19",
+  "title": "高销售低毛利商品诊断",
+  "learningObjective": "先确定销售额排名总体，再筛出毛利率不足阈值的热销商品。",
+  "prerequisites": [],
+  "concept": "高销售指净销售金额高，不代表销量件数高。毛利率为商品总毛利除以总净额，不是各订单毛利率的简单平均。NTILE(4) 将排序后的商品尽量均分成四组，第一组为销售靠前的一组；不是金额累计贡献25%。",
+  "syntax": "WITH a AS (SELECT product_id,SUM(net_cents) net,SUM(cost_cents) cost,SUM(discount_cents) discount,SUM(refund_cents) refund FROM v_sales_lines WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY product_id), b AS (SELECT *,NTILE(4) OVER(ORDER BY net DESC,product_id) bucket FROM a) SELECT product_id,net net_cents,ROUND(100.0*(net-cost)/NULLIF(net,0),2) margin_pct,discount discount_cents,refund refund_cents FROM b WHERE bucket=1 AND 100.0*(net-cost)/NULLIF(net,0)<30 ORDER BY net DESC",
+  "parameters": {
+    "统计截止日": "2025-12-31",
+    "金额": "整数马币分；比率按题设",
+    "输出粒度": "商品"
+  },
+  "fixtureIds": [],
+  "datasetId": "retail-v2",
+  "sourceTables": [
+    {
+      "name": "v_sales_lines",
+      "columns": [
+        {
+          "name": "order_item_id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "order_id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "store_id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "customer_id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "session_id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "channel",
+          "type": "TEXT"
+        },
+        {
+          "name": "order_date",
+          "type": "TEXT"
+        },
+        {
+          "name": "product_id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "promotion_id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "net_qty",
+          "type": "派生"
+        },
+        {
+          "name": "net_cents",
+          "type": "派生"
+        },
+        {
+          "name": "cost_cents",
+          "type": "派生"
+        },
+        {
+          "name": "discount_cents",
+          "type": "INTEGER"
+        },
+        {
+          "name": "refund_cents",
+          "type": "派生"
+        }
+      ],
+      "rows": [
+        [
+          53709,
+          2,
+          4,
+          null,
+          null,
+          "store",
+          "2025-10-02",
+          287,
+          null,
+          1,
+          300,
+          268,
+          0,
+          0
+        ],
+        [
+          55177,
+          2,
+          4,
+          null,
+          null,
+          "store",
+          "2025-10-02",
+          158,
+          null,
+          0,
+          0,
+          0,
+          0,
+          1810
+        ],
+        [
+          29478,
+          3,
+          4,
+          2256,
+          null,
+          "store",
+          "2025-06-09",
+          59,
+          null,
+          1,
+          1310,
+          618,
+          0,
+          0
+        ]
+      ],
+      "previewOnly": true,
+      "rowCount": 64627
+    }
+  ],
+  "sourceTablesArePreview": true,
+  "mysqlSql": "WITH a AS (SELECT product_id,SUM(net_cents) net,SUM(cost_cents) cost,SUM(discount_cents) discount,SUM(refund_cents) refund FROM v_sales_lines WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY product_id), b AS (SELECT *,NTILE(4) OVER(ORDER BY net DESC,product_id) bucket FROM a) SELECT product_id,net net_cents,ROUND(100.0*(net-cost)/NULLIF(net,0),2) margin_pct,discount discount_cents,refund refund_cents FROM b WHERE bucket=1 AND 100.0*(net-cost)/NULLIF(net,0)<30 ORDER BY net DESC",
+  "sqliteSql": "WITH a AS (SELECT product_id,SUM(net_cents) net,SUM(cost_cents) cost,SUM(discount_cents) discount,SUM(refund_cents) refund FROM v_sales_lines WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY product_id), b AS (SELECT *,NTILE(4) OVER(ORDER BY net DESC,product_id) bucket FROM a) SELECT product_id,net net_cents,ROUND(100.0*(net-cost)/NULLIF(net,0),2) margin_pct,discount discount_cents,refund refund_cents FROM b WHERE bucket=1 AND 100.0*(net-cost)/NULLIF(net,0)<30 ORDER BY net DESC",
+  "executionSteps": [
+    "按商品汇总金额",
+    "按净销售划分四档",
+    "筛选首档低毛利",
+    "核对折扣和退款"
+  ],
+  "useCase": "商品经理查找2025年有效线下商品中，净销售额位于第一四分组且毛利率严格低于30%的商品，按净额降序输出。",
+  "comparison": "销售排名与毛利率是两个独立维度；四分组不保证同额商品同档。",
+  "commonError": {
+    "example": "先筛毛利率低于30%的商品，再对剩余商品分四档。",
+    "correction": "先以全体目标商品分档，再应用低毛利筛选；使用未舍入比率判定阈值。"
+  },
+  "notes": "完整输出见 ../enterprise_reference/business_tasks/results/BP03.json；公开预览展示前12行。独立边界及场景仅在提交判题时使用。",
+  "compatibility": {
+    "status": "直接兼容（原生待验证）",
+    "detail": "本版本SQLite及sql.js WASM已实际复验，原生MySQL8.4尚未执行。"
+  },
+  "relatedQuestionIds": [
+    "q0253"
+  ],
+  "relatedFlashcardIds": [
+    "fc0151"
+  ],
+  "relatedKnowledgePointIds": [
+    "kp07-01",
+    "kp08-01",
+    "kp14-01",
+    "kp15-01"
+  ],
+  "mysqlVerification": "未运行原生 MySQL 8.4",
+  "result": {
+    "columns": [
+      "product_id",
+      "net_cents",
+      "margin_pct",
+      "discount_cents",
+      "refund_cents"
+    ],
+    "rows": [
+      [
+        169,
+        1160554,
+        17.73,
+        26953,
+        50733
+      ],
+      [
+        264,
+        422666,
+        19.4,
+        634,
+        30600
+      ],
+      [
+        157,
+        364172,
+        25.3,
+        2401,
+        24737
+      ],
+      [
+        127,
+        359836,
+        25.94,
+        4884,
+        38800
+      ],
+      [
+        399,
+        304741,
+        26.73,
+        759,
+        0
+      ],
+      [
+        367,
+        269142,
+        12.68,
+        7068,
+        13640
+      ],
+      [
+        130,
+        225866,
+        15.99,
+        914,
+        0
+      ],
+      [
+        374,
+        215268,
+        26.51,
+        2869,
+        10123
+      ],
+      [
+        483,
+        213362,
+        15.73,
+        838,
+        14280
+      ],
+      [
+        229,
+        156607,
+        24.8,
+        533,
+        20370
+      ],
+      [
+        22,
+        151511,
+        28.39,
+        3019,
+        17170
+      ],
+      [
+        246,
+        135101,
+        22.39,
+        1659,
+        0
+      ],
+      [
+        193,
+        129663,
+        27.68,
+        1754,
+        9623
+      ],
+      [
+        331,
+        123750,
+        21.41,
+        0,
+        13750
+      ],
+      [
+        231,
+        123483,
+        12.83,
+        2097,
+        9660
+      ],
+      [
+        443,
+        122290,
+        29.07,
+        1080,
+        10140
+      ],
+      [
+        95,
+        120421,
+        22.39,
+        449,
+        0
+      ],
+      [
+        191,
+        116130,
+        21.29,
+        0,
+        5530
+      ],
+      [
+        290,
+        115879,
+        18.7,
+        371,
+        1550
+      ],
+      [
+        460,
+        108609,
+        27.72,
+        982,
+        5249
+      ],
+      [
+        409,
+        108356,
+        20.92,
+        284,
+        970
+      ],
+      [
+        487,
+        107800,
+        25.78,
+        0,
+        43120
+      ],
+      [
+        410,
+        96200,
+        23.09,
+        2600,
+        0
+      ]
+    ],
+    "status": "SQLite实际执行（预览）",
+    "orderGuaranteed": true,
+    "totalRows": 23,
+    "fullResultPath": "../enterprise_reference/business_tasks/results/BP03.json"
+  },
+  "projectId": "retail",
+  "taskId": "BP03",
+  "difficulty": "困难",
+  "crossGroup": null,
+  "mysqlVerificationScript": "../enterprise_reference/business_tasks/mysql_queries/BP03.sql",
+  "visualization": {
+    "kind": "stepFlow",
+    "steps": [
+      {
+        "id": "1",
+        "label": "按商品独立汇总"
+      },
+      {
+        "id": "2",
+        "label": "按全体净额分箱"
+      },
+      {
+        "id": "3",
+        "label": "应用毛利阈值"
+      },
+      {
+        "id": "4",
+        "label": "输出折扣退款"
+      }
+    ],
+    "sourceFixtureIds": [],
+    "resultColumns": [
+      "product_id",
+      "net_cents",
+      "margin_pct",
+      "discount_cents",
+      "refund_cents"
+    ]
+  },
+  "primaryQuestionIds": [
+    "q0253"
+  ],
+  "primaryFlashcardIds": [
+    "fc0151"
+  ],
+  "contentVersion": "4.2.1",
+  "teaching": {
+    "problem": "商品经理查找2025年有效线下商品中，净销售额位于第一四分组且毛利率严格低于30%的商品，按净额降序输出。",
+    "codeExplanation": "a 在商品粒度累计净销售、退货冲减后成本、折扣及退款；b 用全体商品净额降序排名分箱，商品编号为并列决胜键。外层再筛第一组和未舍入毛利率低于30%的商品；零净额作为空值不能判断。退款折扣是诊断线索，净额已经扣除，不再扣第二次。",
+    "resultExplanation": "八件商品分四档，每档两件。商品1净额10000、成本8000、毛利率20%，入选；商品2虽属第一档，毛利率44.44%，不入选；商品3毛利率5%，但在第二档。原企业预览商品169净额1160554分、毛利率17.73%，应核对定价、采购及促销，不能仅凭低毛利认定亏损。",
+    "checkpoints": [
+      {
+        "name": "a",
+        "label": "按商品汇总净额、成本、折扣及退款",
+        "sql": "WITH a AS (SELECT product_id,SUM(net_cents) net,SUM(cost_cents) cost,SUM(discount_cents) discount,SUM(refund_cents) refund FROM v_sales_lines WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY product_id)\nSELECT * FROM a ORDER BY 1, 2, 3, 4, 5 LIMIT 3;",
+        "result": {
+          "columns": [
+            "product_id",
+            "net",
+            "cost",
+            "discount",
+            "refund"
+          ],
+          "rows": [
+            [
+              1,
+              14996,
+              15294,
+              2804,
+              0
+            ],
+            [
+              2,
+              9670,
+              6666,
+              30,
+              970
+            ],
+            [
+              3,
+              26224,
+              12513,
+              276,
+              1060
+            ]
+          ]
+        }
+      },
+      {
+        "name": "b",
+        "label": "按销售额划分商品档位",
+        "sql": "WITH a AS (SELECT product_id,SUM(net_cents) net,SUM(cost_cents) cost,SUM(discount_cents) discount,SUM(refund_cents) refund FROM v_sales_lines WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY product_id), b AS (SELECT *,NTILE(4) OVER(ORDER BY net DESC,product_id) bucket FROM a)\nSELECT * FROM b ORDER BY 1, 2, 3, 4, 5, 6 LIMIT 3;",
+        "result": {
+          "columns": [
+            "product_id",
+            "net",
+            "cost",
+            "discount",
+            "refund",
+            "bucket"
+          ],
+          "rows": [
+            [
+              1,
+              14996,
+              15294,
+              2804,
+              0,
+              4
+            ],
+            [
+              2,
+              9670,
+              6666,
+              30,
+              970,
+              4
+            ],
+            [
+              3,
+              26224,
+              12513,
+              276,
+              1060,
+              3
+            ]
+          ]
+        }
+      }
+    ],
+    "mergedConcepts": [],
+    "mergeExamples": [
+      {
+        "label": "小型示例：商品汇总",
+        "explanation": "查看每件商品的净额及成本，为比较提供统一粒度。",
+        "sql": "WITH v_sales_lines AS (SELECT 1 product_id, '2025-06-01' order_date,'store' channel,10000 net_cents,8000 cost_cents,500 discount_cents,200 refund_cents UNION ALL SELECT 2,'2025-06-01','store',9000,5000,100,0 UNION ALL SELECT 3,'2025-06-01','store',8000,7600,100,0 UNION ALL SELECT 4,'2025-06-01','store',7000,4000,0,0 UNION ALL SELECT 5,'2025-06-01','store',6000,3000,0,0 UNION ALL SELECT 6,'2025-06-01','store',5000,4000,0,0 UNION ALL SELECT 7,'2025-06-01','store',4000,3000,0,0 UNION ALL SELECT 8,'2025-06-01','store',0,0,0,100),\na AS (SELECT product_id,SUM(net_cents) net,SUM(cost_cents) cost,SUM(discount_cents) discount,SUM(refund_cents) refund FROM v_sales_lines WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY product_id),\nb AS (SELECT *,NTILE(4) OVER(ORDER BY net DESC,product_id) bucket FROM a) SELECT product_id,net,cost FROM a ORDER BY net;",
+        "result": {
+          "columns": [
+            "product_id",
+            "net",
+            "cost"
+          ],
+          "rows": [
+            [
+              8,
+              0,
+              0
+            ],
+            [
+              7,
+              4000,
+              3000
+            ],
+            [
+              6,
+              5000,
+              4000
+            ],
+            [
+              5,
+              6000,
+              3000
+            ],
+            [
+              4,
+              7000,
+              4000
+            ],
+            [
+              3,
+              8000,
+              7600
+            ],
+            [
+              2,
+              9000,
+              5000
+            ],
+            [
+              1,
+              10000,
+              8000
+            ]
+          ]
+        }
+      },
+      {
+        "label": "小型示例：销售分档",
+        "explanation": "先给全体商品分档，不能事先按毛利率筛选。",
+        "sql": "WITH v_sales_lines AS (SELECT 1 product_id, '2025-06-01' order_date,'store' channel,10000 net_cents,8000 cost_cents,500 discount_cents,200 refund_cents UNION ALL SELECT 2,'2025-06-01','store',9000,5000,100,0 UNION ALL SELECT 3,'2025-06-01','store',8000,7600,100,0 UNION ALL SELECT 4,'2025-06-01','store',7000,4000,0,0 UNION ALL SELECT 5,'2025-06-01','store',6000,3000,0,0 UNION ALL SELECT 6,'2025-06-01','store',5000,4000,0,0 UNION ALL SELECT 7,'2025-06-01','store',4000,3000,0,0 UNION ALL SELECT 8,'2025-06-01','store',0,0,0,100),\na AS (SELECT product_id,SUM(net_cents) net,SUM(cost_cents) cost,SUM(discount_cents) discount,SUM(refund_cents) refund FROM v_sales_lines WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY product_id),\nb AS (SELECT *,NTILE(4) OVER(ORDER BY net DESC,product_id) bucket FROM a) SELECT product_id,bucket,ROUND(100.0*(net-cost)/NULLIF(net,0),2) AS margin_pct FROM b ORDER BY bucket DESC, margin_pct DESC;",
+        "result": {
+          "columns": [
+            "product_id",
+            "bucket",
+            "margin_pct"
+          ],
+          "rows": [
+            [
+              7,
+              4,
+              25.0
+            ],
+            [
+              8,
+              4,
+              null
+            ],
+            [
+              5,
+              3,
+              50.0
+            ],
+            [
+              6,
+              3,
+              20.0
+            ],
+            [
+              4,
+              2,
+              42.86
+            ],
+            [
+              3,
+              2,
+              5.0
+            ],
+            [
+              2,
+              1,
+              44.44
+            ],
+            [
+              1,
+              1,
+              20.0
+            ]
+          ]
+        }
+      },
+      {
+        "label": "小型示例：完整诊断查询",
+        "explanation": "仅商品1同时满足两个条件。",
+        "sql": "WITH v_sales_lines AS (SELECT 1 product_id, '2025-06-01' order_date,'store' channel,10000 net_cents,8000 cost_cents,500 discount_cents,200 refund_cents UNION ALL SELECT 2,'2025-06-01','store',9000,5000,100,0 UNION ALL SELECT 3,'2025-06-01','store',8000,7600,100,0 UNION ALL SELECT 4,'2025-06-01','store',7000,4000,0,0 UNION ALL SELECT 5,'2025-06-01','store',6000,3000,0,0 UNION ALL SELECT 6,'2025-06-01','store',5000,4000,0,0 UNION ALL SELECT 7,'2025-06-01','store',4000,3000,0,0 UNION ALL SELECT 8,'2025-06-01','store',0,0,0,100),\na AS (SELECT product_id,SUM(net_cents) net,SUM(cost_cents) cost,SUM(discount_cents) discount,SUM(refund_cents) refund FROM v_sales_lines WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY product_id),\nb AS (SELECT *,NTILE(4) OVER(ORDER BY net DESC,product_id) bucket FROM a) SELECT product_id,net net_cents,ROUND(100.0*(net-cost)/NULLIF(net,0),2) margin_pct,discount discount_cents,refund refund_cents FROM b WHERE bucket=1 AND 100.0*(net-cost)/NULLIF(net,0)<30 ORDER BY net DESC;",
+        "result": {
+          "columns": [
+            "product_id",
+            "net_cents",
+            "margin_pct",
+            "discount_cents",
+            "refund_cents"
+          ],
+          "rows": [
+            [
+              1,
+              10000,
+              20.0,
+              500,
+              200
+            ]
+          ]
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,871 @@
+{
+  "id": "kp20-01",
+  "chapterId": "ch20",
+  "title": "多表汇总与贡献率",
+  "learningObjective": "能够按指定业务粒度计算净销售贡献率，保留无销售门店，并解释全体分母与零分母边界。",
+  "prerequisites": [
+    "kp20-03"
+  ],
+  "concept": "贡献率=分组净销售额÷全部分组净销售额×100%。分母必须与分子采用相同期间、渠道及有效订单口径。先按门店汇总，再计算全体总额；全体为零时比例留空。净销售可能因退款为负，贡献率并不必然介于0%和100%之间。",
+  "syntax": "SUM(金额) OVER()；分组金额 / NULLIF(总体金额,0)",
+  "parameters": {
+    "统计期间": "2025年",
+    "渠道": "线下门店",
+    "输出粒度": "门店",
+    "金额": "马币分"
+  },
+  "fixtureIds": [
+    "kp20-01-stores",
+    "kp20-01-customers",
+    "kp20-01-calendar_days",
+    "kp20-01-orders",
+    "kp20-01-order_items",
+    "kp20-01-returns"
+  ],
+  "sourceTables": [
+    {
+      "name": "stores",
+      "columns": [
+        {
+          "name": "store_id",
+          "sqliteType": "INTEGER",
+          "type": "INTEGER"
+        },
+        {
+          "name": "store_name",
+          "sqliteType": "TEXT",
+          "type": "TEXT"
+        },
+        {
+          "name": "city",
+          "sqliteType": "TEXT",
+          "type": "TEXT"
+        },
+        {
+          "name": "fulfillment_warehouse_id",
+          "sqliteType": "INTEGER",
+          "type": "INTEGER"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          "门店1",
+          "古晋",
+          1
+        ],
+        [
+          2,
+          "门店2",
+          "古晋",
+          1
+        ],
+        [
+          3,
+          "门店3",
+          "古晋",
+          1
+        ]
+      ]
+    },
+    {
+      "name": "customers",
+      "columns": [
+        {
+          "name": "customer_id",
+          "sqliteType": "INTEGER",
+          "type": "INTEGER"
+        },
+        {
+          "name": "customer_name",
+          "sqliteType": "TEXT",
+          "type": "TEXT"
+        },
+        {
+          "name": "signup_date",
+          "sqliteType": "TEXT",
+          "type": "TEXT"
+        },
+        {
+          "name": "region",
+          "sqliteType": "TEXT",
+          "type": "TEXT"
+        },
+        {
+          "name": "member_since_date",
+          "sqliteType": "TEXT",
+          "type": "TEXT"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          "客户1",
+          "2024-01-01",
+          null,
+          null
+        ],
+        [
+          2,
+          "客户2",
+          "2024-01-01",
+          null,
+          null
+        ],
+        [
+          3,
+          "客户3",
+          "2024-01-01",
+          null,
+          null
+        ],
+        [
+          4,
+          "客户4",
+          "2024-01-01",
+          null,
+          null
+        ]
+      ]
+    },
+    {
+      "name": "calendar_days",
+      "columns": [
+        {
+          "name": "day",
+          "sqliteType": "TEXT",
+          "type": "TEXT"
+        },
+        {
+          "name": "month_key",
+          "sqliteType": "TEXT",
+          "type": "TEXT"
+        },
+        {
+          "name": "day_index",
+          "sqliteType": "INTEGER",
+          "type": "INTEGER"
+        }
+      ],
+      "rows": [
+        [
+          "2025-01-01",
+          "2025-01",
+          1
+        ],
+        [
+          "2025-02-01",
+          "2025-02",
+          2
+        ],
+        [
+          "2025-03-01",
+          "2025-03",
+          3
+        ],
+        [
+          "2025-04-01",
+          "2025-04",
+          4
+        ],
+        [
+          "2025-05-01",
+          "2025-05",
+          5
+        ],
+        [
+          "2025-06-01",
+          "2025-06",
+          6
+        ],
+        [
+          "2025-07-01",
+          "2025-07",
+          7
+        ],
+        [
+          "2025-08-01",
+          "2025-08",
+          8
+        ],
+        [
+          "2025-09-01",
+          "2025-09",
+          9
+        ],
+        [
+          "2025-10-01",
+          "2025-10",
+          10
+        ],
+        [
+          "2025-11-01",
+          "2025-11",
+          11
+        ],
+        [
+          "2025-12-01",
+          "2025-12",
+          12
+        ]
+      ]
+    },
+    {
+      "name": "orders",
+      "columns": [
+        {
+          "name": "order_id",
+          "sqliteType": "INTEGER",
+          "type": "INTEGER"
+        },
+        {
+          "name": "store_id",
+          "sqliteType": "INTEGER",
+          "type": "INTEGER"
+        },
+        {
+          "name": "customer_id",
+          "sqliteType": "INTEGER",
+          "type": "INTEGER"
+        },
+        {
+          "name": "session_id",
+          "sqliteType": "INTEGER",
+          "type": "INTEGER"
+        },
+        {
+          "name": "order_date",
+          "sqliteType": "TEXT",
+          "type": "TEXT"
+        },
+        {
+          "name": "channel",
+          "sqliteType": "TEXT",
+          "type": "TEXT"
+        },
+        {
+          "name": "status",
+          "sqliteType": "TEXT",
+          "type": "TEXT"
+        },
+        {
+          "name": "cancellation_reason",
+          "sqliteType": "TEXT",
+          "type": "TEXT"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          1,
+          null,
+          null,
+          "2025-01-02",
+          "store",
+          "completed",
+          null
+        ],
+        [
+          2,
+          1,
+          null,
+          null,
+          "2025-03-02",
+          "store",
+          "completed",
+          null
+        ],
+        [
+          3,
+          2,
+          null,
+          null,
+          "2025-03-03",
+          "store",
+          "completed",
+          null
+        ],
+        [
+          4,
+          1,
+          null,
+          null,
+          "2024-12-31",
+          "store",
+          "completed",
+          null
+        ],
+        [
+          5,
+          null,
+          1,
+          5,
+          "2025-01-02",
+          "online",
+          "completed",
+          null
+        ],
+        [
+          6,
+          null,
+          1,
+          6,
+          "2025-03-02",
+          "online",
+          "completed",
+          null
+        ],
+        [
+          7,
+          null,
+          2,
+          7,
+          "2025-03-03",
+          "online",
+          "completed",
+          null
+        ],
+        [
+          8,
+          null,
+          2,
+          8,
+          "2025-04-03",
+          "online",
+          "completed",
+          null
+        ],
+        [
+          9,
+          null,
+          3,
+          9,
+          "2025-05-03",
+          "online",
+          "cancelled",
+          "客户取消"
+        ],
+        [
+          10,
+          null,
+          4,
+          10,
+          "2025-06-03",
+          "online",
+          "pending",
+          null
+        ],
+        [
+          11,
+          null,
+          3,
+          11,
+          "2026-01-01",
+          "online",
+          "completed",
+          null
+        ]
+      ]
+    },
+    {
+      "name": "order_items",
+      "columns": [
+        {
+          "name": "order_item_id",
+          "sqliteType": "INTEGER",
+          "type": "INTEGER"
+        },
+        {
+          "name": "order_id",
+          "sqliteType": "INTEGER",
+          "type": "INTEGER"
+        },
+        {
+          "name": "product_id",
+          "sqliteType": "INTEGER",
+          "type": "INTEGER"
+        },
+        {
+          "name": "promotion_id",
+          "sqliteType": "INTEGER",
+          "type": "INTEGER"
+        },
+        {
+          "name": "quantity",
+          "sqliteType": "INTEGER",
+          "type": "INTEGER"
+        },
+        {
+          "name": "unit_price_cents",
+          "sqliteType": "INTEGER",
+          "type": "INTEGER"
+        },
+        {
+          "name": "discount_cents",
+          "sqliteType": "INTEGER",
+          "type": "INTEGER"
+        },
+        {
+          "name": "unit_cost_cents",
+          "sqliteType": "INTEGER",
+          "type": "INTEGER"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          1,
+          1,
+          null,
+          2,
+          100,
+          0,
+          10
+        ],
+        [
+          2,
+          1,
+          2,
+          null,
+          1,
+          100,
+          0,
+          10
+        ],
+        [
+          3,
+          1,
+          3,
+          null,
+          1,
+          100,
+          0,
+          10
+        ],
+        [
+          4,
+          1,
+          4,
+          null,
+          1,
+          100,
+          0,
+          10
+        ],
+        [
+          5,
+          2,
+          5,
+          null,
+          1,
+          50,
+          0,
+          10
+        ],
+        [
+          6,
+          3,
+          1,
+          null,
+          1,
+          80,
+          0,
+          10
+        ],
+        [
+          7,
+          4,
+          1,
+          null,
+          1,
+          900,
+          0,
+          10
+        ],
+        [
+          8,
+          5,
+          1,
+          null,
+          1,
+          70,
+          0,
+          10
+        ],
+        [
+          9,
+          5,
+          2,
+          null,
+          1,
+          30,
+          0,
+          10
+        ],
+        [
+          10,
+          6,
+          2,
+          null,
+          1,
+          60,
+          0,
+          10
+        ],
+        [
+          11,
+          7,
+          1,
+          null,
+          1,
+          40,
+          0,
+          10
+        ],
+        [
+          12,
+          8,
+          2,
+          null,
+          1,
+          20,
+          0,
+          10
+        ],
+        [
+          13,
+          9,
+          1,
+          null,
+          1,
+          200,
+          0,
+          10
+        ],
+        [
+          14,
+          10,
+          1,
+          null,
+          1,
+          200,
+          0,
+          10
+        ],
+        [
+          15,
+          11,
+          1,
+          null,
+          1,
+          200,
+          0,
+          10
+        ]
+      ]
+    },
+    {
+      "name": "returns",
+      "columns": [
+        {
+          "name": "return_id",
+          "sqliteType": "INTEGER",
+          "type": "INTEGER"
+        },
+        {
+          "name": "order_item_id",
+          "sqliteType": "INTEGER",
+          "type": "INTEGER"
+        },
+        {
+          "name": "return_date",
+          "sqliteType": "TEXT",
+          "type": "TEXT"
+        },
+        {
+          "name": "quantity",
+          "sqliteType": "INTEGER",
+          "type": "INTEGER"
+        },
+        {
+          "name": "refund_cents",
+          "sqliteType": "INTEGER",
+          "type": "INTEGER"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          1,
+          "2025-02-01",
+          1,
+          100
+        ],
+        [
+          2,
+          12,
+          "2025-04-05",
+          1,
+          20
+        ]
+      ]
+    }
+  ],
+  "mysqlSql": "WITH totals AS (\n SELECT s.store_id, COALESCE(SUM(o.net_cents),0) net_cents\n FROM stores s LEFT JOIN v_order_net o ON o.store_id=s.store_id\n  AND o.channel='store' AND o.order_date BETWEEN '2025-01-01' AND '2025-12-31'\n GROUP BY s.store_id\n)\nSELECT store_id,net_cents,ROUND(100.0*net_cents/NULLIF(SUM(net_cents) OVER(),0),2) sales_pct\nFROM totals ORDER BY net_cents DESC",
+  "sqliteSql": "WITH totals AS (\n SELECT s.store_id, COALESCE(SUM(o.net_cents),0) net_cents\n FROM stores s LEFT JOIN v_order_net o ON o.store_id=s.store_id\n  AND o.channel='store' AND o.order_date BETWEEN '2025-01-01' AND '2025-12-31'\n GROUP BY s.store_id\n)\nSELECT store_id,net_cents,ROUND(100.0*net_cents/NULLIF(SUM(net_cents) OVER(),0),2) sales_pct\nFROM totals ORDER BY net_cents DESC",
+  "executionSteps": [
+    "限定有效线下订单及期间",
+    "保留门店并汇总净销售",
+    "计算全体净销售及贡献率",
+    "排序或筛选展示名次"
+  ],
+  "useCase": "区域经理需要比较2025年全部实体门店对同期净销售的贡献，并保留没有销售的门店。金额采用马币分；有效订单以原项目视图为准。",
+  "comparison": "贡献率以总体净销售为分母；毛利率以本组净销售为分母；排名只表示顺序，并非比例。",
+  "commonError": {
+    "example": "先筛选前三门店再计算总体，或将右表过滤放在 WHERE。",
+    "correction": "先计算所有门店贡献率再筛名次；右表匹配条件放在 ON。"
+  },
+  "notes": "原课程数据、主查询和结果保持不变。独立示例采用内联净额，未重建原项目视图；原生数据库及浏览器未验证。",
+  "compatibility": {
+    "status": "直接兼容",
+    "detail": "仅在本示例数据与语义范围验证；不代表全部 MySQL 语法兼容。"
+  },
+  "relatedQuestionIds": [
+    "q0282",
+    "q0284",
+    "q0288",
+    "q0291",
+    "q0294",
+    "q0297",
+    "q0299"
+  ],
+  "relatedFlashcardIds": [
+    "fc0146",
+    "fc0182"
+  ],
+  "relatedKnowledgePointIds": [
+    "kp07-01",
+    "kp08-01",
+    "kp10-01",
+    "kp14-01",
+    "kp15-01",
+    "kp19-01",
+    "kp06-01",
+    "kp09-01",
+    "kp12-01"
+  ],
+  "mysqlVerification": "未执行原生 MySQL",
+  "result": {
+    "columns": [
+      "store_id",
+      "net_cents",
+      "sales_pct"
+    ],
+    "rows": [
+      [
+        1,
+        450,
+        84.91
+      ],
+      [
+        2,
+        80,
+        15.09
+      ],
+      [
+        3,
+        0,
+        0.0
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": true
+  },
+  "visualization": {
+    "kind": "stepFlow",
+    "steps": [
+      {
+        "id": "1",
+        "label": "门店连接"
+      },
+      {
+        "id": "2",
+        "label": "按门店聚合"
+      },
+      {
+        "id": "3",
+        "label": "窗口求全体销售3600"
+      },
+      {
+        "id": "4",
+        "label": "计算占比"
+      }
+    ],
+    "sourceFixtureIds": [
+      "lesson-orders",
+      "lesson-stores"
+    ],
+    "resultColumns": [
+      "store_name",
+      "total",
+      "share_pct"
+    ]
+  },
+  "mysqlVerificationScript": "validation/mysql/kp20-01.sql",
+  "primaryQuestionIds": [
+    "q0288"
+  ],
+  "primaryFlashcardIds": [
+    "fc0146",
+    "fc0182"
+  ],
+  "mergedFrom": [
+    {
+      "id": "kp19-10",
+      "title": "零售：类别销售贡献率"
+    }
+  ],
+  "setupSql": "CREATE VIEW v_sales_lines AS SELECT i.order_item_id,o.order_id,o.store_id,o.customer_id,o.session_id,o.channel,o.order_date,i.product_id,i.promotion_id,i.quantity-COALESCE(r.qty,0) AS net_qty,i.quantity*i.unit_price_cents-i.discount_cents-COALESCE(r.refund,0) AS net_cents,(i.quantity-COALESCE(r.qty,0))*i.unit_cost_cents AS cost_cents,i.discount_cents,COALESCE(r.refund,0) AS refund_cents FROM orders o JOIN order_items i ON o.order_id=i.order_id LEFT JOIN (SELECT order_item_id,SUM(quantity) qty,SUM(refund_cents) refund FROM returns WHERE return_date<='2025-12-31' GROUP BY order_item_id) r ON r.order_item_id=i.order_item_id WHERE o.status='completed';\nCREATE VIEW v_order_net AS SELECT order_id,store_id,customer_id,session_id,channel,order_date,SUM(net_cents) net_cents,SUM(cost_cents) cost_cents FROM v_sales_lines GROUP BY order_id,store_id,customer_id,session_id,channel,order_date;",
+  "teaching": {
+    "problem": "区域经理需要比较2025年全部实体门店对同期净销售的贡献，并保留没有销售的门店。金额采用马币分；有效订单以原项目视图为准。",
+    "codeExplanation": "原查询以门店主档为左表，将渠道和日期条件放在 ON 中，避免无匹配订单的门店被 WHERE 排除。SUM 汇总订单净额，COALESCE 将无销售的门店补零。totals 每门店一行；SUM(net_cents) OVER() 在该层每行提供相同总体分母。NULLIF 将零分母变为空，ROUND 仅在最后保留两位小数。若只展示前几名，先在公用表表达式内计算比例，再在外层排序限制行数；不能先过滤门店再计算总体。类别分析需要商品销售明细及类别映射，而非将订单总额直接连接商品明细。独立例子直接提供净额，未重新构造原订单退款视图。",
+    "resultExplanation": "原课程结果为门店1净额450分、84.91%，门店2净额80分、15.09%，门店3净额0分、0%。独立例子复现相同数值：门店1的2024年订单及门店2的线上订单排除。类别示例总额500分，前两类合计占90%，剩余10%属于未展示类别。贡献率高不代表利润率高；管理层还需结合成本和门店规模。",
+    "checkpoints": [
+      {
+        "name": "totals",
+        "label": "汇总各门店净销售并保留无销售门店",
+        "sql": "WITH totals AS (\n SELECT s.store_id, COALESCE(SUM(o.net_cents),0) net_cents\n FROM stores s LEFT JOIN v_order_net o ON o.store_id=s.store_id\n  AND o.channel='store' AND o.order_date BETWEEN '2025-01-01' AND '2025-12-31'\n GROUP BY s.store_id\n)\nSELECT * FROM totals ORDER BY 1, 2 LIMIT 3;",
+        "result": {
+          "columns": [
+            "store_id",
+            "net_cents"
+          ],
+          "rows": [
+            [
+              1,
+              450
+            ],
+            [
+              2,
+              80
+            ],
+            [
+              3,
+              0
+            ]
+          ]
+        }
+      }
+    ],
+    "mergedConcepts": [
+      {
+        "sourceId": "kp19-10",
+        "explanation": "商品类别贡献率同样先聚合全部类别、计算总体，再限制展示名次。订单总额不能直接分摊至多件商品；采用有效商品行净额并核对类别连接键。"
+      }
+    ],
+    "mergeExamples": [
+      {
+        "label": "门店净销售汇总",
+        "explanation": "先将订单聚合到门店粒度；门店3没有有效订单仍保留。",
+        "sql": "WITH stores(store_id) AS (VALUES (1),(2),(3)),\nv_order_net(store_id,channel,order_date,net_cents) AS (VALUES\n (1,'store','2025-01-02',400),(1,'store','2025-03-02',50),\n (2,'store','2025-03-03',80),(1,'store','2024-12-31',900),\n (2,'online','2025-03-04',200)),\ntotals AS (\n SELECT s.store_id,COALESCE(SUM(o.net_cents),0) net_cents\n FROM stores s LEFT JOIN v_order_net o ON o.store_id=s.store_id\n AND o.channel='store' AND o.order_date BETWEEN '2025-01-01' AND '2025-12-31'\n GROUP BY s.store_id\n)\nSELECT * FROM totals ORDER BY net_cents;",
+        "result": {
+          "columns": [
+            "store_id",
+            "net_cents"
+          ],
+          "rows": [
+            [
+              3,
+              0
+            ],
+            [
+              2,
+              80
+            ],
+            [
+              1,
+              450
+            ]
+          ]
+        }
+      },
+      {
+        "label": "完整贡献率查询",
+        "explanation": "总体金额530分，450÷530×100=84.91%；80÷530×100=15.09%。",
+        "sql": "WITH stores(store_id) AS (VALUES (1),(2),(3)),\nv_order_net(store_id,channel,order_date,net_cents) AS (VALUES\n (1,'store','2025-01-02',400),(1,'store','2025-03-02',50),\n (2,'store','2025-03-03',80),(1,'store','2024-12-31',900),\n (2,'online','2025-03-04',200)),\ntotals AS (\n SELECT s.store_id,COALESCE(SUM(o.net_cents),0) net_cents\n FROM stores s LEFT JOIN v_order_net o ON o.store_id=s.store_id\n AND o.channel='store' AND o.order_date BETWEEN '2025-01-01' AND '2025-12-31'\n GROUP BY s.store_id\n)\nSELECT store_id,net_cents,ROUND(100.0*net_cents/NULLIF(SUM(net_cents) OVER(),0),2) sales_pct\nFROM totals ORDER BY net_cents DESC;",
+        "result": {
+          "columns": [
+            "store_id",
+            "net_cents",
+            "sales_pct"
+          ],
+          "rows": [
+            [
+              1,
+              450,
+              84.91
+            ],
+            [
+              2,
+              80,
+              15.09
+            ],
+            [
+              3,
+              0,
+              0.0
+            ]
+          ]
+        }
+      },
+      {
+        "label": "类别贡献率与前两名",
+        "explanation": "总额500分，类别1为300分、类别2为150分，前两名仍分别占总体60%及30%，不重新归一。",
+        "sql": "WITH sales(category_id,net_cents) AS (VALUES (1,200),(1,100),(2,150),(3,50)),\ntotals AS (SELECT category_id,SUM(net_cents) net_cents FROM sales GROUP BY category_id),\nshares AS (SELECT category_id,net_cents,ROUND(100.0*net_cents/NULLIF(SUM(net_cents) OVER(),0),2) sales_pct FROM totals)\nSELECT * FROM shares ORDER BY net_cents DESC LIMIT 2;",
+        "result": {
+          "columns": [
+            "category_id",
+            "net_cents",
+            "sales_pct"
+          ],
+          "rows": [
+            [
+              1,
+              300,
+              60.0
+            ],
+            [
+              2,
+              150,
+              30.0
+            ]
+          ]
+        }
+      },
+      {
+        "label": "总体为零的边界",
+        "explanation": "总体0时比例没有定义，即使单个门店为0也不能显示0%。",
+        "sql": "WITH totals(store_id,net_cents) AS (VALUES (1,0),(2,0)) SELECT store_id,net_cents,ROUND(100.0*net_cents/NULLIF(SUM(net_cents) OVER(),0),2) sales_pct FROM totals ORDER BY net_cents DESC;",
+        "result": {
+          "columns": [
+            "store_id",
+            "net_cents",
+            "sales_pct"
+          ],
+          "rows": [
+            [
+              1,
+              0,
+              null
+            ],
+            [
+              2,
+              0,
+              null
+            ]
+          ]
+        }
+      }
+    ]
+  }
+}

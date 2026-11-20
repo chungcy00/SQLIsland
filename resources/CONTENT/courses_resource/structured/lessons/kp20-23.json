@@ -1,0 +1,3629 @@
+{
+  "schemaVersion": 1,
+  "id": "kp20-23",
+  "sourceBatch": "unified73",
+  "teachingKind": "business",
+  "conceptBlocks": [
+    {
+      "type": "paragraph",
+      "text": "每月一行。销售按订单日期、费用按分录日期、人工按员工月份、采购按订单日期、广告按活动月份独立聚合。经营贡献=毛利−费用−人工；广告与采购承诺单列，不重复扣减。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "无业务月份保留，确认数据完整后才补零。",
+      "emphasis": []
+    }
+  ],
+  "syntax": {
+    "purpose": "统计截止日 2025-12-31；金额 马币分；输出粒度 月。"
+  },
+  "dataDescriptions": {
+    "calendar_days": "共 3 行；字段：day、month_key、day_index。",
+    "marketing_campaigns": "共 3 行；字段：campaign_id、source_id、month_key、spend_cents。",
+    "v_expenses": "共 3 行；字段：entry_id、entry_date、department_id、store_id、reference_no、account_id、expense_cents。",
+    "v_po_lines": "共 3 行；字段：po_item_id、po_id、supplier_id、warehouse_id、order_date、promised_date、product_id、quantity_ordered、unit_price_cents、ordered_cents、received、accepted、on_time、billed、billed_cents。",
+    "v_sales_lines": "共 3 行；字段：order_item_id、order_id、store_id、customer_id、session_id、channel、order_date、product_id、promotion_id、net_qty、net_cents、cost_cents、discount_cents、refund_cents。",
+    "v_staff_month": "共 3 行；字段：employee_id、month_key、department_id、position_id、store_id、base_cents、bonus_cents、overtime_minutes、worked_minutes、labor_cents。"
+  },
+  "problem": "管理层需要2025年每月全渠道经营概览，将净销售、毛利、费用、人工、广告和采购承诺汇总到同一报表，并在异常月份下钻门店，区分利润、费用压力与采购资金承诺。",
+  "methodBlocks": [
+    {
+      "type": "paragraph",
+      "text": "m 从日历去重取得12个月；s 按订单日期提取月份，汇总净销售与净销售减净成本的毛利；f 按费用入账月份汇总费用；h 按员工月汇总人工估算成本；",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "p 按采购订单月份汇总承诺金额，而非实际付款或销售成本；a 按活动月份汇总广告支出。每个子查询先归并为一月一行，随后从 m 左连接五组结果，避免销售和费用明细多对多相乘。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "主查询中 s、f、p 只设起始日期，最终与2025月份轴连接限制输出；真实部署可为各模块增加截止边界以减少扫描，但此补丁不修改主查询。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "COALESCE 用于已确认无业务的情况，来源缺失需另作完整性核验。最后毛利减费用和人工，广告可能已入费用，不重复扣减；人工同样需确认费用中是否已包含，采购承诺不是当期损益。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "门店下钻时，毛利率用总毛利除总净额，目标达成率仅使用目标为正门店的实际及目标；退款率以折后扣退款前金额为分母。示例以总体加权基准比较低毛利、低达成及高退款，未知比率需另核查。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "门店贡献用毛利减直接归属费用；总部及未归属人工仍在口径外。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "滚动费用率按门店采用三个月费用合计除销售合计，在连续月份轴上用 ROWS 窗口，期初需保留报告前两个月，行数不足或分母为零留空；不得平均月比率。",
+      "emphasis": []
+    }
+  ],
+  "breakdown": [
+    {
+      "kind": "runnable",
+      "title": "准备完整自然月份轴",
+      "sql": "WITH m AS (SELECT DISTINCT month_key FROM calendar_days WHERE month_key BETWEEN '2025-01' AND '2025-12')\nSELECT * FROM m ORDER BY 1 LIMIT 3;",
+      "purpose": "准备完整自然月份轴（m）的实际执行结果。",
+      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "sourceTables": [
+        {
+          "name": "calendar_days",
+          "columns": [
+            {
+              "name": "day",
+              "type": "TEXT"
+            },
+            {
+              "name": "month_key",
+              "type": "TEXT"
+            },
+            {
+              "name": "day_index",
+              "type": "INTEGER"
+            }
+          ],
+          "rows": [
+            [
+              "2023-01-01",
+              "2023-01",
+              0
+            ],
+            [
+              "2023-01-02",
+              "2023-01",
+              1
+            ],
+            [
+              "2023-01-03",
+              "2023-01",
+              2
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 1096
+        },
+        {
+          "name": "marketing_campaigns",
+          "columns": [
+            {
+              "name": "campaign_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "source_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "month_key",
+              "type": "TEXT"
+            },
+            {
+              "name": "spend_cents",
+              "type": "INTEGER"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              "2023-01",
+              0
+            ],
+            [
+              2,
+              2,
+              "2023-01",
+              349637
+            ],
+            [
+              3,
+              3,
+              "2023-01",
+              173632
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 180
+        },
+        {
+          "name": "v_expenses",
+          "columns": [
+            {
+              "name": "entry_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "entry_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "department_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "store_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "reference_no",
+              "type": "TEXT"
+            },
+            {
+              "name": "account_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "expense_cents",
+              "type": "派生"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              "2025-06-02",
+              4,
+              null,
+              "J000001",
+              4,
+              13842
+            ],
+            [
+              2,
+              "2025-12-04",
+              1,
+              null,
+              "J000002",
+              4,
+              65928
+            ],
+            [
+              3,
+              "2023-04-04",
+              1,
+              null,
+              "J000003",
+              4,
+              21203
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 18000
+        },
+        {
+          "name": "v_po_lines",
+          "columns": [
+            {
+              "name": "po_item_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "po_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "supplier_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "warehouse_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "order_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "promised_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "product_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "quantity_ordered",
+              "type": "INTEGER"
+            },
+            {
+              "name": "unit_price_cents",
+              "type": "INTEGER"
+            },
+            {
+              "name": "ordered_cents",
+              "type": "派生"
+            },
+            {
+              "name": "received",
+              "type": "派生"
+            },
+            {
+              "name": "accepted",
+              "type": "派生"
+            },
+            {
+              "name": "on_time",
+              "type": "派生"
+            },
+            {
+              "name": "billed",
+              "type": "派生"
+            },
+            {
+              "name": "billed_cents",
+              "type": "派生"
+            }
+          ],
+          "rows": [
+            [
+              3077,
+              2633,
+              59,
+              3,
+              "2023-01-01",
+              "2023-01-06",
+              312,
+              33,
+              1076,
+              35508,
+              33,
+              33,
+              33,
+              33,
+              35508
+            ],
+            [
+              2479,
+              4775,
+              49,
+              1,
+              "2023-01-01",
+              "2023-01-19",
+              165,
+              10,
+              785,
+              7850,
+              10,
+              10,
+              0,
+              12,
+              9420
+            ],
+            [
+              9661,
+              4886,
+              2,
+              1,
+              "2023-01-01",
+              "2023-01-14",
+              413,
+              6,
+              1212,
+              7272,
+              6,
+              6,
+              6,
+              7,
+              8484
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 9625
+        },
+        {
+          "name": "v_sales_lines",
+          "columns": [
+            {
+              "name": "order_item_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "order_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "store_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "customer_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "session_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "channel",
+              "type": "TEXT"
+            },
+            {
+              "name": "order_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "product_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "promotion_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "net_qty",
+              "type": "派生"
+            },
+            {
+              "name": "net_cents",
+              "type": "派生"
+            },
+            {
+              "name": "cost_cents",
+              "type": "派生"
+            },
+            {
+              "name": "discount_cents",
+              "type": "INTEGER"
+            },
+            {
+              "name": "refund_cents",
+              "type": "派生"
+            }
+          ],
+          "rows": [
+            [
+              53709,
+              2,
+              4,
+              null,
+              null,
+              "store",
+              "2025-10-02",
+              287,
+              null,
+              1,
+              300,
+              268,
+              0,
+              0
+            ],
+            [
+              55177,
+              2,
+              4,
+              null,
+              null,
+              "store",
+              "2025-10-02",
+              158,
+              null,
+              0,
+              0,
+              0,
+              0,
+              1810
+            ],
+            [
+              29478,
+              3,
+              4,
+              2256,
+              null,
+              "store",
+              "2025-06-09",
+              59,
+              null,
+              1,
+              1310,
+              618,
+              0,
+              0
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 64627
+        },
+        {
+          "name": "v_staff_month",
+          "columns": [
+            {
+              "name": "employee_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "month_key",
+              "type": "TEXT"
+            },
+            {
+              "name": "department_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "position_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "store_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "base_cents",
+              "type": "INTEGER"
+            },
+            {
+              "name": "bonus_cents",
+              "type": "INTEGER"
+            },
+            {
+              "name": "overtime_minutes",
+              "type": "派生"
+            },
+            {
+              "name": "worked_minutes",
+              "type": "派生"
+            },
+            {
+              "name": "labor_cents",
+              "type": "派生"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              "2024-12",
+              1,
+              2,
+              3,
+              117077,
+              0,
+              375,
+              4320,
+              123313.0
+            ],
+            [
+              1,
+              "2025-01",
+              1,
+              2,
+              3,
+              350005,
+              0,
+              255,
+              10560,
+              362683.0
+            ],
+            [
+              1,
+              "2025-02",
+              1,
+              2,
+              3,
+              350005,
+              0,
+              660,
+              10560,
+              382818.0
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 3892
+        }
+      ],
+      "result": {
+        "columns": [
+          "month_key"
+        ],
+        "rows": [
+          [
+            "2025-01"
+          ],
+          [
+            "2025-02"
+          ],
+          [
+            "2025-03"
+          ]
+        ]
+      }
+    },
+    {
+      "kind": "runnable",
+      "title": "按月汇总销售与毛利",
+      "sql": "WITH m AS (SELECT DISTINCT month_key FROM calendar_days WHERE month_key BETWEEN '2025-01' AND '2025-12'), s AS (SELECT SUBSTR(order_date,1,7) m,SUM(net_cents) net,SUM(net_cents-cost_cents) gross FROM v_sales_lines WHERE order_date>='2025-01-01' GROUP BY SUBSTR(order_date,1,7))\nSELECT * FROM s ORDER BY 1, 2, 3 LIMIT 3;",
+      "purpose": "按月汇总销售与毛利（s）的实际执行结果。",
+      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "sourceTables": [
+        {
+          "name": "calendar_days",
+          "columns": [
+            {
+              "name": "day",
+              "type": "TEXT"
+            },
+            {
+              "name": "month_key",
+              "type": "TEXT"
+            },
+            {
+              "name": "day_index",
+              "type": "INTEGER"
+            }
+          ],
+          "rows": [
+            [
+              "2023-01-01",
+              "2023-01",
+              0
+            ],
+            [
+              "2023-01-02",
+              "2023-01",
+              1
+            ],
+            [
+              "2023-01-03",
+              "2023-01",
+              2
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 1096
+        },
+        {
+          "name": "marketing_campaigns",
+          "columns": [
+            {
+              "name": "campaign_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "source_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "month_key",
+              "type": "TEXT"
+            },
+            {
+              "name": "spend_cents",
+              "type": "INTEGER"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              "2023-01",
+              0
+            ],
+            [
+              2,
+              2,
+              "2023-01",
+              349637
+            ],
+            [
+              3,
+              3,
+              "2023-01",
+              173632
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 180
+        },
+        {
+          "name": "v_expenses",
+          "columns": [
+            {
+              "name": "entry_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "entry_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "department_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "store_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "reference_no",
+              "type": "TEXT"
+            },
+            {
+              "name": "account_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "expense_cents",
+              "type": "派生"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              "2025-06-02",
+              4,
+              null,
+              "J000001",
+              4,
+              13842
+            ],
+            [
+              2,
+              "2025-12-04",
+              1,
+              null,
+              "J000002",
+              4,
+              65928
+            ],
+            [
+              3,
+              "2023-04-04",
+              1,
+              null,
+              "J000003",
+              4,
+              21203
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 18000
+        },
+        {
+          "name": "v_po_lines",
+          "columns": [
+            {
+              "name": "po_item_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "po_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "supplier_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "warehouse_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "order_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "promised_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "product_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "quantity_ordered",
+              "type": "INTEGER"
+            },
+            {
+              "name": "unit_price_cents",
+              "type": "INTEGER"
+            },
+            {
+              "name": "ordered_cents",
+              "type": "派生"
+            },
+            {
+              "name": "received",
+              "type": "派生"
+            },
+            {
+              "name": "accepted",
+              "type": "派生"
+            },
+            {
+              "name": "on_time",
+              "type": "派生"
+            },
+            {
+              "name": "billed",
+              "type": "派生"
+            },
+            {
+              "name": "billed_cents",
+              "type": "派生"
+            }
+          ],
+          "rows": [
+            [
+              3077,
+              2633,
+              59,
+              3,
+              "2023-01-01",
+              "2023-01-06",
+              312,
+              33,
+              1076,
+              35508,
+              33,
+              33,
+              33,
+              33,
+              35508
+            ],
+            [
+              2479,
+              4775,
+              49,
+              1,
+              "2023-01-01",
+              "2023-01-19",
+              165,
+              10,
+              785,
+              7850,
+              10,
+              10,
+              0,
+              12,
+              9420
+            ],
+            [
+              9661,
+              4886,
+              2,
+              1,
+              "2023-01-01",
+              "2023-01-14",
+              413,
+              6,
+              1212,
+              7272,
+              6,
+              6,
+              6,
+              7,
+              8484
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 9625
+        },
+        {
+          "name": "v_sales_lines",
+          "columns": [
+            {
+              "name": "order_item_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "order_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "store_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "customer_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "session_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "channel",
+              "type": "TEXT"
+            },
+            {
+              "name": "order_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "product_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "promotion_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "net_qty",
+              "type": "派生"
+            },
+            {
+              "name": "net_cents",
+              "type": "派生"
+            },
+            {
+              "name": "cost_cents",
+              "type": "派生"
+            },
+            {
+              "name": "discount_cents",
+              "type": "INTEGER"
+            },
+            {
+              "name": "refund_cents",
+              "type": "派生"
+            }
+          ],
+          "rows": [
+            [
+              53709,
+              2,
+              4,
+              null,
+              null,
+              "store",
+              "2025-10-02",
+              287,
+              null,
+              1,
+              300,
+              268,
+              0,
+              0
+            ],
+            [
+              55177,
+              2,
+              4,
+              null,
+              null,
+              "store",
+              "2025-10-02",
+              158,
+              null,
+              0,
+              0,
+              0,
+              0,
+              1810
+            ],
+            [
+              29478,
+              3,
+              4,
+              2256,
+              null,
+              "store",
+              "2025-06-09",
+              59,
+              null,
+              1,
+              1310,
+              618,
+              0,
+              0
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 64627
+        },
+        {
+          "name": "v_staff_month",
+          "columns": [
+            {
+              "name": "employee_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "month_key",
+              "type": "TEXT"
+            },
+            {
+              "name": "department_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "position_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "store_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "base_cents",
+              "type": "INTEGER"
+            },
+            {
+              "name": "bonus_cents",
+              "type": "INTEGER"
+            },
+            {
+              "name": "overtime_minutes",
+              "type": "派生"
+            },
+            {
+              "name": "worked_minutes",
+              "type": "派生"
+            },
+            {
+              "name": "labor_cents",
+              "type": "派生"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              "2024-12",
+              1,
+              2,
+              3,
+              117077,
+              0,
+              375,
+              4320,
+              123313.0
+            ],
+            [
+              1,
+              "2025-01",
+              1,
+              2,
+              3,
+              350005,
+              0,
+              255,
+              10560,
+              362683.0
+            ],
+            [
+              1,
+              "2025-02",
+              1,
+              2,
+              3,
+              350005,
+              0,
+              660,
+              10560,
+              382818.0
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 3892
+        }
+      ],
+      "result": {
+        "columns": [
+          "m",
+          "net",
+          "gross"
+        ],
+        "rows": [
+          [
+            "2025-01",
+            7319364,
+            2944637
+          ],
+          [
+            "2025-02",
+            6319792,
+            2559341
+          ],
+          [
+            "2025-03",
+            5983145,
+            2345290
+          ]
+        ]
+      }
+    },
+    {
+      "kind": "runnable",
+      "title": "按月汇总财务费用",
+      "sql": "WITH m AS (SELECT DISTINCT month_key FROM calendar_days WHERE month_key BETWEEN '2025-01' AND '2025-12'), s AS (SELECT SUBSTR(order_date,1,7) m,SUM(net_cents) net,SUM(net_cents-cost_cents) gross FROM v_sales_lines WHERE order_date>='2025-01-01' GROUP BY SUBSTR(order_date,1,7)), f AS (SELECT SUBSTR(entry_date,1,7) m,SUM(expense_cents) expense FROM v_expenses WHERE entry_date>='2025-01-01' GROUP BY SUBSTR(entry_date,1,7))\nSELECT * FROM f ORDER BY 1, 2 LIMIT 3;",
+      "purpose": "按月汇总财务费用（f）的实际执行结果。",
+      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "sourceTables": [
+        {
+          "name": "calendar_days",
+          "columns": [
+            {
+              "name": "day",
+              "type": "TEXT"
+            },
+            {
+              "name": "month_key",
+              "type": "TEXT"
+            },
+            {
+              "name": "day_index",
+              "type": "INTEGER"
+            }
+          ],
+          "rows": [
+            [
+              "2023-01-01",
+              "2023-01",
+              0
+            ],
+            [
+              "2023-01-02",
+              "2023-01",
+              1
+            ],
+            [
+              "2023-01-03",
+              "2023-01",
+              2
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 1096
+        },
+        {
+          "name": "marketing_campaigns",
+          "columns": [
+            {
+              "name": "campaign_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "source_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "month_key",
+              "type": "TEXT"
+            },
+            {
+              "name": "spend_cents",
+              "type": "INTEGER"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              "2023-01",
+              0
+            ],
+            [
+              2,
+              2,
+              "2023-01",
+              349637
+            ],
+            [
+              3,
+              3,
+              "2023-01",
+              173632
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 180
+        },
+        {
+          "name": "v_expenses",
+          "columns": [
+            {
+              "name": "entry_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "entry_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "department_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "store_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "reference_no",
+              "type": "TEXT"
+            },
+            {
+              "name": "account_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "expense_cents",
+              "type": "派生"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              "2025-06-02",
+              4,
+              null,
+              "J000001",
+              4,
+              13842
+            ],
+            [
+              2,
+              "2025-12-04",
+              1,
+              null,
+              "J000002",
+              4,
+              65928
+            ],
+            [
+              3,
+              "2023-04-04",
+              1,
+              null,
+              "J000003",
+              4,
+              21203
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 18000
+        },
+        {
+          "name": "v_po_lines",
+          "columns": [
+            {
+              "name": "po_item_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "po_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "supplier_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "warehouse_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "order_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "promised_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "product_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "quantity_ordered",
+              "type": "INTEGER"
+            },
+            {
+              "name": "unit_price_cents",
+              "type": "INTEGER"
+            },
+            {
+              "name": "ordered_cents",
+              "type": "派生"
+            },
+            {
+              "name": "received",
+              "type": "派生"
+            },
+            {
+              "name": "accepted",
+              "type": "派生"
+            },
+            {
+              "name": "on_time",
+              "type": "派生"
+            },
+            {
+              "name": "billed",
+              "type": "派生"
+            },
+            {
+              "name": "billed_cents",
+              "type": "派生"
+            }
+          ],
+          "rows": [
+            [
+              3077,
+              2633,
+              59,
+              3,
+              "2023-01-01",
+              "2023-01-06",
+              312,
+              33,
+              1076,
+              35508,
+              33,
+              33,
+              33,
+              33,
+              35508
+            ],
+            [
+              2479,
+              4775,
+              49,
+              1,
+              "2023-01-01",
+              "2023-01-19",
+              165,
+              10,
+              785,
+              7850,
+              10,
+              10,
+              0,
+              12,
+              9420
+            ],
+            [
+              9661,
+              4886,
+              2,
+              1,
+              "2023-01-01",
+              "2023-01-14",
+              413,
+              6,
+              1212,
+              7272,
+              6,
+              6,
+              6,
+              7,
+              8484
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 9625
+        },
+        {
+          "name": "v_sales_lines",
+          "columns": [
+            {
+              "name": "order_item_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "order_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "store_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "customer_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "session_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "channel",
+              "type": "TEXT"
+            },
+            {
+              "name": "order_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "product_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "promotion_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "net_qty",
+              "type": "派生"
+            },
+            {
+              "name": "net_cents",
+              "type": "派生"
+            },
+            {
+              "name": "cost_cents",
+              "type": "派生"
+            },
+            {
+              "name": "discount_cents",
+              "type": "INTEGER"
+            },
+            {
+              "name": "refund_cents",
+              "type": "派生"
+            }
+          ],
+          "rows": [
+            [
+              53709,
+              2,
+              4,
+              null,
+              null,
+              "store",
+              "2025-10-02",
+              287,
+              null,
+              1,
+              300,
+              268,
+              0,
+              0
+            ],
+            [
+              55177,
+              2,
+              4,
+              null,
+              null,
+              "store",
+              "2025-10-02",
+              158,
+              null,
+              0,
+              0,
+              0,
+              0,
+              1810
+            ],
+            [
+              29478,
+              3,
+              4,
+              2256,
+              null,
+              "store",
+              "2025-06-09",
+              59,
+              null,
+              1,
+              1310,
+              618,
+              0,
+              0
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 64627
+        },
+        {
+          "name": "v_staff_month",
+          "columns": [
+            {
+              "name": "employee_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "month_key",
+              "type": "TEXT"
+            },
+            {
+              "name": "department_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "position_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "store_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "base_cents",
+              "type": "INTEGER"
+            },
+            {
+              "name": "bonus_cents",
+              "type": "INTEGER"
+            },
+            {
+              "name": "overtime_minutes",
+              "type": "派生"
+            },
+            {
+              "name": "worked_minutes",
+              "type": "派生"
+            },
+            {
+              "name": "labor_cents",
+              "type": "派生"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              "2024-12",
+              1,
+              2,
+              3,
+              117077,
+              0,
+              375,
+              4320,
+              123313.0
+            ],
+            [
+              1,
+              "2025-01",
+              1,
+              2,
+              3,
+              350005,
+              0,
+              255,
+              10560,
+              362683.0
+            ],
+            [
+              1,
+              "2025-02",
+              1,
+              2,
+              3,
+              350005,
+              0,
+              660,
+              10560,
+              382818.0
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 3892
+        }
+      ],
+      "result": {
+        "columns": [
+          "m",
+          "expense"
+        ],
+        "rows": [
+          [
+            "2025-01",
+            65219277
+          ],
+          [
+            "2025-02",
+            50068683
+          ],
+          [
+            "2025-03",
+            46414677
+          ]
+        ]
+      }
+    },
+    {
+      "kind": "runnable",
+      "title": "汇总月人工成本",
+      "sql": "WITH m AS (SELECT DISTINCT month_key FROM calendar_days WHERE month_key BETWEEN '2025-01' AND '2025-12'), s AS (SELECT SUBSTR(order_date,1,7) m,SUM(net_cents) net,SUM(net_cents-cost_cents) gross FROM v_sales_lines WHERE order_date>='2025-01-01' GROUP BY SUBSTR(order_date,1,7)), f AS (SELECT SUBSTR(entry_date,1,7) m,SUM(expense_cents) expense FROM v_expenses WHERE entry_date>='2025-01-01' GROUP BY SUBSTR(entry_date,1,7)), h AS (SELECT month_key,SUM(labor_cents) labor FROM v_staff_month WHERE month_key BETWEEN '2025-01' AND '2025-12' GROUP BY month_key)\nSELECT * FROM h ORDER BY 1, 2 LIMIT 3;",
+      "purpose": "汇总月人工成本（h）的实际执行结果。",
+      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "sourceTables": [
+        {
+          "name": "calendar_days",
+          "columns": [
+            {
+              "name": "day",
+              "type": "TEXT"
+            },
+            {
+              "name": "month_key",
+              "type": "TEXT"
+            },
+            {
+              "name": "day_index",
+              "type": "INTEGER"
+            }
+          ],
+          "rows": [
+            [
+              "2023-01-01",
+              "2023-01",
+              0
+            ],
+            [
+              "2023-01-02",
+              "2023-01",
+              1
+            ],
+            [
+              "2023-01-03",
+              "2023-01",
+              2
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 1096
+        },
+        {
+          "name": "marketing_campaigns",
+          "columns": [
+            {
+              "name": "campaign_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "source_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "month_key",
+              "type": "TEXT"
+            },
+            {
+              "name": "spend_cents",
+              "type": "INTEGER"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              "2023-01",
+              0
+            ],
+            [
+              2,
+              2,
+              "2023-01",
+              349637
+            ],
+            [
+              3,
+              3,
+              "2023-01",
+              173632
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 180
+        },
+        {
+          "name": "v_expenses",
+          "columns": [
+            {
+              "name": "entry_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "entry_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "department_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "store_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "reference_no",
+              "type": "TEXT"
+            },
+            {
+              "name": "account_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "expense_cents",
+              "type": "派生"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              "2025-06-02",
+              4,
+              null,
+              "J000001",
+              4,
+              13842
+            ],
+            [
+              2,
+              "2025-12-04",
+              1,
+              null,
+              "J000002",
+              4,
+              65928
+            ],
+            [
+              3,
+              "2023-04-04",
+              1,
+              null,
+              "J000003",
+              4,
+              21203
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 18000
+        },
+        {
+          "name": "v_po_lines",
+          "columns": [
+            {
+              "name": "po_item_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "po_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "supplier_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "warehouse_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "order_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "promised_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "product_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "quantity_ordered",
+              "type": "INTEGER"
+            },
+            {
+              "name": "unit_price_cents",
+              "type": "INTEGER"
+            },
+            {
+              "name": "ordered_cents",
+              "type": "派生"
+            },
+            {
+              "name": "received",
+              "type": "派生"
+            },
+            {
+              "name": "accepted",
+              "type": "派生"
+            },
+            {
+              "name": "on_time",
+              "type": "派生"
+            },
+            {
+              "name": "billed",
+              "type": "派生"
+            },
+            {
+              "name": "billed_cents",
+              "type": "派生"
+            }
+          ],
+          "rows": [
+            [
+              3077,
+              2633,
+              59,
+              3,
+              "2023-01-01",
+              "2023-01-06",
+              312,
+              33,
+              1076,
+              35508,
+              33,
+              33,
+              33,
+              33,
+              35508
+            ],
+            [
+              2479,
+              4775,
+              49,
+              1,
+              "2023-01-01",
+              "2023-01-19",
+              165,
+              10,
+              785,
+              7850,
+              10,
+              10,
+              0,
+              12,
+              9420
+            ],
+            [
+              9661,
+              4886,
+              2,
+              1,
+              "2023-01-01",
+              "2023-01-14",
+              413,
+              6,
+              1212,
+              7272,
+              6,
+              6,
+              6,
+              7,
+              8484
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 9625
+        },
+        {
+          "name": "v_sales_lines",
+          "columns": [
+            {
+              "name": "order_item_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "order_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "store_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "customer_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "session_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "channel",
+              "type": "TEXT"
+            },
+            {
+              "name": "order_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "product_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "promotion_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "net_qty",
+              "type": "派生"
+            },
+            {
+              "name": "net_cents",
+              "type": "派生"
+            },
+            {
+              "name": "cost_cents",
+              "type": "派生"
+            },
+            {
+              "name": "discount_cents",
+              "type": "INTEGER"
+            },
+            {
+              "name": "refund_cents",
+              "type": "派生"
+            }
+          ],
+          "rows": [
+            [
+              53709,
+              2,
+              4,
+              null,
+              null,
+              "store",
+              "2025-10-02",
+              287,
+              null,
+              1,
+              300,
+              268,
+              0,
+              0
+            ],
+            [
+              55177,
+              2,
+              4,
+              null,
+              null,
+              "store",
+              "2025-10-02",
+              158,
+              null,
+              0,
+              0,
+              0,
+              0,
+              1810
+            ],
+            [
+              29478,
+              3,
+              4,
+              2256,
+              null,
+              "store",
+              "2025-06-09",
+              59,
+              null,
+              1,
+              1310,
+              618,
+              0,
+              0
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 64627
+        },
+        {
+          "name": "v_staff_month",
+          "columns": [
+            {
+              "name": "employee_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "month_key",
+              "type": "TEXT"
+            },
+            {
+              "name": "department_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "position_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "store_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "base_cents",
+              "type": "INTEGER"
+            },
+            {
+              "name": "bonus_cents",
+              "type": "INTEGER"
+            },
+            {
+              "name": "overtime_minutes",
+              "type": "派生"
+            },
+            {
+              "name": "worked_minutes",
+              "type": "派生"
+            },
+            {
+              "name": "labor_cents",
+              "type": "派生"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              "2024-12",
+              1,
+              2,
+              3,
+              117077,
+              0,
+              375,
+              4320,
+              123313.0
+            ],
+            [
+              1,
+              "2025-01",
+              1,
+              2,
+              3,
+              350005,
+              0,
+              255,
+              10560,
+              362683.0
+            ],
+            [
+              1,
+              "2025-02",
+              1,
+              2,
+              3,
+              350005,
+              0,
+              660,
+              10560,
+              382818.0
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 3892
+        }
+      ],
+      "result": {
+        "columns": [
+          "month_key",
+          "labor"
+        ],
+        "rows": [
+          [
+            "2025-01",
+            51797482
+          ],
+          [
+            "2025-02",
+            53576806
+          ],
+          [
+            "2025-03",
+            55046371
+          ]
+        ]
+      }
+    },
+    {
+      "kind": "runnable",
+      "title": "按月累计采购承诺",
+      "sql": "WITH m AS (SELECT DISTINCT month_key FROM calendar_days WHERE month_key BETWEEN '2025-01' AND '2025-12'), s AS (SELECT SUBSTR(order_date,1,7) m,SUM(net_cents) net,SUM(net_cents-cost_cents) gross FROM v_sales_lines WHERE order_date>='2025-01-01' GROUP BY SUBSTR(order_date,1,7)), f AS (SELECT SUBSTR(entry_date,1,7) m,SUM(expense_cents) expense FROM v_expenses WHERE entry_date>='2025-01-01' GROUP BY SUBSTR(entry_date,1,7)), h AS (SELECT month_key,SUM(labor_cents) labor FROM v_staff_month WHERE month_key BETWEEN '2025-01' AND '2025-12' GROUP BY month_key), p AS (SELECT SUBSTR(order_date,1,7) m,SUM(ordered_cents) procurement FROM v_po_lines WHERE order_date>='2025-01-01' GROUP BY SUBSTR(order_date,1,7))\nSELECT * FROM p ORDER BY 1, 2 LIMIT 3;",
+      "purpose": "按月累计采购承诺（p）的实际执行结果。",
+      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "sourceTables": [
+        {
+          "name": "calendar_days",
+          "columns": [
+            {
+              "name": "day",
+              "type": "TEXT"
+            },
+            {
+              "name": "month_key",
+              "type": "TEXT"
+            },
+            {
+              "name": "day_index",
+              "type": "INTEGER"
+            }
+          ],
+          "rows": [
+            [
+              "2023-01-01",
+              "2023-01",
+              0
+            ],
+            [
+              "2023-01-02",
+              "2023-01",
+              1
+            ],
+            [
+              "2023-01-03",
+              "2023-01",
+              2
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 1096
+        },
+        {
+          "name": "marketing_campaigns",
+          "columns": [
+            {
+              "name": "campaign_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "source_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "month_key",
+              "type": "TEXT"
+            },
+            {
+              "name": "spend_cents",
+              "type": "INTEGER"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              "2023-01",
+              0
+            ],
+            [
+              2,
+              2,
+              "2023-01",
+              349637
+            ],
+            [
+              3,
+              3,
+              "2023-01",
+              173632
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 180
+        },
+        {
+          "name": "v_expenses",
+          "columns": [
+            {
+              "name": "entry_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "entry_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "department_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "store_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "reference_no",
+              "type": "TEXT"
+            },
+            {
+              "name": "account_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "expense_cents",
+              "type": "派生"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              "2025-06-02",
+              4,
+              null,
+              "J000001",
+              4,
+              13842
+            ],
+            [
+              2,
+              "2025-12-04",
+              1,
+              null,
+              "J000002",
+              4,
+              65928
+            ],
+            [
+              3,
+              "2023-04-04",
+              1,
+              null,
+              "J000003",
+              4,
+              21203
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 18000
+        },
+        {
+          "name": "v_po_lines",
+          "columns": [
+            {
+              "name": "po_item_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "po_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "supplier_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "warehouse_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "order_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "promised_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "product_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "quantity_ordered",
+              "type": "INTEGER"
+            },
+            {
+              "name": "unit_price_cents",
+              "type": "INTEGER"
+            },
+            {
+              "name": "ordered_cents",
+              "type": "派生"
+            },
+            {
+              "name": "received",
+              "type": "派生"
+            },
+            {
+              "name": "accepted",
+              "type": "派生"
+            },
+            {
+              "name": "on_time",
+              "type": "派生"
+            },
+            {
+              "name": "billed",
+              "type": "派生"
+            },
+            {
+              "name": "billed_cents",
+              "type": "派生"
+            }
+          ],
+          "rows": [
+            [
+              3077,
+              2633,
+              59,
+              3,
+              "2023-01-01",
+              "2023-01-06",
+              312,
+              33,
+              1076,
+              35508,
+              33,
+              33,
+              33,
+              33,
+              35508
+            ],
+            [
+              2479,
+              4775,
+              49,
+              1,
+              "2023-01-01",
+              "2023-01-19",
+              165,
+              10,
+              785,
+              7850,
+              10,
+              10,
+              0,
+              12,
+              9420
+            ],
+            [
+              9661,
+              4886,
+              2,
+              1,
+              "2023-01-01",
+              "2023-01-14",
+              413,
+              6,
+              1212,
+              7272,
+              6,
+              6,
+              6,
+              7,
+              8484
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 9625
+        },
+        {
+          "name": "v_sales_lines",
+          "columns": [
+            {
+              "name": "order_item_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "order_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "store_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "customer_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "session_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "channel",
+              "type": "TEXT"
+            },
+            {
+              "name": "order_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "product_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "promotion_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "net_qty",
+              "type": "派生"
+            },
+            {
+              "name": "net_cents",
+              "type": "派生"
+            },
+            {
+              "name": "cost_cents",
+              "type": "派生"
+            },
+            {
+              "name": "discount_cents",
+              "type": "INTEGER"
+            },
+            {
+              "name": "refund_cents",
+              "type": "派生"
+            }
+          ],
+          "rows": [
+            [
+              53709,
+              2,
+              4,
+              null,
+              null,
+              "store",
+              "2025-10-02",
+              287,
+              null,
+              1,
+              300,
+              268,
+              0,
+              0
+            ],
+            [
+              55177,
+              2,
+              4,
+              null,
+              null,
+              "store",
+              "2025-10-02",
+              158,
+              null,
+              0,
+              0,
+              0,
+              0,
+              1810
+            ],
+            [
+              29478,
+              3,
+              4,
+              2256,
+              null,
+              "store",
+              "2025-06-09",
+              59,
+              null,
+              1,
+              1310,
+              618,
+              0,
+              0
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 64627
+        },
+        {
+          "name": "v_staff_month",
+          "columns": [
+            {
+              "name": "employee_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "month_key",
+              "type": "TEXT"
+            },
+            {
+              "name": "department_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "position_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "store_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "base_cents",
+              "type": "INTEGER"
+            },
+            {
+              "name": "bonus_cents",
+              "type": "INTEGER"
+            },
+            {
+              "name": "overtime_minutes",
+              "type": "派生"
+            },
+            {
+              "name": "worked_minutes",
+              "type": "派生"
+            },
+            {
+              "name": "labor_cents",
+              "type": "派生"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              "2024-12",
+              1,
+              2,
+              3,
+              117077,
+              0,
+              375,
+              4320,
+              123313.0
+            ],
+            [
+              1,
+              "2025-01",
+              1,
+              2,
+              3,
+              350005,
+              0,
+              255,
+              10560,
+              362683.0
+            ],
+            [
+              1,
+              "2025-02",
+              1,
+              2,
+              3,
+              350005,
+              0,
+              660,
+              10560,
+              382818.0
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 3892
+        }
+      ],
+      "result": {
+        "columns": [
+          "m",
+          "procurement"
+        ],
+        "rows": [
+          [
+            "2025-01",
+            12292884
+          ],
+          [
+            "2025-02",
+            10624899
+          ],
+          [
+            "2025-03",
+            8019078
+          ]
+        ]
+      }
+    },
+    {
+      "kind": "runnable",
+      "title": "按月汇总广告开支",
+      "sql": "WITH m AS (SELECT DISTINCT month_key FROM calendar_days WHERE month_key BETWEEN '2025-01' AND '2025-12'), s AS (SELECT SUBSTR(order_date,1,7) m,SUM(net_cents) net,SUM(net_cents-cost_cents) gross FROM v_sales_lines WHERE order_date>='2025-01-01' GROUP BY SUBSTR(order_date,1,7)), f AS (SELECT SUBSTR(entry_date,1,7) m,SUM(expense_cents) expense FROM v_expenses WHERE entry_date>='2025-01-01' GROUP BY SUBSTR(entry_date,1,7)), h AS (SELECT month_key,SUM(labor_cents) labor FROM v_staff_month WHERE month_key BETWEEN '2025-01' AND '2025-12' GROUP BY month_key), p AS (SELECT SUBSTR(order_date,1,7) m,SUM(ordered_cents) procurement FROM v_po_lines WHERE order_date>='2025-01-01' GROUP BY SUBSTR(order_date,1,7)), a AS (SELECT month_key,SUM(spend_cents) spend FROM marketing_campaigns WHERE month_key BETWEEN '2025-01' AND '2025-12' GROUP BY month_key)\nSELECT * FROM a ORDER BY 1, 2 LIMIT 3;",
+      "purpose": "按月汇总广告开支（a）的实际执行结果。",
+      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "sourceTables": [
+        {
+          "name": "calendar_days",
+          "columns": [
+            {
+              "name": "day",
+              "type": "TEXT"
+            },
+            {
+              "name": "month_key",
+              "type": "TEXT"
+            },
+            {
+              "name": "day_index",
+              "type": "INTEGER"
+            }
+          ],
+          "rows": [
+            [
+              "2023-01-01",
+              "2023-01",
+              0
+            ],
+            [
+              "2023-01-02",
+              "2023-01",
+              1
+            ],
+            [
+              "2023-01-03",
+              "2023-01",
+              2
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 1096
+        },
+        {
+          "name": "marketing_campaigns",
+          "columns": [
+            {
+              "name": "campaign_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "source_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "month_key",
+              "type": "TEXT"
+            },
+            {
+              "name": "spend_cents",
+              "type": "INTEGER"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              "2023-01",
+              0
+            ],
+            [
+              2,
+              2,
+              "2023-01",
+              349637
+            ],
+            [
+              3,
+              3,
+              "2023-01",
+              173632
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 180
+        },
+        {
+          "name": "v_expenses",
+          "columns": [
+            {
+              "name": "entry_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "entry_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "department_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "store_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "reference_no",
+              "type": "TEXT"
+            },
+            {
+              "name": "account_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "expense_cents",
+              "type": "派生"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              "2025-06-02",
+              4,
+              null,
+              "J000001",
+              4,
+              13842
+            ],
+            [
+              2,
+              "2025-12-04",
+              1,
+              null,
+              "J000002",
+              4,
+              65928
+            ],
+            [
+              3,
+              "2023-04-04",
+              1,
+              null,
+              "J000003",
+              4,
+              21203
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 18000
+        },
+        {
+          "name": "v_po_lines",
+          "columns": [
+            {
+              "name": "po_item_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "po_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "supplier_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "warehouse_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "order_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "promised_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "product_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "quantity_ordered",
+              "type": "INTEGER"
+            },
+            {
+              "name": "unit_price_cents",
+              "type": "INTEGER"
+            },
+            {
+              "name": "ordered_cents",
+              "type": "派生"
+            },
+            {
+              "name": "received",
+              "type": "派生"
+            },
+            {
+              "name": "accepted",
+              "type": "派生"
+            },
+            {
+              "name": "on_time",
+              "type": "派生"
+            },
+            {
+              "name": "billed",
+              "type": "派生"
+            },
+            {
+              "name": "billed_cents",
+              "type": "派生"
+            }
+          ],
+          "rows": [
+            [
+              3077,
+              2633,
+              59,
+              3,
+              "2023-01-01",
+              "2023-01-06",
+              312,
+              33,
+              1076,
+              35508,
+              33,
+              33,
+              33,
+              33,
+              35508
+            ],
+            [
+              2479,
+              4775,
+              49,
+              1,
+              "2023-01-01",
+              "2023-01-19",
+              165,
+              10,
+              785,
+              7850,
+              10,
+              10,
+              0,
+              12,
+              9420
+            ],
+            [
+              9661,
+              4886,
+              2,
+              1,
+              "2023-01-01",
+              "2023-01-14",
+              413,
+              6,
+              1212,
+              7272,
+              6,
+              6,
+              6,
+              7,
+              8484
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 9625
+        },
+        {
+          "name": "v_sales_lines",
+          "columns": [
+            {
+              "name": "order_item_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "order_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "store_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "customer_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "session_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "channel",
+              "type": "TEXT"
+            },
+            {
+              "name": "order_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "product_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "promotion_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "net_qty",
+              "type": "派生"
+            },
+            {
+              "name": "net_cents",
+              "type": "派生"
+            },
+            {
+              "name": "cost_cents",
+              "type": "派生"
+            },
+            {
+              "name": "discount_cents",
+              "type": "INTEGER"
+            },
+            {
+              "name": "refund_cents",
+              "type": "派生"
+            }
+          ],
+          "rows": [
+            [
+              53709,
+              2,
+              4,
+              null,
+              null,
+              "store",
+              "2025-10-02",
+              287,
+              null,
+              1,
+              300,
+              268,
+              0,
+              0
+            ],
+            [
+              55177,
+              2,
+              4,
+              null,
+              null,
+              "store",
+              "2025-10-02",
+              158,
+              null,
+              0,
+              0,
+              0,
+              0,
+              1810
+            ],
+            [
+              29478,
+              3,
+              4,
+              2256,
+              null,
+              "store",
+              "2025-06-09",
+              59,
+              null,
+              1,
+              1310,
+              618,
+              0,
+              0
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 64627
+        },
+        {
+          "name": "v_staff_month",
+          "columns": [
+            {
+              "name": "employee_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "month_key",
+              "type": "TEXT"
+            },
+            {
+              "name": "department_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "position_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "store_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "base_cents",
+              "type": "INTEGER"
+            },
+            {
+              "name": "bonus_cents",
+              "type": "INTEGER"
+            },
+            {
+              "name": "overtime_minutes",
+              "type": "派生"
+            },
+            {
+              "name": "worked_minutes",
+              "type": "派生"
+            },
+            {
+              "name": "labor_cents",
+              "type": "派生"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              "2024-12",
+              1,
+              2,
+              3,
+              117077,
+              0,
+              375,
+              4320,
+              123313.0
+            ],
+            [
+              1,
+              "2025-01",
+              1,
+              2,
+              3,
+              350005,
+              0,
+              255,
+              10560,
+              362683.0
+            ],
+            [
+              1,
+              "2025-02",
+              1,
+              2,
+              3,
+              350005,
+              0,
+              660,
+              10560,
+              382818.0
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 3892
+        }
+      ],
+      "result": {
+        "columns": [
+          "month_key",
+          "spend"
+        ],
+        "rows": [
+          [
+            "2025-01",
+            455218
+          ],
+          [
+            "2025-02",
+            502934
+          ],
+          [
+            "2025-03",
+            715550
+          ]
+        ]
+      }
+    }
+  ],
+  "completeCode": {
+    "mysqlSql": "WITH m AS (SELECT DISTINCT month_key FROM calendar_days WHERE month_key BETWEEN '2025-01' AND '2025-12'), s AS (SELECT SUBSTR(order_date,1,7) m,SUM(net_cents) net,SUM(net_cents-cost_cents) gross FROM v_sales_lines WHERE order_date>='2025-01-01' GROUP BY SUBSTR(order_date,1,7)), f AS (SELECT SUBSTR(entry_date,1,7) m,SUM(expense_cents) expense FROM v_expenses WHERE entry_date>='2025-01-01' GROUP BY SUBSTR(entry_date,1,7)), h AS (SELECT month_key,SUM(labor_cents) labor FROM v_staff_month WHERE month_key BETWEEN '2025-01' AND '2025-12' GROUP BY month_key), p AS (SELECT SUBSTR(order_date,1,7) m,SUM(ordered_cents) procurement FROM v_po_lines WHERE order_date>='2025-01-01' GROUP BY SUBSTR(order_date,1,7)), a AS (SELECT month_key,SUM(spend_cents) spend FROM marketing_campaigns WHERE month_key BETWEEN '2025-01' AND '2025-12' GROUP BY month_key) SELECT m.month_key,COALESCE(s.net,0) net_cents,COALESCE(s.gross,0) gross_cents,COALESCE(f.expense,0) expense_cents,COALESCE(h.labor,0) labor_cents,COALESCE(a.spend,0) advertising_cents,COALESCE(p.procurement,0) committed_purchase_cents,COALESCE(s.gross,0)-COALESCE(f.expense,0)-COALESCE(h.labor,0) operating_contribution_cents FROM m LEFT JOIN s ON s.m=m.month_key LEFT JOIN f ON f.m=m.month_key LEFT JOIN h ON h.month_key=m.month_key LEFT JOIN p ON p.m=m.month_key LEFT JOIN a ON a.month_key=m.month_key ORDER BY m.month_key",
+    "sqliteSql": "WITH m AS (SELECT DISTINCT month_key FROM calendar_days WHERE month_key BETWEEN '2025-01' AND '2025-12'), s AS (SELECT SUBSTR(order_date,1,7) m,SUM(net_cents) net,SUM(net_cents-cost_cents) gross FROM v_sales_lines WHERE order_date>='2025-01-01' GROUP BY SUBSTR(order_date,1,7)), f AS (SELECT SUBSTR(entry_date,1,7) m,SUM(expense_cents) expense FROM v_expenses WHERE entry_date>='2025-01-01' GROUP BY SUBSTR(entry_date,1,7)), h AS (SELECT month_key,SUM(labor_cents) labor FROM v_staff_month WHERE month_key BETWEEN '2025-01' AND '2025-12' GROUP BY month_key), p AS (SELECT SUBSTR(order_date,1,7) m,SUM(ordered_cents) procurement FROM v_po_lines WHERE order_date>='2025-01-01' GROUP BY SUBSTR(order_date,1,7)), a AS (SELECT month_key,SUM(spend_cents) spend FROM marketing_campaigns WHERE month_key BETWEEN '2025-01' AND '2025-12' GROUP BY month_key) SELECT m.month_key,COALESCE(s.net,0) net_cents,COALESCE(s.gross,0) gross_cents,COALESCE(f.expense,0) expense_cents,COALESCE(h.labor,0) labor_cents,COALESCE(a.spend,0) advertising_cents,COALESCE(p.procurement,0) committed_purchase_cents,COALESCE(s.gross,0)-COALESCE(f.expense,0)-COALESCE(h.labor,0) operating_contribution_cents FROM m LEFT JOIN s ON s.m=m.month_key LEFT JOIN f ON f.m=m.month_key LEFT JOIN h ON h.month_key=m.month_key LEFT JOIN p ON p.m=m.month_key LEFT JOIN a ON a.month_key=m.month_key ORDER BY m.month_key"
+  },
+  "expectedResult": {
+    "columns": [
+      "month_key",
+      "net_cents",
+      "gross_cents",
+      "expense_cents",
+      "labor_cents",
+      "advertising_cents",
+      "committed_purchase_cents",
+      "operating_contribution_cents"
+    ],
+    "rows": [
+      [
+        "2025-01",
+        7319364,
+        2944637,
+        65219277,
+        51797482.0,
+        455218,
+        12292884,
+        -114072122.0
+      ],
+      [
+        "2025-02",
+        6319792,
+        2559341,
+        50068683,
+        53576806.0,
+        502934,
+        10624899,
+        -101086148.0
+      ],
+      [
+        "2025-03",
+        5983145,
+        2345290,
+        46414677,
+        55046371.0,
+        715550,
+        8019078,
+        -99115758.0
+      ],
+      [
+        "2025-04",
+        5728525,
+        2263242,
+        54802773,
+        57256858.0,
+        939859,
+        8520654,
+        -109796389.0
+      ],
+      [
+        "2025-05",
+        6956339,
+        2768367,
+        53026540,
+        58710014.0,
+        799309,
+        10474014,
+        -108968187.0
+      ],
+      [
+        "2025-06",
+        8553271,
+        3377914,
+        65223969,
+        60637218.0,
+        483204,
+        9659026,
+        -122483273.0
+      ],
+      [
+        "2025-07",
+        7858249,
+        3109121,
+        50096599,
+        63637967.0,
+        617601,
+        8595682,
+        -110625445.0
+      ],
+      [
+        "2025-08",
+        7643890,
+        2694891,
+        51633603,
+        65088108.0,
+        564993,
+        10262977,
+        -114026820.0
+      ],
+      [
+        "2025-09",
+        9189483,
+        3544956,
+        48384240,
+        67387802.0,
+        337652,
+        12356553,
+        -112227086.0
+      ],
+      [
+        "2025-10",
+        9833767,
+        3784558,
+        49335627,
+        70602677.0,
+        528850,
+        10258478,
+        -116153746.0
+      ],
+      [
+        "2025-11",
+        12092618,
+        4599815,
+        69111137,
+        74354009.0,
+        515079,
+        13392434,
+        -138865331.0
+      ],
+      [
+        "2025-12",
+        22256209,
+        8569877,
+        73162846,
+        76835554.0,
+        709588,
+        12108094,
+        -141428523.0
+      ]
+    ],
+    "status": "SQLite实际执行（预览）",
+    "orderGuaranteed": true,
+    "totalRows": 12,
+    "fullResultPath": "../enterprise_reference/business_tasks/results/BP49.json"
+  },
+  "resultBlocks": [
+    {
+      "type": "paragraph",
+      "text": "独立案例1月毛利400，费用150，人工100，经营贡献150；广告50及采购承诺500单列。2月无销售但费用80、人工100，贡献为负180，不能删除该月份。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "3月毛利300减人工150为150。4月至12月完全无记录，示例已知无业务，全部显示0；实际数据未送达不能视为0。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "门店示例整体毛利率580÷1700=34.12%，正目标门店达成率1500÷1700=88.24%；",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "门店1达成偏低且退款偏高，门店2毛利率低且直接贡献为负60，门店3目标为0不可算达成率，门店4无销售仍有费用。滚动例1月费用120÷销售1000=12%，不同于各月费率的简单平均；",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "4月窗口净销售为0，结果为空。原企业2025年1月公布贡献2944637−65219277−51797482=−114072122分，不是完整净利润；",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "须核验费用归属及是否重复计入人工，不据此直接认定企业亏损。",
+      "emphasis": []
+    }
+  ],
+  "extensions": [
+    {
+      "label": "建立完整月份轴",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "使用自然月份主轴，保证无业务的月份仍然存在。独立示例使用 SQLite 日期函数生成月份；主查询使用现有日历表。",
+          "emphasis": []
+        }
+      ],
+      "sql": "WITH RECURSIVE calendar_days(month_key) AS (SELECT '2025-01' UNION ALL SELECT strftime('%Y-%m',date(month_key||'-01','+1 month')) FROM calendar_days WHERE month_key<'2025-12'),\nv_sales_lines(order_date,net_cents,cost_cents) AS (SELECT '2025-01-05',600,360 UNION ALL SELECT '2025-01-06',400,240 UNION ALL SELECT '2025-03-01',800,500 UNION ALL SELECT '2024-12-01',999,0 UNION ALL SELECT '2026-01-01',999,0),\nv_expenses(entry_date,expense_cents) AS (SELECT '2025-01-03',100 UNION ALL SELECT '2025-01-07',50 UNION ALL SELECT '2025-02-03',80),\nv_staff_month(month_key,labor_cents) AS (SELECT '2025-01',100 UNION ALL SELECT '2025-02',100 UNION ALL SELECT '2025-03',150),\nv_po_lines(order_date,ordered_cents) AS (SELECT '2025-01-04',500 UNION ALL SELECT '2025-02-06',200),\nmarketing_campaigns(month_key,spend_cents) AS (SELECT '2025-01',50 UNION ALL SELECT '2025-02',20),\nm AS (SELECT DISTINCT month_key FROM calendar_days WHERE month_key BETWEEN '2025-01' AND '2025-12') SELECT * FROM m ORDER BY month_key",
+      "result": {
+        "columns": [
+          "month_key"
+        ],
+        "rows": [
+          [
+            "2025-01"
+          ],
+          [
+            "2025-02"
+          ],
+          [
+            "2025-03"
+          ],
+          [
+            "2025-04"
+          ],
+          [
+            "2025-05"
+          ],
+          [
+            "2025-06"
+          ],
+          [
+            "2025-07"
+          ],
+          [
+            "2025-08"
+          ],
+          [
+            "2025-09"
+          ],
+          [
+            "2025-10"
+          ],
+          [
+            "2025-11"
+          ],
+          [
+            "2025-12"
+          ]
+        ]
+      }
+    },
+    {
+      "label": "销售与毛利独立汇总",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "同一月份多笔销售先相加；净销售减净成本求毛利。",
+          "emphasis": []
+        }
+      ],
+      "sql": "WITH RECURSIVE calendar_days(month_key) AS (SELECT '2025-01' UNION ALL SELECT strftime('%Y-%m',date(month_key||'-01','+1 month')) FROM calendar_days WHERE month_key<'2025-12'),\nv_sales_lines(order_date,net_cents,cost_cents) AS (SELECT '2025-01-05',600,360 UNION ALL SELECT '2025-01-06',400,240 UNION ALL SELECT '2025-03-01',800,500 UNION ALL SELECT '2024-12-01',999,0 UNION ALL SELECT '2026-01-01',999,0),\nv_expenses(entry_date,expense_cents) AS (SELECT '2025-01-03',100 UNION ALL SELECT '2025-01-07',50 UNION ALL SELECT '2025-02-03',80),\nv_staff_month(month_key,labor_cents) AS (SELECT '2025-01',100 UNION ALL SELECT '2025-02',100 UNION ALL SELECT '2025-03',150),\nv_po_lines(order_date,ordered_cents) AS (SELECT '2025-01-04',500 UNION ALL SELECT '2025-02-06',200),\nmarketing_campaigns(month_key,spend_cents) AS (SELECT '2025-01',50 UNION ALL SELECT '2025-02',20),\ns AS (SELECT SUBSTR(order_date,1,7) m,SUM(net_cents) net,SUM(net_cents-cost_cents) gross FROM v_sales_lines WHERE order_date>='2025-01-01' GROUP BY SUBSTR(order_date,1,7)) SELECT * FROM s WHERE m BETWEEN '2025-01' AND '2025-12' ORDER BY m",
+      "result": {
+        "columns": [
+          "m",
+          "net",
+          "gross"
+        ],
+        "rows": [
+          [
+            "2025-01",
+            1000,
+            400
+          ],
+          [
+            "2025-03",
+            800,
+            300
+          ]
+        ]
+      }
+    },
+    {
+      "label": "完整月度经营汇总",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "各模块先变成每月一行再连接；广告和采购承诺单列，不再次扣减。",
+          "emphasis": []
+        }
+      ],
+      "sql": "WITH RECURSIVE calendar_days(month_key) AS (SELECT '2025-01' UNION ALL SELECT strftime('%Y-%m',date(month_key||'-01','+1 month')) FROM calendar_days WHERE month_key<'2025-12'),\nv_sales_lines(order_date,net_cents,cost_cents) AS (SELECT '2025-01-05',600,360 UNION ALL SELECT '2025-01-06',400,240 UNION ALL SELECT '2025-03-01',800,500 UNION ALL SELECT '2024-12-01',999,0 UNION ALL SELECT '2026-01-01',999,0),\nv_expenses(entry_date,expense_cents) AS (SELECT '2025-01-03',100 UNION ALL SELECT '2025-01-07',50 UNION ALL SELECT '2025-02-03',80),\nv_staff_month(month_key,labor_cents) AS (SELECT '2025-01',100 UNION ALL SELECT '2025-02',100 UNION ALL SELECT '2025-03',150),\nv_po_lines(order_date,ordered_cents) AS (SELECT '2025-01-04',500 UNION ALL SELECT '2025-02-06',200),\nmarketing_campaigns(month_key,spend_cents) AS (SELECT '2025-01',50 UNION ALL SELECT '2025-02',20),\nm AS (SELECT DISTINCT month_key FROM calendar_days WHERE month_key BETWEEN '2025-01' AND '2025-12'), s AS (SELECT SUBSTR(order_date,1,7) m,SUM(net_cents) net,SUM(net_cents-cost_cents) gross FROM v_sales_lines WHERE order_date>='2025-01-01' GROUP BY SUBSTR(order_date,1,7)), f AS (SELECT SUBSTR(entry_date,1,7) m,SUM(expense_cents) expense FROM v_expenses WHERE entry_date>='2025-01-01' GROUP BY SUBSTR(entry_date,1,7)), h AS (SELECT month_key,SUM(labor_cents) labor FROM v_staff_month WHERE month_key BETWEEN '2025-01' AND '2025-12' GROUP BY month_key), p AS (SELECT SUBSTR(order_date,1,7) m,SUM(ordered_cents) procurement FROM v_po_lines WHERE order_date>='2025-01-01' GROUP BY SUBSTR(order_date,1,7)), a AS (SELECT month_key,SUM(spend_cents) spend FROM marketing_campaigns WHERE month_key BETWEEN '2025-01' AND '2025-12' GROUP BY month_key) SELECT m.month_key,COALESCE(s.net,0) net_cents,COALESCE(s.gross,0) gross_cents,COALESCE(f.expense,0) expense_cents,COALESCE(h.labor,0) labor_cents,COALESCE(a.spend,0) advertising_cents,COALESCE(p.procurement,0) committed_purchase_cents,COALESCE(s.gross,0)-COALESCE(f.expense,0)-COALESCE(h.labor,0) operating_contribution_cents FROM m LEFT JOIN s ON s.m=m.month_key LEFT JOIN f ON f.m=m.month_key LEFT JOIN h ON h.month_key=m.month_key LEFT JOIN p ON p.m=m.month_key LEFT JOIN a ON a.month_key=m.month_key ORDER BY m.month_key",
+      "result": {
+        "columns": [
+          "month_key",
+          "net_cents",
+          "gross_cents",
+          "expense_cents",
+          "labor_cents",
+          "advertising_cents",
+          "committed_purchase_cents",
+          "operating_contribution_cents"
+        ],
+        "rows": [
+          [
+            "2025-01",
+            1000,
+            400,
+            150,
+            100,
+            50,
+            500,
+            150
+          ],
+          [
+            "2025-02",
+            0,
+            0,
+            80,
+            100,
+            20,
+            200,
+            -180
+          ],
+          [
+            "2025-03",
+            800,
+            300,
+            0,
+            150,
+            0,
+            0,
+            150
+          ],
+          [
+            "2025-04",
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            "2025-05",
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            "2025-06",
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            "2025-07",
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            "2025-08",
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            "2025-09",
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            "2025-10",
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            "2025-11",
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            "2025-12",
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        ]
+      }
+    },
+    {
+      "label": "门店经营异常看板",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "独立门店月数据；仅正目标门店参与整体达成率；空值不等于正常，需单独复核。以整体加权指标作为示例比较基准，非原课固定阈值。",
+          "emphasis": []
+        }
+      ],
+      "sql": "WITH store_month(store_id,net,gross,target,refund,pre_refund,direct_expense) AS (SELECT 1,1000,400,1200,100,1100,150 UNION ALL SELECT 2,500,100,400,0,500,160 UNION ALL SELECT 3,200,80,0,0,200,20 UNION ALL SELECT 4,0,0,100,0,0,30),\nbenchmark AS (SELECT 100.0*SUM(gross)/NULLIF(SUM(net),0) overall_margin,100.0*SUM(CASE WHEN target>0 THEN net ELSE 0 END)/NULLIF(SUM(CASE WHEN target>0 THEN target ELSE 0 END),0) overall_attainment,100.0*SUM(refund)/NULLIF(SUM(pre_refund),0) overall_refund FROM store_month),\nmetrics AS (SELECT *,100.0*gross/NULLIF(net,0) margin,100.0*net/NULLIF(CASE WHEN target>0 THEN target END,0) attainment,100.0*refund/NULLIF(pre_refund,0) refund_pct FROM store_month)\nSELECT store_id,ROUND(margin,2) margin_pct,ROUND(attainment,2) attainment_pct,ROUND(refund_pct,2) refund_pct,ROUND(overall_margin,2) overall_margin,ROUND(overall_attainment,2) overall_attainment,CASE WHEN margin<overall_margin THEN 1 ELSE 0 END low_margin,CASE WHEN attainment<overall_attainment THEN 1 ELSE 0 END low_attainment,CASE WHEN refund_pct>overall_refund THEN 1 ELSE 0 END high_refund FROM metrics CROSS JOIN benchmark ORDER BY attainment_pct DESC",
+      "result": {
+        "columns": [
+          "store_id",
+          "margin_pct",
+          "attainment_pct",
+          "refund_pct",
+          "overall_margin",
+          "overall_attainment",
+          "low_margin",
+          "low_attainment",
+          "high_refund"
+        ],
+        "rows": [
+          [
+            2,
+            20.0,
+            125.0,
+            0.0,
+            34.12,
+            88.24,
+            1,
+            0,
+            0
+          ],
+          [
+            1,
+            40.0,
+            83.33,
+            9.09,
+            34.12,
+            88.24,
+            0,
+            1,
+            1
+          ],
+          [
+            4,
+            null,
+            0.0,
+            null,
+            34.12,
+            88.24,
+            0,
+            1,
+            0
+          ],
+          [
+            3,
+            40.0,
+            null,
+            0.0,
+            34.12,
+            88.24,
+            0,
+            0,
+            0
+          ]
+        ]
+      }
+    },
+    {
+      "label": "门店直接费用与贡献",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "示例为已归属门店直接费用的月度汇总；未分摊总部费用或另列人工，不能当作净利润。",
+          "emphasis": []
+        }
+      ],
+      "sql": "WITH store_month(store_id,net,gross,target,refund,pre_refund,direct_expense) AS (SELECT 1,1000,400,1200,100,1100,150 UNION ALL SELECT 2,500,100,400,0,500,160 UNION ALL SELECT 3,200,80,0,0,200,20 UNION ALL SELECT 4,0,0,100,0,0,30),\nbenchmark AS (SELECT 100.0*SUM(gross)/NULLIF(SUM(net),0) overall_margin,100.0*SUM(CASE WHEN target>0 THEN net ELSE 0 END)/NULLIF(SUM(CASE WHEN target>0 THEN target ELSE 0 END),0) overall_attainment,100.0*SUM(refund)/NULLIF(SUM(pre_refund),0) overall_refund FROM store_month),\nmetrics AS (SELECT *,100.0*gross/NULLIF(net,0) margin,100.0*net/NULLIF(CASE WHEN target>0 THEN target END,0) attainment,100.0*refund/NULLIF(pre_refund,0) refund_pct FROM store_month)\n SELECT store_id,net,gross,direct_expense,gross-direct_expense store_contribution FROM store_month ORDER BY net",
+      "result": {
+        "columns": [
+          "store_id",
+          "net",
+          "gross",
+          "direct_expense",
+          "store_contribution"
+        ],
+        "rows": [
+          [
+            4,
+            0,
+            0,
+            30,
+            -30
+          ],
+          [
+            3,
+            200,
+            80,
+            20,
+            60
+          ],
+          [
+            2,
+            500,
+            100,
+            160,
+            -60
+          ],
+          [
+            1,
+            1000,
+            400,
+            150,
+            250
+          ]
+        ]
+      }
+    },
+    {
+      "label": "跨年滚动三个月费用率",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "先保留2024年11、12月，再计算窗口，最后筛选报告期。示例各门店已具备连续有效月份；生产数据需先补齐月份并验证覆盖。",
+          "emphasis": []
+        }
+      ],
+      "sql": "WITH monthly(store_id,month_key,net,expense) AS (SELECT 1,'2024-11',100,10 UNION ALL SELECT 1,'2024-12',200,40 UNION ALL SELECT 1,'2025-01',700,70 UNION ALL SELECT 1,'2025-02',0,20 UNION ALL SELECT 1,'2025-03',0,0 UNION ALL SELECT 1,'2025-04',0,0 UNION ALL SELECT 2,'2025-02',100,20 UNION ALL SELECT 2,'2025-03',100,10),\nw AS (SELECT *,SUM(expense) OVER(PARTITION BY store_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) e3,SUM(net) OVER(PARTITION BY store_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) n3,COUNT(*) OVER(PARTITION BY store_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) cnt FROM monthly)\nSELECT store_id,month_key,ROUND(100.0*expense/NULLIF(net,0),2) monthly_pct,CASE WHEN cnt=3 THEN ROUND(100.0*e3/NULLIF(n3,0),2) END rolling_pct FROM w WHERE month_key BETWEEN '2025-01' AND '2025-12' ORDER BY month_key DESC, monthly_pct DESC",
+      "result": {
+        "columns": [
+          "store_id",
+          "month_key",
+          "monthly_pct",
+          "rolling_pct"
+        ],
+        "rows": [
+          [
+            1,
+            "2025-04",
+            null,
+            null
+          ],
+          [
+            2,
+            "2025-03",
+            10.0,
+            null
+          ],
+          [
+            1,
+            "2025-03",
+            null,
+            12.86
+          ],
+          [
+            2,
+            "2025-02",
+            20.0,
+            null
+          ],
+          [
+            1,
+            "2025-02",
+            null,
+            14.44
+          ],
+          [
+            1,
+            "2025-01",
+            10.0,
+            12.0
+          ]
+        ]
+      }
+    }
+  ],
+  "cautions": {
+    "comparison": [
+      {
+        "type": "paragraph",
+        "text": "经营贡献为题设毛利扣费用与人工；门店直接贡献只扣直接归属费用；采购承诺是订购金额，不等于付款或期间费用。",
+        "emphasis": []
+      }
+    ],
+    "example": [
+      {
+        "type": "paragraph",
+        "text": "将原始明细直接相连；重复扣广告或人工；把采购承诺当费用；平均月费用率。",
+        "emphasis": []
+      }
+    ],
+    "reason": [],
+    "correction": [
+      {
+        "type": "paragraph",
+        "text": "按月预聚合，核对费用范围，用总分子除总分母；窗口计算前保留历史。",
+        "emphasis": []
+      }
+    ],
+    "notes": [
+      {
+        "type": "paragraph",
+        "text": "原主查询及 BP49.json 保留。独立示例仅在 SQLite 验证；递归日期生成使用 SQLite 专有表达式。未复验企业完整数据库、原生 MySQL、浏览器。",
+        "emphasis": []
+      },
+      {
+        "type": "paragraph",
+        "text": "依据现行合并映射整合三个来源，未逐篇复核旧课文。",
+        "emphasis": []
+      }
+    ]
+  },
+  "sourcePath": "source/unified73/kp20-23.json",
+  "sourceSha256": "67b187e07a676373f8720d83026824e2f1092a994c489d3bb549fa5916e626fc"
+}

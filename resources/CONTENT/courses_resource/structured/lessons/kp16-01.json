@@ -1,0 +1,176 @@
+{
+  "schemaVersion": 1,
+  "id": "kp16-01",
+  "sourceBatch": "unified73",
+  "teachingKind": "advanced",
+  "conceptBlocks": [
+    {
+      "type": "paragraph",
+      "text": "技术重复与业务重复不同。同样金额或商品可能属于合法的多次交易；名称经清洗后相同也不证明是同一笔。应先确定业务键、规范化规则和保留优先级，再定位待核实记录。",
+      "emphasis": []
+    }
+  ],
+  "syntax": {
+    "purpose": "business_key 业务识别字段组合。"
+  },
+  "dataDescriptions": {
+    "raw_data": "共 6 行；字段：id、name、amount、category。"
+  },
+  "problem": "导入清单需要找出相同清洗后名称、金额文本及类别的记录；该组合仅是筛查条件，不是已确认的交易唯一键。",
+  "methodBlocks": [
+    {
+      "type": "paragraph",
+      "text": "TRIM 清理名称边缘空格，LOWER 统一类别大小写，GROUP BY 使用同一表达式形成候选组，HAVING 筛出计数大于1的组。明细定位可通过窗口计数保留原编号；",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "确认重复后才按批准规则选择保留行。",
+      "emphasis": []
+    }
+  ],
+  "breakdown": [
+    {
+      "kind": "fragment",
+      "title": "指定来源",
+      "sql": "FROM raw_data",
+      "purpose": "从 raw_data 读取输入数据。",
+      "reason": "后面的子句都基于这里得到的行。"
+    },
+    {
+      "kind": "fragment",
+      "title": "分组",
+      "sql": "GROUP BY TRIM(name),amount,LOWER(category)",
+      "purpose": "按 TRIM(name),amount,LOWER(category) 把行归入各个分组。",
+      "reason": "聚合函数在每个分组内分别计算。"
+    },
+    {
+      "kind": "fragment",
+      "title": "筛选分组",
+      "sql": "HAVING COUNT(*)>1;",
+      "purpose": "仅保留满足 COUNT(*)>1 的分组。",
+      "reason": "聚合值在分组之后才存在，所以要用 HAVING 而不是 WHERE。"
+    },
+    {
+      "kind": "fragment",
+      "title": "选择输出",
+      "sql": "SELECT TRIM(name) AS clean_name,amount,LOWER(category) AS clean_category,COUNT(*) AS duplicate_count",
+      "purpose": "输出查询需要的列与计算表达式。",
+      "reason": "输出列的顺序与别名决定结果表的形状。"
+    }
+  ],
+  "completeCode": {
+    "mysqlSql": "SELECT TRIM(name) AS clean_name,amount,LOWER(category) AS clean_category,COUNT(*) AS duplicate_count FROM raw_data GROUP BY TRIM(name),amount,LOWER(category) HAVING COUNT(*)>1;",
+    "sqliteSql": "SELECT TRIM(name) AS clean_name,amount,LOWER(category) AS clean_category,COUNT(*) AS duplicate_count FROM raw_data GROUP BY TRIM(name),amount,LOWER(category) HAVING COUNT(*)>1;"
+  },
+  "expectedResult": {
+    "columns": [
+      "clean_name",
+      "amount",
+      "clean_category",
+      "duplicate_count"
+    ],
+    "rows": [
+      [
+        "Mask",
+        "15",
+        "skin",
+        2
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "resultBlocks": [
+    {
+      "type": "paragraph",
+      "text": "编号1和2属于同一疑似重复组，计数2。其余四条不符合该规则；这不排除其他业务异常。",
+      "emphasis": []
+    }
+  ],
+  "extensions": [
+    {
+      "label": "定位重复明细",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "窗口计数保留原始编号，外层筛选疑似重复。",
+          "emphasis": []
+        }
+      ],
+      "sql": "WITH d AS (SELECT id,COUNT(*) OVER(PARTITION BY TRIM(name),amount,LOWER(category)) AS n FROM raw_data) SELECT id,n FROM d WHERE n>1 ORDER BY n DESC;",
+      "result": {
+        "columns": [
+          "id",
+          "n"
+        ],
+        "rows": [
+          [
+            1,
+            2
+          ],
+          [
+            2,
+            2
+          ]
+        ]
+      }
+    },
+    {
+      "label": "模拟保留顺序",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "仅预览候选中的后续记录；编号小不代表数据质量一定更高。",
+          "emphasis": []
+        }
+      ],
+      "sql": "WITH d AS (SELECT id,ROW_NUMBER() OVER(PARTITION BY TRIM(name),amount,LOWER(category) ORDER BY id) AS rn FROM raw_data) SELECT id,rn FROM d WHERE rn>1 ORDER BY rn DESC;",
+      "result": {
+        "columns": [
+          "id",
+          "rn"
+        ],
+        "rows": [
+          [
+            2,
+            2
+          ]
+        ]
+      }
+    }
+  ],
+  "cautions": {
+    "comparison": [
+      {
+        "type": "paragraph",
+        "text": "DISTINCT 去除完全相同的输出行，不提供业务重复证据。",
+        "emphasis": []
+      }
+    ],
+    "example": [
+      {
+        "type": "paragraph",
+        "text": "直接删除金额相同或候选键相同的记录。",
+        "emphasis": []
+      }
+    ],
+    "reason": [],
+    "correction": [
+      {
+        "type": "paragraph",
+        "text": "先审核业务凭证与唯一编号，再确定保留规则。",
+        "emphasis": []
+      }
+    ],
+    "notes": [
+      {
+        "type": "paragraph",
+        "text": "金额当前为文本，15与15.00可能被分成不同组；正式口径应先安全规范金额。",
+        "emphasis": []
+      }
+    ]
+  },
+  "sourcePath": "source/unified73/kp16-01.json",
+  "sourceSha256": "36478a21cd7dc85ca19a403df3d841ec4aa8ff869793aa3382fbce1a5690b232"
+}

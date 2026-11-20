@@ -1,0 +1,242 @@
+{
+  "id": "kp15-04",
+  "chapterId": "ch15",
+  "title": "窗口边界与累计计算",
+  "learningObjective": "明确累计窗口起止边界，判断同值行应逐行还是整组累计。",
+  "prerequisites": [
+    "kp15-03",
+    "kp15-05"
+  ],
+  "concept": "窗口帧是在分区内为当前行选出的计算范围。ROWS 按排序后具体行位置确定边界；RANGE 在本例的截至当前值边界包含全部同值行。带排序的聚合窗口默认帧可能包含并列，因此应显式写出业务需要的帧。",
+  "syntax": "SUM(v) OVER(ORDER BY key ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)",
+  "parameters": {
+    "UNBOUNDED PRECEDING": "分区起点",
+    "CURRENT ROW": "当前行或当前排序值边界，取决于帧类型"
+  },
+  "fixtureIds": [
+    "lesson-monthly"
+  ],
+  "sourceTables": [
+    {
+      "name": "monthly",
+      "columns": [
+        {
+          "name": "month",
+          "type": "TEXT",
+          "mysqlType": "VARCHAR(160) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_bin",
+          "sqliteType": "TEXT"
+        },
+        {
+          "name": "sales",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        }
+      ],
+      "rows": [
+        [
+          "2026-01",
+          1000
+        ],
+        [
+          "2026-02",
+          1500
+        ],
+        [
+          "2026-03",
+          1500
+        ],
+        [
+          "2026-04",
+          900
+        ]
+      ]
+    }
+  ],
+  "mysqlSql": "SELECT month,sales,SUM(sales) OVER(ORDER BY month ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS cumulative FROM monthly ORDER BY month;",
+  "sqliteSql": "SELECT month,sales,SUM(sales) OVER(ORDER BY month ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS cumulative FROM monthly ORDER BY month;",
+  "executionSteps": [
+    "确定累计顺序",
+    "设置起点与终点",
+    "逐期累计并检查并列"
+  ],
+  "useCase": "月报需要从一月起累计到当前月；另需理解按薪资排序时同薪记录的累计差异。",
+  "comparison": "同值档累计与逐笔累计是不同业务问题。",
+  "commonError": {
+    "example": "省略帧后假定同值行一定逐笔增加。",
+    "correction": "逐笔采用 ROWS 加稳定决胜键；按同值档累计采用明确的 RANGE。"
+  },
+  "notes": "按年度重置累计时需分区；本例只验证所示帧，不推广至所有范围偏移。",
+  "compatibility": {
+    "status": "直接兼容",
+    "detail": "仅在本示例数据与语义范围验证；不代表全部 MySQL 语法兼容。"
+  },
+  "relatedQuestionIds": [
+    "q0211",
+    "q0212"
+  ],
+  "relatedFlashcardIds": [
+    "fc0116",
+    "fc0117"
+  ],
+  "relatedKnowledgePointIds": [
+    "kp04-01",
+    "kp06-01",
+    "kp07-01",
+    "kp14-01"
+  ],
+  "mysqlVerification": "未运行原生 MySQL 8.4",
+  "result": {
+    "columns": [
+      "month",
+      "sales",
+      "cumulative"
+    ],
+    "rows": [
+      [
+        "2026-01",
+        1000,
+        1000
+      ],
+      [
+        "2026-02",
+        1500,
+        2500
+      ],
+      [
+        "2026-03",
+        1500,
+        4000
+      ],
+      [
+        "2026-04",
+        900,
+        4900
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "visualization": {
+    "kind": "stepFlow",
+    "steps": [
+      {
+        "id": "1",
+        "label": "按月份排序"
+      },
+      {
+        "id": "2",
+        "label": "逐行扩大窗口"
+      },
+      {
+        "id": "3",
+        "label": "累计1000、2500、4000、4900"
+      }
+    ],
+    "sourceFixtureIds": [
+      "lesson-monthly"
+    ],
+    "resultColumns": [
+      "month",
+      "sales",
+      "cumulative"
+    ]
+  },
+  "mysqlVerificationScript": "validation/mysql/kp15-04.sql",
+  "primaryQuestionIds": [
+    "q0211",
+    "q0212"
+  ],
+  "primaryFlashcardIds": [
+    "fc0116",
+    "fc0117"
+  ],
+  "mergedFrom": [
+    {
+      "id": "kp15-06",
+      "title": "RANGE 与 ROWS 的并列效应"
+    }
+  ],
+  "teaching": {
+    "problem": "月报需要从一月起累计到当前月；另需理解按薪资排序时同薪记录的累计差异。",
+    "codeExplanation": "月份唯一时，ROWS 从首行累计至本行。对于同薪示例，RANGE 使用薪资作为排序值，把同薪员工一起计入；ROWS 增加员工编号作为决胜键，使逐人累计可复现。不能为了稳定输出给 RANGE 随意加唯一键。",
+    "resultExplanation": "月累计依次为1000、2500、4000、4900。并列实例中两个5000同值行的 RANGE 均为13000，而逐人累计分别为8000和13000。",
+    "checkpoints": [],
+    "mergedConcepts": [
+      {
+        "sourceId": "kp15-06",
+        "explanation": "保留原四名员工的同薪累计例、窗口边界、稳定决胜键及同值组含义。"
+      }
+    ],
+    "mergeExamples": [
+      {
+        "label": "同薪并列原始示例",
+        "explanation": "内联员工数据与来源课程一致，无需新增正式课程数据表。",
+        "sql": "WITH employees AS (SELECT 1 AS employee_id,8000 AS salary UNION ALL SELECT 2,5000 UNION ALL SELECT 3,5000 UNION ALL SELECT 4,3000) SELECT employee_id,salary,SUM(salary) OVER(ORDER BY salary RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS range_sum,SUM(salary) OVER(ORDER BY salary,employee_id ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS row_sum FROM employees ORDER BY salary;",
+        "result": {
+          "columns": [
+            "employee_id",
+            "salary",
+            "range_sum",
+            "row_sum"
+          ],
+          "rows": [
+            [
+              4,
+              3000,
+              3000,
+              3000
+            ],
+            [
+              2,
+              5000,
+              13000,
+              8000
+            ],
+            [
+              3,
+              5000,
+              13000,
+              13000
+            ],
+            [
+              1,
+              8000,
+              21000,
+              21000
+            ]
+          ]
+        }
+      },
+      {
+        "label": "最近两行窗口",
+        "explanation": "当前行与上一行构成最多两行的滑动窗口。",
+        "sql": "SELECT month,SUM(sales) OVER(ORDER BY month ROWS BETWEEN 1 PRECEDING AND CURRENT ROW) AS last_two FROM monthly ORDER BY month;",
+        "result": {
+          "columns": [
+            "month",
+            "last_two"
+          ],
+          "rows": [
+            [
+              "2026-01",
+              1000
+            ],
+            [
+              "2026-02",
+              2500
+            ],
+            [
+              "2026-03",
+              3000
+            ],
+            [
+              "2026-04",
+              2400
+            ]
+          ]
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,173 @@
+{
+  "schemaVersion": 1,
+  "id": "kp16-03",
+  "lessonSha256": "7277f55d35c5e813690e0fac530aead6349ba22827f79b4fc1965bef6c74e34f",
+  "figures": [
+    {
+      "id": "kp16-03-clauses",
+      "slot": "syntax",
+      "kind": "clause-map",
+      "title": "示例查询的几个部分",
+      "sql": "SELECT id,CAST(amount AS DECIMAL(12,2)) AS numeric_amount,CASE WHEN LOWER(TRIM(category))='skin' THEN '护肤品' WHEN LOWER(TRIM(category))='home' THEN '日用品' WHEN LOWER(TRIM(category))='makeup' THEN '化妆品' ELSE '待分类' END AS clean_category FROM raw_data ORDER BY name DESC;",
+      "parts": [
+        {
+          "role": "select",
+          "label": "取数",
+          "sql": "SELECT id,CAST(amount AS DECIMAL(12,2)) AS numeric_amount,CASE WHEN LOWER(TRIM(category))='skin' THEN '护肤品' WHEN LOWER(TRIM(category))='home' THEN '日用品' WHEN LOWER(TRIM(category))='makeup' THEN '化妆品' ELSE '待分类' END AS clean_category",
+          "note": "输出查询需要的列与计算表达式。"
+        },
+        {
+          "role": "from",
+          "label": "来源",
+          "sql": "FROM raw_data",
+          "note": "从 raw_data 读取输入数据。"
+        },
+        {
+          "role": "order",
+          "label": "排序",
+          "sql": "ORDER BY name DESC;",
+          "note": "按 name DESC 排列结果。"
+        }
+      ]
+    },
+    {
+      "id": "kp16-03-flow",
+      "slot": "breakdown",
+      "kind": "stage-flow",
+      "merge": "breakdown",
+      "title": "每一步的数据变化",
+      "steps": [
+        {
+          "label": "FROM raw_data",
+          "sql": "SELECT * FROM raw_data",
+          "columns": [
+            "id",
+            "name",
+            "amount",
+            "category"
+          ],
+          "rows": [
+            [
+              1,
+              "  Mask ",
+              "15",
+              "SKIN"
+            ],
+            [
+              2,
+              "Mask",
+              "15",
+              "skin"
+            ],
+            [
+              3,
+              "Serum",
+              null,
+              "Skin"
+            ],
+            [
+              4,
+              "Soap",
+              "-5",
+              "HOME"
+            ],
+            [
+              5,
+              "Cream",
+              "0",
+              "makeup"
+            ],
+            [
+              6,
+              "",
+              "20",
+              "HOME"
+            ]
+          ]
+        },
+        {
+          "label": "SELECT id,CAST(amount AS DECIMAL(12,2)) AS numeric_amount,CASE WHEN LOWER(TRIM(category))='skin' THEN '护肤品' WHEN LOWER(TRIM(category))='home' THEN '日用品' WHEN LOWER(TRIM(category))='makeup' THEN '化妆品' ELSE '待分类' END AS clean_category",
+          "sql": "SELECT id,CAST(amount AS DECIMAL(12,2)) AS numeric_amount,CASE WHEN LOWER(TRIM(category))='skin' THEN '护肤品' WHEN LOWER(TRIM(category))='home' THEN '日用品' WHEN LOWER(TRIM(category))='makeup' THEN '化妆品' ELSE '待分类' END AS clean_category FROM raw_data",
+          "columns": [
+            "id",
+            "numeric_amount",
+            "clean_category"
+          ],
+          "rows": [
+            [
+              1,
+              15,
+              "护肤品"
+            ],
+            [
+              2,
+              15,
+              "护肤品"
+            ],
+            [
+              3,
+              null,
+              "护肤品"
+            ],
+            [
+              4,
+              -5,
+              "日用品"
+            ],
+            [
+              5,
+              0,
+              "化妆品"
+            ],
+            [
+              6,
+              20,
+              "日用品"
+            ]
+          ]
+        },
+        {
+          "label": "ORDER BY name DESC;",
+          "sql": "SELECT id,CAST(amount AS DECIMAL(12,2)) AS numeric_amount,CASE WHEN LOWER(TRIM(category))='skin' THEN '护肤品' WHEN LOWER(TRIM(category))='home' THEN '日用品' WHEN LOWER(TRIM(category))='makeup' THEN '化妆品' ELSE '待分类' END AS clean_category FROM raw_data ORDER BY name DESC;",
+          "columns": [
+            "id",
+            "numeric_amount",
+            "clean_category"
+          ],
+          "rows": [
+            [
+              4,
+              -5,
+              "日用品"
+            ],
+            [
+              3,
+              null,
+              "护肤品"
+            ],
+            [
+              2,
+              15,
+              "护肤品"
+            ],
+            [
+              5,
+              0,
+              "化妆品"
+            ],
+            [
+              1,
+              15,
+              "护肤品"
+            ],
+            [
+              6,
+              20,
+              "日用品"
+            ]
+          ]
+        }
+      ]
+    }
+  ]
+}

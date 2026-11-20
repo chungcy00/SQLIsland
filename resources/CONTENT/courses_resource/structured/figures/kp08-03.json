@@ -1,0 +1,109 @@
+{
+  "schemaVersion": 1,
+  "id": "kp08-03",
+  "lessonSha256": "f98b51da5c9e487ba465a19195b7caa4d2f2eb8526ad1a10f1fe43595544790b",
+  "figures": [
+    {
+      "id": "kp08-03-clauses",
+      "slot": "syntax",
+      "kind": "clause-map",
+      "title": "示例查询的几个部分",
+      "sql": "SELECT c.customer_id, COUNT(o.id) AS feb_orders FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id AND o.order_date >= '2026-02-01' AND o.order_date < '2026-03-01' GROUP BY c.customer_id ORDER BY feb_orders DESC, SUM(o.sales) DESC;",
+      "parts": [
+        {
+          "role": "select",
+          "label": "取数",
+          "sql": "SELECT c.customer_id, COUNT(o.id) AS feb_orders",
+          "note": "输出 c.customer_id, COUNT(o.id) AS feb_orders。"
+        },
+        {
+          "role": "from",
+          "label": "来源",
+          "sql": "FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id AND o.order_date >= '2026-02-01' AND o.order_date < '2026-03-01'",
+          "note": "读取查询需要的输入数据。"
+        },
+        {
+          "role": "group",
+          "label": "分组",
+          "sql": "GROUP BY c.customer_id",
+          "note": "按 c.customer_id 把行归入各个分组。"
+        },
+        {
+          "role": "order",
+          "label": "排序",
+          "sql": "ORDER BY feb_orders DESC, SUM(o.sales) DESC;",
+          "note": "按 feb_orders DESC, SUM(o.sales) DESC 排列结果。"
+        }
+      ]
+    },
+    {
+      "id": "kp08-03-flow",
+      "slot": "breakdown",
+      "kind": "stage-flow",
+      "merge": "breakdown",
+      "title": "每一步的数据变化",
+      "steps": [
+        {
+          "label": "FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id AND o.order_date >= '2026-02-01' AND o.order_date < '2026-03-01'",
+          "skip": true
+        },
+        {
+          "label": "GROUP BY c.customer_id",
+          "sql": "SELECT c.customer_id, COUNT(o.id) AS feb_orders FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id AND o.order_date >= '2026-02-01' AND o.order_date < '2026-03-01' GROUP BY c.customer_id",
+          "columns": [
+            "customer_id",
+            "feb_orders"
+          ],
+          "rows": [
+            [
+              1,
+              1
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              4,
+              0
+            ]
+          ]
+        },
+        {
+          "label": "SELECT c.customer_id, COUNT(o.id) AS feb_orders",
+          "skip": true
+        },
+        {
+          "label": "ORDER BY feb_orders DESC, SUM(o.sales) DESC;",
+          "sql": "SELECT c.customer_id, COUNT(o.id) AS feb_orders FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id AND o.order_date >= '2026-02-01' AND o.order_date < '2026-03-01' GROUP BY c.customer_id ORDER BY feb_orders DESC, SUM(o.sales) DESC;",
+          "columns": [
+            "customer_id",
+            "feb_orders"
+          ],
+          "rows": [
+            [
+              3,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              4,
+              0
+            ]
+          ]
+        }
+      ]
+    }
+  ]
+}

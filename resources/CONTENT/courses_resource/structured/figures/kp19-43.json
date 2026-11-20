@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "id": "kp19-43",
+  "lessonSha256": "2d136848aebcee4d5a0445af461d1716b16f970c659b95edc8ebff5627e42ce8",
+  "figures": [
+    {
+      "id": "kp19-43-clauses",
+      "slot": "syntax",
+      "kind": "clause-map",
+      "title": "示例查询的几个部分",
+      "sql": "WITH a AS (SELECT customer_id,MIN(SUBSTR(order_date,1,7)) cohort FROM v_order_net WHERE channel='online' GROUP BY customer_id), b AS (SELECT cohort,COUNT(*) n FROM a GROUP BY cohort), m AS (SELECT DISTINCT month_key FROM calendar_days WHERE day<='2025-12-31'), x AS (SELECT b.cohort,m.month_key,b.n,(CAST(SUBSTR(m.month_key,1,4) AS INTEGER)-CAST(SUBSTR(b.cohort,1,4) AS INTEGER))*12+CAST(SUBSTR(m.month_key,6,2) AS INTEGER)-CAST(SUBSTR(b.cohort,6,2) AS INTEGER) k FROM b CROSS JOIN m WHERE m.month_key>=b.cohort), y AS (SELECT a.cohort,SUBSTR(o.order_date,1,7) m,COUNT(DISTINCT o.customer_id) active FROM a JOIN v_order_net o ON o.customer_id=a.customer_id AND o.channel='online' GROUP BY a.cohort,SUBSTR(o.order_date,1,7)) SELECT x.cohort,x.k month_offset,x.n cohort_size,COALESCE(y.active,0) active_customers,ROUND(100.0*COALESCE(y.active,0)/x.n,2) retention_pct FROM x LEFT JOIN y ON y.cohort=x.cohort AND y.m=x.month_key WHERE x.k BETWEEN 0 AND 6 ORDER BY x.cohort,x.k",
+      "parts": [
+        {
+          "role": "cte",
+          "label": "中间结果",
+          "sql": "WITH a AS (SELECT customer_id,MIN(SUBSTR(order_date,1,7)) cohort FROM v_order_net WHERE channel='online' GROUP BY customer_id),",
+          "note": "先把名为 a 的中间结果算出来，供后面的查询引用。"
+        },
+        {
+          "role": "cte",
+          "label": "中间结果",
+          "sql": "b AS (SELECT cohort,COUNT(*) n FROM a GROUP BY cohort),",
+          "note": "先把名为 b 的中间结果算出来，供后面的查询引用。"
+        },
+        {
+          "role": "cte",
+          "label": "中间结果",
+          "sql": "m AS (SELECT DISTINCT month_key FROM calendar_days WHERE day<='2025-12-31'),",
+          "note": "先把名为 m 的中间结果算出来，供后面的查询引用。"
+        },
+        {
+          "role": "cte",
+          "label": "中间结果",
+          "sql": "x AS (SELECT b.cohort,m.month_key,b.n,(CAST(SUBSTR(m.month_key,1,4) AS INTEGER)-CAST(SUBSTR(b.cohort,1,4) AS INTEGER))*12+CAST(SUBSTR(m.month_key,6,2) AS INTEGER)-CAST(SUBSTR(b.cohort,6,2) AS INTEGER) k FROM b CROSS JOIN m WHERE m.month_key>=b.cohort),",
+          "note": "先把名为 x 的中间结果算出来，供后面的查询引用。"
+        },
+        {
+          "role": "cte",
+          "label": "中间结果",
+          "sql": "y AS (SELECT a.cohort,SUBSTR(o.order_date,1,7) m,COUNT(DISTINCT o.customer_id) active FROM a JOIN v_order_net o ON o.customer_id=a.customer_id AND o.channel='online' GROUP BY a.cohort,SUBSTR(o.order_date,1,7))",
+          "note": "先把名为 y 的中间结果算出来，供后面的查询引用。"
+        },
+        {
+          "role": "select",
+          "label": "取数",
+          "sql": "SELECT x.cohort,x.k month_offset,x.n cohort_size,COALESCE(y.active,0) active_customers,ROUND(100.0*COALESCE(y.active,0)/x.n,2) retention_pct",
+          "note": "输出查询需要的列与计算表达式。"
+        },
+        {
+          "role": "from",
+          "label": "来源",
+          "sql": "FROM x LEFT JOIN y ON y.cohort=x.cohort AND y.m=x.month_key",
+          "note": "从 x LEFT JOIN y ON y.cohort=x.cohort AND y.m=x.month_key 读取输入数据。"
+        },
+        {
+          "role": "where",
+          "label": "筛选",
+          "sql": "WHERE x.k BETWEEN 0 AND 6",
+          "note": "仅保留满足 x.k BETWEEN 0 AND 6 的行。"
+        },
+        {
+          "role": "order",
+          "label": "排序",
+          "sql": "ORDER BY x.cohort,x.k",
+          "note": "按 x.cohort,x.k 排列结果。"
+        }
+      ]
+    }
+  ]
+}

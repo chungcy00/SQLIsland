@@ -1,0 +1,165 @@
+{
+  "schemaVersion": 1,
+  "id": "kp12-04",
+  "sourceBatch": "unified73",
+  "teachingKind": "function",
+  "conceptBlocks": [
+    {
+      "type": "paragraph",
+      "text": "半开区间含起点、不含终点。月报终点用下一月第一天，而不是当月最后一天午夜，可覆盖最后一天任意时刻。相邻区间无重叠，也无需猜测数据精度。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "保持日期字段裸列比较通常有利于索引范围检索，但实际性能由执行计划决定。",
+      "emphasis": []
+    }
+  ],
+  "syntax": {
+    "purpose": "start 包含的开始边界；next_start 排除的结束边界。"
+  },
+  "dataDescriptions": {
+    "orders": "共 5 行；字段：id、category、sales、store_id、order_date、customer_id。"
+  },
+  "problem": "统计2026年2月订单销售额；按订单日期归属，忽略一月及三月记录，不排除匿名订单。",
+  "methodBlocks": [
+    {
+      "type": "paragraph",
+      "text": "两个条件用 AND 连接。第一个保留月初及之后，第二个排除下月月初及之后。先查看筛选明细再求和；本地 ISO 日期文本适合本示例的字典序比较。",
+      "emphasis": []
+    }
+  ],
+  "breakdown": [
+    {
+      "kind": "fragment",
+      "title": "指定来源",
+      "sql": "FROM orders",
+      "purpose": "从 orders 读取输入数据。",
+      "reason": "后面的子句都基于这里得到的行。"
+    },
+    {
+      "kind": "fragment",
+      "title": "筛选行",
+      "sql": "WHERE order_date >= '2026-02-01' AND order_date < '2026-03-01';",
+      "purpose": "仅保留满足 order_date >= '2026-02-01' AND order_date < '2026-03-01' 的行。",
+      "reason": "条件结果为真才保留；未知（NULL）的行会被排除。"
+    },
+    {
+      "kind": "fragment",
+      "title": "选择输出",
+      "sql": "SELECT SUM(sales) AS feb_sales",
+      "purpose": "输出 SUM(sales) AS feb_sales。",
+      "reason": "输出列的顺序与别名决定结果表的形状。"
+    }
+  ],
+  "completeCode": {
+    "mysqlSql": "SELECT SUM(sales) AS feb_sales FROM orders WHERE order_date >= '2026-02-01' AND order_date < '2026-03-01';",
+    "sqliteSql": "SELECT SUM(sales) AS feb_sales FROM orders WHERE order_date >= '2026-02-01' AND order_date < '2026-03-01';"
+  },
+  "expectedResult": {
+    "columns": [
+      "feb_sales"
+    ],
+    "rows": [
+      [
+        2400
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "resultBlocks": [
+    {
+      "type": "paragraph",
+      "text": "二月订单3、4、5的金额600、300、1500合计2400。无交易月份的 SUM 可能返回 NULL，是否填零取决于业务。",
+      "emphasis": []
+    }
+  ],
+  "extensions": [
+    {
+      "label": "查看筛选明细",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "确认三笔交易后再汇总。",
+          "emphasis": []
+        }
+      ],
+      "sql": "SELECT id,sales FROM orders WHERE order_date >= '2026-02-01' AND order_date < '2026-03-01' ORDER BY sales DESC;",
+      "result": {
+        "columns": [
+          "id",
+          "sales"
+        ],
+        "rows": [
+          [
+            5,
+            1500
+          ],
+          [
+            3,
+            600
+          ],
+          [
+            4,
+            300
+          ]
+        ]
+      }
+    },
+    {
+      "label": "验证时间边界",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "最后一天交易必须保留，下一月零时必须排除。",
+          "emphasis": []
+        }
+      ],
+      "sql": "WITH d(t) AS (SELECT '2026-02-28 23:59:59' UNION ALL SELECT '2026-03-01 00:00:00') SELECT t FROM d WHERE t >= '2026-02-01' AND t < '2026-03-01' ORDER BY t;",
+      "result": {
+        "columns": [
+          "t"
+        ],
+        "rows": [
+          [
+            "2026-02-28 23:59:59"
+          ]
+        ]
+      }
+    }
+  ],
+  "cautions": {
+    "comparison": [
+      {
+        "type": "paragraph",
+        "text": "月键生成不等于日期范围筛选。",
+        "emphasis": []
+      }
+    ],
+    "example": [
+      {
+        "type": "paragraph",
+        "text": "使用 <= 当月最后一天的日期字符串筛选含时分秒的数据。",
+        "emphasis": []
+      }
+    ],
+    "reason": [],
+    "correction": [
+      {
+        "type": "paragraph",
+        "text": "改用 < 下一月第一天。",
+        "emphasis": []
+      }
+    ],
+    "notes": [
+      {
+        "type": "paragraph",
+        "text": "时区及日期类型需与项目实际口径一致。",
+        "emphasis": []
+      }
+    ]
+  },
+  "sourcePath": "source/unified73/kp12-04.json",
+  "sourceSha256": "b25eb245d739f1717a73ad27ba3f706e9de4d5376feb3370a0c264ec6b89b7c3"
+}

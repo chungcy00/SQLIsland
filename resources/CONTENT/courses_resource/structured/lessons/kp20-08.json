@@ -1,0 +1,1052 @@
+{
+  "schemaVersion": 1,
+  "id": "kp20-08",
+  "sourceBatch": "unified73",
+  "teachingKind": "business",
+  "conceptBlocks": [
+    {
+      "type": "paragraph",
+      "text": "期间毛利=净销售额−对应销售成本；库存标准价值=数量×单位成本；两端平均库存=(期初库存价值+期末库存价值)÷2；库存投资回报=期间毛利÷平均库存价值，单位为倍。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "缺少任何预期商品、仓库、日期组合的快照时不能当零；平均库存及回报留空。完整零库存的回报也不可定义。",
+      "emphasis": []
+    }
+  ],
+  "syntax": {
+    "purpose": "统计期间 2025年；期初 2024-12-31；期末 2025-12-31；输出粒度 类别；金额 马币分；回报 倍。"
+  },
+  "dataDescriptions": {
+    "categories": "共 3 行；字段：category_id、category_name。",
+    "inventory_snapshots": "共 3 行；字段：snapshot_id、warehouse_id、product_id、snapshot_date、quantity、unit_cost_cents。",
+    "products": "共 3 行；字段：product_id、category_id、product_name、list_price_cents、reorder_level、active、discontinued_date。",
+    "v_sales_lines": "共 3 行；字段：order_item_id、order_id、store_id、customer_id、session_id、channel、order_date、product_id、promotion_id、net_qty、net_cents、cost_cents、discount_cents、refund_cents。",
+    "warehouses": "共 3 行；字段：warehouse_id、warehouse_name。"
+  },
+  "problem": "管理层比较各商品类别2025年度每单位平均库存成本创造的毛利。纳入所有渠道，使用2024年底和2025年底各仓库存标准成本估算平均库存，每类别一行。",
+  "methodBlocks": [
+    {
+      "type": "paragraph",
+      "text": "a 将销售明细连接商品主档得到类别，按2025年日期筛选，先汇总净销售减成本，不再重复扣退款。b 将商品与全部仓库交叉连接形成预期组合，左连接两个指定日期快照；",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "日期条件留在连接条件中，避免缺档被过滤。COUNT(i.snapshot_id) 只数实际匹配记录，而 COUNT(*) 会数左连接占位行。预期数量为2×类别商品数×仓库数；",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "覆盖完整时将两端所有库存金额之和除以2.0，而不是直接平均各行金额。最后以类别主档左连接两组汇总，无销售补零，库存缺档不补零，用 NULLIF 防止零除，最后舍入四位并排序。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "原计数法假设每商品每仓每日期唯一；重复与缺档可能抵消，独立第五例演示逐键审计。两端平均只是估计，库存季节波动明显时应采用一致的月度或日度平均口径。",
+      "emphasis": []
+    }
+  ],
+  "breakdown": [
+    {
+      "kind": "runnable",
+      "title": "按类别汇总销售毛利",
+      "sql": "WITH a AS (SELECT p.category_id,SUM(s.net_cents-s.cost_cents) gross FROM v_sales_lines s JOIN products p ON p.product_id=s.product_id WHERE s.order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY p.category_id)\nSELECT * FROM a ORDER BY 1, 2 LIMIT 3;",
+      "purpose": "按类别汇总销售毛利（a）的实际执行结果。",
+      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "sourceTables": [
+        {
+          "name": "categories",
+          "columns": [
+            {
+              "name": "category_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "category_name",
+              "type": "TEXT"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              "护肤"
+            ],
+            [
+              2,
+              "清洁"
+            ],
+            [
+              3,
+              "家居"
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 15
+        },
+        {
+          "name": "inventory_snapshots",
+          "columns": [
+            {
+              "name": "snapshot_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "warehouse_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "product_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "snapshot_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "quantity",
+              "type": "INTEGER"
+            },
+            {
+              "name": "unit_cost_cents",
+              "type": "INTEGER"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              1,
+              "2023-01-31",
+              2,
+              3341
+            ],
+            [
+              2,
+              1,
+              2,
+              "2023-01-31",
+              3,
+              647
+            ],
+            [
+              3,
+              1,
+              3,
+              "2023-01-31",
+              11,
+              514
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 54000
+        },
+        {
+          "name": "products",
+          "columns": [
+            {
+              "name": "product_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "category_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "product_name",
+              "type": "TEXT"
+            },
+            {
+              "name": "list_price_cents",
+              "type": "INTEGER"
+            },
+            {
+              "name": "reorder_level",
+              "type": "INTEGER"
+            },
+            {
+              "name": "active",
+              "type": "INTEGER"
+            },
+            {
+              "name": "discontinued_date",
+              "type": "TEXT"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              7,
+              "Nusa 休闲长裤 XL",
+              4450,
+              2,
+              1,
+              null
+            ],
+            [
+              2,
+              11,
+              "Bumi 成猫粮 中号",
+              970,
+              4,
+              1,
+              null
+            ],
+            [
+              3,
+              4,
+              "青禾 香米 500g",
+              1060,
+              2,
+              1,
+              null
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 500
+        },
+        {
+          "name": "v_sales_lines",
+          "columns": [
+            {
+              "name": "order_item_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "order_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "store_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "customer_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "session_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "channel",
+              "type": "TEXT"
+            },
+            {
+              "name": "order_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "product_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "promotion_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "net_qty",
+              "type": "派生"
+            },
+            {
+              "name": "net_cents",
+              "type": "派生"
+            },
+            {
+              "name": "cost_cents",
+              "type": "派生"
+            },
+            {
+              "name": "discount_cents",
+              "type": "INTEGER"
+            },
+            {
+              "name": "refund_cents",
+              "type": "派生"
+            }
+          ],
+          "rows": [
+            [
+              53709,
+              2,
+              4,
+              null,
+              null,
+              "store",
+              "2025-10-02",
+              287,
+              null,
+              1,
+              300,
+              268,
+              0,
+              0
+            ],
+            [
+              55177,
+              2,
+              4,
+              null,
+              null,
+              "store",
+              "2025-10-02",
+              158,
+              null,
+              0,
+              0,
+              0,
+              0,
+              1810
+            ],
+            [
+              29478,
+              3,
+              4,
+              2256,
+              null,
+              "store",
+              "2025-06-09",
+              59,
+              null,
+              1,
+              1310,
+              618,
+              0,
+              0
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 64627
+        },
+        {
+          "name": "warehouses",
+          "columns": [
+            {
+              "name": "warehouse_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "warehouse_name",
+              "type": "TEXT"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              "古晋区域配送中心"
+            ],
+            [
+              2,
+              "美里区域配送仓"
+            ],
+            [
+              3,
+              "吉隆坡电商与门店仓"
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 3
+        }
+      ],
+      "result": {
+        "columns": [
+          "category_id",
+          "gross"
+        ],
+        "rows": [
+          [
+            1,
+            2669940
+          ],
+          [
+            2,
+            2190229
+          ],
+          [
+            3,
+            5781330
+          ]
+        ]
+      }
+    },
+    {
+      "kind": "runnable",
+      "title": "按类别计算平均库存价值",
+      "sql": "WITH a AS (SELECT p.category_id,SUM(s.net_cents-s.cost_cents) gross FROM v_sales_lines s JOIN products p ON p.product_id=s.product_id WHERE s.order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY p.category_id), b AS (SELECT p.category_id,CASE WHEN COUNT(i.snapshot_id)=2*COUNT(DISTINCT p.product_id)*(SELECT COUNT(*) FROM warehouses) THEN SUM(i.quantity*i.unit_cost_cents)/2.0 ELSE NULL END avg_stock FROM products p CROSS JOIN warehouses w LEFT JOIN inventory_snapshots i ON i.product_id=p.product_id AND i.warehouse_id=w.warehouse_id AND i.snapshot_date IN ('2024-12-31','2025-12-31') GROUP BY p.category_id)\nSELECT * FROM b ORDER BY 1, 2 LIMIT 3;",
+      "purpose": "按类别计算平均库存价值（b）的实际执行结果。",
+      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "sourceTables": [
+        {
+          "name": "categories",
+          "columns": [
+            {
+              "name": "category_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "category_name",
+              "type": "TEXT"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              "护肤"
+            ],
+            [
+              2,
+              "清洁"
+            ],
+            [
+              3,
+              "家居"
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 15
+        },
+        {
+          "name": "inventory_snapshots",
+          "columns": [
+            {
+              "name": "snapshot_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "warehouse_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "product_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "snapshot_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "quantity",
+              "type": "INTEGER"
+            },
+            {
+              "name": "unit_cost_cents",
+              "type": "INTEGER"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              1,
+              "2023-01-31",
+              2,
+              3341
+            ],
+            [
+              2,
+              1,
+              2,
+              "2023-01-31",
+              3,
+              647
+            ],
+            [
+              3,
+              1,
+              3,
+              "2023-01-31",
+              11,
+              514
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 54000
+        },
+        {
+          "name": "products",
+          "columns": [
+            {
+              "name": "product_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "category_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "product_name",
+              "type": "TEXT"
+            },
+            {
+              "name": "list_price_cents",
+              "type": "INTEGER"
+            },
+            {
+              "name": "reorder_level",
+              "type": "INTEGER"
+            },
+            {
+              "name": "active",
+              "type": "INTEGER"
+            },
+            {
+              "name": "discontinued_date",
+              "type": "TEXT"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              7,
+              "Nusa 休闲长裤 XL",
+              4450,
+              2,
+              1,
+              null
+            ],
+            [
+              2,
+              11,
+              "Bumi 成猫粮 中号",
+              970,
+              4,
+              1,
+              null
+            ],
+            [
+              3,
+              4,
+              "青禾 香米 500g",
+              1060,
+              2,
+              1,
+              null
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 500
+        },
+        {
+          "name": "v_sales_lines",
+          "columns": [
+            {
+              "name": "order_item_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "order_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "store_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "customer_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "session_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "channel",
+              "type": "TEXT"
+            },
+            {
+              "name": "order_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "product_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "promotion_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "net_qty",
+              "type": "派生"
+            },
+            {
+              "name": "net_cents",
+              "type": "派生"
+            },
+            {
+              "name": "cost_cents",
+              "type": "派生"
+            },
+            {
+              "name": "discount_cents",
+              "type": "INTEGER"
+            },
+            {
+              "name": "refund_cents",
+              "type": "派生"
+            }
+          ],
+          "rows": [
+            [
+              53709,
+              2,
+              4,
+              null,
+              null,
+              "store",
+              "2025-10-02",
+              287,
+              null,
+              1,
+              300,
+              268,
+              0,
+              0
+            ],
+            [
+              55177,
+              2,
+              4,
+              null,
+              null,
+              "store",
+              "2025-10-02",
+              158,
+              null,
+              0,
+              0,
+              0,
+              0,
+              1810
+            ],
+            [
+              29478,
+              3,
+              4,
+              2256,
+              null,
+              "store",
+              "2025-06-09",
+              59,
+              null,
+              1,
+              1310,
+              618,
+              0,
+              0
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 64627
+        },
+        {
+          "name": "warehouses",
+          "columns": [
+            {
+              "name": "warehouse_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "warehouse_name",
+              "type": "TEXT"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              "古晋区域配送中心"
+            ],
+            [
+              2,
+              "美里区域配送仓"
+            ],
+            [
+              3,
+              "吉隆坡电商与门店仓"
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 3
+        }
+      ],
+      "result": {
+        "columns": [
+          "category_id",
+          "avg_stock"
+        ],
+        "rows": [
+          [
+            1,
+            10598879.0
+          ],
+          [
+            2,
+            6004347.5
+          ],
+          [
+            3,
+            32097845.5
+          ]
+        ]
+      }
+    }
+  ],
+  "completeCode": {
+    "mysqlSql": "WITH a AS (SELECT p.category_id,SUM(s.net_cents-s.cost_cents) gross FROM v_sales_lines s JOIN products p ON p.product_id=s.product_id WHERE s.order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY p.category_id), b AS (SELECT p.category_id,CASE WHEN COUNT(i.snapshot_id)=2*COUNT(DISTINCT p.product_id)*(SELECT COUNT(*) FROM warehouses) THEN SUM(i.quantity*i.unit_cost_cents)/2.0 ELSE NULL END avg_stock FROM products p CROSS JOIN warehouses w LEFT JOIN inventory_snapshots i ON i.product_id=p.product_id AND i.warehouse_id=w.warehouse_id AND i.snapshot_date IN ('2024-12-31','2025-12-31') GROUP BY p.category_id) SELECT c.category_id,COALESCE(a.gross,0) gross_cents,b.avg_stock avg_stock_cents,ROUND(COALESCE(a.gross,0)/NULLIF(b.avg_stock,0),4) gmroi FROM categories c LEFT JOIN a ON a.category_id=c.category_id LEFT JOIN b ON b.category_id=c.category_id ORDER BY gmroi DESC",
+    "sqliteSql": "WITH a AS (SELECT p.category_id,SUM(s.net_cents-s.cost_cents) gross FROM v_sales_lines s JOIN products p ON p.product_id=s.product_id WHERE s.order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY p.category_id), b AS (SELECT p.category_id,CASE WHEN COUNT(i.snapshot_id)=2*COUNT(DISTINCT p.product_id)*(SELECT COUNT(*) FROM warehouses) THEN SUM(i.quantity*i.unit_cost_cents)/2.0 ELSE NULL END avg_stock FROM products p CROSS JOIN warehouses w LEFT JOIN inventory_snapshots i ON i.product_id=p.product_id AND i.warehouse_id=w.warehouse_id AND i.snapshot_date IN ('2024-12-31','2025-12-31') GROUP BY p.category_id) SELECT c.category_id,COALESCE(a.gross,0) gross_cents,b.avg_stock avg_stock_cents,ROUND(COALESCE(a.gross,0)/NULLIF(b.avg_stock,0),4) gmroi FROM categories c LEFT JOIN a ON a.category_id=c.category_id LEFT JOIN b ON b.category_id=c.category_id ORDER BY gmroi DESC"
+  },
+  "expectedResult": {
+    "columns": [
+      "category_id",
+      "gross_cents",
+      "avg_stock_cents",
+      "gmroi"
+    ],
+    "rows": [
+      [
+        4,
+        6286528,
+        13877168.5,
+        0.453
+      ],
+      [
+        6,
+        987252,
+        2378039.5,
+        0.4152
+      ],
+      [
+        8,
+        2700270,
+        6992836.0,
+        0.3861
+      ],
+      [
+        5,
+        1582364,
+        4165128.0,
+        0.3799
+      ],
+      [
+        15,
+        5453302,
+        14424479.5,
+        0.3781
+      ],
+      [
+        2,
+        2190229,
+        6004347.5,
+        0.3648
+      ],
+      [
+        11,
+        2150355,
+        7748739.5,
+        0.2775
+      ],
+      [
+        1,
+        2669940,
+        10598879.0,
+        0.2519
+      ],
+      [
+        9,
+        791590,
+        3839210.0,
+        0.2062
+      ],
+      [
+        7,
+        5902748,
+        30452426.5,
+        0.1938
+      ],
+      [
+        14,
+        1738669,
+        9634192.5,
+        0.1805
+      ],
+      [
+        3,
+        5781330,
+        32097845.5,
+        0.1801
+      ],
+      [
+        12,
+        1473216,
+        10433142.0,
+        0.1412
+      ],
+      [
+        10,
+        2150523,
+        16507808.5,
+        0.1303
+      ],
+      [
+        13,
+        703693,
+        12393473.5,
+        0.0568
+      ]
+    ],
+    "status": "SQLite实际执行（预览）",
+    "orderGuaranteed": true,
+    "totalRows": 15,
+    "fullResultPath": "../enterprise_reference/business_tasks/results/BP34.json"
+  },
+  "resultBlocks": [
+    {
+      "type": "paragraph",
+      "text": "独立示例类别1毛利600分、期初库存400分、期末800分，平均600分，回报1倍；类别2毛利400分但缺一个期末仓库快照，平均库存和回报为空；",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "类别3毛利100分、完整零库存，回报为空；类别4毛利0、平均库存200分，回报0倍；类别5无商品，平均库存和回报为空。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "原企业预览类别4毛利6286528分、平均库存13877168.5分、回报0.4530倍，即每一马币平均库存成本产生约0.453马币期间毛利，并非毛利率或净利润率。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "原企业结果仅引用未重新运行。比较类别时应统一期间、成本估值与库存覆盖口径；负毛利可以产生负回报，不能据单一指标直接决定停购。",
+      "emphasis": []
+    }
+  ],
+  "extensions": [
+    {
+      "label": "按类别汇总毛利",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "净销售减对应销售成本；排除2024年的记录。",
+          "emphasis": []
+        }
+      ],
+      "sql": "WITH categories(category_id) AS (VALUES (1),(2),(3),(4),(5)),\nproducts(product_id,category_id) AS (VALUES (11,1),(21,2),(31,3),(41,4)),\nwarehouses(warehouse_id) AS (VALUES (1),(2)),\nv_sales_lines(product_id,order_date,net_cents,cost_cents) AS (VALUES\n (11,'2025-01-01',1000,600),(11,'2025-03-01',500,300),(21,'2025-02-01',700,300),(31,'2025-04-01',200,100),(11,'2024-12-31',900,100)),\ninventory_snapshots(snapshot_id,product_id,warehouse_id,snapshot_date,quantity,unit_cost_cents) AS (VALUES\n (1,11,1,'2024-12-31',3,100),(2,11,2,'2024-12-31',1,100),(3,11,1,'2025-12-31',5,100),(4,11,2,'2025-12-31',3,100),\n (5,21,1,'2024-12-31',1,100),(6,21,2,'2024-12-31',1,100),(7,21,1,'2025-12-31',2,100),\n (8,31,1,'2024-12-31',0,100),(9,31,2,'2024-12-31',0,100),(10,31,1,'2025-12-31',0,100),(11,31,2,'2025-12-31',0,100),\n (12,41,1,'2024-12-31',1,100),(13,41,2,'2024-12-31',1,100),(14,41,1,'2025-12-31',1,100),(15,41,2,'2025-12-31',1,100)),\na AS (SELECT p.category_id,SUM(s.net_cents-s.cost_cents) gross FROM v_sales_lines s JOIN products p ON p.product_id=s.product_id WHERE s.order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY p.category_id) SELECT * FROM a ORDER BY gross",
+      "result": {
+        "columns": [
+          "category_id",
+          "gross"
+        ],
+        "rows": [
+          [
+            3,
+            100
+          ],
+          [
+            2,
+            400
+          ],
+          [
+            1,
+            600
+          ]
+        ]
+      }
+    },
+    {
+      "label": "预期与实际快照数量",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "每件商品每仓库每个端点需要一条快照；类别2缺一条。",
+          "emphasis": []
+        }
+      ],
+      "sql": "WITH categories(category_id) AS (VALUES (1),(2),(3),(4),(5)),\nproducts(product_id,category_id) AS (VALUES (11,1),(21,2),(31,3),(41,4)),\nwarehouses(warehouse_id) AS (VALUES (1),(2)),\nv_sales_lines(product_id,order_date,net_cents,cost_cents) AS (VALUES\n (11,'2025-01-01',1000,600),(11,'2025-03-01',500,300),(21,'2025-02-01',700,300),(31,'2025-04-01',200,100),(11,'2024-12-31',900,100)),\ninventory_snapshots(snapshot_id,product_id,warehouse_id,snapshot_date,quantity,unit_cost_cents) AS (VALUES\n (1,11,1,'2024-12-31',3,100),(2,11,2,'2024-12-31',1,100),(3,11,1,'2025-12-31',5,100),(4,11,2,'2025-12-31',3,100),\n (5,21,1,'2024-12-31',1,100),(6,21,2,'2024-12-31',1,100),(7,21,1,'2025-12-31',2,100),\n (8,31,1,'2024-12-31',0,100),(9,31,2,'2024-12-31',0,100),(10,31,1,'2025-12-31',0,100),(11,31,2,'2025-12-31',0,100),\n (12,41,1,'2024-12-31',1,100),(13,41,2,'2024-12-31',1,100),(14,41,1,'2025-12-31',1,100),(15,41,2,'2025-12-31',1,100)),\ncoverage AS (SELECT p.category_id,COUNT(i.snapshot_id) actual,2*COUNT(DISTINCT p.product_id)*(SELECT COUNT(*) FROM warehouses) expected FROM products p CROSS JOIN warehouses w LEFT JOIN inventory_snapshots i ON i.product_id=p.product_id AND i.warehouse_id=w.warehouse_id AND i.snapshot_date IN ('2024-12-31','2025-12-31') GROUP BY p.category_id) SELECT * FROM coverage ORDER BY actual DESC",
+      "result": {
+        "columns": [
+          "category_id",
+          "actual",
+          "expected"
+        ],
+        "rows": [
+          [
+            1,
+            4,
+            4
+          ],
+          [
+            3,
+            4,
+            4
+          ],
+          [
+            4,
+            4,
+            4
+          ],
+          [
+            2,
+            3,
+            4
+          ]
+        ]
+      }
+    },
+    {
+      "label": "两端库存平均值",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "类别1期初400、期末800，平均600；类别2缺档为空；类别3完整零库存。",
+          "emphasis": []
+        }
+      ],
+      "sql": "WITH categories(category_id) AS (VALUES (1),(2),(3),(4),(5)),\nproducts(product_id,category_id) AS (VALUES (11,1),(21,2),(31,3),(41,4)),\nwarehouses(warehouse_id) AS (VALUES (1),(2)),\nv_sales_lines(product_id,order_date,net_cents,cost_cents) AS (VALUES\n (11,'2025-01-01',1000,600),(11,'2025-03-01',500,300),(21,'2025-02-01',700,300),(31,'2025-04-01',200,100),(11,'2024-12-31',900,100)),\ninventory_snapshots(snapshot_id,product_id,warehouse_id,snapshot_date,quantity,unit_cost_cents) AS (VALUES\n (1,11,1,'2024-12-31',3,100),(2,11,2,'2024-12-31',1,100),(3,11,1,'2025-12-31',5,100),(4,11,2,'2025-12-31',3,100),\n (5,21,1,'2024-12-31',1,100),(6,21,2,'2024-12-31',1,100),(7,21,1,'2025-12-31',2,100),\n (8,31,1,'2024-12-31',0,100),(9,31,2,'2024-12-31',0,100),(10,31,1,'2025-12-31',0,100),(11,31,2,'2025-12-31',0,100),\n (12,41,1,'2024-12-31',1,100),(13,41,2,'2024-12-31',1,100),(14,41,1,'2025-12-31',1,100),(15,41,2,'2025-12-31',1,100)),\nb AS (SELECT p.category_id,CASE WHEN COUNT(i.snapshot_id)=2*COUNT(DISTINCT p.product_id)*(SELECT COUNT(*) FROM warehouses) THEN SUM(i.quantity*i.unit_cost_cents)/2.0 ELSE NULL END avg_stock FROM products p CROSS JOIN warehouses w LEFT JOIN inventory_snapshots i ON i.product_id=p.product_id AND i.warehouse_id=w.warehouse_id AND i.snapshot_date IN ('2024-12-31','2025-12-31') GROUP BY p.category_id) SELECT * FROM b ORDER BY avg_stock DESC",
+      "result": {
+        "columns": [
+          "category_id",
+          "avg_stock"
+        ],
+        "rows": [
+          [
+            1,
+            600.0
+          ],
+          [
+            4,
+            200.0
+          ],
+          [
+            3,
+            0.0
+          ],
+          [
+            2,
+            null
+          ]
+        ]
+      }
+    },
+    {
+      "label": "完整库存投资回报报表",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "保留全部类别，零分母或缺档返回空值，类别4无销售但库存有效，回报为零。",
+          "emphasis": []
+        }
+      ],
+      "sql": "WITH categories(category_id) AS (VALUES (1),(2),(3),(4),(5)),\nproducts(product_id,category_id) AS (VALUES (11,1),(21,2),(31,3),(41,4)),\nwarehouses(warehouse_id) AS (VALUES (1),(2)),\nv_sales_lines(product_id,order_date,net_cents,cost_cents) AS (VALUES\n (11,'2025-01-01',1000,600),(11,'2025-03-01',500,300),(21,'2025-02-01',700,300),(31,'2025-04-01',200,100),(11,'2024-12-31',900,100)),\ninventory_snapshots(snapshot_id,product_id,warehouse_id,snapshot_date,quantity,unit_cost_cents) AS (VALUES\n (1,11,1,'2024-12-31',3,100),(2,11,2,'2024-12-31',1,100),(3,11,1,'2025-12-31',5,100),(4,11,2,'2025-12-31',3,100),\n (5,21,1,'2024-12-31',1,100),(6,21,2,'2024-12-31',1,100),(7,21,1,'2025-12-31',2,100),\n (8,31,1,'2024-12-31',0,100),(9,31,2,'2024-12-31',0,100),(10,31,1,'2025-12-31',0,100),(11,31,2,'2025-12-31',0,100),\n (12,41,1,'2024-12-31',1,100),(13,41,2,'2024-12-31',1,100),(14,41,1,'2025-12-31',1,100),(15,41,2,'2025-12-31',1,100)),\na AS (SELECT p.category_id,SUM(s.net_cents-s.cost_cents) gross FROM v_sales_lines s JOIN products p ON p.product_id=s.product_id WHERE s.order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY p.category_id), b AS (SELECT p.category_id,CASE WHEN COUNT(i.snapshot_id)=2*COUNT(DISTINCT p.product_id)*(SELECT COUNT(*) FROM warehouses) THEN SUM(i.quantity*i.unit_cost_cents)/2.0 ELSE NULL END avg_stock FROM products p CROSS JOIN warehouses w LEFT JOIN inventory_snapshots i ON i.product_id=p.product_id AND i.warehouse_id=w.warehouse_id AND i.snapshot_date IN ('2024-12-31','2025-12-31') GROUP BY p.category_id) SELECT c.category_id,COALESCE(a.gross,0) gross_cents,b.avg_stock avg_stock_cents,ROUND(COALESCE(a.gross,0)/NULLIF(b.avg_stock,0),4) gmroi FROM categories c LEFT JOIN a ON a.category_id=c.category_id LEFT JOIN b ON b.category_id=c.category_id ORDER BY gmroi DESC",
+      "result": {
+        "columns": [
+          "category_id",
+          "gross_cents",
+          "avg_stock_cents",
+          "gmroi"
+        ],
+        "rows": [
+          [
+            1,
+            600,
+            600.0,
+            1.0
+          ],
+          [
+            4,
+            0,
+            200.0,
+            0.0
+          ],
+          [
+            2,
+            400,
+            null,
+            null
+          ],
+          [
+            3,
+            100,
+            0.0,
+            null
+          ],
+          [
+            5,
+            0,
+            null,
+            null
+          ]
+        ]
+      }
+    },
+    {
+      "label": "重复快照与缺档抵消检查",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "总行数相同不保证每个端点唯一；逐预期键检查才能识别一处重复、一处缺失。",
+          "emphasis": []
+        }
+      ],
+      "sql": "WITH dates(dt) AS (VALUES ('2024-12-31'),('2025-12-31')), warehouses(w) AS (VALUES (1),(2)), snapshots(w,dt) AS (VALUES (1,'2024-12-31'),(1,'2024-12-31'),(1,'2025-12-31'),(2,'2024-12-31')) SELECT w.w,d.dt,COUNT(s.w) cnt FROM warehouses w CROSS JOIN dates d LEFT JOIN snapshots s ON s.w=w.w AND s.dt=d.dt GROUP BY w.w,d.dt HAVING COUNT(s.w)<>1 ORDER BY w.w,d.dt",
+      "result": {
+        "columns": [
+          "w",
+          "dt",
+          "cnt"
+        ],
+        "rows": [
+          [
+            1,
+            "2024-12-31",
+            2
+          ],
+          [
+            2,
+            "2025-12-31",
+            0
+          ]
+        ]
+      }
+    }
+  ],
+  "cautions": {
+    "comparison": [
+      {
+        "type": "paragraph",
+        "text": "库存投资回报以平均库存成本为分母；毛利率以净销售为分母；库存周转率以销售成本为分子，不能互换。",
+        "emphasis": []
+      }
+    ],
+    "example": [
+      {
+        "type": "paragraph",
+        "text": "以销售收入代替毛利，或将缺档库存当零、直接平均仓库快照金额。",
+        "emphasis": []
+      }
+    ],
+    "reason": [],
+    "correction": [
+      {
+        "type": "paragraph",
+        "text": "使用对应销售成本计算毛利，确认两端完整后汇总库存价值再除以2。",
+        "emphasis": []
+      }
+    ],
+    "notes": [
+      {
+        "type": "paragraph",
+        "text": "保留原企业查询、预览结果及关联。原查询以快照数量判断完整性，依赖组合唯一性及数量成本字段有效；重复缺档抵消时需逐键审计。",
+        "emphasis": []
+      },
+      {
+        "type": "paragraph",
+        "text": "独立示例仅验证 SQLite 查询，未重建企业视图或验证原生数据库及浏览器。",
+        "emphasis": []
+      }
+    ]
+  },
+  "sourcePath": "source/unified73/kp20-08.json",
+  "sourceSha256": "d7d8f62f125bc874cb4a233b2859333d904dfbfdc10ebc138b77faa9144aeda4"
+}

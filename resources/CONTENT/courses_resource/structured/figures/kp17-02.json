@@ -1,0 +1,97 @@
+{
+  "schemaVersion": 1,
+  "id": "kp17-02",
+  "lessonSha256": "e1f30c7e40e0886b1d9104a3f1e8ac4b8817f5f6fad4ab88155799f5a5e31c9e",
+  "figures": [
+    {
+      "id": "kp17-02-clauses",
+      "slot": "syntax",
+      "kind": "clause-map",
+      "title": "示例查询的几个部分",
+      "sql": "SELECT id,qty FROM demo_stock ORDER BY qty DESC;",
+      "parts": [
+        {
+          "role": "select",
+          "label": "取数",
+          "sql": "SELECT id,qty",
+          "note": "输出 id,qty。"
+        },
+        {
+          "role": "from",
+          "label": "来源",
+          "sql": "FROM demo_stock",
+          "note": "从 demo_stock 读取输入数据。"
+        },
+        {
+          "role": "order",
+          "label": "排序",
+          "sql": "ORDER BY qty DESC;",
+          "note": "按 qty DESC 排列结果。"
+        }
+      ]
+    },
+    {
+      "id": "kp17-02-flow",
+      "slot": "breakdown",
+      "kind": "stage-flow",
+      "merge": "breakdown",
+      "title": "每一步的数据变化",
+      "steps": [
+        {
+          "label": "FROM demo_stock",
+          "sql": "SELECT * FROM demo_stock",
+          "columns": [
+            "id",
+            "qty"
+          ],
+          "rows": [
+            [
+              1,
+              10
+            ],
+            [
+              2,
+              25
+            ]
+          ]
+        },
+        {
+          "label": "SELECT id,qty",
+          "sql": "SELECT id,qty FROM demo_stock",
+          "columns": [
+            "id",
+            "qty"
+          ],
+          "rows": [
+            [
+              1,
+              10
+            ],
+            [
+              2,
+              25
+            ]
+          ]
+        },
+        {
+          "label": "ORDER BY qty DESC;",
+          "sql": "SELECT id,qty FROM demo_stock ORDER BY qty DESC;",
+          "columns": [
+            "id",
+            "qty"
+          ],
+          "rows": [
+            [
+              2,
+              25
+            ],
+            [
+              1,
+              10
+            ]
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,159 @@
+{
+  "schemaVersion": 1,
+  "id": "kp07-03",
+  "lessonSha256": "269f3f8437380140f377578dea680751a6e45a628172a60ad641eba2936be1b3",
+  "figures": [
+    {
+      "id": "kp07-03-clauses",
+      "slot": "syntax",
+      "kind": "clause-map",
+      "title": "示例查询的几个部分",
+      "sql": "SELECT store_id, category, SUM(sales) AS total FROM orders GROUP BY store_id, category ORDER BY total DESC;",
+      "parts": [
+        {
+          "role": "select",
+          "label": "取数",
+          "sql": "SELECT store_id, category, SUM(sales) AS total",
+          "note": "输出 store_id, category, SUM(sales) AS total。"
+        },
+        {
+          "role": "from",
+          "label": "来源",
+          "sql": "FROM orders",
+          "note": "从 orders 读取输入数据。"
+        },
+        {
+          "role": "group",
+          "label": "分组",
+          "sql": "GROUP BY store_id, category",
+          "note": "按 store_id, category 把行归入各个分组。"
+        },
+        {
+          "role": "order",
+          "label": "排序",
+          "sql": "ORDER BY total DESC;",
+          "note": "按 total DESC 排列结果。"
+        }
+      ]
+    },
+    {
+      "id": "kp07-03-flow",
+      "slot": "breakdown",
+      "kind": "stage-flow",
+      "merge": "breakdown",
+      "title": "每一步的数据变化",
+      "steps": [
+        {
+          "label": "FROM orders",
+          "sql": "SELECT * FROM orders",
+          "columns": [
+            "id",
+            "category",
+            "sales",
+            "store_id",
+            "order_date",
+            "customer_id"
+          ],
+          "rows": [
+            [
+              1,
+              "护肤品",
+              800,
+              1,
+              "2026-01-03",
+              1
+            ],
+            [
+              2,
+              "化妆品",
+              400,
+              2,
+              "2026-01-10",
+              2
+            ],
+            [
+              3,
+              "护肤品",
+              600,
+              1,
+              "2026-02-02",
+              1
+            ],
+            [
+              4,
+              "化妆品",
+              300,
+              2,
+              "2026-02-15",
+              null
+            ],
+            [
+              5,
+              "日用品",
+              1500,
+              1,
+              "2026-02-20",
+              3
+            ]
+          ]
+        },
+        {
+          "label": "GROUP BY store_id, category",
+          "sql": "SELECT store_id, category, SUM(sales) AS total FROM orders GROUP BY store_id, category",
+          "columns": [
+            "store_id",
+            "category",
+            "total"
+          ],
+          "rows": [
+            [
+              1,
+              "护肤品",
+              1400
+            ],
+            [
+              1,
+              "日用品",
+              1500
+            ],
+            [
+              2,
+              "化妆品",
+              700
+            ]
+          ]
+        },
+        {
+          "label": "SELECT store_id, category, SUM(sales) AS total",
+          "skip": true
+        },
+        {
+          "label": "ORDER BY total DESC;",
+          "sql": "SELECT store_id, category, SUM(sales) AS total FROM orders GROUP BY store_id, category ORDER BY total DESC;",
+          "columns": [
+            "store_id",
+            "category",
+            "total"
+          ],
+          "rows": [
+            [
+              1,
+              "日用品",
+              1500
+            ],
+            [
+              1,
+              "护肤品",
+              1400
+            ],
+            [
+              2,
+              "化妆品",
+              700
+            ]
+          ]
+        }
+      ]
+    }
+  ]
+}

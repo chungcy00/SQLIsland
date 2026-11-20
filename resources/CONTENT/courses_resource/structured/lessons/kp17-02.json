@@ -1,0 +1,269 @@
+{
+  "schemaVersion": 1,
+  "id": "kp17-02",
+  "sourceBatch": "unified73",
+  "teachingKind": "syntax",
+  "conceptBlocks": [
+    {
+      "type": "paragraph",
+      "text": "新增操作产生行，修改操作改变满足条件的行，删除操作移除满足条件的行。事务将多条数据修改作为一个逻辑单位；提交使本次事务结果生效，回滚撤销尚未提交的事务修改。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "原子性意味着同一逻辑任务全部成功或全部撤销，但必须使用支持事务的存储引擎并正确处理错误。回滚不是备份，也不能撤销已提交的修改。",
+      "emphasis": []
+    }
+  ],
+  "syntax": {
+    "purpose": "cols,vals 列与对应值；p 目标条件；COMMIT 确认事务；ROLLBACK 撤销未提交修改。"
+  },
+  "dataDescriptions": {},
+  "problem": "个人库存实验室需要更新商品数量并移除测试记录；发货时库存扣减和发货记录应同时成功。",
+  "methodBlocks": [
+    {
+      "type": "paragraph",
+      "text": "先用与修改完全相同的 WHERE 执行 SELECT，确认目标编号及原值；随后使用明确列名插入，按主键更新和删除，最后查询剩余行。事务示例先将10改为99后回滚，再改为12并提交。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "发货示例将库存扣减和写入发货表放在同一事务；若核对不通过，回滚两项。SQLite 使用 BEGIN TRANSACTION，MySQL 使用 START TRANSACTION。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "真实应用还要检查受影响行数、并发变化和异常，不能只依赖预览。",
+      "emphasis": []
+    }
+  ],
+  "breakdown": [
+    {
+      "kind": "fragment",
+      "title": "指定来源",
+      "sql": "FROM demo_stock",
+      "purpose": "从 demo_stock 读取输入数据。",
+      "reason": "后面的子句都基于这里得到的行。"
+    },
+    {
+      "kind": "fragment",
+      "title": "选择输出",
+      "sql": "SELECT id,qty",
+      "purpose": "输出 id,qty。",
+      "reason": "输出列的顺序与别名决定结果表的形状。"
+    },
+    {
+      "kind": "fragment",
+      "title": "排序",
+      "sql": "ORDER BY qty DESC;",
+      "purpose": "按 qty DESC 排列结果。",
+      "reason": "查询结果的默认行序没有保证，需要显式排序。"
+    }
+  ],
+  "completeCode": {
+    "mysqlSql": "SELECT id,qty FROM demo_stock ORDER BY qty DESC;",
+    "sqliteSql": "SELECT id,qty FROM demo_stock ORDER BY qty DESC;"
+  },
+  "expectedResult": {
+    "columns": [
+      "id",
+      "qty"
+    ],
+    "rows": [
+      [
+        2,
+        25
+      ],
+      [
+        1,
+        10
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "resultBlocks": [
+    {
+      "type": "paragraph",
+      "text": "主查询剩两行：编号1库存10，编号2库存25。编号3已删除。事务对照中回滚恢复10，提交后为12；发货回滚则同时恢复库存并撤销发货记录。",
+      "emphasis": []
+    }
+  ],
+  "extensions": [
+    {
+      "label": "修改前预览",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "预先确认唯一目标。",
+          "emphasis": []
+        }
+      ],
+      "sql": "CREATE TABLE demo_stock(id INTEGER PRIMARY KEY,qty INTEGER NOT NULL CHECK(qty>=0));\nINSERT INTO demo_stock VALUES (1,10),(2,20),(3,30);\n\nSELECT id,qty FROM demo_stock WHERE id=2;",
+      "result": {
+        "columns": [
+          "id",
+          "qty"
+        ],
+        "rows": [
+          [
+            2,
+            20
+          ]
+        ]
+      }
+    },
+    {
+      "label": "新增修改删除完整演练",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "编号2改变，编号3消失，编号1不变。",
+          "emphasis": []
+        }
+      ],
+      "sql": "CREATE TABLE demo_stock(id INTEGER PRIMARY KEY,qty INTEGER NOT NULL CHECK(qty>=0));\nINSERT INTO demo_stock VALUES (1,10),(2,20),(3,30);\nUPDATE demo_stock SET qty=25 WHERE id=2;\nDELETE FROM demo_stock WHERE id=3;\nSELECT id,qty FROM demo_stock ORDER BY qty DESC;",
+      "result": {
+        "columns": [
+          "id",
+          "qty"
+        ],
+        "rows": [
+          [
+            2,
+            25
+          ],
+          [
+            1,
+            10
+          ]
+        ]
+      }
+    },
+    {
+      "label": "回滚恢复原值",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "回滚撤销99，恢复10。",
+          "emphasis": []
+        }
+      ],
+      "sql": "CREATE TABLE demo_stock(id INTEGER PRIMARY KEY,qty INTEGER NOT NULL);\nINSERT INTO demo_stock VALUES(1,10);\nBEGIN TRANSACTION;\nUPDATE demo_stock SET qty=99 WHERE id=1;\nROLLBACK;\nSELECT id,qty FROM demo_stock;",
+      "result": {
+        "columns": [
+          "id",
+          "qty"
+        ],
+        "rows": [
+          [
+            1,
+            10
+          ]
+        ]
+      }
+    },
+    {
+      "label": "回滚后重新修改并提交",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "新事务提交12，之前回滚的99不再出现。",
+          "emphasis": []
+        }
+      ],
+      "sql": "CREATE TABLE demo_stock(id INTEGER PRIMARY KEY,qty INTEGER NOT NULL);\nINSERT INTO demo_stock VALUES(1,10);\nBEGIN TRANSACTION;\nUPDATE demo_stock SET qty=99 WHERE id=1;\nROLLBACK;\nBEGIN TRANSACTION;\nUPDATE demo_stock SET qty=12 WHERE id=1;\nCOMMIT;\nSELECT id,qty FROM demo_stock;",
+      "result": {
+        "columns": [
+          "id",
+          "qty"
+        ],
+        "rows": [
+          [
+            1,
+            12
+          ]
+        ]
+      }
+    },
+    {
+      "label": "发货事务回滚",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "两张表的修改一起撤销。",
+          "emphasis": []
+        }
+      ],
+      "sql": "CREATE TABLE demo_stock(id INTEGER PRIMARY KEY,qty INTEGER NOT NULL CHECK(qty>=0));\nCREATE TABLE shipment(id INTEGER PRIMARY KEY,qty INTEGER NOT NULL);\nINSERT INTO demo_stock VALUES(1,20);\nBEGIN TRANSACTION;\nUPDATE demo_stock SET qty=qty-5 WHERE id=1;\nINSERT INTO shipment VALUES(1,5);\nROLLBACK;\nSELECT qty,(SELECT COUNT(*) FROM shipment) AS shipments FROM demo_stock WHERE id=1;",
+      "result": {
+        "columns": [
+          "qty",
+          "shipments"
+        ],
+        "rows": [
+          [
+            20,
+            0
+          ]
+        ]
+      }
+    },
+    {
+      "label": "发货事务提交",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "两张表的修改一起提交。",
+          "emphasis": []
+        }
+      ],
+      "sql": "CREATE TABLE demo_stock(id INTEGER PRIMARY KEY,qty INTEGER NOT NULL CHECK(qty>=0));\nCREATE TABLE shipment(id INTEGER PRIMARY KEY,qty INTEGER NOT NULL);\nINSERT INTO demo_stock VALUES(1,20);\nBEGIN TRANSACTION;\nUPDATE demo_stock SET qty=qty-5 WHERE id=1;\nINSERT INTO shipment VALUES(1,5);\nCOMMIT;\nSELECT qty,(SELECT COUNT(*) FROM shipment) AS shipments FROM demo_stock WHERE id=1;",
+      "result": {
+        "columns": [
+          "qty",
+          "shipments"
+        ],
+        "rows": [
+          [
+            15,
+            1
+          ]
+        ]
+      }
+    }
+  ],
+  "cautions": {
+    "comparison": [
+      {
+        "type": "paragraph",
+        "text": "UPDATE 或 DELETE 不带 WHERE 通常影响全表；事务回滚与删除已提交的数据是不同概念。",
+        "emphasis": []
+      }
+    ],
+    "example": [
+      {
+        "type": "paragraph",
+        "text": "UPDATE demo_stock SET qty=25;",
+        "emphasis": []
+      }
+    ],
+    "reason": [],
+    "correction": [
+      {
+        "type": "paragraph",
+        "text": "先 SELECT WHERE id=2 核对，再 UPDATE demo_stock SET qty=25 WHERE id=2;",
+        "emphasis": []
+      }
+    ],
+    "notes": [
+      {
+        "type": "paragraph",
+        "text": "只在隔离副本执行。MySQL InnoDB 支持事务；多种 DDL 隐式提交，不把结构操作混入可回滚的业务事务。",
+        "emphasis": []
+      }
+    ]
+  },
+  "sourcePath": "source/unified73/kp17-02.json",
+  "sourceSha256": "91e8ee823f31da375f0d74eff502c41d74750e83e7e316d1c89cad98efcef298"
+}

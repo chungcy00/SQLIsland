@@ -1,0 +1,199 @@
+{
+  "schemaVersion": 1,
+  "id": "kp07-01",
+  "sourceBatch": "unified73",
+  "teachingKind": "syntax",
+  "conceptBlocks": [
+    {
+      "type": "paragraph",
+      "text": "分组是把具有相同分组键的记录归入同一组，再对每组分别计算统计指标。例如订单表中每行是一笔订单，主管想知道每类商品总销售额时，输出应改成每类商品一行。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "GROUP BY category 将相同类别的记录放进同一组，SUM(sales) 分别计算各组销售额。分组键决定结果粒度，聚合函数决定指标。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "没有分组的聚合通常得到一个整体统计值，有分组就得到每个存在的组的统计值。NULL 分组键会形成一个组；原表不存在的类别不会凭空生成零销售组。分组本身不保证结果顺序，需要显式排序。",
+      "emphasis": []
+    }
+  ],
+  "syntax": {
+    "purpose": "group_key 决定统计粒度的维度；metric 需要汇总的数值；GROUP BY 按键划分记录。"
+  },
+  "dataDescriptions": {
+    "orders": "共 5 行；字段：id、category、sales、store_id、order_date、customer_id。"
+  },
+  "problem": "经营会议需要各商品类别的销售额汇总，而不是逐笔订单明细。orders 中 category 表示类别，sales 表示每笔订单销售金额。本例统计全部五笔订单，不限制日期。",
+  "methodBlocks": [
+    {
+      "type": "paragraph",
+      "text": "先确认维度为 category，指标为 SUM(sales)。护肤品包含800和600，化妆品包含400和300，日用品包含1500。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "SELECT 同时输出组键与合计，AS total_sales 命名该指标，ORDER BY total_sales DESC 将金额大的类别排在前面。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "若改为按门店统计，只需要改变分组维度及输出字段，指标计算方法不变。",
+      "emphasis": []
+    }
+  ],
+  "breakdown": [
+    {
+      "kind": "fragment",
+      "title": "指定来源",
+      "sql": "FROM orders",
+      "purpose": "从 orders 读取输入数据。",
+      "reason": "后面的子句都基于这里得到的行。"
+    },
+    {
+      "kind": "fragment",
+      "title": "分组",
+      "sql": "GROUP BY category",
+      "purpose": "按 category 把行归入各个分组。",
+      "reason": "聚合函数在每个分组内分别计算。"
+    },
+    {
+      "kind": "fragment",
+      "title": "选择输出",
+      "sql": "SELECT category, SUM(sales) AS total_sales",
+      "purpose": "输出 category, SUM(sales) AS total_sales。",
+      "reason": "输出列的顺序与别名决定结果表的形状。"
+    },
+    {
+      "kind": "fragment",
+      "title": "排序",
+      "sql": "ORDER BY total_sales DESC;",
+      "purpose": "按 total_sales DESC 排列结果。",
+      "reason": "查询结果的默认行序没有保证，需要显式排序。"
+    }
+  ],
+  "completeCode": {
+    "mysqlSql": "SELECT category, SUM(sales) AS total_sales FROM orders GROUP BY category ORDER BY total_sales DESC;",
+    "sqliteSql": "SELECT category, SUM(sales) AS total_sales FROM orders GROUP BY category ORDER BY total_sales DESC;"
+  },
+  "expectedResult": {
+    "columns": [
+      "category",
+      "total_sales"
+    ],
+    "rows": [
+      [
+        "日用品",
+        1500
+      ],
+      [
+        "护肤品",
+        1400
+      ],
+      [
+        "化妆品",
+        700
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "resultBlocks": [
+    {
+      "type": "paragraph",
+      "text": "五笔订单变为三条类别汇总：日用品1500、护肤品1400、化妆品700。三个组总和为3600，与原销售合计一致。日用品销售额最高，但不能据此判断利润最高或销量最多。",
+      "emphasis": []
+    }
+  ],
+  "extensions": [
+    {
+      "label": "先认识分组维度",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "先查看实际存在的类别，尚未计算销售额。",
+          "emphasis": []
+        }
+      ],
+      "sql": "SELECT DISTINCT category FROM orders ORDER BY category;",
+      "result": {
+        "columns": [
+          "category"
+        ],
+        "rows": [
+          [
+            "化妆品"
+          ],
+          [
+            "护肤品"
+          ],
+          [
+            "日用品"
+          ]
+        ]
+      }
+    },
+    {
+      "label": "换成门店维度",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "同一个求和指标可以按不同维度统计，结果变为每个门店一行。",
+          "emphasis": []
+        }
+      ],
+      "sql": "SELECT store_id, SUM(sales) AS total_sales FROM orders GROUP BY store_id ORDER BY total_sales;",
+      "result": {
+        "columns": [
+          "store_id",
+          "total_sales"
+        ],
+        "rows": [
+          [
+            2,
+            700
+          ],
+          [
+            1,
+            2900
+          ]
+        ]
+      }
+    }
+  ],
+  "cautions": {
+    "comparison": [
+      {
+        "type": "paragraph",
+        "text": "DISTINCT 只提取不同组合，不会汇总组内金额；GROUP BY 配合 SUM 计算指标。",
+        "emphasis": []
+      }
+    ],
+    "example": [
+      {
+        "type": "paragraph",
+        "text": "SELECT category, SUM(sales) FROM orders 却未写 GROUP BY。",
+        "emphasis": []
+      }
+    ],
+    "reason": [],
+    "correction": [
+      {
+        "type": "paragraph",
+        "text": "明确按 category 分组，再求和；不要依赖数据库对非聚合列的任意选择。",
+        "emphasis": []
+      }
+    ],
+    "notes": [
+      {
+        "type": "paragraph",
+        "text": "只有实际出现的组会输出；需要完整类别与零销售时应结合维度表。",
+        "emphasis": []
+      }
+    ]
+  },
+  "sourcePath": "source/unified73/kp07-01.json",
+  "sourceSha256": "0e152f1325b6e45a495c1994dfffee6b85facd5a7ae390b87184262c1ac9cb04"
+}

@@ -1,0 +1,148 @@
+{
+  "schemaVersion": 1,
+  "id": "kp03-04",
+  "lessonSha256": "166ece506931ee4ee3e4931d756296fd2bbdbf22cfeb551a2269e1f0378f4387",
+  "figures": [
+    {
+      "id": "kp03-04-clauses",
+      "slot": "syntax",
+      "kind": "clause-map",
+      "title": "示例查询的几个部分",
+      "sql": "SELECT product_name FROM products WHERE product_name LIKE '%!_%' ESCAPE '!' ORDER BY product_name DESC;",
+      "parts": [
+        {
+          "role": "select",
+          "label": "取数",
+          "sql": "SELECT product_name",
+          "note": "输出 product_name。"
+        },
+        {
+          "role": "from",
+          "label": "来源",
+          "sql": "FROM products",
+          "note": "从 products 读取输入数据。"
+        },
+        {
+          "role": "where",
+          "label": "筛选",
+          "sql": "WHERE product_name LIKE '%!_%' ESCAPE '!'",
+          "note": "仅保留满足 product_name LIKE '%!_%' ESCAPE '!' 的行。"
+        },
+        {
+          "role": "order",
+          "label": "排序",
+          "sql": "ORDER BY product_name DESC;",
+          "note": "按 product_name DESC 排列结果。"
+        }
+      ]
+    },
+    {
+      "id": "kp03-04-flow",
+      "slot": "breakdown",
+      "kind": "stage-flow",
+      "merge": "breakdown",
+      "title": "每一步的数据变化",
+      "steps": [
+        {
+          "label": "FROM products",
+          "sql": "SELECT * FROM products",
+          "columns": [
+            "product_id",
+            "product_name",
+            "category",
+            "price",
+            "stock"
+          ],
+          "rows": [
+            [
+              1,
+              "Mask",
+              "护肤品",
+              15,
+              150
+            ],
+            [
+              2,
+              "Serum",
+              "护肤品",
+              89,
+              40
+            ],
+            [
+              3,
+              "Cleanser",
+              "护肤品",
+              35,
+              200
+            ],
+            [
+              4,
+              "Cream",
+              "化妆品",
+              65,
+              180
+            ],
+            [
+              5,
+              "Sunscreen",
+              "化妆品",
+              45,
+              80
+            ],
+            [
+              6,
+              "Soap_1",
+              "日用品",
+              15,
+              0
+            ]
+          ]
+        },
+        {
+          "label": "WHERE product_name LIKE '%!_%' ESCAPE '!'",
+          "sql": "SELECT * FROM products WHERE product_name LIKE '%!_%' ESCAPE '!'",
+          "columns": [
+            "product_id",
+            "product_name",
+            "category",
+            "price",
+            "stock"
+          ],
+          "rows": [
+            [
+              6,
+              "Soap_1",
+              "日用品",
+              15,
+              0
+            ]
+          ]
+        },
+        {
+          "label": "SELECT product_name",
+          "sql": "SELECT product_name FROM products WHERE product_name LIKE '%!_%' ESCAPE '!'",
+          "columns": [
+            "product_name"
+          ],
+          "rows": [
+            [
+              "Soap_1"
+            ]
+          ]
+        },
+        {
+          "label": "ORDER BY product_name DESC;",
+          "sql": "SELECT product_name FROM products WHERE product_name LIKE '%!_%' ESCAPE '!' ORDER BY product_name DESC;",
+          "columns": [
+            "product_name"
+          ],
+          "rows": [
+            [
+              "Soap_1"
+            ]
+          ]
+        }
+      ]
+    }
+  ]
+}

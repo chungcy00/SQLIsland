@@ -1,0 +1,187 @@
+{
+  "schemaVersion": 1,
+  "id": "kp11-03",
+  "lessonSha256": "4c4a86a0d2bdc5e93e39fc37373d663eaa35f354563039273b78ea8f1bdc4bff",
+  "figures": [
+    {
+      "id": "kp11-03-clauses",
+      "slot": "syntax",
+      "kind": "clause-map",
+      "title": "示例查询的几个部分",
+      "sql": "SELECT id, TRIM(name) AS clean_name, LOWER(category) AS clean_category, REPLACE(name,' ','') AS no_spaces FROM raw_data ORDER BY name DESC;",
+      "parts": [
+        {
+          "role": "select",
+          "label": "取数",
+          "sql": "SELECT id, TRIM(name) AS clean_name, LOWER(category) AS clean_category, REPLACE(name,' ','') AS no_spaces",
+          "note": "输出查询需要的列与计算表达式。"
+        },
+        {
+          "role": "from",
+          "label": "来源",
+          "sql": "FROM raw_data",
+          "note": "从 raw_data 读取输入数据。"
+        },
+        {
+          "role": "order",
+          "label": "排序",
+          "sql": "ORDER BY name DESC;",
+          "note": "按 name DESC 排列结果。"
+        }
+      ]
+    },
+    {
+      "id": "kp11-03-flow",
+      "slot": "breakdown",
+      "kind": "stage-flow",
+      "merge": "breakdown",
+      "title": "每一步的数据变化",
+      "steps": [
+        {
+          "label": "FROM raw_data",
+          "sql": "SELECT * FROM raw_data",
+          "columns": [
+            "id",
+            "name",
+            "amount",
+            "category"
+          ],
+          "rows": [
+            [
+              1,
+              "  Mask ",
+              "15",
+              "SKIN"
+            ],
+            [
+              2,
+              "Mask",
+              "15",
+              "skin"
+            ],
+            [
+              3,
+              "Serum",
+              null,
+              "Skin"
+            ],
+            [
+              4,
+              "Soap",
+              "-5",
+              "HOME"
+            ],
+            [
+              5,
+              "Cream",
+              "0",
+              "makeup"
+            ],
+            [
+              6,
+              "",
+              "20",
+              "HOME"
+            ]
+          ]
+        },
+        {
+          "label": "SELECT id, TRIM(name) AS clean_name, LOWER(category) AS clean_category, REPLACE(name,' ','') AS no_spaces",
+          "sql": "SELECT id, TRIM(name) AS clean_name, LOWER(category) AS clean_category, REPLACE(name,' ','') AS no_spaces FROM raw_data",
+          "columns": [
+            "id",
+            "clean_name",
+            "clean_category",
+            "no_spaces"
+          ],
+          "rows": [
+            [
+              1,
+              "Mask",
+              "skin",
+              "Mask"
+            ],
+            [
+              2,
+              "Mask",
+              "skin",
+              "Mask"
+            ],
+            [
+              3,
+              "Serum",
+              "skin",
+              "Serum"
+            ],
+            [
+              4,
+              "Soap",
+              "home",
+              "Soap"
+            ],
+            [
+              5,
+              "Cream",
+              "makeup",
+              "Cream"
+            ],
+            [
+              6,
+              "",
+              "home",
+              ""
+            ]
+          ]
+        },
+        {
+          "label": "ORDER BY name DESC;",
+          "sql": "SELECT id, TRIM(name) AS clean_name, LOWER(category) AS clean_category, REPLACE(name,' ','') AS no_spaces FROM raw_data ORDER BY name DESC;",
+          "columns": [
+            "id",
+            "clean_name",
+            "clean_category",
+            "no_spaces"
+          ],
+          "rows": [
+            [
+              4,
+              "Soap",
+              "home",
+              "Soap"
+            ],
+            [
+              3,
+              "Serum",
+              "skin",
+              "Serum"
+            ],
+            [
+              2,
+              "Mask",
+              "skin",
+              "Mask"
+            ],
+            [
+              5,
+              "Cream",
+              "makeup",
+              "Cream"
+            ],
+            [
+              1,
+              "Mask",
+              "skin",
+              "Mask"
+            ],
+            [
+              6,
+              "",
+              "home",
+              ""
+            ]
+          ]
+        }
+      ]
+    }
+  ]
+}

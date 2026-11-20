@@ -1,0 +1,220 @@
+{
+  "schemaVersion": 1,
+  "id": "kp07-03",
+  "sourceBatch": "unified73",
+  "teachingKind": "syntax",
+  "conceptBlocks": [
+    {
+      "type": "paragraph",
+      "text": "当一份报表需要同时区分多个业务维度时，分组键必须包含这些维度。例如每家门店内各类别的销售额，结果的一行代表门店与类别的组合，而不是单独一个门店或类别。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "GROUP BY store_id, category 按联合键分组，只有两个字段都相同的记录才归入同一组。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "增加分组键通常使统计粒度更细，删除键通常合并原有组，但实际组数取决于数据。严格分组要求输出的非聚合表达式属于分组键，或能够由分组键唯一决定，或符合数据库允许的单值限制。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "MySQL 默认严格分组模式会拒绝多数来源不确定的裸列，SQLite 可能接受并返回某个输入行的值；能运行不代表结果有明确业务含义。",
+      "emphasis": []
+    }
+  ],
+  "syntax": {
+    "purpose": "key_a, key_b 共同决定结果粒度的维度；SUM(metric) 对联合组内数值求和。"
+  },
+  "dataDescriptions": {
+    "orders": "共 5 行；字段：id、category、sales、store_id、order_date、customer_id。"
+  },
+  "problem": "管理层希望比较各门店不同商品类别的销售表现，避免将不同门店的同类商品混为一个金额。示例数据目前门店1经营两类，门店2只有化妆品；这只是订单中实际出现的组合。",
+  "methodBlocks": [
+    {
+      "type": "paragraph",
+      "text": "SELECT 中保留 store_id 和 category，GROUP BY 中也列出这两个字段，SUM(sales) 汇总组合内的订单。主查询按照金额降序排序；",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "本例金额均不同，若生产环境需要完整稳定排序，可再加 category。不要把订单 id 任意加入结果，因为同一组可能对应多个订单编号。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "若主管还想看订单数量，可以增加 COUNT(*)，而非随意输出一个订单编号。",
+      "emphasis": []
+    }
+  ],
+  "breakdown": [
+    {
+      "kind": "fragment",
+      "title": "指定来源",
+      "sql": "FROM orders",
+      "purpose": "从 orders 读取输入数据。",
+      "reason": "后面的子句都基于这里得到的行。"
+    },
+    {
+      "kind": "fragment",
+      "title": "分组",
+      "sql": "GROUP BY store_id, category",
+      "purpose": "按 store_id, category 把行归入各个分组。",
+      "reason": "聚合函数在每个分组内分别计算。"
+    },
+    {
+      "kind": "fragment",
+      "title": "选择输出",
+      "sql": "SELECT store_id, category, SUM(sales) AS total",
+      "purpose": "输出 store_id, category, SUM(sales) AS total。",
+      "reason": "输出列的顺序与别名决定结果表的形状。"
+    },
+    {
+      "kind": "fragment",
+      "title": "排序",
+      "sql": "ORDER BY total DESC;",
+      "purpose": "按 total DESC 排列结果。",
+      "reason": "查询结果的默认行序没有保证，需要显式排序。"
+    }
+  ],
+  "completeCode": {
+    "mysqlSql": "SELECT store_id, category, SUM(sales) AS total FROM orders GROUP BY store_id, category ORDER BY total DESC;",
+    "sqliteSql": "SELECT store_id, category, SUM(sales) AS total FROM orders GROUP BY store_id, category ORDER BY total DESC;"
+  },
+  "expectedResult": {
+    "columns": [
+      "store_id",
+      "category",
+      "total"
+    ],
+    "rows": [
+      [
+        1,
+        "日用品",
+        1500
+      ],
+      [
+        1,
+        "护肤品",
+        1400
+      ],
+      [
+        2,
+        "化妆品",
+        700
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "resultBlocks": [
+    {
+      "type": "paragraph",
+      "text": "门店1日用品1500、门店1护肤品1400、门店2化妆品700，共三个实际存在的联合组。本例与单类别分组恰好同为三组，不表示增加分组维度永远不影响数量。删除类别键后变为两个门店组。",
+      "emphasis": []
+    }
+  ],
+  "extensions": [
+    {
+      "label": "查看每个联合组的订单数",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "同时输出组键与两个有明确含义的聚合指标。",
+          "emphasis": []
+        }
+      ],
+      "sql": "SELECT store_id, category, COUNT(*) AS order_count, SUM(sales) AS total FROM orders GROUP BY store_id, category ORDER BY category DESC;",
+      "result": {
+        "columns": [
+          "store_id",
+          "category",
+          "order_count",
+          "total"
+        ],
+        "rows": [
+          [
+            1,
+            "日用品",
+            1,
+            1500
+          ],
+          [
+            1,
+            "护肤品",
+            2,
+            1400
+          ],
+          [
+            2,
+            "化妆品",
+            2,
+            700
+          ]
+        ]
+      }
+    },
+    {
+      "label": "减少一个分组维度",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "去掉类别后，同一门店的类别金额合并为门店合计。",
+          "emphasis": []
+        }
+      ],
+      "sql": "SELECT store_id, SUM(sales) AS total FROM orders GROUP BY store_id ORDER BY total;",
+      "result": {
+        "columns": [
+          "store_id",
+          "total"
+        ],
+        "rows": [
+          [
+            2,
+            700
+          ],
+          [
+            1,
+            2900
+          ]
+        ]
+      }
+    }
+  ],
+  "cautions": {
+    "comparison": [
+      {
+        "type": "paragraph",
+        "text": "分组键顺序不改变联合键的成员资格；排序需要独立指定。函数依赖是严格分组的合法例外，但不是任意裸列的理由。",
+        "emphasis": []
+      }
+    ],
+    "example": [
+      {
+        "type": "paragraph",
+        "text": "SELECT category, id, SUM(sales) FROM orders GROUP BY category；一个类别可能有多个订单编号。",
+        "emphasis": []
+      }
+    ],
+    "reason": [],
+    "correction": [
+      {
+        "type": "paragraph",
+        "text": "如果目标为类别汇总，移除 id 或使用有明确含义的 COUNT(*)；只有确实需要订单粒度时才将 id 加入分组。",
+        "emphasis": []
+      }
+    ],
+    "notes": [
+      {
+        "type": "paragraph",
+        "text": "不能仅因为 SQLite 能返回裸列就认为 MySQL 兼容；原生严格模式尚未实测。",
+        "emphasis": []
+      }
+    ]
+  },
+  "sourcePath": "source/unified73/kp07-03.json",
+  "sourceSha256": "137994637b8320e7efe03a5936de34fbad6170561b647c6982d93372c1582d96"
+}

@@ -1,0 +1,230 @@
+{
+  "schemaVersion": 1,
+  "id": "kp09-03",
+  "sourceBatch": "unified73",
+  "teachingKind": "syntax",
+  "conceptBlocks": [
+    {
+      "type": "paragraph",
+      "text": "NULLIF(a,b) 比较两个表达式；相等时返回 NULL，否则返回第一个表达式。用于除法时，可将零分母转换为 NULL，从而让无定义的结果明确显示为空。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "与 IFNULL 或 COALESCE 的方向不同，后者将缺失值替换为其他值。计算比率前必须确定分子、分母、统计范围及单位；不要因为分母为零就自动报告0%。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "SQLite 中两个整数相除可能截断小数，乘以1.0可使示例进行实数除法；MySQL 的 / 与整数除法 DIV 不同，具体精度仍由数据类型和引擎决定。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "ROUND 用于最终展示，而不是在聚合前随意舍入。",
+      "emphasis": []
+    }
+  ],
+  "syntax": {
+    "purpose": "numerator 分子；denominator 分母；NULLIF 相等时返回空值；ROUND 结果保留指定小数位。"
+  },
+  "dataDescriptions": {
+    "products": "共 6 行；字段：product_id、product_name、category、price、stock。"
+  },
+  "problem": "本例使用商品单价除以库存数量演示除法边界，输出仅为语法练习，不是库存周转率或实际经营指标。实际业务中可将相同方法用于利润率、转化率等已明确定义的指标。",
+  "methodBlocks": [
+    {
+      "type": "paragraph",
+      "text": "先计算 NULLIF(stock,0)：库存为0的记录得到 NULL，其余保持原数值。分子乘1.0后相除，避免 SQLite 整数截断；NULL 分母使结果仍为 NULL。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "最后 ROUND 保留两位小数的数值精度，实际界面是否补足尾随零由格式化处理。",
+      "emphasis": []
+    }
+  ],
+  "breakdown": [
+    {
+      "kind": "fragment",
+      "title": "指定来源",
+      "sql": "FROM products",
+      "purpose": "从 products 读取输入数据。",
+      "reason": "后面的子句都基于这里得到的行。"
+    },
+    {
+      "kind": "fragment",
+      "title": "选择输出",
+      "sql": "SELECT product_id, ROUND(1.0*price/NULLIF(stock,0),2) AS ratio",
+      "purpose": "输出 product_id, ROUND(1.0*price/NULLIF(stock,0),2) AS ratio。",
+      "reason": "输出列的顺序与别名决定结果表的形状。"
+    },
+    {
+      "kind": "fragment",
+      "title": "排序",
+      "sql": "ORDER BY ratio DESC;",
+      "purpose": "按 ratio DESC 排列结果。",
+      "reason": "查询结果的默认行序没有保证，需要显式排序。"
+    }
+  ],
+  "completeCode": {
+    "mysqlSql": "SELECT product_id, ROUND(1.0*price/NULLIF(stock,0),2) AS ratio FROM products ORDER BY ratio DESC;",
+    "sqliteSql": "SELECT product_id, ROUND(1.0*price/NULLIF(stock,0),2) AS ratio FROM products ORDER BY ratio DESC;"
+  },
+  "expectedResult": {
+    "columns": [
+      "product_id",
+      "ratio"
+    ],
+    "rows": [
+      [
+        2,
+        2.23
+      ],
+      [
+        5,
+        0.56
+      ],
+      [
+        4,
+        0.36
+      ],
+      [
+        3,
+        0.17
+      ],
+      [
+        1,
+        0.1
+      ],
+      [
+        6,
+        null
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "resultBlocks": [
+    {
+      "type": "paragraph",
+      "text": "编号6无有效分母，结果为空；其他5件返回比率。结果为空并不表示真实比率为0；若制作经营报表应解释是无定义还是输入缺失。原例不是库存经营指标，不据此对商品进行经营评价。",
+      "emphasis": []
+    }
+  ],
+  "extensions": [
+    {
+      "label": "检查安全分母",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "在相除之前观察零分母怎样转换。",
+          "emphasis": []
+        }
+      ],
+      "sql": "SELECT product_id,stock,NULLIF(stock,0) AS safe_stock FROM products ORDER BY stock DESC;",
+      "result": {
+        "columns": [
+          "product_id",
+          "stock",
+          "safe_stock"
+        ],
+        "rows": [
+          [
+            3,
+            200,
+            200
+          ],
+          [
+            4,
+            180,
+            180
+          ],
+          [
+            1,
+            150,
+            150
+          ],
+          [
+            5,
+            80,
+            80
+          ],
+          [
+            2,
+            40,
+            40
+          ],
+          [
+            6,
+            0,
+            null
+          ]
+        ]
+      }
+    },
+    {
+      "label": "整数与小数除法对照",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "本地兼容执行层按 MySQL 习惯把 / 当作小数除法，所以 7/2 也得到 3.5（列名 integer_result 只是示例别名）；",
+          "emphasis": []
+        },
+        {
+          "type": "paragraph",
+          "text": "MySQL 要取整数商应使用 DIV，本地兼容执行暂不支持。",
+          "emphasis": []
+        }
+      ],
+      "sql": "SELECT 7/2 AS integer_result,1.0*7/2 AS real_result,1.0*7/NULLIF(0,0) AS undefined_result;",
+      "result": {
+        "columns": [
+          "integer_result",
+          "real_result",
+          "undefined_result"
+        ],
+        "rows": [
+          [
+            3.5,
+            3.5,
+            null
+          ]
+        ]
+      }
+    }
+  ],
+  "cautions": {
+    "comparison": [
+      {
+        "type": "paragraph",
+        "text": "NULLIF 将指定值转为空；IFNULL/COALESCE 将空值转为候选值。",
+        "emphasis": []
+      }
+    ],
+    "example": [
+      {
+        "type": "paragraph",
+        "text": "直接整数相除导致截断，或将分母为零的结果不加说明填0。",
+        "emphasis": []
+      }
+    ],
+    "reason": [],
+    "correction": [
+      {
+        "type": "paragraph",
+        "text": "使用小数运算及 NULLIF，按业务需要保留无定义标记。",
+        "emphasis": []
+      }
+    ],
+    "notes": [
+      {
+        "type": "paragraph",
+        "text": "SQLite 与 MySQL 对小数类型及舍入的细节不同，本地验证结果不能代替原生验证。",
+        "emphasis": []
+      }
+    ]
+  },
+  "sourcePath": "source/unified73/kp09-03.json",
+  "sourceSha256": "a26a56f456b59b94b9b673d7b42138750461e49570b0090eae302e7e7304f3ff"
+}

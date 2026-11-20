@@ -1,0 +1,166 @@
+{
+  "schemaVersion": 1,
+  "id": "kp11-02",
+  "lessonSha256": "896ad720c666a62e99f532ec167a019548aee0d5c5c6147638fa41aa936baf50",
+  "figures": [
+    {
+      "id": "kp11-02-clauses",
+      "slot": "syntax",
+      "kind": "clause-map",
+      "title": "示例查询的几个部分",
+      "sql": "SELECT product_id, SUBSTRING(product_name,1,3) AS prefix FROM products ORDER BY prefix DESC;",
+      "parts": [
+        {
+          "role": "select",
+          "label": "取数",
+          "sql": "SELECT product_id, SUBSTRING(product_name,1,3) AS prefix",
+          "note": "输出 product_id, SUBSTRING(product_name,1,3) AS prefix。"
+        },
+        {
+          "role": "from",
+          "label": "来源",
+          "sql": "FROM products",
+          "note": "从 products 读取输入数据。"
+        },
+        {
+          "role": "order",
+          "label": "排序",
+          "sql": "ORDER BY prefix DESC;",
+          "note": "按 prefix DESC 排列结果。"
+        }
+      ]
+    },
+    {
+      "id": "kp11-02-flow",
+      "slot": "breakdown",
+      "kind": "stage-flow",
+      "merge": "breakdown",
+      "title": "每一步的数据变化",
+      "steps": [
+        {
+          "label": "FROM products",
+          "sql": "SELECT * FROM products",
+          "columns": [
+            "product_id",
+            "product_name",
+            "category",
+            "price",
+            "stock"
+          ],
+          "rows": [
+            [
+              1,
+              "Mask",
+              "护肤品",
+              15,
+              150
+            ],
+            [
+              2,
+              "Serum",
+              "护肤品",
+              89,
+              40
+            ],
+            [
+              3,
+              "Cleanser",
+              "护肤品",
+              35,
+              200
+            ],
+            [
+              4,
+              "Cream",
+              "化妆品",
+              65,
+              180
+            ],
+            [
+              5,
+              "Sunscreen",
+              "化妆品",
+              45,
+              80
+            ],
+            [
+              6,
+              "Soap_1",
+              "日用品",
+              15,
+              0
+            ]
+          ]
+        },
+        {
+          "label": "SELECT product_id, SUBSTRING(product_name,1,3) AS prefix",
+          "sql": "SELECT product_id, SUBSTRING(product_name,1,3) AS prefix FROM products",
+          "columns": [
+            "product_id",
+            "prefix"
+          ],
+          "rows": [
+            [
+              1,
+              "Mas"
+            ],
+            [
+              2,
+              "Ser"
+            ],
+            [
+              3,
+              "Cle"
+            ],
+            [
+              4,
+              "Cre"
+            ],
+            [
+              5,
+              "Sun"
+            ],
+            [
+              6,
+              "Soa"
+            ]
+          ]
+        },
+        {
+          "label": "ORDER BY prefix DESC;",
+          "sql": "SELECT product_id, SUBSTRING(product_name,1,3) AS prefix FROM products ORDER BY prefix DESC;",
+          "columns": [
+            "product_id",
+            "prefix"
+          ],
+          "rows": [
+            [
+              5,
+              "Sun"
+            ],
+            [
+              6,
+              "Soa"
+            ],
+            [
+              2,
+              "Ser"
+            ],
+            [
+              1,
+              "Mas"
+            ],
+            [
+              4,
+              "Cre"
+            ],
+            [
+              3,
+              "Cle"
+            ]
+          ]
+        }
+      ]
+    }
+  ]
+}

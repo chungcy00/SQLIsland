@@ -1,0 +1,192 @@
+{
+  "schemaVersion": 1,
+  "id": "kp11-01",
+  "sourceBatch": "unified73",
+  "teachingKind": "function",
+  "conceptBlocks": [
+    {
+      "type": "paragraph",
+      "text": "字符串拼接按指定顺序将多个文本组合为一个新值，可以插入空格、连字符等分隔符。它常用于显示标签而不是代替独立字段。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "MySQL 的 CONCAT 任一参数为 NULL 时结果为 NULL；",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "SQLite 的连接运算符 || 具有同样的空值传播效果，但 SQLite 的 concat 函数空值行为不同。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "若业务希望保留部分标签，先确定缺失文本的替代值，不应无条件把未知改成空文本。",
+      "emphasis": []
+    }
+  ],
+  "syntax": {
+    "purpose": "str1,str2 按顺序参与拼接的表达式；分隔符 显式写入的文本常量。"
+  },
+  "dataDescriptions": {
+    "products": "共 6 行；字段：product_id、product_name、category、price、stock。"
+  },
+  "problem": "商品销售报表需要清晰的展示名称，例如护肤品 - Mask。products 每行是一个商品，category 是类别，product_name 是名称；编号仍保留用于后续关联。",
+  "methodBlocks": [
+    {
+      "type": "paragraph",
+      "text": "先选择 category，再加入固定字符串，再拼接商品名称，使用 AS label 给新列命名。SQLite 兼容查询用 ||；MySQL 默认模式不能用 || 表达拼接。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "若原始文本为空，应按业务需求用 COALESCE 提供标记。",
+      "emphasis": []
+    }
+  ],
+  "breakdown": [
+    {
+      "kind": "fragment",
+      "title": "指定来源",
+      "sql": "FROM products",
+      "purpose": "从 products 读取输入数据。",
+      "reason": "后面的子句都基于这里得到的行。"
+    },
+    {
+      "kind": "fragment",
+      "title": "选择输出",
+      "sql": "SELECT product_id, CONCAT(category, ' - ', product_name) AS label",
+      "purpose": "输出 product_id, CONCAT(category, ' - ', product_name) AS label。",
+      "reason": "输出列的顺序与别名决定结果表的形状。"
+    },
+    {
+      "kind": "fragment",
+      "title": "排序",
+      "sql": "ORDER BY label DESC;",
+      "purpose": "按 label DESC 排列结果。",
+      "reason": "查询结果的默认行序没有保证，需要显式排序。"
+    }
+  ],
+  "completeCode": {
+    "mysqlSql": "SELECT product_id, CONCAT(category, ' - ', product_name) AS label FROM products ORDER BY label DESC;",
+    "sqliteSql": "SELECT product_id, category || ' - ' || product_name AS label FROM products ORDER BY label DESC;"
+  },
+  "expectedResult": {
+    "columns": [
+      "product_id",
+      "label"
+    ],
+    "rows": [
+      [
+        6,
+        "日用品 - Soap_1"
+      ],
+      [
+        2,
+        "护肤品 - Serum"
+      ],
+      [
+        1,
+        "护肤品 - Mask"
+      ],
+      [
+        3,
+        "护肤品 - Cleanser"
+      ],
+      [
+        5,
+        "化妆品 - Sunscreen"
+      ],
+      [
+        4,
+        "化妆品 - Cream"
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "resultBlocks": [
+    {
+      "type": "paragraph",
+      "text": "六件商品仍为六行，仅增加展示标签的表达方式，原始数据未修改。标签可能重复，不能据此断定商品编号重复。",
+      "emphasis": []
+    }
+  ],
+  "extensions": [
+    {
+      "label": "空值传播",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "兼容写法：任一操作数为空值，拼接结果为空值。",
+          "emphasis": []
+        }
+      ],
+      "sql": "SELECT '护肤品' || ' - ' || NULL AS label;",
+      "result": {
+        "columns": [
+          "label"
+        ],
+        "rows": [
+          [
+            null
+          ]
+        ]
+      }
+    },
+    {
+      "label": "缺失标记",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "将未知名称显式标为未登记，而非变成看似完整的标签。",
+          "emphasis": []
+        }
+      ],
+      "sql": "SELECT '护肤品' || ' - ' || COALESCE(NULL,'未登记') AS label;",
+      "result": {
+        "columns": [
+          "label"
+        ],
+        "rows": [
+          [
+            "护肤品 - 未登记"
+          ]
+        ]
+      }
+    }
+  ],
+  "cautions": {
+    "comparison": [
+      {
+        "type": "paragraph",
+        "text": "拼接不是合并数据表；也不同于将多行聚合成一个字符串。",
+        "emphasis": []
+      }
+    ],
+    "example": [
+      {
+        "type": "paragraph",
+        "text": "CONCAT(category,product_name) 无分隔符；或直接把兼容运算符复制到 MySQL。",
+        "emphasis": []
+      }
+    ],
+    "reason": [],
+    "correction": [
+      {
+        "type": "paragraph",
+        "text": "使用 CONCAT(category, ' - ', product_name)，SQLite 使用对应兼容写法。",
+        "emphasis": []
+      }
+    ],
+    "notes": [
+      {
+        "type": "paragraph",
+        "text": "以下补充例采用内联值演示空值，不新增课程夹具。",
+        "emphasis": []
+      }
+    ]
+  },
+  "sourcePath": "source/unified73/kp11-01.json",
+  "sourceSha256": "640ca0b949c1e24f21552a555ffc96d8ce291f8e13cf413f7ffefe6144faf19d"
+}

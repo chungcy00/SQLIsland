@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "id": "kp08-05",
+  "lessonSha256": "cd59871752bf71ba7a6dbd24833453865f63563ab961b98c574a113f17c71710",
+  "figures": [
+    {
+      "id": "kp08-05-clauses",
+      "slot": "syntax",
+      "kind": "clause-map",
+      "title": "示例查询的几个部分",
+      "sql": "WITH totals AS (SELECT customer_id,SUM(sales) AS total FROM orders WHERE customer_id IS NOT NULL GROUP BY customer_id) SELECT c.customer_id,COALESCE(t.total,0) AS total FROM customers c LEFT JOIN totals t ON c.customer_id=t.customer_id ORDER BY total DESC;",
+      "parts": [
+        {
+          "role": "cte",
+          "label": "中间结果",
+          "sql": "WITH totals AS (SELECT customer_id,SUM(sales) AS total FROM orders WHERE customer_id IS NOT NULL GROUP BY customer_id)",
+          "note": "先把名为 totals 的中间结果算出来，供后面的查询引用。"
+        },
+        {
+          "role": "select",
+          "label": "取数",
+          "sql": "SELECT c.customer_id,COALESCE(t.total,0) AS total",
+          "note": "输出 c.customer_id,COALESCE(t.total,0) AS total。"
+        },
+        {
+          "role": "from",
+          "label": "来源",
+          "sql": "FROM customers c LEFT JOIN totals t ON c.customer_id=t.customer_id",
+          "note": "读取查询需要的输入数据。"
+        },
+        {
+          "role": "order",
+          "label": "排序",
+          "sql": "ORDER BY total DESC;",
+          "note": "按 total DESC 排列结果。"
+        }
+      ]
+    }
+  ]
+}

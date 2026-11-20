@@ -1,0 +1,182 @@
+{
+  "schemaVersion": 1,
+  "id": "kp03-03",
+  "lessonSha256": "efe7a6275e054d2a936c6993ebe1e30955a2968ae64f9ec24fee28fd6cb3abae",
+  "figures": [
+    {
+      "id": "kp03-03-clauses",
+      "slot": "syntax",
+      "kind": "clause-map",
+      "title": "示例查询的几个部分",
+      "sql": "SELECT product_id, price FROM products WHERE category IN ('护肤品','化妆品') AND price BETWEEN 35 AND 65 ORDER BY price DESC;",
+      "parts": [
+        {
+          "role": "select",
+          "label": "取数",
+          "sql": "SELECT product_id, price",
+          "note": "输出 product_id, price。"
+        },
+        {
+          "role": "from",
+          "label": "来源",
+          "sql": "FROM products",
+          "note": "从 products 读取输入数据。"
+        },
+        {
+          "role": "where",
+          "label": "筛选",
+          "sql": "WHERE category IN ('护肤品','化妆品') AND price BETWEEN 35 AND 65",
+          "note": "仅保留满足 category IN ('护肤品','化妆品') AND price BETWEEN 35 AND 65 的行。"
+        },
+        {
+          "role": "order",
+          "label": "排序",
+          "sql": "ORDER BY price DESC;",
+          "note": "按 price DESC 排列结果。"
+        }
+      ]
+    },
+    {
+      "id": "kp03-03-flow",
+      "slot": "breakdown",
+      "kind": "stage-flow",
+      "merge": "breakdown",
+      "title": "每一步的数据变化",
+      "steps": [
+        {
+          "label": "FROM products",
+          "sql": "SELECT * FROM products",
+          "columns": [
+            "product_id",
+            "product_name",
+            "category",
+            "price",
+            "stock"
+          ],
+          "rows": [
+            [
+              1,
+              "Mask",
+              "护肤品",
+              15,
+              150
+            ],
+            [
+              2,
+              "Serum",
+              "护肤品",
+              89,
+              40
+            ],
+            [
+              3,
+              "Cleanser",
+              "护肤品",
+              35,
+              200
+            ],
+            [
+              4,
+              "Cream",
+              "化妆品",
+              65,
+              180
+            ],
+            [
+              5,
+              "Sunscreen",
+              "化妆品",
+              45,
+              80
+            ],
+            [
+              6,
+              "Soap_1",
+              "日用品",
+              15,
+              0
+            ]
+          ]
+        },
+        {
+          "label": "WHERE category IN ('护肤品','化妆品') AND price BETWEEN 35 AND 65",
+          "sql": "SELECT * FROM products WHERE category IN ('护肤品','化妆品') AND price BETWEEN 35 AND 65",
+          "columns": [
+            "product_id",
+            "product_name",
+            "category",
+            "price",
+            "stock"
+          ],
+          "rows": [
+            [
+              3,
+              "Cleanser",
+              "护肤品",
+              35,
+              200
+            ],
+            [
+              4,
+              "Cream",
+              "化妆品",
+              65,
+              180
+            ],
+            [
+              5,
+              "Sunscreen",
+              "化妆品",
+              45,
+              80
+            ]
+          ]
+        },
+        {
+          "label": "SELECT product_id, price",
+          "sql": "SELECT product_id, price FROM products WHERE category IN ('护肤品','化妆品') AND price BETWEEN 35 AND 65",
+          "columns": [
+            "product_id",
+            "price"
+          ],
+          "rows": [
+            [
+              3,
+              35
+            ],
+            [
+              4,
+              65
+            ],
+            [
+              5,
+              45
+            ]
+          ]
+        },
+        {
+          "label": "ORDER BY price DESC;",
+          "sql": "SELECT product_id, price FROM products WHERE category IN ('护肤品','化妆品') AND price BETWEEN 35 AND 65 ORDER BY price DESC;",
+          "columns": [
+            "product_id",
+            "price"
+          ],
+          "rows": [
+            [
+              4,
+              65
+            ],
+            [
+              5,
+              45
+            ],
+            [
+              3,
+              35
+            ]
+          ]
+        }
+      ]
+    }
+  ]
+}

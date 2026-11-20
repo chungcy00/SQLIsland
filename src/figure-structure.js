@@ -2,7 +2,7 @@
 const SLOTS = ['concept', 'syntax', 'breakdown'];
 const KINDS = ['truth-table', 'clause-map', 'row-flow', 'stage-flow'];
 const TRUTH = ['true', 'false', 'unknown'];
-const ROLES = ['select', 'from', 'where', 'group', 'order'];
+const ROLES = ['select', 'from', 'where', 'group', 'having', 'order', 'limit', 'cte', 'setop'];
 export function validateFigures(lesson, data) {
   const fail = message => { throw Error(`${lesson.id} figures: ${message}`); };
   const text = (value, label) => { if (typeof value !== 'string' || !value.trim()) fail(label); };

@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 1,
+  "id": "kp06-01",
+  "lessonSha256": "91db264e9fc11df4f3180540a02502882fb45acfa919dc90f486f4d5127d0508",
+  "figures": [
+    {
+      "id": "kp06-01-clauses",
+      "slot": "syntax",
+      "kind": "clause-map",
+      "title": "示例查询的几个部分",
+      "sql": "SELECT COUNT(*) AS rows_count, COUNT(value) AS nonnull_count, COUNT(DISTINCT value) AS unique_count FROM nullable_values;",
+      "parts": [
+        {
+          "role": "select",
+          "label": "取数",
+          "sql": "SELECT COUNT(*) AS rows_count, COUNT(value) AS nonnull_count, COUNT(DISTINCT value) AS unique_count",
+          "note": "输出查询需要的列与计算表达式。"
+        },
+        {
+          "role": "from",
+          "label": "来源",
+          "sql": "FROM nullable_values;",
+          "note": "从 nullable_values 读取输入数据。"
+        }
+      ]
+    },
+    {
+      "id": "kp06-01-flow",
+      "slot": "breakdown",
+      "kind": "stage-flow",
+      "merge": "breakdown",
+      "title": "每一步的数据变化",
+      "steps": [
+        {
+          "label": "FROM nullable_values;",
+          "sql": "SELECT * FROM nullable_values;",
+          "columns": [
+            "id",
+            "value",
+            "note"
+          ],
+          "rows": [
+            [
+              1,
+              null,
+              null
+            ],
+            [
+              2,
+              0,
+              ""
+            ],
+            [
+              3,
+              10,
+              "ok"
+            ],
+            [
+              4,
+              10,
+              "ok"
+            ]
+          ]
+        },
+        {
+          "label": "SELECT COUNT(*) AS rows_count, COUNT(value) AS nonnull_count, COUNT(DISTINCT value) AS unique_count",
+          "sql": "SELECT COUNT(*) AS rows_count, COUNT(value) AS nonnull_count, COUNT(DISTINCT value) AS unique_count FROM nullable_values;",
+          "columns": [
+            "rows_count",
+            "nonnull_count",
+            "unique_count"
+          ],
+          "rows": [
+            [
+              4,
+              3,
+              2
+            ]
+          ]
+        }
+      ]
+    }
+  ]
+}

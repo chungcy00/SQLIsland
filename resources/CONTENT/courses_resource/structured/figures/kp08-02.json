@@ -1,0 +1,119 @@
+{
+  "schemaVersion": 1,
+  "id": "kp08-02",
+  "lessonSha256": "826ab67a6458e79e1717a63d69dc44bf4f56bd5757f9932ae59de9a1688af43b",
+  "figures": [
+    {
+      "id": "kp08-02-clauses",
+      "slot": "syntax",
+      "kind": "clause-map",
+      "title": "示例查询的几个部分",
+      "sql": "SELECT c.customer_id, o.id AS order_id, o.sales FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id ORDER BY o.sales DESC;",
+      "parts": [
+        {
+          "role": "select",
+          "label": "取数",
+          "sql": "SELECT c.customer_id, o.id AS order_id, o.sales",
+          "note": "输出 c.customer_id, o.id AS order_id, o.sales。"
+        },
+        {
+          "role": "from",
+          "label": "来源",
+          "sql": "FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id",
+          "note": "读取查询需要的输入数据。"
+        },
+        {
+          "role": "order",
+          "label": "排序",
+          "sql": "ORDER BY o.sales DESC;",
+          "note": "按 o.sales DESC 排列结果。"
+        }
+      ]
+    },
+    {
+      "id": "kp08-02-flow",
+      "slot": "breakdown",
+      "kind": "stage-flow",
+      "merge": "breakdown",
+      "title": "每一步的数据变化",
+      "steps": [
+        {
+          "label": "FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id",
+          "skip": true
+        },
+        {
+          "label": "SELECT c.customer_id, o.id AS order_id, o.sales",
+          "sql": "SELECT c.customer_id, o.id AS order_id, o.sales FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id",
+          "columns": [
+            "customer_id",
+            "order_id",
+            "sales"
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              800
+            ],
+            [
+              1,
+              3,
+              600
+            ],
+            [
+              2,
+              2,
+              400
+            ],
+            [
+              3,
+              5,
+              1500
+            ],
+            [
+              4,
+              null,
+              null
+            ]
+          ]
+        },
+        {
+          "label": "ORDER BY o.sales DESC;",
+          "sql": "SELECT c.customer_id, o.id AS order_id, o.sales FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id ORDER BY o.sales DESC;",
+          "columns": [
+            "customer_id",
+            "order_id",
+            "sales"
+          ],
+          "rows": [
+            [
+              3,
+              5,
+              1500
+            ],
+            [
+              1,
+              1,
+              800
+            ],
+            [
+              1,
+              3,
+              600
+            ],
+            [
+              2,
+              2,
+              400
+            ],
+            [
+              4,
+              null,
+              null
+            ]
+          ]
+        }
+      ]
+    }
+  ]
+}

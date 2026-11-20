@@ -1,0 +1,255 @@
+{
+  "id": "kp10-02",
+  "chapterId": "ch10",
+  "title": "IN 与多行子查询",
+  "learningObjective": "能使用动态编号集合筛选客户，避免一对多连接造成重复。",
+  "prerequisites": [
+    "kp10-01"
+  ],
+  "concept": "多行子查询返回候选集合。IN 判断左侧值是否等于集合中任一值；重复候选不会重复输出外层行。单列比较要求子查询返回一列，多列元组比较须匹配列数。对于无匹配且集合含 NULL 的情况，判断可能为未知。若只需要客户名单，成员判断通常比直接连接订单明细更符合目标粒度。",
+  "syntax": "WHERE key IN (SELECT key FROM other WHERE p)",
+  "parameters": {
+    "key": "两表含义一致的匹配键",
+    "p": "形成候选集合的条件"
+  },
+  "fixtureIds": [
+    "lesson-customers",
+    "lesson-orders"
+  ],
+  "sourceTables": [
+    {
+      "name": "customers",
+      "columns": [
+        {
+          "name": "customer_id",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "customer_name",
+          "type": "TEXT",
+          "mysqlType": "VARCHAR(160) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_bin",
+          "sqliteType": "TEXT"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          "林"
+        ],
+        [
+          2,
+          "陈"
+        ],
+        [
+          3,
+          "王"
+        ],
+        [
+          4,
+          "李"
+        ]
+      ]
+    },
+    {
+      "name": "orders",
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "category",
+          "type": "TEXT",
+          "mysqlType": "VARCHAR(160) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_bin",
+          "sqliteType": "TEXT"
+        },
+        {
+          "name": "sales",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "store_id",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "order_date",
+          "type": "TEXT",
+          "mysqlType": "DATE",
+          "sqliteType": "TEXT"
+        },
+        {
+          "name": "customer_id",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          "护肤品",
+          800,
+          1,
+          "2026-01-03",
+          1
+        ],
+        [
+          2,
+          "化妆品",
+          400,
+          2,
+          "2026-01-10",
+          2
+        ],
+        [
+          3,
+          "护肤品",
+          600,
+          1,
+          "2026-02-02",
+          1
+        ],
+        [
+          4,
+          "化妆品",
+          300,
+          2,
+          "2026-02-15",
+          null
+        ],
+        [
+          5,
+          "日用品",
+          1500,
+          1,
+          "2026-02-20",
+          3
+        ]
+      ]
+    }
+  ],
+  "mysqlSql": "SELECT customer_id, customer_name FROM customers WHERE customer_id IN (SELECT customer_id FROM orders WHERE sales >= 600) ORDER BY customer_name DESC;",
+  "sqliteSql": "SELECT customer_id, customer_name FROM customers WHERE customer_id IN (SELECT customer_id FROM orders WHERE sales >= 600) ORDER BY customer_name DESC;",
+  "executionSteps": [
+    "筛选大额订单",
+    "提取候选客户编号",
+    "保留集合中的客户"
+  ],
+  "useCase": "运营需要至少有一笔金额达到600的已登记客户名单。orders 一行是订单，customers 一行是客户；阈值针对单笔订单，不是累计消费。",
+  "comparison": "IN 表达成员关系，JOIN 返回匹配行对；重复键对两者影响不同。",
+  "commonError": {
+    "example": "使用等号连接多行子查询。",
+    "correction": "改用 IN，或明确聚合为唯一值。"
+  },
+  "notes": "候选集合含 NULL 时，未匹配可能为 UNKNOWN；反向查询尤其需要注意。",
+  "compatibility": {
+    "status": "直接兼容",
+    "detail": "仅在本示例数据与语义范围验证；不代表全部 MySQL 语法兼容。"
+  },
+  "relatedQuestionIds": [
+    "q0136",
+    "q0138",
+    "q0141"
+  ],
+  "relatedFlashcardIds": [
+    "fc0071",
+    "fc0073"
+  ],
+  "relatedKnowledgePointIds": [
+    "kp03-01",
+    "kp05-01",
+    "kp08-01"
+  ],
+  "mysqlVerification": "未运行原生 MySQL 8.4",
+  "result": {
+    "columns": [
+      "customer_id",
+      "customer_name"
+    ],
+    "rows": [
+      [
+        3,
+        "王"
+      ],
+      [
+        1,
+        "林"
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "mysqlVerificationScript": "validation/mysql/kp10-02.sql",
+  "primaryQuestionIds": [
+    "q0136",
+    "q0138",
+    "q0141"
+  ],
+  "primaryFlashcardIds": [
+    "fc0071",
+    "fc0073"
+  ],
+  "teaching": {
+    "problem": "运营需要至少有一笔金额达到600的已登记客户名单。orders 一行是订单，customers 一行是客户；阈值针对单笔订单，不是累计消费。",
+    "codeExplanation": "内层 WHERE sales >= 600 筛出订单1、3、5，对应客户1、1、3。外层 IN 只做成员测试，客户1不会因为匹配两次出现两行。若主管要查看订单明细，应选择连接，因为目标已变为订单粒度。",
+    "resultExplanation": "四位客户中1、3入选，共两位。不能用三笔大额订单解释为三位客户，也不能解释为累计消费达到600的所有客户。",
+    "checkpoints": [],
+    "mergedConcepts": [],
+    "mergeExamples": [
+      {
+        "label": "查看内层候选",
+        "explanation": "客户1重复出现，但成员判断不需要提前去重。",
+        "sql": "SELECT customer_id FROM orders WHERE sales>=600 ORDER BY sales DESC;",
+        "result": {
+          "columns": [
+            "customer_id"
+          ],
+          "rows": [
+            [
+              3
+            ],
+            [
+              1
+            ],
+            [
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "label": "比较连接后的明细",
+        "explanation": "这不是错误查询，但不符合每位客户仅一行的名单口径。",
+        "sql": "SELECT c.customer_id,o.id AS order_id FROM customers c JOIN orders o ON c.customer_id=o.customer_id WHERE o.sales>=600 ORDER BY sales DESC;",
+        "result": {
+          "columns": [
+            "customer_id",
+            "order_id"
+          ],
+          "rows": [
+            [
+              3,
+              5
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              3
+            ]
+          ]
+        }
+      }
+    ]
+  }
+}

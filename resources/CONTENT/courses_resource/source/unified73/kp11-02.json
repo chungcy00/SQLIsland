@@ -1,0 +1,231 @@
+{
+  "id": "kp11-02",
+  "chapterId": "ch11",
+  "title": "文本截取、字符数与字节数",
+  "learningObjective": "能按字符位置提取文本，并区分字符长度与编码字节长度。",
+  "prerequisites": [
+    "kp11-01",
+    "kp11-03"
+  ],
+  "concept": "截取函数从指定字符位置提取一段文本，常规正向位置从1开始。固定长度前缀适合编码规则明确的字段；若分隔符位置变化，应先定位分隔符。字符长度用于限制名称字符数，字节长度用于存储或接口传输预算。MySQL CHAR_LENGTH 统计字符，LENGTH 统计字节；SQLite length 对文本统计字符，对 BLOB 统计字节。在 UTF-8 中古晋是两个字符、六个字节。字符数也不必然等于视觉字形数量。",
+  "syntax": "SUBSTRING(str,pos,len); CHAR_LENGTH(str); LENGTH(str)",
+  "parameters": {
+    "str": "待处理文本",
+    "pos": "从1起的正向字符位置",
+    "len": "截取字符数"
+  },
+  "fixtureIds": [
+    "lesson-products"
+  ],
+  "sourceTables": [
+    {
+      "name": "products",
+      "columns": [
+        {
+          "name": "product_id",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "product_name",
+          "type": "TEXT",
+          "mysqlType": "VARCHAR(160) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_bin",
+          "sqliteType": "TEXT"
+        },
+        {
+          "name": "category",
+          "type": "TEXT",
+          "mysqlType": "VARCHAR(160) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_bin",
+          "sqliteType": "TEXT"
+        },
+        {
+          "name": "price",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "stock",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          "Mask",
+          "护肤品",
+          15,
+          150
+        ],
+        [
+          2,
+          "Serum",
+          "护肤品",
+          89,
+          40
+        ],
+        [
+          3,
+          "Cleanser",
+          "护肤品",
+          35,
+          200
+        ],
+        [
+          4,
+          "Cream",
+          "化妆品",
+          65,
+          180
+        ],
+        [
+          5,
+          "Sunscreen",
+          "化妆品",
+          45,
+          80
+        ],
+        [
+          6,
+          "Soap_1",
+          "日用品",
+          15,
+          0
+        ]
+      ]
+    }
+  ],
+  "mysqlSql": "SELECT product_id, SUBSTRING(product_name,1,3) AS prefix FROM products ORDER BY prefix DESC;",
+  "sqliteSql": "SELECT product_id, SUBSTRING(product_name,1,3) AS prefix FROM products ORDER BY prefix DESC;",
+  "executionSteps": [
+    "读取商品名称",
+    "提取前三个字符",
+    "按商品名称展示"
+  ],
+  "useCase": "采购分类表需要展示名称前三个字符作为临时前缀，另外接口要求核对中文名称的编码字节长度。products 每行一件商品；实际编码是否可按前三字符分组需要业务确认。",
+  "comparison": "文本截取不是按分隔符拆分；字符计数不是字节计数。",
+  "commonError": {
+    "example": "SUBSTRING(product_name,0,3) 期待前三字符，或把 MySQL LENGTH 当字符计数。",
+    "correction": "正向起始位置写1；字符长度使用 CHAR_LENGTH，兼容环境使用 length(text)。"
+  },
+  "notes": "负位置、零位置、特殊字符及字符集差异需要单独验证；本例 UTF-8。",
+  "compatibility": {
+    "status": "直接兼容",
+    "detail": "仅在本示例数据与语义范围验证；不代表全部 MySQL 语法兼容。"
+  },
+  "relatedQuestionIds": [
+    "q0155",
+    "q0156"
+  ],
+  "relatedFlashcardIds": [
+    "fc0079",
+    "fc0081",
+    "fc0084"
+  ],
+  "relatedKnowledgePointIds": [
+    "kp02-01",
+    "kp05-01"
+  ],
+  "mysqlVerification": "未运行原生 MySQL 8.4",
+  "result": {
+    "columns": [
+      "product_id",
+      "prefix"
+    ],
+    "rows": [
+      [
+        5,
+        "Sun"
+      ],
+      [
+        6,
+        "Soa"
+      ],
+      [
+        2,
+        "Ser"
+      ],
+      [
+        1,
+        "Mas"
+      ],
+      [
+        4,
+        "Cre"
+      ],
+      [
+        3,
+        "Cle"
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "mysqlVerificationScript": "validation/mysql/kp11-02.sql",
+  "primaryQuestionIds": [
+    "q0155",
+    "q0156"
+  ],
+  "primaryFlashcardIds": [
+    "fc0079",
+    "fc0081",
+    "fc0084"
+  ],
+  "mergedFrom": [
+    {
+      "id": "kp11-04",
+      "title": "CHAR_LENGTH 与 LENGTH"
+    }
+  ],
+  "teaching": {
+    "problem": "采购分类表需要展示名称前三个字符作为临时前缀，另外接口要求核对中文名称的编码字节长度。products 每行一件商品；实际编码是否可按前三字符分组需要业务确认。",
+    "codeExplanation": "SUBSTRING(product_name,1,3) 从首字符开始提取最多三个字符，AS prefix 标记结果。如果字符串不足三个字符，只返回剩余字符。长度验证使用 MySQL CHAR_LENGTH 与 LENGTH；兼容环境使用 length(text) 与 length(CAST(text AS BLOB))。不要直接把字节数作为截取字符数。",
+    "resultExplanation": "六件商品分别得到 Mas、Ser、Cle、Cre、Sun、Soa，行数保持不变。中文长度样例返回2与6；这是编码层面的差异，不表示中文名称有六个字符。",
+    "checkpoints": [],
+    "mergedConcepts": [
+      {
+        "sourceId": "kp11-04",
+        "explanation": "已融入字符与字节计数、UTF-8 中文样例、MySQL 与 SQLite 函数差异、接口长度验证及误用修正。"
+      }
+    ],
+    "mergeExamples": [
+      {
+        "label": "来源课：字符数与字节数",
+        "explanation": "保留原样例；原生写法 SELECT CHAR_LENGTH('古晋') AS chars, LENGTH('古晋') AS bytes; 下方为兼容写法。",
+        "sql": "SELECT length('古晋') AS chars, length(CAST('古晋' AS BLOB)) AS bytes;",
+        "result": {
+          "columns": [
+            "chars",
+            "bytes"
+          ],
+          "rows": [
+            [
+              2,
+              6
+            ]
+          ]
+        }
+      },
+      {
+        "label": "中文字符截取与短文本",
+        "explanation": "按字符位置截取，不按字节切割；不足长度仍返回现有字符。",
+        "sql": "SELECT SUBSTRING('古晋门店',2,2) AS part,SUBSTRING('A',1,3) AS short_text;",
+        "result": {
+          "columns": [
+            "part",
+            "short_text"
+          ],
+          "rows": [
+            [
+              "晋门",
+              "A"
+            ]
+          ]
+        }
+      }
+    ]
+  }
+}

@@ -12,7 +12,10 @@ const data = await readJson(path.join(root,'structured/figures/kp05-01.json'));
 const fresh = () => structuredClone(data);
 test('pilot figures load only for converted lessons and match the sample data', () => {
   assert.equal(pilot.figures.length, 3);
-  assert.deepEqual(lessons.filter(k=>k.figures).map(k=>k.id), ['kp01-01','kp01-02','kp01-03','kp02-01','kp02-02','kp05-01','kp05-02']);
+  const withFigures = lessons.filter(k=>k.figures);
+  assert.ok(withFigures.every(k=>k.presentation));
+  for (const id of ['kp01-01','kp01-02','kp01-03','kp02-01','kp02-02','kp05-01','kp05-02']) assert.ok(withFigures.some(k=>k.id===id), id);
+  assert.ok(withFigures.length >= 70);
   validateFigures(pilot, fresh());
 });
 test('figure validation rejects numbers that differ from the lesson data', () => {

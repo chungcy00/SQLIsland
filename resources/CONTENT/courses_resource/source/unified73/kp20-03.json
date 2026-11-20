@@ -1,0 +1,1049 @@
+{
+  "id": "kp20-03",
+  "chapterId": "ch20",
+  "title": "分组内排名与前N名",
+  "learningObjective": "能够按业务对象汇总金额、按组独立排名，并根据是否保留并列选择排名函数，完成门店商品及部门薪酬榜单。",
+  "prerequisites": [
+    "kp20-02",
+    "kp19-32",
+    "kp19-46"
+  ],
+  "concept": "分组内排名先聚合到业务对象，再按所属组建立窗口，最后在外层筛名次。ROW_NUMBER 为每行分配唯一序号，RANK 同额并列且跳号，DENSE_RANK 同额并列不跳号。固定最多三行使用 ROW_NUMBER，要求前三个名次包含并列使用 RANK，要求前三种不同金额使用 DENSE_RANK。",
+  "syntax": "ROW_NUMBER() OVER(PARTITION BY 分组键 ORDER BY 金额 DESC, 唯一键)；外层 WHERE 名次<=N",
+  "parameters": {
+    "统计期间": "2025年",
+    "渠道": "线下门店",
+    "输出粒度": "门店×商品",
+    "金额": "马币分",
+    "N": "本例为3"
+  },
+  "fixtureIds": [
+    "kp20-03-stores",
+    "kp20-03-customers",
+    "kp20-03-calendar_days",
+    "kp20-03-orders",
+    "kp20-03-order_items",
+    "kp20-03-returns"
+  ],
+  "sourceTables": [
+    {
+      "name": "stores",
+      "columns": [
+        {
+          "name": "store_id",
+          "sqliteType": "INTEGER",
+          "type": "INTEGER"
+        },
+        {
+          "name": "store_name",
+          "sqliteType": "TEXT",
+          "type": "TEXT"
+        },
+        {
+          "name": "city",
+          "sqliteType": "TEXT",
+          "type": "TEXT"
+        },
+        {
+          "name": "fulfillment_warehouse_id",
+          "sqliteType": "INTEGER",
+          "type": "INTEGER"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          "门店1",
+          "古晋",
+          1
+        ],
+        [
+          2,
+          "门店2",
+          "古晋",
+          1
+        ],
+        [
+          3,
+          "门店3",
+          "古晋",
+          1
+        ]
+      ]
+    },
+    {
+      "name": "customers",
+      "columns": [
+        {
+          "name": "customer_id",
+          "sqliteType": "INTEGER",
+          "type": "INTEGER"
+        },
+        {
+          "name": "customer_name",
+          "sqliteType": "TEXT",
+          "type": "TEXT"
+        },
+        {
+          "name": "signup_date",
+          "sqliteType": "TEXT",
+          "type": "TEXT"
+        },
+        {
+          "name": "region",
+          "sqliteType": "TEXT",
+          "type": "TEXT"
+        },
+        {
+          "name": "member_since_date",
+          "sqliteType": "TEXT",
+          "type": "TEXT"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          "客户1",
+          "2024-01-01",
+          null,
+          null
+        ],
+        [
+          2,
+          "客户2",
+          "2024-01-01",
+          null,
+          null
+        ],
+        [
+          3,
+          "客户3",
+          "2024-01-01",
+          null,
+          null
+        ],
+        [
+          4,
+          "客户4",
+          "2024-01-01",
+          null,
+          null
+        ]
+      ]
+    },
+    {
+      "name": "calendar_days",
+      "columns": [
+        {
+          "name": "day",
+          "sqliteType": "TEXT",
+          "type": "TEXT"
+        },
+        {
+          "name": "month_key",
+          "sqliteType": "TEXT",
+          "type": "TEXT"
+        },
+        {
+          "name": "day_index",
+          "sqliteType": "INTEGER",
+          "type": "INTEGER"
+        }
+      ],
+      "rows": [
+        [
+          "2025-01-01",
+          "2025-01",
+          1
+        ],
+        [
+          "2025-02-01",
+          "2025-02",
+          2
+        ],
+        [
+          "2025-03-01",
+          "2025-03",
+          3
+        ],
+        [
+          "2025-04-01",
+          "2025-04",
+          4
+        ],
+        [
+          "2025-05-01",
+          "2025-05",
+          5
+        ],
+        [
+          "2025-06-01",
+          "2025-06",
+          6
+        ],
+        [
+          "2025-07-01",
+          "2025-07",
+          7
+        ],
+        [
+          "2025-08-01",
+          "2025-08",
+          8
+        ],
+        [
+          "2025-09-01",
+          "2025-09",
+          9
+        ],
+        [
+          "2025-10-01",
+          "2025-10",
+          10
+        ],
+        [
+          "2025-11-01",
+          "2025-11",
+          11
+        ],
+        [
+          "2025-12-01",
+          "2025-12",
+          12
+        ]
+      ]
+    },
+    {
+      "name": "orders",
+      "columns": [
+        {
+          "name": "order_id",
+          "sqliteType": "INTEGER",
+          "type": "INTEGER"
+        },
+        {
+          "name": "store_id",
+          "sqliteType": "INTEGER",
+          "type": "INTEGER"
+        },
+        {
+          "name": "customer_id",
+          "sqliteType": "INTEGER",
+          "type": "INTEGER"
+        },
+        {
+          "name": "session_id",
+          "sqliteType": "INTEGER",
+          "type": "INTEGER"
+        },
+        {
+          "name": "order_date",
+          "sqliteType": "TEXT",
+          "type": "TEXT"
+        },
+        {
+          "name": "channel",
+          "sqliteType": "TEXT",
+          "type": "TEXT"
+        },
+        {
+          "name": "status",
+          "sqliteType": "TEXT",
+          "type": "TEXT"
+        },
+        {
+          "name": "cancellation_reason",
+          "sqliteType": "TEXT",
+          "type": "TEXT"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          1,
+          null,
+          null,
+          "2025-01-02",
+          "store",
+          "completed",
+          null
+        ],
+        [
+          2,
+          1,
+          null,
+          null,
+          "2025-03-02",
+          "store",
+          "completed",
+          null
+        ],
+        [
+          3,
+          2,
+          null,
+          null,
+          "2025-03-03",
+          "store",
+          "completed",
+          null
+        ],
+        [
+          4,
+          1,
+          null,
+          null,
+          "2024-12-31",
+          "store",
+          "completed",
+          null
+        ],
+        [
+          5,
+          null,
+          1,
+          5,
+          "2025-01-02",
+          "online",
+          "completed",
+          null
+        ],
+        [
+          6,
+          null,
+          1,
+          6,
+          "2025-03-02",
+          "online",
+          "completed",
+          null
+        ],
+        [
+          7,
+          null,
+          2,
+          7,
+          "2025-03-03",
+          "online",
+          "completed",
+          null
+        ],
+        [
+          8,
+          null,
+          2,
+          8,
+          "2025-04-03",
+          "online",
+          "completed",
+          null
+        ],
+        [
+          9,
+          null,
+          3,
+          9,
+          "2025-05-03",
+          "online",
+          "cancelled",
+          "客户取消"
+        ],
+        [
+          10,
+          null,
+          4,
+          10,
+          "2025-06-03",
+          "online",
+          "pending",
+          null
+        ],
+        [
+          11,
+          null,
+          3,
+          11,
+          "2026-01-01",
+          "online",
+          "completed",
+          null
+        ]
+      ]
+    },
+    {
+      "name": "order_items",
+      "columns": [
+        {
+          "name": "order_item_id",
+          "sqliteType": "INTEGER",
+          "type": "INTEGER"
+        },
+        {
+          "name": "order_id",
+          "sqliteType": "INTEGER",
+          "type": "INTEGER"
+        },
+        {
+          "name": "product_id",
+          "sqliteType": "INTEGER",
+          "type": "INTEGER"
+        },
+        {
+          "name": "promotion_id",
+          "sqliteType": "INTEGER",
+          "type": "INTEGER"
+        },
+        {
+          "name": "quantity",
+          "sqliteType": "INTEGER",
+          "type": "INTEGER"
+        },
+        {
+          "name": "unit_price_cents",
+          "sqliteType": "INTEGER",
+          "type": "INTEGER"
+        },
+        {
+          "name": "discount_cents",
+          "sqliteType": "INTEGER",
+          "type": "INTEGER"
+        },
+        {
+          "name": "unit_cost_cents",
+          "sqliteType": "INTEGER",
+          "type": "INTEGER"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          1,
+          1,
+          null,
+          2,
+          100,
+          0,
+          10
+        ],
+        [
+          2,
+          1,
+          2,
+          null,
+          1,
+          100,
+          0,
+          10
+        ],
+        [
+          3,
+          1,
+          3,
+          null,
+          1,
+          100,
+          0,
+          10
+        ],
+        [
+          4,
+          1,
+          4,
+          null,
+          1,
+          100,
+          0,
+          10
+        ],
+        [
+          5,
+          2,
+          5,
+          null,
+          1,
+          50,
+          0,
+          10
+        ],
+        [
+          6,
+          3,
+          1,
+          null,
+          1,
+          80,
+          0,
+          10
+        ],
+        [
+          7,
+          4,
+          1,
+          null,
+          1,
+          900,
+          0,
+          10
+        ],
+        [
+          8,
+          5,
+          1,
+          null,
+          1,
+          70,
+          0,
+          10
+        ],
+        [
+          9,
+          5,
+          2,
+          null,
+          1,
+          30,
+          0,
+          10
+        ],
+        [
+          10,
+          6,
+          2,
+          null,
+          1,
+          60,
+          0,
+          10
+        ],
+        [
+          11,
+          7,
+          1,
+          null,
+          1,
+          40,
+          0,
+          10
+        ],
+        [
+          12,
+          8,
+          2,
+          null,
+          1,
+          20,
+          0,
+          10
+        ],
+        [
+          13,
+          9,
+          1,
+          null,
+          1,
+          200,
+          0,
+          10
+        ],
+        [
+          14,
+          10,
+          1,
+          null,
+          1,
+          200,
+          0,
+          10
+        ],
+        [
+          15,
+          11,
+          1,
+          null,
+          1,
+          200,
+          0,
+          10
+        ]
+      ]
+    },
+    {
+      "name": "returns",
+      "columns": [
+        {
+          "name": "return_id",
+          "sqliteType": "INTEGER",
+          "type": "INTEGER"
+        },
+        {
+          "name": "order_item_id",
+          "sqliteType": "INTEGER",
+          "type": "INTEGER"
+        },
+        {
+          "name": "return_date",
+          "sqliteType": "TEXT",
+          "type": "TEXT"
+        },
+        {
+          "name": "quantity",
+          "sqliteType": "INTEGER",
+          "type": "INTEGER"
+        },
+        {
+          "name": "refund_cents",
+          "sqliteType": "INTEGER",
+          "type": "INTEGER"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          1,
+          "2025-02-01",
+          1,
+          100
+        ],
+        [
+          2,
+          12,
+          "2025-04-05",
+          1,
+          20
+        ]
+      ]
+    }
+  ],
+  "mysqlSql": "WITH sales AS (\n SELECT store_id,product_id,SUM(net_cents) net_cents FROM v_sales_lines\n WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31'\n GROUP BY store_id,product_id HAVING SUM(net_cents)>0\n), ranked AS (\n SELECT store_id,product_id,net_cents,ROW_NUMBER() OVER(PARTITION BY store_id ORDER BY net_cents DESC,product_id) sales_rank FROM sales\n)\nSELECT store_id,product_id,net_cents,sales_rank FROM ranked WHERE sales_rank<=3 ORDER BY net_cents DESC, sales_rank DESC",
+  "sqliteSql": "WITH sales AS (\n SELECT store_id,product_id,SUM(net_cents) net_cents FROM v_sales_lines\n WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31'\n GROUP BY store_id,product_id HAVING SUM(net_cents)>0\n), ranked AS (\n SELECT store_id,product_id,net_cents,ROW_NUMBER() OVER(PARTITION BY store_id ORDER BY net_cents DESC,product_id) sales_rank FROM sales\n)\nSELECT store_id,product_id,net_cents,sales_rank FROM ranked WHERE sales_rank<=3 ORDER BY net_cents DESC, sales_rank DESC",
+  "executionSteps": [
+    "筛选有效期间及渠道",
+    "汇总到门店商品粒度",
+    "按门店分区计算名次",
+    "外层筛前三并稳定排序"
+  ],
+  "useCase": "商品经理要求2025年每店净销售为正的前三件商品，并列仍最多三件。人资案例则要求指定月份各部门薪酬前三名，允许同薪并列。两个案例的输出粒度分别是门店×商品和部门×员工，不能直接排名交易明细。金额为马币分。",
+  "comparison": "固定行数用 ROW_NUMBER；并列且跳号用 RANK；并列不跳号用 DENSE_RANK。全局排名不分区，分组排名需明确 PARTITION BY。",
+  "commonError": {
+    "example": "直接对订单明细排名，或先筛前三条交易再汇总；在 RANK 窗口中加入唯一编号破坏并列。",
+    "correction": "先按业务键汇总，再分区排名和外层筛选；并列排名仅按业务指标排序，展示层再加编号。"
+  },
+  "notes": "原主查询、原数据源、结果及关联不变。独立内联数据未重建原订单退款视图；原生数据库及浏览器未验证。",
+  "compatibility": {
+    "status": "直接兼容",
+    "detail": "仅在本示例数据与语义范围验证；不代表全部 MySQL 语法兼容。"
+  },
+  "relatedQuestionIds": [
+    "q0253",
+    "q0255"
+  ],
+  "relatedFlashcardIds": [
+    "fc0143",
+    "fc0171",
+    "fc0179"
+  ],
+  "relatedKnowledgePointIds": [
+    "kp07-01",
+    "kp08-01",
+    "kp10-01",
+    "kp14-01",
+    "kp15-01",
+    "kp19-01",
+    "kp06-01",
+    "kp09-01",
+    "kp12-01"
+  ],
+  "mysqlVerification": "未执行原生 MySQL",
+  "result": {
+    "columns": [
+      "store_id",
+      "product_id",
+      "net_cents",
+      "sales_rank"
+    ],
+    "rows": [
+      [
+        1,
+        3,
+        100,
+        3
+      ],
+      [
+        1,
+        2,
+        100,
+        2
+      ],
+      [
+        1,
+        1,
+        100,
+        1
+      ],
+      [
+        2,
+        1,
+        80,
+        1
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": true
+  },
+  "visualization": {
+    "kind": "stepFlow",
+    "steps": [
+      {
+        "id": "1",
+        "label": "按类别分区"
+      },
+      {
+        "id": "2",
+        "label": "按价格排序"
+      },
+      {
+        "id": "3",
+        "label": "取每类前2行"
+      }
+    ],
+    "sourceFixtureIds": [
+      "lesson-products"
+    ],
+    "resultColumns": [
+      "category",
+      "product_id",
+      "price"
+    ]
+  },
+  "mysqlVerificationScript": "validation/mysql/kp20-03.sql",
+  "primaryQuestionIds": [
+    "q0255"
+  ],
+  "primaryFlashcardIds": [
+    "fc0143",
+    "fc0171",
+    "fc0179"
+  ],
+  "mergedFrom": [
+    {
+      "id": "kp19-09",
+      "title": "零售：各店前三畅销商品"
+    },
+    {
+      "id": "kp19-23",
+      "title": "人力资源：部门内薪资排名"
+    }
+  ],
+  "setupSql": "CREATE VIEW v_sales_lines AS SELECT i.order_item_id,o.order_id,o.store_id,o.customer_id,o.session_id,o.channel,o.order_date,i.product_id,i.promotion_id,i.quantity-COALESCE(r.qty,0) AS net_qty,i.quantity*i.unit_price_cents-i.discount_cents-COALESCE(r.refund,0) AS net_cents,(i.quantity-COALESCE(r.qty,0))*i.unit_cost_cents AS cost_cents,i.discount_cents,COALESCE(r.refund,0) AS refund_cents FROM orders o JOIN order_items i ON o.order_id=i.order_id LEFT JOIN (SELECT order_item_id,SUM(quantity) qty,SUM(refund_cents) refund FROM returns WHERE return_date<='2025-12-31' GROUP BY order_item_id) r ON r.order_item_id=i.order_item_id WHERE o.status='completed';\nCREATE VIEW v_order_net AS SELECT order_id,store_id,customer_id,session_id,channel,order_date,SUM(net_cents) net_cents,SUM(cost_cents) cost_cents FROM v_sales_lines GROUP BY order_id,store_id,customer_id,session_id,channel,order_date;",
+  "teaching": {
+    "problem": "商品经理要求2025年每店净销售为正的前三件商品，并列仍最多三件。人资案例则要求指定月份各部门薪酬前三名，允许同薪并列。两个案例的输出粒度分别是门店×商品和部门×员工，不能直接排名交易明细。金额为马币分。",
+    "codeExplanation": "sales 在指定期间及渠道内按门店、商品汇总净销售；HAVING 排除净额不大于零的商品，不能在 WHERE 排除负金额明细，否则退货冲减会丢失。ranked 使用 PARTITION BY store_id 让每家店独立编号，ORDER BY net_cents DESC 从高到低排列，product_id 作为唯一决胜键保证同额顺序稳定。最后在外层 WHERE sales_rank<=3 筛排名，因为同层 WHERE 早于窗口计算。最终 ORDER BY 决定展示顺序，窗口内排序不能代替它。若业务要求并列，RANK 窗口中不能加入唯一商品编号，否则原本同额的商品会被拆成不同名次。部门薪酬案例先固定月份，将基本薪资及奖金汇总到员工，再按部门排名；实际数据应验证薪资组成是否重复及员工部门归属。",
+    "resultExplanation": "独立示例中门店1四件商品净额均为100分，商品1由两笔明细合计而成。固定前三名只显示商品1、2、3；保留并列时四件均为第一名。门店2只有两件有效商品，所以结果只有两行。此报表不展示没有正净销售的门店；若需要完整门店清单，应另外左连接门店主档。薪酬例中员工2基本薪资400000分与奖金20000分合计420000分，与员工3并列第二；员工4为第四名，不能进入前三名。排名仅描述金额顺序，不等于商品利润或员工绩效。",
+    "checkpoints": [
+      {
+        "name": "sales",
+        "label": "按门店和商品累计净销售",
+        "sql": "WITH sales AS (\n SELECT store_id,product_id,SUM(net_cents) net_cents FROM v_sales_lines\n WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31'\n GROUP BY store_id,product_id HAVING SUM(net_cents)>0\n)\nSELECT * FROM sales ORDER BY 1, 2, 3 LIMIT 3;",
+        "result": {
+          "columns": [
+            "store_id",
+            "product_id",
+            "net_cents"
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              100
+            ],
+            [
+              1,
+              2,
+              100
+            ],
+            [
+              1,
+              3,
+              100
+            ]
+          ]
+        }
+      },
+      {
+        "name": "ranked",
+        "label": "每家门店独立编号",
+        "sql": "WITH sales AS (\n SELECT store_id,product_id,SUM(net_cents) net_cents FROM v_sales_lines\n WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31'\n GROUP BY store_id,product_id HAVING SUM(net_cents)>0\n), ranked AS (\n SELECT store_id,product_id,net_cents,ROW_NUMBER() OVER(PARTITION BY store_id ORDER BY net_cents DESC,product_id) sales_rank FROM sales\n)\nSELECT * FROM ranked ORDER BY 1, 2, 3, 4 LIMIT 3;",
+        "result": {
+          "columns": [
+            "store_id",
+            "product_id",
+            "net_cents",
+            "sales_rank"
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              100,
+              1
+            ],
+            [
+              1,
+              2,
+              100,
+              2
+            ],
+            [
+              1,
+              3,
+              100,
+              3
+            ]
+          ]
+        }
+      }
+    ],
+    "mergedConcepts": [
+      {
+        "sourceId": "kp19-09",
+        "explanation": "门店商品榜先按门店商品汇总跨订单净销售，再分组排名，避免同一商品重复入榜。"
+      },
+      {
+        "sourceId": "kp19-23",
+        "explanation": "部门薪酬榜固定月份、按员工汇总基本薪资与奖金，再按部门分区；同薪是否并列决定排名函数。"
+      }
+    ],
+    "mergeExamples": [
+      {
+        "label": "按门店商品汇总",
+        "explanation": "商品1两笔60及40合计100；商品5净额为零被排除；线上及上年记录不计。",
+        "sql": "WITH v_sales_lines(store_id,product_id,net_cents,channel,order_date) AS (VALUES\n (1,1,60,'store','2025-01-01'),(1,1,40,'store','2025-02-01'),\n (1,2,100,'store','2025-01-01'),(1,3,100,'store','2025-01-01'),\n (1,4,100,'store','2025-01-01'),(1,5,0,'store','2025-01-01'),\n (2,1,80,'store','2025-01-01'),(2,2,20,'store','2025-01-01'),\n (2,3,900,'online','2025-01-01'),(2,4,900,'store','2024-01-01')),\nsales AS (\n SELECT store_id,product_id,SUM(net_cents) net_cents FROM v_sales_lines\n WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31'\n GROUP BY store_id,product_id HAVING SUM(net_cents)>0\n), ranked AS (\n SELECT store_id,product_id,net_cents,ROW_NUMBER() OVER(PARTITION BY store_id ORDER BY net_cents DESC,product_id) sales_rank FROM sales\n)\nSELECT * FROM sales ORDER BY net_cents;",
+        "result": {
+          "columns": [
+            "store_id",
+            "product_id",
+            "net_cents"
+          ],
+          "rows": [
+            [
+              2,
+              2,
+              20
+            ],
+            [
+              2,
+              1,
+              80
+            ],
+            [
+              1,
+              1,
+              100
+            ],
+            [
+              1,
+              2,
+              100
+            ],
+            [
+              1,
+              3,
+              100
+            ],
+            [
+              1,
+              4,
+              100
+            ]
+          ]
+        }
+      },
+      {
+        "label": "分区排名",
+        "explanation": "每店重新编号；同额以商品编号决定顺序。",
+        "sql": "WITH v_sales_lines(store_id,product_id,net_cents,channel,order_date) AS (VALUES\n (1,1,60,'store','2025-01-01'),(1,1,40,'store','2025-02-01'),\n (1,2,100,'store','2025-01-01'),(1,3,100,'store','2025-01-01'),\n (1,4,100,'store','2025-01-01'),(1,5,0,'store','2025-01-01'),\n (2,1,80,'store','2025-01-01'),(2,2,20,'store','2025-01-01'),\n (2,3,900,'online','2025-01-01'),(2,4,900,'store','2024-01-01')),\nsales AS (\n SELECT store_id,product_id,SUM(net_cents) net_cents FROM v_sales_lines\n WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31'\n GROUP BY store_id,product_id HAVING SUM(net_cents)>0\n), ranked AS (\n SELECT store_id,product_id,net_cents,ROW_NUMBER() OVER(PARTITION BY store_id ORDER BY net_cents DESC,product_id) sales_rank FROM sales\n)\nSELECT * FROM ranked ORDER BY net_cents DESC, sales_rank DESC;",
+        "result": {
+          "columns": [
+            "store_id",
+            "product_id",
+            "net_cents",
+            "sales_rank"
+          ],
+          "rows": [
+            [
+              1,
+              4,
+              100,
+              4
+            ],
+            [
+              1,
+              3,
+              100,
+              3
+            ],
+            [
+              1,
+              2,
+              100,
+              2
+            ],
+            [
+              1,
+              1,
+              100,
+              1
+            ],
+            [
+              2,
+              1,
+              80,
+              1
+            ],
+            [
+              2,
+              2,
+              20,
+              2
+            ]
+          ]
+        }
+      },
+      {
+        "label": "完整前三名报表",
+        "explanation": "外层筛选排名不超过3；门店1同额四件只保留三件，门店2仅两件。",
+        "sql": "WITH v_sales_lines(store_id,product_id,net_cents,channel,order_date) AS (VALUES\n (1,1,60,'store','2025-01-01'),(1,1,40,'store','2025-02-01'),\n (1,2,100,'store','2025-01-01'),(1,3,100,'store','2025-01-01'),\n (1,4,100,'store','2025-01-01'),(1,5,0,'store','2025-01-01'),\n (2,1,80,'store','2025-01-01'),(2,2,20,'store','2025-01-01'),\n (2,3,900,'online','2025-01-01'),(2,4,900,'store','2024-01-01')),\nsales AS (\n SELECT store_id,product_id,SUM(net_cents) net_cents FROM v_sales_lines\n WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31'\n GROUP BY store_id,product_id HAVING SUM(net_cents)>0\n), ranked AS (\n SELECT store_id,product_id,net_cents,ROW_NUMBER() OVER(PARTITION BY store_id ORDER BY net_cents DESC,product_id) sales_rank FROM sales\n)\nSELECT store_id,product_id,net_cents,sales_rank FROM ranked WHERE sales_rank<=3 ORDER BY net_cents DESC, sales_rank DESC;",
+        "result": {
+          "columns": [
+            "store_id",
+            "product_id",
+            "net_cents",
+            "sales_rank"
+          ],
+          "rows": [
+            [
+              1,
+              3,
+              100,
+              3
+            ],
+            [
+              1,
+              2,
+              100,
+              2
+            ],
+            [
+              1,
+              1,
+              100,
+              1
+            ],
+            [
+              2,
+              1,
+              80,
+              1
+            ],
+            [
+              2,
+              2,
+              20,
+              2
+            ]
+          ]
+        }
+      },
+      {
+        "label": "保留并列名次",
+        "explanation": "排名窗口仅按销售额排序，展示层才加商品编号。同额四件并列第一，全部入选。",
+        "sql": "WITH v_sales_lines(store_id,product_id,net_cents,channel,order_date) AS (VALUES\n (1,1,60,'store','2025-01-01'),(1,1,40,'store','2025-02-01'),\n (1,2,100,'store','2025-01-01'),(1,3,100,'store','2025-01-01'),\n (1,4,100,'store','2025-01-01'),(1,5,0,'store','2025-01-01'),\n (2,1,80,'store','2025-01-01'),(2,2,20,'store','2025-01-01'),\n (2,3,900,'online','2025-01-01'),(2,4,900,'store','2024-01-01')),\nsales AS (\n SELECT store_id,product_id,SUM(net_cents) net_cents FROM v_sales_lines\n WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31'\n GROUP BY store_id,product_id HAVING SUM(net_cents)>0\n), ranked AS (\n SELECT store_id,product_id,net_cents,ROW_NUMBER() OVER(PARTITION BY store_id ORDER BY net_cents DESC,product_id) sales_rank FROM sales\n), tied AS (SELECT store_id,product_id,net_cents,RANK() OVER(PARTITION BY store_id ORDER BY net_cents DESC) sales_rank FROM sales)\nSELECT * FROM tied WHERE sales_rank<=3 ORDER BY net_cents;",
+        "result": {
+          "columns": [
+            "store_id",
+            "product_id",
+            "net_cents",
+            "sales_rank"
+          ],
+          "rows": [
+            [
+              2,
+              2,
+              20,
+              2
+            ],
+            [
+              2,
+              1,
+              80,
+              1
+            ],
+            [
+              1,
+              1,
+              100,
+              1
+            ],
+            [
+              1,
+              2,
+              100,
+              1
+            ],
+            [
+              1,
+              3,
+              100,
+              1
+            ],
+            [
+              1,
+              4,
+              100,
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "label": "部门薪酬前三名",
+        "explanation": "固定薪资月份并按员工累计基本薪资和奖金；假设员工当月仅属一个部门。保留并列，部门1两人同为第二，部门2独立排名。",
+        "sql": "WITH payroll(department_id,employee_id,month_key,base_cents,bonus_cents) AS (VALUES\n (1,1,'2025-01',500000,50000),(1,2,'2025-01',400000,0),(1,2,'2025-01',0,20000),\n (1,3,'2025-01',420000,0),(1,4,'2025-01',300000,0),(2,5,'2025-01',200000,0),\n (1,4,'2024-12',900000,0)), totals AS (\n SELECT department_id,employee_id,SUM(base_cents+bonus_cents) pay_cents FROM payroll\n WHERE month_key='2025-01' GROUP BY department_id,employee_id), ranked AS (\n SELECT *,RANK() OVER(PARTITION BY department_id ORDER BY pay_cents DESC) pay_rank FROM totals)\nSELECT * FROM ranked WHERE pay_rank<=3 ORDER BY pay_cents;",
+        "result": {
+          "columns": [
+            "department_id",
+            "employee_id",
+            "pay_cents",
+            "pay_rank"
+          ],
+          "rows": [
+            [
+              2,
+              5,
+              200000,
+              1
+            ],
+            [
+              1,
+              2,
+              420000,
+              2
+            ],
+            [
+              1,
+              3,
+              420000,
+              2
+            ],
+            [
+              1,
+              1,
+              550000,
+              1
+            ]
+          ]
+        }
+      }
+    ]
+  }
+}

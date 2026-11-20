@@ -1,0 +1,171 @@
+{
+  "schemaVersion": 1,
+  "id": "kp06-02",
+  "sourceBatch": "unified73",
+  "teachingKind": "syntax",
+  "conceptBlocks": [
+    {
+      "type": "paragraph",
+      "text": "SUM 将非空数值相加，AVG 计算非空数值的算术平均。平均值不是将总和机械地除以表的行数：如果记录缺失，默认分母只包括已知数值。零本身是真实数值，既参与求和也进入平均值分母。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "若没有任何非空输入，SUM 和 AVG 返回 NULL，而不是自动返回零；这与 COUNT 不同。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "业务上必须明确平均的是订单金额、门店营收还是商品价格，统计对象改变时，平均值含义也改变。多个组的平均值不能直接再平均，除非组大小相同或符合另行规定的等权口径；",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "总体平均应合并总和及有效计数。",
+      "emphasis": []
+    }
+  ],
+  "syntax": {
+    "purpose": "SUM 非空数值合计；AVG 非空数值的算术平均；column_name 数值表达式或字段。"
+  },
+  "dataDescriptions": {
+    "nullable_values": "共 4 行；字段：id、value、note。"
+  },
+  "problem": "分析员需要汇报已填写的数值总量及平均水平。数据表包含未知值、真实零以及两条数值10的记录；未知值不得默认为零。",
+  "methodBlocks": [
+    {
+      "type": "paragraph",
+      "text": "SUM(value) 计算0+10+10，AVG(value) 将同一总和除以三个有效值。两个函数都忽略第一行缺失值。若需要核对平均值分母，可以同时查询 COUNT(value)；",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "如果业务明确规定未填报等于零，则先使用 COALESCE 将缺失值转为0，再求平均，但此时指标口径已经改变。",
+      "emphasis": []
+    }
+  ],
+  "breakdown": [
+    {
+      "kind": "fragment",
+      "title": "指定来源",
+      "sql": "FROM nullable_values;",
+      "purpose": "从 nullable_values 读取输入数据。",
+      "reason": "后面的子句都基于这里得到的行。"
+    },
+    {
+      "kind": "fragment",
+      "title": "选择输出",
+      "sql": "SELECT SUM(value) AS total, AVG(value) AS mean",
+      "purpose": "输出 SUM(value) AS total, AVG(value) AS mean。",
+      "reason": "输出列的顺序与别名决定结果表的形状。"
+    }
+  ],
+  "completeCode": {
+    "mysqlSql": "SELECT SUM(value) AS total, AVG(value) AS mean FROM nullable_values;",
+    "sqliteSql": "SELECT SUM(value) AS total, AVG(value) AS mean FROM nullable_values;"
+  },
+  "expectedResult": {
+    "columns": [
+      "total",
+      "mean"
+    ],
+    "rows": [
+      [
+        20,
+        6.666666666666667
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "resultBlocks": [
+    {
+      "type": "paragraph",
+      "text": "总和20，平均约6.67。缺失不进入分母，真实零进入分母。补零后的均值为5，两者差异来自统计口径而非计算错误。不能根据此样例断定缺失记录的实际数值。",
+      "emphasis": []
+    }
+  ],
+  "extensions": [
+    {
+      "label": "核对分母",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "将总记录数和非空数放在一起，可以看清普通平均值的分母。",
+          "emphasis": []
+        }
+      ],
+      "sql": "SELECT SUM(value) AS total, COUNT(value) AS valid_count, COUNT(*) AS row_count FROM nullable_values;",
+      "result": {
+        "columns": [
+          "total",
+          "valid_count",
+          "row_count"
+        ],
+        "rows": [
+          [
+            20,
+            3,
+            4
+          ]
+        ]
+      }
+    },
+    {
+      "label": "补零口径对照",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "仅作为另一种业务口径的对照，不能默认采用。",
+          "emphasis": []
+        }
+      ],
+      "sql": "SELECT AVG(COALESCE(value,0)) AS filled_mean, AVG(value) AS valid_mean FROM nullable_values;",
+      "result": {
+        "columns": [
+          "filled_mean",
+          "valid_mean"
+        ],
+        "rows": [
+          [
+            5.0,
+            6.666666666666667
+          ]
+        ]
+      }
+    }
+  ],
+  "cautions": {
+    "comparison": [
+      {
+        "type": "paragraph",
+        "text": "AVG(value) 和 AVG(COALESCE(value,0)) 并不等价；前者排除缺失，后者把缺失计为零。",
+        "emphasis": []
+      }
+    ],
+    "example": [
+      {
+        "type": "paragraph",
+        "text": "SUM(value)/COUNT(*) 被当作普通平均值。",
+        "emphasis": []
+      }
+    ],
+    "reason": [],
+    "correction": [
+      {
+        "type": "paragraph",
+        "text": "使用 AVG(value)；若采用手工公式，分母用 COUNT(value)，并处理零分母及整数除法。",
+        "emphasis": []
+      }
+    ],
+    "notes": [
+      {
+        "type": "paragraph",
+        "text": "金额计算需要确认精度；本例不要求将原始平均值提前舍入。",
+        "emphasis": []
+      }
+    ]
+  },
+  "sourcePath": "source/unified73/kp06-02.json",
+  "sourceSha256": "811e8c612e8fc5bf859389a2606642f68d75c51f81e5cdbc69a5c6b79ff0c404"
+}

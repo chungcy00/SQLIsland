@@ -1,0 +1,1056 @@
+{
+  "id": "kp20-15",
+  "chapterId": "ch20",
+  "title": "采购承诺、收货、开票及付款敞口",
+  "learningObjective": "独立构建供应商五项金额报表，区分净开票与票面，识别连接重复，并按顺序分配合格收货以追查已付款异常发票。",
+  "prerequisites": [],
+  "concept": "采购承诺、合格收货、扣贷项净开票、实际付款及未付余额是不同业务事件的金额。各自先聚合到供应商，再对齐；未付余额是净开票减付款，并非未收货承诺。",
+  "syntax": "WITH a AS (SELECT supplier_id,SUM(ordered_cents) ordered,SUM(accepted*unit_price_cents) received FROM v_po_lines GROUP BY supplier_id), b AS (SELECT supplier_id,SUM(billed_cents) billed,SUM(paid_cents) paid,SUM(balance_cents) balance FROM v_invoice_balance GROUP BY supplier_id) SELECT s.supplier_id,COALESCE(a.ordered,0) ordered_cents,COALESCE(a.received,0) received_cents,COALESCE(b.billed,0) billed_cents,COALESCE(b.paid,0) paid_cents,COALESCE(b.balance,0) balance_cents FROM suppliers s LEFT JOIN a ON a.supplier_id=s.supplier_id LEFT JOIN b ON b.supplier_id=s.supplier_id ORDER BY balance_cents DESC",
+  "parameters": {
+    "统计截止日": "2025-12-31",
+    "金额": "整数马币分",
+    "输出粒度": "供应商"
+  },
+  "fixtureIds": [],
+  "datasetId": "enterprise-v2",
+  "sourceTables": [
+    {
+      "name": "suppliers",
+      "columns": [
+        {
+          "name": "supplier_id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "supplier_name",
+          "type": "TEXT"
+        },
+        {
+          "name": "region",
+          "type": "TEXT"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          "Kinabalu Lifestyle Enterprise",
+          "区域"
+        ],
+        [
+          2,
+          "Meranti Packaging Trading",
+          "区域"
+        ],
+        [
+          3,
+          "Kinabalu Kitchenware Sdn Bhd",
+          "海外"
+        ]
+      ],
+      "previewOnly": true,
+      "rowCount": 60
+    },
+    {
+      "name": "v_invoice_balance",
+      "columns": [
+        {
+          "name": "supplier_invoice_id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "po_id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "supplier_id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "invoice_no",
+          "type": "TEXT"
+        },
+        {
+          "name": "invoice_date",
+          "type": "TEXT"
+        },
+        {
+          "name": "due_date",
+          "type": "TEXT"
+        },
+        {
+          "name": "billed_cents",
+          "type": "派生"
+        },
+        {
+          "name": "paid_cents",
+          "type": "派生"
+        },
+        {
+          "name": "balance_cents",
+          "type": "派生"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          1,
+          51,
+          "INV-E287130F3A",
+          "2025-03-13",
+          "2025-05-12",
+          1681982,
+          1681982,
+          0
+        ],
+        [
+          2,
+          2,
+          28,
+          "INV-E9FE93C319",
+          "2025-03-26",
+          "2025-05-25",
+          157276,
+          157276,
+          0
+        ],
+        [
+          3,
+          3,
+          15,
+          "INV-B4BFEAA92E",
+          "2024-02-10",
+          "2024-04-10",
+          345254,
+          190828,
+          154426
+        ]
+      ],
+      "previewOnly": true,
+      "rowCount": 4739
+    },
+    {
+      "name": "v_po_lines",
+      "columns": [
+        {
+          "name": "po_item_id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "po_id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "supplier_id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "warehouse_id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "order_date",
+          "type": "TEXT"
+        },
+        {
+          "name": "promised_date",
+          "type": "TEXT"
+        },
+        {
+          "name": "product_id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "quantity_ordered",
+          "type": "INTEGER"
+        },
+        {
+          "name": "unit_price_cents",
+          "type": "INTEGER"
+        },
+        {
+          "name": "ordered_cents",
+          "type": "派生"
+        },
+        {
+          "name": "received",
+          "type": "派生"
+        },
+        {
+          "name": "accepted",
+          "type": "派生"
+        },
+        {
+          "name": "on_time",
+          "type": "派生"
+        },
+        {
+          "name": "billed",
+          "type": "派生"
+        },
+        {
+          "name": "billed_cents",
+          "type": "派生"
+        }
+      ],
+      "rows": [
+        [
+          3077,
+          2633,
+          59,
+          3,
+          "2023-01-01",
+          "2023-01-06",
+          312,
+          33,
+          1076,
+          35508,
+          33,
+          33,
+          33,
+          33,
+          35508
+        ],
+        [
+          2479,
+          4775,
+          49,
+          1,
+          "2023-01-01",
+          "2023-01-19",
+          165,
+          10,
+          785,
+          7850,
+          10,
+          10,
+          0,
+          12,
+          9420
+        ],
+        [
+          9661,
+          4886,
+          2,
+          1,
+          "2023-01-01",
+          "2023-01-14",
+          413,
+          6,
+          1212,
+          7272,
+          6,
+          6,
+          6,
+          7,
+          8484
+        ]
+      ],
+      "previewOnly": true,
+      "rowCount": 9625
+    }
+  ],
+  "sourceTablesArePreview": true,
+  "mysqlSql": "WITH a AS (SELECT supplier_id,SUM(ordered_cents) ordered,SUM(accepted*unit_price_cents) received FROM v_po_lines GROUP BY supplier_id), b AS (SELECT supplier_id,SUM(billed_cents) billed,SUM(paid_cents) paid,SUM(balance_cents) balance FROM v_invoice_balance GROUP BY supplier_id) SELECT s.supplier_id,COALESCE(a.ordered,0) ordered_cents,COALESCE(a.received,0) received_cents,COALESCE(b.billed,0) billed_cents,COALESCE(b.paid,0) paid_cents,COALESCE(b.balance,0) balance_cents FROM suppliers s LEFT JOIN a ON a.supplier_id=s.supplier_id LEFT JOIN b ON b.supplier_id=s.supplier_id ORDER BY balance_cents DESC",
+  "sqliteSql": "WITH a AS (SELECT supplier_id,SUM(ordered_cents) ordered,SUM(accepted*unit_price_cents) received FROM v_po_lines GROUP BY supplier_id), b AS (SELECT supplier_id,SUM(billed_cents) billed,SUM(paid_cents) paid,SUM(balance_cents) balance FROM v_invoice_balance GROUP BY supplier_id) SELECT s.supplier_id,COALESCE(a.ordered,0) ordered_cents,COALESCE(a.received,0) received_cents,COALESCE(b.billed,0) billed_cents,COALESCE(b.paid,0) paid_cents,COALESCE(b.balance,0) balance_cents FROM suppliers s LEFT JOIN a ON a.supplier_id=s.supplier_id LEFT JOIN b ON b.supplier_id=s.supplier_id ORDER BY balance_cents DESC",
+  "executionSteps": [
+    "汇总采购承诺及合格收货",
+    "汇总净开票、付款及余额",
+    "左连接供应商并排序",
+    "追查已付款差异发票"
+  ],
+  "useCase": "采购与财务需要截至2025年底按供应商对照承诺、合格收货、净开票、实付和未付余额，并识别已付款但三方不一致的发票。",
+  "comparison": "采购进度差额与应付余额不同；净开票与原始票面不同，三方匹配按原始票面和合格收货计价，不能混用净应付口径。",
+  "commonError": {
+    "example": "直接连接采购行和发票行；每张发票重复使用全部合格收货量。",
+    "correction": "独立预聚合；按采购行和稳定发票顺序累计分配，按发票汇总后检查付款。"
+  },
+  "notes": "原主查询及结果 BP41.json 保持不变；需核实采购视图截止日期与快照口径。独立示例使用 SQLite 内联数据，未重新执行完整企业库、原生数据库或浏览器。",
+  "compatibility": {
+    "status": "直接兼容（原生待验证）",
+    "detail": "本版本SQLite及sql.js WASM已实际复验，原生MySQL8.4尚未执行。"
+  },
+  "relatedQuestionIds": [
+    "q0291"
+  ],
+  "relatedFlashcardIds": [
+    "fc0191",
+    "fc0192"
+  ],
+  "relatedKnowledgePointIds": [
+    "kp07-01",
+    "kp08-01",
+    "kp14-01",
+    "kp15-01"
+  ],
+  "mysqlVerification": "未运行原生 MySQL 8.4",
+  "result": {
+    "columns": [
+      "supplier_id",
+      "ordered_cents",
+      "received_cents",
+      "billed_cents",
+      "paid_cents",
+      "balance_cents"
+    ],
+    "rows": [
+      [
+        2,
+        37317086,
+        35717666,
+        36165673,
+        25365505,
+        10800168
+      ],
+      [
+        48,
+        27768592,
+        26693264,
+        26942260,
+        17760954,
+        9181306
+      ],
+      [
+        49,
+        22922966,
+        21509223,
+        21773290,
+        15640839,
+        6132451
+      ],
+      [
+        9,
+        9689310,
+        9486035,
+        9628899,
+        4393746,
+        5235153
+      ],
+      [
+        30,
+        14747600,
+        14386479,
+        14540277,
+        9368677,
+        5171600
+      ],
+      [
+        29,
+        14139015,
+        13313631,
+        13425918,
+        8966553,
+        4459365
+      ],
+      [
+        51,
+        17076261,
+        15958620,
+        16215911,
+        12531980,
+        3683931
+      ],
+      [
+        4,
+        12871197,
+        12040169,
+        12131346,
+        8872843,
+        3258503
+      ],
+      [
+        23,
+        10470024,
+        10077519,
+        10131079,
+        6889013,
+        3242066
+      ],
+      [
+        20,
+        10026442,
+        8918831,
+        8955733,
+        5807054,
+        3148679
+      ],
+      [
+        43,
+        7946940,
+        7359658,
+        7448716,
+        4613398,
+        2835318
+      ],
+      [
+        16,
+        8976250,
+        8568446,
+        8671068,
+        6041971,
+        2629097
+      ],
+      [
+        54,
+        9023625,
+        8401937,
+        8534948,
+        5955999,
+        2578949
+      ],
+      [
+        36,
+        9799520,
+        9680656,
+        9730472,
+        7455093,
+        2275379
+      ],
+      [
+        1,
+        9027605,
+        8397221,
+        8404919,
+        6168549,
+        2236370
+      ],
+      [
+        28,
+        6683804,
+        6359223,
+        6544738,
+        4470919,
+        2073819
+      ],
+      [
+        32,
+        9236017,
+        8708167,
+        8724574,
+        6853588,
+        1870986
+      ],
+      [
+        44,
+        5730157,
+        5616128,
+        5660220,
+        3830690,
+        1829530
+      ],
+      [
+        24,
+        7780483,
+        6415195,
+        6428588,
+        4793113,
+        1635475
+      ],
+      [
+        7,
+        4010395,
+        3983941,
+        3996140,
+        2735878,
+        1260262
+      ],
+      [
+        52,
+        2411433,
+        2253820,
+        2279188,
+        1021591,
+        1257597
+      ],
+      [
+        25,
+        3758231,
+        3196258,
+        3243262,
+        2011259,
+        1232003
+      ],
+      [
+        26,
+        3315451,
+        2669321,
+        2633864,
+        1526980,
+        1106884
+      ],
+      [
+        37,
+        5918850,
+        5628968,
+        5637383,
+        4583378,
+        1054005
+      ],
+      [
+        47,
+        2514407,
+        2212235,
+        2210413,
+        1227717,
+        982696
+      ],
+      [
+        17,
+        1324506,
+        1260201,
+        1268301,
+        395965,
+        872336
+      ],
+      [
+        58,
+        4401730,
+        3579088,
+        3648014,
+        2781405,
+        866609
+      ],
+      [
+        5,
+        3855319,
+        3446395,
+        3465866,
+        2705477,
+        760389
+      ],
+      [
+        8,
+        3843444,
+        3431490,
+        3555245,
+        2848372,
+        706873
+      ],
+      [
+        57,
+        2319745,
+        2260484,
+        2291693,
+        1598623,
+        693070
+      ],
+      [
+        35,
+        4550364,
+        4333463,
+        4317827,
+        3668437,
+        649390
+      ],
+      [
+        59,
+        2389483,
+        2335791,
+        2321498,
+        1679740,
+        641758
+      ],
+      [
+        3,
+        2182696,
+        2100573,
+        2102357,
+        1530689,
+        571668
+      ],
+      [
+        39,
+        2532396,
+        2409338,
+        2439896,
+        1873646,
+        566250
+      ],
+      [
+        46,
+        1936934,
+        1837036,
+        1867273,
+        1303606,
+        563667
+      ],
+      [
+        15,
+        2121148,
+        2070813,
+        2092944,
+        1683911,
+        409033
+      ],
+      [
+        33,
+        1880638,
+        1778199,
+        1733785,
+        1336712,
+        397073
+      ],
+      [
+        38,
+        929388,
+        909322,
+        913420,
+        567311,
+        346109
+      ],
+      [
+        11,
+        728979,
+        653520,
+        655706,
+        340104,
+        315602
+      ],
+      [
+        27,
+        2232386,
+        2145129,
+        2154435,
+        1864771,
+        289664
+      ],
+      [
+        55,
+        1046908,
+        1007709,
+        1015383,
+        748049,
+        267334
+      ],
+      [
+        50,
+        639709,
+        630813,
+        641046,
+        380699,
+        260347
+      ],
+      [
+        22,
+        2014543,
+        1572322,
+        1577203,
+        1334401,
+        242802
+      ],
+      [
+        14,
+        1426771,
+        1240653,
+        1289939,
+        1050911,
+        239028
+      ],
+      [
+        41,
+        1141954,
+        1111021,
+        1106778,
+        870644,
+        236134
+      ],
+      [
+        53,
+        1501683,
+        1440422,
+        1468015,
+        1240333,
+        227682
+      ],
+      [
+        21,
+        1256801,
+        745951,
+        745951,
+        532602,
+        213349
+      ],
+      [
+        13,
+        623082,
+        572905,
+        576778,
+        483197,
+        93581
+      ],
+      [
+        31,
+        332983,
+        315764,
+        316952,
+        245574,
+        71378
+      ],
+      [
+        6,
+        258302,
+        208388,
+        209630,
+        149267,
+        60363
+      ],
+      [
+        34,
+        135470,
+        123385,
+        125677,
+        95855,
+        29822
+      ],
+      [
+        10,
+        62157,
+        54177,
+        49428,
+        33264,
+        16164
+      ],
+      [
+        18,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        19,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        40,
+        1273326,
+        1258824,
+        1258824,
+        1258824,
+        0
+      ],
+      [
+        42,
+        39340,
+        34844,
+        34844,
+        34844,
+        0
+      ],
+      [
+        45,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        56,
+        573561,
+        570437,
+        571997,
+        571997,
+        0
+      ],
+      [
+        60,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        12,
+        802741,
+        802741,
+        802741,
+        803769,
+        -1028
+      ]
+    ],
+    "status": "SQLite实际执行（预览）",
+    "orderGuaranteed": true,
+    "totalRows": 60,
+    "fullResultPath": "../enterprise_reference/business_tasks/results/BP41.json"
+  },
+  "projectId": "enterprise",
+  "taskId": "BP41",
+  "difficulty": "困难",
+  "crossGroup": "采购＋财务",
+  "mysqlVerificationScript": "../enterprise_reference/business_tasks/mysql_queries/BP41.sql",
+  "visualization": {
+    "kind": "stepFlow",
+    "steps": [
+      {
+        "id": "1",
+        "label": "聚合采购行和发票余额"
+      },
+      {
+        "id": "2",
+        "label": "匹配供应商"
+      },
+      {
+        "id": "3",
+        "label": "形成资金敞口"
+      }
+    ],
+    "sourceFixtureIds": [],
+    "resultColumns": [
+      "supplier_id",
+      "ordered_cents",
+      "received_cents",
+      "billed_cents",
+      "paid_cents",
+      "balance_cents"
+    ]
+  },
+  "primaryQuestionIds": [
+    "q0291"
+  ],
+  "primaryFlashcardIds": [
+    "fc0191",
+    "fc0192"
+  ],
+  "contentVersion": "4.2.1",
+  "mergedFrom": [
+    {
+      "id": "kp20-16",
+      "title": "三方不一致且已经付款的发票"
+    }
+  ],
+  "teaching": {
+    "problem": "采购与财务需要截至2025年底按供应商对照承诺、合格收货、净开票、实付和未付余额，并识别已付款但三方不一致的发票。",
+    "codeExplanation": "a 将采购行按供应商聚合，承诺为订购金额，收货为合格接收数量乘采购单价。b 将发票余额视图按供应商聚合，净开票已扣截止日前批准贷项，付款仅计截止日前发生的付款。两个汇总各自一供应商一行，再从供应商主档左连接，完整记录假设下缺失金额补零；按未付余额倒序。不能直接连接采购行与发票行，否则两笔采购与两张发票可形成四行。主查询未单独设置年度起点，沿用视图截至年底的累计口径，不应称为2025年度新增采购。追查已付款异常时切回采购行与发票行：按采购行分区，以发票日期、发票号与行编号确定先后，窗口累计此前开票量，当前分配量为不小于零的剩余合格数量与当前开票量的较小值。再按发票汇总原始票面、分配计价与数量差，付款在发票粒度判断，不累加重复的发票付款字段。此分配示例假定数量非负，发票顺序稳定，且为截止日已知收货的事后分配，不等于付款发生当时的收货状态。",
+    "resultExplanation": "示例供应商1承诺1500分，合格收货1300分，差额200分为尚未完成的承诺价值线索；净开票1400分减付款900分得到未付500分。供应商2余额−50分，表示净付款超过净应付，应核查预付、贷项和超付；供应商3没有记录仍显示零。追查示例采购行1合格8件，发票A先分6件，B开4件仅剩2件可分；B票面440分，分配计价200分，差240分且已付300分，应优先复核，不能直接将300分认定为损失。C没有付款，虽有差异但不进入已付款异常清单。供应商汇总差额不能替代逐发票三方核对。",
+    "checkpoints": [
+      {
+        "name": "a",
+        "label": "按供应商汇总承诺及收货金额",
+        "sql": "WITH a AS (SELECT supplier_id,SUM(ordered_cents) ordered,SUM(accepted*unit_price_cents) received FROM v_po_lines GROUP BY supplier_id)\nSELECT * FROM a ORDER BY 1, 2, 3 LIMIT 3;",
+        "result": {
+          "columns": [
+            "supplier_id",
+            "ordered",
+            "received"
+          ],
+          "rows": [
+            [
+              1,
+              9027605,
+              8397221
+            ],
+            [
+              2,
+              37317086,
+              35717666
+            ],
+            [
+              3,
+              2182696,
+              2100573
+            ]
+          ]
+        }
+      },
+      {
+        "name": "b",
+        "label": "按供应商汇总开票与付款",
+        "sql": "WITH a AS (SELECT supplier_id,SUM(ordered_cents) ordered,SUM(accepted*unit_price_cents) received FROM v_po_lines GROUP BY supplier_id), b AS (SELECT supplier_id,SUM(billed_cents) billed,SUM(paid_cents) paid,SUM(balance_cents) balance FROM v_invoice_balance GROUP BY supplier_id)\nSELECT * FROM b ORDER BY 1, 2, 3, 4 LIMIT 3;",
+        "result": {
+          "columns": [
+            "supplier_id",
+            "billed",
+            "paid",
+            "balance"
+          ],
+          "rows": [
+            [
+              1,
+              8404919,
+              6168549,
+              2236370
+            ],
+            [
+              2,
+              36165673,
+              25365505,
+              10800168
+            ],
+            [
+              3,
+              2102357,
+              1530689,
+              571668
+            ]
+          ]
+        }
+      }
+    ],
+    "mergedConcepts": [
+      {
+        "sourceId": "kp20-16",
+        "explanation": "20-16：按发票日期、发票号、行编号顺序分配采购行合格收货；每行最多分得当前开票量与剩余合格量的较小值，余额不低于零；合并至发票粒度后筛选已付款且数量或金额不一致的发票。"
+      }
+    ],
+    "mergeExamples": [
+      {
+        "label": "采购承诺与收货汇总",
+        "explanation": "采购承诺按订购金额，收货按合格数量乘采购单价。",
+        "sql": "WITH suppliers(supplier_id) AS (VALUES (1),(2),(3)),\nv_po_lines(supplier_id,ordered_cents,accepted,unit_price_cents) AS (VALUES (1,1000,8,100),(1,500,5,100),(2,400,0,100)),\nv_invoice_balance(supplier_id,billed_cents,paid_cents,balance_cents) AS (VALUES (1,600,600,0),(1,800,300,500),(2,100,150,-50)), a AS (SELECT supplier_id,SUM(ordered_cents) ordered,SUM(accepted*unit_price_cents) received FROM v_po_lines GROUP BY supplier_id) SELECT * FROM a ORDER BY ordered",
+        "result": {
+          "columns": [
+            "supplier_id",
+            "ordered",
+            "received"
+          ],
+          "rows": [
+            [
+              2,
+              400,
+              0
+            ],
+            [
+              1,
+              1500,
+              1300
+            ]
+          ]
+        }
+      },
+      {
+        "label": "净开票及付款汇总",
+        "explanation": "净开票已扣批准贷项，余额可为负。",
+        "sql": "WITH suppliers(supplier_id) AS (VALUES (1),(2),(3)),\nv_po_lines(supplier_id,ordered_cents,accepted,unit_price_cents) AS (VALUES (1,1000,8,100),(1,500,5,100),(2,400,0,100)),\nv_invoice_balance(supplier_id,billed_cents,paid_cents,balance_cents) AS (VALUES (1,600,600,0),(1,800,300,500),(2,100,150,-50)), b AS (SELECT supplier_id,SUM(billed_cents) billed,SUM(paid_cents) paid,SUM(balance_cents) balance FROM v_invoice_balance GROUP BY supplier_id) SELECT * FROM b ORDER BY billed",
+        "result": {
+          "columns": [
+            "supplier_id",
+            "billed",
+            "paid",
+            "balance"
+          ],
+          "rows": [
+            [
+              2,
+              100,
+              150,
+              -50
+            ],
+            [
+              1,
+              1400,
+              900,
+              500
+            ]
+          ]
+        }
+      },
+      {
+        "label": "供应商敞口报表",
+        "explanation": "分别预聚合再连接供应商主档，保留无交易供应商。",
+        "sql": "WITH suppliers(supplier_id) AS (VALUES (1),(2),(3)),\nv_po_lines(supplier_id,ordered_cents,accepted,unit_price_cents) AS (VALUES (1,1000,8,100),(1,500,5,100),(2,400,0,100)),\nv_invoice_balance(supplier_id,billed_cents,paid_cents,balance_cents) AS (VALUES (1,600,600,0),(1,800,300,500),(2,100,150,-50)), a AS (SELECT supplier_id,SUM(ordered_cents) ordered,SUM(accepted*unit_price_cents) received FROM v_po_lines GROUP BY supplier_id), b AS (SELECT supplier_id,SUM(billed_cents) billed,SUM(paid_cents) paid,SUM(balance_cents) balance FROM v_invoice_balance GROUP BY supplier_id) SELECT s.supplier_id,COALESCE(a.ordered,0) ordered_cents,COALESCE(a.received,0) received_cents,COALESCE(b.billed,0) billed_cents,COALESCE(b.paid,0) paid_cents,COALESCE(b.balance,0) balance_cents FROM suppliers s LEFT JOIN a ON a.supplier_id=s.supplier_id LEFT JOIN b ON b.supplier_id=s.supplier_id ORDER BY balance_cents DESC",
+        "result": {
+          "columns": [
+            "supplier_id",
+            "ordered_cents",
+            "received_cents",
+            "billed_cents",
+            "paid_cents",
+            "balance_cents"
+          ],
+          "rows": [
+            [
+              1,
+              1500,
+              1300,
+              1400,
+              900,
+              500
+            ],
+            [
+              3,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              2,
+              400,
+              0,
+              100,
+              150,
+              -50
+            ]
+          ]
+        }
+      },
+      {
+        "label": "分配合格收货",
+        "explanation": "同一采购行的合格数量只能分配一次，按发票顺序分配。",
+        "sql": "WITH receipts(po_item_id,accepted,unit_price) AS (VALUES (1,8,100),(2,0,100)),\ninvoices(invoice_id,invoice_date,invoice_no,paid_cents) AS (VALUES (1,'2025-02-01','A',600),(2,'2025-02-02','B',300),(3,'2025-02-03','C',0)),\nlines(line_id,invoice_id,po_item_id,qty,price) AS (VALUES (11,1,1,6,100),(21,2,1,4,110),(31,3,2,2,100)),\nseq AS (SELECT l.*,i.paid_cents,r.accepted,r.unit_price,COALESCE(SUM(l.qty) OVER(PARTITION BY l.po_item_id ORDER BY i.invoice_date,i.invoice_no,l.line_id ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING),0) prior_qty FROM lines l JOIN invoices i ON i.invoice_id=l.invoice_id JOIN receipts r ON r.po_item_id=l.po_item_id),\nallocated AS (SELECT *,CASE WHEN accepted<=prior_qty THEN 0 WHEN accepted-prior_qty<qty THEN accepted-prior_qty ELSE qty END matched_qty FROM seq),\nchecked AS (SELECT invoice_id,MAX(paid_cents) paid_cents,SUM(qty) billed_qty,SUM(matched_qty) matched_qty,SUM(qty*price) face_cents,SUM(matched_qty*unit_price) expected_cents FROM allocated GROUP BY invoice_id) SELECT line_id,qty,prior_qty,matched_qty FROM allocated ORDER BY qty",
+        "result": {
+          "columns": [
+            "line_id",
+            "qty",
+            "prior_qty",
+            "matched_qty"
+          ],
+          "rows": [
+            [
+              31,
+              2,
+              0,
+              0
+            ],
+            [
+              21,
+              4,
+              6,
+              2
+            ],
+            [
+              11,
+              6,
+              0,
+              6
+            ]
+          ]
+        }
+      },
+      {
+        "label": "已付款异常发票",
+        "explanation": "发票层判断存在数量或金额差异且已经发生付款；未付款异常不进入此清单。",
+        "sql": "WITH receipts(po_item_id,accepted,unit_price) AS (VALUES (1,8,100),(2,0,100)),\ninvoices(invoice_id,invoice_date,invoice_no,paid_cents) AS (VALUES (1,'2025-02-01','A',600),(2,'2025-02-02','B',300),(3,'2025-02-03','C',0)),\nlines(line_id,invoice_id,po_item_id,qty,price) AS (VALUES (11,1,1,6,100),(21,2,1,4,110),(31,3,2,2,100)),\nseq AS (SELECT l.*,i.paid_cents,r.accepted,r.unit_price,COALESCE(SUM(l.qty) OVER(PARTITION BY l.po_item_id ORDER BY i.invoice_date,i.invoice_no,l.line_id ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING),0) prior_qty FROM lines l JOIN invoices i ON i.invoice_id=l.invoice_id JOIN receipts r ON r.po_item_id=l.po_item_id),\nallocated AS (SELECT *,CASE WHEN accepted<=prior_qty THEN 0 WHEN accepted-prior_qty<qty THEN accepted-prior_qty ELSE qty END matched_qty FROM seq),\nchecked AS (SELECT invoice_id,MAX(paid_cents) paid_cents,SUM(qty) billed_qty,SUM(matched_qty) matched_qty,SUM(qty*price) face_cents,SUM(matched_qty*unit_price) expected_cents FROM allocated GROUP BY invoice_id) SELECT invoice_id,paid_cents,billed_qty,matched_qty,face_cents,expected_cents,face_cents-expected_cents variance_cents FROM checked WHERE paid_cents>0 AND (billed_qty<>matched_qty OR face_cents<>expected_cents) ORDER BY paid_cents DESC",
+        "result": {
+          "columns": [
+            "invoice_id",
+            "paid_cents",
+            "billed_qty",
+            "matched_qty",
+            "face_cents",
+            "expected_cents",
+            "variance_cents"
+          ],
+          "rows": [
+            [
+              2,
+              300,
+              4,
+              2,
+              440,
+              200,
+              240
+            ]
+          ]
+        }
+      }
+    ]
+  }
+}

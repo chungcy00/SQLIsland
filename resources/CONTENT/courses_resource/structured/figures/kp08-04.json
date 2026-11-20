@@ -1,0 +1,99 @@
+{
+  "schemaVersion": 1,
+  "id": "kp08-04",
+  "lessonSha256": "904a28728b127ac7dc63f24d39258e6d9e7259d4dd1cf009b9309abe4716481b",
+  "figures": [
+    {
+      "id": "kp08-04-clauses",
+      "slot": "syntax",
+      "kind": "clause-map",
+      "title": "示例查询的几个部分",
+      "sql": "SELECT e.employee_name, m.employee_name AS manager FROM employees e LEFT JOIN employees m ON e.manager_id=m.employee_id ORDER BY e.salary, e.employee_name;",
+      "parts": [
+        {
+          "role": "select",
+          "label": "取数",
+          "sql": "SELECT e.employee_name, m.employee_name AS manager",
+          "note": "输出 e.employee_name, m.employee_name AS manager。"
+        },
+        {
+          "role": "from",
+          "label": "来源",
+          "sql": "FROM employees e LEFT JOIN employees m ON e.manager_id=m.employee_id",
+          "note": "读取查询需要的输入数据。"
+        },
+        {
+          "role": "order",
+          "label": "排序",
+          "sql": "ORDER BY e.salary, e.employee_name;",
+          "note": "按 e.salary, e.employee_name 排列结果。"
+        }
+      ]
+    },
+    {
+      "id": "kp08-04-flow",
+      "slot": "breakdown",
+      "kind": "stage-flow",
+      "merge": "breakdown",
+      "title": "每一步的数据变化",
+      "steps": [
+        {
+          "label": "FROM employees e LEFT JOIN employees m ON e.manager_id=m.employee_id",
+          "skip": true
+        },
+        {
+          "label": "SELECT e.employee_name, m.employee_name AS manager",
+          "sql": "SELECT e.employee_name, m.employee_name AS manager FROM employees e LEFT JOIN employees m ON e.manager_id=m.employee_id",
+          "columns": [
+            "employee_name",
+            "manager"
+          ],
+          "rows": [
+            [
+              "A",
+              null
+            ],
+            [
+              "B",
+              "A"
+            ],
+            [
+              "C",
+              "A"
+            ],
+            [
+              "D",
+              "B"
+            ]
+          ]
+        },
+        {
+          "label": "ORDER BY e.salary, e.employee_name;",
+          "sql": "SELECT e.employee_name, m.employee_name AS manager FROM employees e LEFT JOIN employees m ON e.manager_id=m.employee_id ORDER BY e.salary, e.employee_name;",
+          "columns": [
+            "employee_name",
+            "manager"
+          ],
+          "rows": [
+            [
+              "D",
+              "B"
+            ],
+            [
+              "B",
+              "A"
+            ],
+            [
+              "C",
+              "A"
+            ],
+            [
+              "A",
+              null
+            ]
+          ]
+        }
+      ]
+    }
+  ]
+}

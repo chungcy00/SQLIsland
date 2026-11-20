@@ -1,0 +1,227 @@
+{
+  "schemaVersion": 1,
+  "id": "kp17-01",
+  "sourceBatch": "unified73",
+  "teachingKind": "syntax",
+  "conceptBlocks": [
+    {
+      "type": "paragraph",
+      "text": "表结构定义列、类型及允许写入的数据。主键标识每条记录；唯一约束保护业务编号；非空约束保证必填；检查约束限制值域；外键要求非空引用对应父记录。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "检查条件遇到未知值不一定拒绝，因此库存数量应同时设置非空和非负约束。外键允许多个子记录对应同一父记录，除非另加唯一约束。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "修改结构与修改数据是不同任务：新增列通常保留原行，而删除表会移除结构及数据。",
+      "emphasis": []
+    }
+  ],
+  "syntax": {
+    "purpose": "PRIMARY KEY 行标识；NOT NULL 禁止缺失；CHECK 检查值域；UNIQUE 限制重复业务键；FOREIGN KEY 引用父表；ADD COLUMN 增加字段；DROP TABLE 删除表。"
+  },
+  "dataDescriptions": {},
+  "problem": "库存管理需要保证商品编号唯一、库存数量不为负，并让库存记录只引用存在的商品。",
+  "methodBlocks": [
+    {
+      "type": "paragraph",
+      "text": "先定义列再定义约束，不要等报表出现问题才清洗。主查询只读取预置库存；完整演练应先创建表及写入两条记录，再执行查询。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "新增标签时，可空列在旧行中为 NULL，带默认值时旧行按示例获得默认值。建立父子表时先写入父记录，再写入子记录；检查外键是否实际启用。删除表只在临时副本演练，先确认依赖和备份。",
+      "emphasis": []
+    }
+  ],
+  "breakdown": [
+    {
+      "kind": "fragment",
+      "title": "指定来源",
+      "sql": "FROM demo_stock",
+      "purpose": "从 demo_stock 读取输入数据。",
+      "reason": "后面的子句都基于这里得到的行。"
+    },
+    {
+      "kind": "fragment",
+      "title": "选择输出",
+      "sql": "SELECT id,qty",
+      "purpose": "输出 id,qty。",
+      "reason": "输出列的顺序与别名决定结果表的形状。"
+    },
+    {
+      "kind": "fragment",
+      "title": "排序",
+      "sql": "ORDER BY qty DESC;",
+      "purpose": "按 qty DESC 排列结果。",
+      "reason": "查询结果的默认行序没有保证，需要显式排序。"
+    }
+  ],
+  "completeCode": {
+    "mysqlSql": "SELECT id,qty FROM demo_stock ORDER BY qty DESC;",
+    "sqliteSql": "SELECT id,qty FROM demo_stock ORDER BY qty DESC;"
+  },
+  "expectedResult": {
+    "columns": [
+      "id",
+      "qty"
+    ],
+    "rows": [
+      [
+        2,
+        20
+      ],
+      [
+        1,
+        10
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "resultBlocks": [
+    {
+      "type": "paragraph",
+      "text": "初始库存为10和20，两行都满足非空和非负约束。增加列不改变原行数量。父表两个商品中第一个有两条明细，第二个没有明细，仍可通过左连接显示。",
+      "emphasis": []
+    }
+  ],
+  "extensions": [
+    {
+      "label": "完整建表演练",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "先建表和插入，再读回确认。每次演练必须使用新隔离库。",
+          "emphasis": []
+        }
+      ],
+      "sql": "CREATE TABLE demo_stock (id INTEGER PRIMARY KEY, qty INTEGER NOT NULL CHECK(qty>=0));\nINSERT INTO demo_stock VALUES (1,10),(2,20);\nSELECT id,qty FROM demo_stock ORDER BY qty DESC;",
+      "result": {
+        "columns": [
+          "id",
+          "qty"
+        ],
+        "rows": [
+          [
+            2,
+            20
+          ],
+          [
+            1,
+            10
+          ]
+        ]
+      }
+    },
+    {
+      "label": "新增可空列与默认值",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "新增可空列保留原记录，默认值列得到指定值。",
+          "emphasis": []
+        }
+      ],
+      "sql": "CREATE TABLE sample_stock (id INTEGER PRIMARY KEY, sku VARCHAR(30) NOT NULL UNIQUE);\nINSERT INTO sample_stock VALUES (1,'MASK-1');\nALTER TABLE sample_stock ADD COLUMN label VARCHAR(80);\nALTER TABLE sample_stock ADD COLUMN status VARCHAR(30) DEFAULT '未分类';\nSELECT id,label,status FROM sample_stock ORDER BY sku;",
+      "result": {
+        "columns": [
+          "id",
+          "label",
+          "status"
+        ],
+        "rows": [
+          [
+            1,
+            null,
+            "未分类"
+          ]
+        ]
+      }
+    },
+    {
+      "label": "外键与一对多关系",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "两个子记录引用同一父编号；计数使用子表主键。SQLite 复验连接已开启外键检查。",
+          "emphasis": []
+        }
+      ],
+      "sql": "CREATE TABLE demo_parent (id INTEGER PRIMARY KEY);\nCREATE TABLE demo_child (id INTEGER PRIMARY KEY, parent_id INTEGER NOT NULL REFERENCES demo_parent(id));\nINSERT INTO demo_parent VALUES (1),(2);\nINSERT INTO demo_child VALUES (1,1),(2,1);\nSELECT p.id,COUNT(c.id) AS children FROM demo_parent p LEFT JOIN demo_child c ON p.id=c.parent_id GROUP BY p.id ORDER BY children DESC;",
+      "result": {
+        "columns": [
+          "id",
+          "children"
+        ],
+        "rows": [
+          [
+            1,
+            2
+          ],
+          [
+            2,
+            0
+          ]
+        ]
+      }
+    },
+    {
+      "label": "删除演示表后核对结构",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "只删除本次新建的临时演示表；本地系统目录查询不适用于 MySQL。",
+          "emphasis": []
+        }
+      ],
+      "sql": "CREATE TABLE discard_stock(id INTEGER PRIMARY KEY);\nDROP TABLE discard_stock;\nSELECT COUNT(*) AS remaining_tables FROM sqlite_master WHERE type='table' AND name='discard_stock';",
+      "result": {
+        "columns": [
+          "remaining_tables"
+        ],
+        "rows": [
+          [
+            0
+          ]
+        ]
+      }
+    }
+  ],
+  "cautions": {
+    "comparison": [
+      {
+        "type": "paragraph",
+        "text": "DELETE 删除记录，DROP TABLE 删除表结构及数据；UNIQUE 与 NOT NULL 不可互相替代。",
+        "emphasis": []
+      }
+    ],
+    "example": [
+      {
+        "type": "paragraph",
+        "text": "只设置 CHECK(qty>=0) 就认为 NULL 不允许写入。",
+        "emphasis": []
+      }
+    ],
+    "reason": [],
+    "correction": [
+      {
+        "type": "paragraph",
+        "text": "同时设置 NOT NULL；对业务键需要非空唯一时加 NOT NULL UNIQUE。",
+        "emphasis": []
+      }
+    ],
+    "notes": [
+      {
+        "type": "paragraph",
+        "text": "SQLite 本地必须开启外键检查；整数主键与 MySQL 类型行为并非完全相同。MySQL 多种结构操作隐式提交，不能假设可回滚。",
+        "emphasis": []
+      }
+    ]
+  },
+  "sourcePath": "source/unified73/kp17-01.json",
+  "sourceSha256": "a11d16413fed199e42fe99f29e3acce22fbdf540191d890154ce23c63ec0308a"
+}

@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "id": "kp20-03",
+  "lessonSha256": "51ae23e4cec7ad58939b03debb0859ee1e50edd92b9047333d1ad1f676799b69",
+  "figures": [
+    {
+      "id": "kp20-03-clauses",
+      "slot": "syntax",
+      "kind": "clause-map",
+      "title": "示例查询的几个部分",
+      "sql": "WITH sales AS (\n SELECT store_id,product_id,SUM(net_cents) net_cents FROM v_sales_lines\n WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31'\n GROUP BY store_id,product_id HAVING SUM(net_cents)>0\n), ranked AS (\n SELECT store_id,product_id,net_cents,ROW_NUMBER() OVER(PARTITION BY store_id ORDER BY net_cents DESC,product_id) sales_rank FROM sales\n)\nSELECT store_id,product_id,net_cents,sales_rank FROM ranked WHERE sales_rank<=3 ORDER BY net_cents DESC, sales_rank DESC",
+      "parts": [
+        {
+          "role": "cte",
+          "label": "中间结果",
+          "sql": "WITH sales AS (\n SELECT store_id,product_id,SUM(net_cents) net_cents FROM v_sales_lines\n WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31'\n GROUP BY store_id,product_id HAVING SUM(net_cents)>0\n),",
+          "note": "先把名为 sales 的中间结果算出来，供后面的查询引用。"
+        },
+        {
+          "role": "cte",
+          "label": "中间结果",
+          "sql": "ranked AS (\n SELECT store_id,product_id,net_cents,ROW_NUMBER() OVER(PARTITION BY store_id ORDER BY net_cents DESC,product_id) sales_rank FROM sales\n)",
+          "note": "先把名为 ranked 的中间结果算出来，供后面的查询引用。"
+        },
+        {
+          "role": "select",
+          "label": "取数",
+          "sql": "SELECT store_id,product_id,net_cents,sales_rank",
+          "note": "输出 store_id,product_id,net_cents,sales_rank。"
+        },
+        {
+          "role": "from",
+          "label": "来源",
+          "sql": "FROM ranked",
+          "note": "从 ranked 读取输入数据。"
+        },
+        {
+          "role": "where",
+          "label": "筛选",
+          "sql": "WHERE sales_rank<=3",
+          "note": "仅保留满足 sales_rank<=3 的行。"
+        },
+        {
+          "role": "order",
+          "label": "排序",
+          "sql": "ORDER BY net_cents DESC, sales_rank DESC",
+          "note": "按 net_cents DESC, sales_rank DESC 排列结果。"
+        }
+      ]
+    }
+  ]
+}

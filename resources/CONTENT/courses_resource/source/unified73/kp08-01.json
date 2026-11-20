@@ -1,0 +1,307 @@
+{
+  "id": "kp08-01",
+  "chapterId": "ch08",
+  "title": "INNER JOIN 与 ON",
+  "learningObjective": "能够识别连接键、选择内连接并解释匹配后的行数及未匹配记录。",
+  "prerequisites": [],
+  "concept": "内连接用于从两张表中取得有对应关系的数据。它不是按行号把两表并排拼接，而是对满足 ON 条件的行对产生结果。订单表的一行代表订单，客户表的一行代表客户；订单的客户编号指向客户表的客户编号。若客户键唯一，每笔订单最多匹配一个客户；反过来一个客户可能匹配多笔订单。普通等值连接不会匹配 NULL。内连接不保留无对应客户的匿名订单，也不保留没有订单的客户。分析之前应先明确希望保留哪些业务对象，而不是默认所有连接都用内连接。",
+  "syntax": "SELECT a.col, b.col FROM a INNER JOIN b ON a.key = b.key;",
+  "parameters": {
+    "INNER JOIN": "只返回满足匹配条件的行对",
+    "ON": "定义连接条件",
+    "a、b": "表名或表别名"
+  },
+  "fixtureIds": [
+    "lesson-orders",
+    "lesson-customers"
+  ],
+  "sourceTables": [
+    {
+      "name": "orders",
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "category",
+          "type": "TEXT",
+          "mysqlType": "VARCHAR(160) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_bin",
+          "sqliteType": "TEXT"
+        },
+        {
+          "name": "sales",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "store_id",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "order_date",
+          "type": "TEXT",
+          "mysqlType": "DATE",
+          "sqliteType": "TEXT"
+        },
+        {
+          "name": "customer_id",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          "护肤品",
+          800,
+          1,
+          "2026-01-03",
+          1
+        ],
+        [
+          2,
+          "化妆品",
+          400,
+          2,
+          "2026-01-10",
+          2
+        ],
+        [
+          3,
+          "护肤品",
+          600,
+          1,
+          "2026-02-02",
+          1
+        ],
+        [
+          4,
+          "化妆品",
+          300,
+          2,
+          "2026-02-15",
+          null
+        ],
+        [
+          5,
+          "日用品",
+          1500,
+          1,
+          "2026-02-20",
+          3
+        ]
+      ]
+    },
+    {
+      "name": "customers",
+      "columns": [
+        {
+          "name": "customer_id",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "customer_name",
+          "type": "TEXT",
+          "mysqlType": "VARCHAR(160) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_bin",
+          "sqliteType": "TEXT"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          "林"
+        ],
+        [
+          2,
+          "陈"
+        ],
+        [
+          3,
+          "王"
+        ],
+        [
+          4,
+          "李"
+        ]
+      ]
+    }
+  ],
+  "mysqlSql": "SELECT o.id, c.customer_name FROM orders o INNER JOIN customers c ON o.customer_id=c.customer_id ORDER BY sales DESC;",
+  "sqliteSql": "SELECT o.id, c.customer_name FROM orders o INNER JOIN customers c ON o.customer_id=c.customer_id ORDER BY sales DESC;",
+  "executionSteps": [
+    "确认订单与客户的连接键",
+    "匹配有效客户",
+    "提取订单编号和姓名"
+  ],
+  "useCase": "主管需要核对已登记客户的订单明细，要求每笔订单显示客户姓名，不需要匿名交易。订单表的 id 是订单编号，customer_id 是关联客户的键；客户表的 customer_id 唯一，customer_name 为姓名。",
+  "comparison": "JOIN 默认表示内连接；LEFT JOIN 可保留未匹配的左表记录。",
+  "commonError": {
+    "example": "ON o.id = c.customer_id，把订单编号当客户编号。",
+    "correction": "ON o.customer_id = c.customer_id；先核对两列的业务含义与键的唯一性。"
+  },
+  "notes": "本例假定客户表编号唯一；实际连接前检查重复键和缺失键。",
+  "compatibility": {
+    "status": "直接兼容",
+    "detail": "仅在本示例数据与语义范围验证；不代表全部 MySQL 语法兼容。"
+  },
+  "relatedQuestionIds": [
+    "q0097",
+    "q0098",
+    "q0106"
+  ],
+  "relatedFlashcardIds": [
+    "fc0051",
+    "fc0053"
+  ],
+  "relatedKnowledgePointIds": [
+    "kp01-01",
+    "kp03-01",
+    "kp07-01"
+  ],
+  "mysqlVerification": "未运行原生 MySQL 8.4",
+  "result": {
+    "columns": [
+      "id",
+      "customer_name"
+    ],
+    "rows": [
+      [
+        5,
+        "王"
+      ],
+      [
+        1,
+        "林"
+      ],
+      [
+        3,
+        "林"
+      ],
+      [
+        2,
+        "陈"
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "visualization": {
+    "kind": "stepFlow",
+    "steps": [
+      {
+        "id": "1",
+        "label": "按客户编号配对"
+      },
+      {
+        "id": "2",
+        "label": "无客户的订单不返回"
+      },
+      {
+        "id": "3",
+        "label": "投影编号与名称"
+      }
+    ],
+    "sourceFixtureIds": [
+      "lesson-orders",
+      "lesson-customers"
+    ],
+    "resultColumns": [
+      "id",
+      "customer_name"
+    ]
+  },
+  "mysqlVerificationScript": "validation/mysql/kp08-01.sql",
+  "primaryQuestionIds": [
+    "q0097",
+    "q0098",
+    "q0106"
+  ],
+  "primaryFlashcardIds": [
+    "fc0051",
+    "fc0053"
+  ],
+  "teaching": {
+    "problem": "主管需要核对已登记客户的订单明细，要求每笔订单显示客户姓名，不需要匿名交易。订单表的 id 是订单编号，customer_id 是关联客户的键；客户表的 customer_id 唯一，customer_name 为姓名。",
+    "codeExplanation": "先用 orders o 和 customers c 区分两个表的角色，再用 ON 比较两个客户编号。此时客户1匹配订单1和3，客户2匹配订单2，客户3匹配订单5。SELECT 只提取需要的两列；ORDER BY 按销售额从高到低排列。若错用订单 id 与客户编号匹配，即使数字偶然相等也不代表业务关系成立。",
+    "resultExplanation": "由5笔订单得到4笔匹配明细，订单4的客户编号未知而被排除；客户4没有订单也不出现。客户1出现两次是两笔不同订单，不是错误重复。结果仍是订单粒度，不能按返回行数解释为客户人数。",
+    "checkpoints": [],
+    "mergedConcepts": [],
+    "mergeExamples": [
+      {
+        "label": "观察匹配前的订单键",
+        "explanation": "先查看订单编号与客户编号的差异，识别匿名订单。",
+        "sql": "SELECT id, customer_id FROM orders ORDER BY sales DESC;",
+        "result": {
+          "columns": [
+            "id",
+            "customer_id"
+          ],
+          "rows": [
+            [
+              5,
+              3
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              2,
+              2
+            ],
+            [
+              4,
+              null
+            ]
+          ]
+        }
+      },
+      {
+        "label": "保留全部订单的对照",
+        "explanation": "若报表要求全量销售，则左连接保留订单4，客户姓名为空。",
+        "sql": "SELECT o.id, c.customer_name FROM orders o LEFT JOIN customers c ON o.customer_id=c.customer_id ORDER BY sales DESC;",
+        "result": {
+          "columns": [
+            "id",
+            "customer_name"
+          ],
+          "rows": [
+            [
+              5,
+              "王"
+            ],
+            [
+              1,
+              "林"
+            ],
+            [
+              3,
+              "林"
+            ],
+            [
+              2,
+              "陈"
+            ],
+            [
+              4,
+              null
+            ]
+          ]
+        }
+      }
+    ]
+  }
+}

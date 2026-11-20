@@ -1,0 +1,190 @@
+{
+  "schemaVersion": 1,
+  "id": "kp10-02",
+  "sourceBatch": "unified73",
+  "teachingKind": "syntax",
+  "conceptBlocks": [
+    {
+      "type": "paragraph",
+      "text": "多行子查询返回候选集合。IN 判断左侧值是否等于集合中任一值；重复候选不会重复输出外层行。单列比较要求子查询返回一列，多列元组比较须匹配列数。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "对于无匹配且集合含 NULL 的情况，判断可能为未知。若只需要客户名单，成员判断通常比直接连接订单明细更符合目标粒度。",
+      "emphasis": []
+    }
+  ],
+  "syntax": {
+    "purpose": "key 两表含义一致的匹配键；p 形成候选集合的条件。"
+  },
+  "dataDescriptions": {
+    "customers": "共 4 行；字段：customer_id、customer_name。",
+    "orders": "共 5 行；字段：id、category、sales、store_id、order_date、customer_id。"
+  },
+  "problem": "运营需要至少有一笔金额达到600的已登记客户名单。orders 一行是订单，customers 一行是客户；阈值针对单笔订单，不是累计消费。",
+  "methodBlocks": [
+    {
+      "type": "paragraph",
+      "text": "内层 WHERE sales >= 600 筛出订单1、3、5，对应客户1、1、3。外层 IN 只做成员测试，客户1不会因为匹配两次出现两行。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "若主管要查看订单明细，应选择连接，因为目标已变为订单粒度。",
+      "emphasis": []
+    }
+  ],
+  "breakdown": [
+    {
+      "kind": "fragment",
+      "title": "指定来源",
+      "sql": "FROM customers",
+      "purpose": "从 customers 读取输入数据。",
+      "reason": "后面的子句都基于这里得到的行。"
+    },
+    {
+      "kind": "fragment",
+      "title": "筛选行",
+      "sql": "WHERE customer_id IN (SELECT customer_id FROM orders WHERE sales >= 600)",
+      "purpose": "仅保留满足条件的行。",
+      "reason": "条件结果为真才保留；未知（NULL）的行会被排除。"
+    },
+    {
+      "kind": "fragment",
+      "title": "选择输出",
+      "sql": "SELECT customer_id, customer_name",
+      "purpose": "输出 customer_id, customer_name。",
+      "reason": "输出列的顺序与别名决定结果表的形状。"
+    },
+    {
+      "kind": "fragment",
+      "title": "排序",
+      "sql": "ORDER BY customer_name DESC;",
+      "purpose": "按 customer_name DESC 排列结果。",
+      "reason": "查询结果的默认行序没有保证，需要显式排序。"
+    }
+  ],
+  "completeCode": {
+    "mysqlSql": "SELECT customer_id, customer_name FROM customers WHERE customer_id IN (SELECT customer_id FROM orders WHERE sales >= 600) ORDER BY customer_name DESC;",
+    "sqliteSql": "SELECT customer_id, customer_name FROM customers WHERE customer_id IN (SELECT customer_id FROM orders WHERE sales >= 600) ORDER BY customer_name DESC;"
+  },
+  "expectedResult": {
+    "columns": [
+      "customer_id",
+      "customer_name"
+    ],
+    "rows": [
+      [
+        3,
+        "王"
+      ],
+      [
+        1,
+        "林"
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "resultBlocks": [
+    {
+      "type": "paragraph",
+      "text": "四位客户中1、3入选，共两位。不能用三笔大额订单解释为三位客户，也不能解释为累计消费达到600的所有客户。",
+      "emphasis": []
+    }
+  ],
+  "extensions": [
+    {
+      "label": "查看内层候选",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "客户1重复出现，但成员判断不需要提前去重。",
+          "emphasis": []
+        }
+      ],
+      "sql": "SELECT customer_id FROM orders WHERE sales>=600 ORDER BY sales DESC;",
+      "result": {
+        "columns": [
+          "customer_id"
+        ],
+        "rows": [
+          [
+            3
+          ],
+          [
+            1
+          ],
+          [
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "label": "比较连接后的明细",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "这不是错误查询，但不符合每位客户仅一行的名单口径。",
+          "emphasis": []
+        }
+      ],
+      "sql": "SELECT c.customer_id,o.id AS order_id FROM customers c JOIN orders o ON c.customer_id=o.customer_id WHERE o.sales>=600 ORDER BY sales DESC;",
+      "result": {
+        "columns": [
+          "customer_id",
+          "order_id"
+        ],
+        "rows": [
+          [
+            3,
+            5
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            3
+          ]
+        ]
+      }
+    }
+  ],
+  "cautions": {
+    "comparison": [
+      {
+        "type": "paragraph",
+        "text": "IN 表达成员关系，JOIN 返回匹配行对；重复键对两者影响不同。",
+        "emphasis": []
+      }
+    ],
+    "example": [
+      {
+        "type": "paragraph",
+        "text": "使用等号连接多行子查询。",
+        "emphasis": []
+      }
+    ],
+    "reason": [],
+    "correction": [
+      {
+        "type": "paragraph",
+        "text": "改用 IN，或明确聚合为唯一值。",
+        "emphasis": []
+      }
+    ],
+    "notes": [
+      {
+        "type": "paragraph",
+        "text": "候选集合含 NULL 时，未匹配可能为 UNKNOWN；反向查询尤其需要注意。",
+        "emphasis": []
+      }
+    ]
+  },
+  "sourcePath": "source/unified73/kp10-02.json",
+  "sourceSha256": "03bb8dcc15a67ff55e15bcb6c19e48aa99bb9d6f01a82726aca35d587b7a3a2d"
+}

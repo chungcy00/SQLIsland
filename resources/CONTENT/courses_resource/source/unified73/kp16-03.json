@@ -1,0 +1,242 @@
+{
+  "id": "kp16-03",
+  "chapterId": "ch16",
+  "title": "类型转换与类别标准化",
+  "learningObjective": "区分格式清理、类型转换及类别映射，保留原始值以便审计。",
+  "prerequisites": [
+    "kp16-02"
+  ],
+  "concept": "类型转换解决数据如何参与计算；类别标准化解决不同写法是否代表同一业务类别。转换前应验证输入格式与允许范围；映射规则应明确未知类别处理。SQLite 的 DECIMAL 类型亲和性不等于 MySQL 的精确十进制类型。",
+  "syntax": "CAST(expr AS DECIMAL(12,2)); CASE WHEN condition THEN value ELSE other END",
+  "parameters": {
+    "expr": "已核验的数值文本",
+    "condition": "标准化后的类别匹配条件"
+  },
+  "fixtureIds": [
+    "lesson-raw_data"
+  ],
+  "sourceTables": [
+    {
+      "name": "raw_data",
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "name",
+          "type": "TEXT",
+          "mysqlType": "VARCHAR(160) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_bin",
+          "sqliteType": "TEXT"
+        },
+        {
+          "name": "amount",
+          "type": "TEXT",
+          "mysqlType": "VARCHAR(160) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_bin",
+          "sqliteType": "TEXT"
+        },
+        {
+          "name": "category",
+          "type": "TEXT",
+          "mysqlType": "VARCHAR(160) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_bin",
+          "sqliteType": "TEXT"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          "  Mask ",
+          "15",
+          "SKIN"
+        ],
+        [
+          2,
+          "Mask",
+          "15",
+          "skin"
+        ],
+        [
+          3,
+          "Serum",
+          null,
+          "Skin"
+        ],
+        [
+          4,
+          "Soap",
+          "-5",
+          "HOME"
+        ],
+        [
+          5,
+          "Cream",
+          "0",
+          "makeup"
+        ],
+        [
+          6,
+          "",
+          "20",
+          "HOME"
+        ]
+      ]
+    }
+  ],
+  "mysqlSql": "SELECT id,CAST(amount AS DECIMAL(12,2)) AS numeric_amount,CASE WHEN LOWER(TRIM(category))='skin' THEN '护肤品' WHEN LOWER(TRIM(category))='home' THEN '日用品' WHEN LOWER(TRIM(category))='makeup' THEN '化妆品' ELSE '待分类' END AS clean_category FROM raw_data ORDER BY name DESC;",
+  "sqliteSql": "SELECT id,CAST(amount AS DECIMAL(12,2)) AS numeric_amount,CASE WHEN LOWER(TRIM(category))='skin' THEN '护肤品' WHEN LOWER(TRIM(category))='home' THEN '日用品' WHEN LOWER(TRIM(category))='makeup' THEN '化妆品' ELSE '待分类' END AS clean_category FROM raw_data ORDER BY name DESC;",
+  "executionSteps": [
+    "核验并转换金额",
+    "统一类别比较格式",
+    "映射标准类别"
+  ],
+  "useCase": "将不同系统导入的金额和类别转换为报表口径。本例金额为合法整数文本或空值，类别字典包含护肤品、日用品、化妆品。",
+  "comparison": "类型转换不保证格式合法，类别映射不代表记录通过全部质量检查。",
+  "commonError": {
+    "example": "CAST 任意文本后直接汇总并忽略转换异常。",
+    "correction": "先验证合法格式与范围，隔离非法值，保留原值及转换状态。"
+  },
+  "notes": "示例类别大小写仅涉及 ASCII；本地数值精度与原生数据库不同。",
+  "compatibility": {
+    "status": "直接兼容",
+    "detail": "仅在本示例数据与语义范围验证；不代表全部 MySQL 语法兼容。"
+  },
+  "relatedQuestionIds": [
+    "q0224",
+    "q0226",
+    "q0230"
+  ],
+  "relatedFlashcardIds": [
+    "fc0124",
+    "fc0125"
+  ],
+  "relatedKnowledgePointIds": [
+    "kp05-01",
+    "kp09-01",
+    "kp11-01",
+    "kp15-01"
+  ],
+  "mysqlVerification": "未运行原生 MySQL 8.4",
+  "result": {
+    "columns": [
+      "id",
+      "numeric_amount",
+      "clean_category"
+    ],
+    "rows": [
+      [
+        4,
+        -5,
+        "日用品"
+      ],
+      [
+        3,
+        null,
+        "护肤品"
+      ],
+      [
+        2,
+        15,
+        "护肤品"
+      ],
+      [
+        5,
+        0,
+        "化妆品"
+      ],
+      [
+        1,
+        15,
+        "护肤品"
+      ],
+      [
+        6,
+        20,
+        "日用品"
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "mysqlVerificationScript": "validation/mysql/kp16-03.sql",
+  "primaryQuestionIds": [
+    "q0224",
+    "q0226",
+    "q0230"
+  ],
+  "primaryFlashcardIds": [
+    "fc0124",
+    "fc0125"
+  ],
+  "teaching": {
+    "problem": "将不同系统导入的金额和类别转换为报表口径。本例金额为合法整数文本或空值，类别字典包含护肤品、日用品、化妆品。",
+    "codeExplanation": "CAST 将金额转换为可计算值；LOWER(TRIM(category)) 先生成标准比较键，CASE 将已知键映射为中文类别，其他标为待分类。生产金额应采用真正的精确十进制或经过设计的整数分；不得把未知类别默认归为已知类别。",
+    "resultExplanation": "前三行统一为护肤品；编号3金额仍为空，编号4保留负数，编号5保留零。六行不改变粒度，清洗不等于去重。",
+    "checkpoints": [],
+    "mergedConcepts": [],
+    "mergeExamples": [
+      {
+        "label": "保留原类别与标准键",
+        "explanation": "先核对映射依据，避免清洗后无法追查。",
+        "sql": "SELECT id,category,LOWER(TRIM(category)) AS normalized FROM raw_data ORDER BY name DESC;",
+        "result": {
+          "columns": [
+            "id",
+            "category",
+            "normalized"
+          ],
+          "rows": [
+            [
+              4,
+              "HOME",
+              "home"
+            ],
+            [
+              3,
+              "Skin",
+              "skin"
+            ],
+            [
+              2,
+              "skin",
+              "skin"
+            ],
+            [
+              5,
+              "makeup",
+              "makeup"
+            ],
+            [
+              1,
+              "SKIN",
+              "skin"
+            ],
+            [
+              6,
+              "HOME",
+              "home"
+            ]
+          ]
+        }
+      },
+      {
+        "label": "非法文本转换反例",
+        "explanation": "仅展示本地数据库的风险：非法文本可能转成零，不能视作校验成功。",
+        "sql": "SELECT CAST('abc' AS DECIMAL(12,2)) AS converted,CAST('0' AS DECIMAL(12,2)) AS legitimate_zero;",
+        "result": {
+          "columns": [
+            "converted",
+            "legitimate_zero"
+          ],
+          "rows": [
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      }
+    ]
+  }
+}

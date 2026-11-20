@@ -1,0 +1,256 @@
+{
+  "id": "kp10-03",
+  "chapterId": "ch10",
+  "title": "相关子查询与 EXISTS",
+  "learningObjective": "能编写关联外层记录的存在判断，并识别遗漏关联条件的错误。",
+  "prerequisites": [
+    "kp10-02"
+  ],
+  "concept": "相关子查询引用外层表中的字段，逻辑上针对当前外层记录判断；物理执行可能被优化器改写，并不保证逐行运行。EXISTS 关注内层是否有至少一行，而不关注 SELECT 返回什么值。它不汇总购买次数，也不搬运订单明细。通过相关条件将每位客户与自己的订单匹配，即使有多笔订单，外层客户也只保留原有的一行。",
+  "syntax": "WHERE EXISTS (SELECT 1 FROM b WHERE b.key=a.key)",
+  "parameters": {
+    "EXISTS": "内层有行时为真",
+    "a.key": "当前外层记录的键",
+    "SELECT 1": "表达仅关注存在性"
+  },
+  "fixtureIds": [
+    "lesson-customers",
+    "lesson-orders"
+  ],
+  "sourceTables": [
+    {
+      "name": "customers",
+      "columns": [
+        {
+          "name": "customer_id",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "customer_name",
+          "type": "TEXT",
+          "mysqlType": "VARCHAR(160) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_bin",
+          "sqliteType": "TEXT"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          "林"
+        ],
+        [
+          2,
+          "陈"
+        ],
+        [
+          3,
+          "王"
+        ],
+        [
+          4,
+          "李"
+        ]
+      ]
+    },
+    {
+      "name": "orders",
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "category",
+          "type": "TEXT",
+          "mysqlType": "VARCHAR(160) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_bin",
+          "sqliteType": "TEXT"
+        },
+        {
+          "name": "sales",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "store_id",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "order_date",
+          "type": "TEXT",
+          "mysqlType": "DATE",
+          "sqliteType": "TEXT"
+        },
+        {
+          "name": "customer_id",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          "护肤品",
+          800,
+          1,
+          "2026-01-03",
+          1
+        ],
+        [
+          2,
+          "化妆品",
+          400,
+          2,
+          "2026-01-10",
+          2
+        ],
+        [
+          3,
+          "护肤品",
+          600,
+          1,
+          "2026-02-02",
+          1
+        ],
+        [
+          4,
+          "化妆品",
+          300,
+          2,
+          "2026-02-15",
+          null
+        ],
+        [
+          5,
+          "日用品",
+          1500,
+          1,
+          "2026-02-20",
+          3
+        ]
+      ]
+    }
+  ],
+  "mysqlSql": "SELECT c.customer_id FROM customers c WHERE EXISTS (SELECT 1 FROM orders o WHERE o.customer_id=c.customer_id) ORDER BY customer_name DESC;",
+  "sqliteSql": "SELECT c.customer_id FROM customers c WHERE EXISTS (SELECT 1 FROM orders o WHERE o.customer_id=c.customer_id) ORDER BY customer_name DESC;",
+  "executionSteps": [
+    "读取客户主档",
+    "检查是否有匹配订单",
+    "保留存在订单的客户"
+  ],
+  "useCase": "运营要识别曾经购买的登记客户，不需要金额或订单次数。customers 的客户编号与 orders 的客户编号关联；匿名订单不能对应客户主档。",
+  "comparison": "相关子查询是引用关系；EXISTS 是存在性判断，两者不是同义词。",
+  "commonError": {
+    "example": "EXISTS (SELECT 1 FROM orders) 漏写相关条件。",
+    "correction": "添加 WHERE o.customer_id=c.customer_id。"
+  },
+  "notes": "不要声称相关子查询必然比连接慢；性能须依据真实数据与执行计划。",
+  "compatibility": {
+    "status": "直接兼容",
+    "detail": "仅在本示例数据与语义范围验证；不代表全部 MySQL 语法兼容。"
+  },
+  "relatedQuestionIds": [
+    "q0139",
+    "q0140",
+    "q0142",
+    "q0149"
+  ],
+  "relatedFlashcardIds": [
+    "fc0072",
+    "fc0073",
+    "fc0077"
+  ],
+  "relatedKnowledgePointIds": [
+    "kp03-01",
+    "kp05-01",
+    "kp08-01"
+  ],
+  "mysqlVerification": "未运行原生 MySQL 8.4",
+  "result": {
+    "columns": [
+      "customer_id"
+    ],
+    "rows": [
+      [
+        2
+      ],
+      [
+        3
+      ],
+      [
+        1
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "mysqlVerificationScript": "validation/mysql/kp10-03.sql",
+  "primaryQuestionIds": [
+    "q0139",
+    "q0140",
+    "q0142",
+    "q0149"
+  ],
+  "primaryFlashcardIds": [
+    "fc0072",
+    "fc0073",
+    "fc0077"
+  ],
+  "teaching": {
+    "problem": "运营要识别曾经购买的登记客户，不需要金额或订单次数。customers 的客户编号与 orders 的客户编号关联；匿名订单不能对应客户主档。",
+    "codeExplanation": "外层给 customers 取别名 c，内层给 orders 取别名 o。o.customer_id=c.customer_id 是关键：只检查当前客户的订单。SELECT 1 不代表只读取第一笔订单，也不是返回订单数；EXISTS 仅判断有无。若要判断二月活跃，则在内层加入二月日期条件。",
+    "resultExplanation": "客户1、2、3均有订单，客户4没有；返回三行客户编号。客户1的两笔订单不会造成名单重复。",
+    "checkpoints": [],
+    "mergedConcepts": [],
+    "mergeExamples": [
+      {
+        "label": "错误关联对照",
+        "explanation": "全表有订单使所有客户通过，包括从未下单的客户4。",
+        "sql": "SELECT c.customer_id FROM customers c WHERE EXISTS (SELECT 1 FROM orders) ORDER BY customer_name DESC;",
+        "result": {
+          "columns": [
+            "customer_id"
+          ],
+          "rows": [
+            [
+              2
+            ],
+            [
+              3
+            ],
+            [
+              1
+            ],
+            [
+              4
+            ]
+          ]
+        }
+      },
+      {
+        "label": "迁移到指定期间",
+        "explanation": "将二月的条件放在存在性判断内，只寻找该期间的订单。",
+        "sql": "SELECT c.customer_id FROM customers c WHERE EXISTS (SELECT 1 FROM orders o WHERE o.customer_id=c.customer_id AND o.order_date>='2026-02-01' AND o.order_date<'2026-03-01') ORDER BY customer_name DESC;",
+        "result": {
+          "columns": [
+            "customer_id"
+          ],
+          "rows": [
+            [
+              3
+            ],
+            [
+              1
+            ]
+          ]
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,187 @@
+{
+  "schemaVersion": 1,
+  "id": "kp10-01",
+  "sourceBatch": "unified73",
+  "teachingKind": "syntax",
+  "conceptBlocks": [
+    {
+      "type": "paragraph",
+      "text": "标量子查询是一列且最多一行的查询，它作为一个值参与外层表达式。零行得到 NULL，多行在 MySQL 中报错。分析师经常需要将明细与动态基准比较，例如价格高于整体均值；",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "硬编码均值会在数据更新后失效。聚合函数不带分组时可形成单行基准，但空输入的平均值为 NULL，普通比较不会保留任何行。外层查询依然逐条商品判断，查询结果不改变原表。",
+      "emphasis": []
+    }
+  ],
+  "syntax": {
+    "purpose": "AVG 对非空数值计算均值；外层 col 待比较的明细值。"
+  },
+  "dataDescriptions": {
+    "products": "共 6 行；字段：product_id、product_name、category、price、stock。"
+  },
+  "problem": "采购主管希望筛出高于全体商品平均价格的商品，作为价格核查候选。products 一行代表一件商品，price 是单价，product_id 是编号；每件商品等权，不按库存加权。",
+  "methodBlocks": [
+    {
+      "type": "paragraph",
+      "text": "先单独求 AVG(price)，得到44；再使用括号中的查询作为 WHERE 的右侧阈值。外层 SELECT 提取编号和单价，ORDER BY 保证顺序。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "若需要类内均值，应让内层引用外层类别，而不是仅更改外层的输出字段。",
+      "emphasis": []
+    }
+  ],
+  "breakdown": [
+    {
+      "kind": "fragment",
+      "title": "指定来源",
+      "sql": "FROM products",
+      "purpose": "从 products 读取输入数据。",
+      "reason": "后面的子句都基于这里得到的行。"
+    },
+    {
+      "kind": "fragment",
+      "title": "筛选行",
+      "sql": "WHERE price > (SELECT AVG(price) FROM products)",
+      "purpose": "仅保留满足 price > (SELECT AVG(price) FROM products) 的行。",
+      "reason": "条件结果为真才保留；未知（NULL）的行会被排除。"
+    },
+    {
+      "kind": "fragment",
+      "title": "选择输出",
+      "sql": "SELECT product_id, price",
+      "purpose": "输出 product_id, price。",
+      "reason": "输出列的顺序与别名决定结果表的形状。"
+    },
+    {
+      "kind": "fragment",
+      "title": "排序",
+      "sql": "ORDER BY price;",
+      "purpose": "按 price 排列结果。",
+      "reason": "查询结果的默认行序没有保证，需要显式排序。"
+    }
+  ],
+  "completeCode": {
+    "mysqlSql": "SELECT product_id, price FROM products WHERE price > (SELECT AVG(price) FROM products) ORDER BY price;",
+    "sqliteSql": "SELECT product_id, price FROM products WHERE price > (SELECT AVG(price) FROM products) ORDER BY price;"
+  },
+  "expectedResult": {
+    "columns": [
+      "product_id",
+      "price"
+    ],
+    "rows": [
+      [
+        5,
+        45
+      ],
+      [
+        4,
+        65
+      ],
+      [
+        2,
+        89
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "resultBlocks": [
+    {
+      "type": "paragraph",
+      "text": "六件商品中编号2、4、5高于44，返回三行，仍是商品粒度。高于均价不等于价格异常，需要结合类别、成本等信息核查。",
+      "emphasis": []
+    }
+  ],
+  "extensions": [
+    {
+      "label": "先求动态基准",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "确认分母为6件商品，价格和264，均值44。",
+          "emphasis": []
+        }
+      ],
+      "sql": "SELECT SUM(price) AS total,COUNT(price) AS n,AVG(price) AS mean FROM products;",
+      "result": {
+        "columns": [
+          "total",
+          "n",
+          "mean"
+        ],
+        "rows": [
+          [
+            264,
+            6,
+            44.0
+          ]
+        ]
+      }
+    },
+    {
+      "label": "返回所有最低价商品",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "使用 MIN 得到单值15；两件并列商品均保留。",
+          "emphasis": []
+        }
+      ],
+      "sql": "SELECT product_id,price FROM products WHERE price=(SELECT MIN(price) FROM products) ORDER BY product_name DESC;",
+      "result": {
+        "columns": [
+          "product_id",
+          "price"
+        ],
+        "rows": [
+          [
+            6,
+            15
+          ],
+          [
+            1,
+            15
+          ]
+        ]
+      }
+    }
+  ],
+  "cautions": {
+    "comparison": [
+      {
+        "type": "paragraph",
+        "text": "标量子查询用于单值比较；多行候选应使用 IN 或其他集合语义。",
+        "emphasis": []
+      }
+    ],
+    "example": [
+      {
+        "type": "paragraph",
+        "text": "WHERE price = (SELECT price FROM products)，内层产生多行。",
+        "emphasis": []
+      }
+    ],
+    "reason": [],
+    "correction": [
+      {
+        "type": "paragraph",
+        "text": "明确所需单值，例如 MAX(price)，或者改用 IN。",
+        "emphasis": []
+      }
+    ],
+    "notes": [
+      {
+        "type": "paragraph",
+        "text": "SQLite 可能取多行标量查询的首行，不能当作 MySQL 的正确行为。",
+        "emphasis": []
+      }
+    ]
+  },
+  "sourcePath": "source/unified73/kp10-01.json",
+  "sourceSha256": "aa164519f6865bb4230252e277e3a41a8b522262a8de175a30e5115793e20ca6"
+}

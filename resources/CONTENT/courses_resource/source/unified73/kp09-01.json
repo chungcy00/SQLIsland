@@ -1,0 +1,261 @@
+{
+  "id": "kp09-01",
+  "chapterId": "ch09",
+  "title": "CASE WHEN 分类",
+  "learningObjective": "能够设计互斥业务分类，正确处理条件重叠、边界和缺失值。",
+  "prerequisites": [],
+  "concept": "CASE 是查询中的条件表达式，可以为每行计算一个新值，不会像 WHERE 一样删除不符合条件的记录。搜索式 CASE 从上到下判断 WHEN，返回首个为真的分支；若没有真条件，返回 ELSE，省略 ELSE 时返回 NULL。条件可能重叠，所以应先判断更具体的规则。例如库存为0同时满足小于50，必须先判断缺货再判断低库存。NULL 与数值比较通常未知，不会命中普通分支，因此有缺失时需单独处理。分类规则应明确边界及异常负值，不把未知数据当作正常。",
+  "syntax": "CASE WHEN condition1 THEN value1 WHEN condition2 THEN value2 ELSE default_value END AS label",
+  "parameters": {
+    "WHEN": "判断条件",
+    "THEN": "命中后的返回值",
+    "ELSE": "无命中时的默认值",
+    "END": "结束表达式"
+  },
+  "fixtureIds": [
+    "lesson-products"
+  ],
+  "sourceTables": [
+    {
+      "name": "products",
+      "columns": [
+        {
+          "name": "product_id",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "product_name",
+          "type": "TEXT",
+          "mysqlType": "VARCHAR(160) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_bin",
+          "sqliteType": "TEXT"
+        },
+        {
+          "name": "category",
+          "type": "TEXT",
+          "mysqlType": "VARCHAR(160) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_bin",
+          "sqliteType": "TEXT"
+        },
+        {
+          "name": "price",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "stock",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          "Mask",
+          "护肤品",
+          15,
+          150
+        ],
+        [
+          2,
+          "Serum",
+          "护肤品",
+          89,
+          40
+        ],
+        [
+          3,
+          "Cleanser",
+          "护肤品",
+          35,
+          200
+        ],
+        [
+          4,
+          "Cream",
+          "化妆品",
+          65,
+          180
+        ],
+        [
+          5,
+          "Sunscreen",
+          "化妆品",
+          45,
+          80
+        ],
+        [
+          6,
+          "Soap_1",
+          "日用品",
+          15,
+          0
+        ]
+      ]
+    }
+  ],
+  "mysqlSql": "SELECT product_id, CASE WHEN stock=0 THEN '缺货' WHEN stock<50 THEN '低库存' ELSE '正常' END AS stock_level FROM products ORDER BY product_name DESC;",
+  "sqliteSql": "SELECT product_id, CASE WHEN stock=0 THEN '缺货' WHEN stock<50 THEN '低库存' ELSE '正常' END AS stock_level FROM products ORDER BY product_name DESC;",
+  "executionSteps": [
+    "先识别缺货",
+    "再识别低库存",
+    "其余归正常"
+  ],
+  "useCase": "库存主管需要每件商品的状态标签，以便查看缺货和低库存。本例库存为非负已知数量，0为缺货，1至49为低库存，50及以上为正常；正式业务若有未知或负值需单独标记。",
+  "comparison": "CASE 生成分类或数值；WHERE 过滤结果行。",
+  "commonError": {
+    "example": "先判断 stock<50 再判断 stock=0，或把 NULL 落入正常。",
+    "correction": "具体条件在前；可能未知时先写 WHEN stock IS NULL，再处理数值边界。"
+  },
+  "notes": "不同 THEN/ELSE 返回值尽量使用相容类型。",
+  "compatibility": {
+    "status": "直接兼容",
+    "detail": "仅在本示例数据与语义范围验证；不代表全部 MySQL 语法兼容。"
+  },
+  "relatedQuestionIds": [
+    "q0120",
+    "q0123",
+    "q0125",
+    "q0128"
+  ],
+  "relatedFlashcardIds": [
+    "fc0062",
+    "fc0063",
+    "fc0068",
+    "fc0069"
+  ],
+  "relatedKnowledgePointIds": [
+    "kp03-01",
+    "kp05-01",
+    "kp06-01"
+  ],
+  "mysqlVerification": "未运行原生 MySQL 8.4",
+  "result": {
+    "columns": [
+      "product_id",
+      "stock_level"
+    ],
+    "rows": [
+      [
+        5,
+        "正常"
+      ],
+      [
+        6,
+        "缺货"
+      ],
+      [
+        2,
+        "低库存"
+      ],
+      [
+        1,
+        "正常"
+      ],
+      [
+        4,
+        "正常"
+      ],
+      [
+        3,
+        "正常"
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "mysqlVerificationScript": "validation/mysql/kp09-01.sql",
+  "primaryQuestionIds": [
+    "q0120",
+    "q0123",
+    "q0125",
+    "q0128"
+  ],
+  "primaryFlashcardIds": [
+    "fc0062",
+    "fc0063",
+    "fc0068",
+    "fc0069"
+  ],
+  "teaching": {
+    "problem": "库存主管需要每件商品的状态标签，以便查看缺货和低库存。本例库存为非负已知数量，0为缺货，1至49为低库存，50及以上为正常；正式业务若有未知或负值需单独标记。",
+    "codeExplanation": "读取每件商品的库存，CASE 先检查 stock=0，命中后不再使用后面的分类结果；其他记录再检查 stock<50，否则使用正常标签。AS stock_level 仅命名输出列。SELECT 保留每件商品，不修改源表。",
+    "resultExplanation": "6件商品仍返回6行：编号2库存40属低库存，编号6库存0属缺货，其余正常。标签不是筛选结果；若要统计各标签数量，可再进行分组或条件聚合。",
+    "checkpoints": [],
+    "mergedConcepts": [],
+    "mergeExamples": [
+      {
+        "label": "错误分支顺序对照",
+        "explanation": "编号6先命中小于50，缺货标签无法到达。",
+        "sql": "SELECT product_id,CASE WHEN stock<50 THEN '低库存' WHEN stock=0 THEN '缺货' ELSE '正常' END AS stock_level FROM products ORDER BY product_name DESC;",
+        "result": {
+          "columns": [
+            "product_id",
+            "stock_level"
+          ],
+          "rows": [
+            [
+              5,
+              "正常"
+            ],
+            [
+              6,
+              "低库存"
+            ],
+            [
+              2,
+              "低库存"
+            ],
+            [
+              1,
+              "正常"
+            ],
+            [
+              4,
+              "正常"
+            ],
+            [
+              3,
+              "正常"
+            ]
+          ]
+        }
+      },
+      {
+        "label": "验证边界与缺失",
+        "explanation": "内联边界样本检验分类完整性，不改变原商品夹具。",
+        "sql": "WITH samples AS (SELECT 1 AS id,NULL AS stock UNION ALL SELECT 2,-1 UNION ALL SELECT 3,0 UNION ALL SELECT 4,49 UNION ALL SELECT 5,50) SELECT id,CASE WHEN stock IS NULL THEN '未知' WHEN stock<0 THEN '异常' WHEN stock=0 THEN '缺货' WHEN stock<50 THEN '低库存' ELSE '正常' END AS stock_level FROM samples ORDER BY stock_level DESC;",
+        "result": {
+          "columns": [
+            "id",
+            "stock_level"
+          ],
+          "rows": [
+            [
+              3,
+              "缺货"
+            ],
+            [
+              5,
+              "正常"
+            ],
+            [
+              1,
+              "未知"
+            ],
+            [
+              2,
+              "异常"
+            ],
+            [
+              4,
+              "低库存"
+            ]
+          ]
+        }
+      }
+    ]
+  }
+}

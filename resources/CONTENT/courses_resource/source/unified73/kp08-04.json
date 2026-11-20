@@ -1,0 +1,299 @@
+{
+  "id": "kp08-04",
+  "chapterId": "ch08",
+  "title": "CROSS JOIN 与自连接",
+  "learningObjective": "能够用别名表达同表角色关系，并使用交叉连接构建完整业务维度组合。",
+  "prerequisites": [
+    "kp08-03",
+    "kp08-05"
+  ],
+  "concept": "自连接指同一张表以不同别名参与查询，例如员工表同时充当员工资料和主管资料。它仍需明确匹配条件，并可使用内连接或外连接。员工编号是唯一键，主管编号指向另一位员工的编号；最高层员工可能没有主管，因此用左连接保留。交叉连接则在没有匹配条件时产生两侧所有行对，n行与m行得到n×m行。它适合有意构建门店×月份等完整维度，而不是随意连接两张交易明细。完整报表应先构造唯一的维度组合，再按相同组合键连接已汇总事实；没有交易是否填零需核对营业状态及数据是否完整。",
+  "syntax": "FROM employees e LEFT JOIN employees m ON e.manager_id=m.employee_id;\nFROM dimension_a CROSS JOIN dimension_b;",
+  "parameters": {
+    "e": "员工角色",
+    "m": "主管角色",
+    "CROSS JOIN": "无条件生成全部组合"
+  },
+  "fixtureIds": [
+    "lesson-employees"
+  ],
+  "sourceTables": [
+    {
+      "name": "employees",
+      "columns": [
+        {
+          "name": "employee_id",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "employee_name",
+          "type": "TEXT",
+          "mysqlType": "VARCHAR(160) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_bin",
+          "sqliteType": "TEXT"
+        },
+        {
+          "name": "manager_id",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "salary",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          "A",
+          null,
+          8000
+        ],
+        [
+          2,
+          "B",
+          1,
+          5000
+        ],
+        [
+          3,
+          "C",
+          1,
+          5000
+        ],
+        [
+          4,
+          "D",
+          2,
+          3000
+        ]
+      ]
+    }
+  ],
+  "mysqlSql": "SELECT e.employee_name, m.employee_name AS manager FROM employees e LEFT JOIN employees m ON e.manager_id=m.employee_id ORDER BY e.salary, e.employee_name;",
+  "sqliteSql": "SELECT e.employee_name, m.employee_name AS manager FROM employees e LEFT JOIN employees m ON e.manager_id=m.employee_id ORDER BY e.salary, e.employee_name;",
+  "executionSteps": [
+    "为员工表区分两个角色",
+    "匹配主管编号",
+    "保留无主管的员工"
+  ],
+  "useCase": "人力资源需要员工及直属主管名单。员工表中 employee_id 是员工编号，manager_id 指向主管编号，employee_name 为姓名，salary 为工资。本例只读直属关系，不涉及递归层级查询。",
+  "comparison": "自连接描述表的角色关系，通常需要 ON；交叉连接描述全组合，不依赖相等匹配。",
+  "commonError": {
+    "example": "无意在两张交易事实表之间 CROSS JOIN，造成行数乘积；或自连接不使用别名。",
+    "correction": "只有需要全部维度组合时使用 CROSS JOIN；自连接明确别名与连接键。"
+  },
+  "notes": "交叉连接前检查维度唯一性和规模。新增示例使用内联维度，避免修改本节原有夹具。",
+  "compatibility": {
+    "status": "直接兼容",
+    "detail": "仅在本示例数据与语义范围验证；不代表全部 MySQL 语法兼容。"
+  },
+  "relatedQuestionIds": [
+    "q0096",
+    "q0103",
+    "q0108",
+    "q0111"
+  ],
+  "relatedFlashcardIds": [
+    "fc0052",
+    "fc0057",
+    "fc0058",
+    "fc0059"
+  ],
+  "relatedKnowledgePointIds": [
+    "kp01-01",
+    "kp03-01",
+    "kp07-01"
+  ],
+  "mysqlVerification": "未运行原生 MySQL 8.4",
+  "result": {
+    "columns": [
+      "employee_name",
+      "manager"
+    ],
+    "rows": [
+      [
+        "D",
+        "B"
+      ],
+      [
+        "B",
+        "A"
+      ],
+      [
+        "C",
+        "A"
+      ],
+      [
+        "A",
+        null
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "visualization": {
+    "kind": "stepFlow",
+    "steps": [
+      {
+        "id": "1",
+        "label": "为员工表创建两个逻辑角色"
+      },
+      {
+        "id": "2",
+        "label": "匹配主管编号"
+      },
+      {
+        "id": "3",
+        "label": "顶层主管为空"
+      }
+    ],
+    "sourceFixtureIds": [
+      "lesson-employees"
+    ],
+    "resultColumns": [
+      "employee_name",
+      "manager"
+    ]
+  },
+  "mysqlVerificationScript": "validation/mysql/kp08-04.sql",
+  "primaryQuestionIds": [
+    "q0096",
+    "q0103",
+    "q0108",
+    "q0111"
+  ],
+  "primaryFlashcardIds": [
+    "fc0052",
+    "fc0057",
+    "fc0058",
+    "fc0059"
+  ],
+  "mergedFrom": [
+    {
+      "id": "kp08-06",
+      "title": "RIGHT JOIN 与 CROSS JOIN 实操"
+    },
+    {
+      "id": "kp08-07",
+      "title": "笛卡尔积与完整维度"
+    }
+  ],
+  "teaching": {
+    "problem": "人力资源需要员工及直属主管名单。员工表中 employee_id 是员工编号，manager_id 指向主管编号，employee_name 为姓名，salary 为工资。本例只读直属关系，不涉及递归层级查询。",
+    "codeExplanation": "同一 employees 表分别命名为 e 与 m，用 e.manager_id=m.employee_id 匹配主管。若使用员工编号对员工编号，只会将员工与自己匹配。LEFT JOIN 保留最高层A。另一类业务需要完整门店月份报表，不能只用存在交易的月份生成报表；通过 CROSS JOIN 将独立门店与月份维度配成全部组合，再左接汇总数据。",
+    "resultExplanation": "员工名单仍有4行；A无主管，B与C的主管均为A，D的主管为B。交叉连接补充例中3家门店与4个月形成12行，即使诗巫没有订单也仍在骨架内。骨架仅表示需要展示的组合，不代表各组合实际发生销售。",
+    "checkpoints": [],
+    "mergedConcepts": [
+      {
+        "sourceId": "kp08-06",
+        "explanation": "交叉连接部分融入全部组合、行数乘积及保留侧与完整维度的区别。"
+      },
+      {
+        "sourceId": "kp08-07",
+        "explanation": "完整门店月份骨架、原始三门店四月份示例、后续左连接事实汇总以及交叉连接规模风险均保留。"
+      }
+    ],
+    "mergeExamples": [
+      {
+        "label": "核对员工与主管编号",
+        "explanation": "观察自连接实际匹配的键。",
+        "sql": "SELECT e.employee_id,e.manager_id,m.employee_id AS matched_manager FROM employees e LEFT JOIN employees m ON e.manager_id=m.employee_id ORDER BY matched_manager DESC;",
+        "result": {
+          "columns": [
+            "employee_id",
+            "manager_id",
+            "matched_manager"
+          ],
+          "rows": [
+            [
+              4,
+              2,
+              2
+            ],
+            [
+              2,
+              1,
+              1
+            ],
+            [
+              3,
+              1,
+              1
+            ],
+            [
+              1,
+              null,
+              null
+            ]
+          ]
+        }
+      },
+      {
+        "label": "来源课：门店月份完整骨架",
+        "explanation": "使用原来源课的三个门店编号和四个月份，内联维度避免额外夹具；每店四行。",
+        "sql": "WITH stores AS (SELECT 1 AS store_id UNION ALL SELECT 2 UNION ALL SELECT 3), monthly AS (SELECT '2026-01' AS month UNION ALL SELECT '2026-02' UNION ALL SELECT '2026-03' UNION ALL SELECT '2026-04') SELECT s.store_id,m.month FROM stores s CROSS JOIN monthly m ORDER BY month DESC;",
+        "result": {
+          "columns": [
+            "store_id",
+            "month"
+          ],
+          "rows": [
+            [
+              1,
+              "2026-04"
+            ],
+            [
+              2,
+              "2026-04"
+            ],
+            [
+              3,
+              "2026-04"
+            ],
+            [
+              1,
+              "2026-03"
+            ],
+            [
+              2,
+              "2026-03"
+            ],
+            [
+              3,
+              "2026-03"
+            ],
+            [
+              1,
+              "2026-02"
+            ],
+            [
+              2,
+              "2026-02"
+            ],
+            [
+              3,
+              "2026-02"
+            ],
+            [
+              1,
+              "2026-01"
+            ],
+            [
+              2,
+              "2026-01"
+            ],
+            [
+              3,
+              "2026-01"
+            ]
+          ]
+        }
+      }
+    ]
+  }
+}

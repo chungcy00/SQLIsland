@@ -8,6 +8,7 @@ try {
   await page.goto('http://127.0.0.1:4173/'); await page.locator('.appbar').waitFor();
   const report = await page.evaluate(async () => {
     const content = await (await fetch('content.json')).json();
+    const databases = await (await fetch('databases.json')).json();
     const lessons = content.chapters.flatMap(c => c.knowledgePoints).filter(k => k.figures);
     const worker = new Worker('sql-worker.js'); let sequence = 0; const calls = new Map();
     worker.onmessage = ({data}) => { const call = calls.get(data.id); calls.delete(data.id); data.error ? call.reject(Error(data.error)) : call.resolve(data.result); };
@@ -15,15 +16,15 @@ try {
     const out = [];
     try {
       for (const lesson of lessons) for (const figure of lesson.figures) {
-        const tables = lesson.sourceTables, setupSql = lesson.setupSql;
+        const tables = lesson.datasetId ? undefined : lesson.sourceTables, setupSql = lesson.setupSql, path = databases.datasets.find(d => d.id === lesson.datasetId)?.path;
         if (figure.kind === 'truth-table') {
-          const result = await run({tables, setupSql, sql: `SELECT ${figure.keyColumn}, ${figure.valueColumn}, CASE WHEN (${figure.predicate}) IS NULL THEN 'unknown' WHEN ${figure.predicate} THEN 'true' ELSE 'false' END FROM ${figure.table} ORDER BY ${figure.keyColumn}`});
+          const result = await run({tables, setupSql, path, sql: `SELECT ${figure.keyColumn}, ${figure.valueColumn}, CASE WHEN (${figure.predicate}) IS NULL THEN 'unknown' WHEN ${figure.predicate} THEN 'true' ELSE 'false' END FROM ${figure.table} ORDER BY ${figure.keyColumn}`});
           out.push({id: figure.id, expected: figure.rows.map(r => [r.key, r.value, r.truth]), actual: result.rows});
-          const kept = await run({tables, setupSql, sql: `SELECT ${figure.keyColumn} FROM ${figure.table} WHERE ${figure.predicate} ORDER BY ${figure.keyColumn}`});
+          const kept = await run({tables, setupSql, path, sql: `SELECT ${figure.keyColumn} FROM ${figure.table} WHERE ${figure.predicate} ORDER BY ${figure.keyColumn}`});
           out.push({id: figure.id + ':kept', expected: figure.rows.filter(r => r.truth === 'true').map(r => [r.key]), actual: kept.rows});
         } else if (figure.kind === 'row-flow') {
           for (const [index, step] of figure.steps.entries()) {
-            const result = await run({tables, setupSql, sql: step.sql});
+            const result = await run({tables, setupSql, path, sql: step.sql});
             const key = result.columns.indexOf(figure.keyColumn);
             out.push({id: `${figure.id}:step${index + 1}`, expected: [...step.keptKeys].sort((a, b) => a - b), actual: result.rows.map(r => r[key]).sort((a, b) => a - b)});
           }
@@ -31,13 +32,13 @@ try {
           const norm = rows => rows.map(r => JSON.stringify(r)).sort();
           for (const [index, step] of figure.steps.entries()) {
             if (step.skip) continue;
-            const result = await run({tables, setupSql, sql: step.sql});
+            const result = await run({tables, setupSql, path, sql: step.sql});
             out.push({id: `${figure.id}:step${index + 1}:columns`, expected: step.columns, actual: result.columns});
             out.push({id: `${figure.id}:step${index + 1}:rows`, expected: norm(step.rows), actual: norm(result.rows)});
           }
         } else if (figure.kind === 'clause-map') {
-          const result = await run({tables, setupSql, sql: figure.sql});
-          out.push({id: figure.id, expected: lesson.result.rows, actual: result.rows});
+          const result = await run({tables, setupSql, path, sql: figure.sql});
+          out.push({id: figure.id, expected: lesson.result.rows, actual: lesson.result.totalRows > lesson.result.rows.length ? result.rows.slice(0, lesson.result.rows.length) : result.rows});
         }
       }
       return out;

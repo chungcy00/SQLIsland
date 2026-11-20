@@ -1,0 +1,226 @@
+{
+  "schemaVersion": 1,
+  "id": "kp03-03",
+  "sourceBatch": "unified73",
+  "teachingKind": "syntax",
+  "conceptBlocks": [
+    {
+      "type": "paragraph",
+      "text": "IN 适用于离散候选值，例如允许的类别或门店编号。对于非空候选值，IN 可理解为多个等于条件用 OR 组合，避免重复书写字段。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "BETWEEN 适用于连续范围，并包含上下界，相当于在通常的同类型比较中同时应用 >= 和 <=。上下界顺序不能任意交换。两种条件可以结合，分别约束类别与金额。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "在时间戳筛选中，业务人员说“整个一月”时，常用大于等于一月一日且小于二月一日，而不是小于等于一月三十一日零点，以免漏掉最后一天的记录。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "NOT IN 遇到未知候选值会产生特殊情况，后续子查询章节详讲。",
+      "emphasis": []
+    }
+  ],
+  "syntax": {
+    "purpose": "IN 匹配允许值集合；BETWEEN 包含上下界的范围；low 下界；high 上界；AND 两个筛选条件同时满足。"
+  },
+  "dataDescriptions": {
+    "products": "共 6 行；字段：product_id、product_name、category、price、stock。"
+  },
+  "problem": "采购主管只想检查护肤品和化妆品，且只看单价35至65（包含端点）的商品。日用品不属于当前检查范围。",
+  "methodBlocks": [
+    {
+      "type": "paragraph",
+      "text": "category IN (...) 判断类别是否属于允许名单，price BETWEEN 35 AND 65 判断价格区间；AND 将两项规则组合。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "选择 IN 是为了清楚写出离散名单，选择 BETWEEN 是因为本例明确包括两端。先用类别条件观察候选，再加入价格条件。对于时间戳，则按明确的日期边界改写。",
+      "emphasis": []
+    }
+  ],
+  "breakdown": [
+    {
+      "kind": "fragment",
+      "title": "指定来源",
+      "sql": "FROM products",
+      "purpose": "从 products 读取输入数据。",
+      "reason": "后面的子句都基于这里得到的行。"
+    },
+    {
+      "kind": "fragment",
+      "title": "筛选行",
+      "sql": "WHERE category IN ('护肤品','化妆品') AND price BETWEEN 35 AND 65",
+      "purpose": "仅保留满足 category IN ('护肤品','化妆品') AND price BETWEEN 35 AND 65 的行。",
+      "reason": "条件结果为真才保留；未知（NULL）的行会被排除。"
+    },
+    {
+      "kind": "fragment",
+      "title": "选择输出",
+      "sql": "SELECT product_id, price",
+      "purpose": "输出 product_id, price。",
+      "reason": "输出列的顺序与别名决定结果表的形状。"
+    },
+    {
+      "kind": "fragment",
+      "title": "排序",
+      "sql": "ORDER BY price DESC;",
+      "purpose": "按 price DESC 排列结果。",
+      "reason": "查询结果的默认行序没有保证，需要显式排序。"
+    }
+  ],
+  "completeCode": {
+    "mysqlSql": "SELECT product_id, price FROM products WHERE category IN ('护肤品','化妆品') AND price BETWEEN 35 AND 65 ORDER BY price DESC;",
+    "sqliteSql": "SELECT product_id, price FROM products WHERE category IN ('护肤品','化妆品') AND price BETWEEN 35 AND 65 ORDER BY price DESC;"
+  },
+  "expectedResult": {
+    "columns": [
+      "product_id",
+      "price"
+    ],
+    "rows": [
+      [
+        4,
+        65
+      ],
+      [
+        5,
+        45
+      ],
+      [
+        3,
+        35
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "resultBlocks": [
+    {
+      "type": "paragraph",
+      "text": "候选类别包含编号1至5，进一步筛选后只剩3、4、5，价格35、65、45。编号6类别不符；编号1、2属于允许类别但价格不符。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "与上一节比较表达式示例虽然得到相同结果，但业务条件不同，不能据此认为类别条件多余。",
+      "emphasis": []
+    }
+  ],
+  "extensions": [
+    {
+      "label": "仅筛选类别",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "先验证名单范围：价格尚未参与筛选。",
+          "emphasis": []
+        }
+      ],
+      "sql": "SELECT product_id, category, price FROM products WHERE category IN ('护肤品','化妆品') ORDER BY price DESC;",
+      "result": {
+        "columns": [
+          "product_id",
+          "category",
+          "price"
+        ],
+        "rows": [
+          [
+            2,
+            "护肤品",
+            89
+          ],
+          [
+            4,
+            "化妆品",
+            65
+          ],
+          [
+            5,
+            "化妆品",
+            45
+          ],
+          [
+            3,
+            "护肤品",
+            35
+          ],
+          [
+            1,
+            "护肤品",
+            15
+          ]
+        ]
+      }
+    },
+    {
+      "label": "等价的显式比较",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "对本例已知数值和文本，显式写法与集合和区间写法的结果一致。",
+          "emphasis": []
+        }
+      ],
+      "sql": "SELECT product_id, price FROM products WHERE (category='护肤品' OR category='化妆品') AND price>=35 AND price<=65 ORDER BY price DESC;",
+      "result": {
+        "columns": [
+          "product_id",
+          "price"
+        ],
+        "rows": [
+          [
+            4,
+            65
+          ],
+          [
+            5,
+            45
+          ],
+          [
+            3,
+            35
+          ]
+        ]
+      }
+    }
+  ],
+  "cautions": {
+    "comparison": [
+      {
+        "type": "paragraph",
+        "text": "IN 适合离散选项；BETWEEN 适合有序区间。不要用 BETWEEN 表达无实际顺序关系的类别名单。",
+        "emphasis": []
+      }
+    ],
+    "example": [
+      {
+        "type": "paragraph",
+        "text": "BETWEEN 65 AND 35 期待自动交换上下界。",
+        "emphasis": []
+      }
+    ],
+    "reason": [],
+    "correction": [
+      {
+        "type": "paragraph",
+        "text": "使用 BETWEEN 35 AND 65；日期时间常改为左闭右开区间。",
+        "emphasis": []
+      }
+    ],
+    "notes": [
+      {
+        "type": "paragraph",
+        "text": "不同数据库的隐式类型转换可能不同；比较前核对字段类型。",
+        "emphasis": []
+      }
+    ]
+  },
+  "sourcePath": "source/unified73/kp03-03.json",
+  "sourceSha256": "3f3b47bd84bad6164ce5c6c93af78cf52791f2abea4aeab655f836b19a077333"
+}

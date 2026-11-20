@@ -1,0 +1,816 @@
+{
+  "id": "kp19-03",
+  "chapterId": "ch19",
+  "title": "客户复购率与统计粒度",
+  "learningObjective": "能够从订单粒度转换到客户粒度，正确计算期间复购人数与复购率。",
+  "prerequisites": [
+    "kp19-02"
+  ],
+  "concept": "复购率是期间有至少两笔有效购买的客户人数÷有至少一笔有效购买的客户人数×100%。不是复购订单占比，也不是所有注册客户中复购客户的占比。一个订单可能有多条商品明细，必须按订单编号计数；同一客户的有效订单次数再用于分类。",
+  "syntax": "WITH purchases AS (\n  SELECT c.customer_id, COUNT(DISTINCT o.order_id) purchase_count\n  FROM customers c JOIN v_order_net o ON o.customer_id=c.customer_id\n  WHERE o.channel='online' AND o.order_date BETWEEN '2025-01-01' AND '2025-12-31'\n    AND o.net_cents>0\n  GROUP BY c.customer_id\n)\nSELECT COUNT(*) AS purchasing_customers,\n  COALESCE(SUM(CASE WHEN purchase_count>=2 THEN 1 ELSE 0 END),0) AS repeat_customers,\n  ROUND(100.0*COALESCE(SUM(CASE WHEN purchase_count>=2 THEN 1 ELSE 0 END),0)/NULLIF(COUNT(*),0),2) AS repeat_pct\nFROM purchases",
+  "parameters": {},
+  "fixtureIds": [
+    "kp19-03-stores",
+    "kp19-03-customers",
+    "kp19-03-calendar_days",
+    "kp19-03-orders",
+    "kp19-03-order_items",
+    "kp19-03-returns"
+  ],
+  "sourceTables": [
+    {
+      "name": "stores",
+      "columns": [
+        {
+          "name": "store_id",
+          "sqliteType": "INTEGER",
+          "type": "INTEGER"
+        },
+        {
+          "name": "store_name",
+          "sqliteType": "TEXT",
+          "type": "TEXT"
+        },
+        {
+          "name": "city",
+          "sqliteType": "TEXT",
+          "type": "TEXT"
+        },
+        {
+          "name": "fulfillment_warehouse_id",
+          "sqliteType": "INTEGER",
+          "type": "INTEGER"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          "门店1",
+          "古晋",
+          1
+        ],
+        [
+          2,
+          "门店2",
+          "古晋",
+          1
+        ],
+        [
+          3,
+          "门店3",
+          "古晋",
+          1
+        ]
+      ]
+    },
+    {
+      "name": "customers",
+      "columns": [
+        {
+          "name": "customer_id",
+          "sqliteType": "INTEGER",
+          "type": "INTEGER"
+        },
+        {
+          "name": "customer_name",
+          "sqliteType": "TEXT",
+          "type": "TEXT"
+        },
+        {
+          "name": "signup_date",
+          "sqliteType": "TEXT",
+          "type": "TEXT"
+        },
+        {
+          "name": "region",
+          "sqliteType": "TEXT",
+          "type": "TEXT"
+        },
+        {
+          "name": "member_since_date",
+          "sqliteType": "TEXT",
+          "type": "TEXT"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          "客户1",
+          "2024-01-01",
+          null,
+          null
+        ],
+        [
+          2,
+          "客户2",
+          "2024-01-01",
+          null,
+          null
+        ],
+        [
+          3,
+          "客户3",
+          "2024-01-01",
+          null,
+          null
+        ],
+        [
+          4,
+          "客户4",
+          "2024-01-01",
+          null,
+          null
+        ]
+      ]
+    },
+    {
+      "name": "calendar_days",
+      "columns": [
+        {
+          "name": "day",
+          "sqliteType": "TEXT",
+          "type": "TEXT"
+        },
+        {
+          "name": "month_key",
+          "sqliteType": "TEXT",
+          "type": "TEXT"
+        },
+        {
+          "name": "day_index",
+          "sqliteType": "INTEGER",
+          "type": "INTEGER"
+        }
+      ],
+      "rows": [
+        [
+          "2025-01-01",
+          "2025-01",
+          1
+        ],
+        [
+          "2025-02-01",
+          "2025-02",
+          2
+        ],
+        [
+          "2025-03-01",
+          "2025-03",
+          3
+        ],
+        [
+          "2025-04-01",
+          "2025-04",
+          4
+        ],
+        [
+          "2025-05-01",
+          "2025-05",
+          5
+        ],
+        [
+          "2025-06-01",
+          "2025-06",
+          6
+        ],
+        [
+          "2025-07-01",
+          "2025-07",
+          7
+        ],
+        [
+          "2025-08-01",
+          "2025-08",
+          8
+        ],
+        [
+          "2025-09-01",
+          "2025-09",
+          9
+        ],
+        [
+          "2025-10-01",
+          "2025-10",
+          10
+        ],
+        [
+          "2025-11-01",
+          "2025-11",
+          11
+        ],
+        [
+          "2025-12-01",
+          "2025-12",
+          12
+        ]
+      ]
+    },
+    {
+      "name": "orders",
+      "columns": [
+        {
+          "name": "order_id",
+          "sqliteType": "INTEGER",
+          "type": "INTEGER"
+        },
+        {
+          "name": "store_id",
+          "sqliteType": "INTEGER",
+          "type": "INTEGER"
+        },
+        {
+          "name": "customer_id",
+          "sqliteType": "INTEGER",
+          "type": "INTEGER"
+        },
+        {
+          "name": "session_id",
+          "sqliteType": "INTEGER",
+          "type": "INTEGER"
+        },
+        {
+          "name": "order_date",
+          "sqliteType": "TEXT",
+          "type": "TEXT"
+        },
+        {
+          "name": "channel",
+          "sqliteType": "TEXT",
+          "type": "TEXT"
+        },
+        {
+          "name": "status",
+          "sqliteType": "TEXT",
+          "type": "TEXT"
+        },
+        {
+          "name": "cancellation_reason",
+          "sqliteType": "TEXT",
+          "type": "TEXT"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          1,
+          null,
+          null,
+          "2025-01-02",
+          "store",
+          "completed",
+          null
+        ],
+        [
+          2,
+          1,
+          null,
+          null,
+          "2025-03-02",
+          "store",
+          "completed",
+          null
+        ],
+        [
+          3,
+          2,
+          null,
+          null,
+          "2025-03-03",
+          "store",
+          "completed",
+          null
+        ],
+        [
+          4,
+          1,
+          null,
+          null,
+          "2024-12-31",
+          "store",
+          "completed",
+          null
+        ],
+        [
+          5,
+          null,
+          1,
+          5,
+          "2025-01-02",
+          "online",
+          "completed",
+          null
+        ],
+        [
+          6,
+          null,
+          1,
+          6,
+          "2025-03-02",
+          "online",
+          "completed",
+          null
+        ],
+        [
+          7,
+          null,
+          2,
+          7,
+          "2025-03-03",
+          "online",
+          "completed",
+          null
+        ],
+        [
+          8,
+          null,
+          2,
+          8,
+          "2025-04-03",
+          "online",
+          "completed",
+          null
+        ],
+        [
+          9,
+          null,
+          3,
+          9,
+          "2025-05-03",
+          "online",
+          "cancelled",
+          "客户取消"
+        ],
+        [
+          10,
+          null,
+          4,
+          10,
+          "2025-06-03",
+          "online",
+          "pending",
+          null
+        ],
+        [
+          11,
+          null,
+          3,
+          11,
+          "2026-01-01",
+          "online",
+          "completed",
+          null
+        ]
+      ]
+    },
+    {
+      "name": "order_items",
+      "columns": [
+        {
+          "name": "order_item_id",
+          "sqliteType": "INTEGER",
+          "type": "INTEGER"
+        },
+        {
+          "name": "order_id",
+          "sqliteType": "INTEGER",
+          "type": "INTEGER"
+        },
+        {
+          "name": "product_id",
+          "sqliteType": "INTEGER",
+          "type": "INTEGER"
+        },
+        {
+          "name": "promotion_id",
+          "sqliteType": "INTEGER",
+          "type": "INTEGER"
+        },
+        {
+          "name": "quantity",
+          "sqliteType": "INTEGER",
+          "type": "INTEGER"
+        },
+        {
+          "name": "unit_price_cents",
+          "sqliteType": "INTEGER",
+          "type": "INTEGER"
+        },
+        {
+          "name": "discount_cents",
+          "sqliteType": "INTEGER",
+          "type": "INTEGER"
+        },
+        {
+          "name": "unit_cost_cents",
+          "sqliteType": "INTEGER",
+          "type": "INTEGER"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          1,
+          1,
+          null,
+          2,
+          100,
+          0,
+          10
+        ],
+        [
+          2,
+          1,
+          2,
+          null,
+          1,
+          100,
+          0,
+          10
+        ],
+        [
+          3,
+          1,
+          3,
+          null,
+          1,
+          100,
+          0,
+          10
+        ],
+        [
+          4,
+          1,
+          4,
+          null,
+          1,
+          100,
+          0,
+          10
+        ],
+        [
+          5,
+          2,
+          5,
+          null,
+          1,
+          50,
+          0,
+          10
+        ],
+        [
+          6,
+          3,
+          1,
+          null,
+          1,
+          80,
+          0,
+          10
+        ],
+        [
+          7,
+          4,
+          1,
+          null,
+          1,
+          900,
+          0,
+          10
+        ],
+        [
+          8,
+          5,
+          1,
+          null,
+          1,
+          70,
+          0,
+          10
+        ],
+        [
+          9,
+          5,
+          2,
+          null,
+          1,
+          30,
+          0,
+          10
+        ],
+        [
+          10,
+          6,
+          2,
+          null,
+          1,
+          60,
+          0,
+          10
+        ],
+        [
+          11,
+          7,
+          1,
+          null,
+          1,
+          40,
+          0,
+          10
+        ],
+        [
+          12,
+          8,
+          2,
+          null,
+          1,
+          20,
+          0,
+          10
+        ],
+        [
+          13,
+          9,
+          1,
+          null,
+          1,
+          200,
+          0,
+          10
+        ],
+        [
+          14,
+          10,
+          1,
+          null,
+          1,
+          200,
+          0,
+          10
+        ],
+        [
+          15,
+          11,
+          1,
+          null,
+          1,
+          200,
+          0,
+          10
+        ]
+      ]
+    },
+    {
+      "name": "returns",
+      "columns": [
+        {
+          "name": "return_id",
+          "sqliteType": "INTEGER",
+          "type": "INTEGER"
+        },
+        {
+          "name": "order_item_id",
+          "sqliteType": "INTEGER",
+          "type": "INTEGER"
+        },
+        {
+          "name": "return_date",
+          "sqliteType": "TEXT",
+          "type": "TEXT"
+        },
+        {
+          "name": "quantity",
+          "sqliteType": "INTEGER",
+          "type": "INTEGER"
+        },
+        {
+          "name": "refund_cents",
+          "sqliteType": "INTEGER",
+          "type": "INTEGER"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          1,
+          "2025-02-01",
+          1,
+          100
+        ],
+        [
+          2,
+          12,
+          "2025-04-05",
+          1,
+          20
+        ]
+      ]
+    }
+  ],
+  "mysqlSql": "WITH purchases AS (\n  SELECT c.customer_id, COUNT(DISTINCT o.order_id) purchase_count\n  FROM customers c JOIN v_order_net o ON o.customer_id=c.customer_id\n  WHERE o.channel='online' AND o.order_date BETWEEN '2025-01-01' AND '2025-12-31'\n    AND o.net_cents>0\n  GROUP BY c.customer_id\n)\nSELECT COUNT(*) AS purchasing_customers,\n  COALESCE(SUM(CASE WHEN purchase_count>=2 THEN 1 ELSE 0 END),0) AS repeat_customers,\n  ROUND(100.0*COALESCE(SUM(CASE WHEN purchase_count>=2 THEN 1 ELSE 0 END),0)/NULLIF(COUNT(*),0),2) AS repeat_pct\nFROM purchases",
+  "sqliteSql": "WITH purchases AS (\n  SELECT c.customer_id, COUNT(DISTINCT o.order_id) purchase_count\n  FROM customers c JOIN v_order_net o ON o.customer_id=c.customer_id\n  WHERE o.channel='online' AND o.order_date BETWEEN '2025-01-01' AND '2025-12-31'\n    AND o.net_cents>0\n  GROUP BY c.customer_id\n)\nSELECT COUNT(*) AS purchasing_customers,\n  COALESCE(SUM(CASE WHEN purchase_count>=2 THEN 1 ELSE 0 END),0) AS repeat_customers,\n  ROUND(100.0*COALESCE(SUM(CASE WHEN purchase_count>=2 THEN 1 ELSE 0 END),0)/NULLIF(COUNT(*),0),2) AS repeat_pct\nFROM purchases",
+  "executionSteps": [
+    "筛选有效线上订单",
+    "按客户计算不同订单数",
+    "统计购买及复购人数",
+    "计算复购率"
+  ],
+  "useCase": "2025全年、线上、已完成且扣退款后净额大于0的订单，关联客户主档。全额退款、取消、待付款、期外或线下订单不计。原项目净订单视图已经处理已完成状态及退款；再次扣退款会重复冲减。无有效购买客户时返回人数0、比率NULL。",
+  "comparison": "分母不是订单数、注册人数或商品行数；本期复购与历史首购分群不同。",
+  "commonError": {
+    "example": "直接在订单明细层用 COUNT(*) 算购买次数，或以所有客户为分母。",
+    "correction": "先计算不同有效订单数，再在客户粒度统计人数。"
+  },
+  "notes": "示例采用可逐笔核对的小型数据，练习采用正式业务数据库。金额单位为马币分。",
+  "compatibility": {
+    "status": "直接兼容",
+    "detail": "仅在本示例数据与语义范围验证；不代表全部 MySQL 语法兼容。"
+  },
+  "relatedQuestionIds": [
+    "q0261",
+    "q0263",
+    "q0265"
+  ],
+  "relatedFlashcardIds": [
+    "fc0141"
+  ],
+  "relatedKnowledgePointIds": [
+    "kp06-01",
+    "kp07-01",
+    "kp08-01",
+    "kp09-01",
+    "kp10-01",
+    "kp12-01",
+    "kp14-01",
+    "kp15-01"
+  ],
+  "mysqlVerification": "未执行原生 MySQL",
+  "result": {
+    "columns": [
+      "purchasing_customers",
+      "repeat_customers",
+      "repeat_pct"
+    ],
+    "rows": [
+      [
+        2,
+        1,
+        50.0
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": true
+  },
+  "projectId": "ecommerce",
+  "visualization": {
+    "kind": "stepFlow",
+    "steps": [
+      {
+        "id": "1",
+        "label": "过滤取消订单"
+      },
+      {
+        "id": "2",
+        "label": "客户1两笔、客户2一笔"
+      },
+      {
+        "id": "3",
+        "label": "复购1人/购买2人"
+      }
+    ],
+    "sourceFixtureIds": [
+      "lesson-commerce_orders"
+    ],
+    "resultColumns": [
+      "buyers",
+      "repeat_buyers",
+      "repeat_pct"
+    ]
+  },
+  "mysqlVerificationScript": "validation/mysql/kp19-03.sql",
+  "primaryQuestionIds": [
+    "q0265"
+  ],
+  "primaryFlashcardIds": [
+    "fc0141"
+  ],
+  "setupSql": "CREATE VIEW v_sales_lines AS SELECT i.order_item_id,o.order_id,o.store_id,o.customer_id,o.session_id,o.channel,o.order_date,i.product_id,i.promotion_id,i.quantity-COALESCE(r.qty,0) AS net_qty,i.quantity*i.unit_price_cents-i.discount_cents-COALESCE(r.refund,0) AS net_cents,(i.quantity-COALESCE(r.qty,0))*i.unit_cost_cents AS cost_cents,i.discount_cents,COALESCE(r.refund,0) AS refund_cents FROM orders o JOIN order_items i ON o.order_id=i.order_id LEFT JOIN (SELECT order_item_id,SUM(quantity) qty,SUM(refund_cents) refund FROM returns WHERE return_date<='2025-12-31' GROUP BY order_item_id) r ON r.order_item_id=i.order_item_id WHERE o.status='completed';\nCREATE VIEW v_order_net AS SELECT order_id,store_id,customer_id,session_id,channel,order_date,SUM(net_cents) net_cents,SUM(cost_cents) cost_cents FROM v_sales_lines GROUP BY order_id,store_id,customer_id,session_id,channel,order_date;",
+  "teaching": {
+    "problem": "2025全年、线上、已完成且扣退款后净额大于0的订单，关联客户主档。全额退款、取消、待付款、期外或线下订单不计。原项目净订单视图已经处理已完成状态及退款；再次扣退款会重复冲减。无有效购买客户时返回人数0、比率NULL。",
+    "codeExplanation": "先在订单层过滤范围和净额，再连接客户主档排除无有效客户编号的记录。COUNT(DISTINCT o.order_id) 保证一笔订单只数一次；GROUP BY c.customer_id 将订单粒度转换为客户粒度。外层 COUNT(*) 是购买客户人数，因为内层每人仅一行；SUM(CASE WHEN purchase_count>=2 THEN 1 ELSE 0 END) 给每位复购客户计1。乘100.0、NULLIF 防止整数截断和除零，COALESCE 让空输入的复购人数为0。独立示例直接模拟已处理好的订单视图，不代表原始订单表的全部记录。",
+    "resultExplanation": "客户1两笔有效订单，客户2一笔有效订单且另一笔全退；客户3的线上订单在2026年、线下订单不纳入；客户4无有效订单。分母2人、分子1人，复购率50%。原项目小型案例也给出2、1、50。这个比率仅反映本期至少购买两次的情况，不能解释历史老客户占比，也不能证明复购增长。",
+    "checkpoints": [
+      {
+        "name": "purchases",
+        "label": "每位客户的有效购买订单数",
+        "sql": "WITH purchases AS (\n  SELECT c.customer_id, COUNT(DISTINCT o.order_id) purchase_count\n  FROM customers c JOIN v_order_net o ON o.customer_id=c.customer_id\n  WHERE o.channel='online' AND o.order_date BETWEEN '2025-01-01' AND '2025-12-31'\n    AND o.net_cents>0\n  GROUP BY c.customer_id\n)\nSELECT * FROM purchases ORDER BY 1, 2 LIMIT 3;",
+        "result": {
+          "columns": [
+            "customer_id",
+            "purchase_count"
+          ],
+          "rows": [
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              1
+            ]
+          ]
+        }
+      }
+    ],
+    "mergedConcepts": [],
+    "mergeExamples": [
+      {
+        "label": "小型示例：有效订单明细",
+        "explanation": "全退、期外、线下均排除。",
+        "sql": "WITH customers(customer_id) AS (SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4),\nv_order_net(order_id,customer_id,channel,order_date,net_cents) AS (SELECT 5,1,'online','2025-01-02',100 UNION ALL SELECT 6,1,'online','2025-03-02',60 UNION ALL SELECT 7,2,'online','2025-03-03',40 UNION ALL SELECT 8,2,'online','2025-04-03',0 UNION ALL SELECT 11,3,'online','2026-01-01',200 UNION ALL SELECT 12,3,'store','2025-05-01',100),\npurchases AS (SELECT c.customer_id,COUNT(DISTINCT o.order_id) purchase_count FROM customers c JOIN v_order_net o ON o.customer_id=c.customer_id WHERE o.channel='online' AND o.order_date BETWEEN '2025-01-01' AND '2025-12-31' AND o.net_cents>0 GROUP BY c.customer_id)\nSELECT order_id,customer_id,net_cents FROM v_order_net WHERE channel='online' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' AND net_cents>0 ORDER BY net_cents;",
+        "result": {
+          "columns": [
+            "order_id",
+            "customer_id",
+            "net_cents"
+          ],
+          "rows": [
+            [
+              7,
+              2,
+              40
+            ],
+            [
+              6,
+              1,
+              60
+            ],
+            [
+              5,
+              1,
+              100
+            ]
+          ]
+        }
+      },
+      {
+        "label": "小型示例：客户购买次数",
+        "explanation": "每人一行，客户1计两次。",
+        "sql": "WITH customers(customer_id) AS (SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4),\nv_order_net(order_id,customer_id,channel,order_date,net_cents) AS (SELECT 5,1,'online','2025-01-02',100 UNION ALL SELECT 6,1,'online','2025-03-02',60 UNION ALL SELECT 7,2,'online','2025-03-03',40 UNION ALL SELECT 8,2,'online','2025-04-03',0 UNION ALL SELECT 11,3,'online','2026-01-01',200 UNION ALL SELECT 12,3,'store','2025-05-01',100),\npurchases AS (SELECT c.customer_id,COUNT(DISTINCT o.order_id) purchase_count FROM customers c JOIN v_order_net o ON o.customer_id=c.customer_id WHERE o.channel='online' AND o.order_date BETWEEN '2025-01-01' AND '2025-12-31' AND o.net_cents>0 GROUP BY c.customer_id)\nSELECT * FROM purchases ORDER BY purchase_count;",
+        "result": {
+          "columns": [
+            "customer_id",
+            "purchase_count"
+          ],
+          "rows": [
+            [
+              2,
+              1
+            ],
+            [
+              1,
+              2
+            ]
+          ]
+        }
+      },
+      {
+        "label": "小型示例：完整复购率",
+        "explanation": "外层按客户数计算。",
+        "sql": "WITH customers(customer_id) AS (SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4),\nv_order_net(order_id,customer_id,channel,order_date,net_cents) AS (SELECT 5,1,'online','2025-01-02',100 UNION ALL SELECT 6,1,'online','2025-03-02',60 UNION ALL SELECT 7,2,'online','2025-03-03',40 UNION ALL SELECT 8,2,'online','2025-04-03',0 UNION ALL SELECT 11,3,'online','2026-01-01',200 UNION ALL SELECT 12,3,'store','2025-05-01',100),\npurchases AS (SELECT c.customer_id,COUNT(DISTINCT o.order_id) purchase_count FROM customers c JOIN v_order_net o ON o.customer_id=c.customer_id WHERE o.channel='online' AND o.order_date BETWEEN '2025-01-01' AND '2025-12-31' AND o.net_cents>0 GROUP BY c.customer_id)\nSELECT COUNT(*) AS purchasing_customers,COALESCE(SUM(CASE WHEN purchase_count>=2 THEN 1 ELSE 0 END),0) AS repeat_customers,ROUND(100.0*COALESCE(SUM(CASE WHEN purchase_count>=2 THEN 1 ELSE 0 END),0)/NULLIF(COUNT(*),0),2) AS repeat_pct FROM purchases;",
+        "result": {
+          "columns": [
+            "purchasing_customers",
+            "repeat_customers",
+            "repeat_pct"
+          ],
+          "rows": [
+            [
+              2,
+              1,
+              50
+            ]
+          ]
+        }
+      },
+      {
+        "label": "小型示例：空分母边界",
+        "explanation": "将期间改为无有效订单的2023年。",
+        "sql": "WITH customers(customer_id) AS (SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4),\nv_order_net(order_id,customer_id,channel,order_date,net_cents) AS (SELECT 5,1,'online','2025-01-02',100 UNION ALL SELECT 6,1,'online','2025-03-02',60 UNION ALL SELECT 7,2,'online','2025-03-03',40 UNION ALL SELECT 8,2,'online','2025-04-03',0 UNION ALL SELECT 11,3,'online','2026-01-01',200 UNION ALL SELECT 12,3,'store','2025-05-01',100),\npurchases AS (SELECT c.customer_id,COUNT(DISTINCT o.order_id) purchase_count FROM customers c JOIN v_order_net o ON o.customer_id=c.customer_id WHERE o.channel='online' AND o.order_date BETWEEN '2023-01-01' AND '2023-12-31' AND o.net_cents>0 GROUP BY c.customer_id)\nSELECT COUNT(*) AS purchasing_customers,COALESCE(SUM(CASE WHEN purchase_count>=2 THEN 1 ELSE 0 END),0) AS repeat_customers,ROUND(100.0*COALESCE(SUM(CASE WHEN purchase_count>=2 THEN 1 ELSE 0 END),0)/NULLIF(COUNT(*),0),2) AS repeat_pct FROM purchases;",
+        "result": {
+          "columns": [
+            "purchasing_customers",
+            "repeat_customers",
+            "repeat_pct"
+          ],
+          "rows": [
+            [
+              0,
+              0,
+              null
+            ]
+          ]
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,195 @@
+{
+  "schemaVersion": 1,
+  "id": "kp15-02",
+  "sourceBatch": "unified73",
+  "teachingKind": "advanced",
+  "conceptBlocks": [
+    {
+      "type": "paragraph",
+      "text": "序号为每行分配唯一位置，普通排名让并列共享名次且跳过被占用位置，连续排名按不同排序值连续编号。窗口排序决定名次，外层排序决定展示顺序。排名范围由分区决定。",
+      "emphasis": []
+    }
+  ],
+  "syntax": {
+    "purpose": "v 排名指标；id 唯一决胜键，仅用于需要确定行序时。"
+  },
+  "dataDescriptions": {
+    "employees": "共 4 行；字段：employee_id、employee_name、manager_id、salary。"
+  },
+  "problem": "人事报表需按薪资排名，同时说明并列薪资是否应占用相同名次。",
+  "methodBlocks": [
+    {
+      "type": "paragraph",
+      "text": "两个5000同薪。ROW_NUMBER 增加编号使顺序确定；RANK 和 DENSE_RANK 不添加编号，否则会破坏同薪并列。筛选前若干名需先在公用表表达式中生成名次。",
+      "emphasis": []
+    }
+  ],
+  "breakdown": [
+    {
+      "kind": "fragment",
+      "title": "指定来源",
+      "sql": "FROM employees",
+      "purpose": "从 employees 读取输入数据。",
+      "reason": "后面的子句都基于这里得到的行。"
+    },
+    {
+      "kind": "fragment",
+      "title": "选择输出",
+      "sql": "SELECT employee_id,salary,ROW_NUMBER() OVER(ORDER BY salary DESC,employee_id) AS rn,RANK() OVER(ORDER BY salary DESC) AS rnk,DENSE_RANK() OVER(ORDER BY salary DESC) AS dense_rnk",
+      "purpose": "输出查询需要的列与计算表达式。",
+      "reason": "输出列的顺序与别名决定结果表的形状。"
+    },
+    {
+      "kind": "fragment",
+      "title": "排序",
+      "sql": "ORDER BY rn;",
+      "purpose": "按 rn 排列结果。",
+      "reason": "查询结果的默认行序没有保证，需要显式排序。"
+    }
+  ],
+  "completeCode": {
+    "mysqlSql": "SELECT employee_id,salary,ROW_NUMBER() OVER(ORDER BY salary DESC,employee_id) AS rn,RANK() OVER(ORDER BY salary DESC) AS rnk,DENSE_RANK() OVER(ORDER BY salary DESC) AS dense_rnk FROM employees ORDER BY rn;",
+    "sqliteSql": "SELECT employee_id,salary,ROW_NUMBER() OVER(ORDER BY salary DESC,employee_id) AS rn,RANK() OVER(ORDER BY salary DESC) AS rnk,DENSE_RANK() OVER(ORDER BY salary DESC) AS dense_rnk FROM employees ORDER BY rn;"
+  },
+  "expectedResult": {
+    "columns": [
+      "employee_id",
+      "salary",
+      "rn",
+      "rnk",
+      "dense_rnk"
+    ],
+    "rows": [
+      [
+        1,
+        8000,
+        1,
+        1,
+        1
+      ],
+      [
+        2,
+        5000,
+        2,
+        2,
+        2
+      ],
+      [
+        3,
+        5000,
+        3,
+        2,
+        2
+      ],
+      [
+        4,
+        3000,
+        4,
+        4,
+        3
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "resultBlocks": [
+    {
+      "type": "paragraph",
+      "text": "员工2及3的序号是2和3，普通排名均为2，员工4的普通排名为4，连续排名为3。",
+      "emphasis": []
+    }
+  ],
+  "extensions": [
+    {
+      "label": "固定两人",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "序号小于等于2只返回两人。",
+          "emphasis": []
+        }
+      ],
+      "sql": "WITH r AS (SELECT employee_id,ROW_NUMBER() OVER(ORDER BY salary DESC,employee_id) AS rn FROM employees) SELECT employee_id,rn FROM r WHERE rn<=2 ORDER BY rn;",
+      "result": {
+        "columns": [
+          "employee_id",
+          "rn"
+        ],
+        "rows": [
+          [
+            1,
+            1
+          ],
+          [
+            2,
+            2
+          ]
+        ]
+      }
+    },
+    {
+      "label": "保留并列第二名",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "普通排名小于等于2返回三人。",
+          "emphasis": []
+        }
+      ],
+      "sql": "WITH r AS (SELECT employee_id,RANK() OVER(ORDER BY salary DESC) AS rnk FROM employees) SELECT employee_id,rnk FROM r WHERE rnk<=2 ORDER BY rnk;",
+      "result": {
+        "columns": [
+          "employee_id",
+          "rnk"
+        ],
+        "rows": [
+          [
+            1,
+            1
+          ],
+          [
+            2,
+            2
+          ],
+          [
+            3,
+            2
+          ]
+        ]
+      }
+    }
+  ],
+  "cautions": {
+    "comparison": [
+      {
+        "type": "paragraph",
+        "text": "固定最多两人使用序号；保留第二名的全部并列者使用普通排名。",
+        "emphasis": []
+      }
+    ],
+    "example": [
+      {
+        "type": "paragraph",
+        "text": "在同层 WHERE 使用窗口函数，或给普通排名添加唯一编号导致并列消失。",
+        "emphasis": []
+      }
+    ],
+    "reason": [],
+    "correction": [
+      {
+        "type": "paragraph",
+        "text": "内层计算排名后外层筛选；并列函数只使用定义并列的业务排序键。",
+        "emphasis": []
+      }
+    ],
+    "notes": [
+      {
+        "type": "paragraph",
+        "text": "若分组取前若干名，在窗口中添加分区；外层仍显式排序。",
+        "emphasis": []
+      }
+    ]
+  },
+  "sourcePath": "source/unified73/kp15-02.json",
+  "sourceSha256": "2ee77fc3213ba6c7440aeeae0b748d4d19dd369fcccd07d9e1666fe2b2bb2670"
+}

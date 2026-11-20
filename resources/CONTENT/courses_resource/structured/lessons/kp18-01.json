@@ -1,0 +1,296 @@
+{
+  "schemaVersion": 1,
+  "id": "kp18-01",
+  "sourceBatch": "unified73",
+  "teachingKind": "syntax",
+  "conceptBlocks": [
+    {
+      "type": "paragraph",
+      "text": "索引是辅助定位数据的结构，而不是额外的业务筛选条件。常见树形索引按键组织数据，可缩小需要检查的候选范围。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "选择性较高的条件通常匹配较少记录，但是否采用索引取决于统计信息、表大小、成本及优化器。复合索引按列顺序组织，门店等值加日期范围通常适合门店在前、日期在后。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "普通索引列上直接比较常比套函数更容易形成搜索范围。索引增加空间及写入维护成本。执行计划用于观察访问方式，不能仅凭出现索引断言已经提速。",
+      "emphasis": []
+    }
+  ],
+  "syntax": {
+    "purpose": "idx_price 价格索引名称；store_id 复合索引前导列；order_date 日期范围列；EXPLAIN 查看计划；EXPLAIN ANALYZE 实际执行并测量。"
+  },
+  "dataDescriptions": {
+    "products": "共 6 行；字段：product_id、product_name、category、price、stock。"
+  },
+  "problem": "商品检索需要查找指定价格，门店报表需要按门店和月份查交易。希望减少不必要的扫描，不改变报表口径。",
+  "methodBlocks": [
+    {
+      "type": "paragraph",
+      "text": "原查询使用 price=89 直接比较。先读取相同查询结果，再建立索引并重新核对。门店月份查询使用门店等值和左闭右开日期范围，避免仅按月份数字筛选而混入其他年份。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "复合索引首列不是绝对限制，跳跃扫描等受优化器影响；实际使用情况看计划。MySQL EXPLAIN 的 type、key、rows 分别帮助理解访问类型、所选索引、估计检查行数；",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "EXPLAIN ANALYZE 实际执行查询，不能当成无副作用预览。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "SQLite EXPLAIN QUERY PLAN 的 SEARCH 与 SCAN 是本地计划信息，不能当成 MySQL 耗时或估计行数。",
+      "emphasis": []
+    }
+  ],
+  "breakdown": [
+    {
+      "kind": "fragment",
+      "title": "指定来源",
+      "sql": "FROM products",
+      "purpose": "从 products 读取输入数据。",
+      "reason": "后面的子句都基于这里得到的行。"
+    },
+    {
+      "kind": "fragment",
+      "title": "筛选行",
+      "sql": "WHERE price=89",
+      "purpose": "仅保留满足 price=89 的行。",
+      "reason": "条件结果为真才保留；未知（NULL）的行会被排除。"
+    },
+    {
+      "kind": "fragment",
+      "title": "选择输出",
+      "sql": "SELECT product_id,price",
+      "purpose": "输出 product_id,price。",
+      "reason": "输出列的顺序与别名决定结果表的形状。"
+    },
+    {
+      "kind": "fragment",
+      "title": "排序",
+      "sql": "ORDER BY product_name DESC;",
+      "purpose": "按 product_name DESC 排列结果。",
+      "reason": "查询结果的默认行序没有保证，需要显式排序。"
+    }
+  ],
+  "completeCode": {
+    "mysqlSql": "SELECT product_id,price FROM products WHERE price=89 ORDER BY product_name DESC;",
+    "sqliteSql": "SELECT product_id,price FROM products WHERE price=89 ORDER BY product_name DESC;"
+  },
+  "expectedResult": {
+    "columns": [
+      "product_id",
+      "price"
+    ],
+    "rows": [
+      [
+        2,
+        89
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "resultBlocks": [
+    {
+      "type": "paragraph",
+      "text": "价格89仅对应商品2；索引前后结果一致。门店1在二月的订单3和5金额分别为600和1500。索引计划可能随版本变化；本地示例只证明本次访问路径，不能证明真实业务性能提升。",
+      "emphasis": []
+    }
+  ],
+  "extensions": [
+    {
+      "label": "无索引结果对照",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "无索引时结果相同。",
+          "emphasis": []
+        }
+      ],
+      "sql": "SELECT product_id,price FROM products WHERE price=89 ORDER BY product_name DESC;",
+      "result": {
+        "columns": [
+          "product_id",
+          "price"
+        ],
+        "rows": [
+          [
+            2,
+            89
+          ]
+        ]
+      }
+    },
+    {
+      "label": "建立价格索引后查询",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "建立索引后仍只返回商品2。",
+          "emphasis": []
+        }
+      ],
+      "sql": "CREATE INDEX idx_price ON products(price);\nSELECT product_id,price FROM products WHERE price=89 ORDER BY product_name DESC;",
+      "result": {
+        "columns": [
+          "product_id",
+          "price"
+        ],
+        "rows": [
+          [
+            2,
+            89
+          ]
+        ]
+      }
+    },
+    {
+      "label": "复合索引门店月报",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "等值门店及日期范围共同约束候选行；使用来源课程的五条原始数据。",
+          "emphasis": []
+        }
+      ],
+      "sql": "CREATE TABLE demo_orders(id INTEGER PRIMARY KEY,category TEXT,sales INTEGER,store_id INTEGER,order_date VARCHAR(10),customer_id INTEGER);\nINSERT INTO demo_orders VALUES (1,'护肤品',800,1,'2026-01-03',1),(2,'化妆品',400,2,'2026-01-10',2),(3,'护肤品',600,1,'2026-02-02',1),(4,'化妆品',300,2,'2026-02-15',NULL),(5,'日用品',1500,1,'2026-02-20',3);\nCREATE INDEX idx_store_date ON demo_orders(store_id,order_date);\nSELECT id,sales FROM demo_orders WHERE store_id=1 AND order_date >= '2026-02-01' AND order_date < '2026-03-01' ORDER BY sales DESC;",
+      "result": {
+        "columns": [
+          "id",
+          "sales"
+        ],
+        "rows": [
+          [
+            5,
+            1500
+          ],
+          [
+            3,
+            600
+          ]
+        ]
+      }
+    },
+    {
+      "label": "无索引计划（本地计划）",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "仅展示本次 SQLite 观测结果；不同版本可能改变。",
+          "emphasis": []
+        }
+      ],
+      "sql": "EXPLAIN QUERY PLAN SELECT product_id FROM products WHERE price=89;",
+      "result": {
+        "columns": [
+          "id",
+          "parent",
+          "notused",
+          "detail"
+        ],
+        "rows": [
+          [
+            2,
+            0,
+            0,
+            "SCAN products"
+          ]
+        ]
+      }
+    },
+    {
+      "label": "价格索引计划（本地计划）",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "仅展示本次 SQLite 观测结果；不同版本可能改变。",
+          "emphasis": []
+        }
+      ],
+      "sql": "CREATE INDEX idx_price ON products(price);\nEXPLAIN QUERY PLAN SELECT product_id FROM products WHERE price=89;",
+      "result": {
+        "columns": [
+          "id",
+          "parent",
+          "notused",
+          "detail"
+        ],
+        "rows": [
+          [
+            3,
+            0,
+            0,
+            "SEARCH products USING INDEX idx_price (price=?)"
+          ]
+        ]
+      }
+    },
+    {
+      "label": "复合索引计划（本地计划）",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "仅展示本次 SQLite 观测结果；不同版本可能改变。",
+          "emphasis": []
+        }
+      ],
+      "sql": "CREATE TABLE demo_orders(id INTEGER PRIMARY KEY,category TEXT,sales INTEGER,store_id INTEGER,order_date VARCHAR(10),customer_id INTEGER);\nINSERT INTO demo_orders VALUES (1,'护肤品',800,1,'2026-01-03',1),(2,'化妆品',400,2,'2026-01-10',2),(3,'护肤品',600,1,'2026-02-02',1),(4,'化妆品',300,2,'2026-02-15',NULL),(5,'日用品',1500,1,'2026-02-20',3);\nCREATE INDEX idx_store_date ON demo_orders(store_id,order_date);\nEXPLAIN QUERY PLAN SELECT id,sales FROM demo_orders WHERE store_id=1 AND order_date >= '2026-02-01' AND order_date < '2026-03-01';",
+      "result": {
+        "columns": [
+          "id",
+          "parent",
+          "notused",
+          "detail"
+        ],
+        "rows": [
+          [
+            3,
+            0,
+            0,
+            "SEARCH demo_orders USING INDEX idx_store_date (store_id=? AND order_date>? AND order_date<?)"
+          ]
+        ]
+      }
+    }
+  ],
+  "cautions": {
+    "comparison": [
+      {
+        "type": "paragraph",
+        "text": "索引改变访问方式，不改变正确查询结果；全表扫描小表不必然是错误。",
+        "emphasis": []
+      }
+    ],
+    "example": [
+      {
+        "type": "paragraph",
+        "text": "每列都建索引，或看到全表扫描就认定查询有问题。",
+        "emphasis": []
+      }
+    ],
+    "reason": [],
+    "correction": [
+      {
+        "type": "paragraph",
+        "text": "针对真实筛选、连接和排序模式设计索引，检查代表性数据的计划、结果及耗时。",
+        "emphasis": []
+      }
+    ],
+    "notes": [
+      {
+        "type": "paragraph",
+        "text": "MySQL 原生计划尚未执行。SQLite 计划仅为教学观测，计划字符串不保证跨版本稳定。",
+        "emphasis": []
+      }
+    ]
+  },
+  "sourcePath": "source/unified73/kp18-01.json",
+  "sourceSha256": "831a00e4b3a261daf27d3a55093d1a4fd95368166f105aefac46c249b1976279"
+}

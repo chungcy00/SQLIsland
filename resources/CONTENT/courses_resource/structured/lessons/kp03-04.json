@@ -1,0 +1,198 @@
+{
+  "schemaVersion": 1,
+  "id": "kp03-04",
+  "sourceBatch": "unified73",
+  "teachingKind": "syntax",
+  "conceptBlocks": [
+    {
+      "type": "paragraph",
+      "text": "文本相等比较要求字段符合指定值，而 LIKE 根据模式判断文本是否符合某种结构。百分号 % 匹配零个或多个字符，下划线 _ 匹配恰好一个字符。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "模式通常要匹配整个字符串，因此前缀搜索把百分号放在末尾，后缀搜索放在开头，包含搜索则两边都放。当业务要求找出实际包含下划线或百分号的名称时，必须把通配符转义。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "本例通过 ESCAPE 指定感叹号为转义字符，!_ 表示普通下划线，!% 表示普通百分号，!! 表示感叹号本身。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "大小写敏感性受数据库和排序规则影响，不能从一个本地例子推断全部数据库表现。",
+      "emphasis": []
+    }
+  ],
+  "syntax": {
+    "purpose": "LIKE 按模式匹配文本；% 零个或多个字符；_ 恰好一个字符；ESCAPE 指定转义字符。"
+  },
+  "dataDescriptions": {
+    "products": "共 6 行；字段：product_id、product_name、category、price、stock。"
+  },
+  "problem": "商品主数据管理员需要找出名称含下划线的商品，检查是否仍有旧的命名格式。只需查找真实存在的下划线，而不是任意字符。",
+  "methodBlocks": [
+    {
+      "type": "paragraph",
+      "text": "product_name LIKE '%!_%' 中，两侧百分号允许任意前后缀；ESCAPE '!' 让紧随其后的下划线按普通字符匹配。SELECT 返回需要核查的名称。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "主例不需要分组或替换内容，因为当前任务只要求找出记录。补充例子展示前缀匹配和错误模式的区别。",
+      "emphasis": []
+    }
+  ],
+  "breakdown": [
+    {
+      "kind": "fragment",
+      "title": "指定来源",
+      "sql": "FROM products",
+      "purpose": "从 products 读取输入数据。",
+      "reason": "后面的子句都基于这里得到的行。"
+    },
+    {
+      "kind": "fragment",
+      "title": "筛选行",
+      "sql": "WHERE product_name LIKE '%!_%' ESCAPE '!'",
+      "purpose": "仅保留满足 product_name LIKE '%!_%' ESCAPE '!' 的行。",
+      "reason": "条件结果为真才保留；未知（NULL）的行会被排除。"
+    },
+    {
+      "kind": "fragment",
+      "title": "选择输出",
+      "sql": "SELECT product_name",
+      "purpose": "输出 product_name。",
+      "reason": "输出列的顺序与别名决定结果表的形状。"
+    },
+    {
+      "kind": "fragment",
+      "title": "排序",
+      "sql": "ORDER BY product_name DESC;",
+      "purpose": "按 product_name DESC 排列结果。",
+      "reason": "查询结果的默认行序没有保证，需要显式排序。"
+    }
+  ],
+  "completeCode": {
+    "mysqlSql": "SELECT product_name FROM products WHERE product_name LIKE '%!_%' ESCAPE '!' ORDER BY product_name DESC;",
+    "sqliteSql": "SELECT product_name FROM products WHERE product_name LIKE '%!_%' ESCAPE '!' ORDER BY product_name DESC;"
+  },
+  "expectedResult": {
+    "columns": [
+      "product_name"
+    ],
+    "rows": [
+      [
+        "Soap_1"
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "resultBlocks": [
+    {
+      "type": "paragraph",
+      "text": "六个商品中仅 Soap_1 命中。未转义的下划线可以匹配任何一个字符，因此普通非空名称也可能全部命中。找到下划线不代表名称一定错误，还要核对命名规范。",
+      "emphasis": []
+    }
+  ],
+  "extensions": [
+    {
+      "label": "前缀匹配",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "找以大写 S 开头的示例名称；本数据没有大小写对立样本。",
+          "emphasis": []
+        }
+      ],
+      "sql": "SELECT product_name FROM products WHERE product_name LIKE 'S%' ORDER BY product_name DESC;",
+      "result": {
+        "columns": [
+          "product_name"
+        ],
+        "rows": [
+          [
+            "Sunscreen"
+          ],
+          [
+            "Soap_1"
+          ],
+          [
+            "Serum"
+          ]
+        ]
+      }
+    },
+    {
+      "label": "错误模式对照",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "故意不转义下划线，观察全部非空名称均被匹配。",
+          "emphasis": []
+        }
+      ],
+      "sql": "SELECT product_name FROM products WHERE product_name LIKE '%_%' ORDER BY product_name DESC;",
+      "result": {
+        "columns": [
+          "product_name"
+        ],
+        "rows": [
+          [
+            "Sunscreen"
+          ],
+          [
+            "Soap_1"
+          ],
+          [
+            "Serum"
+          ],
+          [
+            "Mask"
+          ],
+          [
+            "Cream"
+          ],
+          [
+            "Cleanser"
+          ]
+        ]
+      }
+    }
+  ],
+  "cautions": {
+    "comparison": [
+      {
+        "type": "paragraph",
+        "text": "等号用于相等比较，LIKE 用于模式匹配；下划线不是默认的字面字符。",
+        "emphasis": []
+      }
+    ],
+    "example": [
+      {
+        "type": "paragraph",
+        "text": "LIKE '%_%' 期待仅找到下划线。",
+        "emphasis": []
+      }
+    ],
+    "reason": [],
+    "correction": [
+      {
+        "type": "paragraph",
+        "text": "LIKE '%!_%' ESCAPE '!'",
+        "emphasis": []
+      }
+    ],
+    "notes": [
+      {
+        "type": "paragraph",
+        "text": "本例匹配标点；其他文本的大小写与 Unicode 行为应在目标数据库复验。",
+        "emphasis": []
+      }
+    ]
+  },
+  "sourcePath": "source/unified73/kp03-04.json",
+  "sourceSha256": "342887eda37d05acac61997c2caf85ff0108005a0582e7cb363a43da035361cc"
+}

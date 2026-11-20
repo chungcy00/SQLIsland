@@ -1,0 +1,133 @@
+{
+  "schemaVersion": 1,
+  "id": "kp10-03",
+  "lessonSha256": "844248134cf09e4794060d98a5dbc85aa080edd548af2fd27e4a452984b786be",
+  "figures": [
+    {
+      "id": "kp10-03-clauses",
+      "slot": "syntax",
+      "kind": "clause-map",
+      "title": "示例查询的几个部分",
+      "sql": "SELECT c.customer_id FROM customers c WHERE EXISTS (SELECT 1 FROM orders o WHERE o.customer_id=c.customer_id) ORDER BY customer_name DESC;",
+      "parts": [
+        {
+          "role": "select",
+          "label": "取数",
+          "sql": "SELECT c.customer_id",
+          "note": "输出 c.customer_id。"
+        },
+        {
+          "role": "from",
+          "label": "来源",
+          "sql": "FROM customers c",
+          "note": "从 customers c 读取输入数据。"
+        },
+        {
+          "role": "where",
+          "label": "筛选",
+          "sql": "WHERE EXISTS (SELECT 1 FROM orders o WHERE o.customer_id=c.customer_id)",
+          "note": "仅保留满足条件的行。"
+        },
+        {
+          "role": "order",
+          "label": "排序",
+          "sql": "ORDER BY customer_name DESC;",
+          "note": "按 customer_name DESC 排列结果。"
+        }
+      ]
+    },
+    {
+      "id": "kp10-03-flow",
+      "slot": "breakdown",
+      "kind": "stage-flow",
+      "merge": "breakdown",
+      "title": "每一步的数据变化",
+      "steps": [
+        {
+          "label": "FROM customers c",
+          "sql": "SELECT * FROM customers c",
+          "columns": [
+            "customer_id",
+            "customer_name"
+          ],
+          "rows": [
+            [
+              1,
+              "林"
+            ],
+            [
+              2,
+              "陈"
+            ],
+            [
+              3,
+              "王"
+            ],
+            [
+              4,
+              "李"
+            ]
+          ]
+        },
+        {
+          "label": "WHERE EXISTS (SELECT 1 FROM orders o WHERE o.customer_id=c.customer_id)",
+          "sql": "SELECT * FROM customers c WHERE EXISTS (SELECT 1 FROM orders o WHERE o.customer_id=c.customer_id)",
+          "columns": [
+            "customer_id",
+            "customer_name"
+          ],
+          "rows": [
+            [
+              1,
+              "林"
+            ],
+            [
+              2,
+              "陈"
+            ],
+            [
+              3,
+              "王"
+            ]
+          ]
+        },
+        {
+          "label": "SELECT c.customer_id",
+          "sql": "SELECT c.customer_id FROM customers c WHERE EXISTS (SELECT 1 FROM orders o WHERE o.customer_id=c.customer_id)",
+          "columns": [
+            "customer_id"
+          ],
+          "rows": [
+            [
+              1
+            ],
+            [
+              2
+            ],
+            [
+              3
+            ]
+          ]
+        },
+        {
+          "label": "ORDER BY customer_name DESC;",
+          "sql": "SELECT c.customer_id FROM customers c WHERE EXISTS (SELECT 1 FROM orders o WHERE o.customer_id=c.customer_id) ORDER BY customer_name DESC;",
+          "columns": [
+            "customer_id"
+          ],
+          "rows": [
+            [
+              2
+            ],
+            [
+              3
+            ],
+            [
+              1
+            ]
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,212 @@
+{
+  "schemaVersion": 1,
+  "id": "kp08-03",
+  "sourceBatch": "unified73",
+  "teachingKind": "syntax",
+  "conceptBlocks": [
+    {
+      "type": "paragraph",
+      "text": "ON 定义哪些行可以匹配；WHERE 对连接产生的结果进行筛选。对于内连接，某些条件放在两处效果相同；外连接不能机械互换。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "当右侧日期条件放进 ON 时，只允许该期间订单参与匹配，左侧无符合条件的客户仍返回补齐行。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "如果在 WHERE 中对右侧日期做普通比较，补齐行的日期是 NULL，条件未知，因而被排除。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "更隐蔽的是：只有其他月份订单的客户在连接时已有匹配，WHERE 删除这些订单后也不会重新补齐。仅追加 OR 右键 IS NULL 不能补救这种情况。",
+      "emphasis": []
+    }
+  ],
+  "syntax": {
+    "purpose": "ON 定义键与期间匹配条件；WHERE 连接结果筛选；COUNT(b.id) 仅统计实际匹配记录。"
+  },
+  "dataDescriptions": {
+    "customers": "共 4 行；字段：customer_id、customer_name。",
+    "orders": "共 5 行；字段：id、category、sales、store_id、order_date、customer_id。"
+  },
+  "problem": "主管要查看2026年2月每位登记客户的下单量，零单客户必须展示，以便核对客户活跃覆盖。日期范围为2月1日（含）至3月1日（不含），匿名订单不属于登记客户。",
+  "methodBlocks": [
+    {
+      "type": "paragraph",
+      "text": "先在 ON 中规定相同客户编号且订单日期在二月，形成该期间的可匹配关系。客户2只有一月订单，因此二月没有匹配；客户4没有任何订单，也补齐为空。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "GROUP BY 按客户编号汇总，COUNT(o.id) 对补齐行返回0。使用左闭右开区间可适应带时分秒的日期字段。",
+      "emphasis": []
+    }
+  ],
+  "breakdown": [
+    {
+      "kind": "fragment",
+      "title": "指定来源",
+      "sql": "FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id AND o.order_date >= '2026-02-01' AND o.order_date < '2026-03-01'",
+      "purpose": "读取查询需要的输入数据。",
+      "reason": "后面的子句都基于这里得到的行。"
+    },
+    {
+      "kind": "fragment",
+      "title": "分组",
+      "sql": "GROUP BY c.customer_id",
+      "purpose": "按 c.customer_id 把行归入各个分组。",
+      "reason": "聚合函数在每个分组内分别计算。"
+    },
+    {
+      "kind": "fragment",
+      "title": "选择输出",
+      "sql": "SELECT c.customer_id, COUNT(o.id) AS feb_orders",
+      "purpose": "输出 c.customer_id, COUNT(o.id) AS feb_orders。",
+      "reason": "输出列的顺序与别名决定结果表的形状。"
+    },
+    {
+      "kind": "fragment",
+      "title": "排序",
+      "sql": "ORDER BY feb_orders DESC, SUM(o.sales) DESC;",
+      "purpose": "按 feb_orders DESC, SUM(o.sales) DESC 排列结果。",
+      "reason": "查询结果的默认行序没有保证，需要显式排序。"
+    }
+  ],
+  "completeCode": {
+    "mysqlSql": "SELECT c.customer_id, COUNT(o.id) AS feb_orders FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id AND o.order_date >= '2026-02-01' AND o.order_date < '2026-03-01' GROUP BY c.customer_id ORDER BY feb_orders DESC, SUM(o.sales) DESC;",
+    "sqliteSql": "SELECT c.customer_id, COUNT(o.id) AS feb_orders FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id AND o.order_date >= '2026-02-01' AND o.order_date < '2026-03-01' GROUP BY c.customer_id ORDER BY feb_orders DESC, SUM(o.sales) DESC;"
+  },
+  "expectedResult": {
+    "columns": [
+      "customer_id",
+      "feb_orders"
+    ],
+    "rows": [
+      [
+        3,
+        1
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        2,
+        0
+      ],
+      [
+        4,
+        0
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "resultBlocks": [
+    {
+      "type": "paragraph",
+      "text": "输出4位客户：客户1、3各有1单，客户2、4为0。登记客户二月订单合计2笔，而全表二月有3笔（另1笔匿名订单）；不要把登记客户报表误解为全公司总量。",
+      "emphasis": []
+    }
+  ],
+  "extensions": [
+    {
+      "label": "观察二月匹配明细",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "分组前先看每位客户是否有符合期间的订单。",
+          "emphasis": []
+        }
+      ],
+      "sql": "SELECT c.customer_id,o.id AS order_id FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id AND o.order_date>='2026-02-01' AND o.order_date<'2026-03-01' ORDER BY customer_name DESC;",
+      "result": {
+        "columns": [
+          "customer_id",
+          "order_id"
+        ],
+        "rows": [
+          [
+            2,
+            null
+          ],
+          [
+            3,
+            5
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            4,
+            null
+          ]
+        ]
+      }
+    },
+    {
+      "label": "错误位置对照",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "此查询可运行但不符合需求：零单客户不再出现。",
+          "emphasis": []
+        }
+      ],
+      "sql": "SELECT c.customer_id,COUNT(o.id) AS feb_orders FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id WHERE o.order_date>='2026-02-01' AND o.order_date<'2026-03-01' GROUP BY c.customer_id ORDER BY SUM(o.sales) DESC;",
+      "result": {
+        "columns": [
+          "customer_id",
+          "feb_orders"
+        ],
+        "rows": [
+          [
+            3,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      }
+    }
+  ],
+  "cautions": {
+    "comparison": [
+      {
+        "type": "paragraph",
+        "text": "ON 限制匹配，WHERE 筛选匹配后的结果；右侧可空字段条件需要特别检查。",
+        "emphasis": []
+      }
+    ],
+    "example": [
+      {
+        "type": "paragraph",
+        "text": "把期间条件移到 WHERE，或只追加 OR o.id IS NULL 就认为可保留全部客户。",
+        "emphasis": []
+      }
+    ],
+    "reason": [],
+    "correction": [
+      {
+        "type": "paragraph",
+        "text": "将期间限制放在 ON；也可以先过滤右表再做左连接。",
+        "emphasis": []
+      }
+    ],
+    "notes": [
+      {
+        "type": "paragraph",
+        "text": "若要筛选客户主档本身，例如只分析指定客户，左表条件可放 WHERE，但需按业务范围决定。",
+        "emphasis": []
+      }
+    ]
+  },
+  "sourcePath": "source/unified73/kp08-03.json",
+  "sourceSha256": "74582a5fc8471f2be030f824a3680db3ab16f1e70b4c7625b30e2f26fe9efe11"
+}

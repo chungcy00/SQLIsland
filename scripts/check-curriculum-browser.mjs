@@ -103,14 +103,16 @@ try {
     const sections = await page.locator('[data-lesson-section]').evaluateAll(nodes => nodes.map(node => node.dataset.lessonSection));
     assert.ok(sections.indexOf('steps') < sections.indexOf('example'), k.id);
     assert.equal(await page.locator('#lesson-result table').count(),0,k.id);
-    assert.equal(await page.locator('.lesson-checkpoint').count(),k.teaching.checkpoints.length+k.teaching.mergeExamples.length,k.id);
+    // 已转换课文：检查点以“分步执行”的可运行步骤显示，扩展示例仍是 .lesson-checkpoint
+    assert.equal(await page.locator('.lesson-checkpoint').count(),(k.presentation?0:k.teaching.checkpoints.length)+k.teaching.mergeExamples.length,k.id);
+    if(k.presentation)assert.equal(await page.locator('.step-item').count(),k.presentation.breakdown.length,k.id);
     await page.locator('[data-action=lessonRun]').click();
     await page.waitForFunction(() => document.querySelector('#lesson-result small')?.textContent.includes('本次 SQLite'),{},{timeout:6000}).catch(async error => {
       throw Error(k.id+' '+(await page.locator('#snackbar').textContent())+' '+error.message);
     });
     const rows = k.result.totalRows ?? k.result.rows.length;
     assert.match(await page.locator('#lesson-result small').innerText(), new RegExp(' · '+ rows +' 行'),k.id);
-    assert.equal(await page.locator('.lesson-result-explanation p').innerText(),k.teaching.resultExplanation,k.id);
+    assert.equal((await page.locator('.lesson-result-explanation p').allInnerTexts()).join(''),k.teaching.resultExplanation,k.id);
   }
   assert.deepEqual(errors,[]);
   console.log('80 browser lesson executions, four rewritten submissions, 80/200/200 counts, fixed separator-free footer, and historical-state migration passed.');

@@ -1,0 +1,169 @@
+{
+  "schemaVersion": 1,
+  "id": "kp10-04",
+  "sourceBatch": "unified73",
+  "teachingKind": "syntax",
+  "conceptBlocks": [
+    {
+      "type": "paragraph",
+      "text": "反向匹配用于找出有主档却没有交易的对象，例如未购买客户、未收货采购单。NOT EXISTS 在没有满足相关条件的行时为真。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "NOT IN 在候选集合出现 NULL 时，未匹配值的比较可能为未知；WHERE 不保留未知，因此结果可能少于预期。对非空客户主键，本例用 NOT EXISTS 最直接。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "若外层键也允许空值，需要另外定义缺失键的业务处理规则。",
+      "emphasis": []
+    }
+  ],
+  "syntax": {
+    "purpose": "NOT EXISTS 没有符合条件的内层记录；NOT IN 不属于候选集合，须考虑 NULL。"
+  },
+  "dataDescriptions": {
+    "customers": "共 4 行；字段：customer_id、customer_name。",
+    "orders": "共 5 行；字段：id、category、sales、store_id、order_date、customer_id。"
+  },
+  "problem": "主管要求列出从未购买的登记客户。订单4的客户编号为空，表示本例有匿名交易；它不能作为已知客户的购买证据。",
+  "methodBlocks": [
+    {
+      "type": "paragraph",
+      "text": "外层逐个客户进行逻辑判断，内层只检查同一客户编号。客户4没有匹配行，所以 NOT EXISTS 为真。若使用 NOT IN，候选编号为1、2、1、NULL、3；",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "客户4与已知编号均不相等，但与 NULL 比较未知。应在子查询明确过滤 NULL 后再使用 NOT IN。",
+      "emphasis": []
+    }
+  ],
+  "breakdown": [
+    {
+      "kind": "fragment",
+      "title": "指定来源",
+      "sql": "FROM customers c",
+      "purpose": "从 customers c 读取输入数据。",
+      "reason": "后面的子句都基于这里得到的行。"
+    },
+    {
+      "kind": "fragment",
+      "title": "筛选行",
+      "sql": "WHERE NOT EXISTS (SELECT 1 FROM orders o WHERE o.customer_id=c.customer_id)",
+      "purpose": "仅保留满足条件的行。",
+      "reason": "条件结果为真才保留；未知（NULL）的行会被排除。"
+    },
+    {
+      "kind": "fragment",
+      "title": "选择输出",
+      "sql": "SELECT c.customer_id",
+      "purpose": "输出 c.customer_id。",
+      "reason": "输出列的顺序与别名决定结果表的形状。"
+    },
+    {
+      "kind": "fragment",
+      "title": "排序",
+      "sql": "ORDER BY customer_name DESC;",
+      "purpose": "按 customer_name DESC 排列结果。",
+      "reason": "查询结果的默认行序没有保证，需要显式排序。"
+    }
+  ],
+  "completeCode": {
+    "mysqlSql": "SELECT c.customer_id FROM customers c WHERE NOT EXISTS (SELECT 1 FROM orders o WHERE o.customer_id=c.customer_id) ORDER BY customer_name DESC;",
+    "sqliteSql": "SELECT c.customer_id FROM customers c WHERE NOT EXISTS (SELECT 1 FROM orders o WHERE o.customer_id=c.customer_id) ORDER BY customer_name DESC;"
+  },
+  "expectedResult": {
+    "columns": [
+      "customer_id"
+    ],
+    "rows": [
+      [
+        4
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "resultBlocks": [
+    {
+      "type": "paragraph",
+      "text": "最终仅客户4入选；不等同于所有未交易人员，因为名单范围只包括客户主档。错误写法返回空结果，容易误判所有客户都买过。",
+      "emphasis": []
+    }
+  ],
+  "extensions": [
+    {
+      "label": "含空值的错误对照",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "没有报错，但未知条件导致没有任何客户返回。",
+          "emphasis": []
+        }
+      ],
+      "sql": "SELECT customer_id FROM customers WHERE customer_id NOT IN (SELECT customer_id FROM orders) ORDER BY customer_name DESC;",
+      "result": {
+        "columns": [
+          "customer_id"
+        ],
+        "rows": []
+      }
+    },
+    {
+      "label": "排除候选空值",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "已知外层主键非空，因此本例与 NOT EXISTS 返回相同结果。",
+          "emphasis": []
+        }
+      ],
+      "sql": "SELECT customer_id FROM customers WHERE customer_id NOT IN (SELECT customer_id FROM orders WHERE customer_id IS NOT NULL) ORDER BY customer_name DESC;",
+      "result": {
+        "columns": [
+          "customer_id"
+        ],
+        "rows": [
+          [
+            4
+          ]
+        ]
+      }
+    }
+  ],
+  "cautions": {
+    "comparison": [
+      {
+        "type": "paragraph",
+        "text": "NOT EXISTS 与排除 NULL 后的 NOT IN 在本例非空外层键条件下等价。",
+        "emphasis": []
+      }
+    ],
+    "example": [
+      {
+        "type": "paragraph",
+        "text": "WHERE customer_id NOT IN (SELECT customer_id FROM orders)",
+        "emphasis": []
+      }
+    ],
+    "reason": [],
+    "correction": [
+      {
+        "type": "paragraph",
+        "text": "改用 NOT EXISTS，或内层明确 WHERE customer_id IS NOT NULL。",
+        "emphasis": []
+      }
+    ],
+    "notes": [
+      {
+        "type": "paragraph",
+        "text": "外层可空键时两种写法不一定等价。",
+        "emphasis": []
+      }
+    ]
+  },
+  "sourcePath": "source/unified73/kp10-04.json",
+  "sourceSha256": "44382105382e68a1f214ba90a475d47067ff69b528c8c5a14f6595d84164a61a"
+}

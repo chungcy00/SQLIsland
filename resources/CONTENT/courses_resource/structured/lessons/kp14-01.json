@@ -1,0 +1,355 @@
+{
+  "schemaVersion": 1,
+  "id": "kp14-01",
+  "sourceBatch": "unified73",
+  "teachingKind": "advanced",
+  "conceptBlocks": [
+    {
+      "type": "paragraph",
+      "text": "公用表表达式是当前语句内命名的查询结果，不是持久表，也不保证物理物化。可以在后续表达式中引用前面已经定义的关系，将复杂分析拆解为可核查的逻辑步骤。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "每个表达式应明确一行代表什么，以及指标计算口径。递归形式另有起始项、递归项和终止条件，可处理层级结构；本面试精简版只需了解其用途，不展开递归语法教学。",
+      "emphasis": []
+    }
+  ],
+  "syntax": {
+    "purpose": "a,b 当前语句内的表达式名称；AS 定义表达式查询。"
+  },
+  "dataDescriptions": {
+    "orders": "共 5 行；字段：id、category、sales、store_id、order_date、customer_id。"
+  },
+  "problem": "主管需要列出销售额严格超过1000的商品类别。以全部五笔订单为统计范围，按类别汇总金额，再筛选类别；不先排除单笔小额订单。",
+  "methodBlocks": [
+    {
+      "type": "paragraph",
+      "text": "先定义 totals，GROUP BY category 将订单粒度变为类别粒度，SUM 计算总额。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "然后定义 qualified，从 totals 读取类别级别结果，使用 WHERE 筛选已计算的 total。此处 WHERE 作用于中间关系的普通列，而非原订单层的聚合表达式。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "最后 SELECT 从 qualified 输出并按金额降序。每个独立检查查询都包含其所需定义；这里描述的是逻辑构建而非优化器物理顺序。",
+      "emphasis": []
+    }
+  ],
+  "breakdown": [
+    {
+      "kind": "runnable",
+      "title": "类别销售汇总",
+      "sql": "WITH totals AS (SELECT category,SUM(sales) AS total FROM orders GROUP BY category) SELECT * FROM totals ORDER BY total DESC;",
+      "purpose": "类别销售汇总（totals）的实际执行结果。",
+      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "sourceTables": [
+        {
+          "name": "orders",
+          "columns": [
+            {
+              "name": "id",
+              "type": "INTEGER",
+              "mysqlType": "INT",
+              "sqliteType": "INTEGER"
+            },
+            {
+              "name": "category",
+              "type": "TEXT",
+              "mysqlType": "VARCHAR(160) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_bin",
+              "sqliteType": "TEXT"
+            },
+            {
+              "name": "sales",
+              "type": "INTEGER",
+              "mysqlType": "INT",
+              "sqliteType": "INTEGER"
+            },
+            {
+              "name": "store_id",
+              "type": "INTEGER",
+              "mysqlType": "INT",
+              "sqliteType": "INTEGER"
+            },
+            {
+              "name": "order_date",
+              "type": "TEXT",
+              "mysqlType": "DATE",
+              "sqliteType": "TEXT"
+            },
+            {
+              "name": "customer_id",
+              "type": "INTEGER",
+              "mysqlType": "INT",
+              "sqliteType": "INTEGER"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              "护肤品",
+              800,
+              1,
+              "2026-01-03",
+              1
+            ],
+            [
+              2,
+              "化妆品",
+              400,
+              2,
+              "2026-01-10",
+              2
+            ],
+            [
+              3,
+              "护肤品",
+              600,
+              1,
+              "2026-02-02",
+              1
+            ],
+            [
+              4,
+              "化妆品",
+              300,
+              2,
+              "2026-02-15",
+              null
+            ],
+            [
+              5,
+              "日用品",
+              1500,
+              1,
+              "2026-02-20",
+              3
+            ]
+          ]
+        }
+      ],
+      "result": {
+        "columns": [
+          "category",
+          "total"
+        ],
+        "rows": [
+          [
+            "日用品",
+            1500
+          ],
+          [
+            "护肤品",
+            1400
+          ],
+          [
+            "化妆品",
+            700
+          ]
+        ]
+      }
+    },
+    {
+      "kind": "runnable",
+      "title": "保留符合阈值的类别",
+      "sql": "WITH totals AS (SELECT category,SUM(sales) AS total FROM orders GROUP BY category), qualified AS (SELECT category,total FROM totals WHERE total>1000) SELECT * FROM qualified ORDER BY total DESC;",
+      "purpose": "保留符合阈值的类别（qualified）的实际执行结果。",
+      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "sourceTables": [
+        {
+          "name": "orders",
+          "columns": [
+            {
+              "name": "id",
+              "type": "INTEGER",
+              "mysqlType": "INT",
+              "sqliteType": "INTEGER"
+            },
+            {
+              "name": "category",
+              "type": "TEXT",
+              "mysqlType": "VARCHAR(160) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_bin",
+              "sqliteType": "TEXT"
+            },
+            {
+              "name": "sales",
+              "type": "INTEGER",
+              "mysqlType": "INT",
+              "sqliteType": "INTEGER"
+            },
+            {
+              "name": "store_id",
+              "type": "INTEGER",
+              "mysqlType": "INT",
+              "sqliteType": "INTEGER"
+            },
+            {
+              "name": "order_date",
+              "type": "TEXT",
+              "mysqlType": "DATE",
+              "sqliteType": "TEXT"
+            },
+            {
+              "name": "customer_id",
+              "type": "INTEGER",
+              "mysqlType": "INT",
+              "sqliteType": "INTEGER"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              "护肤品",
+              800,
+              1,
+              "2026-01-03",
+              1
+            ],
+            [
+              2,
+              "化妆品",
+              400,
+              2,
+              "2026-01-10",
+              2
+            ],
+            [
+              3,
+              "护肤品",
+              600,
+              1,
+              "2026-02-02",
+              1
+            ],
+            [
+              4,
+              "化妆品",
+              300,
+              2,
+              "2026-02-15",
+              null
+            ],
+            [
+              5,
+              "日用品",
+              1500,
+              1,
+              "2026-02-20",
+              3
+            ]
+          ]
+        }
+      ],
+      "result": {
+        "columns": [
+          "category",
+          "total"
+        ],
+        "rows": [
+          [
+            "日用品",
+            1500
+          ],
+          [
+            "护肤品",
+            1400
+          ]
+        ]
+      }
+    }
+  ],
+  "completeCode": {
+    "mysqlSql": "WITH totals AS (SELECT category,SUM(sales) AS total FROM orders GROUP BY category), qualified AS (SELECT category,total FROM totals WHERE total>1000) SELECT * FROM qualified ORDER BY total DESC;",
+    "sqliteSql": "WITH totals AS (SELECT category,SUM(sales) AS total FROM orders GROUP BY category), qualified AS (SELECT category,total FROM totals WHERE total>1000) SELECT * FROM qualified ORDER BY total DESC;"
+  },
+  "expectedResult": {
+    "columns": [
+      "category",
+      "total"
+    ],
+    "rows": [
+      [
+        "日用品",
+        1500
+      ],
+      [
+        "护肤品",
+        1400
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "resultBlocks": [
+    {
+      "type": "paragraph",
+      "text": "五笔订单变成三类汇总：日用品1500、护肤品1400、化妆品700；通过阈值的前两类保留，最终两行。与直接 HAVING 的业务结果一致。",
+      "emphasis": []
+    }
+  ],
+  "extensions": [
+    {
+      "label": "单层分组筛选对照",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "简单条件可以直接使用 HAVING，不必人为增加表达式。",
+          "emphasis": []
+        }
+      ],
+      "sql": "SELECT category,SUM(sales) AS total FROM orders GROUP BY category HAVING SUM(sales)>1000 ORDER BY total DESC;",
+      "result": {
+        "columns": [
+          "category",
+          "total"
+        ],
+        "rows": [
+          [
+            "日用品",
+            1500
+          ],
+          [
+            "护肤品",
+            1400
+          ]
+        ]
+      }
+    }
+  ],
+  "cautions": {
+    "comparison": [
+      {
+        "type": "paragraph",
+        "text": "具名表达式提高复杂查询可读性；简单查询可直接分组筛选。",
+        "emphasis": []
+      }
+    ],
+    "example": [
+      {
+        "type": "paragraph",
+        "text": "同一语句连续写两个 WITH，或在下一条独立语句引用先前的表达式。",
+        "emphasis": []
+      }
+    ],
+    "reason": [],
+    "correction": [
+      {
+        "type": "paragraph",
+        "text": "一个 WITH 后以逗号分隔多个定义，并在同一语句引用。",
+        "emphasis": []
+      }
+    ],
+    "notes": [
+      {
+        "type": "paragraph",
+        "text": "不保证性能更好；原生优化器可能合并或物化。14-02 已删除，仅保留递归概念简介。",
+        "emphasis": []
+      }
+    ]
+  },
+  "sourcePath": "source/unified73/kp14-01.json",
+  "sourceSha256": "18c830e7b095d4e6ad045abd1001345b5d6f199af4512f7bc771e7913831e964"
+}

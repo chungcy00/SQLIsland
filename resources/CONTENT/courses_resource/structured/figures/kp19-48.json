@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "id": "kp19-48",
+  "lessonSha256": "cb6ebcd4e20ec3ed053da5c32e349dea6e0a1ef1486690789af2dbd297511902",
+  "figures": [
+    {
+      "id": "kp19-48-clauses",
+      "slot": "syntax",
+      "kind": "clause-map",
+      "title": "示例查询的几个部分",
+      "sql": "WITH a AS (SELECT v.*,CASE WHEN due_date>='2025-12-31' THEN 'current' WHEN due_date>='2025-12-01' THEN '01-30' WHEN due_date>='2025-11-01' THEN '31-60' WHEN due_date>='2025-10-02' THEN '61-90' ELSE '90+' END bucket FROM v_invoice_balance v WHERE balance_cents>0) SELECT supplier_id,bucket,COUNT(*) invoices,SUM(balance_cents) outstanding_cents FROM a GROUP BY supplier_id,bucket ORDER BY outstanding_cents DESC",
+      "parts": [
+        {
+          "role": "cte",
+          "label": "中间结果",
+          "sql": "WITH a AS (SELECT v.*,CASE WHEN due_date>='2025-12-31' THEN 'current' WHEN due_date>='2025-12-01' THEN '01-30' WHEN due_date>='2025-11-01' THEN '31-60' WHEN due_date>='2025-10-02' THEN '61-90' ELSE '90+' END bucket FROM v_invoice_balance v WHERE balance_cents>0)",
+          "note": "先把名为 a 的中间结果算出来，供后面的查询引用。"
+        },
+        {
+          "role": "select",
+          "label": "取数",
+          "sql": "SELECT supplier_id,bucket,COUNT(*) invoices,SUM(balance_cents) outstanding_cents",
+          "note": "输出查询需要的列与计算表达式。"
+        },
+        {
+          "role": "from",
+          "label": "来源",
+          "sql": "FROM a",
+          "note": "从 a 读取输入数据。"
+        },
+        {
+          "role": "group",
+          "label": "分组",
+          "sql": "GROUP BY supplier_id,bucket",
+          "note": "按 supplier_id,bucket 把行归入各个分组。"
+        },
+        {
+          "role": "order",
+          "label": "排序",
+          "sql": "ORDER BY outstanding_cents DESC",
+          "note": "按 outstanding_cents DESC 排列结果。"
+        }
+      ]
+    }
+  ]
+}

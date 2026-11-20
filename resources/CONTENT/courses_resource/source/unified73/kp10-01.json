@@ -1,0 +1,209 @@
+{
+  "id": "kp10-01",
+  "chapterId": "ch10",
+  "title": "标量子查询",
+  "learningObjective": "能以动态单值作为筛选阈值，区分单值与集合查询。",
+  "prerequisites": [],
+  "concept": "标量子查询是一列且最多一行的查询，它作为一个值参与外层表达式。零行得到 NULL，多行在 MySQL 中报错。分析师经常需要将明细与动态基准比较，例如价格高于整体均值；硬编码均值会在数据更新后失效。聚合函数不带分组时可形成单行基准，但空输入的平均值为 NULL，普通比较不会保留任何行。外层查询依然逐条商品判断，查询结果不改变原表。",
+  "syntax": "WHERE col > (SELECT AVG(col) FROM t)",
+  "parameters": {
+    "AVG": "对非空数值计算均值",
+    "外层 col": "待比较的明细值"
+  },
+  "fixtureIds": [
+    "lesson-products"
+  ],
+  "sourceTables": [
+    {
+      "name": "products",
+      "columns": [
+        {
+          "name": "product_id",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "product_name",
+          "type": "TEXT",
+          "mysqlType": "VARCHAR(160) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_bin",
+          "sqliteType": "TEXT"
+        },
+        {
+          "name": "category",
+          "type": "TEXT",
+          "mysqlType": "VARCHAR(160) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_bin",
+          "sqliteType": "TEXT"
+        },
+        {
+          "name": "price",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        },
+        {
+          "name": "stock",
+          "type": "INTEGER",
+          "mysqlType": "INT",
+          "sqliteType": "INTEGER"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          "Mask",
+          "护肤品",
+          15,
+          150
+        ],
+        [
+          2,
+          "Serum",
+          "护肤品",
+          89,
+          40
+        ],
+        [
+          3,
+          "Cleanser",
+          "护肤品",
+          35,
+          200
+        ],
+        [
+          4,
+          "Cream",
+          "化妆品",
+          65,
+          180
+        ],
+        [
+          5,
+          "Sunscreen",
+          "化妆品",
+          45,
+          80
+        ],
+        [
+          6,
+          "Soap_1",
+          "日用品",
+          15,
+          0
+        ]
+      ]
+    }
+  ],
+  "mysqlSql": "SELECT product_id, price FROM products WHERE price > (SELECT AVG(price) FROM products) ORDER BY price;",
+  "sqliteSql": "SELECT product_id, price FROM products WHERE price > (SELECT AVG(price) FROM products) ORDER BY price;",
+  "executionSteps": [
+    "求整体平均价",
+    "比较每件商品价格",
+    "保留高于均值的商品"
+  ],
+  "useCase": "采购主管希望筛出高于全体商品平均价格的商品，作为价格核查候选。products 一行代表一件商品，price 是单价，product_id 是编号；每件商品等权，不按库存加权。",
+  "comparison": "标量子查询用于单值比较；多行候选应使用 IN 或其他集合语义。",
+  "commonError": {
+    "example": "WHERE price = (SELECT price FROM products)，内层产生多行。",
+    "correction": "明确所需单值，例如 MAX(price)，或者改用 IN。"
+  },
+  "notes": "SQLite 可能取多行标量查询的首行，不能当作 MySQL 的正确行为。",
+  "compatibility": {
+    "status": "直接兼容",
+    "detail": "仅在本示例数据与语义范围验证；不代表全部 MySQL 语法兼容。"
+  },
+  "relatedQuestionIds": [
+    "q0132",
+    "q0134"
+  ],
+  "relatedFlashcardIds": [
+    "fc0070",
+    "fc0075"
+  ],
+  "relatedKnowledgePointIds": [
+    "kp03-01",
+    "kp05-01",
+    "kp08-01"
+  ],
+  "mysqlVerification": "未运行原生 MySQL 8.4",
+  "result": {
+    "columns": [
+      "product_id",
+      "price"
+    ],
+    "rows": [
+      [
+        5,
+        45
+      ],
+      [
+        4,
+        65
+      ],
+      [
+        2,
+        89
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "mysqlVerificationScript": "validation/mysql/kp10-01.sql",
+  "primaryQuestionIds": [
+    "q0132",
+    "q0134"
+  ],
+  "primaryFlashcardIds": [
+    "fc0070",
+    "fc0075"
+  ],
+  "teaching": {
+    "problem": "采购主管希望筛出高于全体商品平均价格的商品，作为价格核查候选。products 一行代表一件商品，price 是单价，product_id 是编号；每件商品等权，不按库存加权。",
+    "codeExplanation": "先单独求 AVG(price)，得到44；再使用括号中的查询作为 WHERE 的右侧阈值。外层 SELECT 提取编号和单价，ORDER BY 保证顺序。若需要类内均值，应让内层引用外层类别，而不是仅更改外层的输出字段。",
+    "resultExplanation": "六件商品中编号2、4、5高于44，返回三行，仍是商品粒度。高于均价不等于价格异常，需要结合类别、成本等信息核查。",
+    "checkpoints": [],
+    "mergedConcepts": [],
+    "mergeExamples": [
+      {
+        "label": "先求动态基准",
+        "explanation": "确认分母为6件商品，价格和264，均值44。",
+        "sql": "SELECT SUM(price) AS total,COUNT(price) AS n,AVG(price) AS mean FROM products;",
+        "result": {
+          "columns": [
+            "total",
+            "n",
+            "mean"
+          ],
+          "rows": [
+            [
+              264,
+              6,
+              44.0
+            ]
+          ]
+        }
+      },
+      {
+        "label": "返回所有最低价商品",
+        "explanation": "使用 MIN 得到单值15；两件并列商品均保留。",
+        "sql": "SELECT product_id,price FROM products WHERE price=(SELECT MIN(price) FROM products) ORDER BY product_name DESC;",
+        "result": {
+          "columns": [
+            "product_id",
+            "price"
+          ],
+          "rows": [
+            [
+              6,
+              15
+            ],
+            [
+              1,
+              15
+            ]
+          ]
+        }
+      }
+    ]
+  }
+}

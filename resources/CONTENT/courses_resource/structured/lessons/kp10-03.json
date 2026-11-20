@@ -1,0 +1,186 @@
+{
+  "schemaVersion": 1,
+  "id": "kp10-03",
+  "sourceBatch": "unified73",
+  "teachingKind": "syntax",
+  "conceptBlocks": [
+    {
+      "type": "paragraph",
+      "text": "相关子查询引用外层表中的字段，逻辑上针对当前外层记录判断；物理执行可能被优化器改写，并不保证逐行运行。EXISTS 关注内层是否有至少一行，而不关注 SELECT 返回什么值。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "它不汇总购买次数，也不搬运订单明细。通过相关条件将每位客户与自己的订单匹配，即使有多笔订单，外层客户也只保留原有的一行。",
+      "emphasis": []
+    }
+  ],
+  "syntax": {
+    "purpose": "EXISTS 内层有行时为真；a.key 当前外层记录的键；SELECT 1 表达仅关注存在性。"
+  },
+  "dataDescriptions": {
+    "customers": "共 4 行；字段：customer_id、customer_name。",
+    "orders": "共 5 行；字段：id、category、sales、store_id、order_date、customer_id。"
+  },
+  "problem": "运营要识别曾经购买的登记客户，不需要金额或订单次数。customers 的客户编号与 orders 的客户编号关联；匿名订单不能对应客户主档。",
+  "methodBlocks": [
+    {
+      "type": "paragraph",
+      "text": "外层给 customers 取别名 c，内层给 orders 取别名 o。o.customer_id=c.customer_id 是关键：只检查当前客户的订单。",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "SELECT 1 不代表只读取第一笔订单，也不是返回订单数；EXISTS 仅判断有无。若要判断二月活跃，则在内层加入二月日期条件。",
+      "emphasis": []
+    }
+  ],
+  "breakdown": [
+    {
+      "kind": "fragment",
+      "title": "指定来源",
+      "sql": "FROM customers c",
+      "purpose": "从 customers c 读取输入数据。",
+      "reason": "后面的子句都基于这里得到的行。"
+    },
+    {
+      "kind": "fragment",
+      "title": "筛选行",
+      "sql": "WHERE EXISTS (SELECT 1 FROM orders o WHERE o.customer_id=c.customer_id)",
+      "purpose": "仅保留满足条件的行。",
+      "reason": "条件结果为真才保留；未知（NULL）的行会被排除。"
+    },
+    {
+      "kind": "fragment",
+      "title": "选择输出",
+      "sql": "SELECT c.customer_id",
+      "purpose": "输出 c.customer_id。",
+      "reason": "输出列的顺序与别名决定结果表的形状。"
+    },
+    {
+      "kind": "fragment",
+      "title": "排序",
+      "sql": "ORDER BY customer_name DESC;",
+      "purpose": "按 customer_name DESC 排列结果。",
+      "reason": "查询结果的默认行序没有保证，需要显式排序。"
+    }
+  ],
+  "completeCode": {
+    "mysqlSql": "SELECT c.customer_id FROM customers c WHERE EXISTS (SELECT 1 FROM orders o WHERE o.customer_id=c.customer_id) ORDER BY customer_name DESC;",
+    "sqliteSql": "SELECT c.customer_id FROM customers c WHERE EXISTS (SELECT 1 FROM orders o WHERE o.customer_id=c.customer_id) ORDER BY customer_name DESC;"
+  },
+  "expectedResult": {
+    "columns": [
+      "customer_id"
+    ],
+    "rows": [
+      [
+        2
+      ],
+      [
+        3
+      ],
+      [
+        1
+      ]
+    ],
+    "status": "SQLite实际执行",
+    "orderGuaranteed": false
+  },
+  "resultBlocks": [
+    {
+      "type": "paragraph",
+      "text": "客户1、2、3均有订单，客户4没有；返回三行客户编号。客户1的两笔订单不会造成名单重复。",
+      "emphasis": []
+    }
+  ],
+  "extensions": [
+    {
+      "label": "错误关联对照",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "全表有订单使所有客户通过，包括从未下单的客户4。",
+          "emphasis": []
+        }
+      ],
+      "sql": "SELECT c.customer_id FROM customers c WHERE EXISTS (SELECT 1 FROM orders) ORDER BY customer_name DESC;",
+      "result": {
+        "columns": [
+          "customer_id"
+        ],
+        "rows": [
+          [
+            2
+          ],
+          [
+            3
+          ],
+          [
+            1
+          ],
+          [
+            4
+          ]
+        ]
+      }
+    },
+    {
+      "label": "迁移到指定期间",
+      "explanationBlocks": [
+        {
+          "type": "paragraph",
+          "text": "将二月的条件放在存在性判断内，只寻找该期间的订单。",
+          "emphasis": []
+        }
+      ],
+      "sql": "SELECT c.customer_id FROM customers c WHERE EXISTS (SELECT 1 FROM orders o WHERE o.customer_id=c.customer_id AND o.order_date>='2026-02-01' AND o.order_date<'2026-03-01') ORDER BY customer_name DESC;",
+      "result": {
+        "columns": [
+          "customer_id"
+        ],
+        "rows": [
+          [
+            3
+          ],
+          [
+            1
+          ]
+        ]
+      }
+    }
+  ],
+  "cautions": {
+    "comparison": [
+      {
+        "type": "paragraph",
+        "text": "相关子查询是引用关系；EXISTS 是存在性判断，两者不是同义词。",
+        "emphasis": []
+      }
+    ],
+    "example": [
+      {
+        "type": "paragraph",
+        "text": "EXISTS (SELECT 1 FROM orders) 漏写相关条件。",
+        "emphasis": []
+      }
+    ],
+    "reason": [],
+    "correction": [
+      {
+        "type": "paragraph",
+        "text": "添加 WHERE o.customer_id=c.customer_id。",
+        "emphasis": []
+      }
+    ],
+    "notes": [
+      {
+        "type": "paragraph",
+        "text": "不要声称相关子查询必然比连接慢；性能须依据真实数据与执行计划。",
+        "emphasis": []
+      }
+    ]
+  },
+  "sourcePath": "source/unified73/kp10-03.json",
+  "sourceSha256": "eafe77df9ec01b78089d5f023a2e0ce6dbc2faf50ec0d7be28fdd3ee78ff390b"
+}
