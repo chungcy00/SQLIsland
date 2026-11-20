@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp19-02",
-  "lessonSha256": "a1f5bad8682f0ccaaa360ae0b669b3e6e855b1fd5ec7621192364a798db5a6db",
+  "lessonSha256": "3feff53f8ae2aef269c4e7e8a8fec8dc842dfc1b4ff9eb35c1ed3e96c43e8bcc",
   "figures": [
     {
       "id": "kp19-02-clauses",
@@ -44,100 +44,150 @@
     },
     {
       "id": "kp19-02-turnover",
-      "slot": "problem",
+      "slot": "concept",
       "kind": "metric-card",
-      "title": "库存周转率的口径",
+      "title": "库存周转率",
       "metric": {
         "column": "turnover",
         "label": "库存周转率"
       },
-      "numerator": {
-        "label": "销售成本（分）",
-        "expr": "COALESCE(a.cogs,0)"
+      "meaning": "衡量库存周转的快慢：销售成本相对于平均库存成本越大，库存周转得越快。",
+      "formula": {
+        "lhs": "库存周转率",
+        "numerator": "销售成本",
+        "denominator": "平均库存成本"
       },
-      "denominator": {
-        "label": "平均库存成本（分）",
-        "expr": "b.avg_stock"
+      "example": {
+        "source": "result",
+        "row": 0,
+        "inputs": [
+          {
+            "name": "cogs",
+            "label": "销售成本",
+            "unit": "分",
+            "value": 7705671,
+            "column": "cogs_cents"
+          },
+          {
+            "name": "avg",
+            "label": "平均库存成本",
+            "unit": "分",
+            "value": 17613195.5,
+            "column": "avg_stock_cents"
+          }
+        ],
+        "calc": "cogs/avg",
+        "process": "7,705,671 ÷ 17,613,195.5 ＝ 0.4375",
+        "result": {
+          "value": 0.4375,
+          "unit": "倍",
+          "decimals": 4,
+          "column": "turnover"
+        }
       },
-      "scope": [
+      "interpretation": "库存周转率 {result}：这段时间的销售成本是平均库存成本的这么多倍；数值越大，库存周转越快。",
+      "sql": {
+        "lines": [
+          "ROUND(COALESCE(a.cogs,0)/NULLIF(b.avg_stock,0),4) turnover"
+        ]
+      },
+      "notes": [
         {
+          "kind": "range",
           "label": "范围",
           "text": "2025全年，按仓库×类别输出"
         },
         {
+          "kind": "range",
           "label": "期初期末",
           "text": "期初为2024-12-31，期末为2025-12-31"
         },
         {
+          "kind": "range",
           "label": "零值",
           "text": "无销售成本且库存为正时周转率为0、天数未定义"
-        }
-      ],
-      "pitfall": "用期末售价金额作分母，或者把缺失快照填零",
-      "sources": [
-        {
-          "table": "stock_movements",
-          "fields": [
-            "quantity_delta",
-            "unit_cost_cents",
-            "movement_type",
-            "movement_date"
-          ]
         },
         {
-          "table": "inventory_snapshots",
-          "fields": [
-            "quantity",
-            "unit_cost_cents",
-            "snapshot_date"
-          ]
+          "kind": "pitfall",
+          "label": "易错口径",
+          "text": "用期末售价金额作分母，或者把缺失快照填零"
+        },
+        {
+          "kind": "derived",
+          "rule": "zero-denominator",
+          "text": "分母为 0 时，结果为空（NULL），不会报错，也不会写成 0。"
         }
       ]
     },
     {
       "id": "kp19-02-days",
-      "slot": "problem",
+      "slot": "concept",
       "kind": "metric-card",
-      "title": "周转天数的口径",
+      "title": "周转天数",
       "metric": {
         "column": "turnover_days",
         "label": "周转天数"
       },
-      "numerator": {
-        "label": "365 × 平均库存成本（分）",
-        "expr": "365.0*b.avg_stock"
+      "meaning": "把周转率换算成天数：库存平均要多少天才能周转一次。",
+      "formula": {
+        "lhs": "周转天数",
+        "numerator": "365 × 平均库存成本",
+        "denominator": "销售成本"
       },
-      "denominator": {
-        "label": "销售成本（分）",
-        "expr": "a.cogs"
+      "example": {
+        "source": "result",
+        "row": 0,
+        "inputs": [
+          {
+            "name": "avg",
+            "label": "平均库存成本",
+            "unit": "分",
+            "value": 17613195.5,
+            "column": "avg_stock_cents"
+          },
+          {
+            "name": "cogs",
+            "label": "销售成本",
+            "unit": "分",
+            "value": 7705671,
+            "column": "cogs_cents"
+          }
+        ],
+        "calc": "365*avg/cogs",
+        "process": "365 × 17,613,195.5 ÷ 7,705,671 ＝ 834.3",
+        "result": {
+          "value": 834.3,
+          "unit": "天",
+          "decimals": 2,
+          "column": "turnover_days"
+        }
       },
-      "scope": [
+      "interpretation": "周转天数 {result}：库存平均要这么多天才能周转一次；天数越小，周转越快。",
+      "sql": {
+        "lines": [
+          "CASE WHEN a.cogs>0 THEN ROUND(365.0*b.avg_stock/a.cogs,2) ELSE NULL END turnover_days"
+        ]
+      },
+      "notes": [
         {
+          "kind": "range",
           "label": "范围",
           "text": "2025全年，按仓库×类别输出"
         },
         {
+          "kind": "range",
           "label": "零值",
           "text": "无销售成本且库存为正时周转率为0、天数未定义"
-        }
-      ],
-      "pitfall": "覆盖天数不是周转天数",
-      "sources": [
-        {
-          "table": "stock_movements",
-          "fields": [
-            "quantity_delta",
-            "unit_cost_cents",
-            "movement_date"
-          ]
         },
         {
-          "table": "inventory_snapshots",
-          "fields": [
-            "quantity",
-            "unit_cost_cents",
-            "snapshot_date"
-          ]
+          "kind": "pitfall",
+          "label": "易错口径",
+          "text": "覆盖天数不是周转天数"
+        },
+        {
+          "kind": "derived",
+          "rule": "zero-denominator",
+          "text": "分母为 0 时，结果为空（NULL），不会报错，也不会写成 0。"
         }
       ]
     }

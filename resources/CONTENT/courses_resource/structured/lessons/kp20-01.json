@@ -21,6 +21,12 @@
       ]
     },
     {
+      "type": "figure",
+      "ids": [
+        "kp20-01-share"
+      ]
+    },
+    {
       "type": "heading",
       "text": "使用要点",
       "emphasis": []

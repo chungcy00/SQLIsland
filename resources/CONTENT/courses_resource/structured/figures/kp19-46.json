@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp19-46",
-  "lessonSha256": "abd7ddd67f60b2d18345e0b96163aaf679b7c91e3349980215ff726ed6945c90",
+  "lessonSha256": "3b6ad7b23b4bc2644664d3b75a759d66ea69ab02503d24675ec63a50418c23b4",
   "figures": [
     {
       "id": "kp19-46-clauses",
@@ -44,50 +44,79 @@
     },
     {
       "id": "kp19-46-variance",
-      "slot": "problem",
+      "slot": "concept",
       "kind": "metric-card",
-      "title": "预算偏差率的口径",
+      "title": "预算偏差率",
       "metric": {
         "column": "variance_pct",
-        "label": "预算偏差率（%）"
+        "label": "预算偏差率"
       },
-      "numerator": {
-        "label": "实际费用减预算（分）",
-        "expr": "COALESCE(a.actual,0)-b.budget"
+      "meaning": "衡量实际费用相对预算多了或少了多少，用于预算执行检查。",
+      "formula": {
+        "lhs": "预算偏差率",
+        "numerator": "实际费用 − 预算",
+        "denominator": "预算",
+        "times": "× 100%"
       },
-      "denominator": {
-        "label": "预算（分）",
-        "expr": "b.budget"
+      "example": {
+        "source": "result",
+        "row": 0,
+        "inputs": [
+          {
+            "name": "actual",
+            "label": "实际费用",
+            "unit": "分",
+            "value": 119790619,
+            "column": "actual_cents"
+          },
+          {
+            "name": "budget",
+            "label": "预算",
+            "unit": "分",
+            "value": 75531604,
+            "column": "budget_cents"
+          }
+        ],
+        "calc": "100*(actual-budget)/budget",
+        "process": "100 × (119,790,619 − 75,531,604) ÷ 75,531,604 ＝ 58.6%",
+        "result": {
+          "value": 58.6,
+          "unit": "%",
+          "decimals": 2,
+          "column": "variance_pct"
+        }
       },
-      "scope": [
+      "interpretation": "预算偏差率 {result}：实际费用比预算多（正数）或少（负数）的比例。",
+      "sql": {
+        "lines": [
+          "ROUND(100.0*(COALESCE(a.actual,0)-b.budget)/NULLIF(b.budget,0),2) variance_pct"
+        ]
+      },
+      "notes": [
         {
+          "kind": "range",
           "label": "范围",
           "text": "2025年预算执行"
         },
         {
+          "kind": "range",
           "label": "粒度",
           "text": "每部门每科目一行，以预算为保留侧"
         },
         {
+          "kind": "range",
           "label": "标记",
           "text": "超过预算110%才标记，恰好110%不标记"
-        }
-      ],
-      "pitfall": "按部门直接连接预算月行和实际凭证行后求和，或用 ABS 汇总费用",
-      "sources": [
-        {
-          "table": "budgets",
-          "fields": [
-            "department_id",
-            "account_id"
-          ]
         },
         {
-          "table": "v_expenses",
-          "fields": [
-            "department_id",
-            "account_id"
-          ]
+          "kind": "pitfall",
+          "label": "易错口径",
+          "text": "按部门直接连接预算月行和实际凭证行后求和，或用 ABS 汇总费用"
+        },
+        {
+          "kind": "derived",
+          "rule": "zero-denominator",
+          "text": "分母为 0 时，结果为空（NULL），不会报错，也不会写成 0。"
         }
       ]
     }

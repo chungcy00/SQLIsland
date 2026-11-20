@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp19-36",
-  "lessonSha256": "7695ad2af3a7a8b1230a6f4a2adbf287c62792bbd98939ad3fa54f0e76618ef6",
+  "lessonSha256": "7c788d8a09f2a3a8c39bf8e53f5e26364c6438e1c8921716c9b5a2de9922a7b8",
   "figures": [
     {
       "id": "kp19-36-clauses",
@@ -44,50 +44,78 @@
     },
     {
       "id": "kp19-36-cover",
-      "slot": "problem",
+      "slot": "concept",
       "kind": "metric-card",
-      "title": "库存覆盖天数的口径",
+      "title": "库存覆盖天数",
       "metric": {
         "column": "cover_days",
-        "label": "覆盖天数"
+        "label": "库存覆盖天数"
       },
-      "numerator": {
-        "label": "90 × 期末库存数量",
-        "expr": "90.0*i.quantity"
+      "meaning": "估算现有库存按近期的销售速度还能卖多少天，用来识别积压。",
+      "formula": {
+        "lhs": "覆盖天数",
+        "numerator": "90 × 期末库存数量",
+        "denominator": "90 天销量"
       },
-      "denominator": {
-        "label": "90 天销量",
-        "expr": "s.sold"
+      "example": {
+        "source": "result",
+        "row": 0,
+        "inputs": [
+          {
+            "name": "qty",
+            "label": "期末库存数量",
+            "unit": "件",
+            "value": 282,
+            "column": "quantity"
+          },
+          {
+            "name": "sold",
+            "label": "90 天销量",
+            "unit": "件",
+            "value": 9,
+            "column": "sold_units"
+          }
+        ],
+        "calc": "90*qty/sold",
+        "process": "90 × 282 ÷ 9 ＝ 2,820",
+        "result": {
+          "value": 2820.0,
+          "unit": "天",
+          "decimals": 2,
+          "column": "cover_days"
+        }
       },
-      "scope": [
+      "interpretation": "覆盖天数 {result}：按这 90 天的销售速度，现有库存大约够卖这么多天；销量为 0 时没有定义。",
+      "sql": {
+        "lines": [
+          "ROUND(90.0*i.quantity/NULLIF(s.sold,0),2) cover_days"
+        ]
+      },
+      "notes": [
         {
+          "kind": "range",
           "label": "范围",
           "text": "2025-10-03至12-31共90天"
         },
         {
+          "kind": "range",
           "label": "商品",
           "text": "期末有效商品"
         },
         {
+          "kind": "range",
           "label": "零销量",
           "text": "零销量的覆盖天数为空"
-        }
-      ],
-      "pitfall": "覆盖天数高不是充分证据，零销量也不是零天",
-      "sources": [
-        {
-          "table": "inventory_snapshots",
-          "fields": [
-            "quantity",
-            "snapshot_date"
-          ]
         },
         {
-          "table": "stock_movements",
-          "fields": [
-            "quantity_delta",
-            "movement_date"
-          ]
+          "kind": "pitfall",
+          "label": "易错口径",
+          "text": "覆盖天数高不是充分证据，零销量也不是零天"
+        },
+        {
+          "kind": "derived",
+          "rule": "zero-denominator",
+          "text": "分母为 0 时，结果为空（NULL），不会报错，也不会写成 0。"
         }
       ]
     }

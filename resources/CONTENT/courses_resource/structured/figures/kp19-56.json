@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp19-56",
-  "lessonSha256": "1046a980f2f784ca8888d54d4ffeec1e13ea4c0753d2885bcb133e5179a8ed08",
+  "lessonSha256": "be48be7dd3523b5af84941c939c4df097b8d84de0421035a4acd0db760bdff03",
   "figures": [
     {
       "id": "kp19-56-clauses",
@@ -44,54 +44,84 @@
     },
     {
       "id": "kp19-56-change",
-      "slot": "problem",
+      "slot": "concept",
       "kind": "metric-card",
-      "title": "价格变动率的口径",
+      "title": "价格变动率",
       "metric": {
         "column": "change_pct",
-        "label": "较上次采购价变动（%）"
+        "label": "价格变动率"
       },
-      "numerator": {
-        "label": "本次减上次单价（分）",
-        "expr": "unit_price_cents-previous_cents"
+      "meaning": "衡量本次采购单价相对上一笔采购价格的变化，用来发现价格偏离。",
+      "formula": {
+        "lhs": "价格变动率",
+        "numerator": "本次采购单价 − 上一笔采购单价",
+        "denominator": "上一笔采购单价",
+        "times": "× 100%"
       },
-      "denominator": {
-        "label": "上次采购单价（分）",
-        "expr": "previous_cents"
+      "example": {
+        "source": "result",
+        "row": 0,
+        "inputs": [
+          {
+            "name": "price",
+            "label": "本次采购单价",
+            "unit": "分",
+            "value": 5065,
+            "column": "unit_price_cents"
+          },
+          {
+            "name": "prev",
+            "label": "上一笔采购单价",
+            "unit": "分",
+            "value": 4755,
+            "column": "previous_cents"
+          }
+        ],
+        "calc": "100*(price-prev)/prev",
+        "process": "100 × (5,065 − 4,755) ÷ 4,755 ＝ 6.52%",
+        "result": {
+          "value": 6.52,
+          "unit": "%",
+          "decimals": 2,
+          "column": "change_pct"
+        }
       },
-      "scope": [
+      "interpretation": "价格变动率 {result}：本次采购单价比上一笔变化的幅度；为正表示涨价，为负表示降价。",
+      "sql": {
+        "lines": [
+          "ROUND(100.0*(unit_price_cents-previous_cents)/NULLIF(previous_cents,0),2) change_pct"
+        ]
+      },
+      "notes": [
         {
+          "kind": "range",
           "label": "范围",
           "text": "成交价格偏离合同或历史价格的采购行"
         },
         {
+          "kind": "range",
           "label": "金额",
           "text": "所有金额以马币分表示"
         },
         {
+          "kind": "range",
           "label": "提醒",
           "text": "采购承诺不是已收货或已付款金额"
-        }
-      ],
-      "pitfall": "先筛2025年再用 LAG，或直接平均各次采购单价",
-      "sources": [
-        {
-          "table": "purchase_order_items",
-          "fields": [
-            "unit_price_cents"
-          ]
         },
         {
-          "table": "purchase_orders",
-          "fields": [
-            "order_date"
-          ]
+          "kind": "pitfall",
+          "label": "易错口径",
+          "text": "先筛2025年再用 LAG，或直接平均各次采购单价"
         },
         {
-          "table": "supplier_contracts",
-          "fields": [
-            "unit_price_cents"
-          ]
+          "kind": "derived",
+          "rule": "zero-denominator",
+          "text": "分母为 0 时，结果为空（NULL），不会报错，也不会写成 0。"
+        },
+        {
+          "kind": "derived",
+          "rule": "unit-cents",
+          "text": "金额的单位是分，不是元。"
         }
       ]
     }

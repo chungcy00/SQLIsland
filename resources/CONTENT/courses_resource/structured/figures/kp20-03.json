@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp20-03",
-  "lessonSha256": "54d02bccafdf3bbac90a91a421c77362997db8de1d03ca9deabbe5c19816dc04",
+  "lessonSha256": "82b5b6e3ad00b6ef33f9b4223d94e87992d21e07bcd3539de0b3c8ae79917c0d",
   "figures": [
     {
       "id": "kp20-03-clauses",
@@ -47,6 +47,83 @@
           "note": "按 net_cents DESC, sales_rank DESC 排列结果。"
         }
       ]
+    },
+    {
+      "id": "kp20-03-rank",
+      "slot": "concept",
+      "kind": "compare-card",
+      "title": "分组内排名的结果长什么样？",
+      "panels": [
+        {
+          "label": "门店 1：三件商品净销售相同",
+          "tone": "neutral",
+          "note": "分数相同时，按商品编号的先后决定名次。",
+          "columns": [
+            "商品",
+            "净销售（分）",
+            "组内名次"
+          ],
+          "rows": [
+            [
+              1,
+              100,
+              1
+            ],
+            [
+              2,
+              100,
+              2
+            ],
+            [
+              3,
+              100,
+              3
+            ]
+          ],
+          "big": {
+            "label": "门店 1 保留的行数",
+            "value": 3
+          },
+          "check": {
+            "sql": "WITH sales AS (\n SELECT store_id,product_id,SUM(net_cents) net_cents FROM v_sales_lines\n WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31'\n GROUP BY store_id,product_id HAVING SUM(net_cents)>0\n), ranked AS (\n SELECT store_id,product_id,net_cents,ROW_NUMBER() OVER(PARTITION BY store_id ORDER BY net_cents DESC,product_id) sales_rank FROM sales\n)\n SELECT COUNT(*) FROM ranked WHERE sales_rank<=3 AND store_id=1",
+            "expected": [
+              [
+                3
+              ]
+            ]
+          }
+        },
+        {
+          "label": "门店 2：只有一件商品",
+          "tone": "neutral",
+          "note": "名次在每个门店里单独从 1 开始，不够三件就全部保留。",
+          "columns": [
+            "商品",
+            "净销售（分）",
+            "组内名次"
+          ],
+          "rows": [
+            [
+              1,
+              80,
+              1
+            ]
+          ],
+          "big": {
+            "label": "门店 2 保留的行数",
+            "value": 1
+          },
+          "check": {
+            "sql": "WITH sales AS (\n SELECT store_id,product_id,SUM(net_cents) net_cents FROM v_sales_lines\n WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31'\n GROUP BY store_id,product_id HAVING SUM(net_cents)>0\n), ranked AS (\n SELECT store_id,product_id,net_cents,ROW_NUMBER() OVER(PARTITION BY store_id ORDER BY net_cents DESC,product_id) sales_rank FROM sales\n)\n SELECT COUNT(*) FROM ranked WHERE sales_rank<=3 AND store_id=2",
+            "expected": [
+              [
+                1
+              ]
+            ]
+          }
+        }
+      ],
+      "conclusion": "名次在每个门店内部单独计数，外层再用「名次 ≤ 3」保留每店前三。"
     }
   ]
 }

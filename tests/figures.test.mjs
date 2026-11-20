@@ -80,18 +80,32 @@ test('stage-flow validation rejects data that differs from the sample or the les
   assert.equal(rowFlowStep(join,1), null);
   assert.equal(rowFlowStep(join,2).badge, '5 → 4 行');
 });
-test('metric cards quote the lesson instead of inventing a definition', async () => {
+test('metric cards v2 recompute their example and quote the lesson', async () => {
   const lesson = lessons.find(k => k.id === 'kp19-41');
   const card = () => structuredClone(lesson.figures.find(figure => figure.kind === 'metric-card'));
   const check = figure => validateFigures(lesson, {schemaVersion: 1, id: lesson.id, figures: [figure]});
   check(card());
-  let bad = card(); bad.numerator.expr = 'SUM(profit_cents)';
+  let bad = card(); bad.sql.lines = ['SUM(profit_cents)'];
   assert.throws(() => check(bad), /not in the lesson query/);
-  bad = card(); bad.scope[0].text = '2024年度线下订单';
+  bad = card(); bad.example.result.value += 1;
+  assert.throws(() => check(bad), /differs from the calculation/);
+  bad = card(); bad.example.inputs[0].value += 1;
+  assert.throws(() => check(bad), /differs from the lesson data/);
+  bad = card(); bad.example.calc = 'net*orders';
+  assert.throws(() => check(bad), /differs from the calculation|unknown input/);
+  bad = card(); bad.notes = [{kind: 'range', text: '2024年度线下订单'}];
   assert.throws(() => check(bad), /not quoted from the lesson problem/);
-  bad = card(); bad.pitfall = '分母可以随意更换';
+  bad = card(); bad.notes = [{kind: 'pitfall', text: '分母可以随意更换'}];
   assert.throws(() => check(bad), /not quoted from the lesson cautions/);
-  bad = card(); bad.metric.column = 'unknown_pct';
-  assert.throws(() => check(bad), /not a result column/);
-  assert.match(renderFigures(lesson, 'problem'), /fig-formula/);
+  bad = card(); bad.notes = [{kind: 'derived', rule: 'zero-denominator', text: '分母为 0 时，结果为 0。'}];
+  assert.throws(() => check(bad), /derived note/);
+  bad = card(); bad.slot = 'problem';
+  assert.throws(() => check(bad), /concept slot/);
+  bad = card(); bad.interpretation = '没有占位符';
+  assert.throws(() => check(bad), /\{result\}/);
+  const html = renderFigures(lesson, 'concept');
+  assert.match(html, /mc-formula/); assert.match(html, /mc-sql/); assert.match(html, /mc-result/);
+  // 七段顺序：含义 → 公式 → 示例 → 解读 → SQL
+  const order = ['mc-meaning', 'mc-formula', 'mc-example', 'mc-sql'].map(name => html.indexOf(name));
+  assert.deepEqual(order, [...order].sort((x, y) => x - y)); assert.ok(order.every(n => n >= 0));
 });

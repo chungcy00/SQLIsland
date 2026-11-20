@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp20-02",
-  "lessonSha256": "411109a60cac2773df09c7279c4f464d10815a0eca1627540deac8461719cf5f",
+  "lessonSha256": "71ff33cc4bf61e5cf4e44d1e1095018855f87197199acd8de3fcaefb7ba3b42b",
   "figures": [
     {
       "id": "kp20-02-clauses",
@@ -56,49 +56,84 @@
     },
     {
       "id": "kp20-02-change",
-      "slot": "problem",
+      "slot": "concept",
       "kind": "metric-card",
-      "title": "净销售环比的口径",
+      "title": "净销售环比",
       "metric": {
         "column": "change_pct",
-        "label": "环比（%）"
+        "label": "净销售环比"
       },
-      "numerator": {
-        "label": "本月减上月净销售（分）",
-        "expr": "net_cents-previous_net_cents"
+      "meaning": "把本月和上一个月比较，看净销售的变化幅度。",
+      "formula": {
+        "lhs": "环比",
+        "numerator": "本月净销售 − 上月净销售",
+        "denominator": "上月净销售",
+        "times": "× 100%"
       },
-      "denominator": {
-        "label": "上月净销售（分）",
-        "expr": "previous_net_cents"
+      "example": {
+        "source": "result",
+        "row": 1,
+        "inputs": [
+          {
+            "name": "net",
+            "label": "本月净销售",
+            "unit": "分",
+            "value": 0,
+            "column": "net_cents"
+          },
+          {
+            "name": "prev",
+            "label": "上月净销售",
+            "unit": "分",
+            "value": 400,
+            "column": "previous_net_cents"
+          }
+        ],
+        "calc": "100*(net-prev)/prev",
+        "process": "100 × (0 − 400) ÷ 400 ＝ -100%",
+        "result": {
+          "value": -100.0,
+          "unit": "%",
+          "decimals": 2,
+          "column": "change_pct"
+        }
       },
-      "scope": [
+      "interpretation": "环比 {result}：本月净销售比上个月变化的幅度；上月为 0 或没有上月时结果为空。",
+      "sql": {
+        "lines": [
+          "ROUND(100.0*(net_cents-previous_net_cents)/NULLIF(previous_net_cents,0),2) change_pct"
+        ]
+      },
+      "notes": [
         {
+          "kind": "range",
           "label": "范围",
           "text": "2025年线下月度净销售报表"
         },
         {
+          "kind": "range",
           "label": "补零",
           "text": "来源数据完整才允许将无交易解释为零"
         },
         {
+          "kind": "range",
           "label": "不补零",
           "text": "系统漏传、未关账、未来月份不能直接补零"
-        }
-      ],
-      "pitfall": "只对有销售的月份使用 LAG，或将零分母的环比补为0%",
-      "sources": [
-        {
-          "table": "v_order_net",
-          "fields": [
-            "net_cents",
-            "order_date"
-          ]
         },
         {
-          "table": "calendar_days",
-          "fields": [
-            "month_key"
-          ]
+          "kind": "pitfall",
+          "label": "易错口径",
+          "text": "只对有销售的月份使用 LAG，或将零分母的环比补为0%"
+        },
+        {
+          "kind": "derived",
+          "rule": "zero-denominator",
+          "text": "分母为 0 时，结果为空（NULL），不会报错，也不会写成 0。"
+        },
+        {
+          "kind": "derived",
+          "rule": "unit-cents",
+          "text": "金额的单位是分，不是元。"
         }
       ]
     }

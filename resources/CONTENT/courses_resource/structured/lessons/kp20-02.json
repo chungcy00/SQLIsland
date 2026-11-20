@@ -21,6 +21,12 @@
       ]
     },
     {
+      "type": "figure",
+      "ids": [
+        "kp20-02-change"
+      ]
+    },
+    {
       "type": "heading",
       "text": "使用要点",
       "emphasis": []

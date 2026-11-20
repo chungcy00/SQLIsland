@@ -49,6 +49,12 @@ try {
             out.push({id: figure.id + ':input', expected: figure.inputRows, actual: result.rows.map(row => row.slice(0, width))});
             figure.outputs.forEach((output, i) => out.push({id: figure.id + ':' + output.label, expected: output.values, actual: result.rows.map(row => row[width + i])}));
           }
+        } else if (figure.kind === 'metric-card') {
+          // 数值示例里不在课程结果行中的输入（合计、上月、去年同月等）：用其 check.sql 在课程数据上实际执行核对。
+          for (const input of figure.example.inputs.filter(item => item.check)) {
+            const result = await run({tables, setupSql, path, sql: input.check.sql});
+            out.push({id: `${figure.id}:${input.name}`, expected: [[input.value]], actual: result.rows});
+          }
         } else if (figure.kind === 'compare-card') {
           for (const [index, panel] of figure.panels.entries()) {
             const result = await run({tables, setupSql, path, sql: panel.check.sql});

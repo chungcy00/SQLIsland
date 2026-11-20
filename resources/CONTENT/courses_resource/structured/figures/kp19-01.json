@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp19-01",
-  "lessonSha256": "28ffcf0c5befe1662638c9aaf24159bbfa03811cca3db4bde584a0eeba15f85f",
+  "lessonSha256": "e52a49c1980068045c3a0b247cb858db8ef2ab6f475abb9c157f26b712d03c68",
   "figures": [
     {
       "id": "kp19-01-clauses",
@@ -44,91 +44,152 @@
     },
     {
       "id": "kp19-01-achievement",
-      "slot": "problem",
+      "slot": "concept",
       "kind": "metric-card",
-      "title": "目标达成率的口径",
+      "title": "目标达成率",
       "metric": {
         "column": "achievement_pct",
-        "label": "目标达成率（%）"
+        "label": "目标达成率"
       },
-      "numerator": {
-        "label": "净销售（分）",
-        "expr": "COALESCE(a.net,0)"
+      "meaning": "衡量门店在统计期内的净销售完成了销售目标的多少，用来判断计划完成情况。",
+      "formula": {
+        "lhs": "目标达成率",
+        "numerator": "净销售",
+        "denominator": "销售目标",
+        "times": "× 100%"
       },
-      "denominator": {
-        "label": "销售目标（分）",
-        "expr": "b.target"
+      "example": {
+        "source": "result",
+        "row": 0,
+        "inputs": [
+          {
+            "name": "net",
+            "label": "净销售",
+            "unit": "分",
+            "value": 6969441,
+            "column": "net_cents"
+          },
+          {
+            "name": "target",
+            "label": "销售目标",
+            "unit": "分",
+            "value": 69312500,
+            "column": "target_cents"
+          }
+        ],
+        "calc": "100*net/target",
+        "process": "100 × 6,969,441 ÷ 69,312,500 ＝ 10.06%",
+        "result": {
+          "value": 10.06,
+          "unit": "%",
+          "decimals": 2,
+          "column": "achievement_pct"
+        }
       },
-      "scope": [
+      "interpretation": "目标达成率 {result}：净销售相当于销售目标的这个比例；100% 表示刚好完成，低于 100% 说明还没有完成目标。",
+      "sql": {
+        "lines": [
+          "ROUND(100.0*COALESCE(a.net,0)/NULLIF(b.target,0),2) achievement_pct"
+        ]
+      },
+      "notes": [
         {
+          "kind": "range",
           "label": "范围",
           "text": "2025年有效线下订单"
         },
         {
+          "kind": "range",
           "label": "退款",
           "text": "退款截至年底并归属原订单日期"
         },
         {
+          "kind": "range",
           "label": "零值",
           "text": "净额和目标为零时分别不计算对应比率"
-        }
-      ],
-      "pitfall": "毛利率衡量盈利结构，目标达成率衡量计划完成；不能互换。",
-      "sources": [
-        {
-          "table": "v_sales_lines",
-          "fields": [
-            "net_cents",
-            "channel",
-            "order_date"
-          ]
         },
         {
-          "table": "sales_targets",
-          "fields": [
-            "target_cents",
-            "month_key"
-          ]
+          "kind": "pitfall",
+          "label": "易错口径",
+          "text": "毛利率衡量盈利结构，目标达成率衡量计划完成；不能互换。"
+        },
+        {
+          "kind": "derived",
+          "rule": "zero-denominator",
+          "text": "分母为 0 时，结果为空（NULL），不会报错，也不会写成 0。"
         }
       ]
     },
     {
       "id": "kp19-01-margin",
-      "slot": "problem",
+      "slot": "concept",
       "kind": "metric-card",
-      "title": "毛利率的口径",
+      "title": "毛利率",
       "metric": {
         "column": "margin_pct",
-        "label": "毛利率（%）"
+        "label": "毛利率"
       },
-      "numerator": {
-        "label": "毛利（分）",
-        "expr": "a.net-a.cost"
+      "meaning": "衡量净销售中毛利所占的比例，反映盈利结构；毛利 = 净销售 − 销售成本。",
+      "formula": {
+        "lhs": "毛利率",
+        "numerator": "毛利",
+        "denominator": "净销售",
+        "times": "× 100%"
       },
-      "denominator": {
-        "label": "净销售（分）",
-        "expr": "a.net"
+      "example": {
+        "source": "result",
+        "row": 0,
+        "inputs": [
+          {
+            "name": "gross",
+            "label": "毛利",
+            "unit": "分",
+            "value": 2741661,
+            "column": "gross_cents"
+          },
+          {
+            "name": "net",
+            "label": "净销售",
+            "unit": "分",
+            "value": 6969441,
+            "column": "net_cents"
+          }
+        ],
+        "calc": "100*gross/net",
+        "process": "100 × 2,741,661 ÷ 6,969,441 ＝ 39.34%",
+        "result": {
+          "value": 39.34,
+          "unit": "%",
+          "decimals": 2,
+          "column": "margin_pct"
+        }
       },
-      "scope": [
+      "interpretation": "毛利率 {result}：净销售中有这个比例是毛利，其余部分用来抵销售成本。",
+      "sql": {
+        "lines": [
+          "ROUND(100.0*(a.net-a.cost)/NULLIF(a.net,0),2) margin_pct"
+        ]
+      },
+      "notes": [
         {
+          "kind": "range",
           "label": "范围",
           "text": "2025年有效线下订单"
         },
         {
+          "kind": "range",
           "label": "退款",
           "text": "退款截至年底并归属原订单日期"
-        }
-      ],
-      "pitfall": "毛利率衡量盈利结构，目标达成率衡量计划完成；不能互换。",
-      "sources": [
+        },
         {
-          "table": "v_sales_lines",
-          "fields": [
-            "net_cents",
-            "cost_cents",
-            "channel",
-            "order_date"
-          ]
+          "kind": "pitfall",
+          "label": "易错口径",
+          "text": "毛利率衡量盈利结构，目标达成率衡量计划完成；不能互换。"
+        },
+        {
+          "kind": "derived",
+          "rule": "zero-denominator",
+          "text": "分母为 0 时，结果为空（NULL），不会报错，也不会写成 0。"
         }
       ]
     }

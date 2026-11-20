@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp20-21",
-  "lessonSha256": "a213697653946ceba81c57575392db69139c2a252d4ebd344c6abdeac0c8d743",
+  "lessonSha256": "be59a8b1caf776143b4d39e981f6c4e3568c46d6643d53975bf654b1e1a7b9ee",
   "figures": [
     {
       "id": "kp20-21-clauses",
@@ -44,47 +44,74 @@
     },
     {
       "id": "kp20-21-labor",
-      "slot": "problem",
+      "slot": "concept",
       "kind": "metric-card",
-      "title": "人工费用占比的口径",
+      "title": "人工占净销售比",
       "metric": {
         "column": "labor_pct",
-        "label": "人工占净销售比（%）"
+        "label": "人工占净销售比"
       },
-      "numerator": {
-        "label": "人工费用（分）",
-        "expr": "COALESCE(b.labor,0)"
+      "meaning": "衡量人工费用占净销售的比例，用来判断门店的人工负担。",
+      "formula": {
+        "lhs": "人工占净销售比",
+        "numerator": "人工费用",
+        "denominator": "净销售",
+        "times": "× 100%"
       },
-      "denominator": {
-        "label": "净销售（分）",
-        "expr": "a.net"
+      "example": {
+        "source": "result",
+        "row": 8,
+        "inputs": [
+          {
+            "name": "labor",
+            "label": "人工费用",
+            "unit": "分",
+            "value": 4762259.0,
+            "column": "labor_cents"
+          },
+          {
+            "name": "net",
+            "label": "净销售",
+            "unit": "分",
+            "value": 2598900,
+            "column": "net_cents"
+          }
+        ],
+        "calc": "100*labor/net",
+        "process": "100 × 4,762,259 ÷ 2,598,900 ＝ 183.24%",
+        "result": {
+          "value": 183.24,
+          "unit": "%",
+          "decimals": 2,
+          "column": "labor_pct"
+        }
       },
-      "scope": [
+      "interpretation": "人工占净销售比 {result}：人工费用占净销售的比例；比例越高，说明人工负担越重。",
+      "sql": {
+        "lines": [
+          "ROUND(100.0*COALESCE(b.labor,0)/NULLIF(a.net,0),2) labor_pct"
+        ]
+      },
+      "notes": [
         {
+          "kind": "range",
           "label": "范围",
           "text": "2025年各实体门店"
         },
         {
+          "kind": "range",
           "label": "归属",
           "text": "必须按员工月记录的历史门店归属计算"
-        }
-      ],
-      "pitfall": "组合比率先汇总分子分母",
-      "sources": [
-        {
-          "table": "v_sales_lines",
-          "fields": [
-            "net_cents",
-            "channel",
-            "order_date"
-          ]
         },
         {
-          "table": "v_staff_month",
-          "fields": [
-            "labor_cents",
-            "month_key"
-          ]
+          "kind": "pitfall",
+          "label": "易错口径",
+          "text": "组合比率先汇总分子分母"
+        },
+        {
+          "kind": "derived",
+          "rule": "zero-denominator",
+          "text": "分母为 0 时，结果为空（NULL），不会报错，也不会写成 0。"
         }
       ]
     }

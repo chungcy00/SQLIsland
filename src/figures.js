@@ -143,13 +143,17 @@ function joinMap(figure, lesson) {
     + `<h4 class="fig-step-h"><b>③</b> 最终查询结果 <span class="fig-total">共 ${resultRows.length} 行</span></h4>${result}`
     + (figure.caption ? `<div class="fig-caption">${esc(figure.caption)}</div>` : "");
 }
+// 指标公式卡 v2：名称 → 含义 → 中文公式 → 数值示例 → 结果解读 → 对应 SQL → 特殊情况（仅适用时）。
+const mcNumber = (value, decimals = 2) => (typeof value === "number" ? value.toLocaleString("en-US", { maximumFractionDigits: decimals, minimumFractionDigits: Number.isInteger(value) ? 0 : Math.min(decimals, 2) }) : String(value));
 function metricCard(figure) {
-  const part = (kind, label, expr) => `<div class="fig-formula-part ${kind}"><small>${esc(label)}</small><code>${esc(expr)}</code></div>`;
-  return `<div class="fig-metric-head"><span>输出列 <code>${esc(figure.metric.column)}</code></span><b>${esc(figure.metric.label)}</b></div>`
-    + `<div class="fig-formula" role="group" aria-label="指标公式">${part("num", "分子 · " + figure.numerator.label, figure.numerator.expr)}<div class="fig-slash" aria-hidden="true"></div>${part("den", "分母 · " + figure.denominator.label, figure.denominator.expr)}</div>`
-    + `<div class="fig-scope">${figure.scope.map((tag) => `<span class="fig-scope-tag"><b>${esc(tag.label)}</b>${esc(tag.text)}</span>`).join("")}</div>`
-    + (figure.pitfall ? `<div class="fig-pitfall"><b>易错口径</b>${esc(figure.pitfall)}</div>` : "")
-    + `<p class="fig-source">数据来源：${figure.sources.map((item) => `<code>${esc(item.table)}</code>（${item.fields.map(esc).join("、")}）`).join("；")}</p>`;
+  const f = figure.formula, ex = figure.example, unit = ex.result.unit || "";
+  const fraction = f.denominator ? `<span class="mc-frac"><span class="mc-num">${esc(f.numerator)}</span><span class="mc-den">${esc(f.denominator)}</span></span>` : `<span class="mc-plain">${esc(f.numerator)}</span>`;
+  const formula = `<div class="mc-formula" role="group" aria-label="${esc(f.lhs)}的计算公式"><span class="mc-lhs">${esc(f.lhs)}</span><span class="mc-eq">＝</span>${fraction}${f.times ? `<span class="mc-times">${esc(f.times)}</span>` : ""}</div>`;
+  const inputs = ex.inputs.map((input) => `<div class="mc-input"><small>${esc(input.label)}</small><b>${esc(mcNumber(input.value, 2))}</b>${input.unit ? `<em>${esc(input.unit)}</em>` : ""}</div>`).join("");
+  const resultText = `${mcNumber(ex.result.value, ex.result.decimals)}${unit === "%" ? "%" : unit ? " " + unit : ""}`;
+  const example = `<div class="mc-example"><div class="mc-inputs">${inputs}</div><p class="mc-process">${esc(ex.process)}</p><div class="mc-result"><small>计算结果</small><b>${esc(mcNumber(ex.result.value, ex.result.decimals))}</b><span>${esc(unit)}</span></div></div>`;
+  const notes = (figure.notes || []).map((note) => `<li>${note.label ? `<b>${esc(note.label)}</b>` : ""}${esc(note.text)}</li>`).join("");
+  return `<p class="mc-meaning"><b>指标含义</b>${esc(figure.meaning)}</p>${formula}<h4 class="mc-h">数值示例</h4>${example}<p class="mc-reading"><b>结果解读</b>${esc(figure.interpretation.replace("{result}", resultText))}</p><div class="mc-sql"><small>对应 SQL 写法</small><pre><code>${figure.sql.lines.map(esc).join("\n")}</code></pre></div>${notes ? `<h4 class="mc-h">特殊情况</h4><ul class="mc-notes">${notes}</ul>` : ""}`;
 }
 const joinName = { inner: "INNER JOIN 内连接", left: "LEFT JOIN 左连接", right: "RIGHT JOIN 右连接", full: "FULL JOIN 全连接" };
 export function renderFigures(lesson, slot) {

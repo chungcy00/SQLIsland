@@ -20,6 +20,12 @@
         "ROW_NUMBER 为每行分配唯一序号，RANK 同额并列且跳号，DENSE_RANK 同额并列不跳号。",
         "固定最多三行使用 ROW_NUMBER，要求前三个名次包含并列使用 RANK，要求前三种不同金额使用 DENSE_RANK。"
       ]
+    },
+    {
+      "type": "figure",
+      "ids": [
+        "kp20-03-rank"
+      ]
     }
   ],
   "syntax": {

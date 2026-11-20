@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp20-06",
-  "lessonSha256": "00f3f29e9514522ef7e39b56cdd78f0a5f7827562e63135a61089348e56cae46",
+  "lessonSha256": "953bf951be24965d34adff37cd5b8faff6b75986296bd397fee756367a4c606c",
   "figures": [
     {
       "id": "kp20-06-clauses",
@@ -56,82 +56,158 @@
     },
     {
       "id": "kp20-06-sales",
-      "slot": "problem",
+      "slot": "concept",
       "kind": "metric-card",
-      "title": "销售占比的口径",
+      "title": "销售占比",
       "metric": {
         "column": "sales_pct",
-        "label": "销售占比（%）"
+        "label": "销售占比"
       },
-      "numerator": {
-        "label": "本商品净销售（分）",
-        "expr": "net"
+      "meaning": "衡量某个商品的年度净销售占全体商品净销售合计的比例，用来看销售贡献。",
+      "formula": {
+        "lhs": "销售占比",
+        "numerator": "本商品净销售",
+        "denominator": "全部商品净销售合计",
+        "times": "× 100%"
       },
-      "denominator": {
-        "label": "全部商品净销售合计（分）",
-        "expr": "SUM(net) OVER()"
+      "example": {
+        "source": "result",
+        "row": 0,
+        "inputs": [
+          {
+            "name": "net",
+            "label": "本商品净销售",
+            "unit": "分",
+            "value": 362880,
+            "column": "net_cents"
+          },
+          {
+            "name": "total",
+            "label": "全部商品净销售合计",
+            "unit": "分",
+            "value": 109734652,
+            "check": {
+              "sql": "WITH a AS (SELECT product_id,SUM(net_cents) net FROM v_sales_lines WHERE order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY product_id), b AS (SELECT product_id,SUM(quantity*unit_cost_cents) stock FROM inventory_snapshots WHERE snapshot_date='2025-12-31' GROUP BY product_id), z AS (SELECT p.product_id,COALESCE(a.net,0) net,COALESCE(b.stock,0) stock FROM products p LEFT JOIN a ON a.product_id=p.product_id LEFT JOIN b ON b.product_id=p.product_id), q AS (SELECT *,100.0*net/NULLIF(SUM(net) OVER(),0) sales_share,100.0*stock/NULLIF(SUM(stock) OVER(),0) stock_share FROM z)  SELECT SUM(net) FROM z"
+            }
+          }
+        ],
+        "calc": "100*net/total",
+        "process": "100 × 362,880 ÷ 109,734,652 ＝ 0.3307%",
+        "result": {
+          "value": 0.3307,
+          "unit": "%",
+          "decimals": 4,
+          "column": "sales_pct"
+        }
       },
-      "scope": [
+      "interpretation": "销售占比 {result}：这个商品的年度净销售占全体商品净销售合计的比例。",
+      "sql": {
+        "lines": [
+          "100.0*net/NULLIF(SUM(net) OVER(),0) sales_share",
+          "ROUND(sales_share,4) sales_pct"
+        ]
+      },
+      "notes": [
         {
+          "kind": "range",
           "label": "范围",
           "text": "2025年度"
         },
         {
+          "kind": "range",
           "label": "总体",
           "text": "两项指标均以全体商品为比较总体"
         },
         {
+          "kind": "range",
           "label": "粒度",
           "text": "每商品一行"
-        }
-      ],
-      "pitfall": "销售额是期间流量，库存价值是时点存量；两个占比可比较相对结构，但不能代替库存周转率或利润率。",
-      "sources": [
+        },
         {
-          "table": "v_sales_lines",
-          "fields": [
-            "net_cents",
-            "order_date"
-          ]
+          "kind": "pitfall",
+          "label": "易错口径",
+          "text": "销售额是期间流量，库存价值是时点存量；两个占比可比较相对结构，但不能代替库存周转率或利润率。"
+        },
+        {
+          "kind": "derived",
+          "rule": "zero-denominator",
+          "text": "分母为 0 时，结果为空（NULL），不会报错，也不会写成 0。"
         }
       ]
     },
     {
       "id": "kp20-06-stock",
-      "slot": "problem",
+      "slot": "concept",
       "kind": "metric-card",
-      "title": "库存占比的口径",
+      "title": "库存占比",
       "metric": {
         "column": "stock_pct",
-        "label": "库存占比（%）"
+        "label": "库存占比"
       },
-      "numerator": {
-        "label": "本商品库存成本（分）",
-        "expr": "stock"
+      "meaning": "衡量某个商品的年底库存成本占全体商品库存成本合计的比例，用来看库存占用。",
+      "formula": {
+        "lhs": "库存占比",
+        "numerator": "本商品库存成本",
+        "denominator": "全部商品库存成本合计",
+        "times": "× 100%"
       },
-      "denominator": {
-        "label": "全部商品库存成本合计（分）",
-        "expr": "SUM(stock) OVER()"
+      "example": {
+        "source": "result",
+        "row": 0,
+        "inputs": [
+          {
+            "name": "stock",
+            "label": "本商品库存成本",
+            "unit": "分",
+            "value": 5216435,
+            "column": "stock_cents"
+          },
+          {
+            "name": "total",
+            "label": "全部商品库存成本合计",
+            "unit": "分",
+            "value": 211781884,
+            "check": {
+              "sql": "WITH a AS (SELECT product_id,SUM(net_cents) net FROM v_sales_lines WHERE order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY product_id), b AS (SELECT product_id,SUM(quantity*unit_cost_cents) stock FROM inventory_snapshots WHERE snapshot_date='2025-12-31' GROUP BY product_id), z AS (SELECT p.product_id,COALESCE(a.net,0) net,COALESCE(b.stock,0) stock FROM products p LEFT JOIN a ON a.product_id=p.product_id LEFT JOIN b ON b.product_id=p.product_id), q AS (SELECT *,100.0*net/NULLIF(SUM(net) OVER(),0) sales_share,100.0*stock/NULLIF(SUM(stock) OVER(),0) stock_share FROM z)  SELECT SUM(stock) FROM z"
+            }
+          }
+        ],
+        "calc": "100*stock/total",
+        "process": "100 × 5,216,435 ÷ 211,781,884 ＝ 2.4631%",
+        "result": {
+          "value": 2.4631,
+          "unit": "%",
+          "decimals": 4,
+          "column": "stock_pct"
+        }
       },
-      "scope": [
+      "interpretation": "库存占比 {result}：这个商品的年底库存成本占全体商品库存成本合计的比例。",
+      "sql": {
+        "lines": [
+          "100.0*stock/NULLIF(SUM(stock) OVER(),0) stock_share",
+          "ROUND(stock_share,4) stock_pct"
+        ]
+      },
+      "notes": [
         {
+          "kind": "range",
           "label": "范围",
           "text": "2025年度"
         },
         {
+          "kind": "range",
           "label": "总体",
           "text": "两项指标均以全体商品为比较总体"
-        }
-      ],
-      "pitfall": "销售额是期间流量，库存价值是时点存量；两个占比可比较相对结构，但不能代替库存周转率或利润率。",
-      "sources": [
+        },
         {
-          "table": "inventory_snapshots",
-          "fields": [
-            "quantity",
-            "unit_cost_cents",
-            "snapshot_date"
-          ]
+          "kind": "pitfall",
+          "label": "易错口径",
+          "text": "销售额是期间流量，库存价值是时点存量；两个占比可比较相对结构，但不能代替库存周转率或利润率。"
+        },
+        {
+          "kind": "derived",
+          "rule": "zero-denominator",
+          "text": "分母为 0 时，结果为空（NULL），不会报错，也不会写成 0。"
         }
       ]
     }

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp20-08",
-  "lessonSha256": "26ee0392f4b4622a02334e6a5733a088e3f6f96973575b99651ea74ec28ebc04",
+  "lessonSha256": "11ec96ba8ec3c20c6f7fd86fc6ec51a44462c409d9c8eeca1933b1fad020baf5",
   "figures": [
     {
       "id": "kp20-08-clauses",
@@ -44,52 +44,78 @@
     },
     {
       "id": "kp20-08-gmroi",
-      "slot": "problem",
+      "slot": "concept",
       "kind": "metric-card",
-      "title": "库存投资回报率的口径",
+      "title": "库存投资回报率",
       "metric": {
         "column": "gmroi",
         "label": "库存投资回报率"
       },
-      "numerator": {
-        "label": "毛利（分）",
-        "expr": "COALESCE(a.gross,0)"
+      "meaning": "衡量每投入 1 分平均库存成本，一年能创造多少毛利，用来比较类别的库存使用效率。",
+      "formula": {
+        "lhs": "库存投资回报率",
+        "numerator": "毛利",
+        "denominator": "平均库存成本"
       },
-      "denominator": {
-        "label": "平均库存成本（分）",
-        "expr": "b.avg_stock"
+      "example": {
+        "source": "result",
+        "row": 0,
+        "inputs": [
+          {
+            "name": "gross",
+            "label": "毛利",
+            "unit": "分",
+            "value": 6286528,
+            "column": "gross_cents"
+          },
+          {
+            "name": "avg",
+            "label": "平均库存成本",
+            "unit": "分",
+            "value": 13877168.5,
+            "column": "avg_stock_cents"
+          }
+        ],
+        "calc": "gross/avg",
+        "process": "6,286,528 ÷ 13,877,168.5 ＝ 0.453",
+        "result": {
+          "value": 0.453,
+          "unit": "倍",
+          "decimals": 4,
+          "column": "gmroi"
+        }
       },
-      "scope": [
+      "interpretation": "库存投资回报率 {result}：每 1 分平均库存成本一年创造了这么多分毛利。",
+      "sql": {
+        "lines": [
+          "ROUND(COALESCE(a.gross,0)/NULLIF(b.avg_stock,0),4) gmroi"
+        ]
+      },
+      "notes": [
         {
+          "kind": "range",
           "label": "范围",
           "text": "2025年度"
         },
         {
+          "kind": "range",
           "label": "渠道",
           "text": "纳入所有渠道"
         },
         {
+          "kind": "range",
           "label": "平均库存",
           "text": "使用2024年底和2025年底各仓库存标准成本估算平均库存"
-        }
-      ],
-      "pitfall": "库存投资回报以平均库存成本为分母；毛利率以净销售为分母；库存周转率以销售成本为分子，不能互换。",
-      "sources": [
-        {
-          "table": "v_sales_lines",
-          "fields": [
-            "net_cents",
-            "cost_cents",
-            "order_date"
-          ]
         },
         {
-          "table": "inventory_snapshots",
-          "fields": [
-            "quantity",
-            "unit_cost_cents",
-            "snapshot_date"
-          ]
+          "kind": "pitfall",
+          "label": "易错口径",
+          "text": "库存投资回报以平均库存成本为分母；毛利率以净销售为分母；库存周转率以销售成本为分子，不能互换。"
+        },
+        {
+          "kind": "derived",
+          "rule": "zero-denominator",
+          "text": "分母为 0 时，结果为空（NULL），不会报错，也不会写成 0。"
         }
       ]
     }

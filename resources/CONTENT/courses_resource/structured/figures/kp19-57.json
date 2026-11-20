@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp19-57",
-  "lessonSha256": "4edcc29b2d6379823e521431e959acabafc7fa2f78ddf919cec6060d82ab8053",
+  "lessonSha256": "63182912a5e10bc8c5b26dfd143bf74e35661be676b8a96e59b49e99a37683b9",
   "figures": [
     {
       "id": "kp19-57-clauses",
@@ -44,83 +44,154 @@
     },
     {
       "id": "kp19-57-ontime",
-      "slot": "problem",
+      "slot": "concept",
       "kind": "metric-card",
-      "title": "准时率的口径",
+      "title": "准时率",
       "metric": {
         "column": "ontime_pct",
-        "label": "准时率（%）"
+        "label": "准时率"
       },
-      "numerator": {
-        "label": "按时交足的采购行数",
-        "expr": "SUM(CASE WHEN on_time>=quantity_ordered THEN 1 ELSE 0 END)"
+      "meaning": "衡量供应商是否按承诺日期交足商品，反映交付表现。",
+      "formula": {
+        "lhs": "准时率",
+        "numerator": "按时交足的采购行数",
+        "denominator": "到期采购行数",
+        "times": "× 100%"
       },
-      "denominator": {
-        "label": "到期采购行数",
-        "expr": "COUNT(*)"
+      "example": {
+        "source": {
+          "step": 1
+        },
+        "row": 0,
+        "inputs": [
+          {
+            "name": "ontime",
+            "label": "按时交足的采购行数",
+            "unit": "行",
+            "value": 26,
+            "column": "ontime_lines"
+          },
+          {
+            "name": "due",
+            "label": "到期采购行数",
+            "unit": "行",
+            "value": 53,
+            "column": "due_lines"
+          }
+        ],
+        "calc": "100*ontime/due",
+        "process": "100 × 26 ÷ 53 ＝ 49.06%",
+        "result": {
+          "value": 49.06,
+          "unit": "%",
+          "decimals": 2
+        }
       },
-      "scope": [
+      "interpretation": "准时率 {result}：按承诺日期交足的采购行占到期采购行的比例。",
+      "sql": {
+        "lines": [
+          "ROUND(100.0*SUM(CASE WHEN on_time>=quantity_ordered THEN 1 ELSE 0 END)/COUNT(*),2) ontime_pct"
+        ]
+      },
+      "notes": [
         {
+          "kind": "range",
           "label": "范围",
           "text": "2025年承诺到期的非取消采购行"
         },
         {
+          "kind": "range",
           "label": "截止",
           "text": "截止2025-12-31"
         },
         {
+          "kind": "range",
           "label": "分母",
           "text": "尚未到期的采购行不进入分母"
-        }
-      ],
-      "pitfall": "准时率与完整率按采购行计数；质量率按件数加权；到齐日期不同于首次收货日期。",
-      "sources": [
+        },
         {
-          "table": "v_po_lines",
-          "fields": [
-            "on_time",
-            "quantity_ordered",
-            "promised_date"
-          ]
+          "kind": "pitfall",
+          "label": "易错口径",
+          "text": "准时率与完整率按采购行计数；质量率按件数加权；到齐日期不同于首次收货日期。"
+        },
+        {
+          "kind": "derived",
+          "rule": "zero-denominator",
+          "text": "分母为 0 时，结果为空（NULL），不会报错，也不会写成 0。"
         }
       ]
     },
     {
       "id": "kp19-57-quality",
-      "slot": "problem",
+      "slot": "concept",
       "kind": "metric-card",
-      "title": "质量合格率的口径",
+      "title": "质量合格率",
       "metric": {
         "column": "quality_pct",
-        "label": "质量合格率（%）"
+        "label": "质量合格率"
       },
-      "numerator": {
-        "label": "合格件数",
-        "expr": "SUM(accepted)"
+      "meaning": "衡量收到的商品中合格接收的比例，反映到货质量。",
+      "formula": {
+        "lhs": "质量合格率",
+        "numerator": "合格件数",
+        "denominator": "收货件数",
+        "times": "× 100%"
       },
-      "denominator": {
-        "label": "收货件数",
-        "expr": "SUM(received)"
+      "example": {
+        "source": {
+          "step": 1
+        },
+        "row": 0,
+        "inputs": [
+          {
+            "name": "accepted",
+            "label": "合格件数",
+            "unit": "件",
+            "value": 1438,
+            "column": "accepted_units"
+          },
+          {
+            "name": "received",
+            "label": "收货件数",
+            "unit": "件",
+            "value": 1440,
+            "column": "received_units"
+          }
+        ],
+        "calc": "100*accepted/received",
+        "process": "100 × 1,438 ÷ 1,440 ＝ 99.86%",
+        "result": {
+          "value": 99.86,
+          "unit": "%",
+          "decimals": 2
+        }
       },
-      "scope": [
+      "interpretation": "质量合格率 {result}：收到的货里合格接收的件数所占的比例。",
+      "sql": {
+        "lines": [
+          "ROUND(100.0*SUM(accepted)/NULLIF(SUM(received),0),2) quality_pct"
+        ]
+      },
+      "notes": [
         {
+          "kind": "range",
           "label": "范围",
           "text": "2025年承诺到期的非取消采购行"
         },
         {
+          "kind": "range",
           "label": "截止",
           "text": "截止2025-12-31"
-        }
-      ],
-      "pitfall": "准时率与完整率按采购行计数；质量率按件数加权；到齐日期不同于首次收货日期。",
-      "sources": [
+        },
         {
-          "table": "v_po_lines",
-          "fields": [
-            "accepted",
-            "received",
-            "promised_date"
-          ]
+          "kind": "pitfall",
+          "label": "易错口径",
+          "text": "准时率与完整率按采购行计数；质量率按件数加权；到齐日期不同于首次收货日期。"
+        },
+        {
+          "kind": "derived",
+          "rule": "zero-denominator",
+          "text": "分母为 0 时，结果为空（NULL），不会报错，也不会写成 0。"
         }
       ]
     }

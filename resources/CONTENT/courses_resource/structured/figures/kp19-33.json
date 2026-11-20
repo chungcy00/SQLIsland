@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp19-33",
-  "lessonSha256": "f5d109394a447f0f54eeb737f1525f1581341ec27eb48abc0ebc5a88f5166572",
+  "lessonSha256": "29032785f87439204a2e704bb2513ea9b3a332f0accdd5711def1574ffb16617",
   "figures": [
     {
       "id": "kp19-33-clauses",
@@ -50,44 +50,174 @@
     },
     {
       "id": "kp19-33-margin",
-      "slot": "problem",
+      "slot": "concept",
       "kind": "metric-card",
-      "title": "毛利率的口径",
+      "title": "毛利率",
       "metric": {
         "column": "margin_pct",
-        "label": "毛利率（%）"
+        "label": "毛利率"
       },
-      "numerator": {
-        "label": "毛利（分）",
-        "expr": "net-cost"
+      "meaning": "衡量净销售中毛利所占的比例；本课用它筛出毛利率偏低的商品。",
+      "formula": {
+        "lhs": "毛利率",
+        "numerator": "净销售 − 销售成本",
+        "denominator": "净销售",
+        "times": "× 100%"
       },
-      "denominator": {
-        "label": "净销售（分）",
-        "expr": "net"
+      "example": {
+        "source": {
+          "step": 0
+        },
+        "row": 0,
+        "inputs": [
+          {
+            "name": "net",
+            "label": "净销售",
+            "unit": "分",
+            "value": 14996,
+            "column": "net"
+          },
+          {
+            "name": "cost",
+            "label": "销售成本",
+            "unit": "分",
+            "value": 15294,
+            "column": "cost"
+          }
+        ],
+        "calc": "100*(net-cost)/net",
+        "process": "100 × (14,996 − 15,294) ÷ 14,996 ＝ -1.99%",
+        "result": {
+          "value": -1.99,
+          "unit": "%",
+          "decimals": 2
+        }
       },
-      "scope": [
+      "interpretation": "毛利率 {result}：净销售中有这个比例是毛利；本课的筛选条件是毛利率严格低于 30%。",
+      "sql": {
+        "lines": [
+          "ROUND(100.0*(net-cost)/NULLIF(net,0),2) margin_pct"
+        ]
+      },
+      "notes": [
         {
+          "kind": "range",
           "label": "范围",
           "text": "2025年有效线下商品"
         },
         {
+          "kind": "range",
           "label": "分组",
           "text": "净销售额位于第一四分组"
         },
         {
+          "kind": "range",
           "label": "条件",
           "text": "毛利率严格低于30%"
-        }
-      ],
-      "pitfall": "先筛毛利率低于30%的商品，再对剩余商品分四档",
-      "sources": [
+        },
         {
-          "table": "v_sales_lines",
-          "fields": [
-            "channel"
-          ]
+          "kind": "pitfall",
+          "label": "易错口径",
+          "text": "先筛毛利率低于30%的商品，再对剩余商品分四档"
+        },
+        {
+          "kind": "derived",
+          "rule": "zero-denominator",
+          "text": "分母为 0 时，结果为空（NULL），不会报错，也不会写成 0。"
         }
       ]
+    },
+    {
+      "id": "kp19-33-funnel",
+      "slot": "concept",
+      "kind": "compare-card",
+      "title": "两道筛选如何叠加？",
+      "panels": [
+        {
+          "label": "第一步：净销售最高的四分之一",
+          "tone": "neutral",
+          "note": "按净销售从高到低分成四组，只取第一组；下表是该组里净销售最高的 4 件商品。",
+          "columns": [
+            "商品",
+            "净销售（分）",
+            "毛利率（%）"
+          ],
+          "rows": [
+            [
+              413,
+              3783241,
+              41.62
+            ],
+            [
+              163,
+              2455059,
+              39.59
+            ],
+            [
+              50,
+              1376112,
+              32.28
+            ],
+            [
+              64,
+              1342411,
+              50.83
+            ]
+          ],
+          "big": {
+            "label": "第一四分组的商品数",
+            "value": 120
+          },
+          "check": {
+            "sql": "WITH a AS (SELECT product_id,SUM(net_cents) net,SUM(cost_cents) cost,SUM(discount_cents) discount,SUM(refund_cents) refund FROM v_sales_lines WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY product_id), b AS (SELECT *,NTILE(4) OVER(ORDER BY net DESC,product_id) bucket FROM a)  SELECT COUNT(*) FROM b WHERE bucket=1",
+            "expected": [
+              [
+                120
+              ]
+            ]
+          }
+        },
+        {
+          "label": "第二步：只留毛利率低于 30%",
+          "tone": "good",
+          "note": "在第一组里再筛毛利率；下表是剩下的商品中净销售最高的 3 件。",
+          "columns": [
+            "商品",
+            "净销售（分）",
+            "毛利率（%）"
+          ],
+          "rows": [
+            [
+              169,
+              1160554,
+              17.73
+            ],
+            [
+              264,
+              422666,
+              19.4
+            ],
+            [
+              157,
+              364172,
+              25.3
+            ]
+          ],
+          "big": {
+            "label": "最后保留的商品数",
+            "value": 23
+          },
+          "check": {
+            "sql": "SELECT COUNT(*) FROM (WITH a AS (SELECT product_id,SUM(net_cents) net,SUM(cost_cents) cost,SUM(discount_cents) discount,SUM(refund_cents) refund FROM v_sales_lines WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY product_id), b AS (SELECT *,NTILE(4) OVER(ORDER BY net DESC,product_id) bucket FROM a) SELECT product_id,net net_cents,ROUND(100.0*(net-cost)/NULLIF(net,0),2) margin_pct,discount discount_cents,refund refund_cents FROM b WHERE bucket=1 AND 100.0*(net-cost)/NULLIF(net,0)<30 ORDER BY net DESC)",
+            "expected": [
+              [
+                23
+              ]
+            ]
+          }
+        }
+      ],
+      "conclusion": "高销售不等于高毛利：第一四分组的 120 件商品中，只有 23 件毛利率低于 30%。"
     }
   ]
 }

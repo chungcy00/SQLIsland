@@ -21,6 +21,12 @@
       ]
     },
     {
+      "type": "figure",
+      "ids": [
+        "kp19-46-variance"
+      ]
+    },
+    {
       "type": "heading",
       "text": "使用要点",
       "emphasis": []

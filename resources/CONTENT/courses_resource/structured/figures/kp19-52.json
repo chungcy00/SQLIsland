@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp19-52",
-  "lessonSha256": "3bcf82a9fecfcfca2f620fce6edaa734ecb4cc2d1f7b782ce36117a6141f5e43",
+  "lessonSha256": "053122e5cffe39d48b66630c039499cf2a486182a933fda0f85b974986e282d9",
   "figures": [
     {
       "id": "kp19-52-clauses",
@@ -62,55 +62,87 @@
     },
     {
       "id": "kp19-52-exit",
-      "slot": "problem",
+      "slot": "concept",
       "kind": "metric-card",
-      "title": "月离职率的口径",
+      "title": "月离职率",
       "metric": {
         "column": "exit_pct",
-        "label": "月离职率（%）"
+        "label": "月离职率"
       },
-      "numerator": {
-        "label": "当月离职人数",
-        "expr": "exits"
+      "meaning": "衡量当月离职人数相对平均在岗人数的比例，用于比较部门的人员流动。",
+      "formula": {
+        "lhs": "月离职率",
+        "numerator": "当月离职人数",
+        "denominator": "（月初在岗人数 + 月末在岗人数）÷ 2",
+        "times": "× 100%"
       },
-      "denominator": {
-        "label": "期初期末平均在岗人数",
-        "expr": "(opening+closing)/2.0"
+      "example": {
+        "source": "result",
+        "row": 0,
+        "inputs": [
+          {
+            "name": "exits",
+            "label": "当月离职人数",
+            "unit": "人",
+            "value": 9,
+            "column": "exits"
+          },
+          {
+            "name": "opening",
+            "label": "月初在岗人数",
+            "unit": "人",
+            "value": 77,
+            "column": "opening"
+          },
+          {
+            "name": "closing",
+            "label": "月末在岗人数",
+            "unit": "人",
+            "value": 72,
+            "column": "closing"
+          }
+        ],
+        "calc": "100*exits/((opening+closing)/2)",
+        "process": "100 × 9 ÷ ((77 + 72) ÷ 2) ＝ 12.08%",
+        "result": {
+          "value": 12.08,
+          "unit": "%",
+          "decimals": 2,
+          "column": "exit_pct"
+        }
       },
-      "scope": [
+      "interpretation": "月离职率 {result}：当月离职人数占平均在岗人数的比例。",
+      "sql": {
+        "lines": [
+          "(opening+closing)/2.0 avg_h",
+          "ROUND(100.0*exits/NULLIF(avg_h,0),2) exit_pct"
+        ]
+      },
+      "notes": [
         {
+          "kind": "range",
           "label": "范围",
           "text": "部门人员流动"
         },
         {
+          "kind": "range",
           "label": "调岗",
           "text": "调岗只改变任职部门，不代表企业离职"
         },
         {
+          "kind": "range",
           "label": "历史",
           "text": "保留2024年11、12月历史用于2025年1月滚动计算"
-        }
-      ],
-      "pitfall": "部门净变化不等于离职人数；滚动月均口径与累计期间离职率不同",
-      "sources": [
-        {
-          "table": "employment_history",
-          "fields": [
-            "start_date",
-            "end_date"
-          ]
         },
         {
-          "table": "employees",
-          "fields": [
-            "termination_date"
-          ]
+          "kind": "pitfall",
+          "label": "易错口径",
+          "text": "部门净变化不等于离职人数；滚动月均口径与累计期间离职率不同"
         },
         {
-          "table": "calendar_days",
-          "fields": [
-            "month_key"
-          ]
+          "kind": "derived",
+          "rule": "zero-denominator",
+          "text": "分母为 0 时，结果为空（NULL），不会报错，也不会写成 0。"
         }
       ]
     }

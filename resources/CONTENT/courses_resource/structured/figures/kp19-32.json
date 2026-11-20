@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp19-32",
-  "lessonSha256": "8f8ef4e8af14bee10f82521a3137acb4b94038a8d062fabb0d45a66abc6adf09",
+  "lessonSha256": "21c93f160ebb98d1e20bf5760dfe31d23c6435bff084be538335ae676c4f4b28",
   "figures": [
     {
       "id": "kp19-32-clauses",
@@ -74,93 +74,229 @@
     },
     {
       "id": "kp19-32-mom",
-      "slot": "problem",
+      "slot": "concept",
       "kind": "metric-card",
-      "title": "环比的口径",
+      "title": "环比",
       "metric": {
         "column": "mom_pct",
-        "label": "环比（%）"
+        "label": "环比"
       },
-      "numerator": {
-        "label": "本月净销售与上月之差",
-        "expr": "net-prev"
+      "meaning": "把本月和上个月比较，看净销售是增长还是下降。",
+      "formula": {
+        "lhs": "环比",
+        "numerator": "本月净销售 − 上月净销售",
+        "denominator": "上月净销售",
+        "times": "× 100%"
       },
-      "denominator": {
-        "label": "上月净销售",
-        "expr": "prev"
+      "example": {
+        "source": "result",
+        "row": 0,
+        "inputs": [
+          {
+            "name": "net",
+            "label": "本月净销售",
+            "unit": "分",
+            "value": 943845,
+            "column": "net_cents"
+          },
+          {
+            "name": "prev",
+            "label": "上月净销售",
+            "unit": "分",
+            "value": 595693,
+            "check": {
+              "sql": "WITH m AS (SELECT DISTINCT month_key FROM calendar_days WHERE day<='2025-12-31'), a AS (SELECT store_id,SUBSTR(order_date,1,7) m,SUM(net_cents) net FROM v_sales_lines WHERE channel='store' GROUP BY store_id,SUBSTR(order_date,1,7)), b AS (SELECT s.store_id,m.month_key,COALESCE(a.net,0) net FROM stores s CROSS JOIN m LEFT JOIN a ON a.store_id=s.store_id AND a.m=m.month_key), p AS (SELECT *,LAG(net) OVER(PARTITION BY store_id ORDER BY month_key) prev,LAG(net,12) OVER(PARTITION BY store_id ORDER BY month_key) prior_year FROM b), q AS (SELECT *,CASE WHEN prev>0 AND net<prev THEN 1 ELSE 0 END falling FROM p), z AS (SELECT *,SUM(falling) OVER(PARTITION BY store_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) fall3 FROM q)  SELECT prev FROM z WHERE store_id=6 AND month_key='2025-12'"
+            }
+          }
+        ],
+        "calc": "100*(net-prev)/prev",
+        "process": "100 × (943,845 − 595,693) ÷ 595,693 ＝ 58.44%",
+        "result": {
+          "value": 58.44,
+          "unit": "%",
+          "decimals": 2,
+          "column": "mom_pct"
+        }
       },
-      "scope": [
+      "interpretation": "环比 {result}：本月净销售比上个月变化的幅度；为正表示增长，为负表示下降。",
+      "sql": {
+        "lines": [
+          "ROUND(100.0*(net-prev)/NULLIF(prev,0),2) mom_pct"
+        ]
+      },
+      "notes": [
         {
+          "kind": "range",
           "label": "范围",
           "text": "2025年逐月线下净销售趋势"
         },
         {
+          "kind": "range",
           "label": "历史",
           "text": "读取2023—2025年的完整历史轴"
         },
         {
+          "kind": "range",
           "label": "缺报",
           "text": "缺报不能补零"
-        }
-      ],
-      "pitfall": "环比不是同比；相邻数据行不是天然相邻月份",
-      "sources": [
-        {
-          "table": "v_sales_lines",
-          "fields": [
-            "channel"
-          ]
         },
         {
-          "table": "calendar_days",
-          "fields": [
-            "month_key"
-          ]
+          "kind": "pitfall",
+          "label": "易错口径",
+          "text": "环比不是同比；相邻数据行不是天然相邻月份"
+        },
+        {
+          "kind": "derived",
+          "rule": "zero-denominator",
+          "text": "分母为 0 时，结果为空（NULL），不会报错，也不会写成 0。"
         }
       ]
     },
     {
       "id": "kp19-32-yoy",
-      "slot": "problem",
+      "slot": "concept",
       "kind": "metric-card",
-      "title": "同比的口径",
+      "title": "同比",
       "metric": {
         "column": "yoy_pct",
-        "label": "同比（%）"
+        "label": "同比"
       },
-      "numerator": {
-        "label": "本月净销售与去年同月之差",
-        "expr": "net-prior_year"
+      "meaning": "把本月和去年同月比较，排除季节变化的影响，看净销售的变化。",
+      "formula": {
+        "lhs": "同比",
+        "numerator": "本月净销售 − 去年同月净销售",
+        "denominator": "去年同月净销售",
+        "times": "× 100%"
       },
-      "denominator": {
-        "label": "去年同月净销售",
-        "expr": "prior_year"
+      "example": {
+        "source": "result",
+        "row": 0,
+        "inputs": [
+          {
+            "name": "net",
+            "label": "本月净销售",
+            "unit": "分",
+            "value": 943845,
+            "column": "net_cents"
+          },
+          {
+            "name": "prior",
+            "label": "去年同月净销售",
+            "unit": "分",
+            "value": 795306,
+            "check": {
+              "sql": "WITH m AS (SELECT DISTINCT month_key FROM calendar_days WHERE day<='2025-12-31'), a AS (SELECT store_id,SUBSTR(order_date,1,7) m,SUM(net_cents) net FROM v_sales_lines WHERE channel='store' GROUP BY store_id,SUBSTR(order_date,1,7)), b AS (SELECT s.store_id,m.month_key,COALESCE(a.net,0) net FROM stores s CROSS JOIN m LEFT JOIN a ON a.store_id=s.store_id AND a.m=m.month_key), p AS (SELECT *,LAG(net) OVER(PARTITION BY store_id ORDER BY month_key) prev,LAG(net,12) OVER(PARTITION BY store_id ORDER BY month_key) prior_year FROM b), q AS (SELECT *,CASE WHEN prev>0 AND net<prev THEN 1 ELSE 0 END falling FROM p), z AS (SELECT *,SUM(falling) OVER(PARTITION BY store_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) fall3 FROM q)  SELECT prior_year FROM z WHERE store_id=6 AND month_key='2025-12'"
+            }
+          }
+        ],
+        "calc": "100*(net-prior)/prior",
+        "process": "100 × (943,845 − 795,306) ÷ 795,306 ＝ 18.68%",
+        "result": {
+          "value": 18.68,
+          "unit": "%",
+          "decimals": 2,
+          "column": "yoy_pct"
+        }
       },
-      "scope": [
+      "interpretation": "同比 {result}：本月净销售比去年同月变化的幅度；为正表示增长，为负表示下降。",
+      "sql": {
+        "lines": [
+          "ROUND(100.0*(net-prior_year)/NULLIF(prior_year,0),2) yoy_pct"
+        ]
+      },
+      "notes": [
         {
+          "kind": "range",
           "label": "范围",
           "text": "2025年逐月线下净销售趋势"
         },
         {
+          "kind": "range",
           "label": "历史",
           "text": "读取2023—2025年的完整历史轴"
-        }
-      ],
-      "pitfall": "环比不是同比；相邻数据行不是天然相邻月份",
-      "sources": [
-        {
-          "table": "v_sales_lines",
-          "fields": [
-            "channel"
-          ]
         },
         {
-          "table": "calendar_days",
-          "fields": [
-            "month_key"
-          ]
+          "kind": "pitfall",
+          "label": "易错口径",
+          "text": "环比不是同比；相邻数据行不是天然相邻月份"
+        },
+        {
+          "kind": "derived",
+          "rule": "zero-denominator",
+          "text": "分母为 0 时，结果为空（NULL），不会报错，也不会写成 0。"
         }
       ]
+    },
+    {
+      "id": "kp19-32-compare",
+      "slot": "concept",
+      "kind": "compare-card",
+      "title": "环比和同比，比较的是哪一个月？",
+      "panels": [
+        {
+          "label": "环比：和上个月比",
+          "tone": "neutral",
+          "note": "门店 6 的 2025-12 与 2025-11 相邻。",
+          "columns": [
+            "月份",
+            "净销售（分）"
+          ],
+          "rows": [
+            [
+              "2025-12（本月）",
+              943845
+            ],
+            [
+              "2025-11（上月）",
+              595693
+            ]
+          ],
+          "big": {
+            "label": "环比（%）",
+            "value": 58.44
+          },
+          "check": {
+            "sql": "WITH m AS (SELECT DISTINCT month_key FROM calendar_days WHERE day<='2025-12-31'), a AS (SELECT store_id,SUBSTR(order_date,1,7) m,SUM(net_cents) net FROM v_sales_lines WHERE channel='store' GROUP BY store_id,SUBSTR(order_date,1,7)), b AS (SELECT s.store_id,m.month_key,COALESCE(a.net,0) net FROM stores s CROSS JOIN m LEFT JOIN a ON a.store_id=s.store_id AND a.m=m.month_key), p AS (SELECT *,LAG(net) OVER(PARTITION BY store_id ORDER BY month_key) prev,LAG(net,12) OVER(PARTITION BY store_id ORDER BY month_key) prior_year FROM b), q AS (SELECT *,CASE WHEN prev>0 AND net<prev THEN 1 ELSE 0 END falling FROM p), z AS (SELECT *,SUM(falling) OVER(PARTITION BY store_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) fall3 FROM q)  SELECT ROUND(100.0*(net-prev)/NULLIF(prev,0),2) FROM z WHERE store_id=6 AND month_key='2025-12'",
+            "expected": [
+              [
+                58.44
+              ]
+            ]
+          }
+        },
+        {
+          "label": "同比：和去年同月比",
+          "tone": "neutral",
+          "note": "同一家门店，把 2025-12 与 2024-12 放在一起，避开季节影响。",
+          "columns": [
+            "月份",
+            "净销售（分）"
+          ],
+          "rows": [
+            [
+              "2025-12（本月）",
+              943845
+            ],
+            [
+              "2024-12（去年同月）",
+              795306
+            ]
+          ],
+          "big": {
+            "label": "同比（%）",
+            "value": 18.68
+          },
+          "check": {
+            "sql": "WITH m AS (SELECT DISTINCT month_key FROM calendar_days WHERE day<='2025-12-31'), a AS (SELECT store_id,SUBSTR(order_date,1,7) m,SUM(net_cents) net FROM v_sales_lines WHERE channel='store' GROUP BY store_id,SUBSTR(order_date,1,7)), b AS (SELECT s.store_id,m.month_key,COALESCE(a.net,0) net FROM stores s CROSS JOIN m LEFT JOIN a ON a.store_id=s.store_id AND a.m=m.month_key), p AS (SELECT *,LAG(net) OVER(PARTITION BY store_id ORDER BY month_key) prev,LAG(net,12) OVER(PARTITION BY store_id ORDER BY month_key) prior_year FROM b), q AS (SELECT *,CASE WHEN prev>0 AND net<prev THEN 1 ELSE 0 END falling FROM p), z AS (SELECT *,SUM(falling) OVER(PARTITION BY store_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) fall3 FROM q)  SELECT ROUND(100.0*(net-prior_year)/NULLIF(prior_year,0),2) FROM z WHERE store_id=6 AND month_key='2025-12'",
+            "expected": [
+              [
+                18.68
+              ]
+            ]
+          }
+        }
+      ],
+      "conclusion": "同一个月份，环比看相邻月份的变化，同比看去年同月的变化，两个比率的分母不同，不能互换。"
     }
   ]
 }

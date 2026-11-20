@@ -2968,6 +2968,32 @@ nav .nav-svg { color: var(--primary); }
 /* B11：触控区不小于 44px（原先 38–42px 的控件补足高度） */
 .chip, .small-button, .lesson-nav button, .keyboard-mode, .keyboard-theme, .query-add, .query-tab-title { min-height: 44px; }
 .query-add, .keyboard-theme { min-width: 44px; }
-/* 开关外观不变，用透明的伪元素把可点击区域扩到 ≥44px 高 */
-button.switch, .switch { position: relative; }
-.switch::after { content: ""; position: absolute; inset: -8px -4px; }
+/* 开关外观不变：圆点用 ::after，透明的 ::before 把可点击区域扩到 ≥44px 高 */
+.switch::before { content: ""; position: absolute; inset: -8px -4px; }
+
+/* 指标公式卡 v2 */
+.figure-metric-card .mc-meaning, .figure-metric-card .mc-reading { margin: 0 0 10px; font-size: 0.875rem; line-height: 1.6; }
+.figure-metric-card .mc-meaning b, .figure-metric-card .mc-reading b { display: inline-block; margin-right: 8px; padding: 0 8px; border-radius: 999px; background: var(--lake); color: var(--primary); font-size: 0.75rem; font-weight: 600; }
+.mc-formula { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; padding: 12px; margin: 0 0 12px; border-radius: 12px; background: var(--lake); font-size: 0.9375rem; font-weight: 600; }
+.mc-lhs { color: var(--primary); }
+.mc-frac { display: inline-flex; flex-direction: column; align-items: stretch; text-align: center; }
+.mc-num, .mc-den { padding: 2px 8px; }
+.mc-num { border-bottom: 2px solid var(--ink); }
+.mc-times { color: var(--ink2); }
+.mc-h { margin: 12px 0 6px; font-size: 0.8125rem; font-weight: 600; color: var(--ink2); }
+.mc-example { padding: 10px 12px; border-radius: 12px; border: 1px solid var(--line); margin-bottom: 10px; }
+.mc-inputs { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; }
+.mc-input { padding: 8px 10px; border-radius: 10px; background: #fff; border: 1px solid var(--line); display: grid; gap: 2px; }
+.mc-input small { color: var(--ink2); font-size: 0.75rem; }
+.mc-input b { font-size: 1.0625rem; font-weight: 650; overflow-wrap: anywhere; }
+.mc-input em { font-style: normal; font-size: 0.75rem; color: var(--ink2); }
+.mc-process { margin: 8px 0; font-size: 0.8125rem; color: var(--ink2); overflow-wrap: anywhere; }
+.mc-result { display: flex; align-items: baseline; gap: 8px; padding: 8px 12px; border-radius: 10px; background: var(--sun-bg); }
+.mc-result small { color: var(--sun-ink); font-size: 0.75rem; }
+.mc-result b { font-size: 1.75rem; line-height: 1.1; font-weight: 700; color: var(--sun-ink); overflow-wrap: anywhere; }
+.mc-result span { color: var(--sun-ink); font-size: 0.875rem; }
+.mc-sql { margin: 0 0 10px; }
+.mc-sql small { display: block; margin-bottom: 4px; color: var(--ink2); font-size: 0.75rem; }
+.mc-sql pre { margin: 0; padding: 10px 12px; border-radius: 10px; background: var(--lake); font-size: 0.75rem; line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere; }
+.mc-notes { margin: 0; padding-left: 18px; font-size: 0.8125rem; line-height: 1.6; color: var(--ink); }
+.mc-notes b { margin-right: 6px; color: var(--primary); font-weight: 600; }

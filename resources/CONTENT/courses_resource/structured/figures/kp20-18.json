@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp20-18",
-  "lessonSha256": "c20c8411fd075481cd40133493c4c225ea61916928bbb206203f58a36e0dcd33",
+  "lessonSha256": "370f2c004deee64c8c0a4b998e9a22a7e8130d7e8a21a7c0b13590d2326b2d16",
   "figures": [
     {
       "id": "kp20-18-clauses",
@@ -44,52 +44,86 @@
     },
     {
       "id": "kp20-18-contribution",
-      "slot": "problem",
+      "slot": "concept",
       "kind": "metric-card",
-      "title": "广告后贡献率的口径",
+      "title": "广告后贡献率",
       "metric": {
         "column": "contribution_pct",
-        "label": "广告后贡献率（%）"
+        "label": "广告后贡献率"
       },
-      "numerator": {
-        "label": "毛利减广告费（分）",
-        "expr": "COALESCE(a.gross,0)-COALESCE(b.spend,0)"
+      "meaning": "衡量扣除广告费之后，渠道还剩多少贡献，占净销售的多少。",
+      "formula": {
+        "lhs": "广告后贡献率",
+        "numerator": "毛利 − 广告费",
+        "denominator": "净销售",
+        "times": "× 100%"
       },
-      "denominator": {
-        "label": "净销售（分）",
-        "expr": "a.net"
+      "example": {
+        "source": "result",
+        "row": 0,
+        "inputs": [
+          {
+            "name": "gross",
+            "label": "毛利",
+            "unit": "分",
+            "value": 10543653,
+            "column": "gross_cents"
+          },
+          {
+            "name": "spend",
+            "label": "广告费",
+            "unit": "分",
+            "value": 0,
+            "column": "spend_cents"
+          },
+          {
+            "name": "net",
+            "label": "净销售",
+            "unit": "分",
+            "value": 27221835,
+            "column": "net_cents"
+          }
+        ],
+        "calc": "100*(gross-spend)/net",
+        "process": "100 × (10,543,653 − 0) ÷ 27,221,835 ＝ 38.73%",
+        "result": {
+          "value": 38.73,
+          "unit": "%",
+          "decimals": 2,
+          "column": "contribution_pct"
+        }
       },
-      "scope": [
+      "interpretation": "广告后贡献率 {result}：扣除广告费后的贡献占净销售的比例；它还不是最终净利润。",
+      "sql": {
+        "lines": [
+          "ROUND(100.0*(COALESCE(a.gross,0)-COALESCE(b.spend,0))/NULLIF(a.net,0),2) contribution_pct"
+        ]
+      },
+      "notes": [
         {
+          "kind": "range",
           "label": "范围",
           "text": "2025年线上订单"
         },
         {
+          "kind": "range",
           "label": "归因",
           "text": "按会话归因"
         },
         {
+          "kind": "range",
           "label": "扣减",
           "text": "扣除当年广告费后的贡献"
-        }
-      ],
-      "pitfall": "广告后贡献不是最终净利润",
-      "sources": [
-        {
-          "table": "v_order_net",
-          "fields": [
-            "net_cents",
-            "cost_cents",
-            "channel",
-            "order_date"
-          ]
         },
         {
-          "table": "marketing_campaigns",
-          "fields": [
-            "spend_cents",
-            "month_key"
-          ]
+          "kind": "pitfall",
+          "label": "易错口径",
+          "text": "广告后贡献不是最终净利润"
+        },
+        {
+          "kind": "derived",
+          "rule": "zero-denominator",
+          "text": "分母为 0 时，结果为空（NULL），不会报错，也不会写成 0。"
         }
       ]
     }

@@ -21,6 +21,12 @@
       ]
     },
     {
+      "type": "figure",
+      "ids": [
+        "kp19-43-retention"
+      ]
+    },
+    {
       "type": "heading",
       "text": "使用要点",
       "emphasis": []

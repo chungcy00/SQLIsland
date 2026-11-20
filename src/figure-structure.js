@@ -83,20 +83,61 @@ export function validateFigures(lesson, data) {
       continue;
     }
     if (figure.kind === 'metric-card') {
-      // 指标公式卡：口径只取自现有课文——公式必须出现在完整查询里，口径标签与易错口径必须是课文原句的片段，不新增、不改写。
-      if (figure.slot !== 'problem' || figure.merge) fail('metric-card belongs to the problem slot ' + figure.id);
+      // 指标公式卡 v2：名称 → 含义 → 中文公式 → 数值示例 → 结果解读 → 对应 SQL → 特殊情况。
+      // 数值示例取自课程已验证的结果行（或经 check.sql 在课程数据上实际执行核对），公式与结果由校验器重新计算；
+      // 范围/易错口径必须是课文原句的片段，不新增、不改写指标定义。
+      if (figure.slot !== 'concept' || figure.merge) fail('metric-card belongs to the concept slot ' + figure.id);
       const sql = normalized(lesson.sqliteSql);
-      const inQuery = (value, label) => { text(value, label + ' ' + figure.id); if (!sql.includes(normalized(value))) fail(label + ' is not in the lesson query: ' + value); };
-      text(figure.metric?.label, 'metric label ' + figure.id);
-      if (!lesson.result?.columns.includes(figure.metric?.column)) fail('metric column is not a result column ' + figure.id);
-      for (const part of ['numerator', 'denominator']) { text(figure[part]?.label, part + ' label ' + figure.id); inQuery(figure[part]?.expr, part); }
+      for (const key of ['meaning', 'interpretation']) text(figure[key], key + ' ' + figure.id);
+      text(figure.formula?.lhs, 'formula lhs ' + figure.id); text(figure.formula?.numerator, 'formula numerator ' + figure.id);
+      if (figure.formula.denominator !== undefined) text(figure.formula.denominator, 'formula denominator ' + figure.id);
+      if (!figure.interpretation.includes('{result}')) fail('interpretation must mention {result} ' + figure.id);
+      const lines = figure.sql?.lines;
+      if (!Array.isArray(lines) || !lines.length) fail('sql lines ' + figure.id);
+      for (const line of lines) { text(line, 'sql line ' + figure.id); if (!sql.includes(normalized(line))) fail('sql line is not in the lesson query: ' + line); }
+      const example = figure.example;
+      const sourceResult = example?.source === 'result' ? lesson.result : lesson.presentation?.breakdown?.[example?.source?.step]?.result;
+      if (!sourceResult) fail('example source ' + figure.id);
+      const row = sourceResult.rows[example.row];
+      if (!row) fail('example row ' + figure.id);
+      const values = {};
+      for (const input of example.inputs || []) {
+        text(input.name, 'input name'); text(input.label, 'input label');
+        if (input.column !== undefined) {
+          const at = sourceResult.columns.indexOf(input.column);
+          if (at < 0) fail('input column ' + input.column);
+          if (row[at] !== input.value) fail('input value differs from the lesson data ' + figure.id + ':' + input.column);
+        } else { if (typeof input.value !== 'number') fail('input value ' + figure.id); text(input.check?.sql, 'input check sql ' + figure.id); }
+        values[input.name] = input.value;
+      }
+      if (!example.inputs?.length) fail('example inputs ' + figure.id);
+      if (!/^[0-9a-zA-Z_+\-*/(). ]+$/.test(example.calc || '')) fail('calc ' + figure.id);
+      const calc = Function('"use strict"; const v = arguments[0]; return (' + example.calc.replace(/[a-zA-Z_][a-zA-Z_0-9]*/g, name => { if (!(name in values)) fail('calc uses an unknown input ' + name); return 'v.' + name; }) + ');')(values);
+      const decimals = example.result?.decimals;
+      if (!Number.isInteger(decimals)) fail('result decimals ' + figure.id);
+      const rounded = Math.round(calc * 10 ** decimals) / 10 ** decimals;
+      if (Math.abs(rounded - example.result.value) > 1e-9) fail(`result value ${example.result.value} differs from the calculation ${rounded} ${figure.id}`);
+      if (example.result.column !== undefined) {
+        const resultRow = lesson.result.rows[example.resultRow ?? example.row];
+        const at = lesson.result.columns.indexOf(example.result.column);
+        if (at < 0 || !resultRow || Math.abs(resultRow[at] - example.result.value) > 1e-9) fail('result differs from the lesson result column ' + figure.id);
+      }
+      text(example.process, 'process ' + figure.id);
       const problem = lesson.presentation?.problem || '';
-      if (!Array.isArray(figure.scope) || figure.scope.length < 1 || figure.scope.length > 3) fail('scope needs 1-3 tags ' + figure.id);
-      for (const tag of figure.scope) { text(tag.label, 'scope label'); if (!problem.includes(tag.text)) fail('scope text is not quoted from the lesson problem: ' + tag.text); }
       const cautions = Object.values(lesson.presentation?.cautions || {}).flat().map(block => block.text || '').join('\n');
-      if (figure.pitfall !== undefined && !cautions.includes(figure.pitfall)) fail('pitfall is not quoted from the lesson cautions ' + figure.id);
-      if (!Array.isArray(figure.sources) || figure.sources.length < 1 || figure.sources.length > 3) fail('sources needs 1-3 tables ' + figure.id);
-      for (const item of figure.sources) { inQuery(item.table, 'source table'); if (!Array.isArray(item.fields) || !item.fields.length) fail('source fields ' + figure.id); for (const field of item.fields) inQuery(field, 'source field'); }
+      for (const note of figure.notes || []) {
+        text(note.text, 'note text ' + figure.id);
+        if (note.kind === 'range') { if (!problem.includes(note.text)) fail('range note is not quoted from the lesson problem: ' + note.text); }
+        else if (note.kind === 'pitfall') { if (!cautions.includes(note.text)) fail('pitfall note is not quoted from the lesson cautions: ' + note.text); }
+        else if (note.kind === 'derived') {
+          const rules = {
+            'zero-denominator': ['分母为 0 时，结果为空（NULL），不会报错，也不会写成 0。', /nullif/i.test(lesson.sqliteSql)],
+            'unit-cents': ['金额的单位是分，不是元。', /马币分|单位为马币分|金额以马币分/.test(problem + lesson.concept)],
+          };
+          const rule = rules[note.rule];
+          if (!rule || note.text !== rule[0] || !rule[1]) fail('derived note ' + note.rule + ' ' + figure.id);
+        } else fail('note kind ' + figure.id);
+      }
       continue;
     }
     if (figure.kind === 'clause-map') {

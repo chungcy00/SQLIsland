@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp19-43",
-  "lessonSha256": "06c68c6d5be5243951e6a55e414f252b589c4938272fd5d8ef5f99759510221a",
+  "lessonSha256": "ed057e5e53e2b9f6640ad9441caa1c731af87ff64adcda9f15ad9b146894d105",
   "figures": [
     {
       "id": "kp19-43-clauses",
@@ -68,51 +68,74 @@
     },
     {
       "id": "kp19-43-retention",
-      "slot": "problem",
+      "slot": "concept",
       "kind": "metric-card",
-      "title": "留存率的口径",
+      "title": "留存率",
       "metric": {
         "column": "retention_pct",
-        "label": "留存率（%）"
+        "label": "留存率"
       },
-      "numerator": {
-        "label": "当月活跃客户数",
-        "expr": "COALESCE(y.active,0)"
+      "meaning": "衡量同一批首次购买的客户，在之后各月还有多少人继续购买。",
+      "formula": {
+        "lhs": "留存率",
+        "numerator": "当月仍有购买的客户数",
+        "denominator": "同期群初始人数",
+        "times": "× 100%"
       },
-      "denominator": {
-        "label": "同期群初始人数",
-        "expr": "x.n"
+      "example": {
+        "source": "result",
+        "row": 1,
+        "inputs": [
+          {
+            "name": "active",
+            "label": "当月仍有购买的客户数",
+            "unit": "人",
+            "value": 4,
+            "column": "active_customers"
+          },
+          {
+            "name": "size",
+            "label": "同期群初始人数",
+            "unit": "人",
+            "value": 7,
+            "column": "cohort_size"
+          }
+        ],
+        "calc": "100*active/size",
+        "process": "100 × 4 ÷ 7 ＝ 57.14%",
+        "result": {
+          "value": 57.14,
+          "unit": "%",
+          "decimals": 2,
+          "column": "retention_pct"
+        }
       },
-      "scope": [
+      "interpretation": "留存率 {result}：这个同期群的客户里，在该月仍有购买的人所占的比例。",
+      "sql": {
+        "lines": [
+          "ROUND(100.0*COALESCE(y.active,0)/x.n,2) retention_pct"
+        ]
+      },
+      "notes": [
         {
+          "kind": "range",
           "label": "范围",
           "text": "线上有效订单"
         },
         {
+          "kind": "range",
           "label": "观察窗口",
           "text": "观察截止2025-12-31，月偏移0至6"
         },
         {
+          "kind": "range",
           "label": "分母",
           "text": "分母沿用同期群初始人数"
-        }
-      ],
-      "pitfall": "把分母换成上月活跃人数，或把未来月份填零",
-      "sources": [
-        {
-          "table": "v_order_net",
-          "fields": [
-            "customer_id",
-            "channel",
-            "order_date"
-          ]
         },
         {
-          "table": "calendar_days",
-          "fields": [
-            "month_key",
-            "day"
-          ]
+          "kind": "pitfall",
+          "label": "易错口径",
+          "text": "把分母换成上月活跃人数，或把未来月份填零"
         }
       ]
     }

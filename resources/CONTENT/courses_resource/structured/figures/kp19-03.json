@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp19-03",
-  "lessonSha256": "bf96a574fdc9c073c84abfffcff5541d27e6d9c65e99adf0d61b1671de640eb3",
+  "lessonSha256": "90f756c06f35633a7bbd64a08dbc3b2b21fa4df534c34efc0b95e7cbdc419d33",
   "figures": [
     {
       "id": "kp19-03-clauses",
@@ -32,47 +32,74 @@
     },
     {
       "id": "kp19-03-repeat",
-      "slot": "problem",
+      "slot": "concept",
       "kind": "metric-card",
-      "title": "复购率的口径",
+      "title": "复购率",
       "metric": {
         "column": "repeat_pct",
-        "label": "复购率（%）"
+        "label": "复购率"
       },
-      "numerator": {
-        "label": "购买 2 次及以上的客户数",
-        "expr": "COALESCE(SUM(CASE WHEN purchase_count>=2 THEN 1 ELSE 0 END),0)"
+      "meaning": "衡量有购买的客户中有多少会再次购买，反映客户回购情况。",
+      "formula": {
+        "lhs": "复购率",
+        "numerator": "购买 2 次及以上的客户数",
+        "denominator": "有购买的客户数",
+        "times": "× 100%"
       },
-      "denominator": {
-        "label": "有购买的客户数",
-        "expr": "COUNT(*)"
+      "example": {
+        "source": "result",
+        "row": 0,
+        "inputs": [
+          {
+            "name": "repeat",
+            "label": "购买 2 次及以上的客户数",
+            "unit": "人",
+            "value": 1,
+            "column": "repeat_customers"
+          },
+          {
+            "name": "purch",
+            "label": "有购买的客户数",
+            "unit": "人",
+            "value": 2,
+            "column": "purchasing_customers"
+          }
+        ],
+        "calc": "100*repeat/purch",
+        "process": "100 × 1 ÷ 2 ＝ 50%",
+        "result": {
+          "value": 50.0,
+          "unit": "%",
+          "decimals": 2,
+          "column": "repeat_pct"
+        }
       },
-      "scope": [
+      "interpretation": "复购率 {result}：有购买的客户中，购买 2 次及以上的客户占这个比例。",
+      "sql": {
+        "lines": [
+          "ROUND(100.0*COALESCE(SUM(CASE WHEN purchase_count>=2 THEN 1 ELSE 0 END),0)/NULLIF(COUNT(*),0),2) AS repeat_pct"
+        ]
+      },
+      "notes": [
         {
+          "kind": "range",
           "label": "范围",
           "text": "2025全年、线上、已完成且扣退款后净额大于0的订单"
         },
         {
+          "kind": "range",
           "label": "空值",
           "text": "无有效购买客户时返回人数0、比率NULL"
-        }
-      ],
-      "pitfall": "分母不是订单数、注册人数或商品行数",
-      "sources": [
-        {
-          "table": "customers",
-          "fields": [
-            "customer_id"
-          ]
         },
         {
-          "table": "v_order_net",
-          "fields": [
-            "order_id",
-            "channel",
-            "order_date",
-            "net_cents"
-          ]
+          "kind": "pitfall",
+          "label": "易错口径",
+          "text": "分母不是订单数、注册人数或商品行数"
+        },
+        {
+          "kind": "derived",
+          "rule": "zero-denominator",
+          "text": "分母为 0 时，结果为空（NULL），不会报错，也不会写成 0。"
         }
       ]
     }

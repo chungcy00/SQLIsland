@@ -19,6 +19,12 @@
       "items": [
         "保留全部渠道。"
       ]
+    },
+    {
+      "type": "figure",
+      "ids": [
+        "kp20-18-contribution"
+      ]
     }
   ],
   "syntax": {

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp19-41",
-  "lessonSha256": "25e8d2b0b6d5df5da059a1b9b0fde82d1bb1c3003b238ee26d42c6f60944dfc3",
+  "lessonSha256": "799ec36a4575e744db091f6f55e5e0b5cb7c807b317c6c3ff12f3b1465c3a33a",
   "figures": [
     {
       "id": "kp19-41-clauses",
@@ -50,42 +50,73 @@
     },
     {
       "id": "kp19-41-avg-order",
-      "slot": "problem",
+      "slot": "concept",
       "kind": "metric-card",
-      "title": "平均订单净额的口径",
+      "title": "平均订单净额",
       "metric": {
         "column": "avg_order_cents",
-        "label": "平均订单净额（分）"
+        "label": "平均订单净额"
       },
-      "numerator": {
-        "label": "净收入合计（分）",
-        "expr": "SUM(net_cents)"
+      "meaning": "衡量每笔订单平均带来多少净收入，也就是常说的客单价。",
+      "formula": {
+        "lhs": "平均订单净额",
+        "numerator": "净收入合计",
+        "denominator": "订单数"
       },
-      "denominator": {
-        "label": "订单数",
-        "expr": "COUNT(*)"
+      "example": {
+        "source": "result",
+        "row": 0,
+        "inputs": [
+          {
+            "name": "net",
+            "label": "净收入合计",
+            "unit": "分",
+            "value": 11963679,
+            "column": "net_cents"
+          },
+          {
+            "name": "orders",
+            "label": "订单数",
+            "unit": "笔",
+            "value": 1272,
+            "column": "orders"
+          }
+        ],
+        "calc": "net/orders",
+        "process": "11,963,679 ÷ 1,272 ＝ 9,405.41",
+        "result": {
+          "value": 9405.41,
+          "unit": "分",
+          "decimals": 2,
+          "column": "avg_order_cents"
+        }
       },
-      "scope": [
+      "interpretation": "平均订单净额 {result}：这一类订单平均每笔带来的净收入。",
+      "sql": {
+        "lines": [
+          "ROUND(1.0*SUM(net_cents)/COUNT(*),2) avg_order_cents"
+        ]
+      },
+      "notes": [
         {
+          "kind": "range",
           "label": "范围",
           "text": "2025年度线上有效订单"
         },
         {
+          "kind": "range",
           "label": "首购判定",
           "text": "先使用完整历史，以订单日期和订单编号共同决定顺序"
-        }
-      ],
-      "pitfall": "先过滤2025年再排名，或用客户人数作为客单价分母",
-      "sources": [
+        },
         {
-          "table": "v_order_net",
-          "fields": [
-            "net_cents",
-            "channel",
-            "order_date",
-            "customer_id",
-            "order_id"
-          ]
+          "kind": "pitfall",
+          "label": "易错口径",
+          "text": "先过滤2025年再排名，或用客户人数作为客单价分母"
+        },
+        {
+          "kind": "derived",
+          "rule": "unit-cents",
+          "text": "金额的单位是分，不是元。"
         }
       ]
     }

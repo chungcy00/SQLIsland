@@ -21,6 +21,19 @@
       ]
     },
     {
+      "type": "figure",
+      "ids": [
+        "kp19-32-mom",
+        "kp19-32-yoy"
+      ]
+    },
+    {
+      "type": "figure",
+      "ids": [
+        "kp19-32-compare"
+      ]
+    },
+    {
       "type": "heading",
       "text": "使用要点",
       "emphasis": []
