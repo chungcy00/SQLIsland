@@ -1,4 +1,5 @@
 import dagre from "@dagrejs/dagre";
+import { hasIcon, iconSvg } from "./icons-v2.js";
 const escape = (value) =>
   String(value ?? "").replace(
     /[&<>"']/g,
@@ -17,7 +18,7 @@ const paths = {
   close: "M6 6l12 12 M6 18 18 6",
 };
 const icon = (name) =>
-  `<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="${paths[name]}"/></svg>`;
+  hasIcon(name) ? iconSvg(name) : `<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="${paths[name]}"/></svg>`;
 const control = (action, label) =>
   `<button type="button" class="erd-icon" data-erd-action="${action}" aria-label="${label}" title="${label}">${icon(action)}</button>`;
 const WIDTH = 300,

@@ -1,6 +1,7 @@
 import { lessonComplete, lessonNote, lessonNoteKey, migrateLessonBookmarks } from "./curriculum-progress.js";
 import { isCurrentQuestionAttempt, questionDraft } from "./question-progress.js";
 import { actionIconPaths } from "./action-icons.js";
+import { hasIcon, iconSvg } from "./icons-v2.js";
 import { islandSvg, islandLitCount } from "./island.js";
 import islandSource from "../resources/ASSETS/v2/illustrations/milestone/milestone.svg";
 import { contourSvg, tideSvg } from "./decor.js";
@@ -70,8 +71,8 @@ const paths = {
     "M7 2h10a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Z M10 18h4",
 };
 const icon = (name, cls = "") =>
-  `<svg class="icon ${cls}" viewBox="0 0 24 24" aria-hidden="true"><path d="${paths[name] || paths.book}"/></svg>`;
-const actionIcon = (name) => `<svg class="icon material-icon" viewBox="0 0 24 24" aria-hidden="true">${actionIconPaths[name].map((path) => `<path d="${path}"/>`).join("")}</svg>`;
+  hasIcon(name) ? iconSvg(name, cls) : `<svg class="icon ${cls}" viewBox="0 0 24 24" aria-hidden="true"><path d="${paths[name] || paths.book}"/></svg>`;
+const actionIcon = (name) => hasIcon(name) ? iconSvg(name, "material-icon") : `<svg class="icon material-icon" viewBox="0 0 24 24" aria-hidden="true">${actionIconPaths[name].map((path) => `<path d="${path}"/>`).join("")}</svg>`;
 const image = (path, cls = "", alt = "") =>
   `<img class="${cls}" src="assets/${path}.png" alt="${e(alt)}">`;
 const button = (label, action, arg = "", cls = "") =>
@@ -93,7 +94,7 @@ const empty = (title, description = "", action = "") =>
   `<div class="empty">${image("illustrations/states/state_empty")}<h3>${e(title)}</h3>${description ? `<p>${e(description)}</p>` : ""}${action}</div>`;
 const linkRow = (title, description, route, ico = "book", asset = false) =>
   goButton(
-    `<span class="list-icon">${asset ? image("functions/" + ico, "asset-icon") : icon(ico)}</span><div class="grow"><h3>${e(title)}</h3>${description ? `<small>${e(description)}</small>` : ""}</div>${icon("right", "chevron")}`,
+    `<span class="list-icon">${asset ? icon(ico) : icon(ico)}</span><div class="grow"><h3>${e(title)}</h3>${description ? `<small>${e(description)}</small>` : ""}</div>${icon("right", "chevron")}`,
     route,
     description ? "link-row" : "link-row compact",
   );
@@ -442,7 +443,7 @@ function shell(title, body, tab = "home", detail = false, extra = "") {
     ["flashcards", "闪卡", "/cards"],
     ["mine", "我的", "/mine"],
   ];
-  app.innerHTML = `<header class="appbar ${detail ? "detail" : ""}">${detail ? button(icon("back"), "back", "", "icon-button") : image("brand/logo_d", "logo")}<h1>${e(title)}</h1>${extra || (!detail ? goButton(icon("settings"), "/settings", "icon-button") : '<span class="appbar-spacer"></span>')}</header><main class="page ${detail ? "detail" : ""}">${body}</main>${detail ? "" : `<nav aria-label="主导航">${navigation.map(([key, label, path]) => goButton(`<span class="nav-icon">${image(`navigation/${key}_${tab === key ? "active" : "inactive"}`)}</span>${label}`, path, tab === key ? "active" : "")).join("")}</nav>`}`;
+  app.innerHTML = `<header class="appbar ${detail ? "detail" : ""}">${detail ? button(icon("back"), "back", "", "icon-button") : image("brand/logo_d", "logo")}<h1>${e(title)}</h1>${extra || (!detail ? goButton(icon("settings"), "/settings", "icon-button") : '<span class="appbar-spacer"></span>')}</header><main class="page ${detail ? "detail" : ""}">${body}</main>${detail ? "" : `<nav aria-label="主导航">${navigation.map(([key, label, path]) => goButton(`<span class="nav-icon">${iconSvg(`${key}_${tab === key ? "active" : "inactive"}`, "nav-svg")}</span>${label}`, path, tab === key ? "active" : "")).join("")}</nav>`}`;
 }
 function completedChapter(c) {
   return c.knowledgePoints.every((k) => completedLesson(k.id));
@@ -522,7 +523,7 @@ function home() {
   shell(
     "数屿SQL",
     `<section class="panel continue learning-hero">${contourSvg("hero-contour")}${islandSvg(islandLitCount(completedKnowledgePoints(), knowledgePoints().length), islandSource, "learning-hero-art")}<div class="hero-text"><div class="study-badge">连续学习 ${studyStreak()} 天 · 累计 ${minutes} 分钟</div><h2>${e(title)}</h2><p class="hero-summary">${summary}</p></div><div class="hero-progress"><div class="progress" role="progressbar" aria-label="已学知识点" aria-valuemin="0" aria-valuemax="${knowledgePoints().length}" aria-valuenow="${completedKnowledgePoints()}"><span style="width:${knowledgePoints().length ? (completedKnowledgePoints() / knowledgePoints().length) * 100 : 0}%"></span></div><small>已学 ${completedKnowledgePoints()}/${knowledgePoints().length}</small></div><div class="hero-actions">${goButton(icon("play") + " " + (state.lastLesson ? "继续学习" : "开始学习"), "/lesson/" + next.id, "primary")}${goButton("待复习 " + dueCards().length + " 卡", "/cards", "hero-review")}</div></section>
-    <div class="section-heading"><h2>快捷入口</h2></div><div class="home-shortcuts">${shortcuts.map(([label, route, asset, count]) => goButton(`<span class="list-icon">${image("functions/" + asset, "asset-icon")}</span><span class="grow"><strong>${label}</strong>${count ? `<small>${count}</small>` : ""}</span>`, route, "shortcut-tile")).join("")}</div>
+    <div class="section-heading"><h2>快捷入口</h2></div><div class="home-shortcuts">${shortcuts.map(([label, route, asset, count]) => goButton(`<span class="list-icon">${icon(asset)}</span><span class="grow"><strong>${label}</strong>${count ? `<small>${count}</small>` : ""}</span>`, route, "shortcut-tile")).join("")}</div>
     ${tideSvg("tide")}<div class="section-heading"><h2>学习路线</h2>${goButton("查看统计", "/stats")}</div><div class="stats home-progress"><div class="stat"><strong>${completedKnowledgePoints()}<small> / ${knowledgePoints().length}</small></strong><small>学完知识点</small></div><div class="stat"><strong>${stats.done}<small> / ${content.questions.length}</small></strong><small>独立完成题目</small></div><div class="stat"><strong>${studiedCards()}<small> / 200</small></strong><small>已学闪卡</small></div></div>
     <div class="panel home-stages">${stages.map((stage) => {
       const chapters = content.chapters.filter((c) => c.stage === stage);
@@ -1431,7 +1432,7 @@ async function labPage(id) {
 function mine() {
   const stats = summaryStats();
   const row = (title, count, route, ico, asset = true) =>
-    goButton(`<span class="list-icon">${asset ? image("functions/" + ico, "asset-icon") : icon(ico)}</span><span class="grow menu-title">${e(title)}</span>${count ? `<small class="menu-count">${e(count)}</small>` : ""}${icon("right", "chevron")}`, route, "link-row compact");
+    goButton(`<span class="list-icon">${asset ? icon(ico) : icon(ico)}</span><span class="grow menu-title">${e(title)}</span>${count ? `<small class="menu-count">${e(count)}</small>` : ""}${icon("right", "chevron")}`, route, "link-row compact");
   const resourceStatus = state.resourceCheck ? (state.resourceCheck.pass ? "校验通过" : "发现异常") : "未检查";
   shell(
     "我的",

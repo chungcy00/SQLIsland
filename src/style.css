@@ -2715,3 +2715,10 @@ td.cell-bad { background: var(--err-bg); color: var(--err); font-weight: 600; }
 .sec3 p { margin: 0; font-size: 0.9375rem; }
 .note { background: var(--sand); border-radius: 10px; padding: 10px; font-size: 0.8125rem; margin: 0; }
 .card-flip.back .code-sample { margin-top: 0; }
+
+/* ===== B8 新版图标 ===== */
+.icon.v2 { fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+.primary .icon, .hero-actions .primary .icon, button.primary .icon { --icon-fill: transparent; }
+nav .nav-icon .nav-svg { width: 24px; height: 24px; }
+.list-icon > .icon { width: 28px; height: 28px; }
+nav .nav-svg { color: var(--primary); }
