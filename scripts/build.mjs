@@ -32,8 +32,16 @@ await cp("src/style.css", "dist/style.css");
 await cp("node_modules/sql.js/dist/sql-wasm.wasm", "dist/sql-wasm.wasm");
 await cp(assetSource, "dist/assets", {
   recursive: true,
-  // v2/illustrations 尚未接入界面（B10 再做白名单），暂不打包，避免 APK 增加约 36MB 未使用资源。
-  filter: (p) => !p.endsWith(".svg") && !p.endsWith(".md") && !p.split(path.sep).join("/").includes("/v2/illustrations"),
+  // B10 白名单：v2/illustrations 只打包 final/ 顶层的 PNG（不含 final/source、business、tools、milestone；里程碑 SVG 由 esbuild 内联），
+  // 避免 APK 带入约 28MB 原图与分层素材及试验图。
+  filter: (p) => {
+    const norm = p.split(path.sep).join("/");
+    if (norm.endsWith(".svg") || norm.endsWith(".md")) return false;
+    const i = norm.indexOf("/v2/illustrations");
+    if (i < 0) return true;
+    const rest = norm.slice(i + "/v2/illustrations".length);
+    return rest === "" || rest === "/final" || /^\/final\/[^/]+\.png$/.test(rest);
+  },
 });
 const chapters = [],
   questions = [],

@@ -35,6 +35,55 @@
           "note": "按 net_cents DESC 排列结果。"
         }
       ]
+    },
+    {
+      "id": "kp20-01-share",
+      "slot": "problem",
+      "kind": "metric-card",
+      "title": "门店销售贡献率的口径",
+      "metric": {
+        "column": "sales_pct",
+        "label": "销售贡献率（%）"
+      },
+      "numerator": {
+        "label": "本店净销售（分）",
+        "expr": "net_cents"
+      },
+      "denominator": {
+        "label": "全部门店净销售合计（分）",
+        "expr": "SUM(net_cents) OVER()"
+      },
+      "scope": [
+        {
+          "label": "范围",
+          "text": "2025年全部实体门店"
+        },
+        {
+          "label": "保留",
+          "text": "保留没有销售的门店"
+        },
+        {
+          "label": "订单",
+          "text": "有效订单以原项目视图为准"
+        }
+      ],
+      "pitfall": "贡献率以总体净销售为分母；毛利率以本组净销售为分母；排名只表示顺序，并非比例。",
+      "sources": [
+        {
+          "table": "stores",
+          "fields": [
+            "store_id"
+          ]
+        },
+        {
+          "table": "v_order_net",
+          "fields": [
+            "net_cents",
+            "channel",
+            "order_date"
+          ]
+        }
+      ]
     }
   ]
 }

@@ -65,6 +65,56 @@
           "note": "按 x.cohort,x.k 排列结果。"
         }
       ]
+    },
+    {
+      "id": "kp19-43-retention",
+      "slot": "problem",
+      "kind": "metric-card",
+      "title": "留存率的口径",
+      "metric": {
+        "column": "retention_pct",
+        "label": "留存率（%）"
+      },
+      "numerator": {
+        "label": "当月活跃客户数",
+        "expr": "COALESCE(y.active,0)"
+      },
+      "denominator": {
+        "label": "同期群初始人数",
+        "expr": "x.n"
+      },
+      "scope": [
+        {
+          "label": "范围",
+          "text": "线上有效订单"
+        },
+        {
+          "label": "观察窗口",
+          "text": "观察截止2025-12-31，月偏移0至6"
+        },
+        {
+          "label": "分母",
+          "text": "分母沿用同期群初始人数"
+        }
+      ],
+      "pitfall": "把分母换成上月活跃人数，或把未来月份填零",
+      "sources": [
+        {
+          "table": "v_order_net",
+          "fields": [
+            "customer_id",
+            "channel",
+            "order_date"
+          ]
+        },
+        {
+          "table": "calendar_days",
+          "fields": [
+            "month_key",
+            "day"
+          ]
+        }
+      ]
     }
   ]
 }

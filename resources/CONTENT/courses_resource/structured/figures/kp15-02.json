@@ -156,6 +156,69 @@
           ]
         }
       ]
+    },
+    {
+      "id": "kp15-02-fn",
+      "slot": "concept",
+      "kind": "function-map",
+      "title": "三种排名如何处理并列",
+      "form": "window",
+      "table": "employees",
+      "inputColumns": [
+        "employee_id",
+        "salary"
+      ],
+      "orderBy": "salary DESC, employee_id",
+      "inputRows": [
+        [
+          1,
+          8000
+        ],
+        [
+          2,
+          5000
+        ],
+        [
+          3,
+          5000
+        ],
+        [
+          4,
+          3000
+        ]
+      ],
+      "outputs": [
+        {
+          "label": "rn",
+          "sql": "ROW_NUMBER() OVER(ORDER BY salary DESC,employee_id)",
+          "values": [
+            1,
+            2,
+            3,
+            4
+          ]
+        },
+        {
+          "label": "rnk",
+          "sql": "RANK() OVER(ORDER BY salary DESC)",
+          "values": [
+            1,
+            2,
+            2,
+            4
+          ]
+        },
+        {
+          "label": "dense_rnk",
+          "sql": "DENSE_RANK() OVER(ORDER BY salary DESC)",
+          "values": [
+            1,
+            2,
+            2,
+            3
+          ]
+        }
+      ]
     }
   ]
 }

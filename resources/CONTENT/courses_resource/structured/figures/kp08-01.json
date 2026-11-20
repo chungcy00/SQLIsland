@@ -94,6 +94,93 @@
           ]
         }
       ]
+    },
+    {
+      "id": "kp08-01-join",
+      "slot": "concept",
+      "kind": "join-map",
+      "title": "内连接保留哪些行",
+      "joinType": "inner",
+      "left": {
+        "table": "orders",
+        "key": "customer_id",
+        "show": [
+          "id",
+          "customer_id"
+        ]
+      },
+      "right": {
+        "table": "customers",
+        "key": "customer_id",
+        "show": [
+          "customer_id",
+          "customer_name"
+        ]
+      },
+      "on": "o.customer_id=c.customer_id",
+      "sql": "SELECT o.id, o.customer_id, c.customer_id, c.customer_name FROM orders o INNER JOIN customers c ON o.customer_id=c.customer_id",
+      "pairs": [
+        {
+          "left": [
+            1,
+            1
+          ],
+          "right": [
+            1,
+            "林"
+          ],
+          "kept": true
+        },
+        {
+          "left": [
+            2,
+            2
+          ],
+          "right": [
+            2,
+            "陈"
+          ],
+          "kept": true
+        },
+        {
+          "left": [
+            3,
+            1
+          ],
+          "right": [
+            1,
+            "林"
+          ],
+          "kept": true
+        },
+        {
+          "left": [
+            4,
+            null
+          ],
+          "right": null,
+          "kept": false
+        },
+        {
+          "left": [
+            5,
+            3
+          ],
+          "right": [
+            3,
+            "王"
+          ],
+          "kept": true
+        },
+        {
+          "left": null,
+          "right": [
+            4,
+            "李"
+          ],
+          "kept": false
+        }
+      ]
     }
   ]
 }

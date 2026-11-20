@@ -53,6 +53,87 @@
           "note": "按 gap_points DESC 排列结果。"
         }
       ]
+    },
+    {
+      "id": "kp20-06-sales",
+      "slot": "problem",
+      "kind": "metric-card",
+      "title": "销售占比的口径",
+      "metric": {
+        "column": "sales_pct",
+        "label": "销售占比（%）"
+      },
+      "numerator": {
+        "label": "本商品净销售（分）",
+        "expr": "net"
+      },
+      "denominator": {
+        "label": "全部商品净销售合计（分）",
+        "expr": "SUM(net) OVER()"
+      },
+      "scope": [
+        {
+          "label": "范围",
+          "text": "2025年度"
+        },
+        {
+          "label": "总体",
+          "text": "两项指标均以全体商品为比较总体"
+        },
+        {
+          "label": "粒度",
+          "text": "每商品一行"
+        }
+      ],
+      "pitfall": "销售额是期间流量，库存价值是时点存量；两个占比可比较相对结构，但不能代替库存周转率或利润率。",
+      "sources": [
+        {
+          "table": "v_sales_lines",
+          "fields": [
+            "net_cents",
+            "order_date"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "kp20-06-stock",
+      "slot": "problem",
+      "kind": "metric-card",
+      "title": "库存占比的口径",
+      "metric": {
+        "column": "stock_pct",
+        "label": "库存占比（%）"
+      },
+      "numerator": {
+        "label": "本商品库存成本（分）",
+        "expr": "stock"
+      },
+      "denominator": {
+        "label": "全部商品库存成本合计（分）",
+        "expr": "SUM(stock) OVER()"
+      },
+      "scope": [
+        {
+          "label": "范围",
+          "text": "2025年度"
+        },
+        {
+          "label": "总体",
+          "text": "两项指标均以全体商品为比较总体"
+        }
+      ],
+      "pitfall": "销售额是期间流量，库存价值是时点存量；两个占比可比较相对结构，但不能代替库存周转率或利润率。",
+      "sources": [
+        {
+          "table": "inventory_snapshots",
+          "fields": [
+            "quantity",
+            "unit_cost_cents",
+            "snapshot_date"
+          ]
+        }
+      ]
     }
   ]
 }

@@ -47,6 +47,47 @@
           "note": "按 segment 排列结果。"
         }
       ]
+    },
+    {
+      "id": "kp19-41-avg-order",
+      "slot": "problem",
+      "kind": "metric-card",
+      "title": "平均订单净额的口径",
+      "metric": {
+        "column": "avg_order_cents",
+        "label": "平均订单净额（分）"
+      },
+      "numerator": {
+        "label": "净收入合计（分）",
+        "expr": "SUM(net_cents)"
+      },
+      "denominator": {
+        "label": "订单数",
+        "expr": "COUNT(*)"
+      },
+      "scope": [
+        {
+          "label": "范围",
+          "text": "2025年度线上有效订单"
+        },
+        {
+          "label": "首购判定",
+          "text": "先使用完整历史，以订单日期和订单编号共同决定顺序"
+        }
+      ],
+      "pitfall": "先过滤2025年再排名，或用客户人数作为客单价分母",
+      "sources": [
+        {
+          "table": "v_order_net",
+          "fields": [
+            "net_cents",
+            "channel",
+            "order_date",
+            "customer_id",
+            "order_id"
+          ]
+        }
+      ]
     }
   ]
 }

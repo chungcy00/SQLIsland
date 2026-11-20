@@ -41,6 +41,59 @@
           "note": "按 po_item_id 排列结果。"
         }
       ]
+    },
+    {
+      "id": "kp19-56-change",
+      "slot": "problem",
+      "kind": "metric-card",
+      "title": "价格变动率的口径",
+      "metric": {
+        "column": "change_pct",
+        "label": "较上次采购价变动（%）"
+      },
+      "numerator": {
+        "label": "本次减上次单价（分）",
+        "expr": "unit_price_cents-previous_cents"
+      },
+      "denominator": {
+        "label": "上次采购单价（分）",
+        "expr": "previous_cents"
+      },
+      "scope": [
+        {
+          "label": "范围",
+          "text": "成交价格偏离合同或历史价格的采购行"
+        },
+        {
+          "label": "金额",
+          "text": "所有金额以马币分表示"
+        },
+        {
+          "label": "提醒",
+          "text": "采购承诺不是已收货或已付款金额"
+        }
+      ],
+      "pitfall": "先筛2025年再用 LAG，或直接平均各次采购单价",
+      "sources": [
+        {
+          "table": "purchase_order_items",
+          "fields": [
+            "unit_price_cents"
+          ]
+        },
+        {
+          "table": "purchase_orders",
+          "fields": [
+            "order_date"
+          ]
+        },
+        {
+          "table": "supplier_contracts",
+          "fields": [
+            "unit_price_cents"
+          ]
+        }
+      ]
     }
   ]
 }

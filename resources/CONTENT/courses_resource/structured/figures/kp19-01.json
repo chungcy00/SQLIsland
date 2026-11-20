@@ -41,6 +41,96 @@
           "note": "按 net_cents DESC 排列结果。"
         }
       ]
+    },
+    {
+      "id": "kp19-01-achievement",
+      "slot": "problem",
+      "kind": "metric-card",
+      "title": "目标达成率的口径",
+      "metric": {
+        "column": "achievement_pct",
+        "label": "目标达成率（%）"
+      },
+      "numerator": {
+        "label": "净销售（分）",
+        "expr": "COALESCE(a.net,0)"
+      },
+      "denominator": {
+        "label": "销售目标（分）",
+        "expr": "b.target"
+      },
+      "scope": [
+        {
+          "label": "范围",
+          "text": "2025年有效线下订单"
+        },
+        {
+          "label": "退款",
+          "text": "退款截至年底并归属原订单日期"
+        },
+        {
+          "label": "零值",
+          "text": "净额和目标为零时分别不计算对应比率"
+        }
+      ],
+      "pitfall": "毛利率衡量盈利结构，目标达成率衡量计划完成；不能互换。",
+      "sources": [
+        {
+          "table": "v_sales_lines",
+          "fields": [
+            "net_cents",
+            "channel",
+            "order_date"
+          ]
+        },
+        {
+          "table": "sales_targets",
+          "fields": [
+            "target_cents",
+            "month_key"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "kp19-01-margin",
+      "slot": "problem",
+      "kind": "metric-card",
+      "title": "毛利率的口径",
+      "metric": {
+        "column": "margin_pct",
+        "label": "毛利率（%）"
+      },
+      "numerator": {
+        "label": "毛利（分）",
+        "expr": "a.net-a.cost"
+      },
+      "denominator": {
+        "label": "净销售（分）",
+        "expr": "a.net"
+      },
+      "scope": [
+        {
+          "label": "范围",
+          "text": "2025年有效线下订单"
+        },
+        {
+          "label": "退款",
+          "text": "退款截至年底并归属原订单日期"
+        }
+      ],
+      "pitfall": "毛利率衡量盈利结构，目标达成率衡量计划完成；不能互换。",
+      "sources": [
+        {
+          "table": "v_sales_lines",
+          "fields": [
+            "net_cents",
+            "cost_cents",
+            "channel",
+            "order_date"
+          ]
+        }
+      ]
     }
   ]
 }

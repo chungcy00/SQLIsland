@@ -126,6 +126,49 @@
           ]
         }
       ]
+    },
+    {
+      "id": "kp15-04-fn",
+      "slot": "concept",
+      "kind": "function-map",
+      "title": "累计值逐行增长",
+      "form": "window",
+      "table": "monthly",
+      "inputColumns": [
+        "month",
+        "sales"
+      ],
+      "orderBy": "month",
+      "inputRows": [
+        [
+          "2026-01",
+          1000
+        ],
+        [
+          "2026-02",
+          1500
+        ],
+        [
+          "2026-03",
+          1500
+        ],
+        [
+          "2026-04",
+          900
+        ]
+      ],
+      "outputs": [
+        {
+          "label": "cumulative",
+          "sql": "SUM(sales) OVER(ORDER BY month ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)",
+          "values": [
+            1000,
+            2500,
+            4000,
+            4900
+          ]
+        }
+      ]
     }
   ]
 }

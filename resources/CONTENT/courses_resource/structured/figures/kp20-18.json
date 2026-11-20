@@ -41,6 +41,57 @@
           "note": "按 contribution_cents DESC 排列结果。"
         }
       ]
+    },
+    {
+      "id": "kp20-18-contribution",
+      "slot": "problem",
+      "kind": "metric-card",
+      "title": "广告后贡献率的口径",
+      "metric": {
+        "column": "contribution_pct",
+        "label": "广告后贡献率（%）"
+      },
+      "numerator": {
+        "label": "毛利减广告费（分）",
+        "expr": "COALESCE(a.gross,0)-COALESCE(b.spend,0)"
+      },
+      "denominator": {
+        "label": "净销售（分）",
+        "expr": "a.net"
+      },
+      "scope": [
+        {
+          "label": "范围",
+          "text": "2025年线上订单"
+        },
+        {
+          "label": "归因",
+          "text": "按会话归因"
+        },
+        {
+          "label": "扣减",
+          "text": "扣除当年广告费后的贡献"
+        }
+      ],
+      "pitfall": "广告后贡献不是最终净利润",
+      "sources": [
+        {
+          "table": "v_order_net",
+          "fields": [
+            "net_cents",
+            "cost_cents",
+            "channel",
+            "order_date"
+          ]
+        },
+        {
+          "table": "marketing_campaigns",
+          "fields": [
+            "spend_cents",
+            "month_key"
+          ]
+        }
+      ]
     }
   ]
 }

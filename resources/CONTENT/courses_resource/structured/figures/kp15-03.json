@@ -136,6 +136,59 @@
           ]
         }
       ]
+    },
+    {
+      "id": "kp15-03-fn",
+      "slot": "concept",
+      "kind": "function-map",
+      "title": "LAG 与 LEAD 取相邻行",
+      "form": "window",
+      "table": "monthly",
+      "inputColumns": [
+        "month",
+        "sales"
+      ],
+      "orderBy": "month",
+      "inputRows": [
+        [
+          "2026-01",
+          1000
+        ],
+        [
+          "2026-02",
+          1500
+        ],
+        [
+          "2026-03",
+          1500
+        ],
+        [
+          "2026-04",
+          900
+        ]
+      ],
+      "outputs": [
+        {
+          "label": "previous_sales",
+          "sql": "LAG(sales) OVER(ORDER BY month)",
+          "values": [
+            null,
+            1000,
+            1500,
+            1500
+          ]
+        },
+        {
+          "label": "next_sales",
+          "sql": "LEAD(sales) OVER(ORDER BY month)",
+          "values": [
+            1500,
+            1500,
+            900,
+            null
+          ]
+        }
+      ]
     }
   ]
 }

@@ -47,6 +47,47 @@
           "note": "按 net DESC 排列结果。"
         }
       ]
+    },
+    {
+      "id": "kp19-33-margin",
+      "slot": "problem",
+      "kind": "metric-card",
+      "title": "毛利率的口径",
+      "metric": {
+        "column": "margin_pct",
+        "label": "毛利率（%）"
+      },
+      "numerator": {
+        "label": "毛利（分）",
+        "expr": "net-cost"
+      },
+      "denominator": {
+        "label": "净销售（分）",
+        "expr": "net"
+      },
+      "scope": [
+        {
+          "label": "范围",
+          "text": "2025年有效线下商品"
+        },
+        {
+          "label": "分组",
+          "text": "净销售额位于第一四分组"
+        },
+        {
+          "label": "条件",
+          "text": "毛利率严格低于30%"
+        }
+      ],
+      "pitfall": "先筛毛利率低于30%的商品，再对剩余商品分四档",
+      "sources": [
+        {
+          "table": "v_sales_lines",
+          "fields": [
+            "channel"
+          ]
+        }
+      ]
     }
   ]
 }

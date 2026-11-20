@@ -41,6 +41,55 @@
           "note": "按 stock_value_cents DESC, product_name 排列结果。"
         }
       ]
+    },
+    {
+      "id": "kp19-36-cover",
+      "slot": "problem",
+      "kind": "metric-card",
+      "title": "库存覆盖天数的口径",
+      "metric": {
+        "column": "cover_days",
+        "label": "覆盖天数"
+      },
+      "numerator": {
+        "label": "90 × 期末库存数量",
+        "expr": "90.0*i.quantity"
+      },
+      "denominator": {
+        "label": "90 天销量",
+        "expr": "s.sold"
+      },
+      "scope": [
+        {
+          "label": "范围",
+          "text": "2025-10-03至12-31共90天"
+        },
+        {
+          "label": "商品",
+          "text": "期末有效商品"
+        },
+        {
+          "label": "零销量",
+          "text": "零销量的覆盖天数为空"
+        }
+      ],
+      "pitfall": "覆盖天数高不是充分证据，零销量也不是零天",
+      "sources": [
+        {
+          "table": "inventory_snapshots",
+          "fields": [
+            "quantity",
+            "snapshot_date"
+          ]
+        },
+        {
+          "table": "stock_movements",
+          "fields": [
+            "quantity_delta",
+            "movement_date"
+          ]
+        }
+      ]
     }
   ]
 }

@@ -29,6 +29,52 @@
           "note": "从 purchases 读取输入数据。"
         }
       ]
+    },
+    {
+      "id": "kp19-03-repeat",
+      "slot": "problem",
+      "kind": "metric-card",
+      "title": "复购率的口径",
+      "metric": {
+        "column": "repeat_pct",
+        "label": "复购率（%）"
+      },
+      "numerator": {
+        "label": "购买 2 次及以上的客户数",
+        "expr": "COALESCE(SUM(CASE WHEN purchase_count>=2 THEN 1 ELSE 0 END),0)"
+      },
+      "denominator": {
+        "label": "有购买的客户数",
+        "expr": "COUNT(*)"
+      },
+      "scope": [
+        {
+          "label": "范围",
+          "text": "2025全年、线上、已完成且扣退款后净额大于0的订单"
+        },
+        {
+          "label": "空值",
+          "text": "无有效购买客户时返回人数0、比率NULL"
+        }
+      ],
+      "pitfall": "分母不是订单数、注册人数或商品行数",
+      "sources": [
+        {
+          "table": "customers",
+          "fields": [
+            "customer_id"
+          ]
+        },
+        {
+          "table": "v_order_net",
+          "fields": [
+            "order_id",
+            "channel",
+            "order_date",
+            "net_cents"
+          ]
+        }
+      ]
     }
   ]
 }

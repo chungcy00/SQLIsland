@@ -41,6 +41,88 @@
           "note": "按指定顺序排列结果。"
         }
       ]
+    },
+    {
+      "id": "kp19-57-ontime",
+      "slot": "problem",
+      "kind": "metric-card",
+      "title": "准时率的口径",
+      "metric": {
+        "column": "ontime_pct",
+        "label": "准时率（%）"
+      },
+      "numerator": {
+        "label": "按时交足的采购行数",
+        "expr": "SUM(CASE WHEN on_time>=quantity_ordered THEN 1 ELSE 0 END)"
+      },
+      "denominator": {
+        "label": "到期采购行数",
+        "expr": "COUNT(*)"
+      },
+      "scope": [
+        {
+          "label": "范围",
+          "text": "2025年承诺到期的非取消采购行"
+        },
+        {
+          "label": "截止",
+          "text": "截止2025-12-31"
+        },
+        {
+          "label": "分母",
+          "text": "尚未到期的采购行不进入分母"
+        }
+      ],
+      "pitfall": "准时率与完整率按采购行计数；质量率按件数加权；到齐日期不同于首次收货日期。",
+      "sources": [
+        {
+          "table": "v_po_lines",
+          "fields": [
+            "on_time",
+            "quantity_ordered",
+            "promised_date"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "kp19-57-quality",
+      "slot": "problem",
+      "kind": "metric-card",
+      "title": "质量合格率的口径",
+      "metric": {
+        "column": "quality_pct",
+        "label": "质量合格率（%）"
+      },
+      "numerator": {
+        "label": "合格件数",
+        "expr": "SUM(accepted)"
+      },
+      "denominator": {
+        "label": "收货件数",
+        "expr": "SUM(received)"
+      },
+      "scope": [
+        {
+          "label": "范围",
+          "text": "2025年承诺到期的非取消采购行"
+        },
+        {
+          "label": "截止",
+          "text": "截止2025-12-31"
+        }
+      ],
+      "pitfall": "准时率与完整率按采购行计数；质量率按件数加权；到齐日期不同于首次收货日期。",
+      "sources": [
+        {
+          "table": "v_po_lines",
+          "fields": [
+            "accepted",
+            "received",
+            "promised_date"
+          ]
+        }
+      ]
     }
   ]
 }

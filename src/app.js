@@ -80,6 +80,46 @@ const button = (label, action, arg = "", cls = "") =>
   `<button class="${cls}" data-action="${action}" data-arg="${e(arg)}">${label}</button>`;
 const goButton = (label, route, cls = "") => button(label, "go", route, cls);
 const code = (sql) => `<pre><code>${e(formatSqlForDisplay(sql))}</code></pre>`;
+// 分步执行：高亮“这一步新增的代码”。有上一步（同为可运行步骤）时，按词比较，只高亮相对上一步新增的词；没有可比较的上一步（首步、片段）则整段都是这一步引入的。
+// 数据表较多（超过 2 张）时，表区域限高并改为上下滑动，避免每一步都把页面撑得很长。
+const stepTables = (tables) => (tables || []).length > 2 ? `<div class="step-tables" tabindex="0" role="region" aria-label="示例数据表（可上下滑动）">${renderTables(tables)}</div>` : renderTables(tables);
+function newCode(sql, previous) {
+  const text = formatSqlForDisplay(sql);
+  const parts = text.split(/(\s+)/);
+  const words = [];
+  parts.forEach((part, index) => { if (part && !/^\s+$/.test(part)) words.push(index); });
+  const before = previous == null ? null : formatSqlForDisplay(previous).split(/\s+/).filter(Boolean).map((w) => w.replace(/;$/, ""));
+  const now = words.map((index) => parts[index].replace(/;$/, ""));
+  let isNew = now.map(() => true);
+  if (before) {
+    const n = before.length, m = now.length;
+    const table = Array.from({ length: n + 1 }, () => new Uint16Array(m + 1));
+    for (let i = n - 1; i >= 0; i--) for (let j = m - 1; j >= 0; j--) table[i][j] = before[i] === now[j] ? table[i + 1][j + 1] + 1 : Math.max(table[i + 1][j], table[i][j + 1]);
+    isNew = now.map(() => true);
+    let i = 0, j = 0;
+    while (i < n && j < m) {
+      if (before[i] === now[j]) { isNew[j] = false; i++; j++; } else if (table[i + 1][j] >= table[i][j + 1]) i++; else j++;
+    }
+  }
+  const flagAt = new Map(words.map((index, w) => [index, isNew[w]]));
+  let html = "", open = false;
+  parts.forEach((part, index) => {
+    if (!part) return;
+    if (/^\s+$/.test(part)) {
+      const nextWord = words.find((w) => w > index);
+      const keep = open && nextWord !== undefined && flagAt.get(nextWord);
+      if (open && !keep) { html += "</mark>"; open = false; }
+      html += e(part);
+      return;
+    }
+    const flag = flagAt.get(index);
+    if (flag && !open) { html += '<mark class="step-new">'; open = true; }
+    if (!flag && open) { html += "</mark>"; open = false; }
+    html += e(part);
+  });
+  if (open) html += "</mark>";
+  return `<pre><code>${html}</code></pre>`;
+}
 const table = (columns, rows, limit = 40) =>
   `<div class="table-wrap"><table><thead><tr>${columns.map((c) => `<th>${e(typeof c === "object" ? c.name : c)}</th>`).join("")}</tr></thead><tbody>${rows
     .slice(0, limit)
@@ -91,8 +131,11 @@ const table = (columns, rows, limit = 40) =>
       "",
     )}</tbody></table></div>${rows.length > limit ? `<small>展示前 ${limit} 行，共 ${rows.length} 行</small>` : ""}`;
 const tag = (text, cls = "") => `<span class="tag ${cls}">${e(text)}</span>`;
-const empty = (title, description = "", action = "") =>
-  `<div class="empty">${image("illustrations/states/state_empty")}<h3>${e(title)}</h3>${description ? `<p>${e(description)}</p>` : ""}${action}</div>`;
+// B10：新版插画（resources/ASSETS/v2/illustrations/final）。空态默认 08 问号；搜索无结果传 09。
+const finalArt = (name, cls = "") => image("v2/illustrations/final/" + name, cls);
+const businessArt = (name, cls = "") => finalArt({ retail_sales: "02", ecommerce_customer: "03", inventory_management: "04", procurement_data: "05", financial_data: "06", human_resources: "07" }[name] + "_business_" + name, cls);
+const empty = (title, description = "", action = "", art = "08_empty_question") =>
+  `<div class="empty">${finalArt(art)}<h3>${e(title)}</h3>${description ? `<p>${e(description)}</p>` : ""}${action}</div>`;
 const linkRow = (title, description, route, ico = "book", asset = false) =>
   goButton(
     `<span class="list-icon">${asset ? icon(ico) : icon(ico)}</span><div class="grow"><h3>${e(title)}</h3>${description ? `<small>${e(description)}</small>` : ""}</div>${icon("right", "chevron")}`,
@@ -541,7 +584,7 @@ function home() {
     <div class="section-heading"><h2>业务实战</h2>${goButton("全部项目", "/projects")}</div><div class="home-projects" aria-label="业务项目">${projects.map((p) => {
       const tasks = content.questions.filter((q) => q.chapterId === "ch19" && q.projectId === p[0]);
       const done = tasks.filter((q) => independentDone(q.id)).length;
-      return goButton(`${image("illustrations/business/business_" + p[3], "home-project-art")}<strong>${e(p[1])}</strong><small>${done} / ${tasks.length} 项任务已完成</small>`, "/projects/" + p[0], "home-project");
+      return goButton(`${businessArt(p[3], "home-project-art")}<strong>${e(p[1])}</strong><small>${done} / ${tasks.length} 项任务已完成</small>`, "/projects/" + p[0], "home-project");
     }).join("")}</div><div class="notice">${icon("database")} 本地 SQLite 兼容执行 · MySQL 8.4 教学</div>`,
   );
 }
@@ -612,7 +655,7 @@ function learning() {
   }).join("");
     shell(
     "学习路线",
-    `<div class="row between route-summary"><h2>体系课程</h2>${tag(completedKnowledgePoints() + " / " + knowledgePoints().length + " 已学")}</div><div class="search">${icon("search")}<input id="search" value="${e(search)}" placeholder="搜索知识点或语法" aria-label="搜索章节或知识点"></div><div class="chips stage-filters">${stages.map((stage) => button(stage, "learningStage", stage, "chip " + (view.stage === stage ? "selected" : ""))).join("")}</div><div class="chapter-list">${stageGroups}</div>${matching.length ? "" : empty("未找到相关内容", "", button("重置筛选", "resetLearning", "", "outline"))}`,
+    `<div class="row between route-summary"><h2>体系课程</h2>${tag(completedKnowledgePoints() + " / " + knowledgePoints().length + " 已学")}</div><div class="search">${icon("search")}<input id="search" value="${e(search)}" placeholder="搜索知识点或语法" aria-label="搜索章节或知识点"></div><div class="chips stage-filters">${stages.map((stage) => button(stage, "learningStage", stage, "chip " + (view.stage === stage ? "selected" : ""))).join("")}</div><div class="chapter-list">${stageGroups}</div>${matching.length ? "" : empty("未找到相关内容", "", button("重置筛选", "resetLearning", "", "outline"), "09_empty_magnifier")}`,
     "learn",
   );
 }
@@ -727,14 +770,13 @@ function lessonTeaching(k) {
   if (!k.teaching) return "";
   const presentation = k.presentation;
   const method = presentation ? renderTeachingBlocks(presentation.methodBlocks) : `<p>${e(k.teaching.codeExplanation || "")}</p>`;
-  return `<div class="lesson-demand"><h3>实际业务需求</h3><p>${e(presentation?.problem || k.teaching.problem)}</p></div><div class="lesson-method"><h3>查询思路讲解</h3>${method}</div>`;
+  return `<div class="lesson-demand"><h3>实际业务需求</h3><p>${e(presentation?.problem || k.teaching.problem)}</p></div>${renderFigures(k, "problem")}<div class="lesson-method"><h3>查询思路讲解</h3>${method}</div>`;
 }
 function lessonBreakdown(k) {
   const steps = k.presentation?.breakdown || [];
-  const summary = (sql) => e(String(sql || "").replace(/\s+/g, " ").trim());
-  const row = (step, i) => `<div class="code-explanation-part step-item" data-step="${i}"><button class="step-row" data-action="lessonStep" data-arg="${i}" aria-expanded="false" aria-controls="step-body-${i}"><span class="step-no">${i + 1}</span><span class="step-main"><strong>${e(step.title)}</strong><small class="step-summary">${summary(step.sql)}</small></span>${rowFlowStep(k, i) ? `<span class="fig-count">${rowFlowStep(k, i).badge}</span>` : ""}${icon("down", "step-chevron")}</button><div class="step-body" id="step-body-${i}" hidden>${step.kind === "fragment"
-    ? `${code(step.sql)}<p><strong>作用：</strong>${e(step.purpose)}</p><p><strong>原因：</strong>${e(step.reason)}</p>${rowFlowStep(k, i) ? `<h3>数据变化</h3>${rowFlowStep(k, i).html}` : ""}`
-    : `${renderTables(step.sourceTables)}${code(step.sql)}<p>${e(step.purpose)}</p><p>${e(step.reason)}</p><h3>中间结果</h3>${table(step.result.columns, step.result.rows)}`}</div></div>`;
+  const row = (step, i) => `<div class="code-explanation-part step-item" data-step="${i}"><button class="step-row" data-action="lessonStep" data-arg="${i}" aria-expanded="false" aria-controls="step-body-${i}"><span class="step-no">${i + 1}</span><span class="step-main"><strong>${e(step.title)}</strong></span>${rowFlowStep(k, i) ? `<span class="fig-count">${rowFlowStep(k, i).badge}</span>` : ""}${icon("down", "step-chevron")}</button><div class="step-body" id="step-body-${i}" hidden>${step.kind === "fragment"
+    ? `${newCode(step.sql, null)}<p><strong>作用：</strong>${e(step.purpose)}</p><p><strong>原因：</strong>${e(step.reason)}</p>${rowFlowStep(k, i) ? `<h3>数据变化</h3>${rowFlowStep(k, i).html}` : ""}`
+    : `${stepTables(step.sourceTables)}${newCode(step.sql, i > 0 && k.presentation.breakdown[i - 1].kind !== "fragment" ? k.presentation.breakdown[i - 1].sql : null)}<p>${e(step.purpose)}</p><p>${e(step.reason)}</p><h3>中间结果</h3>${table(step.result.columns, step.result.rows, 10)}`}</div></div>`;
   const legacy = k.presentation ? "" : (k.teaching?.checkpoints || []).map(step =>
     `<details class="lesson-checkpoint"><summary>${e(step.label)} · <code>${e(step.name)}</code></summary>${lessonCode(step.sql)}${table(step.result.columns, step.result.rows)}</details>`
   ).join("");
@@ -1149,7 +1191,7 @@ function cardsPage() {
     `<div class="row route-summary card-head">${goButton(icon("plus") + " 自定义 (" + state.userCards.length + ")", "/my-cards", "small-button")}</div>
     <section class="panel continue card-center"><div class="hub-row"><div class="grow"><h2>今日记忆调度台</h2><div class="card-counts"><span><strong class="c-due">${dueCards().length}</strong><small>待复习</small></span><span><strong class="c-new">${fresh.length}</strong><small>未学新卡</small></span><span><strong class="c-done">${studiedCards()}</strong><small>已掌握</small></span></div></div>${image("illustrations/states/state_flashcard_review", "card-center-art")}</div>
     <div class="hub-prog"><div class="between-text"><span>累计涉猎 ${studiedCards()}/${content.cards.length} 张</span><b>目标保持率 90%</b></div><div class="hub-track"><i style="width:${Math.round((studiedCards() / Math.max(1, content.cards.length)) * 100)}%"></i></div></div>
-    <div class="chips review-modes">${Object.keys(modeLabels).map((mode) => button(modeLabels[mode], "cardMode", mode, "chip " + (newMode === mode ? "selected" : ""))).join("")}</div>
+    <div class="chips review-modes mode-scroll">${Object.keys(modeLabels).map((mode) => button(modeLabels[mode], "cardMode", mode, "chip " + (newMode === mode ? "selected" : ""))).join("")}</div>
     ${newMode === "章节" ? `<div class="chips review-modes chapter-chips">${chapterChips(cardChapter, "cardChapter")}</div>` : ""}
     <div class="sched"><span>${cardScheduled ? "正式调度（自动计算下次复习时间）" : "自由浏览（不改变复习计划）"}</span><button class="switch" role="switch" aria-checked="${cardScheduled}" aria-label="正式调度" data-action="toggleSched"></button></div>
     ${button(icon("flip") + `<span>进入「${modeText}」3D 翻卡学习</span>`, "startCards", newMode, "primary full start-flip")}${state.flashSession ? button("继续上次复习", "resumeCards", "", "tonal full") : ""}</section>
@@ -1224,6 +1266,23 @@ function shuffle(list) {
     .sort((a, b) => a.sort - b.sort)
     .map(({ v }) => v);
 }
+const milestonePlayed = new WeakSet();
+// 里程碑：默认输出最终态（12 块全亮 + 旗子），脚本失败也是完整画面；系统允许动画时重置后播放一次（约 600ms）。
+const milestoneArt = () => `<div class="milestone-art" aria-hidden="true">${islandSvg(12, islandSource, "milestone-svg")}</div>`;
+function playMilestone(session) {
+  const svg = document.querySelector(".milestone-art svg");
+  if (!svg || milestonePlayed.has(session)) return;
+  milestonePlayed.add(session);
+  if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
+  const tiles = [...svg.querySelectorAll(".tile")];
+  const flag = svg.querySelector("#flag");
+  if (!tiles.length || !flag) return;
+  const paint = (tile, on) => { tile.classList.toggle("on", on); tile.setAttribute("fill", on ? "#38607F" : "#F3F8FA"); tile.setAttribute("stroke", on ? "#38607F" : "#A9C2D2"); };
+  tiles.forEach((tile) => paint(tile, false));
+  flag.style.transition = "none"; flag.style.opacity = "0"; flag.style.transform = "translateY(34px)";
+  tiles.forEach((tile, i) => setTimeout(() => paint(tile, true), i * 28));
+  setTimeout(() => { flag.style.transition = "transform 260ms ease-out, opacity 260ms ease-out"; flag.style.opacity = "1"; flag.style.transform = "translateY(0)"; }, tiles.length * 28);
+}
 function reviewPage() {
   const session = state.flashSession;
   if (!session) return cardsPage();
@@ -1232,10 +1291,11 @@ function reviewPage() {
     const count = session.ratings.length;
     shell(
       count ? "本次复习完成" : "暂无待复习卡片",
-      `${image("illustrations/states/" + (count ? "state_learning_complete" : "state_empty"), "summary-illustration")}<p class="review-summary">${count ? "已复习 " + count + " 张卡片" : "当前模式没有待复习卡片"}</p><div class="actions">${goButton("返回闪卡", "/cards", "primary")}${button("浏览新卡", "startCards", "新卡", "outline")}${session.lastRating ? button("撤回上次评分", "undoRating", "", "outline") : ""}</div>`,
+      `${count ? milestoneArt() : finalArt("08_empty_question", "summary-illustration")}<p class="review-summary">${count ? "已复习 " + count + " 张卡片" : "当前模式没有待复习卡片"}</p><div class="actions">${goButton("返回闪卡", "/cards", "primary")}${button("浏览新卡", "startCards", "新卡", "outline")}${session.lastRating ? button("撤回上次评分", "undoRating", "", "outline") : ""}</div>`,
       "flashcards",
       true,
     );
+    if (count) requestAnimationFrame(() => playMilestone(session));
     return;
   }
   const schedule = scheduler.repeat(
@@ -1298,12 +1358,12 @@ async function projectsPage(id) {
       return `<div><dt>${e(name)}</dt><dd>${e(typeof info === "string" ? info : info?.description || "")}${Number.isFinite(info?.rowCount) ? `<small>${info.rowCount.toLocaleString()} 行</small>` : ""}</dd></div>`;
     }).join("")}</dl></details>` : `<div class="notice error">${e(schemaError)}${goButton("重新加载", requestedRoute, "small-button")}</div>`;
     const done = qs.filter((q) => independentDone(q.id)).length;
-    shell(project[1], `<div class="project-intro">${image("illustrations/business/business_" + project[3], "summary-illustration")}<div><p>${e(project[2])}</p><small>金额单位为马币分</small></div></div>${grains.length ? `<p class="project-grain">分析粒度 · ${e(grains.join("、"))}</p>` : ""}${overview}${goButton(icon("database") + " 查看数据表与结构", "/lab/" + id + "-v2", "outline full")}<div class="section-heading"><h2>项目任务</h2><small>已完成 ${done} / ${qs.length}</small></div><div class="project-tasks">${questionList(qs, true)}</div>`, "practice", true);
+    shell(project[1], `<div class="project-intro">${businessArt(project[3], "summary-illustration")}<div><p>${e(project[2])}</p><small>金额单位为马币分</small></div></div>${grains.length ? `<p class="project-grain">分析粒度 · ${e(grains.join("、"))}</p>` : ""}${overview}${goButton(icon("database") + " 查看数据表与结构", "/lab/" + id + "-v2", "outline full")}<div class="section-heading"><h2>项目任务</h2><small>已完成 ${done} / ${qs.length}</small></div><div class="project-tasks">${questionList(qs, true)}</div>`, "practice", true);
     return;
   }
   shell(
     "业务实战",
-    `<p class="page-meta">${projects.length} 个项目 · ${content.questions.filter((q) => q.chapterId === "ch19").length} 项任务</p>${projects.map((p) => goButton(`${image("illustrations/business/business_" + p[3], "project-img")}<div class="grow"><h3>${p[1]}</h3></div>${icon("right", "chevron")}`, "/projects/" + p[0], "link-row")).join("")}${goButton("第 20 章 · 跨业务综合练习", "/chapter/ch20", "tonal full")}`,
+    `<p class="page-meta">${projects.length} 个项目 · ${content.questions.filter((q) => q.chapterId === "ch19").length} 项任务</p>${projects.map((p) => goButton(`${businessArt(p[3], "project-img")}<div class="grow"><h3>${p[1]}</h3></div>${icon("right", "chevron")}`, "/projects/" + p[0], "link-row")).join("")}${goButton("第 20 章 · 跨业务综合练习", "/chapter/ch20", "tonal full")}`,
     "home",
     true,
   );
@@ -1595,7 +1655,7 @@ async function importPage() {
 function backupPage() {
   shell(
     "备份与恢复",
-    `${image("illustrations/states/state_backup_restore", "summary-illustration")}<details><summary>备份范围</summary><p class="muted">学习进度、笔记、错题历史、收藏、闪卡计划、个人卡片、草稿和个人数据库。</p></details><p class="muted">${state.lastBackupExportAt ? "上次发起导出 " + new Date(state.lastBackupExportAt).toLocaleString("zh-CN") + "，保存结果以系统提示为准。" : "尚未导出备份"}</p>${button(icon("download") + " 导出完整备份", "exportBackup", "", "primary full")}<h2>恢复备份</h2><label class="form-field">选择 数屿SQL备份文件<input type="file" id="backup-file" accept=".json"></label><div id="backup-preview"></div><p class="muted">合并时保留当前记录，相同 ID 的冲突以当前记录为准。覆盖会替换当前学习记录，需再次确认。</p>`,
+    `${finalArt("11_ready_anchor", "summary-illustration")}<details><summary>备份范围</summary><p class="muted">学习进度、笔记、错题历史、收藏、闪卡计划、个人卡片、草稿和个人数据库。</p></details><p class="muted">${state.lastBackupExportAt ? "上次发起导出 " + new Date(state.lastBackupExportAt).toLocaleString("zh-CN") + "，保存结果以系统提示为准。" : "尚未导出备份"}</p>${button(icon("download") + " 导出完整备份", "exportBackup", "", "primary full")}<h2>恢复备份</h2><label class="form-field">选择 数屿SQL备份文件<input type="file" id="backup-file" accept=".json"></label><div id="backup-preview"></div><p class="muted">合并时保留当前记录，相同 ID 的冲突以当前记录为准。覆盖会替换当前学习记录，需再次确认。</p>`,
     "mine",
     true,
   );
@@ -1671,7 +1731,7 @@ function resourcesPage() {
   const check = state.resourceCheck;
   shell(
     "离线资源",
-    `${image("illustrations/states/state_offline_ready", "summary-illustration")}<div class="notice ${check?.pass ? "success" : ""}">${check ? `上次检查 ${new Date(check.time).toLocaleString("zh-CN")}\n${check.pass ? "资源完整性与 SQL 引擎自检通过" : e(check.message)}` : "尚未进行完整性检查"}</div>${button("检查离线资源", "checkResources", "", "primary full")}<div id="resource-progress" class="muted" style="margin-top:12px"></div><div class="stats"><div class="stat"><strong>${content.chapters.length}</strong><small>课程章节</small></div><div class="stat"><strong>${content.questions.length}</strong><small>练习题目</small></div><div class="stat"><strong>${content.cards.length}</strong><small>内置闪卡</small></div></div><p class="muted">卸载应用或清除数据会删除个人记录，请先导出备份。</p><details><summary>检查方式</summary><p class="muted">逐项核对 SHA-256，并执行 SQL 引擎自检。</p></details>`,
+    `${finalArt(check && !check.pass ? "14_load_failed_lighthouse_off" : "10_ready_lighthouse", "summary-illustration")}<div class="notice ${check?.pass ? "success" : ""}">${check ? `上次检查 ${new Date(check.time).toLocaleString("zh-CN")}\n${check.pass ? "资源完整性与 SQL 引擎自检通过" : e(check.message)}` : "尚未进行完整性检查"}</div>${button("检查离线资源", "checkResources", "", "primary full")}<div id="resource-progress" class="muted" style="margin-top:12px"></div><div class="stats"><div class="stat"><strong>${content.chapters.length}</strong><small>课程章节</small></div><div class="stat"><strong>${content.questions.length}</strong><small>练习题目</small></div><div class="stat"><strong>${content.cards.length}</strong><small>内置闪卡</small></div></div><p class="muted">卸载应用或清除数据会删除个人记录，请先导出备份。</p><details><summary>检查方式</summary><p class="muted">逐项核对 SHA-256，并执行 SQL 引擎自检。</p></details>`,
     "mine",
     true,
   );

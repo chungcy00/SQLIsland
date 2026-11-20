@@ -22,7 +22,7 @@ try{
    }
    assert.notEqual(k.presentation.cautions.reason.map(b=>b.text).join(''),k.comparison);
    assert.equal(await page.locator('.mistake-reason dd').textContent(),k.presentation.cautions.reason.map(b=>b.text).join(''));
-   assert.equal(await page.locator('.lesson-concept table').count(),k.presentation.conceptBlocks.some(b=>b.type==='table')?1:0);
+   assert.equal(await page.locator('.lesson-concept table:not(.fig-mini):not(.fig-join)').count(),k.presentation.conceptBlocks.some(b=>b.type==='table')?1:0);
 
    const sections=await page.locator('[data-lesson-section]').evaluateAll(nodes=>nodes.map(n=>n.dataset.lessonSection));assert.ok(sections.indexOf('steps')<sections.indexOf('data'));
    assert.equal(await page.locator('.lesson-expected table').count(),0);assert.equal(await page.locator('.lesson-result-explanation').count(),0); // 预期查询结果表已删除；结果解读随实际运行结果一起出现assert.equal(await page.locator('#lesson-result table').count(),0);

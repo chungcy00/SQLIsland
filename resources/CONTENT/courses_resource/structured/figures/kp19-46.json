@@ -41,6 +41,55 @@
           "note": "按 budget_cents DESC 排列结果。"
         }
       ]
+    },
+    {
+      "id": "kp19-46-variance",
+      "slot": "problem",
+      "kind": "metric-card",
+      "title": "预算偏差率的口径",
+      "metric": {
+        "column": "variance_pct",
+        "label": "预算偏差率（%）"
+      },
+      "numerator": {
+        "label": "实际费用减预算（分）",
+        "expr": "COALESCE(a.actual,0)-b.budget"
+      },
+      "denominator": {
+        "label": "预算（分）",
+        "expr": "b.budget"
+      },
+      "scope": [
+        {
+          "label": "范围",
+          "text": "2025年预算执行"
+        },
+        {
+          "label": "粒度",
+          "text": "每部门每科目一行，以预算为保留侧"
+        },
+        {
+          "label": "标记",
+          "text": "超过预算110%才标记，恰好110%不标记"
+        }
+      ],
+      "pitfall": "按部门直接连接预算月行和实际凭证行后求和，或用 ABS 汇总费用",
+      "sources": [
+        {
+          "table": "budgets",
+          "fields": [
+            "department_id",
+            "account_id"
+          ]
+        },
+        {
+          "table": "v_expenses",
+          "fields": [
+            "department_id",
+            "account_id"
+          ]
+        }
+      ]
     }
   ]
 }

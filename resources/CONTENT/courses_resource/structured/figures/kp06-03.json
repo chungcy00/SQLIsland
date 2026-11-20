@@ -101,6 +101,57 @@
           ]
         }
       ]
+    },
+    {
+      "id": "kp06-03-fn",
+      "slot": "concept",
+      "kind": "function-map",
+      "title": "最小值与最大值",
+      "form": "aggregate",
+      "table": "products",
+      "inputColumns": [
+        "product_name",
+        "price"
+      ],
+      "orderBy": "product_id",
+      "inputRows": [
+        [
+          "Mask",
+          15
+        ],
+        [
+          "Serum",
+          89
+        ],
+        [
+          "Cleanser",
+          35
+        ],
+        [
+          "Cream",
+          65
+        ],
+        [
+          "Sunscreen",
+          45
+        ],
+        [
+          "Soap_1",
+          15
+        ]
+      ],
+      "outputs": [
+        {
+          "label": "min_price",
+          "sql": "MIN(price)",
+          "value": 15
+        },
+        {
+          "label": "max_price",
+          "sql": "MAX(price)",
+          "value": 89
+        }
+      ]
     }
   ]
 }

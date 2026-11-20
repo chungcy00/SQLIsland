@@ -114,6 +114,93 @@
           ]
         }
       ]
+    },
+    {
+      "id": "kp08-02-join",
+      "slot": "concept",
+      "kind": "join-map",
+      "title": "左连接保留左表全部行",
+      "joinType": "left",
+      "left": {
+        "table": "customers",
+        "key": "customer_id",
+        "show": [
+          "customer_id",
+          "customer_name"
+        ]
+      },
+      "right": {
+        "table": "orders",
+        "key": "customer_id",
+        "show": [
+          "id",
+          "sales"
+        ]
+      },
+      "on": "c.customer_id=o.customer_id",
+      "sql": "SELECT c.customer_id, c.customer_name, o.id, o.sales FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id",
+      "pairs": [
+        {
+          "left": [
+            1,
+            "林"
+          ],
+          "right": [
+            1,
+            800
+          ],
+          "kept": true
+        },
+        {
+          "left": [
+            1,
+            "林"
+          ],
+          "right": [
+            3,
+            600
+          ],
+          "kept": true
+        },
+        {
+          "left": [
+            2,
+            "陈"
+          ],
+          "right": [
+            2,
+            400
+          ],
+          "kept": true
+        },
+        {
+          "left": [
+            3,
+            "王"
+          ],
+          "right": [
+            5,
+            1500
+          ],
+          "kept": true
+        },
+        {
+          "left": [
+            4,
+            "李"
+          ],
+          "right": null,
+          "kept": true
+        },
+        {
+          "left": null,
+          "right": [
+            4,
+            300
+          ],
+          "kept": false
+        }
+      ]
     }
   ]
 }

@@ -5,8 +5,11 @@
 ## 文件与版本
 
 - `../source/batch1/`：原始外部包逐字节归档，以及按原编号导入后的 7 节快照。原包自述基于课程 5.0.0；`5.0.0-batch1` 是本项目导入批次标签。
+- `../source/unified73/`：其余 73 节的统一导入包（8 个文件）逐字节归档及导入后快照，`manifest.json` 的 `sourceBatches` 登记为 `unified73`。至此 80/80 节均已结构化（`pending` 为 0）。
 - `manifest.json`：资源版本、来源文件校验值、已转换编号和结构化文件校验值。
-- `lessons/kpNN-NN.json`：每节一次性转换后的内容块。
+- `lessons/kpNN-NN.json`：每节一次性转换后的内容块。概念块 `table` 可带可选字段 `title`、`caption`、`codeColumns`，带标题时渲染为卡片样式（48 节含表）。
+- `figures/kpNN-NN.json`：教学图示（`clause-map`、`stage-flow`、`truth-table`、`row-flow`、`metric-card`、`function-map`、`join-map`），在 manifest `figures` 登记并绑定对应课文 sha256（78 节有图示，kp12-01、kp12-03 暂无）。**修改任一节课文后，必须重算该课 `lessons` 条目的 sha256，并把同一值写入该课图示的 `lessonSha256`、重算 `figures` 条目的 sha256**，再运行 `node scripts/refresh-course-integrity.mjs`，否则构建报“Structure checksum changed”或“Figure data is bound to a different lesson version”。
+- `revisions.json`：第一批 7 节导入后的 ORDER BY 等修订记录，`check-structured-lessons` 与 `tests/lesson-structure.test.mjs` 据此核对。
 - 仓库根目录下的 `src/lesson-structure.js`：共享校验器，供导入、构建及测试使用。
 
 原有 `courses/chNN.json` 保持导入后的课程字段，题目/闪卡关联、运行代码、初始化条件、原始样本和用户记录机制沿用原功能。转换结果不再放在 `teaching.presentation` 内。构建阶段将单独文件挂到内存中的 `lesson.presentation`，写入离线 `content.json`；浏览器无需访问外部资源或在线服务。
@@ -49,3 +52,6 @@ SQL 示例内部：实际需求 → 查询思路 → 拆解/分步 → 完整代
 5. 更新验证报告与 `HANDOFF.md` 的版本、编号、剩余项、文件用途及下一步。运行 `node scripts/refresh-course-integrity.mjs` 刷新资源清单后再构建。
 
 第一批复验：`node --test tests/lesson-structure.test.mjs tests/presentation.test.mjs`、`node scripts/check-structured-lessons.mjs`、`node scripts/check-teaching-layout.mjs`。浏览器脚本依赖本地 4173 预览服务。
+
+## 阶段收尾状态（2026-11-20）
+80/80 节已结构化；本阶段最后一次实际运行通过：`node scripts/check-structured-lessons.mjs`（结构化 80/80，16 条第一批原始执行记录一致）、`node scripts/check-figures.mjs`（350 项）、`npm test`（45/45）、`node scripts/check-curriculum-browser.mjs`（80 节）。第一批 7 节为人工编排，其余 73 节由本地脚本确定性生成后重排，分步“作用/原因”为模板化通用文字，不是逐节定制；MySQL 8.4 原生验证未运行。详见项目根目录 `HANDOFF.md`“阶段收尾记录”。

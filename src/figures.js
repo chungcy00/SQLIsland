@@ -38,10 +38,54 @@ export function rowFlowStep(lesson, index) {
   const badge = index === 0 ? `${kept.size} 行` : `${before.length} → ${kept.size} 行`;
   return { badge, html: scroll(plainTable(figure.columns, rows.map((row) => columns.map((c) => row[c])), rows.map((row) => kept.has(row[key])))) };
 }
+const shown = 4;
+const miniTable = (columns, rows, marks = []) => `<div class="fig-scroll"><table class="fig-table fig-mini"><thead><tr>${columns.map((name, i) => `<th${marks.includes(i) ? ' class="new"' : ""}>${esc(name)}</th>`).join("")}</tr></thead><tbody>${rows.slice(0, shown).map((row) => `<tr class="fig-row kept">${row.map((v, i) => `<td${marks.includes(i) ? ' class="new"' : ""}>${cell(v)}</td>`).join("")}</tr>`).join("")}${rows.length > shown ? `<tr class="fig-more"><td colspan="${columns.length}">…共 ${rows.length} 行</td></tr>` : ""}</tbody></table></div>`;
+function functionMap(figure) {
+  const rows = figure.inputRows, n = rows.length;
+  const calls = figure.outputs.map((output) => `<code>${esc(output.sql)}</code>`).join("");
+  let result, badge;
+  if (figure.form === "aggregate") {
+    result = miniTable(figure.outputs.map((output) => output.label), [figure.outputs.map((output) => output.value)], figure.outputs.map((_, i) => i));
+    badge = `${n} 行 → 1 行`;
+  } else if (figure.form === "window") {
+    result = miniTable([...figure.inputColumns, ...figure.outputs.map((output) => output.label)], rows.map((row, i) => [...row, ...figure.outputs.map((output) => output.values[i])]), figure.outputs.map((_, i) => figure.inputColumns.length + i));
+    badge = `${n} 行 → ${n} 行，多出 ${figure.outputs.length} 列`;
+  } else {
+    result = miniTable([figure.inputColumns[0], ...figure.outputs.map((output) => output.label)], rows.map((row, i) => [row[0], ...figure.outputs.map((output) => output.values[i])]), figure.outputs.map((_, i) => i + 1));
+    badge = `${n} 行 → ${n} 行`;
+  }
+  return `<div class="fig-fn"><div class="fig-fn-block"><small>输入 · ${n} 行</small>${miniTable(figure.inputColumns, rows)}</div><div class="fig-fn-call"><span class="fig-count">${esc(badge)}</span>${calls}</div><div class="fig-fn-block"><small>输出</small>${result}</div></div>${figure.caption ? `<div class="fig-caption">${esc(figure.caption)}</div>` : ""}`;
+}
+function joinMap(figure) {
+  const left = figure.left, right = figure.right;
+  const head = `<tr><th colspan="${left.show.length}">${esc(left.table)}</th><th></th><th colspan="${right.show.length}">${esc(right.table)}</th></tr><tr class="fig-sub">${left.show.map((c) => `<th>${esc(c)}</th>`).join("")}<th></th>${right.show.map((c) => `<th>${esc(c)}</th>`).join("")}</tr>`;
+  const counts = new Map(); for (const pair of figure.pairs) if (pair.left && pair.right) { const key = JSON.stringify(pair.left); counts.set(key, (counts.get(key) || 0) + 1); }
+  const seen = new Set();
+  const body = figure.pairs.map((pair) => {
+    const matched = pair.left && pair.right, state = matched ? "match" : pair.kept ? "kept" : "dropped";
+    const key = JSON.stringify(pair.left), dup = matched && counts.get(key) > 1;
+    const leftCells = pair.left ? pair.left.map((v, i) => `<td>${cell(v)}${i === 0 && dup && !seen.has(key) ? ` <span class="fig-dup">×${counts.get(key)}</span>` : ""}</td>`).join("") : left.show.map(() => '<td class="fig-null">—</td>').join("");
+    if (dup) seen.add(key);
+    const link = `<td class="fig-link ${state}" aria-hidden="true">${matched ? "→" : pair.kept ? "⇢" : "✕"}</td>`;
+    const rightCells = pair.right ? pair.right.map((v) => `<td>${cell(v)}</td>`).join("") : right.show.map(() => `<td class="fig-null">${pair.kept ? "NULL" : "—"}</td>`).join("");
+    return `<tr class="fig-row ${state}">${leftCells}${link}${rightCells}</tr>`;
+  }).join("");
+  const legend = `<p class="fig-legend"><span>→ 匹配</span>${figure.joinType === "left" ? "<span>⇢ 无匹配，右侧补 NULL</span>" : ""}<span>✕ 无匹配，不保留</span></p>`;
+  const kept = figure.pairs.filter((pair) => pair.kept).length;
+  return `<div class="fig-scroll"><table class="fig-table fig-join"><thead>${head}</thead><tbody>${body}</tbody></table></div>${legend}<p class="fig-source"><code>${esc(figure.on)}</code> · ${esc(figure.joinType === "left" ? "LEFT JOIN" : "INNER JOIN")} 结果 ${kept} 行</p>${figure.caption ? `<div class="fig-caption">${esc(figure.caption)}</div>` : ""}`;
+}
+function metricCard(figure) {
+  const part = (kind, label, expr) => `<div class="fig-formula-part ${kind}"><small>${esc(label)}</small><code>${esc(expr)}</code></div>`;
+  return `<div class="fig-metric-head"><span>输出列 <code>${esc(figure.metric.column)}</code></span><b>${esc(figure.metric.label)}</b></div>`
+    + `<div class="fig-formula" role="group" aria-label="指标公式">${part("num", "分子 · " + figure.numerator.label, figure.numerator.expr)}<div class="fig-slash" aria-hidden="true"></div>${part("den", "分母 · " + figure.denominator.label, figure.denominator.expr)}</div>`
+    + `<div class="fig-scope">${figure.scope.map((tag) => `<span class="fig-scope-tag"><b>${esc(tag.label)}</b>${esc(tag.text)}</span>`).join("")}</div>`
+    + (figure.pitfall ? `<div class="fig-pitfall"><b>易错口径</b>${esc(figure.pitfall)}</div>` : "")
+    + `<p class="fig-source">数据来源：${figure.sources.map((item) => `<code>${esc(item.table)}</code>（${item.fields.map(esc).join("、")}）`).join("；")}</p>`;
+}
 export function renderFigures(lesson, slot) {
   const list = (lesson.figures || []).filter((figure) => figure.slot === slot && !figure.merge);
   return list.map((figure) => {
-    const body = figure.kind === "truth-table" ? truthTable(figure, lesson) : clauseMap(figure);
+    const body = figure.kind === "truth-table" ? truthTable(figure, lesson) : figure.kind === "metric-card" ? metricCard(figure) : figure.kind === "function-map" ? functionMap(figure) : figure.kind === "join-map" ? joinMap(figure) : clauseMap(figure);
     return `<figure class="figure figure-${figure.kind}" data-figure="${esc(figure.id)}"><figcaption>${esc(figure.title)}</figcaption>${body}</figure>`;
   }).join("");
 }

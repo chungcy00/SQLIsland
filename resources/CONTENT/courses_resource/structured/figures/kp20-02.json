@@ -53,6 +53,54 @@
           "note": "按 month_key 排列结果。"
         }
       ]
+    },
+    {
+      "id": "kp20-02-change",
+      "slot": "problem",
+      "kind": "metric-card",
+      "title": "净销售环比的口径",
+      "metric": {
+        "column": "change_pct",
+        "label": "环比（%）"
+      },
+      "numerator": {
+        "label": "本月减上月净销售（分）",
+        "expr": "net_cents-previous_net_cents"
+      },
+      "denominator": {
+        "label": "上月净销售（分）",
+        "expr": "previous_net_cents"
+      },
+      "scope": [
+        {
+          "label": "范围",
+          "text": "2025年线下月度净销售报表"
+        },
+        {
+          "label": "补零",
+          "text": "来源数据完整才允许将无交易解释为零"
+        },
+        {
+          "label": "不补零",
+          "text": "系统漏传、未关账、未来月份不能直接补零"
+        }
+      ],
+      "pitfall": "只对有销售的月份使用 LAG，或将零分母的环比补为0%",
+      "sources": [
+        {
+          "table": "v_order_net",
+          "fields": [
+            "net_cents",
+            "order_date"
+          ]
+        },
+        {
+          "table": "calendar_days",
+          "fields": [
+            "month_key"
+          ]
+        }
+      ]
     }
   ]
 }

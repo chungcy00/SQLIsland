@@ -79,6 +79,54 @@
           ]
         }
       ]
+    },
+    {
+      "id": "kp06-01-fn",
+      "slot": "concept",
+      "kind": "function-map",
+      "title": "三种计数把多行压成一行",
+      "form": "aggregate",
+      "table": "nullable_values",
+      "inputColumns": [
+        "id",
+        "value"
+      ],
+      "orderBy": "id",
+      "inputRows": [
+        [
+          1,
+          null
+        ],
+        [
+          2,
+          0
+        ],
+        [
+          3,
+          10
+        ],
+        [
+          4,
+          10
+        ]
+      ],
+      "outputs": [
+        {
+          "label": "rows_count",
+          "sql": "COUNT(*)",
+          "value": 4
+        },
+        {
+          "label": "nonnull_count",
+          "sql": "COUNT(value)",
+          "value": 3
+        },
+        {
+          "label": "unique_count",
+          "sql": "COUNT(DISTINCT value)",
+          "value": 2
+        }
+      ]
     }
   ]
 }

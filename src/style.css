@@ -2814,3 +2814,57 @@ nav .nav-svg { color: var(--primary); }
 .fig-concept code { font-size: 0.75rem; }
 .fig-scroll .fig-concept td, .fig-scroll .fig-concept th { white-space: normal; }
 .fig-scroll .fig-concept { min-width: 0; }
+
+/* B10：新版插画（3:2 状态图、1:1 业务图、里程碑矢量） */
+.empty img { width: 160px; height: 107px; }
+.summary-illustration { width: 160px; height: 107px; }
+.project-intro .summary-illustration { width: 80px; height: 80px; }
+.milestone-art { width: 240px; max-width: 70%; margin: 8px auto 0; }
+.milestone-art svg { display: block; width: 100%; height: auto; }
+
+/* 闪卡首页：模式芯片单行左右滑动（与章节芯片一致） */
+.review-modes.mode-scroll { flex-wrap: nowrap; overflow-x: auto; overflow-y: hidden; scrollbar-width: none; margin-left: -16px; margin-right: -16px; padding-left: 16px; padding-right: 16px; }
+.review-modes.mode-scroll::-webkit-scrollbar { display: none; }
+.review-modes.mode-scroll .chip { flex: none; }
+
+/* 指标公式卡（B9 扩展） */
+.fig-metric-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-size: 0.8125rem; color: var(--ink2); margin-bottom: 8px; }
+.fig-metric-head b { color: var(--ink); font-weight: 600; }
+.fig-formula { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.fig-formula-part { padding: 8px 14px; min-height: 48px; }
+.fig-formula-part.num { background: var(--lake); }
+.fig-formula-part.den { background: #DCEFEE; }
+.fig-formula-part small { display: block; font-size: 0.75rem; color: var(--ink2); }
+.fig-formula-part code { font-size: 0.8125rem; overflow-wrap: anywhere; }
+.fig-slash { border-top: 2px solid var(--ink); }
+.fig-scope { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.fig-scope-tag { font-size: 0.75rem; padding: 2px 10px; border-radius: 999px; background: var(--lake); color: var(--ink); overflow-wrap: anywhere; }
+.fig-scope-tag b { margin-right: 6px; color: var(--primary); font-weight: 600; }
+.fig-pitfall { margin-top: 10px; padding: 8px 12px; border-radius: 10px; background: var(--sun-bg); color: var(--sun-ink); font-size: 0.8125rem; }
+.fig-pitfall b { margin-right: 6px; }
+.fig-source { margin: 10px 0 0; font-size: 0.75rem; color: var(--ink2); overflow-wrap: anywhere; }
+
+/* 分步执行：本步新增的代码 */
+.step-body pre mark.step-new { background: var(--sun-bg); color: inherit; border-radius: 3px; padding: 0 1px; }
+
+/* 函数图 / 关系图 */
+.fig-fn { display: grid; gap: 8px; }
+.fig-fn-block small { display: block; margin-bottom: 4px; font-size: 0.75rem; color: var(--ink2); }
+.fig-fn-call { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 8px 10px; border-radius: 10px; background: var(--lake); border: 1px solid var(--primary); }
+.fig-fn-call code { font-size: 0.75rem; overflow-wrap: anywhere; }
+.fig-mini .new { background: var(--sun-bg); color: var(--sun-ink); font-weight: 600; }
+.fig-mini th.new { background: var(--sun-bg); }
+.fig-more td { color: var(--ink2); font-size: 0.75rem; text-align: center; }
+.fig-join th { text-align: center; }
+.fig-join .fig-sub th { font-weight: 500; font-size: 0.75rem; }
+.fig-join td { white-space: nowrap; }
+.fig-link { text-align: center; color: var(--primary); font-weight: 700; width: 28px; }
+.fig-link.kept { color: var(--ink2); }
+.fig-link.dropped { color: var(--err); }
+.fig-row.dropped td { opacity: 0.6; text-decoration: line-through; }
+.fig-row.dropped td.fig-link, .fig-row.dropped td.fig-out-cell { text-decoration: none; opacity: 1; }
+.fig-dup { font-size: 0.6875rem; font-weight: 600; color: var(--sun-ink); background: var(--sun-bg); padding: 0 6px; border-radius: 999px; }
+.fig-legend { display: flex; flex-wrap: wrap; gap: 4px 12px; margin: 8px 0 0; font-size: 0.75rem; color: var(--ink2); }
+
+/* 分步执行：数据表过多时上下滑动 */
+.step-tables { max-height: 320px; overflow-y: auto; overscroll-behavior: contain; border: 1px solid var(--line); border-radius: 12px; padding: 0 12px; margin: 8px 0; }

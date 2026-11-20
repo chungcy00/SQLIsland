@@ -41,6 +41,57 @@
           "note": "按 gmroi DESC 排列结果。"
         }
       ]
+    },
+    {
+      "id": "kp20-08-gmroi",
+      "slot": "problem",
+      "kind": "metric-card",
+      "title": "库存投资回报率的口径",
+      "metric": {
+        "column": "gmroi",
+        "label": "库存投资回报率"
+      },
+      "numerator": {
+        "label": "毛利（分）",
+        "expr": "COALESCE(a.gross,0)"
+      },
+      "denominator": {
+        "label": "平均库存成本（分）",
+        "expr": "b.avg_stock"
+      },
+      "scope": [
+        {
+          "label": "范围",
+          "text": "2025年度"
+        },
+        {
+          "label": "渠道",
+          "text": "纳入所有渠道"
+        },
+        {
+          "label": "平均库存",
+          "text": "使用2024年底和2025年底各仓库存标准成本估算平均库存"
+        }
+      ],
+      "pitfall": "库存投资回报以平均库存成本为分母；毛利率以净销售为分母；库存周转率以销售成本为分子，不能互换。",
+      "sources": [
+        {
+          "table": "v_sales_lines",
+          "fields": [
+            "net_cents",
+            "cost_cents",
+            "order_date"
+          ]
+        },
+        {
+          "table": "inventory_snapshots",
+          "fields": [
+            "quantity",
+            "unit_cost_cents",
+            "snapshot_date"
+          ]
+        }
+      ]
     }
   ]
 }

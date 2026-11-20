@@ -36,6 +36,24 @@ try {
             out.push({id: `${figure.id}:step${index + 1}:columns`, expected: step.columns, actual: result.columns});
             out.push({id: `${figure.id}:step${index + 1}:rows`, expected: norm(step.rows), actual: norm(result.rows)});
           }
+        } else if (figure.kind === 'function-map') {
+          const exprs = figure.outputs.map(output => output.sql).join(', ');
+          if (figure.form === 'aggregate') {
+            const result = await run({tables, setupSql, path, sql: `SELECT ${exprs} FROM ${figure.table}`});
+            out.push({id: figure.id + ':aggregate', expected: [figure.outputs.map(output => output.value)], actual: result.rows});
+            const input = await run({tables, setupSql, path, sql: `SELECT ${figure.inputColumns.join(', ')} FROM ${figure.table} ORDER BY ${figure.orderBy}`});
+            out.push({id: figure.id + ':input', expected: figure.inputRows, actual: input.rows});
+          } else {
+            const result = await run({tables, setupSql, path, sql: `SELECT ${figure.inputColumns.join(', ')}, ${exprs} FROM ${figure.table} ORDER BY ${figure.orderBy}`});
+            const width = figure.inputColumns.length;
+            out.push({id: figure.id + ':input', expected: figure.inputRows, actual: result.rows.map(row => row.slice(0, width))});
+            figure.outputs.forEach((output, i) => out.push({id: figure.id + ':' + output.label, expected: output.values, actual: result.rows.map(row => row[width + i])}));
+          }
+        } else if (figure.kind === 'join-map') {
+          const result = await run({tables, setupSql, path, sql: figure.sql});
+          const norm = rows => rows.map(row => JSON.stringify(row)).sort();
+          const shownRight = figure.right.show.length;
+          out.push({id: figure.id, expected: norm(figure.pairs.filter(pair => pair.kept).map(pair => [...pair.left, ...(pair.right || Array(shownRight).fill(null))])), actual: norm(result.rows)});
         } else if (figure.kind === 'clause-map') {
           const result = await run({tables, setupSql, path, sql: figure.sql});
           out.push({id: figure.id, expected: lesson.result.rows, actual: lesson.result.totalRows > lesson.result.rows.length ? result.rows.slice(0, lesson.result.rows.length) : result.rows});

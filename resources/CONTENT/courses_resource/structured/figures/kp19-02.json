@@ -41,6 +41,105 @@
           "note": "按 cogs_cents DESC 排列结果。"
         }
       ]
+    },
+    {
+      "id": "kp19-02-turnover",
+      "slot": "problem",
+      "kind": "metric-card",
+      "title": "库存周转率的口径",
+      "metric": {
+        "column": "turnover",
+        "label": "库存周转率"
+      },
+      "numerator": {
+        "label": "销售成本（分）",
+        "expr": "COALESCE(a.cogs,0)"
+      },
+      "denominator": {
+        "label": "平均库存成本（分）",
+        "expr": "b.avg_stock"
+      },
+      "scope": [
+        {
+          "label": "范围",
+          "text": "2025全年，按仓库×类别输出"
+        },
+        {
+          "label": "期初期末",
+          "text": "期初为2024-12-31，期末为2025-12-31"
+        },
+        {
+          "label": "零值",
+          "text": "无销售成本且库存为正时周转率为0、天数未定义"
+        }
+      ],
+      "pitfall": "用期末售价金额作分母，或者把缺失快照填零",
+      "sources": [
+        {
+          "table": "stock_movements",
+          "fields": [
+            "quantity_delta",
+            "unit_cost_cents",
+            "movement_type",
+            "movement_date"
+          ]
+        },
+        {
+          "table": "inventory_snapshots",
+          "fields": [
+            "quantity",
+            "unit_cost_cents",
+            "snapshot_date"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "kp19-02-days",
+      "slot": "problem",
+      "kind": "metric-card",
+      "title": "周转天数的口径",
+      "metric": {
+        "column": "turnover_days",
+        "label": "周转天数"
+      },
+      "numerator": {
+        "label": "365 × 平均库存成本（分）",
+        "expr": "365.0*b.avg_stock"
+      },
+      "denominator": {
+        "label": "销售成本（分）",
+        "expr": "a.cogs"
+      },
+      "scope": [
+        {
+          "label": "范围",
+          "text": "2025全年，按仓库×类别输出"
+        },
+        {
+          "label": "零值",
+          "text": "无销售成本且库存为正时周转率为0、天数未定义"
+        }
+      ],
+      "pitfall": "覆盖天数不是周转天数",
+      "sources": [
+        {
+          "table": "stock_movements",
+          "fields": [
+            "quantity_delta",
+            "unit_cost_cents",
+            "movement_date"
+          ]
+        },
+        {
+          "table": "inventory_snapshots",
+          "fields": [
+            "quantity",
+            "unit_cost_cents",
+            "snapshot_date"
+          ]
+        }
+      ]
     }
   ]
 }

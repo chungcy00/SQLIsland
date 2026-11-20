@@ -152,6 +152,64 @@
           ]
         }
       ]
+    },
+    {
+      "id": "kp05-02-fn",
+      "slot": "concept",
+      "kind": "function-map",
+      "title": "函数逐行处理 NULL",
+      "form": "scalar",
+      "table": "nullable_values",
+      "inputColumns": [
+        "id",
+        "value",
+        "note"
+      ],
+      "orderBy": "id",
+      "inputRows": [
+        [
+          1,
+          null,
+          null
+        ],
+        [
+          2,
+          0,
+          ""
+        ],
+        [
+          3,
+          10,
+          "ok"
+        ],
+        [
+          4,
+          10,
+          "ok"
+        ]
+      ],
+      "outputs": [
+        {
+          "label": "filled",
+          "sql": "IFNULL(value, -1)",
+          "values": [
+            -1,
+            0,
+            10,
+            10
+          ]
+        },
+        {
+          "label": "note_filled",
+          "sql": "COALESCE(note, 'missing')",
+          "values": [
+            "missing",
+            "",
+            "ok",
+            "ok"
+          ]
+        }
+      ]
     }
   ]
 }

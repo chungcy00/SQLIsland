@@ -71,6 +71,96 @@
           "note": "按 net_cents DESC 排列结果。"
         }
       ]
+    },
+    {
+      "id": "kp19-32-mom",
+      "slot": "problem",
+      "kind": "metric-card",
+      "title": "环比的口径",
+      "metric": {
+        "column": "mom_pct",
+        "label": "环比（%）"
+      },
+      "numerator": {
+        "label": "本月净销售与上月之差",
+        "expr": "net-prev"
+      },
+      "denominator": {
+        "label": "上月净销售",
+        "expr": "prev"
+      },
+      "scope": [
+        {
+          "label": "范围",
+          "text": "2025年逐月线下净销售趋势"
+        },
+        {
+          "label": "历史",
+          "text": "读取2023—2025年的完整历史轴"
+        },
+        {
+          "label": "缺报",
+          "text": "缺报不能补零"
+        }
+      ],
+      "pitfall": "环比不是同比；相邻数据行不是天然相邻月份",
+      "sources": [
+        {
+          "table": "v_sales_lines",
+          "fields": [
+            "channel"
+          ]
+        },
+        {
+          "table": "calendar_days",
+          "fields": [
+            "month_key"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "kp19-32-yoy",
+      "slot": "problem",
+      "kind": "metric-card",
+      "title": "同比的口径",
+      "metric": {
+        "column": "yoy_pct",
+        "label": "同比（%）"
+      },
+      "numerator": {
+        "label": "本月净销售与去年同月之差",
+        "expr": "net-prior_year"
+      },
+      "denominator": {
+        "label": "去年同月净销售",
+        "expr": "prior_year"
+      },
+      "scope": [
+        {
+          "label": "范围",
+          "text": "2025年逐月线下净销售趋势"
+        },
+        {
+          "label": "历史",
+          "text": "读取2023—2025年的完整历史轴"
+        }
+      ],
+      "pitfall": "环比不是同比；相邻数据行不是天然相邻月份",
+      "sources": [
+        {
+          "table": "v_sales_lines",
+          "fields": [
+            "channel"
+          ]
+        },
+        {
+          "table": "calendar_days",
+          "fields": [
+            "month_key"
+          ]
+        }
+      ]
     }
   ]
 }

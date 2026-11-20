@@ -59,6 +59,60 @@
           "note": "按 month_key DESC, opening DESC, closing DESC 排列结果。"
         }
       ]
+    },
+    {
+      "id": "kp19-52-exit",
+      "slot": "problem",
+      "kind": "metric-card",
+      "title": "月离职率的口径",
+      "metric": {
+        "column": "exit_pct",
+        "label": "月离职率（%）"
+      },
+      "numerator": {
+        "label": "当月离职人数",
+        "expr": "exits"
+      },
+      "denominator": {
+        "label": "期初期末平均在岗人数",
+        "expr": "(opening+closing)/2.0"
+      },
+      "scope": [
+        {
+          "label": "范围",
+          "text": "部门人员流动"
+        },
+        {
+          "label": "调岗",
+          "text": "调岗只改变任职部门，不代表企业离职"
+        },
+        {
+          "label": "历史",
+          "text": "保留2024年11、12月历史用于2025年1月滚动计算"
+        }
+      ],
+      "pitfall": "部门净变化不等于离职人数；滚动月均口径与累计期间离职率不同",
+      "sources": [
+        {
+          "table": "employment_history",
+          "fields": [
+            "start_date",
+            "end_date"
+          ]
+        },
+        {
+          "table": "employees",
+          "fields": [
+            "termination_date"
+          ]
+        },
+        {
+          "table": "calendar_days",
+          "fields": [
+            "month_key"
+          ]
+        }
+      ]
     }
   ]
 }

@@ -77,6 +77,49 @@
           ]
         }
       ]
+    },
+    {
+      "id": "kp06-02-fn",
+      "slot": "concept",
+      "kind": "function-map",
+      "title": "求和与平均怎样处理空值",
+      "form": "aggregate",
+      "table": "nullable_values",
+      "inputColumns": [
+        "id",
+        "value"
+      ],
+      "orderBy": "id",
+      "inputRows": [
+        [
+          1,
+          null
+        ],
+        [
+          2,
+          0
+        ],
+        [
+          3,
+          10
+        ],
+        [
+          4,
+          10
+        ]
+      ],
+      "outputs": [
+        {
+          "label": "total",
+          "sql": "SUM(value)",
+          "value": 20
+        },
+        {
+          "label": "mean",
+          "sql": "AVG(value)",
+          "value": 6.666666666666667
+        }
+      ]
     }
   ]
 }

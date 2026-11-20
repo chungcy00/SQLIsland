@@ -41,6 +41,52 @@
           "note": "按 net_cents DESC 排列结果。"
         }
       ]
+    },
+    {
+      "id": "kp20-21-labor",
+      "slot": "problem",
+      "kind": "metric-card",
+      "title": "人工费用占比的口径",
+      "metric": {
+        "column": "labor_pct",
+        "label": "人工占净销售比（%）"
+      },
+      "numerator": {
+        "label": "人工费用（分）",
+        "expr": "COALESCE(b.labor,0)"
+      },
+      "denominator": {
+        "label": "净销售（分）",
+        "expr": "a.net"
+      },
+      "scope": [
+        {
+          "label": "范围",
+          "text": "2025年各实体门店"
+        },
+        {
+          "label": "归属",
+          "text": "必须按员工月记录的历史门店归属计算"
+        }
+      ],
+      "pitfall": "组合比率先汇总分子分母",
+      "sources": [
+        {
+          "table": "v_sales_lines",
+          "fields": [
+            "net_cents",
+            "channel",
+            "order_date"
+          ]
+        },
+        {
+          "table": "v_staff_month",
+          "fields": [
+            "labor_cents",
+            "month_key"
+          ]
+        }
+      ]
     }
   ]
 }
