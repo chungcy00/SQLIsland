@@ -37,44 +37,74 @@
     {
       "id": "kp01-01",
       "path": "lessons/kp01-01.json",
-      "sha256": "02794724411bdf0894f5e49473402d582cf87b3cedb6d309f06cb2b9731cee48"
+      "sha256": "5241b6e56a33d94391f89158a4f1d794411c208a499ffe1f9e6f1e2725cd4105"
     },
     {
       "id": "kp01-02",
       "path": "lessons/kp01-02.json",
-      "sha256": "f805cbf6fd3910593277c442226c0ff41252b4bc97eadf98261a4d35b1d22c12"
+      "sha256": "4c5a307bec570c7953145de65ed4cba06e3eb96ef70618b0675957ec5fbe0eb3"
     },
     {
       "id": "kp01-03",
       "path": "lessons/kp01-03.json",
-      "sha256": "d65bcdf633b3abeef9ae48068aab1256144f28515fdb3540cc306202318d8151"
+      "sha256": "d76d1b160cef8dbafa23ed2bc1c34d32ba22e26e03689c15e145b31d32f40d21"
     },
     {
       "id": "kp02-01",
       "path": "lessons/kp02-01.json",
-      "sha256": "8897bdb97802e77f51fabc68a22e617b8fe4c3834db7533c12db38c314448f62"
+      "sha256": "6c853ec98e9c1b50e89f137c7c2b1c3945c3382e9d6bb009c4e40ab17eaa2ddf"
     },
     {
       "id": "kp02-02",
       "path": "lessons/kp02-02.json",
-      "sha256": "6aefb77a47dec645a9e69acfa69d95e475482b6e565c9078a9c0a4e31010f0d9"
+      "sha256": "8abc1a82324f9ec4c20b413e741d7cdbaedf0a70c4075b6a058da70c0719f786"
     },
     {
       "id": "kp05-01",
       "path": "lessons/kp05-01.json",
-      "sha256": "5cae9b4b952dcb12cc412d54a7da5844075c5f849d50280cbf7488605b80502d"
+      "sha256": "419242737500667ed6bdc866de6ce00873e01059cd8f0e3befd6e9e5a7237654"
     },
     {
       "id": "kp05-02",
       "path": "lessons/kp05-02.json",
-      "sha256": "c8261c49414d6ff582ec7d29da2838104bd7801052ba08d6ec30d6cd47fecd53"
+      "sha256": "6e632cb9f65368b129c4a3c193f9165e4c30b2243ef516b0641114518b0468fe"
     }
   ],
   "figures": [
     {
+      "id": "kp01-01",
+      "path": "figures/kp01-01.json",
+      "sha256": "21e800ba939050dbdba96ca43c8577b70d6de4525b60a94e10870b4dfbbd916d"
+    },
+    {
+      "id": "kp01-02",
+      "path": "figures/kp01-02.json",
+      "sha256": "4520bc90610368a2759727235ab649036732bb7d30ff82dd49ccb5ac51c26707"
+    },
+    {
+      "id": "kp01-03",
+      "path": "figures/kp01-03.json",
+      "sha256": "6fe672fcd5b19bfbf417816b339adc9e1a0fc78c33372de7fd0f978322238780"
+    },
+    {
+      "id": "kp02-01",
+      "path": "figures/kp02-01.json",
+      "sha256": "b25abf3eb607de6f3ecc8ea0e11298b2524546707764209a0024df27f623881c"
+    },
+    {
+      "id": "kp02-02",
+      "path": "figures/kp02-02.json",
+      "sha256": "f9b76d6f268cff9d2a4dd7e18fcdd16a2ad1554ca4b3391928d1f6d2aaa657cc"
+    },
+    {
       "id": "kp05-01",
       "path": "figures/kp05-01.json",
-      "sha256": "6b219d6308c7ff00107a985cd1da07929f5598d95e92006a9264ced9c2ed238e"
+      "sha256": "e3f4197b0697d0d48585235f1d315d3abfe941442fd38743b01b6d73938129c1"
+    },
+    {
+      "id": "kp05-02",
+      "path": "figures/kp05-02.json",
+      "sha256": "3cc2c6384463e5ef43016f1af0f2dca2f279fb88c26e605c91378e9f2a5e8223"
     }
   ]
 }

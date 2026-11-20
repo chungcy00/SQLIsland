@@ -137,8 +137,8 @@
       ]
     }
   ],
-  "mysqlSql": "SELECT c.customer_id, COUNT(o.id) AS order_count FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id GROUP BY c.customer_id ORDER BY c.customer_id;",
-  "sqliteSql": "SELECT c.customer_id, COUNT(o.id) AS order_count FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id GROUP BY c.customer_id ORDER BY c.customer_id;",
+  "mysqlSql": "SELECT c.customer_id, COUNT(o.id) AS order_count FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id GROUP BY c.customer_id ORDER BY order_count DESC, SUM(o.sales) DESC;",
+  "sqliteSql": "SELECT c.customer_id, COUNT(o.id) AS order_count FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id GROUP BY c.customer_id ORDER BY order_count DESC, SUM(o.sales) DESC;",
   "executionSteps": [
     "以客户表为起点",
     "匹配关联订单",
@@ -175,11 +175,11 @@
         2
       ],
       [
-        2,
+        3,
         1
       ],
       [
-        3,
+        2,
         1
       ],
       [
@@ -208,31 +208,37 @@
       {
         "label": "查看一对多匹配明细",
         "explanation": "观察客户1出现两次、客户4订单编号为空，再理解为什么最终需要分组。",
-        "sql": "SELECT c.customer_id, o.id AS order_id FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id ORDER BY c.customer_id,o.id;",
+        "sql": "SELECT c.customer_id, o.id AS order_id, o.sales FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id ORDER BY o.sales DESC;",
         "result": {
           "columns": [
             "customer_id",
-            "order_id"
+            "order_id",
+            "sales"
           ],
           "rows": [
             [
-              1,
-              1
+              3,
+              5,
+              1500
             ],
             [
               1,
-              3
+              1,
+              800
+            ],
+            [
+              1,
+              3,
+              600
             ],
             [
               2,
-              2
-            ],
-            [
-              3,
-              5
+              2,
+              400
             ],
             [
               4,
+              null,
               null
             ]
           ]

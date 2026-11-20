@@ -70,15 +70,15 @@
     },
     {
       "kind": "fragment",
-      "title": "按编号排列",
-      "sql": "ORDER BY product_id;",
-      "purpose": "按未显示的商品编号排序。",
+      "title": "按库存排列",
+      "sql": "ORDER BY stock DESC;",
+      "purpose": "按未显示的库存量从多到少排序。",
       "reason": "排序依据可以来自来源表，无需为了排序额外显示该列。"
     }
   ],
   "completeCode": {
-    "mysqlSql": "SELECT product_name, price FROM products ORDER BY product_id;",
-    "sqliteSql": "SELECT product_name, price FROM products ORDER BY product_id;"
+    "mysqlSql": "SELECT product_name, price FROM products ORDER BY stock DESC;",
+    "sqliteSql": "SELECT product_name, price FROM products ORDER BY stock DESC;"
   },
   "expectedResult": {
     "columns": [
@@ -86,14 +86,6 @@
       "price"
     ],
     "rows": [
-      [
-        "Mask",
-        15
-      ],
-      [
-        "Serum",
-        89
-      ],
       [
         "Cleanser",
         35
@@ -103,8 +95,16 @@
         65
       ],
       [
+        "Mask",
+        15
+      ],
+      [
         "Sunscreen",
         45
+      ],
+      [
+        "Serum",
+        89
       ],
       [
         "Soap_1",
@@ -124,7 +124,7 @@
     {
       "label": "合并来源：库存售价估算",
       "explanation": "逐行计算价格与库存乘积，保留原粒度。ORDER BY 可以使用输出别名。",
-      "sql": "SELECT product_id, price, stock, price * stock AS stock_value FROM products ORDER BY product_id;",
+      "sql": "SELECT product_id, price, stock, price * stock AS stock_value FROM products ORDER BY stock_value DESC;",
       "result": {
         "columns": [
           "product_id",
@@ -134,16 +134,10 @@
         ],
         "rows": [
           [
-            1,
-            15,
-            150,
-            2250
-          ],
-          [
-            2,
-            89,
-            40,
-            3560
+            4,
+            65,
+            180,
+            11700
           ],
           [
             3,
@@ -152,16 +146,22 @@
             7000
           ],
           [
-            4,
-            65,
-            180,
-            11700
-          ],
-          [
             5,
             45,
             80,
             3600
+          ],
+          [
+            2,
+            89,
+            40,
+            3560
+          ],
+          [
+            1,
+            15,
+            150,
+            2250
           ],
           [
             6,
@@ -181,7 +181,7 @@
     {
       "label": "按派生金额筛选",
       "explanation": "筛选时重复表达式，排序时使用别名。",
-      "sql": "SELECT product_id, price * stock AS stock_value FROM products WHERE price * stock > 1000 ORDER BY stock_value DESC, product_id;",
+      "sql": "SELECT product_id, price * stock AS stock_value FROM products WHERE price * stock > 1000 ORDER BY stock_value DESC;",
       "result": {
         "columns": [
           "product_id",
@@ -259,5 +259,5 @@
     ]
   },
   "sourcePath": "source/batch1/kp02-01.json",
-  "sourceSha256": "0b8f8b4c5f15a1c34a5c8749651bff83525a4a41970a7c629b8d7d6e0625f48d"
+  "sourceSha256": "8f8986a526b754a321f52fec62d3b3d67636d2fdd464b3db9b16437cf00c38b3"
 }

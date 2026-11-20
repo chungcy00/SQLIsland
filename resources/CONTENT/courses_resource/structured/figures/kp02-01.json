@@ -1,0 +1,166 @@
+{
+  "schemaVersion": 1,
+  "id": "kp02-01",
+  "lessonSha256": "6c853ec98e9c1b50e89f137c7c2b1c3945c3382e9d6bb009c4e40ab17eaa2ddf",
+  "figures": [
+    {
+      "id": "kp02-01-clauses",
+      "slot": "syntax",
+      "kind": "clause-map",
+      "title": "示例查询的几个部分",
+      "sql": "SELECT product_name, price FROM products ORDER BY stock DESC;",
+      "parts": [
+        {
+          "role": "select",
+          "label": "取数",
+          "sql": "SELECT product_name, price",
+          "note": "输出 product_name 和 price"
+        },
+        {
+          "role": "from",
+          "label": "来源",
+          "sql": "FROM products",
+          "note": "读取 products 表"
+        },
+        {
+          "role": "order",
+          "label": "排序",
+          "sql": "ORDER BY stock DESC;",
+          "note": "按 product_id 排列"
+        }
+      ]
+    },
+    {
+      "id": "kp02-01-flow",
+      "slot": "breakdown",
+      "kind": "stage-flow",
+      "merge": "breakdown",
+      "title": "每一步的数据变化",
+      "steps": [
+        {
+          "label": "FROM products",
+          "sql": "SELECT * FROM products",
+          "columns": [
+            "product_id",
+            "product_name",
+            "category",
+            "price",
+            "stock"
+          ],
+          "rows": [
+            [
+              1,
+              "Mask",
+              "护肤品",
+              15,
+              150
+            ],
+            [
+              2,
+              "Serum",
+              "护肤品",
+              89,
+              40
+            ],
+            [
+              3,
+              "Cleanser",
+              "护肤品",
+              35,
+              200
+            ],
+            [
+              4,
+              "Cream",
+              "化妆品",
+              65,
+              180
+            ],
+            [
+              5,
+              "Sunscreen",
+              "化妆品",
+              45,
+              80
+            ],
+            [
+              6,
+              "Soap_1",
+              "日用品",
+              15,
+              0
+            ]
+          ]
+        },
+        {
+          "label": "SELECT product_name, price",
+          "sql": "SELECT product_name, price FROM products",
+          "columns": [
+            "product_name",
+            "price"
+          ],
+          "rows": [
+            [
+              "Mask",
+              15
+            ],
+            [
+              "Serum",
+              89
+            ],
+            [
+              "Cleanser",
+              35
+            ],
+            [
+              "Cream",
+              65
+            ],
+            [
+              "Sunscreen",
+              45
+            ],
+            [
+              "Soap_1",
+              15
+            ]
+          ]
+        },
+        {
+          "label": "ORDER BY stock DESC;",
+          "sql": "SELECT product_name, price FROM products ORDER BY stock DESC;",
+          "columns": [
+            "product_name",
+            "price"
+          ],
+          "rows": [
+            [
+              "Cleanser",
+              35
+            ],
+            [
+              "Cream",
+              65
+            ],
+            [
+              "Mask",
+              15
+            ],
+            [
+              "Sunscreen",
+              45
+            ],
+            [
+              "Serum",
+              89
+            ],
+            [
+              "Soap_1",
+              15
+            ]
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -108,13 +108,13 @@
           ]
         }
       ],
-      "mysqlSql": "SELECT product_name, price FROM products ORDER BY product_id;",
-      "sqliteSql": "SELECT product_name, price FROM products ORDER BY product_id;",
+      "mysqlSql": "SELECT product_name, price FROM products ORDER BY stock DESC;",
+      "sqliteSql": "SELECT product_name, price FROM products ORDER BY stock DESC;",
       "executionSteps": [
         "读取商品表",
         "选择所需字段",
         "计算并命名派生列",
-        "按编号排序"
+        "按库存从多到少排序"
       ],
       "useCase": "采购主管先需要商品价目表，再希望估算每件商品的现有库存按售价计算的金额。现有商品表包含单价和库存件数，不需要其他表或分组。",
       "comparison": "原字段直接读取；派生列由表达式计算；别名只修改输出名称。",
@@ -149,14 +149,6 @@
         ],
         "rows": [
           [
-            "Mask",
-            15
-          ],
-          [
-            "Serum",
-            89
-          ],
-          [
             "Cleanser",
             35
           ],
@@ -165,8 +157,16 @@
             65
           ],
           [
+            "Mask",
+            15
+          ],
+          [
             "Sunscreen",
             45
+          ],
+          [
+            "Serum",
+            89
           ],
           [
             "Soap_1",
@@ -211,7 +211,7 @@
           {
             "label": "合并来源：库存售价估算",
             "explanation": "逐行计算价格与库存乘积，保留原粒度。",
-            "sql": "SELECT product_id, price, stock, price * stock AS stock_value FROM products ORDER BY product_id;",
+            "sql": "SELECT product_id, price, stock, price * stock AS stock_value FROM products ORDER BY stock_value DESC;",
             "result": {
               "columns": [
                 "product_id",
@@ -221,16 +221,10 @@
               ],
               "rows": [
                 [
-                  1,
-                  15,
-                  150,
-                  2250
-                ],
-                [
-                  2,
-                  89,
-                  40,
-                  3560
+                  4,
+                  65,
+                  180,
+                  11700
                 ],
                 [
                   3,
@@ -239,16 +233,22 @@
                   7000
                 ],
                 [
-                  4,
-                  65,
-                  180,
-                  11700
-                ],
-                [
                   5,
                   45,
                   80,
                   3600
+                ],
+                [
+                  2,
+                  89,
+                  40,
+                  3560
+                ],
+                [
+                  1,
+                  15,
+                  150,
+                  2250
                 ],
                 [
                   6,
@@ -262,7 +262,7 @@
           {
             "label": "按派生金额筛选",
             "explanation": "筛选时重复表达式，排序时使用别名。",
-            "sql": "SELECT product_id, price * stock AS stock_value FROM products WHERE price * stock > 1000 ORDER BY stock_value DESC, product_id;",
+            "sql": "SELECT product_id, price * stock AS stock_value FROM products WHERE price * stock > 1000 ORDER BY stock_value DESC;",
             "result": {
               "columns": [
                 "product_id",
@@ -397,8 +397,8 @@
           ]
         }
       ],
-      "mysqlSql": "SELECT DISTINCT store_id, category FROM orders ORDER BY store_id, category;",
-      "sqliteSql": "SELECT DISTINCT store_id, category FROM orders ORDER BY store_id, category;",
+      "mysqlSql": "SELECT DISTINCT store_id, category FROM orders ORDER BY category;",
+      "sqliteSql": "SELECT DISTINCT store_id, category FROM orders ORDER BY category;",
       "executionSteps": [
         "提取门店和类别",
         "合并重复组合",
@@ -433,16 +433,16 @@
         ],
         "rows": [
           [
+            2,
+            "化妆品"
+          ],
+          [
             1,
             "护肤品"
           ],
           [
             1,
             "日用品"
-          ],
-          [
-            2,
-            "化妆品"
           ]
         ],
         "status": "SQLite实际执行",

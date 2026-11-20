@@ -345,7 +345,7 @@
       "type": "独立编写",
       "title": "低于零的金额待核",
       "context": "使用课程中小型原始导入资料数据练习低于零的金额待核。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "raw_data 的 amount 为规范数字文本或NULL；转成数值后，仅输出负金额记录 id、numeric_amount，按编号升序。\n输出列名称及顺序：id, numeric_amount。按题设排序；参考排序键：id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "requirements": "raw_data 的 amount 为规范数字文本或NULL；转成数值后，仅输出负金额记录 id、numeric_amount。\n输出列名称及顺序：id, numeric_amount。结果行的先后顺序不作要求。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
       "datasetId": "q0223-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -372,25 +372,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT id,CAST(amount AS DECIMAL(12,2)) AS numeric_amount FROM raw_data WHERE CAST(amount AS DECIMAL(12,2))<0 ORDER BY id",
-          "sqliteSql": "SELECT id,CAST(amount AS DECIMAL(12,2)) AS numeric_amount FROM raw_data WHERE CAST(amount AS DECIMAL(12,2))<0 ORDER BY id"
+          "mysqlSql": "SELECT id,CAST(amount AS DECIMAL(12,2)) AS numeric_amount FROM raw_data WHERE CAST(amount AS DECIMAL(12,2))<0",
+          "sqliteSql": "SELECT id,CAST(amount AS DECIMAL(12,2)) AS numeric_amount FROM raw_data WHERE CAST(amount AS DECIMAL(12,2))<0"
         },
         {
           "kind": "关系结构等价",
-          "mysqlSql": "SELECT id,CAST(amount AS DECIMAL(12,2)) AS numeric_amount FROM (SELECT * FROM raw_data) AS raw_data WHERE CAST(amount AS DECIMAL(12,2))<0 ORDER BY id",
-          "sqliteSql": "SELECT id,CAST(amount AS DECIMAL(12,2)) AS numeric_amount FROM (SELECT * FROM raw_data) AS raw_data WHERE CAST(amount AS DECIMAL(12,2))<0 ORDER BY id",
+          "mysqlSql": "SELECT id,CAST(amount AS DECIMAL(12,2)) AS numeric_amount FROM (SELECT * FROM raw_data) AS raw_data WHERE CAST(amount AS DECIMAL(12,2))<0",
+          "sqliteSql": "SELECT id,CAST(amount AS DECIMAL(12,2)) AS numeric_amount FROM (SELECT * FROM raw_data) AS raw_data WHERE CAST(amount AS DECIMAL(12,2))<0",
           "explanation": "先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。"
         }
       ],
       "hints": [
         "先明确原始数据异常规则和规范化标准，再决定保留哪些记录。",
         "结合《缺失与异常检测》：先定义规则，再标记异常；空字符串、NULL、负值及零值有不同含义。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT id,CAST(amount AS DECIMAL(12,2)) AS numeric_amount FROM raw_data WHERE CAST(amount AS DECIMAL(12,2))□□□ ORDER BY id"
+        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT id,CAST(amount AS DECIMAL(12,2)) AS numeric_amount FROM raw_data WHERE CAST(amount AS DECIMAL(12,2))□□□"
       ],
-      "explanation": "异常规则为严格负数，0可能是有效金额。\n执行思路：确认raw_data的输入记录；按筛选条件保留符合要求的记录，并考虑空值；输出id、numeric_amount列；遵循题设排序和并列规则。\n公开夹具实际返回 1 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
+      "explanation": "异常规则为严格负数，0可能是有效金额。\n执行思路：确认raw_data的输入记录；按筛选条件保留符合要求的记录，并考虑空值；输出id、numeric_amount列；结果行的先后顺序不作要求。\n公开夹具实际返回 1 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
       "commonErrors": [
         {
-          "sql": "SELECT id,CAST(amount AS DECIMAL(12,2)) AS numeric_amount FROM raw_data WHERE CAST(amount AS DECIMAL(12,2))<=0 ORDER BY id",
+          "sql": "SELECT id,CAST(amount AS DECIMAL(12,2)) AS numeric_amount FROM raw_data WHERE CAST(amount AS DECIMAL(12,2))<=0",
           "reason": "异常规则为严格负数，0可能是有效金额。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
@@ -406,24 +406,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0223/q0223-public.json",
-          "sha256": "31ba83bf57a3d8403943a3ea7a372f31135248a7e85fcb46250eed201c0397d1"
+          "sha256": "dbb4e1e48fb27f4456820a654ca5514e9dd17980660f8b949d023bfb6bd25507"
         },
         {
           "id": "q0223-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0223/q0223-boundary.json",
-          "sha256": "049b9809be37fb7f562068db3001e04c9d00b553cee2d9f08108817b366e8bf9"
+          "sha256": "31fb27ecae8e95baab7126f4c915312853559b94fd8f37de3ecbd09def56abb6"
         },
         {
           "id": "q0223-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0223/q0223-empty.json",
-          "sha256": "25a68547bc83426d6e369895ffc130639958bbd66e089ba4e4883cd406132bde"
+          "sha256": "e3a6d709082890ad5763daf2afc9d3068d27b6d8a2e7967bfcfa24d52a0450c9"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -545,7 +545,7 @@
       "type": "独立编写",
       "title": "清洗类别与规范金额输出",
       "context": "使用课程中小型原始导入资料数据练习清洗类别与规范金额输出。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "输出 id、category_key（去两端空格、转英文小写）、numeric_amount（金额转DECIMAL(12,2)，NULL不填充），按编号升序。\n输出列名称及顺序：id, category_key, numeric_amount。按题设排序；参考排序键：id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "requirements": "输出 id、category_key（去两端空格、转英文小写）、numeric_amount（金额转DECIMAL(12,2)，NULL不填充）。\n输出列名称及顺序：id, category_key, numeric_amount。结果行的先后顺序不作要求。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
       "datasetId": "q0224-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -599,25 +599,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT id,LOWER(TRIM(category)) AS category_key,CAST(amount AS DECIMAL(12,2)) AS numeric_amount FROM raw_data ORDER BY id",
-          "sqliteSql": "SELECT id,LOWER(TRIM(category)) AS category_key,CAST(amount AS DECIMAL(12,2)) AS numeric_amount FROM raw_data ORDER BY id"
+          "mysqlSql": "SELECT id,LOWER(TRIM(category)) AS category_key,CAST(amount AS DECIMAL(12,2)) AS numeric_amount FROM raw_data",
+          "sqliteSql": "SELECT id,LOWER(TRIM(category)) AS category_key,CAST(amount AS DECIMAL(12,2)) AS numeric_amount FROM raw_data"
         },
         {
           "kind": "关系结构等价",
-          "mysqlSql": "SELECT id,LOWER(TRIM(category)) AS category_key,CAST(amount AS DECIMAL(12,2)) AS numeric_amount FROM (SELECT * FROM raw_data) AS raw_data ORDER BY id",
-          "sqliteSql": "SELECT id,LOWER(TRIM(category)) AS category_key,CAST(amount AS DECIMAL(12,2)) AS numeric_amount FROM (SELECT * FROM raw_data) AS raw_data ORDER BY id",
+          "mysqlSql": "SELECT id,LOWER(TRIM(category)) AS category_key,CAST(amount AS DECIMAL(12,2)) AS numeric_amount FROM (SELECT * FROM raw_data) AS raw_data",
+          "sqliteSql": "SELECT id,LOWER(TRIM(category)) AS category_key,CAST(amount AS DECIMAL(12,2)) AS numeric_amount FROM (SELECT * FROM raw_data) AS raw_data",
           "explanation": "先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。"
         }
       ],
       "hints": [
         "先明确原始数据异常规则和规范化标准，再决定保留哪些记录。",
         "结合《CAST 与分类标准化》：CAST 显式转换类型；先清理空白和格式，再验证合法性并转换，最后统一类别。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT id,LOWER(TRIM(category)) AS category_key,□□□ AS numeric_amount FROM raw_data ORDER BY id"
+        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT id,LOWER(TRIM(category)) AS category_key,□□□ AS numeric_amount FROM raw_data"
       ],
-      "explanation": "转换类型不应把缺失金额按0填充，数据清洗与填值是独立决策。\n执行思路：确认raw_data的输入记录；输出id、category_key、numeric_amount列；遵循题设排序和并列规则。\n公开夹具实际返回 6 行、3 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
+      "explanation": "转换类型不应把缺失金额按0填充，数据清洗与填值是独立决策。\n执行思路：确认raw_data的输入记录；输出id、category_key、numeric_amount列；结果行的先后顺序不作要求。\n公开夹具实际返回 6 行、3 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
       "commonErrors": [
         {
-          "sql": "SELECT id,LOWER(TRIM(category)) AS category_key,COALESCE(CAST(amount AS DECIMAL(12,2)),0) AS numeric_amount FROM raw_data ORDER BY id",
+          "sql": "SELECT id,LOWER(TRIM(category)) AS category_key,COALESCE(CAST(amount AS DECIMAL(12,2)),0) AS numeric_amount FROM raw_data",
           "reason": "转换类型不应把缺失金额按0填充，数据清洗与填值是独立决策。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
@@ -633,24 +633,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0224/q0224-public.json",
-          "sha256": "1b0b927cb2e44027203835ec771986e00c4f64c04ec101ec4e8662c4c9efaab3"
+          "sha256": "12a53ae9e445131ceb057c35f0f0bf7aac495ecc228183c5832cce70ff5e6d7a"
         },
         {
           "id": "q0224-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0224/q0224-boundary.json",
-          "sha256": "31094c8dd12fa65d233bd0c3103d77ef8b5a4665b6d59d53c5afa88cb4c7b518"
+          "sha256": "3e6b6403584737fb20987ae58333717c19e4cd4622e3efba7c89113233623928"
         },
         {
           "id": "q0224-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0224/q0224-empty.json",
-          "sha256": "00063871deb5a2044daac844f12bbeb0393e57c4d5bc5d858c07238ef405878e"
+          "sha256": "b37660855f6ae99c9577f39c1365ec336c63edd597902c0a92b630ed1cce986b"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -1153,7 +1153,7 @@
       "type": "独立编写",
       "title": "保留规范化重名中编号最小者",
       "context": "使用课程中小型原始导入资料数据练习保留规范化重名中编号最小者。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "用 TRIM 后的非空名称分组，保留编号最小的记录，输出 id、clean_name、amount，按 id 升序。\n输出列名称及顺序：id, clean_name, amount。按题设排序；参考排序键：id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "requirements": "用 TRIM 后的非空名称分组，保留编号最小的记录，输出 id、clean_name、amount，按 clean_name 升序。\n输出列名称及顺序：id, clean_name, amount。按题设排序；参考排序键：clean_name。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
       "datasetId": "q0229-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -1172,6 +1172,11 @@
         ],
         "rows": [
           [
+            5,
+            "Cream",
+            "0"
+          ],
+          [
             1,
             "Mask",
             "15"
@@ -1185,11 +1190,6 @@
             4,
             "Soap",
             "-5"
-          ],
-          [
-            5,
-            "Cream",
-            "0"
           ]
         ],
         "rowCount": 4
@@ -1197,25 +1197,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "WITH a AS (SELECT id,TRIM(name) AS clean_name,amount,ROW_NUMBER() OVER(PARTITION BY TRIM(name) ORDER BY id) AS rn FROM raw_data WHERE name IS NOT NULL AND TRIM(name)<>'') SELECT id,clean_name,amount FROM a WHERE rn=1 ORDER BY id",
-          "sqliteSql": "WITH a AS (SELECT id,TRIM(name) AS clean_name,amount,ROW_NUMBER() OVER(PARTITION BY TRIM(name) ORDER BY id) AS rn FROM raw_data WHERE name IS NOT NULL AND TRIM(name)<>'') SELECT id,clean_name,amount FROM a WHERE rn=1 ORDER BY id"
+          "mysqlSql": "WITH a AS (SELECT id,TRIM(name) AS clean_name,amount,ROW_NUMBER() OVER(PARTITION BY TRIM(name) ORDER BY id) AS rn FROM raw_data WHERE name IS NOT NULL AND TRIM(name)<>'') SELECT id,clean_name,amount FROM a WHERE rn=1 ORDER BY clean_name",
+          "sqliteSql": "WITH a AS (SELECT id,TRIM(name) AS clean_name,amount,ROW_NUMBER() OVER(PARTITION BY TRIM(name) ORDER BY id) AS rn FROM raw_data WHERE name IS NOT NULL AND TRIM(name)<>'') SELECT id,clean_name,amount FROM a WHERE rn=1 ORDER BY clean_name"
         },
         {
           "kind": "代数或函数等价",
-          "mysqlSql": "WITH a AS (SELECT id,TRIM(name) AS clean_name,amount,ROW_NUMBER() OVER(PARTITION BY TRIM(name) ORDER BY id) AS rn FROM raw_data WHERE name IS NOT NULL AND TRIM(name)<>'') SELECT id,clean_name,amount FROM a WHERE NOT (rn<>1) ORDER BY id",
-          "sqliteSql": "WITH a AS (SELECT id,TRIM(name) AS clean_name,amount,ROW_NUMBER() OVER(PARTITION BY TRIM(name) ORDER BY id) AS rn FROM raw_data WHERE name IS NOT NULL AND TRIM(name)<>'') SELECT id,clean_name,amount FROM a WHERE NOT (rn<>1) ORDER BY id",
+          "mysqlSql": "WITH a AS (SELECT id,TRIM(name) AS clean_name,amount,ROW_NUMBER() OVER(PARTITION BY TRIM(name) ORDER BY id) AS rn FROM raw_data WHERE name IS NOT NULL AND TRIM(name)<>'') SELECT id,clean_name,amount FROM a WHERE NOT (rn<>1) ORDER BY clean_name",
+          "sqliteSql": "WITH a AS (SELECT id,TRIM(name) AS clean_name,amount,ROW_NUMBER() OVER(PARTITION BY TRIM(name) ORDER BY id) AS rn FROM raw_data WHERE name IS NOT NULL AND TRIM(name)<>'') SELECT id,clean_name,amount FROM a WHERE NOT (rn<>1) ORDER BY clean_name",
           "explanation": "用反向比较并取 NOT 表达相同三值逻辑。"
         }
       ],
       "hints": [
         "先明确原始数据异常规则和规范化标准，再决定保留哪些记录。",
         "结合《识别重复与去重规则》：重复记录由业务键决定，不是任意字段相同就删除；先报告重复，再确定保留规则。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nWITH a AS (SELECT id,TRIM(name) AS clean_name,amount,ROW_NUMBER() OVER(PARTITION BY TRIM(name) □□□ FROM raw_data WHERE name IS NOT NULL AND TRIM(name)<>'') SELECT id,clean_name,amount FROM a WHERE rn=1 ORDER BY id"
+        "关注这个局部结构（空缺部分仍需自行完成）：\nWITH a AS (SELECT id,TRIM(name) AS clean_name,amount,ROW_NUMBER() OVER(PARTITION BY TRIM(name) □□□ FROM raw_data WHERE name IS NOT NULL AND TRIM(name)<>'') SELECT id,clean_name,amount FROM a WHERE rn=1 ORDER BY clean_name"
       ],
       "explanation": "重复组必须用明确的确定性保留规则，取最小编号而非最大。\n执行思路：确认raw_data的输入记录；先明确公用表表达式的中间数据及其粒度；按筛选条件保留符合要求的记录，并考虑空值；根据窗口分区、顺序及框架计算每行的分析值；输出id、clean_name、amount列；遵循题设排序和并列规则。\n公开夹具实际返回 4 行、3 列；完整结果见 expectedOutput。\n另一种可用写法：用反向比较并取 NOT 表达相同三值逻辑。",
       "commonErrors": [
         {
-          "sql": "WITH a AS (SELECT id,TRIM(name) AS clean_name,amount,ROW_NUMBER() OVER(PARTITION BY TRIM(name) ORDER BY id DESC) AS rn FROM raw_data WHERE name IS NOT NULL AND TRIM(name)<>'') SELECT id,clean_name,amount FROM a WHERE rn=1 ORDER BY id",
+          "sql": "WITH a AS (SELECT id,TRIM(name) AS clean_name,amount,ROW_NUMBER() OVER(PARTITION BY TRIM(name) ORDER BY id DESC) AS rn FROM raw_data WHERE name IS NOT NULL AND TRIM(name)<>'') SELECT id,clean_name,amount FROM a WHERE rn=1 ORDER BY clean_name",
           "reason": "重复组必须用明确的确定性保留规则，取最小编号而非最大。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
@@ -1231,14 +1231,14 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0229/q0229-public.json",
-          "sha256": "cb89d620f8aad0d29106ce09116b72d7c1b2bb18637f446935fdf2a29fbe9708"
+          "sha256": "99d2cf7b6674aa0ab5504c1ba0133a5768d03b18eb940cd430662989016fe44d"
         },
         {
           "id": "q0229-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0229/q0229-boundary.json",
-          "sha256": "8c4c27d0804dd95cae06405ece50e3f344d0c1cd98b06cbb89738e70a87609ef"
+          "sha256": "469c09c6cffb83700b8da6311faa76bdf633908df372ed801d6bccc7f09dbd48"
         },
         {
           "id": "q0229-empty",
@@ -1274,19 +1274,19 @@
             "reference": {
               "ran": true,
               "match": true,
-              "resultHash": "c56e6d089b7cf580b0808a4325b5f8aaefe20e72d30c610221cc08b798faf85c",
+              "resultHash": "f08ec5e18e7b54ac7b3c01b5b425213f6e7dbc73d7b216f93c8273cd7a344bd0",
               "rowCount": 4
             },
             "equivalent": {
               "ran": true,
               "match": true,
-              "resultHash": "c56e6d089b7cf580b0808a4325b5f8aaefe20e72d30c610221cc08b798faf85c",
+              "resultHash": "f08ec5e18e7b54ac7b3c01b5b425213f6e7dbc73d7b216f93c8273cd7a344bd0",
               "rows": 4
             },
             "wrong": {
               "ran": true,
               "match": false,
-              "resultHash": "f3d7609cd1ce3c04205d403dd46bfcbdb3d611b4938bde9f8ae97a24e25167a5",
+              "resultHash": "bb165528b2dfe8a73d77da5b45cffffe7cad1ce27e297ad1f0e29aaccde50741",
               "rows": 4
             }
           },
@@ -1295,19 +1295,19 @@
             "reference": {
               "ran": true,
               "match": true,
-              "resultHash": "4e91345ac1d529c7c56f4ab94f46307240aeb3be3fdaa0d2252a67c5f8ce9441",
+              "resultHash": "2e6e27128a06b1a6b3f04376776bee1e9eb60c4f8dfea02411c5429a8b0496f2",
               "rowCount": 5
             },
             "equivalent": {
               "ran": true,
               "match": true,
-              "resultHash": "4e91345ac1d529c7c56f4ab94f46307240aeb3be3fdaa0d2252a67c5f8ce9441",
+              "resultHash": "2e6e27128a06b1a6b3f04376776bee1e9eb60c4f8dfea02411c5429a8b0496f2",
               "rows": 5
             },
             "wrong": {
               "ran": true,
               "match": false,
-              "resultHash": "50a72e44a3083fd6d35fc3697f63c71cef6096db2edee911e99c0f6c7d797b22",
+              "resultHash": "739f03ef5bf210b70832104e6cb386f8f700e35b36bfe47fb0ca9b6765fa41fb",
               "rows": 5
             }
           },

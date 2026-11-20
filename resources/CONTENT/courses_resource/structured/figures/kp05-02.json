@@ -1,0 +1,157 @@
+{
+  "schemaVersion": 1,
+  "id": "kp05-02",
+  "lessonSha256": "6e632cb9f65368b129c4a3c193f9165e4c30b2243ef516b0641114518b0468fe",
+  "figures": [
+    {
+      "id": "kp05-02-clauses",
+      "slot": "syntax",
+      "kind": "clause-map",
+      "title": "示例查询的几个部分",
+      "sql": "SELECT id, IFNULL(value, -1) AS filled, COALESCE(note, 'missing') AS note_filled FROM nullable_values ORDER BY filled DESC;",
+      "parts": [
+        {
+          "role": "select",
+          "label": "取数",
+          "sql": "SELECT id, IFNULL(value, -1) AS filled, COALESCE(note, 'missing') AS note_filled",
+          "note": "输出 id；IFNULL 把缺失的 value 换成 -1，COALESCE 把缺失的 note 换成 'missing'"
+        },
+        {
+          "role": "from",
+          "label": "来源",
+          "sql": "FROM nullable_values",
+          "note": "读取 nullable_values 表"
+        },
+        {
+          "role": "order",
+          "label": "排序",
+          "sql": "ORDER BY filled DESC;",
+          "note": "按 id 排列"
+        }
+      ]
+    },
+    {
+      "id": "kp05-02-flow",
+      "slot": "breakdown",
+      "kind": "stage-flow",
+      "merge": "breakdown",
+      "title": "每一步的数据变化",
+      "steps": [
+        {
+          "label": "FROM nullable_values",
+          "sql": "SELECT * FROM nullable_values",
+          "columns": [
+            "id",
+            "value",
+            "note"
+          ],
+          "rows": [
+            [
+              1,
+              null,
+              null
+            ],
+            [
+              2,
+              0,
+              ""
+            ],
+            [
+              3,
+              10,
+              "ok"
+            ],
+            [
+              4,
+              10,
+              "ok"
+            ]
+          ]
+        },
+        {
+          "label": "IFNULL(value, -1) AS filled",
+          "sql": "SELECT id, IFNULL(value, -1) AS filled FROM nullable_values",
+          "columns": [
+            "id",
+            "filled"
+          ],
+          "rows": [
+            [
+              1,
+              -1
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              3,
+              10
+            ],
+            [
+              4,
+              10
+            ]
+          ]
+        },
+        {
+          "label": "COALESCE(note, 'missing') AS note_filled",
+          "sql": "SELECT id, COALESCE(note, 'missing') AS note_filled FROM nullable_values",
+          "columns": [
+            "id",
+            "note_filled"
+          ],
+          "rows": [
+            [
+              1,
+              "missing"
+            ],
+            [
+              2,
+              ""
+            ],
+            [
+              3,
+              "ok"
+            ],
+            [
+              4,
+              "ok"
+            ]
+          ]
+        },
+        {
+          "label": "ORDER BY filled DESC;",
+          "sql": "SELECT id, IFNULL(value, -1) AS filled, COALESCE(note, 'missing') AS note_filled FROM nullable_values ORDER BY filled DESC;",
+          "columns": [
+            "id",
+            "filled",
+            "note_filled"
+          ],
+          "rows": [
+            [
+              3,
+              10,
+              "ok"
+            ],
+            [
+              4,
+              10,
+              "ok"
+            ],
+            [
+              2,
+              0,
+              ""
+            ],
+            [
+              1,
+              -1,
+              "missing"
+            ]
+          ]
+        }
+      ]
+    }
+  ]
+}

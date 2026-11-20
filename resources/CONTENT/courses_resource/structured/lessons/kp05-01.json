@@ -104,15 +104,15 @@
     },
     {
       "kind": "fragment",
-      "title": "按记录编号排序",
-      "sql": "ORDER BY id;",
-      "purpose": "按编号排列。",
+      "title": "按数值排序",
+      "sql": "ORDER BY value;",
+      "purpose": "按数值升序排列。",
       "reason": "在扩展条件返回多行时也能稳定核对。"
     }
   ],
   "completeCode": {
-    "mysqlSql": "SELECT id, value FROM nullable_values WHERE value <> 10 ORDER BY id;",
-    "sqliteSql": "SELECT id, value FROM nullable_values WHERE value <> 10 ORDER BY id;"
+    "mysqlSql": "SELECT id, value FROM nullable_values WHERE value <> 10 ORDER BY value;",
+    "sqliteSql": "SELECT id, value FROM nullable_values WHERE value <> 10 ORDER BY value;"
   },
   "expectedResult": {
     "columns": [
@@ -138,7 +138,7 @@
     {
       "label": "合并来源：识别缺失记录",
       "explanation": "仅返回真正的空值记录。",
-      "sql": "SELECT id, value, note FROM nullable_values WHERE value IS NULL ORDER BY id;",
+      "sql": "SELECT id, value, note FROM nullable_values WHERE value IS NULL ORDER BY value;",
       "result": {
         "columns": [
           "id",
@@ -163,7 +163,7 @@
     {
       "label": "同时筛选未知和非10",
       "explanation": "显式保留未知值，不依赖普通比较。",
-      "sql": "SELECT id,value FROM nullable_values WHERE value <> 10 OR value IS NULL ORDER BY id;",
+      "sql": "SELECT id,value FROM nullable_values WHERE value <> 10 OR value IS NULL ORDER BY value DESC;",
       "result": {
         "columns": [
           "id",
@@ -171,12 +171,12 @@
         ],
         "rows": [
           [
-            1,
-            null
-          ],
-          [
             2,
             0
+          ],
+          [
+            1,
+            null
           ]
         ]
       },
@@ -190,7 +190,7 @@
     {
       "label": "识别缺少客户编号的订单",
       "explanation": "作为匿名订单或数据缺失的待核记录，不直接认定错误。",
-      "sql": "SELECT id,customer_id FROM orders WHERE customer_id IS NULL ORDER BY id;",
+      "sql": "SELECT id,customer_id FROM orders WHERE customer_id IS NULL ORDER BY order_date;",
       "result": {
         "columns": [
           "id",
@@ -337,5 +337,5 @@
     ]
   },
   "sourcePath": "source/batch1/kp05-01.json",
-  "sourceSha256": "d3f727d62ff59da5461ca19e5d423e3efd8de031831b54404a21ab60cb8ed9e7"
+  "sourceSha256": "dc52284f0512b41eb8eb1f2c268d13c61bb52f25397defaaa7bc2eab8a4a32ff"
 }

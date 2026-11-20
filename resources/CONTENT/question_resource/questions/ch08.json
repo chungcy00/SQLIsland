@@ -1309,7 +1309,7 @@
       "type": "独立编写",
       "title": "右连接保留每家门店",
       "context": "使用课程中小型订单、门店数据练习右连接保留每家门店。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "以 orders 为左表 stores 为右表，输出 store_id、order_id，保留没有订单的门店，按门店、订单编号升序；也允许反向左连接。\n输出列名称及顺序：store_id, order_id。按题设排序；参考排序键：s.store_id,o.id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "requirements": "以 orders 为左表 stores 为右表，输出 store_id、order_id，保留没有订单的门店；也允许反向左连接。\n输出列名称及顺序：store_id, order_id。结果行的先后顺序不作要求。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
       "datasetId": "q0102-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -1332,20 +1332,20 @@
             1
           ],
           [
-            1,
-            3
-          ],
-          [
-            1,
-            5
-          ],
-          [
             2,
             2
           ],
           [
+            1,
+            3
+          ],
+          [
             2,
             4
+          ],
+          [
+            1,
+            5
           ],
           [
             3,
@@ -1357,25 +1357,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT s.store_id,o.id AS order_id FROM orders o RIGHT JOIN stores s ON o.store_id=s.store_id ORDER BY s.store_id,o.id",
-          "sqliteSql": "SELECT s.store_id,o.id AS order_id FROM orders o RIGHT JOIN stores s ON o.store_id=s.store_id ORDER BY s.store_id,o.id"
+          "mysqlSql": "SELECT s.store_id,o.id AS order_id FROM orders o RIGHT JOIN stores s ON o.store_id=s.store_id",
+          "sqliteSql": "SELECT s.store_id,o.id AS order_id FROM orders o RIGHT JOIN stores s ON o.store_id=s.store_id"
         },
         {
           "kind": "独立方法等价",
-          "mysqlSql": "SELECT s.store_id,o.id AS order_id FROM stores s LEFT JOIN orders o ON o.store_id=s.store_id ORDER BY s.store_id,o.id",
-          "sqliteSql": "SELECT s.store_id,o.id AS order_id FROM stores s LEFT JOIN orders o ON o.store_id=s.store_id ORDER BY s.store_id,o.id",
+          "mysqlSql": "SELECT s.store_id,o.id AS order_id FROM stores s LEFT JOIN orders o ON o.store_id=s.store_id",
+          "sqliteSql": "SELECT s.store_id,o.id AS order_id FROM stores s LEFT JOIN orders o ON o.store_id=s.store_id",
           "explanation": "采用另一种关系运算或查询结构计算相同结果。"
         }
       ],
       "hints": [
         "先画出两个关系中使用的键与一对多方向，判断哪一侧必须保留。",
         "结合《RIGHT JOIN 与 CROSS JOIN 实操》：右连接保留右侧全部记录；交叉连接产生所有组合。应先判断希望保留哪侧以及目标结果粒度。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT s.store_id,o.id AS order_id FROM orders o □□□ stores s ON o.store_id=s.store_id ORDER BY s.store_id,o.id"
+        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT s.store_id,o.id AS order_id FROM orders o □□□ stores s ON o.store_id=s.store_id"
       ],
-      "explanation": "右连接保留右侧维度表全部记录。\n执行思路：确认orders、stores的输入记录；按题设连接条件匹配数据，注意连接造成的行数变化；输出store_id、order_id列；遵循题设排序和并列规则。\n公开夹具实际返回 6 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：采用另一种关系运算或查询结构计算相同结果。",
+      "explanation": "右连接保留右侧维度表全部记录。\n执行思路：确认orders、stores的输入记录；按题设连接条件匹配数据，注意连接造成的行数变化；输出store_id、order_id列；结果行的先后顺序不作要求。\n公开夹具实际返回 6 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：采用另一种关系运算或查询结构计算相同结果。",
       "commonErrors": [
         {
-          "sql": "SELECT s.store_id,o.id AS order_id FROM orders o JOIN stores s ON o.store_id=s.store_id ORDER BY s.store_id,o.id",
+          "sql": "SELECT s.store_id,o.id AS order_id FROM orders o JOIN stores s ON o.store_id=s.store_id",
           "reason": "右连接保留右侧维度表全部记录。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
@@ -1391,24 +1391,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0102/q0102-public.json",
-          "sha256": "58b55db3749023432d11cd7ca0776bd1f00df4167d2e6f1de891d77d6a48672f"
+          "sha256": "662320de94c979cc08203c7ca7f30708e4c4f54b6ca2152dac0576468b1ef00d"
         },
         {
           "id": "q0102-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0102/q0102-boundary.json",
-          "sha256": "e4d636cba2b3a2247a21ee45a39092e1af8924186edef07101b44ca624e379fd"
+          "sha256": "0912d2e6e97ce9bbad486fa6cbd71ed756f8e7786dd4aef7f2cef46d97354d57"
         },
         {
           "id": "q0102-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0102/q0102-empty.json",
-          "sha256": "13c89c1f49fa58c77b71a63d54bb2a6af6c00393ecc1d4bcfe901d1ab0ad66e4"
+          "sha256": "e5217ea4caac0a85ed284973fffceb0d7e98811a5114709b339e6851f8fa46c8"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -1434,7 +1434,7 @@
             "reference": {
               "ran": true,
               "match": true,
-              "resultHash": "294c012ad1ecfdb5ba95970ed8e41318e296e93930eb75c7454ed73649419160",
+              "resultHash": "c50682b65815a3268538f48ecfb71416f09664bcbd59b9d047cd7febacf83f39",
               "rowCount": 6
             },
             "equivalent": {
@@ -1446,7 +1446,7 @@
             "wrong": {
               "ran": true,
               "match": false,
-              "resultHash": "ef3391c9e84f6c2b45d46a7e247baeb86e283bd60372bd5f0a2dae8331824dca",
+              "resultHash": "bd01e31bc16289da2b2a8b4277e99f9217af0655555059801e673bd74e0bd50a",
               "rows": 5
             }
           },
@@ -1455,7 +1455,7 @@
             "reference": {
               "ran": true,
               "match": true,
-              "resultHash": "a8047af7392ecde5e6bf4ee3a40cd07394237735b9cbb4137d351a0099dc2521",
+              "resultHash": "f7362e4e70ab16eb1f841e71759810e67e1c4858f65364229a5eb024f32ab2d8",
               "rowCount": 14
             },
             "equivalent": {
@@ -1467,7 +1467,7 @@
             "wrong": {
               "ran": true,
               "match": false,
-              "resultHash": "ecf6e4765e26196d78a8992462f0681ce5f0cdd3b06863413fdb8eb34948afc9",
+              "resultHash": "33724cb37868a5d4d388fdee6394df59eaf6516c64756cf139b7bac1b796bc15",
               "rows": 13
             }
           },
@@ -1511,7 +1511,7 @@
       "type": "代码纠错",
       "title": "门店与类别完整维度",
       "context": "使用课程中小型商品、门店数据练习门店与类别完整维度。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "下面提供的初始代码存在逻辑、语法或结构错误。请修改整段代码，使其满足以下要求。\n每家门店与不同商品类别的组合，输出 store_id、category，按门店、类别升序。\n输出列名称及顺序：store_id, category。按题设排序；参考排序键：s.store_id,p.category。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "requirements": "下面提供的初始代码存在逻辑、语法或结构错误。请修改整段代码，使其满足以下要求。\n每家门店与不同商品类别的组合，输出 store_id、category。\n输出列名称及顺序：store_id, category。结果行的先后顺序不作要求。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
       "datasetId": "q0103-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -1519,7 +1519,7 @@
         "products",
         "stores"
       ],
-      "initialCode": "SELECT s.store_id,p.category FROM stores s CROSS JOIN (SELECT category FROM products) p ORDER BY s.store_id,p.category",
+      "initialCode": "SELECT s.store_id,p.category FROM stores s CROSS JOIN (SELECT category FROM products) p",
       "options": [],
       "acceptedBlanks": [],
       "expectedOutput": {
@@ -1531,11 +1531,11 @@
         "rows": [
           [
             1,
-            "化妆品"
+            "护肤品"
           ],
           [
             1,
-            "护肤品"
+            "化妆品"
           ],
           [
             1,
@@ -1543,11 +1543,11 @@
           ],
           [
             2,
-            "化妆品"
+            "护肤品"
           ],
           [
             2,
-            "护肤品"
+            "化妆品"
           ],
           [
             2,
@@ -1555,11 +1555,11 @@
           ],
           [
             3,
-            "化妆品"
+            "护肤品"
           ],
           [
             3,
-            "护肤品"
+            "化妆品"
           ],
           [
             3,
@@ -1571,13 +1571,13 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT s.store_id,p.category FROM stores s CROSS JOIN (SELECT DISTINCT category FROM products) p ORDER BY s.store_id,p.category",
-          "sqliteSql": "SELECT s.store_id,p.category FROM stores s CROSS JOIN (SELECT DISTINCT category FROM products) p ORDER BY s.store_id,p.category"
+          "mysqlSql": "SELECT s.store_id,p.category FROM stores s CROSS JOIN (SELECT DISTINCT category FROM products) p",
+          "sqliteSql": "SELECT s.store_id,p.category FROM stores s CROSS JOIN (SELECT DISTINCT category FROM products) p"
         },
         {
           "kind": "语法等价",
-          "mysqlSql": "SELECT ALL s.store_id,p.category FROM stores s CROSS JOIN (SELECT DISTINCT category FROM products) p ORDER BY s.store_id,p.category",
-          "sqliteSql": "SELECT ALL s.store_id,p.category FROM stores s CROSS JOIN (SELECT DISTINCT category FROM products) p ORDER BY s.store_id,p.category",
+          "mysqlSql": "SELECT ALL s.store_id,p.category FROM stores s CROSS JOIN (SELECT DISTINCT category FROM products) p",
+          "sqliteSql": "SELECT ALL s.store_id,p.category FROM stores s CROSS JOIN (SELECT DISTINCT category FROM products) p",
           "explanation": "普通 SELECT 默认保留重复记录，显式 ALL 不改变结果。"
         }
       ],
@@ -1586,10 +1586,10 @@
         "结合《笛卡尔积与完整维度》：CROSS JOIN 可构建所有维度组合，例如每个月份与每家门店；再左连接真实销售数据可补齐无交易组合。",
         "检查初始代码的 DISTINCT  对应的业务规则。先去重类别，再展成完整组合，否则重复类别会膨胀行数。"
       ],
-      "explanation": "先去重类别，再展成完整组合，否则重复类别会膨胀行数。\n执行思路：确认products、stores的输入记录；按题设连接条件匹配数据，注意连接造成的行数变化；仅在题设指定的范围内去重；输出store_id、category列；遵循题设排序和并列规则。\n公开夹具实际返回 9 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：普通 SELECT 默认保留重复记录，显式 ALL 不改变结果。",
+      "explanation": "先去重类别，再展成完整组合，否则重复类别会膨胀行数。\n执行思路：确认products、stores的输入记录；按题设连接条件匹配数据，注意连接造成的行数变化；仅在题设指定的范围内去重；输出store_id、category列；结果行的先后顺序不作要求。\n公开夹具实际返回 9 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：普通 SELECT 默认保留重复记录，显式 ALL 不改变结果。",
       "commonErrors": [
         {
-          "sql": "SELECT s.store_id,p.category FROM stores s CROSS JOIN (SELECT category FROM products) p ORDER BY s.store_id,p.category",
+          "sql": "SELECT s.store_id,p.category FROM stores s CROSS JOIN (SELECT category FROM products) p",
           "reason": "先去重类别，再展成完整组合，否则重复类别会膨胀行数。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
@@ -1605,24 +1605,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0103/q0103-public.json",
-          "sha256": "c1a7bd8d972ee081c8ed8827e740a65e818f0f63b9ba8543b80595725ff5fb14"
+          "sha256": "ad1fb8586e7e1e732fbd38ae88140f671c6bf38cbcbb2888b922674f35ffd77a"
         },
         {
           "id": "q0103-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0103/q0103-boundary.json",
-          "sha256": "5ecb0f4c7ee42f667ecde4a58a5ceb605e2a80f14fc978efc49746adf2e219f3"
+          "sha256": "e5ee54b93e28c49e89f9fb0a536b8c679be8a7ad46a434daa6ff8bcedb62540f"
         },
         {
           "id": "q0103-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0103/q0103-empty.json",
-          "sha256": "1369048babefe27006694cf2e098125bb9d5f44b91ce3babc5edcdbac7df94d3"
+          "sha256": "8a49aad584e559f6f9d1005a36f7e818a8dc23340a0df83fda752cffd70b1679"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -1648,19 +1648,19 @@
             "reference": {
               "ran": true,
               "match": true,
-              "resultHash": "4004f98d7f98dcf4cd90c069cc5f6c8482c47e28e7ea420495e4b16bd78e810b",
+              "resultHash": "40a8a85152ee8573c4a5e8075c223c58b50f211bd73b04aacc17c4ba4c487f65",
               "rowCount": 9
             },
             "equivalent": {
               "ran": true,
               "match": true,
-              "resultHash": "4004f98d7f98dcf4cd90c069cc5f6c8482c47e28e7ea420495e4b16bd78e810b",
+              "resultHash": "40a8a85152ee8573c4a5e8075c223c58b50f211bd73b04aacc17c4ba4c487f65",
               "rows": 9
             },
             "wrong": {
               "ran": true,
               "match": false,
-              "resultHash": "f9b459c9d60942ae46757f39607bfc2111c3985be019eb4161044d482ecd295d",
+              "resultHash": "325854cae887ce6ec7330f0adfffd55bfef1b5850469cc72fd5e919e6996b19a",
               "rows": 18
             }
           },
@@ -1669,19 +1669,19 @@
             "reference": {
               "ran": true,
               "match": true,
-              "resultHash": "94453d152271b86833e577b70cc2f1d7c3cd659ce4b4dcad56e11b8b7405dcd4",
+              "resultHash": "1f05637e481fb5a32b0375707500a2f475873c650ce7549031e0edfc5db8fe9a",
               "rowCount": 20
             },
             "equivalent": {
               "ran": true,
               "match": true,
-              "resultHash": "94453d152271b86833e577b70cc2f1d7c3cd659ce4b4dcad56e11b8b7405dcd4",
+              "resultHash": "1f05637e481fb5a32b0375707500a2f475873c650ce7549031e0edfc5db8fe9a",
               "rows": 20
             },
             "wrong": {
               "ran": true,
               "match": false,
-              "resultHash": "f840736a6fb8683cb7146e8b433c23ccf63d04b9cc075ee39b12b8f9dfa6dd39",
+              "resultHash": "b1428ce4cf695cd9eab568721ec99ea000aa4de8f549d3fb019b8384293d2389",
               "rows": 105
             }
           },
@@ -2515,7 +2515,7 @@
       "type": "独立编写",
       "title": "主管与直属员工清单",
       "context": "使用课程中小型员工数据练习主管与直属员工清单。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "每个实际存在的主管下属组合，输出 manager_name、report_name，按主管编号和下属编号升序，不输出没有下属者。\n输出列名称及顺序：manager_name, report_name。按题设排序；参考排序键：m.employee_id,e.employee_id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "requirements": "每个实际存在的主管下属组合，输出 manager_name、report_name，按下属姓名升序，不输出没有下属者。\n输出列名称及顺序：manager_name, report_name。按题设排序；参考排序键：report_name。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
       "datasetId": "q0111-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -2550,25 +2550,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT m.employee_name AS manager_name,e.employee_name AS report_name FROM employees m JOIN employees e ON m.employee_id=e.manager_id ORDER BY m.employee_id,e.employee_id",
-          "sqliteSql": "SELECT m.employee_name AS manager_name,e.employee_name AS report_name FROM employees m JOIN employees e ON m.employee_id=e.manager_id ORDER BY m.employee_id,e.employee_id"
+          "mysqlSql": "SELECT m.employee_name AS manager_name,e.employee_name AS report_name FROM employees m JOIN employees e ON m.employee_id=e.manager_id ORDER BY report_name",
+          "sqliteSql": "SELECT m.employee_name AS manager_name,e.employee_name AS report_name FROM employees m JOIN employees e ON m.employee_id=e.manager_id ORDER BY report_name"
         },
         {
           "kind": "语法等价",
-          "mysqlSql": "SELECT ALL m.employee_name AS manager_name,e.employee_name AS report_name FROM employees m JOIN employees e ON m.employee_id=e.manager_id ORDER BY m.employee_id,e.employee_id",
-          "sqliteSql": "SELECT ALL m.employee_name AS manager_name,e.employee_name AS report_name FROM employees m JOIN employees e ON m.employee_id=e.manager_id ORDER BY m.employee_id,e.employee_id",
+          "mysqlSql": "SELECT ALL m.employee_name AS manager_name,e.employee_name AS report_name FROM employees m JOIN employees e ON m.employee_id=e.manager_id ORDER BY report_name",
+          "sqliteSql": "SELECT ALL m.employee_name AS manager_name,e.employee_name AS report_name FROM employees m JOIN employees e ON m.employee_id=e.manager_id ORDER BY report_name",
           "explanation": "普通 SELECT 默认保留重复记录，显式 ALL 不改变结果。"
         }
       ],
       "hints": [
         "先画出两个关系中使用的键与一对多方向，判断哪一侧必须保留。",
         "结合《CROSS JOIN 与自连接》：交叉连接形成两表笛卡尔积；自连接使用同一表的不同别名表示不同角色。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT m.employee_name AS manager_name,e.employee_name AS report_name FROM employees m JOIN employees e ON □□□ ORDER BY m.employee_id,e.employee_id"
+        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT m.employee_name AS manager_name,e.employee_name AS report_name FROM employees m JOIN employees e ON □□□ ORDER BY report_name"
       ],
       "explanation": "关系有方向，主管主键连下属的主管外键。\n执行思路：确认employees的输入记录；按题设连接条件匹配数据，注意连接造成的行数变化；输出manager_name、report_name列；遵循题设排序和并列规则。\n公开夹具实际返回 3 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：普通 SELECT 默认保留重复记录，显式 ALL 不改变结果。",
       "commonErrors": [
         {
-          "sql": "SELECT m.employee_name AS manager_name,e.employee_name AS report_name FROM employees m JOIN employees e ON m.manager_id=e.employee_id ORDER BY m.employee_id,e.employee_id",
+          "sql": "SELECT m.employee_name AS manager_name,e.employee_name AS report_name FROM employees m JOIN employees e ON m.manager_id=e.employee_id ORDER BY report_name",
           "reason": "关系有方向，主管主键连下属的主管外键。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
@@ -2591,7 +2591,7 @@
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0111/q0111-boundary.json",
-          "sha256": "986358fe68895bb2480ad26ed289bda45e74c11da01caf0ae95015724ae2044e"
+          "sha256": "50c09103cf6057477e0fab0bfea7bcb4a67a230403d499af42d957c131bd9510"
         },
         {
           "id": "q0111-empty",
@@ -2648,19 +2648,19 @@
             "reference": {
               "ran": true,
               "match": true,
-              "resultHash": "8a6b6c61c996108a2096cf233d234ad27361528bac64bd5d5fe677cd1094c755",
+              "resultHash": "10c83d301b13bc849050d84ecd0740335fbc8c8d6953d5ac529d36b7684b69cc",
               "rowCount": 5
             },
             "equivalent": {
               "ran": true,
               "match": true,
-              "resultHash": "8a6b6c61c996108a2096cf233d234ad27361528bac64bd5d5fe677cd1094c755",
+              "resultHash": "10c83d301b13bc849050d84ecd0740335fbc8c8d6953d5ac529d36b7684b69cc",
               "rows": 5
             },
             "wrong": {
               "ran": true,
               "match": false,
-              "resultHash": "c693a14bb06d3a9e3404f5cced3e0d1bbb5b514a4a11231a3c8f0ab0b3fbe9a2",
+              "resultHash": "cdf8afc5873c804149c28528966c1bffbbfd42835c2bd67f2fa519b5e32352ef",
               "rows": 5
             }
           },

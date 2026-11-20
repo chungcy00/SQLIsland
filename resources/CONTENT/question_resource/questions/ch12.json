@@ -18,7 +18,7 @@
       "type": "独立编写",
       "title": "月份整数标签",
       "context": "使用课程中小型订单数据练习月份整数标签。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "编写 SQL，完成以下查询要求。\n返回 orders.id、month_no（1—12的整数月份），按编号升序。\n输出列名称及顺序：id, month_no。按题设排序；参考排序键：id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "requirements": "编写 SQL，完成以下查询要求。\n返回 orders.id、month_no（1—12的整数月份）。\n输出列名称及顺序：id, month_no。结果行的先后顺序不作要求。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
       "datasetId": "q0162-lesson",
       "schemaVersion": 3,
       "contentVersion": "4.2.2",
@@ -61,13 +61,13 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT id,MONTH(order_date) AS month_no FROM orders ORDER BY id",
-          "sqliteSql": "SELECT id,MONTH(order_date) AS month_no FROM orders ORDER BY id"
+          "mysqlSql": "SELECT id,MONTH(order_date) AS month_no FROM orders",
+          "sqliteSql": "SELECT id,MONTH(order_date) AS month_no FROM orders"
         },
         {
           "kind": "关系结构等价",
-          "mysqlSql": "SELECT id,MONTH(order_date) AS month_no FROM (SELECT * FROM orders) AS orders ORDER BY id",
-          "sqliteSql": "SELECT id,MONTH(order_date) AS month_no FROM (SELECT * FROM orders) AS orders ORDER BY id",
+          "mysqlSql": "SELECT id,MONTH(order_date) AS month_no FROM (SELECT * FROM orders) AS orders",
+          "sqliteSql": "SELECT id,MONTH(order_date) AS month_no FROM (SELECT * FROM orders) AS orders",
           "explanation": "先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。"
         }
       ],
@@ -76,10 +76,10 @@
         "结合《日期格式、年份和月份》：DATE_FORMAT 用指定格式展示日期；YEAR 和 MONTH 提取数值年份与月份。",
         "按题设编写投影、筛选及分组，使用运行检查列名、NULL、重复记录和排序。"
       ],
-      "explanation": "月份数字不等于四位年份。\n执行思路：确认orders的输入记录；输出id、month_no列；遵循题设排序和并列规则。\n公开夹具实际返回 5 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
+      "explanation": "月份数字不等于四位年份。\n执行思路：确认orders的输入记录；输出id、month_no列；结果行的先后顺序不作要求。\n公开夹具实际返回 5 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
       "commonErrors": [
         {
-          "sql": "SELECT id,YEAR(order_date) AS month_no FROM orders ORDER BY id",
+          "sql": "SELECT id,YEAR(order_date) AS month_no FROM orders",
           "reason": "月份数字不等于四位年份。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
@@ -95,24 +95,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0162/q0162-public.json",
-          "sha256": "5308e79781fdbc8be57bf3f91644bf732c35d6da6a347f24a105ef2b6efbfe3b"
+          "sha256": "45707c093e917b5ffe15257e6a540cae40bb8694d551665df16715b00e0ed23c"
         },
         {
           "id": "q0162-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0162/q0162-boundary.json",
-          "sha256": "f639c8da1fd24c83403f75fb2e8586cedb7aed2affa65dd78a92555fc285b14c"
+          "sha256": "b5cfc0b48b292d2ee05d44ca59e4a69a914518ac0c0d0c2fcba0e2374432e25a"
         },
         {
           "id": "q0162-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0162/q0162-empty.json",
-          "sha256": "5418118ea64e37d05697a0e0cdd06e9c01981550cfbac201a9a19f081a33e4d0"
+          "sha256": "b6cbd7fd902eba744e35471278badbb330645ab9810ba3d280ffa6b7be9afb82"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -745,7 +745,7 @@
       "type": "独立编写",
       "title": "发票信用期限",
       "context": "使用课程中小型发票数据练习发票信用期限。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "返回每张 invoice_id 及 days_allowed（到期日期减开票日期，天数），按编号升序。\n输出列名称及顺序：invoice_id, days_allowed。按题设排序；参考排序键：invoice_id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "requirements": "返回每张 invoice_id 及 days_allowed（到期日期减开票日期，天数）。\n输出列名称及顺序：invoice_id, days_allowed。结果行的先后顺序不作要求。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
       "datasetId": "q0169-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -776,25 +776,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT invoice_id,DATEDIFF(due_date,invoice_date) AS days_allowed FROM invoices ORDER BY invoice_id",
-          "sqliteSql": "SELECT invoice_id,DATEDIFF(due_date,invoice_date) AS days_allowed FROM invoices ORDER BY invoice_id"
+          "mysqlSql": "SELECT invoice_id,DATEDIFF(due_date,invoice_date) AS days_allowed FROM invoices",
+          "sqliteSql": "SELECT invoice_id,DATEDIFF(due_date,invoice_date) AS days_allowed FROM invoices"
         },
         {
           "kind": "关系结构等价",
-          "mysqlSql": "SELECT invoice_id,DATEDIFF(due_date,invoice_date) AS days_allowed FROM (SELECT * FROM invoices) AS invoices ORDER BY invoice_id",
-          "sqliteSql": "SELECT invoice_id,DATEDIFF(due_date,invoice_date) AS days_allowed FROM (SELECT * FROM invoices) AS invoices ORDER BY invoice_id",
+          "mysqlSql": "SELECT invoice_id,DATEDIFF(due_date,invoice_date) AS days_allowed FROM (SELECT * FROM invoices) AS invoices",
+          "sqliteSql": "SELECT invoice_id,DATEDIFF(due_date,invoice_date) AS days_allowed FROM (SELECT * FROM invoices) AS invoices",
           "explanation": "先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。"
         }
       ],
       "hints": [
         "确认计算单位；确定日期或数值的边界，对零分母另作判断。",
         "结合《DATEDIFF 与 TIMESTAMPDIFF》：DATEDIFF(a,b) 计算日期部分之差；TIMESTAMPDIFF(unit,start,end) 按指定单位计算完整差值。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT invoice_id,□□□ AS days_allowed FROM invoices ORDER BY invoice_id"
+        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT invoice_id,□□□ AS days_allowed FROM invoices"
       ],
-      "explanation": "日期差函数参数顺序决定正负，信用期限从开票到到期。\n执行思路：确认invoices的输入记录；输出invoice_id、days_allowed列；遵循题设排序和并列规则。\n公开夹具实际返回 2 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
+      "explanation": "日期差函数参数顺序决定正负，信用期限从开票到到期。\n执行思路：确认invoices的输入记录；输出invoice_id、days_allowed列；结果行的先后顺序不作要求。\n公开夹具实际返回 2 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
       "commonErrors": [
         {
-          "sql": "SELECT invoice_id,DATEDIFF(invoice_date,due_date) AS days_allowed FROM invoices ORDER BY invoice_id",
+          "sql": "SELECT invoice_id,DATEDIFF(invoice_date,due_date) AS days_allowed FROM invoices",
           "reason": "日期差函数参数顺序决定正负，信用期限从开票到到期。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
@@ -810,24 +810,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0169/q0169-public.json",
-          "sha256": "70252ef5ef1efe239e65984b1bdfd4ad36631719f3d7fd413f503325bd328e5b"
+          "sha256": "affe8034effbdbd415512de9e376130e6ebf7630413048d87e0c1922a91617f2"
         },
         {
           "id": "q0169-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0169/q0169-boundary.json",
-          "sha256": "20d30a4a51f350e38e989b30da2156f1e5a620fabb5046d1aa67c9e1932e543f"
+          "sha256": "0a3765757676962817e0124a9280eafb73e2cc42047f67f4718bba08c157f4a5"
         },
         {
           "id": "q0169-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0169/q0169-empty.json",
-          "sha256": "7830644e566295ce97701c5658fc9200d2b73ed3f7e6e93a4d14e22dd2a87096"
+          "sha256": "1436963dcb78ffd090fc728135a2cba7abb88ff293f9cfeb0d5635acc28ec6ef"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -933,7 +933,7 @@
       "type": "代码填空",
       "title": "截至报告日的发票账龄",
       "context": "使用课程中小型发票数据练习截至报告日的发票账龄。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "补全代码中的一个空位，使完整SQL满足以下要求。可输入具有相同语义的片段，提交后按完整代码执行结果核对。\n报告日2026-02-15，计算自开票日期经过的日数 age_days，输出 invoice_id、age_days，按编号升序。\n输出列名称及顺序：invoice_id, age_days。按题设排序；参考排序键：invoice_id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "requirements": "补全代码中的一个空位，使完整SQL满足以下要求。可输入具有相同语义的片段，提交后按完整代码执行结果核对。\n报告日2026-02-15，计算自开票日期经过的日数 age_days，输出 invoice_id、age_days，按 age_days 降序。\n输出列名称及顺序：invoice_id, age_days。按题设排序；参考排序键：age_days DESC。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
       "datasetId": "q0170-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -972,13 +972,13 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT invoice_id,DATEDIFF('2026-02-15',invoice_date) AS age_days FROM invoices ORDER BY invoice_id",
-          "sqliteSql": "SELECT invoice_id,DATEDIFF('2026-02-15',invoice_date) AS age_days FROM invoices ORDER BY invoice_id"
+          "mysqlSql": "SELECT invoice_id,DATEDIFF('2026-02-15',invoice_date) AS age_days FROM invoices ORDER BY age_days DESC",
+          "sqliteSql": "SELECT invoice_id,DATEDIFF('2026-02-15',invoice_date) AS age_days FROM invoices ORDER BY age_days DESC"
         },
         {
           "kind": "关系结构等价",
-          "mysqlSql": "SELECT invoice_id,DATEDIFF('2026-02-15',invoice_date) AS age_days FROM (SELECT * FROM invoices) AS invoices ORDER BY invoice_id",
-          "sqliteSql": "SELECT invoice_id,DATEDIFF('2026-02-15',invoice_date) AS age_days FROM (SELECT * FROM invoices) AS invoices ORDER BY invoice_id",
+          "mysqlSql": "SELECT invoice_id,DATEDIFF('2026-02-15',invoice_date) AS age_days FROM (SELECT * FROM invoices) AS invoices ORDER BY age_days DESC",
+          "sqliteSql": "SELECT invoice_id,DATEDIFF('2026-02-15',invoice_date) AS age_days FROM (SELECT * FROM invoices) AS invoices ORDER BY age_days DESC",
           "explanation": "先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。"
         }
       ],
@@ -990,7 +990,7 @@
       "explanation": "账龄按开票日计算，不是按到期日计算。\n执行思路：确认invoices的输入记录；输出invoice_id、age_days列；遵循题设排序和并列规则。\n公开夹具实际返回 2 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
       "commonErrors": [
         {
-          "sql": "SELECT invoice_id,DATEDIFF('2026-02-15',due_date) AS age_days FROM invoices ORDER BY invoice_id",
+          "sql": "SELECT invoice_id,DATEDIFF('2026-02-15',due_date) AS age_days FROM invoices ORDER BY age_days DESC",
           "reason": "账龄按开票日计算，不是按到期日计算。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
@@ -1082,7 +1082,7 @@
             "wrong": {
               "ran": true,
               "match": false,
-              "resultHash": "04e710cebc1d1bbbb62d7416e961f211fc30c26fcb6655e1ba661cc22fafdde1",
+              "resultHash": "e61e08dc15caa0c0c085ab183f6ef33797ae92f0efe5284d6650b34fbeefa904",
               "rows": 4
             }
           },
@@ -1133,7 +1133,7 @@
       "type": "独立编写",
       "title": "生成报告用月份键",
       "context": "使用课程中小型交易数据练习生成报告用月份键。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "返回 transactions.transaction_id、month_key（YYYY-MM），按交易编号升序。\n输出列名称及顺序：transaction_id, month_key。按题设排序；参考排序键：transaction_id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "requirements": "返回 transactions.transaction_id、month_key（YYYY-MM）。\n输出列名称及顺序：transaction_id, month_key。结果行的先后顺序不作要求。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
       "datasetId": "q0171-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -1176,25 +1176,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT transaction_id,DATE_FORMAT(transaction_date,'%Y-%m') AS month_key FROM transactions ORDER BY transaction_id",
-          "sqliteSql": "SELECT transaction_id,DATE_FORMAT(transaction_date,'%Y-%m') AS month_key FROM transactions ORDER BY transaction_id"
+          "mysqlSql": "SELECT transaction_id,DATE_FORMAT(transaction_date,'%Y-%m') AS month_key FROM transactions",
+          "sqliteSql": "SELECT transaction_id,DATE_FORMAT(transaction_date,'%Y-%m') AS month_key FROM transactions"
         },
         {
           "kind": "关系结构等价",
-          "mysqlSql": "SELECT transaction_id,DATE_FORMAT(transaction_date,'%Y-%m') AS month_key FROM (SELECT * FROM transactions) AS transactions ORDER BY transaction_id",
-          "sqliteSql": "SELECT transaction_id,DATE_FORMAT(transaction_date,'%Y-%m') AS month_key FROM (SELECT * FROM transactions) AS transactions ORDER BY transaction_id",
+          "mysqlSql": "SELECT transaction_id,DATE_FORMAT(transaction_date,'%Y-%m') AS month_key FROM (SELECT * FROM transactions) AS transactions",
+          "sqliteSql": "SELECT transaction_id,DATE_FORMAT(transaction_date,'%Y-%m') AS month_key FROM (SELECT * FROM transactions) AS transactions",
           "explanation": "先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。"
         }
       ],
       "hints": [
         "确认计算单位；确定日期或数值的边界，对零分母另作判断。",
         "结合《日期格式、年份和月份》：DATE_FORMAT 用指定格式展示日期；YEAR 和 MONTH 提取数值年份与月份。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT transaction_id,DATE_FORMAT(transaction_date,□□□) AS month_key FROM transactions ORDER BY transaction_id"
+        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT transaction_id,DATE_FORMAT(transaction_date,□□□) AS month_key FROM transactions"
       ],
-      "explanation": "格式必须包括两位月份，才能区分同年不同月份。\n执行思路：确认transactions的输入记录；输出transaction_id、month_key列；遵循题设排序和并列规则。\n公开夹具实际返回 5 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
+      "explanation": "格式必须包括两位月份，才能区分同年不同月份。\n执行思路：确认transactions的输入记录；输出transaction_id、month_key列；结果行的先后顺序不作要求。\n公开夹具实际返回 5 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
       "commonErrors": [
         {
-          "sql": "SELECT transaction_id,DATE_FORMAT(transaction_date,'%Y') AS month_key FROM transactions ORDER BY transaction_id",
+          "sql": "SELECT transaction_id,DATE_FORMAT(transaction_date,'%Y') AS month_key FROM transactions",
           "reason": "格式必须包括两位月份，才能区分同年不同月份。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
@@ -1210,24 +1210,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0171/q0171-public.json",
-          "sha256": "d4392e8e0c0999edb62d76b2d1e108b2b376cab40755b53fee7fbdcbf3a34cee"
+          "sha256": "361a244c9651e2fc37c85264d88082f5dbd4b52e7678e57544b8511b83569805"
         },
         {
           "id": "q0171-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0171/q0171-boundary.json",
-          "sha256": "8fc580adf43fc8a25808a58dac4ef3da194851e1ff67e03e8912565f7ed34188"
+          "sha256": "332c539d9abf132419c57a157e8edb24a18d187fd0711f265a03db059e0dc94c"
         },
         {
           "id": "q0171-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0171/q0171-empty.json",
-          "sha256": "1cc592f32881e37caf4dab53f741a514442d0d9443c37c8a97ab42f8844e02b4"
+          "sha256": "3f165e33f4408841398b85cdedefb35bee6fcbf70f5602d851577c907f7a58e2"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -1699,7 +1699,7 @@
       "type": "代码纠错",
       "title": "每批收货相对承诺日的偏差",
       "context": "使用课程中小型采购明细、采购订单、收货数据练习每批收货相对承诺日的偏差。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "下面提供的初始代码存在逻辑、语法或结构错误。请修改整段代码，使其满足以下要求。\n匹配 receipts、purchase_items、purchase_orders，输出 receipt_id、delay_days（收货减承诺日，提前为负），按编号升序。\n输出列名称及顺序：receipt_id, delay_days。按题设排序；参考排序键：r.receipt_id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "requirements": "下面提供的初始代码存在逻辑、语法或结构错误。请修改整段代码，使其满足以下要求。\n匹配 receipts、purchase_items、purchase_orders，输出 receipt_id、delay_days（收货减承诺日，提前为负）。\n输出列名称及顺序：receipt_id, delay_days。结果行的先后顺序不作要求。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
       "datasetId": "q0175-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -1708,7 +1708,7 @@
         "purchase_orders",
         "receipts"
       ],
-      "initialCode": "SELECT r.receipt_id,DATEDIFF(r.receipt_date,p.order_date) AS delay_days FROM receipts r JOIN purchase_items i ON r.po_item_id=i.po_item_id JOIN purchase_orders p ON p.po_id=i.po_id ORDER BY r.receipt_id",
+      "initialCode": "SELECT r.receipt_id,DATEDIFF(r.receipt_date,p.order_date) AS delay_days FROM receipts r JOIN purchase_items i ON r.po_item_id=i.po_item_id JOIN purchase_orders p ON p.po_id=i.po_id",
       "options": [],
       "acceptedBlanks": [],
       "expectedOutput": {
@@ -1732,13 +1732,13 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT r.receipt_id,DATEDIFF(r.receipt_date,p.promised_date) AS delay_days FROM receipts r JOIN purchase_items i ON r.po_item_id=i.po_item_id JOIN purchase_orders p ON p.po_id=i.po_id ORDER BY r.receipt_id",
-          "sqliteSql": "SELECT r.receipt_id,DATEDIFF(r.receipt_date,p.promised_date) AS delay_days FROM receipts r JOIN purchase_items i ON r.po_item_id=i.po_item_id JOIN purchase_orders p ON p.po_id=i.po_id ORDER BY r.receipt_id"
+          "mysqlSql": "SELECT r.receipt_id,DATEDIFF(r.receipt_date,p.promised_date) AS delay_days FROM receipts r JOIN purchase_items i ON r.po_item_id=i.po_item_id JOIN purchase_orders p ON p.po_id=i.po_id",
+          "sqliteSql": "SELECT r.receipt_id,DATEDIFF(r.receipt_date,p.promised_date) AS delay_days FROM receipts r JOIN purchase_items i ON r.po_item_id=i.po_item_id JOIN purchase_orders p ON p.po_id=i.po_id"
         },
         {
           "kind": "语法等价",
-          "mysqlSql": "SELECT ALL r.receipt_id,DATEDIFF(r.receipt_date,p.promised_date) AS delay_days FROM receipts r JOIN purchase_items i ON r.po_item_id=i.po_item_id JOIN purchase_orders p ON p.po_id=i.po_id ORDER BY r.receipt_id",
-          "sqliteSql": "SELECT ALL r.receipt_id,DATEDIFF(r.receipt_date,p.promised_date) AS delay_days FROM receipts r JOIN purchase_items i ON r.po_item_id=i.po_item_id JOIN purchase_orders p ON p.po_id=i.po_id ORDER BY r.receipt_id",
+          "mysqlSql": "SELECT ALL r.receipt_id,DATEDIFF(r.receipt_date,p.promised_date) AS delay_days FROM receipts r JOIN purchase_items i ON r.po_item_id=i.po_item_id JOIN purchase_orders p ON p.po_id=i.po_id",
+          "sqliteSql": "SELECT ALL r.receipt_id,DATEDIFF(r.receipt_date,p.promised_date) AS delay_days FROM receipts r JOIN purchase_items i ON r.po_item_id=i.po_item_id JOIN purchase_orders p ON p.po_id=i.po_id",
           "explanation": "普通 SELECT 默认保留重复记录，显式 ALL 不改变结果。"
         }
       ],
@@ -1747,10 +1747,10 @@
         "结合《DATEDIFF 与 TIMESTAMPDIFF》：DATEDIFF(a,b) 计算日期部分之差；TIMESTAMPDIFF(unit,start,end) 按指定单位计算完整差值。",
         "检查初始代码的 p.promised_date) AS delay_days 对应的业务规则。延迟需要对照承诺日，不是下单日。"
       ],
-      "explanation": "延迟需要对照承诺日，不是下单日。\n执行思路：确认purchase_items、purchase_orders、receipts的输入记录；按题设连接条件匹配数据，注意连接造成的行数变化；输出receipt_id、delay_days列；遵循题设排序和并列规则。\n公开夹具实际返回 2 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：普通 SELECT 默认保留重复记录，显式 ALL 不改变结果。",
+      "explanation": "延迟需要对照承诺日，不是下单日。\n执行思路：确认purchase_items、purchase_orders、receipts的输入记录；按题设连接条件匹配数据，注意连接造成的行数变化；输出receipt_id、delay_days列；结果行的先后顺序不作要求。\n公开夹具实际返回 2 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：普通 SELECT 默认保留重复记录，显式 ALL 不改变结果。",
       "commonErrors": [
         {
-          "sql": "SELECT r.receipt_id,DATEDIFF(r.receipt_date,p.order_date) AS delay_days FROM receipts r JOIN purchase_items i ON r.po_item_id=i.po_item_id JOIN purchase_orders p ON p.po_id=i.po_id ORDER BY r.receipt_id",
+          "sql": "SELECT r.receipt_id,DATEDIFF(r.receipt_date,p.order_date) AS delay_days FROM receipts r JOIN purchase_items i ON r.po_item_id=i.po_item_id JOIN purchase_orders p ON p.po_id=i.po_id",
           "reason": "延迟需要对照承诺日，不是下单日。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
@@ -1766,24 +1766,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0175/q0175-public.json",
-          "sha256": "4f821a9818e4bca7bbd9622c4c2509595d7733384d3fb68a63a065c3092d2de6"
+          "sha256": "12d190c6db8b24e192781ea176eda1e2dcebce044172087d5ae1f9d678cf64d7"
         },
         {
           "id": "q0175-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0175/q0175-boundary.json",
-          "sha256": "4aea78eec932b8fb254fe1f63049a2e7c7db03c0a5e1fcdbb290761e13dedd13"
+          "sha256": "6b972d187451fda18e2a83044059193282dd7d0acccdca533701ec2fb5841767"
         },
         {
           "id": "q0175-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0175/q0175-empty.json",
-          "sha256": "d486f3f2bc309dee3753151ed2ee4d84578cd1fab3741772f3b122db13daa3b0"
+          "sha256": "5eb9794e1133d236a66735c95989a466ea3cc9ce6293255efff997333d0a0e93"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,

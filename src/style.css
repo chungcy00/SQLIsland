@@ -2762,3 +2762,10 @@ nav .nav-svg { color: var(--primary); }
 .fig-flow .fig-table { table-layout: fixed; } .fig-flow .fig-table th:last-child, .fig-flow .fig-table td:last-child { width: 64px; }
 .step-row .fig-count { flex: none; margin-right: 4px; }
 .step-body h3 { margin: 10px 0 6px; font-size: 0.875rem; }
+
+.fig-scroll { overflow-x: auto; }
+.fig-scroll .fig-table { min-width: max-content; width: 100%; }
+.fig-scroll .fig-table td, .fig-scroll .fig-table th { white-space: nowrap; }
+
+/* 小节标题右侧的按钮：文字右缘与内容右缘对齐（保留 44 高的点击区，向右外延 8px 抵消内边距） */
+.section-heading > button, .section-heading > .small-button { margin-right: -8px; }

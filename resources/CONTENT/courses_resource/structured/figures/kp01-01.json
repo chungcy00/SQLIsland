@@ -1,0 +1,169 @@
+{
+  "schemaVersion": 1,
+  "id": "kp01-01",
+  "lessonSha256": "5241b6e56a33d94391f89158a4f1d794411c208a499ffe1f9e6f1e2725cd4105",
+  "figures": [
+    {
+      "id": "kp01-01-clauses",
+      "slot": "syntax",
+      "kind": "clause-map",
+      "title": "示例查询的几个部分",
+      "sql": "SELECT id, category, sales FROM orders ORDER BY sales DESC;",
+      "parts": [
+        {
+          "role": "select",
+          "label": "取数",
+          "sql": "SELECT id, category, sales",
+          "note": "输出 id、category、sales 三列"
+        },
+        {
+          "role": "from",
+          "label": "来源",
+          "sql": "FROM orders",
+          "note": "读取 orders 表的全部行"
+        },
+        {
+          "role": "order",
+          "label": "排序",
+          "sql": "ORDER BY sales DESC;",
+          "note": "按 id 从小到大排列"
+        }
+      ]
+    },
+    {
+      "id": "kp01-01-flow",
+      "slot": "breakdown",
+      "kind": "stage-flow",
+      "merge": "breakdown",
+      "title": "每一步的数据变化",
+      "steps": [
+        {
+          "label": "FROM orders",
+          "sql": "SELECT * FROM orders",
+          "columns": [
+            "id",
+            "category",
+            "sales",
+            "store_id",
+            "order_date",
+            "customer_id"
+          ],
+          "rows": [
+            [
+              1,
+              "护肤品",
+              800,
+              1,
+              "2026-01-03",
+              1
+            ],
+            [
+              2,
+              "化妆品",
+              400,
+              2,
+              "2026-01-10",
+              2
+            ],
+            [
+              3,
+              "护肤品",
+              600,
+              1,
+              "2026-02-02",
+              1
+            ],
+            [
+              4,
+              "化妆品",
+              300,
+              2,
+              "2026-02-15",
+              null
+            ],
+            [
+              5,
+              "日用品",
+              1500,
+              1,
+              "2026-02-20",
+              3
+            ]
+          ]
+        },
+        {
+          "label": "SELECT id, category, sales",
+          "sql": "SELECT id, category, sales FROM orders",
+          "columns": [
+            "id",
+            "category",
+            "sales"
+          ],
+          "rows": [
+            [
+              1,
+              "护肤品",
+              800
+            ],
+            [
+              2,
+              "化妆品",
+              400
+            ],
+            [
+              3,
+              "护肤品",
+              600
+            ],
+            [
+              4,
+              "化妆品",
+              300
+            ],
+            [
+              5,
+              "日用品",
+              1500
+            ]
+          ]
+        },
+        {
+          "label": "ORDER BY sales DESC;",
+          "sql": "SELECT id, category, sales FROM orders ORDER BY sales DESC;",
+          "columns": [
+            "id",
+            "category",
+            "sales"
+          ],
+          "rows": [
+            [
+              5,
+              "日用品",
+              1500
+            ],
+            [
+              1,
+              "护肤品",
+              800
+            ],
+            [
+              3,
+              "护肤品",
+              600
+            ],
+            [
+              2,
+              "化妆品",
+              400
+            ],
+            [
+              4,
+              "化妆品",
+              300
+            ]
+          ]
+        }
+      ]
+    }
+  ]
+}

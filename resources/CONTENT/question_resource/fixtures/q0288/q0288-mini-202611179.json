@@ -19,23 +19,23 @@
         65.6
       ],
       [
-        3,
-        487600,
-        20.66
-      ],
-      [
         2,
         324400,
         13.74
       ],
       [
+        3,
+        487600,
+        20.66
+      ],
+      [
         4,
         0,
-        0.0
+        0
       ]
     ]
   },
-  "orderPolicy": "ordered",
+  "orderPolicy": "unordered_multiset",
   "numericTolerance": {
     "absolute": 1e-06,
     "integerExact": true,

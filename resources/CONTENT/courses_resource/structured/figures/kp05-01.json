@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp05-01",
-  "lessonSha256": "5cae9b4b952dcb12cc412d54a7da5844075c5f849d50280cbf7488605b80502d",
+  "lessonSha256": "419242737500667ed6bdc866de6ce00873e01059cd8f0e3befd6e9e5a7237654",
   "figures": [
     {
       "id": "kp05-01-truth",
@@ -42,7 +42,7 @@
       "slot": "syntax",
       "kind": "clause-map",
       "title": "示例查询的四个部分",
-      "sql": "SELECT id, value FROM nullable_values WHERE value <> 10 ORDER BY id;",
+      "sql": "SELECT id, value FROM nullable_values WHERE value <> 10 ORDER BY value;",
       "parts": [
         {
           "role": "select",
@@ -65,7 +65,7 @@
         {
           "role": "order",
           "label": "排序",
-          "sql": "ORDER BY id;",
+          "sql": "ORDER BY value;",
           "note": "按记录编号排列"
         }
       ]
@@ -107,8 +107,8 @@
           ]
         },
         {
-          "label": "ORDER BY id;",
-          "sql": "SELECT id, value FROM nullable_values WHERE value <> 10 ORDER BY id;",
+          "label": "ORDER BY value;",
+          "sql": "SELECT id, value FROM nullable_values WHERE value <> 10 ORDER BY value;",
           "keptKeys": [
             2
           ]

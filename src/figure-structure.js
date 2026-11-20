@@ -1,6 +1,6 @@
 // “图示”数据契约（B9）：图示数据独立存放，不改动已转换课文；所有数值须能追溯到课程示例数据，并由执行检查核对。
 const SLOTS = ['concept', 'syntax', 'breakdown'];
-const KINDS = ['truth-table', 'clause-map', 'row-flow'];
+const KINDS = ['truth-table', 'clause-map', 'row-flow', 'stage-flow'];
 const TRUTH = ['true', 'false', 'unknown'];
 const ROLES = ['select', 'from', 'where', 'group', 'order'];
 export function validateFigures(lesson, data) {
@@ -25,6 +25,26 @@ export function validateFigures(lesson, data) {
       if (!Array.isArray(figure.parts) || figure.parts.length < 2) fail('parts ' + figure.id);
       for (const part of figure.parts) { if (!ROLES.includes(part.role)) fail('role ' + figure.id); text(part.label, 'label'); text(part.sql, 'part sql'); text(part.note, 'note'); }
       if (normalized(figure.parts.map(part => part.sql).join(' ')) !== normalized(figure.sql)) fail('parts do not rebuild the query ' + figure.id);
+      continue;
+    }
+    if (figure.kind === 'stage-flow') {
+      // 每一步给出该步的列与行（由 SQL 执行核对）；skip 表示该步没有可独立展示的中间结果。
+      const breakdown = lesson.presentation?.breakdown || [];
+      if (figure.merge !== 'breakdown' || figure.slot !== 'breakdown') fail('stage-flow must merge into breakdown ' + figure.id);
+      if (!Array.isArray(figure.steps) || figure.steps.length !== breakdown.length) fail('stage-flow steps must match the breakdown steps ' + figure.id);
+      for (const [index, step] of figure.steps.entries()) {
+        if (normalized(step.label) !== normalized(breakdown[index].sql)) fail('stage-flow label differs from breakdown step ' + (index + 1));
+        if (step.skip) { if (step.sql || step.rows) fail('skipped step carries data ' + (index + 1)); continue; }
+        text(step.sql, 'step sql');
+        if (!Array.isArray(step.columns) || !step.columns.length || step.columns.some(name => typeof name !== 'string')) fail('step columns ' + (index + 1));
+        if (!Array.isArray(step.rows) || step.rows.some(row => !Array.isArray(row) || row.length !== step.columns.length || row.some(value => value !== null && !['string', 'number'].includes(typeof value)))) fail('step rows ' + (index + 1));
+        const whole = /^select \* from (\w+);?$/i.exec(step.sql.trim());
+        const table = whole && lesson.sourceTables?.find(item => item.name === whole[1]);
+        if (table && (JSON.stringify(step.rows) !== JSON.stringify(table.rows) || JSON.stringify(step.columns) !== JSON.stringify(table.columns.map(column => column.name)))) fail('first step differs from sample data ' + (index + 1));
+      }
+      const last = figure.steps.at(-1);
+      if (last.skip || normalized(last.sql) !== normalized(lesson.sqliteSql)) fail('last step must be the full query ' + figure.id);
+      if (JSON.stringify(last.rows) !== JSON.stringify(lesson.result.rows) || JSON.stringify(last.columns) !== JSON.stringify(lesson.result.columns)) fail('last step differs from the lesson result ' + figure.id);
       continue;
     }
     if (!source) fail('unknown table ' + figure.table);

@@ -12,12 +12,15 @@
       "id": "kp03-01",
       "chapterId": "ch03",
       "title": "WHERE 与比较运算",
-      "learningObjective": "能够运用本节知识完成：筛选指定价位商品",
+      "learningObjective": "能够将业务筛选条件转换为比较表达式，正确处理上下界，并解释为何某些记录被排除。",
       "prerequisites": [],
-      "concept": "WHERE 对每行计算条件，只保留真值；比较符包括 =、<>、!=、>、>=、<、<=。",
-      "syntax": "SELECT ... FROM t WHERE condition;",
+      "concept": "筛选是从一批记录中选出符合条件的部分，而不是修改或删除源数据。WHERE 对输入中的每一行判断条件，只保留判断结果为真的行。例如商品价格必须在某个范围，分析师需要明确临界值是否算合格。等于使用 =，不等于使用 <>（也可用 !=），大于和小于分别使用 >、<，带等号的 >=、<= 包含边界。多个条件可以同时约束同一行。筛选前后通常仍是一行一个商品，只是行数改变。若字段为空，普通比较通常得到未知，不能认为它自动满足“不等于”。日期、文本和金额比较还必须确认字段类型及单位。",
+      "syntax": "SELECT column_name FROM table_name WHERE condition;",
       "parameters": {
-        "condition": "布尔条件"
+        "SELECT": "选择结果字段",
+        "FROM": "指定输入表",
+        "WHERE": "只保留条件为真的记录",
+        "condition": "比较表达式，可组合多个条件"
       },
       "fixtureIds": [
         "lesson-products"
@@ -103,19 +106,20 @@
           ]
         }
       ],
-      "mysqlSql": "SELECT product_id, price FROM products WHERE price >= 35 AND price <= 65 ORDER BY product_id;",
-      "sqliteSql": "SELECT product_id, price FROM products WHERE price >= 35 AND price <= 65 ORDER BY product_id;",
+      "mysqlSql": "SELECT product_id, price FROM products WHERE price >= 35 AND price <= 65 ORDER BY price DESC;",
+      "sqliteSql": "SELECT product_id, price FROM products WHERE price >= 35 AND price <= 65 ORDER BY price DESC;",
       "executionSteps": [
-        "逐行比较下限与上限",
-        "同时满足才保留"
+        "确定价格上下界",
+        "逐行判断两个条件",
+        "输出符合条件的商品"
       ],
-      "useCase": "筛选指定价位商品",
-      "comparison": "WHERE 过滤行，HAVING 用于分组后的条件。",
+      "useCase": "采购主管需要列出单价在35至65之间（包含35和65）的商品，作为价格带核查清单。只需要商品编号和单价，不需要修改商品资料。",
+      "comparison": "WHERE 筛选明细行；HAVING 通常用于分组后的筛选，后续章节详讲。闭区间包含两端，半开区间只包含其中一端。",
       "commonError": {
-        "example": "WHERE price => 35",
-        "correction": "WHERE price >= 35"
+        "example": "WHERE price => 35；或使用 price > 35 却希望包含35。",
+        "correction": "使用 price >= 35；根据业务明确是否包含边界。"
       },
-      "notes": "NULL 比较结果通常未知，不会被 WHERE 保留。",
+      "notes": "不把未知价格当零；本例数值均已知。",
       "compatibility": {
         "status": "直接兼容",
         "detail": "仅在本示例数据与语义范围验证；不代表全部 MySQL 语法兼容。"
@@ -137,16 +141,16 @@
         ],
         "rows": [
           [
-            3,
-            35
-          ],
-          [
             4,
             65
           ],
           [
             5,
             45
+          ],
+          [
+            3,
+            35
           ]
         ],
         "status": "SQLite实际执行",
@@ -162,28 +166,80 @@
         "fc0015"
       ],
       "teaching": {
-        "problem": "按闭区间查商品时先确认边界值是否要保留。",
-        "codeExplanation": "WHERE 的两个比较分别约束下界和上界，AND 要求二者都真。SELECT 只在通过筛选的行上投影。",
-        "resultExplanation": "价格正好 35 和 65 的记录都保留。若改为半开区间，明确把上界改为小于。",
+        "problem": "采购主管需要列出单价在35至65之间（包含35和65）的商品，作为价格带核查清单。只需要商品编号和单价，不需要修改商品资料。",
+        "codeExplanation": "先从 products 读取商品表；price 是单件售价而非库存金额。price >= 35 排除价格低于35的记录，price <= 65 排除高于65的记录，AND 要求两者同时成立。SELECT 仅展示商品编号与单价，ORDER BY price DESC 使输出顺序确定。下方补充示例先单独应用下界，再观察加入上界的变化。逻辑上的逐步筛选是教学拆解，不代表数据库必然按该物理顺序执行。",
+        "resultExplanation": "原表6行，最终3行，编号3、4、5的价格分别为35、65、45。35和65均保留；编号2价格89被上界排除，编号1、6价格15被下界排除。结果仍是商品粒度，不是价格区间汇总。不能仅凭这个清单判断商品是否畅销。",
         "checkpoints": [],
         "mergedConcepts": [],
-        "mergeExamples": []
+        "mergeExamples": [
+          {
+            "label": "先检查下界",
+            "explanation": "保留单价至少35的商品，此时89仍在结果内，说明只设下界并不完整。",
+            "sql": "SELECT product_id, price FROM products WHERE price >= 35 ORDER BY price DESC;",
+            "result": {
+              "columns": [
+                "product_id",
+                "price"
+              ],
+              "rows": [
+                [
+                  2,
+                  89
+                ],
+                [
+                  4,
+                  65
+                ],
+                [
+                  5,
+                  45
+                ],
+                [
+                  3,
+                  35
+                ]
+              ]
+            }
+          },
+          {
+            "label": "对比半开区间",
+            "explanation": "如果业务规定65不包含，改用小于65，编号4消失。",
+            "sql": "SELECT product_id, price FROM products WHERE price >= 35 AND price < 65 ORDER BY price DESC;",
+            "result": {
+              "columns": [
+                "product_id",
+                "price"
+              ],
+              "rows": [
+                [
+                  5,
+                  45
+                ],
+                [
+                  3,
+                  35
+                ]
+              ]
+            }
+          }
+        ]
       }
     },
     {
       "id": "kp03-02",
       "chapterId": "ch03",
       "title": "AND、OR、NOT 与优先级",
-      "learningObjective": "能够运用本节知识完成：寻找低价或高库存且有货商品",
+      "learningObjective": "能够将多条件业务需求拆成候选条件与必备条件，使用括号避免逻辑错误，并检查反例。",
       "prerequisites": [
         "kp03-01"
       ],
-      "concept": "NOT 通常先于 AND，AND 先于 OR；括号明确业务条件，避免依赖记忆。",
-      "syntax": "WHERE (a OR b) AND NOT c",
+      "concept": "逻辑运算用于组合真假条件。AND 要求两个条件都为真；OR 要求至少一个条件为真（也允许两个都为真）；NOT 对条件取反。在本项目的常规语法设置中，NOT 的逻辑优先级高于 AND，AND 高于 OR；但最好主动用括号写出业务含义。实际需求常有两层：任一候选规则成立，但必须满足共同的限制。例如低价或高库存的商品可参加促销，但零库存必须排除。若把共同限制只写在 OR 的一侧，另一侧通过的商品可能绕过限制。涉及 NULL 时，未知条件的取反仍可能是未知，并不是所有记录都能分为真与假两类。",
+      "syntax": "WHERE (condition_a OR condition_b) AND NOT (condition_c)",
       "parameters": {
-        "AND": "同时满足",
-        "OR": "至少一个为真",
-        "NOT": "逻辑取反"
+        "AND": "两个条件都成立",
+        "OR": "至少一个条件成立",
+        "NOT": "对括号内条件取反",
+        "()": "明确条件组合范围"
       },
       "fixtureIds": [
         "lesson-products"
@@ -269,20 +325,20 @@
           ]
         }
       ],
-      "mysqlSql": "SELECT product_id FROM products WHERE (price < 40 OR stock > 100) AND NOT stock = 0 ORDER BY product_id;",
-      "sqliteSql": "SELECT product_id FROM products WHERE (price < 40 OR stock > 100) AND NOT stock = 0 ORDER BY product_id;",
+      "mysqlSql": "SELECT product_id FROM products WHERE (price < 40 OR stock > 100) AND NOT stock = 0 ORDER BY product_name DESC;",
+      "sqliteSql": "SELECT product_id FROM products WHERE (price < 40 OR stock > 100) AND NOT stock = 0 ORDER BY product_name DESC;",
       "executionSteps": [
-        "先判断括号",
+        "筛选低价或高库存商品",
         "排除零库存",
-        "保留交集"
+        "按商品编号输出"
       ],
-      "useCase": "寻找低价或高库存且有货商品",
-      "comparison": "AND 与 OR 不能互换。",
+      "useCase": "运营人员要寻找促销候选商品：单价低于40，或者库存超过100；同时不能是零库存商品。原表库存均为非负整数，因此排除零库存符合本例口径。",
+      "comparison": "OR 不是二选一；AND 是交集。括号约束逻辑范围，不是强制数据库采用特定物理执行顺序。",
       "commonError": {
         "example": "WHERE price < 40 OR stock > 100 AND stock > 0",
         "correction": "WHERE (price < 40 OR stock > 100) AND stock > 0"
       },
-      "notes": "遇 NULL 时 NOT 未必得到真。",
+      "notes": "主例假设库存非负，未知库存不视为有货。",
       "compatibility": {
         "status": "直接兼容",
         "detail": "仅在本示例数据与语义范围验证；不代表全部 MySQL 语法兼容。"
@@ -309,10 +365,10 @@
             1
           ],
           [
-            3
+            4
           ],
           [
-            4
+            3
           ]
         ],
         "status": "SQLite实际执行",
@@ -331,27 +387,89 @@
         "fc0022"
       ],
       "teaching": {
-        "problem": "促销候选可以由低价或高库存触发，但缺货商品一律排除。",
-        "codeExplanation": "括号先形成候选集合，外层 AND 再应用排除条件。加括号让逻辑不依赖读者凭印象判断运算优先级。",
-        "resultExplanation": "低价但库存为零的商品被排除。写多条件时先手工列出最容易漏掉的反例，再检查括号。",
+        "problem": "运营人员要寻找促销候选商品：单价低于40，或者库存超过100；同时不能是零库存商品。原表库存均为非负整数，因此排除零库存符合本例口径。",
+        "codeExplanation": "先把 price < 40 与 stock > 100 放入同一个括号，用 OR 形成候选集合。随后在括号外使用 AND NOT stock = 0，把零库存排除条件应用到整个候选集合，而非只应用到高库存分支。实际业务若允许负库存，更稳妥的“有货”判断是 stock > 0。本例主代码保持原有写法。下面先观察候选集合，再对比省略括号造成的错误。",
+        "resultExplanation": "原候选编号为1、3、4、6；编号6单价15但库存0，因此最终仅保留1、3、4。编号4不是低价商品，但库存180符合另一条候选规则。结果只是促销候选，不代表促销一定盈利。",
         "checkpoints": [],
         "mergedConcepts": [],
-        "mergeExamples": []
+        "mergeExamples": [
+          {
+            "label": "查看候选集合",
+            "explanation": "先不应用库存限制，观察编号6如何因为低价被选入。",
+            "sql": "SELECT product_id, price, stock FROM products WHERE price < 40 OR stock > 100 ORDER BY stock DESC;",
+            "result": {
+              "columns": [
+                "product_id",
+                "price",
+                "stock"
+              ],
+              "rows": [
+                [
+                  3,
+                  35,
+                  200
+                ],
+                [
+                  4,
+                  65,
+                  180
+                ],
+                [
+                  1,
+                  15,
+                  150
+                ],
+                [
+                  6,
+                  15,
+                  0
+                ]
+              ]
+            }
+          },
+          {
+            "label": "检查遗漏括号的反例",
+            "explanation": "错误写法的 AND 仅约束右侧分支，编号6仍出现。此查询故意展示错误业务结果。",
+            "sql": "SELECT product_id FROM products WHERE price < 40 OR stock > 100 AND stock > 0 ORDER BY product_name DESC;",
+            "result": {
+              "columns": [
+                "product_id"
+              ],
+              "rows": [
+                [
+                  6
+                ],
+                [
+                  1
+                ],
+                [
+                  4
+                ],
+                [
+                  3
+                ]
+              ]
+            }
+          }
+        ]
       }
     },
     {
       "id": "kp03-03",
       "chapterId": "ch03",
       "title": "IN 与 BETWEEN",
-      "learningObjective": "能够运用本节知识完成：筛选指定类别及价格带",
+      "learningObjective": "能够使用集合和区间条件完成多维筛选，识别包含边界的规则，并解释日期时间区间的常见陷阱。",
       "prerequisites": [
         "kp03-02"
       ],
-      "concept": "IN 判断是否属于集合；BETWEEN 包含上下端点。",
-      "syntax": "WHERE col IN (v1,v2) AND price BETWEEN low AND high",
+      "concept": "IN 适用于离散候选值，例如允许的类别或门店编号。对于非空候选值，IN 可理解为多个等于条件用 OR 组合，避免重复书写字段。BETWEEN 适用于连续范围，并包含上下界，相当于在通常的同类型比较中同时应用 >= 和 <=。上下界顺序不能任意交换。两种条件可以结合，分别约束类别与金额。在时间戳筛选中，业务人员说“整个一月”时，常用大于等于一月一日且小于二月一日，而不是小于等于一月三十一日零点，以免漏掉最后一天的记录。NOT IN 遇到未知候选值会产生特殊情况，后续子查询章节详讲。",
+      "syntax": "WHERE category IN (value1, value2) AND price BETWEEN low AND high",
       "parameters": {
-        "IN": "集合成员",
-        "BETWEEN": "闭区间"
+        "IN": "匹配允许值集合",
+        "BETWEEN": "包含上下界的范围",
+        "low": "下界",
+        "high": "上界",
+        "AND": "两个筛选条件同时满足"
       },
       "fixtureIds": [
         "lesson-products"
@@ -437,19 +555,20 @@
           ]
         }
       ],
-      "mysqlSql": "SELECT product_id, price FROM products WHERE category IN ('护肤品','化妆品') AND price BETWEEN 35 AND 65 ORDER BY product_id;",
-      "sqliteSql": "SELECT product_id, price FROM products WHERE category IN ('护肤品','化妆品') AND price BETWEEN 35 AND 65 ORDER BY product_id;",
+      "mysqlSql": "SELECT product_id, price FROM products WHERE category IN ('护肤品','化妆品') AND price BETWEEN 35 AND 65 ORDER BY price DESC;",
+      "sqliteSql": "SELECT product_id, price FROM products WHERE category IN ('护肤品','化妆品') AND price BETWEEN 35 AND 65 ORDER BY price DESC;",
       "executionSteps": [
-        "先筛类别集合",
-        "保留闭区间价格"
+        "筛选指定商品类别",
+        "筛选闭区间单价",
+        "保留符合两类条件的商品"
       ],
-      "useCase": "筛选指定类别及价格带",
-      "comparison": "IN 等价于若干相等条件的 OR（注意 NULL）。",
+      "useCase": "采购主管只想检查护肤品和化妆品，且只看单价35至65（包含端点）的商品。日用品不属于当前检查范围。",
+      "comparison": "IN 适合离散选项；BETWEEN 适合有序区间。不要用 BETWEEN 表达无实际顺序关系的类别名单。",
       "commonError": {
-        "example": "BETWEEN 65 AND 35 期待自动交换",
-        "correction": "BETWEEN 35 AND 65"
+        "example": "BETWEEN 65 AND 35 期待自动交换上下界。",
+        "correction": "使用 BETWEEN 35 AND 65；日期时间常改为左闭右开区间。"
       },
-      "notes": "时间戳区间建议使用 >= 起点 AND < 下一边界。",
+      "notes": "不同数据库的隐式类型转换可能不同；比较前核对字段类型。",
       "compatibility": {
         "status": "直接兼容",
         "detail": "仅在本示例数据与语义范围验证；不代表全部 MySQL 语法兼容。"
@@ -473,16 +592,16 @@
         ],
         "rows": [
           [
-            3,
-            35
-          ],
-          [
             4,
             65
           ],
           [
             5,
             45
+          ],
+          [
+            3,
+            35
           ]
         ],
         "status": "SQLite实际执行",
@@ -500,27 +619,94 @@
         "fc0023"
       ],
       "teaching": {
-        "problem": "筛选指定品类内的价格带，同时表达枚举值和区间。",
-        "codeExplanation": "IN 匹配任一允许的类别，BETWEEN 连同上下界一起比较，AND 取两个条件的交集。",
-        "resultExplanation": "两个边界价可以入选，其他类别即使价格符合也不入选。日期时间通常改用左闭右开，避免漏掉最后一天的非零时刻。",
+        "problem": "采购主管只想检查护肤品和化妆品，且只看单价35至65（包含端点）的商品。日用品不属于当前检查范围。",
+        "codeExplanation": "category IN (...) 判断类别是否属于允许名单，price BETWEEN 35 AND 65 判断价格区间；AND 将两项规则组合。选择 IN 是为了清楚写出离散名单，选择 BETWEEN 是因为本例明确包括两端。先用类别条件观察候选，再加入价格条件。对于时间戳，则按明确的日期边界改写。",
+        "resultExplanation": "候选类别包含编号1至5，进一步筛选后只剩3、4、5，价格35、65、45。编号6类别不符；编号1、2属于允许类别但价格不符。与上一节比较表达式示例虽然得到相同结果，但业务条件不同，不能据此认为类别条件多余。",
         "checkpoints": [],
         "mergedConcepts": [],
-        "mergeExamples": []
+        "mergeExamples": [
+          {
+            "label": "仅筛选类别",
+            "explanation": "先验证名单范围：价格尚未参与筛选。",
+            "sql": "SELECT product_id, category, price FROM products WHERE category IN ('护肤品','化妆品') ORDER BY price DESC;",
+            "result": {
+              "columns": [
+                "product_id",
+                "category",
+                "price"
+              ],
+              "rows": [
+                [
+                  2,
+                  "护肤品",
+                  89
+                ],
+                [
+                  4,
+                  "化妆品",
+                  65
+                ],
+                [
+                  5,
+                  "化妆品",
+                  45
+                ],
+                [
+                  3,
+                  "护肤品",
+                  35
+                ],
+                [
+                  1,
+                  "护肤品",
+                  15
+                ]
+              ]
+            }
+          },
+          {
+            "label": "等价的显式比较",
+            "explanation": "对本例已知数值和文本，显式写法与集合和区间写法的结果一致。",
+            "sql": "SELECT product_id, price FROM products WHERE (category='护肤品' OR category='化妆品') AND price>=35 AND price<=65 ORDER BY price DESC;",
+            "result": {
+              "columns": [
+                "product_id",
+                "price"
+              ],
+              "rows": [
+                [
+                  4,
+                  65
+                ],
+                [
+                  5,
+                  45
+                ],
+                [
+                  3,
+                  35
+                ]
+              ]
+            }
+          }
+        ]
       }
     },
     {
       "id": "kp03-04",
       "chapterId": "ch03",
       "title": "LIKE、通配符与转义",
-      "learningObjective": "能够运用本节知识完成：查找含下划线的商品编码",
+      "learningObjective": "能够按前缀、后缀、包含或字符长度进行文本匹配，并正确查询字面上的通配符。",
       "prerequisites": [
         "kp03-03"
       ],
-      "concept": "% 匹配零个或多个字符；_ 匹配单个字符；ESCAPE 指定转义符。",
-      "syntax": "WHERE name LIKE pattern ESCAPE '!'",
+      "concept": "文本相等比较要求字段符合指定值，而 LIKE 根据模式判断文本是否符合某种结构。百分号 % 匹配零个或多个字符，下划线 _ 匹配恰好一个字符。模式通常要匹配整个字符串，因此前缀搜索把百分号放在末尾，后缀搜索放在开头，包含搜索则两边都放。当业务要求找出实际包含下划线或百分号的名称时，必须把通配符转义。本例通过 ESCAPE 指定感叹号为转义字符，!_ 表示普通下划线，!% 表示普通百分号，!! 表示感叹号本身。大小写敏感性受数据库和排序规则影响，不能从一个本地例子推断全部数据库表现。",
+      "syntax": "WHERE column_name LIKE 'pattern' ESCAPE '!'",
       "parameters": {
-        "pattern": "模式字符串",
-        "!": "本例转义字符"
+        "LIKE": "按模式匹配文本",
+        "%": "零个或多个字符",
+        "_": "恰好一个字符",
+        "ESCAPE": "指定转义字符"
       },
       "fixtureIds": [
         "lesson-products"
@@ -606,19 +792,20 @@
           ]
         }
       ],
-      "mysqlSql": "SELECT product_name FROM products WHERE product_name LIKE '%!_%' ESCAPE '!' ORDER BY product_id;",
-      "sqliteSql": "SELECT product_name FROM products WHERE product_name LIKE '%!_%' ESCAPE '!' ORDER BY product_id;",
+      "mysqlSql": "SELECT product_name FROM products WHERE product_name LIKE '%!_%' ESCAPE '!' ORDER BY product_name DESC;",
+      "sqliteSql": "SELECT product_name FROM products WHERE product_name LIKE '%!_%' ESCAPE '!' ORDER BY product_name DESC;",
       "executionSteps": [
-        "逐行匹配模式",
-        "把下划线作为普通字符"
+        "构造包含字面下划线的模式",
+        "逐行匹配名称",
+        "输出符合条件的商品"
       ],
-      "useCase": "查找含下划线的商品编码",
-      "comparison": "LIKE 用于模式匹配，= 用于相等比较。",
+      "useCase": "商品主数据管理员需要找出名称含下划线的商品，检查是否仍有旧的命名格式。只需查找真实存在的下划线，而不是任意字符。",
+      "comparison": "等号用于相等比较，LIKE 用于模式匹配；下划线不是默认的字面字符。",
       "commonError": {
-        "example": "LIKE '%_%' 期待只找下划线",
+        "example": "LIKE '%_%' 期待仅找到下划线。",
         "correction": "LIKE '%!_%' ESCAPE '!'"
       },
-      "notes": "MySQL 排序规则与 SQLite 的大小写行为不同；本例只匹配标点。",
+      "notes": "本例匹配标点；其他文本的大小写与 Unicode 行为应在目标数据库复验。",
       "compatibility": {
         "status": "直接兼容",
         "detail": "仅在本示例数据与语义范围验证；不代表全部 MySQL 语法兼容。"
@@ -661,12 +848,64 @@
         "fc0021"
       ],
       "teaching": {
-        "problem": "查找命名中含下划线的商品时，需要把字面标记和通配符分开。",
-        "codeExplanation": "两端 % 匹配任意前后缀，ESCAPE '!' 使 !_ 只匹配字符下划线；普通 _ 则匹配任意单个字符。",
-        "resultExplanation": "Soap_1 被命中。识别含百分号的标签时用同样办法把 % 转义。",
+        "problem": "商品主数据管理员需要找出名称含下划线的商品，检查是否仍有旧的命名格式。只需查找真实存在的下划线，而不是任意字符。",
+        "codeExplanation": "product_name LIKE '%!_%' 中，两侧百分号允许任意前后缀；ESCAPE '!' 让紧随其后的下划线按普通字符匹配。SELECT 返回需要核查的名称。主例不需要分组或替换内容，因为当前任务只要求找出记录。补充例子展示前缀匹配和错误模式的区别。",
+        "resultExplanation": "六个商品中仅 Soap_1 命中。未转义的下划线可以匹配任何一个字符，因此普通非空名称也可能全部命中。找到下划线不代表名称一定错误，还要核对命名规范。",
         "checkpoints": [],
         "mergedConcepts": [],
-        "mergeExamples": []
+        "mergeExamples": [
+          {
+            "label": "前缀匹配",
+            "explanation": "找以大写 S 开头的示例名称；本数据没有大小写对立样本。",
+            "sql": "SELECT product_name FROM products WHERE product_name LIKE 'S%' ORDER BY product_name DESC;",
+            "result": {
+              "columns": [
+                "product_name"
+              ],
+              "rows": [
+                [
+                  "Sunscreen"
+                ],
+                [
+                  "Soap_1"
+                ],
+                [
+                  "Serum"
+                ]
+              ]
+            }
+          },
+          {
+            "label": "错误模式对照",
+            "explanation": "故意不转义下划线，观察全部非空名称均被匹配。",
+            "sql": "SELECT product_name FROM products WHERE product_name LIKE '%_%' ORDER BY product_name DESC;",
+            "result": {
+              "columns": [
+                "product_name"
+              ],
+              "rows": [
+                [
+                  "Sunscreen"
+                ],
+                [
+                  "Soap_1"
+                ],
+                [
+                  "Serum"
+                ],
+                [
+                  "Mask"
+                ],
+                [
+                  "Cream"
+                ],
+                [
+                  "Cleanser"
+                ]
+              ]
+            }
+          }
+        ]
       }
     }
   ],

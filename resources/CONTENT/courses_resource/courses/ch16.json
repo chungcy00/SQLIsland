@@ -12,12 +12,12 @@
       "id": "kp16-01",
       "chapterId": "ch16",
       "title": "识别重复与去重规则",
-      "learningObjective": "能够运用本节知识完成：发现重复导入数据",
+      "learningObjective": "定义疑似重复键，定位重复明细并制定可复核的保留规则。",
       "prerequisites": [],
-      "concept": "重复记录由业务键决定，不是任意字段相同就删除；先报告重复，再确定保留规则。",
+      "concept": "技术重复与业务重复不同。同样金额或商品可能属于合法的多次交易；名称经清洗后相同也不证明是同一笔。应先确定业务键、规范化规则和保留优先级，再定位待核实记录。",
       "syntax": "GROUP BY business_key HAVING COUNT(*)>1",
       "parameters": {
-        "business_key": "定义同一业务对象的字段"
+        "business_key": "业务识别字段组合"
       },
       "fixtureIds": [
         "lesson-raw_data"
@@ -94,17 +94,17 @@
       "mysqlSql": "SELECT TRIM(name) AS clean_name,amount,LOWER(category) AS clean_category,COUNT(*) AS duplicate_count FROM raw_data GROUP BY TRIM(name),amount,LOWER(category) HAVING COUNT(*)>1;",
       "sqliteSql": "SELECT TRIM(name) AS clean_name,amount,LOWER(category) AS clean_category,COUNT(*) AS duplicate_count FROM raw_data GROUP BY TRIM(name),amount,LOWER(category) HAVING COUNT(*)>1;",
       "executionSteps": [
-        "统一名称与分类",
-        "按名称、金额及类别分组",
-        "标记重复组"
+        "统一用于比较的文本",
+        "按候选键分组计数",
+        "定位疑似重复明细"
       ],
-      "useCase": "发现重复导入数据",
-      "comparison": "DISTINCT 能去掉投影后的重复行，但不能决定保留哪一条业务记录。",
+      "useCase": "导入清单需要找出相同清洗后名称、金额文本及类别的记录；该组合仅是筛查条件，不是已确认的交易唯一键。",
+      "comparison": "DISTINCT 去除完全相同的输出行，不提供业务重复证据。",
       "commonError": {
-        "example": "直接 DELETE 相同金额的记录",
-        "correction": "先定义业务键与保留顺序"
+        "example": "直接删除金额相同或候选键相同的记录。",
+        "correction": "先审核业务凭证与唯一编号，再确定保留规则。"
       },
-      "notes": "相同商品和金额可能是合法交易；本例只标记疑似重复。",
+      "notes": "金额当前为文本，15与15.00可能被分成不同组；正式口径应先安全规范金额。",
       "compatibility": {
         "status": "直接兼容",
         "detail": "仅在本示例数据与语义范围验证；不代表全部 MySQL 语法兼容。"
@@ -156,26 +156,65 @@
         "fc0126"
       ],
       "teaching": {
-        "problem": "先量化疑似重复，再决定哪些记录允许归并。",
-        "codeExplanation": "按清洗后的名称、金额及类别分组，HAVING 筛选计数超过一的组合。这样的组合是待复核的业务键。",
-        "resultExplanation": "两条 Mask 被归为一组。若同值交易确实可能多次发生，应加发票号等业务标识或人工复核。",
+        "problem": "导入清单需要找出相同清洗后名称、金额文本及类别的记录；该组合仅是筛查条件，不是已确认的交易唯一键。",
+        "codeExplanation": "TRIM 清理名称边缘空格，LOWER 统一类别大小写，GROUP BY 使用同一表达式形成候选组，HAVING 筛出计数大于1的组。明细定位可通过窗口计数保留原编号；确认重复后才按批准规则选择保留行。",
+        "resultExplanation": "编号1和2属于同一疑似重复组，计数2。其余四条不符合该规则；这不排除其他业务异常。",
         "checkpoints": [],
         "mergedConcepts": [],
-        "mergeExamples": []
+        "mergeExamples": [
+          {
+            "label": "定位重复明细",
+            "explanation": "窗口计数保留原始编号，外层筛选疑似重复。",
+            "sql": "WITH d AS (SELECT id,COUNT(*) OVER(PARTITION BY TRIM(name),amount,LOWER(category)) AS n FROM raw_data) SELECT id,n FROM d WHERE n>1 ORDER BY n DESC;",
+            "result": {
+              "columns": [
+                "id",
+                "n"
+              ],
+              "rows": [
+                [
+                  1,
+                  2
+                ],
+                [
+                  2,
+                  2
+                ]
+              ]
+            }
+          },
+          {
+            "label": "模拟保留顺序",
+            "explanation": "仅预览候选中的后续记录；编号小不代表数据质量一定更高。",
+            "sql": "WITH d AS (SELECT id,ROW_NUMBER() OVER(PARTITION BY TRIM(name),amount,LOWER(category) ORDER BY id) AS rn FROM raw_data) SELECT id,rn FROM d WHERE rn>1 ORDER BY rn DESC;",
+            "result": {
+              "columns": [
+                "id",
+                "rn"
+              ],
+              "rows": [
+                [
+                  2,
+                  2
+                ]
+              ]
+            }
+          }
+        ]
       }
     },
     {
       "id": "kp16-02",
       "chapterId": "ch16",
       "title": "缺失与异常检测",
-      "learningObjective": "能够运用本节知识完成：生成数据质量检查报告",
+      "learningObjective": "将数据质量规则转换为可审查标签，区分缺失、异常和合法零值。",
       "prerequisites": [
         "kp16-01"
       ],
-      "concept": "先定义规则，再标记异常；空字符串、NULL、负值及零值有不同含义。",
-      "syntax": "CASE WHEN condition THEN label ... END",
+      "concept": "缺失代表数据未提供；异常是违反规则或需要核实的记录。负金额可能是退款，零金额可能是赠品，不应自动纠正。条件分类只返回首个命中的标签；多异常审计可以为每项规则生成独立标记。",
+      "syntax": "CASE WHEN condition THEN label ELSE other END",
       "parameters": {
-        "condition": "数据质量规则"
+        "condition": "已经定义的数据质量规则"
       },
       "fixtureIds": [
         "lesson-raw_data"
@@ -249,20 +288,20 @@
           ]
         }
       ],
-      "mysqlSql": "SELECT id,CASE WHEN name IS NULL OR TRIM(name)='' THEN '名称缺失' WHEN amount IS NULL THEN '金额缺失' WHEN CAST(amount AS DECIMAL(12,2))<0 THEN '负金额待核' ELSE '通过' END AS quality FROM raw_data ORDER BY id;",
-      "sqliteSql": "SELECT id,CASE WHEN name IS NULL OR TRIM(name)='' THEN '名称缺失' WHEN amount IS NULL THEN '金额缺失' WHEN CAST(amount AS DECIMAL(12,2))<0 THEN '负金额待核' ELSE '通过' END AS quality FROM raw_data ORDER BY id;",
+      "mysqlSql": "SELECT id,CASE WHEN name IS NULL OR TRIM(name)='' THEN '名称缺失' WHEN amount IS NULL THEN '金额缺失' WHEN CAST(amount AS DECIMAL(12,2))<0 THEN '负金额待核' ELSE '通过' END AS quality FROM raw_data ORDER BY name DESC;",
+      "sqliteSql": "SELECT id,CASE WHEN name IS NULL OR TRIM(name)='' THEN '名称缺失' WHEN amount IS NULL THEN '金额缺失' WHEN CAST(amount AS DECIMAL(12,2))<0 THEN '负金额待核' ELSE '通过' END AS quality FROM raw_data ORDER BY name DESC;",
       "executionSteps": [
-        "先检查名称",
-        "检查金额缺失",
-        "在已知合法数字文本中识别负值"
+        "检查名称与金额缺失",
+        "检查负金额",
+        "按规则标记并汇总"
       ],
-      "useCase": "生成数据质量检查报告",
-      "comparison": "异常值不是必然错误，例如退款可以为负数。",
+      "useCase": "导入数据中金额文本已知为合法整数或空值，检查名称缺失、金额缺失及负金额。零值暂视为允许。",
+      "comparison": "单一分类适合汇总首要原因；独立标记适合同时检出多个问题。",
       "commonError": {
-        "example": "所有负金额直接改为0",
-        "correction": "保留原值并按业务核实"
+        "example": "把负金额直接改为0，或依赖 CAST 判断非法文本是否合法。",
+        "correction": "保留原值，建立符合业务的数据格式检查与人工复核。"
       },
-      "notes": "样例金额文本已知合法；实际导入必须先验证数字格式。",
+      "notes": "普通 TRIM 不覆盖所有 Unicode 空白；样例不含非法数字。",
       "compatibility": {
         "status": "直接兼容",
         "detail": "仅在本示例数据与语义范围验证；不代表全部 MySQL 语法兼容。"
@@ -289,23 +328,23 @@
         ],
         "rows": [
           [
-            1,
-            "通过"
-          ],
-          [
-            2,
-            "通过"
+            4,
+            "负金额待核"
           ],
           [
             3,
             "金额缺失"
           ],
           [
-            4,
-            "负金额待核"
+            2,
+            "通过"
           ],
           [
             5,
+            "通过"
+          ],
+          [
+            1,
             "通过"
           ],
           [
@@ -326,26 +365,96 @@
         "fc0127"
       ],
       "teaching": {
-        "problem": "数据质量报告要区分缺失、异常和通过的记录。",
-        "codeExplanation": "CASE 优先检查缺失和全空白文本，然后才比较转换后的金额。用稳定主键保留可回查线索。",
-        "resultExplanation": "同样的检查可批量汇总每种异常类型。存在非法数字字符串时应先验证可转换性，不能依赖数据库隐式转换。",
+        "problem": "导入数据中金额文本已知为合法整数或空值，检查名称缺失、金额缺失及负金额。零值暂视为允许。",
+        "codeExplanation": "先判断名称为空或去除普通空格后为空，再判断金额是否缺失，最后比较转换后的金额。保留原始编号用于回查。实际来源若可能含非法数字文本，必须先验证格式，不能把转换结果零当成合法输入。",
+        "resultExplanation": "编号3金额缺失，4负金额待核，6名称缺失；1、2、5通过本组规则。通过不等于已经完成全部质量审核。",
         "checkpoints": [],
         "mergedConcepts": [],
-        "mergeExamples": []
+        "mergeExamples": [
+          {
+            "label": "独立质量标记",
+            "explanation": "三个标记可同时为1。",
+            "sql": "SELECT id,CASE WHEN name IS NULL OR TRIM(name)='' THEN 1 ELSE 0 END AS missing_name,CASE WHEN amount IS NULL THEN 1 ELSE 0 END AS missing_amount,CASE WHEN CAST(amount AS DECIMAL(12,2))<0 THEN 1 ELSE 0 END AS negative_amount FROM raw_data ORDER BY name DESC;",
+            "result": {
+              "columns": [
+                "id",
+                "missing_name",
+                "missing_amount",
+                "negative_amount"
+              ],
+              "rows": [
+                [
+                  4,
+                  0,
+                  0,
+                  1
+                ],
+                [
+                  3,
+                  0,
+                  1,
+                  0
+                ],
+                [
+                  2,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  5,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  1,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  6,
+                  1,
+                  0,
+                  0
+                ]
+              ]
+            }
+          },
+          {
+            "label": "统计缺失数量",
+            "explanation": "按各规则独立汇总，不将计数相加解释为唯一异常记录数。",
+            "sql": "SELECT SUM(CASE WHEN name IS NULL OR TRIM(name)='' THEN 1 ELSE 0 END) AS missing_names,SUM(CASE WHEN amount IS NULL THEN 1 ELSE 0 END) AS missing_amounts FROM raw_data;",
+            "result": {
+              "columns": [
+                "missing_names",
+                "missing_amounts"
+              ],
+              "rows": [
+                [
+                  1,
+                  1
+                ]
+              ]
+            }
+          }
+        ]
       }
     },
     {
       "id": "kp16-03",
       "chapterId": "ch16",
-      "title": "CAST 与分类标准化",
-      "learningObjective": "能够运用本节知识完成：将原始数据整理成分析字段",
+      "title": "类型转换与类别标准化",
+      "learningObjective": "区分格式清理、类型转换及类别映射，保留原始值以便审计。",
       "prerequisites": [
         "kp16-02"
       ],
-      "concept": "CAST 显式转换类型；先清理空白和格式，再验证合法性并转换，最后统一类别。",
-      "syntax": "CAST(expr AS DECIMAL(12,2))",
+      "concept": "类型转换解决数据如何参与计算；类别标准化解决不同写法是否代表同一业务类别。转换前应验证输入格式与允许范围；映射规则应明确未知类别处理。SQLite 的 DECIMAL 类型亲和性不等于 MySQL 的精确十进制类型。",
+      "syntax": "CAST(expr AS DECIMAL(12,2)); CASE WHEN condition THEN value ELSE other END",
       "parameters": {
-        "expr": "经过验证的数值文本"
+        "expr": "已核验的数值文本",
+        "condition": "标准化后的类别匹配条件"
       },
       "fixtureIds": [
         "lesson-raw_data"
@@ -419,20 +528,20 @@
           ]
         }
       ],
-      "mysqlSql": "SELECT id,CAST(amount AS DECIMAL(12,2)) AS numeric_amount,CASE WHEN LOWER(TRIM(category))='skin' THEN '护肤品' WHEN LOWER(TRIM(category))='home' THEN '日用品' WHEN LOWER(TRIM(category))='makeup' THEN '化妆品' ELSE '待分类' END AS clean_category FROM raw_data ORDER BY id;",
-      "sqliteSql": "SELECT id,CAST(amount AS DECIMAL(12,2)) AS numeric_amount,CASE WHEN LOWER(TRIM(category))='skin' THEN '护肤品' WHEN LOWER(TRIM(category))='home' THEN '日用品' WHEN LOWER(TRIM(category))='makeup' THEN '化妆品' ELSE '待分类' END AS clean_category FROM raw_data ORDER BY id;",
+      "mysqlSql": "SELECT id,CAST(amount AS DECIMAL(12,2)) AS numeric_amount,CASE WHEN LOWER(TRIM(category))='skin' THEN '护肤品' WHEN LOWER(TRIM(category))='home' THEN '日用品' WHEN LOWER(TRIM(category))='makeup' THEN '化妆品' ELSE '待分类' END AS clean_category FROM raw_data ORDER BY name DESC;",
+      "sqliteSql": "SELECT id,CAST(amount AS DECIMAL(12,2)) AS numeric_amount,CASE WHEN LOWER(TRIM(category))='skin' THEN '护肤品' WHEN LOWER(TRIM(category))='home' THEN '日用品' WHEN LOWER(TRIM(category))='makeup' THEN '化妆品' ELSE '待分类' END AS clean_category FROM raw_data ORDER BY name DESC;",
       "executionSteps": [
-        "确认输入为数字文本或NULL",
-        "转换数值",
-        "按映射统一类别"
+        "核验并转换金额",
+        "统一类别比较格式",
+        "映射标准类别"
       ],
-      "useCase": "将原始数据整理成分析字段",
-      "comparison": "CAST 改变表达式类型，不代表已修改源数据。",
+      "useCase": "将不同系统导入的金额和类别转换为报表口径。本例金额为合法整数文本或空值，类别字典包含护肤品、日用品、化妆品。",
+      "comparison": "类型转换不保证格式合法，类别映射不代表记录通过全部质量检查。",
       "commonError": {
-        "example": "CAST 任意字符串并认为一定有效",
-        "correction": "先验证格式并隔离非法输入"
+        "example": "CAST 任意文本后直接汇总并忽略转换异常。",
+        "correction": "先验证合法格式与范围，隔离非法值，保留原值及转换状态。"
       },
-      "notes": "本例数字为整数；SQLite DECIMAL 不提供 MySQL 精确十进制保障。",
+      "notes": "示例类别大小写仅涉及 ASCII；本地数值精度与原生数据库不同。",
       "compatibility": {
         "status": "直接兼容",
         "detail": "仅在本示例数据与语义范围验证；不代表全部 MySQL 语法兼容。"
@@ -461,8 +570,13 @@
         ],
         "rows": [
           [
-            1,
-            15,
+            4,
+            -5,
+            "日用品"
+          ],
+          [
+            3,
+            null,
             "护肤品"
           ],
           [
@@ -471,19 +585,14 @@
             "护肤品"
           ],
           [
-            3,
-            null,
-            "护肤品"
-          ],
-          [
-            4,
-            -5,
-            "日用品"
-          ],
-          [
             5,
             0,
             "化妆品"
+          ],
+          [
+            1,
+            15,
+            "护肤品"
           ],
           [
             6,
@@ -505,12 +614,74 @@
         "fc0125"
       ],
       "teaching": {
-        "problem": "不同来源的金额文本及类别写法需要转成统一的对账口径。",
-        "codeExplanation": "CAST 为金额指定目标类型，TRIM 与 LOWER 归一类别后用 CASE 映射。建议保留原字段以便回溯。",
-        "resultExplanation": "两种写法可映射为同一数值和类别，行粒度保持不变。遇到无法识别的类别，应按明确规则标记。",
+        "problem": "将不同系统导入的金额和类别转换为报表口径。本例金额为合法整数文本或空值，类别字典包含护肤品、日用品、化妆品。",
+        "codeExplanation": "CAST 将金额转换为可计算值；LOWER(TRIM(category)) 先生成标准比较键，CASE 将已知键映射为中文类别，其他标为待分类。生产金额应采用真正的精确十进制或经过设计的整数分；不得把未知类别默认归为已知类别。",
+        "resultExplanation": "前三行统一为护肤品；编号3金额仍为空，编号4保留负数，编号5保留零。六行不改变粒度，清洗不等于去重。",
         "checkpoints": [],
         "mergedConcepts": [],
-        "mergeExamples": []
+        "mergeExamples": [
+          {
+            "label": "保留原类别与标准键",
+            "explanation": "先核对映射依据，避免清洗后无法追查。",
+            "sql": "SELECT id,category,LOWER(TRIM(category)) AS normalized FROM raw_data ORDER BY name DESC;",
+            "result": {
+              "columns": [
+                "id",
+                "category",
+                "normalized"
+              ],
+              "rows": [
+                [
+                  4,
+                  "HOME",
+                  "home"
+                ],
+                [
+                  3,
+                  "Skin",
+                  "skin"
+                ],
+                [
+                  2,
+                  "skin",
+                  "skin"
+                ],
+                [
+                  5,
+                  "makeup",
+                  "makeup"
+                ],
+                [
+                  1,
+                  "SKIN",
+                  "skin"
+                ],
+                [
+                  6,
+                  "HOME",
+                  "home"
+                ]
+              ]
+            }
+          },
+          {
+            "label": "非法文本转换反例",
+            "explanation": "仅展示本地数据库的风险：非法文本可能转成零，不能视作校验成功。",
+            "sql": "SELECT CAST('abc' AS DECIMAL(12,2)) AS converted,CAST('0' AS DECIMAL(12,2)) AS legitimate_zero;",
+            "result": {
+              "columns": [
+                "converted",
+                "legitimate_zero"
+              ],
+              "rows": [
+                [
+                  0,
+                  0
+                ]
+              ]
+            }
+          }
+        ]
       }
     }
   ],

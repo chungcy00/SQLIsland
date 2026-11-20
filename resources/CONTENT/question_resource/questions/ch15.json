@@ -361,14 +361,14 @@
       "type": "代码填空",
       "title": "订单贡献占总销售比率",
       "context": "使用课程中小型订单数据练习订单贡献占总销售比率。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "补全代码中的一个空位，使完整SQL满足以下要求。可输入具有相同语义的片段，提交后按完整代码执行结果核对。\n返回 id、share_pct（单笔销售占全部销售百分比，两位小数，零分母NULL），按编号升序。\n输出列名称及顺序：id, share_pct。按题设排序；参考排序键：id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "requirements": "补全代码中的一个空位，使完整SQL满足以下要求。可输入具有相同语义的片段，提交后按完整代码执行结果核对。\n返回 id、share_pct（单笔销售占全部销售百分比，两位小数，零分母NULL）。\n输出列名称及顺序：id, share_pct。结果行的先后顺序不作要求。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
       "datasetId": "q0199-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
       "sourceTables": [
         "orders"
       ],
-      "initialCode": "SELECT id,ROUND(100.0*sales/NULLIF(SUM(sales) {{blank1}},0),2) AS share_pct FROM orders ORDER BY id",
+      "initialCode": "SELECT id,ROUND(100.0*sales/NULLIF(SUM(sales) {{blank1}},0),2) AS share_pct FROM orders",
       "options": [],
       "acceptedBlanks": [
         {
@@ -412,13 +412,13 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT id,ROUND(100.0*sales/NULLIF(SUM(sales) OVER(),0),2) AS share_pct FROM orders ORDER BY id",
-          "sqliteSql": "SELECT id,ROUND(100.0*sales/NULLIF(SUM(sales) OVER(),0),2) AS share_pct FROM orders ORDER BY id"
+          "mysqlSql": "SELECT id,ROUND(100.0*sales/NULLIF(SUM(sales) OVER(),0),2) AS share_pct FROM orders",
+          "sqliteSql": "SELECT id,ROUND(100.0*sales/NULLIF(SUM(sales) OVER(),0),2) AS share_pct FROM orders"
         },
         {
           "kind": "关系结构等价",
-          "mysqlSql": "SELECT id,ROUND(100.0*sales/NULLIF(SUM(sales) OVER(),0),2) AS share_pct FROM (SELECT * FROM orders) AS orders ORDER BY id",
-          "sqliteSql": "SELECT id,ROUND(100.0*sales/NULLIF(SUM(sales) OVER(),0),2) AS share_pct FROM (SELECT * FROM orders) AS orders ORDER BY id",
+          "mysqlSql": "SELECT id,ROUND(100.0*sales/NULLIF(SUM(sales) OVER(),0),2) AS share_pct FROM (SELECT * FROM orders) AS orders",
+          "sqliteSql": "SELECT id,ROUND(100.0*sales/NULLIF(SUM(sales) OVER(),0),2) AS share_pct FROM (SELECT * FROM orders) AS orders",
           "explanation": "先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。"
         }
       ],
@@ -427,10 +427,10 @@
         "结合《OVER 与 PARTITION BY》：普通聚合压缩行数；窗口聚合为每行计算所处窗口的指标。",
         "回想空位所在子句的功能：OVER 与 PARTITION BY；保留周围代码，填入实现题设的表达式。"
       ],
-      "explanation": "分母是全体销售而非门店内合计。\n执行思路：确认orders的输入记录；根据窗口分区、顺序及框架计算每行的分析值；输出id、share_pct列；遵循题设排序和并列规则。\n公开夹具实际返回 5 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
+      "explanation": "分母是全体销售而非门店内合计。\n执行思路：确认orders的输入记录；根据窗口分区、顺序及框架计算每行的分析值；输出id、share_pct列；结果行的先后顺序不作要求。\n公开夹具实际返回 5 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
       "commonErrors": [
         {
-          "sql": "SELECT id,ROUND(100.0*sales/NULLIF(SUM(sales) OVER(PARTITION BY store_id),0),2) AS share_pct FROM orders ORDER BY id",
+          "sql": "SELECT id,ROUND(100.0*sales/NULLIF(SUM(sales) OVER(PARTITION BY store_id),0),2) AS share_pct FROM orders",
           "reason": "分母是全体销售而非门店内合计。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
@@ -446,24 +446,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0199/q0199-public.json",
-          "sha256": "5e7fe2ae2384b96abb9668878ad0818e1a02df9e6efc0364e6aabfac72c83c9f"
+          "sha256": "ebe209359320177bb3cd85afb3e025c44f4c7cf48c55824d7922253d5ddc2ab2"
         },
         {
           "id": "q0199-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0199/q0199-boundary.json",
-          "sha256": "d89c0f22c381ab68531ce5e5c5eb38ef5068b0887da4e3a909a745f603ea0884"
+          "sha256": "1d462daf0cf25aa217351f328e6f765245f089b579bc98cff0ce2212ed62800d"
         },
         {
           "id": "q0199-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0199/q0199-empty.json",
-          "sha256": "7856ece3a3ef4344eece62d83a58d20eb488ae18827fce1f53a55b009a7c1ddc"
+          "sha256": "69554ed29b8ee8c0c065e4ef5d6eedb2fb8f7794042c78a327b201ce36f58b1f"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -501,7 +501,7 @@
             "wrong": {
               "ran": true,
               "match": false,
-              "resultHash": "2287c1f3f926acb8be8fc90e1656f9840c0da113ea720087ae4f8a7129547588",
+              "resultHash": "9635c54dd387a827801f4faa29a0eabe908eccf144ce17aec870a42f1ecad4be",
               "rows": 5
             }
           },
@@ -510,19 +510,19 @@
             "reference": {
               "ran": true,
               "match": true,
-              "resultHash": "18642f1f217309d2c1694da7b9fe94bbbf790f3fc5411b3bc3bbe7a1a6bd324c",
+              "resultHash": "9671208e9e1896e757c9b6e30b0fa82ade42b6a5f6437e45a7dbb596edcbe938",
               "rowCount": 13
             },
             "equivalent": {
               "ran": true,
               "match": true,
-              "resultHash": "18642f1f217309d2c1694da7b9fe94bbbf790f3fc5411b3bc3bbe7a1a6bd324c",
+              "resultHash": "9671208e9e1896e757c9b6e30b0fa82ade42b6a5f6437e45a7dbb596edcbe938",
               "rows": 13
             },
             "wrong": {
               "ran": true,
               "match": false,
-              "resultHash": "072fd9f7022204020412bde54c8f0680edf0f05da6ec255a40e4a17f4b75c035",
+              "resultHash": "c5f07e18d89d2d5fcbd3ec0edb30984badd1cbbe7d3b0cbf68dc8133be6b387e",
               "rows": 13
             }
           },
@@ -574,14 +574,14 @@
       "type": "代码纠错",
       "title": "每个订单及所在门店总额",
       "context": "使用课程中小型订单数据练习每个订单及所在门店总额。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "下面提供的初始代码存在逻辑、语法或结构错误。请修改整段代码，使其满足以下要求。\n保留订单粒度，返回 id、store_id、store_total（所在门店销售额总计），按 id 升序。\n输出列名称及顺序：id, store_id, store_total。按题设排序；参考排序键：id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "requirements": "下面提供的初始代码存在逻辑、语法或结构错误。请修改整段代码，使其满足以下要求。\n保留订单粒度，返回 id、store_id、store_total（所在门店销售额总计）。\n输出列名称及顺序：id, store_id, store_total。结果行的先后顺序不作要求。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
       "datasetId": "q0200-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
       "sourceTables": [
         "orders"
       ],
-      "initialCode": "SELECT id,store_id,SUM(sales) OVER(PARTITION BY category) AS store_total FROM orders ORDER BY id",
+      "initialCode": "SELECT id,store_id,SUM(sales) OVER(PARTITION BY category) AS store_total FROM orders",
       "options": [],
       "acceptedBlanks": [],
       "expectedOutput": {
@@ -598,24 +598,24 @@
             2900
           ],
           [
-            2,
-            2,
-            700
-          ],
-          [
             3,
             1,
             2900
           ],
           [
-            4,
+            5,
+            1,
+            2900
+          ],
+          [
+            2,
             2,
             700
           ],
           [
-            5,
-            1,
-            2900
+            4,
+            2,
+            700
           ]
         ],
         "rowCount": 5
@@ -623,13 +623,13 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT id,store_id,SUM(sales) OVER(PARTITION BY store_id) AS store_total FROM orders ORDER BY id",
-          "sqliteSql": "SELECT id,store_id,SUM(sales) OVER(PARTITION BY store_id) AS store_total FROM orders ORDER BY id"
+          "mysqlSql": "SELECT id,store_id,SUM(sales) OVER(PARTITION BY store_id) AS store_total FROM orders",
+          "sqliteSql": "SELECT id,store_id,SUM(sales) OVER(PARTITION BY store_id) AS store_total FROM orders"
         },
         {
           "kind": "关系结构等价",
-          "mysqlSql": "SELECT id,store_id,SUM(sales) OVER(PARTITION BY store_id) AS store_total FROM (SELECT * FROM orders) AS orders ORDER BY id",
-          "sqliteSql": "SELECT id,store_id,SUM(sales) OVER(PARTITION BY store_id) AS store_total FROM (SELECT * FROM orders) AS orders ORDER BY id",
+          "mysqlSql": "SELECT id,store_id,SUM(sales) OVER(PARTITION BY store_id) AS store_total FROM (SELECT * FROM orders) AS orders",
+          "sqliteSql": "SELECT id,store_id,SUM(sales) OVER(PARTITION BY store_id) AS store_total FROM (SELECT * FROM orders) AS orders",
           "explanation": "先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。"
         }
       ],
@@ -638,10 +638,10 @@
         "结合《OVER 与 PARTITION BY》：普通聚合压缩行数；窗口聚合为每行计算所处窗口的指标。",
         "检查初始代码的 PARTITION BY store_id 对应的业务规则。窗口分区键为门店；不改变订单行数。"
       ],
-      "explanation": "窗口分区键为门店；不改变订单行数。\n执行思路：确认orders的输入记录；根据窗口分区、顺序及框架计算每行的分析值；输出id、store_id、store_total列；遵循题设排序和并列规则。\n公开夹具实际返回 5 行、3 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
+      "explanation": "窗口分区键为门店；不改变订单行数。\n执行思路：确认orders的输入记录；根据窗口分区、顺序及框架计算每行的分析值；输出id、store_id、store_total列；结果行的先后顺序不作要求。\n公开夹具实际返回 5 行、3 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
       "commonErrors": [
         {
-          "sql": "SELECT id,store_id,SUM(sales) OVER(PARTITION BY category) AS store_total FROM orders ORDER BY id",
+          "sql": "SELECT id,store_id,SUM(sales) OVER(PARTITION BY category) AS store_total FROM orders",
           "reason": "窗口分区键为门店；不改变订单行数。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
@@ -657,24 +657,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0200/q0200-public.json",
-          "sha256": "364b1a3733b4ec502a71af3bd60786bc512d1fb5326f7c47eb208de48ecd0b14"
+          "sha256": "5bc3091c06fe18852ddb9ebc0bde7bcfd2a91574c75bf9fe855b8a170feb1700"
         },
         {
           "id": "q0200-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0200/q0200-boundary.json",
-          "sha256": "b94c4db654c17eef763ec57dd6a148b38c1ebada88087e5f7018d484b859e68f"
+          "sha256": "8ae8fd952cad346d04b095b7e5e05cc7649af253aece09c021349023352814e7"
         },
         {
           "id": "q0200-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0200/q0200-empty.json",
-          "sha256": "eb7ed9089f053a8c871eb0906a2f5895e60981edf9f5965d6dcb9b2632b53814"
+          "sha256": "9876d9cba60becc360b5e794ae55c8d436cf66de1c149fb1a2256ed76e315376"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -700,19 +700,19 @@
             "reference": {
               "ran": true,
               "match": true,
-              "resultHash": "40bc5a9341ee25fb1db3b9928b8d7c3323b7ac8112a6df024920fbef5ab104c3",
+              "resultHash": "a575ece4784c926ba6f802cffc2e7179ab635b73fe2790d22f4248af0431e43e",
               "rowCount": 5
             },
             "equivalent": {
               "ran": true,
               "match": true,
-              "resultHash": "40bc5a9341ee25fb1db3b9928b8d7c3323b7ac8112a6df024920fbef5ab104c3",
+              "resultHash": "a575ece4784c926ba6f802cffc2e7179ab635b73fe2790d22f4248af0431e43e",
               "rows": 5
             },
             "wrong": {
               "ran": true,
               "match": false,
-              "resultHash": "4d5ce8944aca6eba9ecbadab3a23854482df39a64f3a942de4d0995ac4e8094a",
+              "resultHash": "25f1e0f224905b16f0c108dc88da463ac80c76311b3fa362276f62f6b223e611",
               "rows": 5
             }
           },
@@ -721,19 +721,19 @@
             "reference": {
               "ran": true,
               "match": true,
-              "resultHash": "ddf31cf9794f4041452873d56b85b1cde17c373951fe9b0892a4eb8eb2d65c99",
+              "resultHash": "766e145ddb478dbf5a0ec84eb098ad4a6cff4289a9d301d3f7f161d74047fc70",
               "rowCount": 13
             },
             "equivalent": {
               "ran": true,
               "match": true,
-              "resultHash": "ddf31cf9794f4041452873d56b85b1cde17c373951fe9b0892a4eb8eb2d65c99",
+              "resultHash": "766e145ddb478dbf5a0ec84eb098ad4a6cff4289a9d301d3f7f161d74047fc70",
               "rows": 13
             },
             "wrong": {
               "ran": true,
               "match": false,
-              "resultHash": "9776dda5ab9a024b8afd90411b75c879049aa94196f77357e91da0a74d74caeb",
+              "resultHash": "ad3cdc39bad2b56c2f4ecb84b0d37f381ee30c3234c9778fb7185bc5ebd9ece1",
               "rows": 13
             }
           },
@@ -781,7 +781,7 @@
       "type": "独立编写",
       "title": "商品相对类别平均售价",
       "context": "使用课程中小型商品数据练习商品相对类别平均售价。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "输出 product_id、price、gap（售价减所在类别平均售价，两位小数），按编号升序。\n输出列名称及顺序：product_id, price, gap。按题设排序；参考排序键：product_id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "requirements": "输出 product_id、price、gap（售价减所在类别平均售价，两位小数）。\n输出列名称及顺序：product_id, price, gap。结果行的先后顺序不作要求。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
       "datasetId": "q0201-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -800,6 +800,16 @@
         ],
         "rows": [
           [
+            4,
+            65,
+            10
+          ],
+          [
+            5,
+            45,
+            -10
+          ],
+          [
             1,
             15,
             -31.33
@@ -815,19 +825,9 @@
             -11.33
           ],
           [
-            4,
-            65,
-            10.0
-          ],
-          [
-            5,
-            45,
-            -10.0
-          ],
-          [
             6,
             15,
-            0.0
+            0
           ]
         ],
         "rowCount": 6
@@ -835,25 +835,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT product_id,price,ROUND(price-AVG(price) OVER(PARTITION BY category),2) AS gap FROM products ORDER BY product_id",
-          "sqliteSql": "SELECT product_id,price,ROUND(price-AVG(price) OVER(PARTITION BY category),2) AS gap FROM products ORDER BY product_id"
+          "mysqlSql": "SELECT product_id,price,ROUND(price-AVG(price) OVER(PARTITION BY category),2) AS gap FROM products",
+          "sqliteSql": "SELECT product_id,price,ROUND(price-AVG(price) OVER(PARTITION BY category),2) AS gap FROM products"
         },
         {
           "kind": "关系结构等价",
-          "mysqlSql": "SELECT product_id,price,ROUND(price-AVG(price) OVER(PARTITION BY category),2) AS gap FROM (SELECT * FROM products) AS products ORDER BY product_id",
-          "sqliteSql": "SELECT product_id,price,ROUND(price-AVG(price) OVER(PARTITION BY category),2) AS gap FROM (SELECT * FROM products) AS products ORDER BY product_id",
+          "mysqlSql": "SELECT product_id,price,ROUND(price-AVG(price) OVER(PARTITION BY category),2) AS gap FROM (SELECT * FROM products) AS products",
+          "sqliteSql": "SELECT product_id,price,ROUND(price-AVG(price) OVER(PARTITION BY category),2) AS gap FROM (SELECT * FROM products) AS products",
           "explanation": "先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。"
         }
       ],
       "hints": [
         "决定窗口内的分区、排序与范围，注意是否需要保留全部原行。",
         "结合《OVER 与 PARTITION BY》：普通聚合压缩行数；窗口聚合为每行计算所处窗口的指标。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT product_id,price,ROUND(price-AVG(price) OVER(□□□),2) AS gap FROM products ORDER BY product_id"
+        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT product_id,price,ROUND(price-AVG(price) OVER(□□□),2) AS gap FROM products"
       ],
-      "explanation": "每个类别单独建立价格基准；去除分区会变成全局均值。\n执行思路：确认products的输入记录；根据窗口分区、顺序及框架计算每行的分析值；输出product_id、price、gap列；遵循题设排序和并列规则。\n公开夹具实际返回 6 行、3 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
+      "explanation": "每个类别单独建立价格基准；去除分区会变成全局均值。\n执行思路：确认products的输入记录；根据窗口分区、顺序及框架计算每行的分析值；输出product_id、price、gap列；结果行的先后顺序不作要求。\n公开夹具实际返回 6 行、3 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
       "commonErrors": [
         {
-          "sql": "SELECT product_id,price,ROUND(price-AVG(price) OVER(),2) AS gap FROM products ORDER BY product_id",
+          "sql": "SELECT product_id,price,ROUND(price-AVG(price) OVER(),2) AS gap FROM products",
           "reason": "每个类别单独建立价格基准；去除分区会变成全局均值。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
@@ -869,24 +869,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0201/q0201-public.json",
-          "sha256": "a434812d8c3c0d10926d6bf980e1cd9bd852c4c611cbd3b6bec3f08a64959f34"
+          "sha256": "542cf369082852a3a57fd85efec6d019b6749d442f978e3f0ed00ea2f2a9ea57"
         },
         {
           "id": "q0201-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0201/q0201-boundary.json",
-          "sha256": "216163c5323c8c4d00c21189819d420354e269443bc7866b2237c76ea8cf0a9f"
+          "sha256": "5bb953847ccd5c7e0ce12b1414ab2af175cf80426d98ec0fe8a2947292ec7976"
         },
         {
           "id": "q0201-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0201/q0201-empty.json",
-          "sha256": "5ac3fe8074b5d1142aa89697d264e8d2163946c87a395c632839124f8d5e13b7"
+          "sha256": "092a0e74dce81ce83ceb74a3d16e27878a59e4854cfe7d44713bd5d89f3c9076"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -912,19 +912,19 @@
             "reference": {
               "ran": true,
               "match": true,
-              "resultHash": "1a0aa75e717a0a8d7e48d49f2d74c7209b887d102c0fa53a19e1e0c0e87db654",
+              "resultHash": "76c8bb9305c63a411aad7f83e920b5d62d5fca9d218745ca00f6d7034c267aaf",
               "rowCount": 6
             },
             "equivalent": {
               "ran": true,
               "match": true,
-              "resultHash": "1a0aa75e717a0a8d7e48d49f2d74c7209b887d102c0fa53a19e1e0c0e87db654",
+              "resultHash": "76c8bb9305c63a411aad7f83e920b5d62d5fca9d218745ca00f6d7034c267aaf",
               "rows": 6
             },
             "wrong": {
               "ran": true,
               "match": false,
-              "resultHash": "e030b5e4b3f4e6888e4a0bff282b8f0e2413c96d6cdb6e2183c02f5febbb776e",
+              "resultHash": "23a88f3e1777f58529fe49d1dac6ad3d6d9637b848f3fb5d8f9380964dd506fa",
               "rows": 6
             }
           },
@@ -933,13 +933,13 @@
             "reference": {
               "ran": true,
               "match": true,
-              "resultHash": "156dca29985df15bb226daed3730a8ca1e88fc8d52b5f5c1daed77842e41d7e4",
+              "resultHash": "3335dffdaf6387fbbd03b2058f3492c29843b0f105194d627ad38b467c21119d",
               "rowCount": 21
             },
             "equivalent": {
               "ran": true,
               "match": true,
-              "resultHash": "156dca29985df15bb226daed3730a8ca1e88fc8d52b5f5c1daed77842e41d7e4",
+              "resultHash": "3335dffdaf6387fbbd03b2058f3492c29843b0f105194d627ad38b467c21119d",
               "rows": 21
             },
             "wrong": {
@@ -991,14 +991,14 @@
       "type": "代码纠错",
       "title": "每店订单与前一单金额",
       "context": "使用课程中小型订单数据练习每店订单与前一单金额。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "下面提供的初始代码存在逻辑、语法或结构错误。请修改整段代码，使其满足以下要求。\n保留每笔订单，按门店、日期和id计算前一订单金额 prev_sales，输出 id、store_id、prev_sales，按 id 升序。\n输出列名称及顺序：id, store_id, prev_sales。按题设排序；参考排序键：id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "requirements": "下面提供的初始代码存在逻辑、语法或结构错误。请修改整段代码，使其满足以下要求。\n保留每笔订单，按门店、日期和id计算前一订单金额 prev_sales，输出 id、store_id、prev_sales。\n输出列名称及顺序：id, store_id, prev_sales。结果行的先后顺序不作要求。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
       "datasetId": "q0202-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
       "sourceTables": [
         "orders"
       ],
-      "initialCode": "SELECT id,store_id,LAG(sales) OVER(ORDER BY order_date,id) AS prev_sales FROM orders ORDER BY id",
+      "initialCode": "SELECT id,store_id,LAG(sales) OVER(ORDER BY order_date,id) AS prev_sales FROM orders",
       "options": [],
       "acceptedBlanks": [],
       "expectedOutput": {
@@ -1015,24 +1015,24 @@
             null
           ],
           [
-            2,
-            2,
-            null
-          ],
-          [
             3,
             1,
             800
           ],
           [
-            4,
-            2,
-            400
-          ],
-          [
             5,
             1,
             600
+          ],
+          [
+            2,
+            2,
+            null
+          ],
+          [
+            4,
+            2,
+            400
           ]
         ],
         "rowCount": 5
@@ -1040,13 +1040,13 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT id,store_id,LAG(sales) OVER(PARTITION BY store_id ORDER BY order_date,id) AS prev_sales FROM orders ORDER BY id",
-          "sqliteSql": "SELECT id,store_id,LAG(sales) OVER(PARTITION BY store_id ORDER BY order_date,id) AS prev_sales FROM orders ORDER BY id"
+          "mysqlSql": "SELECT id,store_id,LAG(sales) OVER(PARTITION BY store_id ORDER BY order_date,id) AS prev_sales FROM orders",
+          "sqliteSql": "SELECT id,store_id,LAG(sales) OVER(PARTITION BY store_id ORDER BY order_date,id) AS prev_sales FROM orders"
         },
         {
           "kind": "关系结构等价",
-          "mysqlSql": "SELECT id,store_id,LAG(sales) OVER(PARTITION BY store_id ORDER BY order_date,id) AS prev_sales FROM (SELECT * FROM orders) AS orders ORDER BY id",
-          "sqliteSql": "SELECT id,store_id,LAG(sales) OVER(PARTITION BY store_id ORDER BY order_date,id) AS prev_sales FROM (SELECT * FROM orders) AS orders ORDER BY id",
+          "mysqlSql": "SELECT id,store_id,LAG(sales) OVER(PARTITION BY store_id ORDER BY order_date,id) AS prev_sales FROM (SELECT * FROM orders) AS orders",
+          "sqliteSql": "SELECT id,store_id,LAG(sales) OVER(PARTITION BY store_id ORDER BY order_date,id) AS prev_sales FROM (SELECT * FROM orders) AS orders",
           "explanation": "先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。"
         }
       ],
@@ -1055,10 +1055,10 @@
         "结合《LAG 与 LEAD》：LAG 获取分区中前一行，LEAD 获取后一行；可指定偏移和缺失默认值。",
         "检查初始代码的 PARTITION BY store_id  对应的业务规则。第一笔门店订单没有本店前序，不能引用其他门店的销售。"
       ],
-      "explanation": "第一笔门店订单没有本店前序，不能引用其他门店的销售。\n执行思路：确认orders的输入记录；根据窗口分区、顺序及框架计算每行的分析值；输出id、store_id、prev_sales列；遵循题设排序和并列规则。\n公开夹具实际返回 5 行、3 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
+      "explanation": "第一笔门店订单没有本店前序，不能引用其他门店的销售。\n执行思路：确认orders的输入记录；根据窗口分区、顺序及框架计算每行的分析值；输出id、store_id、prev_sales列；结果行的先后顺序不作要求。\n公开夹具实际返回 5 行、3 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
       "commonErrors": [
         {
-          "sql": "SELECT id,store_id,LAG(sales) OVER(ORDER BY order_date,id) AS prev_sales FROM orders ORDER BY id",
+          "sql": "SELECT id,store_id,LAG(sales) OVER(ORDER BY order_date,id) AS prev_sales FROM orders",
           "reason": "第一笔门店订单没有本店前序，不能引用其他门店的销售。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
@@ -1074,24 +1074,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0202/q0202-public.json",
-          "sha256": "05e48b87bb42084e362963741ee5eb83705a1f59c685cd7de97472eeb8641701"
+          "sha256": "37c304cd02abf09668e2729b22b2fce6f2716588dbcf3d74ca1384c7b4e9bf10"
         },
         {
           "id": "q0202-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0202/q0202-boundary.json",
-          "sha256": "5d824a328990c657c3d6242c51b0dfe2f1f169942b6eeed341c11dbbabb4ba3f"
+          "sha256": "b53df77e9578664784c0345a6eed1c0396337f922ca1014126bc54ab2b218a9e"
         },
         {
           "id": "q0202-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0202/q0202-empty.json",
-          "sha256": "b1a54a9ac0a2813751babd926d2dec1784f6ae333176e184cf4c9c55f24713ed"
+          "sha256": "ac0dcf0769e6e0ad750726876cf31194c0846019bed7b3e13698cb6323ee3043"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -1117,13 +1117,13 @@
             "reference": {
               "ran": true,
               "match": true,
-              "resultHash": "26fb1d68d26a874a5db55b3c31e12e8b390e1bea230c00ad391a7c45b5e34349",
+              "resultHash": "c8b899646bb37a45b16642ac0deab17552497b8f39dc24b0855105c0948dcad9",
               "rowCount": 5
             },
             "equivalent": {
               "ran": true,
               "match": true,
-              "resultHash": "26fb1d68d26a874a5db55b3c31e12e8b390e1bea230c00ad391a7c45b5e34349",
+              "resultHash": "c8b899646bb37a45b16642ac0deab17552497b8f39dc24b0855105c0948dcad9",
               "rows": 5
             },
             "wrong": {
@@ -1138,19 +1138,19 @@
             "reference": {
               "ran": true,
               "match": true,
-              "resultHash": "57f8759633691a7569376be93138c92d259c9d8c6e9e64cdc70949acb23a7003",
+              "resultHash": "26fbf09629b2ca2c955b1d9b680e4c241d749521e21f3c60c434a4f6ebc50ee6",
               "rowCount": 13
             },
             "equivalent": {
               "ran": true,
               "match": true,
-              "resultHash": "57f8759633691a7569376be93138c92d259c9d8c6e9e64cdc70949acb23a7003",
+              "resultHash": "26fbf09629b2ca2c955b1d9b680e4c241d749521e21f3c60c434a4f6ebc50ee6",
               "rows": 13
             },
             "wrong": {
               "ran": true,
               "match": false,
-              "resultHash": "fa9a66383fcd166ca21c42483349db0d5f3d41eac6d4c216155fbb09ddfdb820",
+              "resultHash": "a77ecfefefb8f1211172550bd333cd9f4f124bd7f246923b2cabd1774c11ce38",
               "rows": 13
             }
           },
@@ -1392,7 +1392,7 @@
       "type": "独立编写",
       "title": "每个客户购买记录数量",
       "context": "使用课程中小型订单数据练习每个客户购买记录数量。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "编写 SQL，完成以下查询要求。\n返回 orders 中已登记客户的 id、customer_id、customer_orders（同客户订单数），按订单编号升序。\n输出列名称及顺序：id, customer_id, customer_orders。按题设排序；参考排序键：id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "requirements": "编写 SQL，完成以下查询要求。\n返回 orders 中已登记客户的 id、customer_id、customer_orders（同客户订单数）。\n输出列名称及顺序：id, customer_id, customer_orders。结果行的先后顺序不作要求。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
       "datasetId": "q0204-lesson",
       "schemaVersion": 3,
       "contentVersion": "4.2.2",
@@ -1416,14 +1416,14 @@
             2
           ],
           [
-            2,
-            2,
-            1
-          ],
-          [
             3,
             1,
             2
+          ],
+          [
+            2,
+            2,
+            1
           ],
           [
             5,
@@ -1436,13 +1436,13 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT id,customer_id,COUNT(*) OVER(PARTITION BY customer_id) AS customer_orders FROM orders WHERE customer_id IS NOT NULL ORDER BY id",
-          "sqliteSql": "SELECT id,customer_id,COUNT(*) OVER(PARTITION BY customer_id) AS customer_orders FROM orders WHERE customer_id IS NOT NULL ORDER BY id"
+          "mysqlSql": "SELECT id,customer_id,COUNT(*) OVER(PARTITION BY customer_id) AS customer_orders FROM orders WHERE customer_id IS NOT NULL",
+          "sqliteSql": "SELECT id,customer_id,COUNT(*) OVER(PARTITION BY customer_id) AS customer_orders FROM orders WHERE customer_id IS NOT NULL"
         },
         {
           "kind": "代数或函数等价",
-          "mysqlSql": "SELECT id,customer_id,COUNT(1) OVER(PARTITION BY customer_id) AS customer_orders FROM orders WHERE customer_id IS NOT NULL ORDER BY id",
-          "sqliteSql": "SELECT id,customer_id,COUNT(1) OVER(PARTITION BY customer_id) AS customer_orders FROM orders WHERE customer_id IS NOT NULL ORDER BY id",
+          "mysqlSql": "SELECT id,customer_id,COUNT(1) OVER(PARTITION BY customer_id) AS customer_orders FROM orders WHERE customer_id IS NOT NULL",
+          "sqliteSql": "SELECT id,customer_id,COUNT(1) OVER(PARTITION BY customer_id) AS customer_orders FROM orders WHERE customer_id IS NOT NULL",
           "explanation": "常量1对每行非NULL，因此 COUNT(1) 与 COUNT(*) 同计行数。"
         }
       ],
@@ -1451,10 +1451,10 @@
         "结合《OVER 与 PARTITION BY》：普通聚合压缩行数；窗口聚合为每行计算所处窗口的指标。",
         "按题设编写投影、筛选及分组，使用运行检查列名、NULL、重复记录和排序。"
       ],
-      "explanation": "计数窗口以同客户为边界，而不是同门店。\n执行思路：确认orders的输入记录；按筛选条件保留符合要求的记录，并考虑空值；根据窗口分区、顺序及框架计算每行的分析值；输出id、customer_id、customer_orders列；遵循题设排序和并列规则。\n公开夹具实际返回 4 行、3 列；完整结果见 expectedOutput。\n另一种可用写法：常量1对每行非NULL，因此 COUNT(1) 与 COUNT(*) 同计行数。",
+      "explanation": "计数窗口以同客户为边界，而不是同门店。\n执行思路：确认orders的输入记录；按筛选条件保留符合要求的记录，并考虑空值；根据窗口分区、顺序及框架计算每行的分析值；输出id、customer_id、customer_orders列；结果行的先后顺序不作要求。\n公开夹具实际返回 4 行、3 列；完整结果见 expectedOutput。\n另一种可用写法：常量1对每行非NULL，因此 COUNT(1) 与 COUNT(*) 同计行数。",
       "commonErrors": [
         {
-          "sql": "SELECT id,customer_id,COUNT(*) OVER(PARTITION BY store_id) AS customer_orders FROM orders WHERE customer_id IS NOT NULL ORDER BY id",
+          "sql": "SELECT id,customer_id,COUNT(*) OVER(PARTITION BY store_id) AS customer_orders FROM orders WHERE customer_id IS NOT NULL",
           "reason": "计数窗口以同客户为边界，而不是同门店。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
@@ -1470,24 +1470,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0204/q0204-public.json",
-          "sha256": "63e4d0a71bc42d7929beb13f82a738acc2e8049165a94ef331e84260c9fb95d9"
+          "sha256": "8ca7117658c396d8670e83eb57949283c477b1f45923e27c84deeb9d41d01b8b"
         },
         {
           "id": "q0204-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0204/q0204-boundary.json",
-          "sha256": "2e2234142f6acaba500aaeb9a94d22911aa0908af1669a1d5deb7a9116d8aa51"
+          "sha256": "91b39f093cc9d48500b05dd24282f09d39c90d0140dbf8cada4f20a7916da392"
         },
         {
           "id": "q0204-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0204/q0204-empty.json",
-          "sha256": "cbf4fe99d57fec871d07a13c382c92b8d755559715d62d69211dafb4ede9b223"
+          "sha256": "e49d62a254702287f0216b3fa0fa2e5af2713db82d9cc0eb2f2145894d78950c"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -1513,19 +1513,19 @@
             "reference": {
               "ran": true,
               "match": true,
-              "resultHash": "bd9721d98ac71ad5d56c145f4f1627c47420acbf2ae1657128856b695d69cc9e",
+              "resultHash": "1f8047dea7d0246cc0f8d677d1e3fec69e172710e2ac9d957646eb0a31aeb825",
               "rowCount": 4
             },
             "equivalent": {
               "ran": true,
               "match": true,
-              "resultHash": "bd9721d98ac71ad5d56c145f4f1627c47420acbf2ae1657128856b695d69cc9e",
+              "resultHash": "1f8047dea7d0246cc0f8d677d1e3fec69e172710e2ac9d957646eb0a31aeb825",
               "rows": 4
             },
             "wrong": {
               "ran": true,
               "match": false,
-              "resultHash": "8868ed7c78850b451702fd50d0020e95be1388f9100c36ab6b26f7ec371946c5",
+              "resultHash": "37dca026af052b3174a3c3f288cff10ef7eec51a4eb51950a965deef6323f926",
               "rows": 4
             }
           },
@@ -1534,19 +1534,19 @@
             "reference": {
               "ran": true,
               "match": true,
-              "resultHash": "0fddf94969f09dd5f120e8227a0a3302230b7ec27435b5923b3d48cefbec912c",
+              "resultHash": "2449d64d1f4cc15feab058d0fe3afd0bb3829808d28cc0231bcc1bc2904deffc",
               "rowCount": 10
             },
             "equivalent": {
               "ran": true,
               "match": true,
-              "resultHash": "0fddf94969f09dd5f120e8227a0a3302230b7ec27435b5923b3d48cefbec912c",
+              "resultHash": "2449d64d1f4cc15feab058d0fe3afd0bb3829808d28cc0231bcc1bc2904deffc",
               "rows": 10
             },
             "wrong": {
               "ran": true,
               "match": false,
-              "resultHash": "729fc8ae15bcc95839f063d22911b0c382c19401a49e02a05d3a9e5d14210b37",
+              "resultHash": "266dc833e42ec50c354014f7d6704bb37a11bf9925afdea0e0900ec9191c5138",
               "rows": 10
             }
           },
@@ -1810,14 +1810,14 @@
       "type": "代码填空",
       "title": "员工薪资有跳号排名",
       "context": "使用课程中小型员工数据练习员工薪资有跳号排名。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "补全代码中的一个空位，使完整SQL满足以下要求。可输入具有相同语义的片段，提交后按完整代码执行结果核对。\n全体员工按薪资降序 RANK，薪资相同同名次，输出 employee_id、salary、rank_no，按名次、编号升序。\n输出列名称及顺序：employee_id, salary, rank_no。按题设排序；参考排序键：rank_no,employee_id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "requirements": "补全代码中的一个空位，使完整SQL满足以下要求。可输入具有相同语义的片段，提交后按完整代码执行结果核对。\n全体员工按薪资降序 RANK，薪资相同同名次，输出 employee_id、salary、rank_no。\n输出列名称及顺序：employee_id, salary, rank_no。结果行的先后顺序不作要求。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
       "datasetId": "q0207-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
       "sourceTables": [
         "employees"
       ],
-      "initialCode": "SELECT employee_id,salary,{{blank1}} OVER(ORDER BY salary DESC) AS rank_no FROM employees WHERE salary IS NOT NULL ORDER BY rank_no,employee_id",
+      "initialCode": "SELECT employee_id,salary,{{blank1}} OVER(ORDER BY salary DESC) AS rank_no FROM employees WHERE salary IS NOT NULL",
       "options": [],
       "acceptedBlanks": [
         {
@@ -1862,13 +1862,13 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT employee_id,salary,RANK() OVER(ORDER BY salary DESC) AS rank_no FROM employees WHERE salary IS NOT NULL ORDER BY rank_no,employee_id",
-          "sqliteSql": "SELECT employee_id,salary,RANK() OVER(ORDER BY salary DESC) AS rank_no FROM employees WHERE salary IS NOT NULL ORDER BY rank_no,employee_id"
+          "mysqlSql": "SELECT employee_id,salary,RANK() OVER(ORDER BY salary DESC) AS rank_no FROM employees WHERE salary IS NOT NULL",
+          "sqliteSql": "SELECT employee_id,salary,RANK() OVER(ORDER BY salary DESC) AS rank_no FROM employees WHERE salary IS NOT NULL"
         },
         {
           "kind": "关系结构等价",
-          "mysqlSql": "SELECT employee_id,salary,RANK() OVER(ORDER BY salary DESC) AS rank_no FROM (SELECT * FROM employees) AS employees WHERE salary IS NOT NULL ORDER BY rank_no,employee_id",
-          "sqliteSql": "SELECT employee_id,salary,RANK() OVER(ORDER BY salary DESC) AS rank_no FROM (SELECT * FROM employees) AS employees WHERE salary IS NOT NULL ORDER BY rank_no,employee_id",
+          "mysqlSql": "SELECT employee_id,salary,RANK() OVER(ORDER BY salary DESC) AS rank_no FROM (SELECT * FROM employees) AS employees WHERE salary IS NOT NULL",
+          "sqliteSql": "SELECT employee_id,salary,RANK() OVER(ORDER BY salary DESC) AS rank_no FROM (SELECT * FROM employees) AS employees WHERE salary IS NOT NULL",
           "explanation": "先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。"
         }
       ],
@@ -1877,10 +1877,10 @@
         "结合《ROW_NUMBER、RANK、DENSE_RANK》：ROW_NUMBER 给每行唯一序号；RANK 同值同名次并留空档；DENSE_RANK 同值同名次不留空档。",
         "回想空位所在子句的功能：ROW_NUMBER、RANK、DENSE_RANK；保留周围代码，填入实现题设的表达式。"
       ],
-      "explanation": "RANK 对并列后的名次留空档，密集排名不留。\n执行思路：确认employees的输入记录；按筛选条件保留符合要求的记录，并考虑空值；根据窗口分区、顺序及框架计算每行的分析值；输出employee_id、salary、rank_no列；遵循题设排序和并列规则。\n公开夹具实际返回 4 行、3 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
+      "explanation": "RANK 对并列后的名次留空档，密集排名不留。\n执行思路：确认employees的输入记录；按筛选条件保留符合要求的记录，并考虑空值；根据窗口分区、顺序及框架计算每行的分析值；输出employee_id、salary、rank_no列；结果行的先后顺序不作要求。\n公开夹具实际返回 4 行、3 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
       "commonErrors": [
         {
-          "sql": "SELECT employee_id,salary,DENSE_RANK() OVER(ORDER BY salary DESC) AS rank_no FROM employees WHERE salary IS NOT NULL ORDER BY rank_no,employee_id",
+          "sql": "SELECT employee_id,salary,DENSE_RANK() OVER(ORDER BY salary DESC) AS rank_no FROM employees WHERE salary IS NOT NULL",
           "reason": "RANK 对并列后的名次留空档，密集排名不留。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
@@ -1896,24 +1896,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0207/q0207-public.json",
-          "sha256": "e70d851a30e2b9bc8f25d1d9474a7af8535cb45d508a89ffdd01f858c91096a0"
+          "sha256": "f41d3f0bd0703527f8e3bb6eae357c6f6001ccbc66fa10f37db1507231eaec3b"
         },
         {
           "id": "q0207-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0207/q0207-boundary.json",
-          "sha256": "197e9e5ff286075df504b796b3e0883cdeb67e9f849e6c54bad570e86e6ade15"
+          "sha256": "08f0873cb88d65cbce617e3fb7a8882b417ed8c3b45d3e4914ed98063f6dabb2"
         },
         {
           "id": "q0207-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0207/q0207-empty.json",
-          "sha256": "114f9a882b8607bedc9c0237e194e157f556a537cc7b05f9610a5e59f3a2bf5d"
+          "sha256": "1716899ce3049de0188cc6ef2f701513045a4cd30542ea2d7fc8b7b4933d9467"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -2038,7 +2038,7 @@
       "type": "独立编写",
       "title": "下一笔客户订单日期",
       "context": "使用课程中小型订单数据练习下一笔客户订单日期。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "已知客户的订单按日期、id升序，输出 id、customer_id、next_date（该客户下一笔订单日期），没有时NULL；按 id 升序。\n输出列名称及顺序：id, customer_id, next_date。按题设排序；参考排序键：id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "requirements": "已知客户的订单按日期、id升序，输出 id、customer_id、next_date（该客户下一笔订单日期），没有时NULL；结果按 customer_id、next_date 升序。\n输出列名称及顺序：id, customer_id, next_date。按题设排序；参考排序键：customer_id, next_date。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
       "datasetId": "q0209-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -2057,6 +2057,11 @@
         ],
         "rows": [
           [
+            3,
+            1,
+            null
+          ],
+          [
             1,
             1,
             "2026-02-02"
@@ -2064,11 +2069,6 @@
           [
             2,
             2,
-            null
-          ],
-          [
-            3,
-            1,
             null
           ],
           [
@@ -2082,25 +2082,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT id,customer_id,LEAD(order_date) OVER(PARTITION BY customer_id ORDER BY order_date,id) AS next_date FROM orders WHERE customer_id IS NOT NULL ORDER BY id",
-          "sqliteSql": "SELECT id,customer_id,LEAD(order_date) OVER(PARTITION BY customer_id ORDER BY order_date,id) AS next_date FROM orders WHERE customer_id IS NOT NULL ORDER BY id"
+          "mysqlSql": "SELECT id,customer_id,LEAD(order_date) OVER(PARTITION BY customer_id ORDER BY order_date,id) AS next_date FROM orders WHERE customer_id IS NOT NULL ORDER BY customer_id, next_date",
+          "sqliteSql": "SELECT id,customer_id,LEAD(order_date) OVER(PARTITION BY customer_id ORDER BY order_date,id) AS next_date FROM orders WHERE customer_id IS NOT NULL ORDER BY customer_id, next_date"
         },
         {
           "kind": "关系结构等价",
-          "mysqlSql": "SELECT id,customer_id,LEAD(order_date) OVER(PARTITION BY customer_id ORDER BY order_date,id) AS next_date FROM (SELECT * FROM orders) AS orders WHERE customer_id IS NOT NULL ORDER BY id",
-          "sqliteSql": "SELECT id,customer_id,LEAD(order_date) OVER(PARTITION BY customer_id ORDER BY order_date,id) AS next_date FROM (SELECT * FROM orders) AS orders WHERE customer_id IS NOT NULL ORDER BY id",
+          "mysqlSql": "SELECT id,customer_id,LEAD(order_date) OVER(PARTITION BY customer_id ORDER BY order_date,id) AS next_date FROM (SELECT * FROM orders) AS orders WHERE customer_id IS NOT NULL ORDER BY customer_id, next_date",
+          "sqliteSql": "SELECT id,customer_id,LEAD(order_date) OVER(PARTITION BY customer_id ORDER BY order_date,id) AS next_date FROM (SELECT * FROM orders) AS orders WHERE customer_id IS NOT NULL ORDER BY customer_id, next_date",
           "explanation": "先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。"
         }
       ],
       "hints": [
         "决定窗口内的分区、排序与范围，注意是否需要保留全部原行。",
         "结合《LAG 与 LEAD》：LAG 获取分区中前一行，LEAD 获取后一行；可指定偏移和缺失默认值。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT id,customer_id,□□□ OVER(PARTITION BY customer_id ORDER BY order_date,id) AS next_date FROM orders WHERE customer_id IS NOT NULL ORDER BY id"
+        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT id,customer_id,□□□ OVER(PARTITION BY customer_id ORDER BY order_date,id) AS next_date FROM orders WHERE customer_id IS NOT NULL ORDER BY customer_id, next_date"
       ],
       "explanation": "LEAD 引用未来行，客户分区避免跨客户串单。\n执行思路：确认orders的输入记录；按筛选条件保留符合要求的记录，并考虑空值；根据窗口分区、顺序及框架计算每行的分析值；输出id、customer_id、next_date列；遵循题设排序和并列规则。\n公开夹具实际返回 4 行、3 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
       "commonErrors": [
         {
-          "sql": "SELECT id,customer_id,LAG(order_date) OVER(PARTITION BY customer_id ORDER BY order_date,id) AS next_date FROM orders WHERE customer_id IS NOT NULL ORDER BY id",
+          "sql": "SELECT id,customer_id,LAG(order_date) OVER(PARTITION BY customer_id ORDER BY order_date,id) AS next_date FROM orders WHERE customer_id IS NOT NULL ORDER BY customer_id, next_date",
           "reason": "LEAD 引用未来行，客户分区避免跨客户串单。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
@@ -2116,14 +2116,14 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0209/q0209-public.json",
-          "sha256": "7bd5906d32fc615f68990eec5cd37b456e04499c6d278f0e91ce131351f90987"
+          "sha256": "5a489de745dd0db0f8f24bff3a83b2213e633e8a87476d45c25f3d27419c75ad"
         },
         {
           "id": "q0209-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0209/q0209-boundary.json",
-          "sha256": "10c58e35b799e6209c2f51f34e4883f44d09d2c510f6cfaa677214e022da82eb"
+          "sha256": "e5ccd274df002ef21fe981b35673fc20b7eda381f3e04613edf93b4b23c9d8fd"
         },
         {
           "id": "q0209-empty",
@@ -2159,19 +2159,19 @@
             "reference": {
               "ran": true,
               "match": true,
-              "resultHash": "13b0747934816dc6270a2159d28465b352221d9c2bfcf1c6de37b1356e3c437f",
+              "resultHash": "2684da50c506c668af3801e10fac151d52120752d409dff9ffbf7e9a77270e54",
               "rowCount": 4
             },
             "equivalent": {
               "ran": true,
               "match": true,
-              "resultHash": "13b0747934816dc6270a2159d28465b352221d9c2bfcf1c6de37b1356e3c437f",
+              "resultHash": "2684da50c506c668af3801e10fac151d52120752d409dff9ffbf7e9a77270e54",
               "rows": 4
             },
             "wrong": {
               "ran": true,
               "match": false,
-              "resultHash": "0235549bdbdac66c26f1c98e7822347a2b06ea6bfc7846a42a66e2bf40606b24",
+              "resultHash": "a44080df4298efccbf4dc1b752d55b60d020fa65d220bfafb469614ac4e633df",
               "rows": 4
             }
           },
@@ -2180,19 +2180,19 @@
             "reference": {
               "ran": true,
               "match": true,
-              "resultHash": "4179e806762309f9743ef72ba33744a680e5fa369d602a30d1d5b94346966244",
+              "resultHash": "8d11e97c37adeb15398c9f2badce0224059ce9a598a60f6c5321d12828bd6979",
               "rowCount": 10
             },
             "equivalent": {
               "ran": true,
               "match": true,
-              "resultHash": "4179e806762309f9743ef72ba33744a680e5fa369d602a30d1d5b94346966244",
+              "resultHash": "8d11e97c37adeb15398c9f2badce0224059ce9a598a60f6c5321d12828bd6979",
               "rows": 10
             },
             "wrong": {
               "ran": true,
               "match": false,
-              "resultHash": "57137702d6e045400dba4e2e93d06cfb44e6111199733b2959d9066f93fa55fa",
+              "resultHash": "5bc686232b68f155d1118c2537a0f4e62aa82ca3d3d2b972a2fd91ea3442f26f",
               "rows": 10
             }
           },
@@ -2238,7 +2238,7 @@
       "type": "独立编写",
       "title": "门店内按订单累计销售",
       "context": "使用课程中小型订单数据练习门店内按订单累计销售。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "按门店分区，按日期及 id 逐行累计 sales，返回 id、store_id、running_sales，按 id 升序。\n输出列名称及顺序：id, store_id, running_sales。按题设排序；参考排序键：id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "requirements": "按门店分区，按日期及 id 逐行累计 sales，返回 id、store_id、running_sales。\n输出列名称及顺序：id, store_id, running_sales。结果行的先后顺序不作要求。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
       "datasetId": "q0211-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -2262,24 +2262,24 @@
             800
           ],
           [
-            2,
-            2,
-            400
-          ],
-          [
             3,
             1,
             1400
           ],
           [
-            4,
-            2,
-            700
-          ],
-          [
             5,
             1,
             2900
+          ],
+          [
+            2,
+            2,
+            400
+          ],
+          [
+            4,
+            2,
+            700
           ]
         ],
         "rowCount": 5
@@ -2287,25 +2287,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT id,store_id,SUM(sales) OVER(PARTITION BY store_id ORDER BY order_date,id ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS running_sales FROM orders ORDER BY id",
-          "sqliteSql": "SELECT id,store_id,SUM(sales) OVER(PARTITION BY store_id ORDER BY order_date,id ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS running_sales FROM orders ORDER BY id"
+          "mysqlSql": "SELECT id,store_id,SUM(sales) OVER(PARTITION BY store_id ORDER BY order_date,id ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS running_sales FROM orders",
+          "sqliteSql": "SELECT id,store_id,SUM(sales) OVER(PARTITION BY store_id ORDER BY order_date,id ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS running_sales FROM orders"
         },
         {
           "kind": "关系结构等价",
-          "mysqlSql": "SELECT id,store_id,SUM(sales) OVER(PARTITION BY store_id ORDER BY order_date,id ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS running_sales FROM (SELECT * FROM orders) AS orders ORDER BY id",
-          "sqliteSql": "SELECT id,store_id,SUM(sales) OVER(PARTITION BY store_id ORDER BY order_date,id ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS running_sales FROM (SELECT * FROM orders) AS orders ORDER BY id",
+          "mysqlSql": "SELECT id,store_id,SUM(sales) OVER(PARTITION BY store_id ORDER BY order_date,id ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS running_sales FROM (SELECT * FROM orders) AS orders",
+          "sqliteSql": "SELECT id,store_id,SUM(sales) OVER(PARTITION BY store_id ORDER BY order_date,id ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS running_sales FROM (SELECT * FROM orders) AS orders",
           "explanation": "先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。"
         }
       ],
       "hints": [
         "决定窗口内的分区、排序与范围，注意是否需要保留全部原行。",
         "结合《ROWS、RANGE 与累计》：ROWS 按物理窗口行数界定范围；RANGE 按排序值与同值组界定。显式指定累计帧可避免默认帧歧义。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT id,store_id,SUM(sales) OVER(□□□ORDER BY order_date,id ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS running_sales FROM orders ORDER BY id"
+        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT id,store_id,SUM(sales) OVER(□□□ORDER BY order_date,id ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS running_sales FROM orders"
       ],
-      "explanation": "累计窗口应按门店重新开始，而不是所有订单连在一起。\n执行思路：确认orders的输入记录；根据窗口分区、顺序及框架计算每行的分析值；输出id、store_id、running_sales列；遵循题设排序和并列规则。\n公开夹具实际返回 5 行、3 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
+      "explanation": "累计窗口应按门店重新开始，而不是所有订单连在一起。\n执行思路：确认orders的输入记录；根据窗口分区、顺序及框架计算每行的分析值；输出id、store_id、running_sales列；结果行的先后顺序不作要求。\n公开夹具实际返回 5 行、3 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
       "commonErrors": [
         {
-          "sql": "SELECT id,store_id,SUM(sales) OVER(ORDER BY order_date,id ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS running_sales FROM orders ORDER BY id",
+          "sql": "SELECT id,store_id,SUM(sales) OVER(ORDER BY order_date,id ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS running_sales FROM orders",
           "reason": "累计窗口应按门店重新开始，而不是所有订单连在一起。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
@@ -2321,24 +2321,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0211/q0211-public.json",
-          "sha256": "6e12f1a5e61dd922174d659aa4319b7738483ca8db76d3c477e72e7ab6dfabef"
+          "sha256": "7467a97a7e1077ccbcd2baaaee329d63b7ffa23d0765c0a14e3ac05c02f9a103"
         },
         {
           "id": "q0211-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0211/q0211-boundary.json",
-          "sha256": "429b0c0108f0bcfba4cd543c0d237b2b9107948df4291137a712b175468f37ad"
+          "sha256": "427290a0dcf8e0159f7cc3cfa78c34f4653090d33b28a18c466ae74f25350970"
         },
         {
           "id": "q0211-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0211/q0211-empty.json",
-          "sha256": "eeed4c8d50b5d74cd773d8370c19b2d4640d467a8eb1cfbe3532a2b821ab2d71"
+          "sha256": "b547b388ea24de48dbe349402ccaff0258a75c382f3714c011f5b6a95649a648"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -2364,13 +2364,13 @@
             "reference": {
               "ran": true,
               "match": true,
-              "resultHash": "ade8aa6b495412d50208e206a2dcfc5328064650a435979d0e6696b5dcf48060",
+              "resultHash": "565146e1bce33185884703bff2e14a9a9b2e0fc441c344d7104f0a57095b0359",
               "rowCount": 5
             },
             "equivalent": {
               "ran": true,
               "match": true,
-              "resultHash": "ade8aa6b495412d50208e206a2dcfc5328064650a435979d0e6696b5dcf48060",
+              "resultHash": "565146e1bce33185884703bff2e14a9a9b2e0fc441c344d7104f0a57095b0359",
               "rows": 5
             },
             "wrong": {
@@ -2385,19 +2385,19 @@
             "reference": {
               "ran": true,
               "match": true,
-              "resultHash": "a894b881912c39dcf14a60c50be98472ed2e63310cdd981b1b780e46b6f8ec7a",
+              "resultHash": "0eb6ec23f36477a427df5667c2d31ad2abbb4c502bd472074bc9aa453b1fe812",
               "rowCount": 13
             },
             "equivalent": {
               "ran": true,
               "match": true,
-              "resultHash": "a894b881912c39dcf14a60c50be98472ed2e63310cdd981b1b780e46b6f8ec7a",
+              "resultHash": "0eb6ec23f36477a427df5667c2d31ad2abbb4c502bd472074bc9aa453b1fe812",
               "rows": 13
             },
             "wrong": {
               "ran": true,
               "match": false,
-              "resultHash": "db160e2561118fd315b39181678a96a8eb37c02227c47279ca7f78fe3f2d04cb",
+              "resultHash": "afc1a61cc08cf5adc8d6254782a0dfc23613e83b80aa4b9e4142b8923a044248",
               "rows": 13
             }
           },
@@ -2443,7 +2443,7 @@
       "type": "独立编写",
       "title": "并列薪资的范围累计",
       "context": "使用课程中小型员工数据练习并列薪资的范围累计。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "按薪资升序做 RANGE 从开头到当前值，输出 employee_id、salary、running_salary，并列薪资得到相同累计，按薪资、编号升序。\n输出列名称及顺序：employee_id, salary, running_salary。按题设排序；参考排序键：salary,employee_id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "requirements": "按薪资升序做 RANGE 从开头到当前值，输出 employee_id、salary、running_salary，并列薪资得到相同累计。\n输出列名称及顺序：employee_id, salary, running_salary。结果行的先后顺序不作要求。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
       "datasetId": "q0212-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -2487,25 +2487,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT employee_id,salary,SUM(salary) OVER(ORDER BY salary RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS running_salary FROM employees WHERE salary IS NOT NULL ORDER BY salary,employee_id",
-          "sqliteSql": "SELECT employee_id,salary,SUM(salary) OVER(ORDER BY salary RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS running_salary FROM employees WHERE salary IS NOT NULL ORDER BY salary,employee_id"
+          "mysqlSql": "SELECT employee_id,salary,SUM(salary) OVER(ORDER BY salary RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS running_salary FROM employees WHERE salary IS NOT NULL",
+          "sqliteSql": "SELECT employee_id,salary,SUM(salary) OVER(ORDER BY salary RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS running_salary FROM employees WHERE salary IS NOT NULL"
         },
         {
           "kind": "关系结构等价",
-          "mysqlSql": "SELECT employee_id,salary,SUM(salary) OVER(ORDER BY salary RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS running_salary FROM (SELECT * FROM employees) AS employees WHERE salary IS NOT NULL ORDER BY salary,employee_id",
-          "sqliteSql": "SELECT employee_id,salary,SUM(salary) OVER(ORDER BY salary RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS running_salary FROM (SELECT * FROM employees) AS employees WHERE salary IS NOT NULL ORDER BY salary,employee_id",
+          "mysqlSql": "SELECT employee_id,salary,SUM(salary) OVER(ORDER BY salary RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS running_salary FROM (SELECT * FROM employees) AS employees WHERE salary IS NOT NULL",
+          "sqliteSql": "SELECT employee_id,salary,SUM(salary) OVER(ORDER BY salary RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS running_salary FROM (SELECT * FROM employees) AS employees WHERE salary IS NOT NULL",
           "explanation": "先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。"
         }
       ],
       "hints": [
         "决定窗口内的分区、排序与范围，注意是否需要保留全部原行。",
         "结合《RANGE 与 ROWS 的并列效应》：排序键相同的行属于同值组；RANGE 截至当前排序值，可能同时纳入并列行；ROWS 截至具体物理行。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT employee_id,salary,SUM(salary) OVER(ORDER BY salary □□□ UNBOUNDED PRECEDING AND CURRENT ROW) AS running_salary FROM employees WHERE salary IS NOT NULL ORDER BY salary,employee_id"
+        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT employee_id,salary,SUM(salary) OVER(ORDER BY salary □□□ UNBOUNDED PRECEDING AND CURRENT ROW) AS running_salary FROM employees WHERE salary IS NOT NULL"
       ],
-      "explanation": "RANGE 会将同排序值的并列行纳入当前帧，ROWS逐行计算可能不同。\n执行思路：确认employees的输入记录；按筛选条件保留符合要求的记录，并考虑空值；根据窗口分区、顺序及框架计算每行的分析值；输出employee_id、salary、running_salary列；遵循题设排序和并列规则。\n公开夹具实际返回 4 行、3 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
+      "explanation": "RANGE 会将同排序值的并列行纳入当前帧，ROWS逐行计算可能不同。\n执行思路：确认employees的输入记录；按筛选条件保留符合要求的记录，并考虑空值；根据窗口分区、顺序及框架计算每行的分析值；输出employee_id、salary、running_salary列；结果行的先后顺序不作要求。\n公开夹具实际返回 4 行、3 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
       "commonErrors": [
         {
-          "sql": "SELECT employee_id,salary,SUM(salary) OVER(ORDER BY salary ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS running_salary FROM employees WHERE salary IS NOT NULL ORDER BY salary,employee_id",
+          "sql": "SELECT employee_id,salary,SUM(salary) OVER(ORDER BY salary ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS running_salary FROM employees WHERE salary IS NOT NULL",
           "reason": "RANGE 会将同排序值的并列行纳入当前帧，ROWS逐行计算可能不同。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
@@ -2521,24 +2521,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0212/q0212-public.json",
-          "sha256": "1773c2111b3ecb325e3a3f4c9e3a6f7f8ba7f5b89fda5082857040afbcf2b55c"
+          "sha256": "6103ea9f73fe9f981ca635726145da824aef9cfd0857a4f0c5d5f842d7b14bbc"
         },
         {
           "id": "q0212-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0212/q0212-boundary.json",
-          "sha256": "c29c9f66c5405cec26d62709a2b0030f5ccf124b0719b94c97a43582a08dc53c"
+          "sha256": "a06265277e21eff8104edd9b3ffcb8e35cbd79bfd20f0c4d66e3aff627fbf295"
         },
         {
           "id": "q0212-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0212/q0212-empty.json",
-          "sha256": "432f2f9005918bd987451750a6025d1d8b9ec6378a04988411cf61dc714556e4"
+          "sha256": "a7c4ae55bc1bc077317b422a9adc4a8aa7b3a8cb0809be96013ae163881ba089"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -2550,7 +2550,7 @@
         {
           "kind": "range_frame",
           "status": "需运行时语法树核查；不以关键词匹配判分",
-          "requirement": "按薪资升序做 RANGE 从开头到当前值，输出 employee_id、salary、running_salary，并列薪资得到相同累计，按薪资、编号升序。"
+          "requirement": "按薪资升序做 RANGE 从开头到当前值，输出 employee_id、salary、running_salary，并列薪资得到相同累计。"
         }
       ],
       "supportStatus": "直接兼容",
@@ -3044,7 +3044,7 @@
       "type": "独立编写",
       "title": "每类别价格最高的商品含并列",
       "context": "使用课程中小型商品数据练习每类别价格最高的商品含并列。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "类别内按价格降序排名，返回排名1的全部已知售价商品，输出 category、product_id、price，按类别和编号升序。\n输出列名称及顺序：category, product_id, price。按题设排序；参考排序键：category,product_id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "requirements": "类别内按价格降序排名，返回排名1的全部已知售价商品，输出 category、product_id、price。\n输出列名称及顺序：category, product_id, price。结果行的先后顺序不作要求。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
       "datasetId": "q0217-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -3083,25 +3083,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "WITH a AS (SELECT category,product_id,price,RANK() OVER(PARTITION BY category ORDER BY price DESC) AS r FROM products WHERE price IS NOT NULL) SELECT category,product_id,price FROM a WHERE r=1 ORDER BY category,product_id",
-          "sqliteSql": "WITH a AS (SELECT category,product_id,price,RANK() OVER(PARTITION BY category ORDER BY price DESC) AS r FROM products WHERE price IS NOT NULL) SELECT category,product_id,price FROM a WHERE r=1 ORDER BY category,product_id"
+          "mysqlSql": "WITH a AS (SELECT category,product_id,price,RANK() OVER(PARTITION BY category ORDER BY price DESC) AS r FROM products WHERE price IS NOT NULL) SELECT category,product_id,price FROM a WHERE r=1",
+          "sqliteSql": "WITH a AS (SELECT category,product_id,price,RANK() OVER(PARTITION BY category ORDER BY price DESC) AS r FROM products WHERE price IS NOT NULL) SELECT category,product_id,price FROM a WHERE r=1"
         },
         {
           "kind": "代数或函数等价",
-          "mysqlSql": "WITH a AS (SELECT category,product_id,price,RANK() OVER(PARTITION BY category ORDER BY price DESC) AS r FROM products WHERE price IS NOT NULL) SELECT category,product_id,price FROM a WHERE NOT (r<>1) ORDER BY category,product_id",
-          "sqliteSql": "WITH a AS (SELECT category,product_id,price,RANK() OVER(PARTITION BY category ORDER BY price DESC) AS r FROM products WHERE price IS NOT NULL) SELECT category,product_id,price FROM a WHERE NOT (r<>1) ORDER BY category,product_id",
+          "mysqlSql": "WITH a AS (SELECT category,product_id,price,RANK() OVER(PARTITION BY category ORDER BY price DESC) AS r FROM products WHERE price IS NOT NULL) SELECT category,product_id,price FROM a WHERE NOT (r<>1)",
+          "sqliteSql": "WITH a AS (SELECT category,product_id,price,RANK() OVER(PARTITION BY category ORDER BY price DESC) AS r FROM products WHERE price IS NOT NULL) SELECT category,product_id,price FROM a WHERE NOT (r<>1)",
           "explanation": "用反向比较并取 NOT 表达相同三值逻辑。"
         }
       ],
       "hints": [
         "决定窗口内的分区、排序与范围，注意是否需要保留全部原行。",
         "结合《ROW_NUMBER、RANK、DENSE_RANK》：ROW_NUMBER 给每行唯一序号；RANK 同值同名次并留空档；DENSE_RANK 同值同名次不留空档。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nWITH a AS (SELECT category,product_id,price,□□□ OVER(PARTITION BY category ORDER BY price DESC) AS r FROM products WHERE price IS NOT NULL) SELECT category,product_id,price FROM a WHERE r=1 ORDER BY category,product_id"
+        "关注这个局部结构（空缺部分仍需自行完成）：\nWITH a AS (SELECT category,product_id,price,□□□ OVER(PARTITION BY category ORDER BY price DESC) AS r FROM products WHERE price IS NOT NULL) SELECT category,product_id,price FROM a WHERE r=1"
       ],
-      "explanation": "RANK 保留并列第一，ROW_NUMBER 会任意舍弃同价者。\n执行思路：确认products的输入记录；先明确公用表表达式的中间数据及其粒度；按筛选条件保留符合要求的记录，并考虑空值；根据窗口分区、顺序及框架计算每行的分析值；输出category、product_id、price列；遵循题设排序和并列规则。\n公开夹具实际返回 3 行、3 列；完整结果见 expectedOutput。\n另一种可用写法：用反向比较并取 NOT 表达相同三值逻辑。",
+      "explanation": "RANK 保留并列第一，ROW_NUMBER 会任意舍弃同价者。\n执行思路：确认products的输入记录；先明确公用表表达式的中间数据及其粒度；按筛选条件保留符合要求的记录，并考虑空值；根据窗口分区、顺序及框架计算每行的分析值；输出category、product_id、price列；结果行的先后顺序不作要求。\n公开夹具实际返回 3 行、3 列；完整结果见 expectedOutput。\n另一种可用写法：用反向比较并取 NOT 表达相同三值逻辑。",
       "commonErrors": [
         {
-          "sql": "WITH a AS (SELECT category,product_id,price,ROW_NUMBER() OVER(PARTITION BY category ORDER BY price DESC) AS r FROM products WHERE price IS NOT NULL) SELECT category,product_id,price FROM a WHERE r=1 ORDER BY category,product_id",
+          "sql": "WITH a AS (SELECT category,product_id,price,ROW_NUMBER() OVER(PARTITION BY category ORDER BY price DESC) AS r FROM products WHERE price IS NOT NULL) SELECT category,product_id,price FROM a WHERE r=1",
           "reason": "RANK 保留并列第一，ROW_NUMBER 会任意舍弃同价者。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
@@ -3117,24 +3117,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0217/q0217-public.json",
-          "sha256": "be6bebb0a43b402e9d8bc4528d1b072c27ccd35ed8e42eeed55b8a4d6dfa9232"
+          "sha256": "b64e7e7261c9e2c15452a678838a1b011ca8823502baeaedc6b18d6f00b2d500"
         },
         {
           "id": "q0217-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0217/q0217-boundary.json",
-          "sha256": "5b6afdf015198ebdbd57b86e627ba680989d6d56145916ff4f8c3db90089368a"
+          "sha256": "ff0ad4cf5f5d7c2f7bad53ba23d8d6d6c1811579529c29808ff3abaf88fc7bdc"
         },
         {
           "id": "q0217-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0217/q0217-empty.json",
-          "sha256": "8c9c4ce96d368c99ec213fc095a757ff2f1a293142f06c343378edf014333ece"
+          "sha256": "e0fac57891c8df34209863fd5ace3246f6347040b5abf0353f0f21a811ce5683"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -3239,7 +3239,7 @@
       "type": "独立编写",
       "title": "每种类别的价格第二档",
       "context": "使用课程中小型商品数据练习每种类别的价格第二档。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "使用密集排名取得每类别降序第二个不同售价的全部商品，输出 category、product_id、price，按类别、编号升序。\n输出列名称及顺序：category, product_id, price。按题设排序；参考排序键：category,product_id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "requirements": "使用密集排名取得每类别降序第二个不同售价的全部商品，输出 category、product_id、price。\n输出列名称及顺序：category, product_id, price。结果行的先后顺序不作要求。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
       "datasetId": "q0218-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -3273,25 +3273,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "WITH a AS (SELECT category,product_id,price,DENSE_RANK() OVER(PARTITION BY category ORDER BY price DESC) AS r FROM products WHERE price IS NOT NULL) SELECT category,product_id,price FROM a WHERE r=2 ORDER BY category,product_id",
-          "sqliteSql": "WITH a AS (SELECT category,product_id,price,DENSE_RANK() OVER(PARTITION BY category ORDER BY price DESC) AS r FROM products WHERE price IS NOT NULL) SELECT category,product_id,price FROM a WHERE r=2 ORDER BY category,product_id"
+          "mysqlSql": "WITH a AS (SELECT category,product_id,price,DENSE_RANK() OVER(PARTITION BY category ORDER BY price DESC) AS r FROM products WHERE price IS NOT NULL) SELECT category,product_id,price FROM a WHERE r=2",
+          "sqliteSql": "WITH a AS (SELECT category,product_id,price,DENSE_RANK() OVER(PARTITION BY category ORDER BY price DESC) AS r FROM products WHERE price IS NOT NULL) SELECT category,product_id,price FROM a WHERE r=2"
         },
         {
           "kind": "代数或函数等价",
-          "mysqlSql": "WITH a AS (SELECT category,product_id,price,DENSE_RANK() OVER(PARTITION BY category ORDER BY price DESC) AS r FROM products WHERE price IS NOT NULL) SELECT category,product_id,price FROM a WHERE NOT (r<>2) ORDER BY category,product_id",
-          "sqliteSql": "WITH a AS (SELECT category,product_id,price,DENSE_RANK() OVER(PARTITION BY category ORDER BY price DESC) AS r FROM products WHERE price IS NOT NULL) SELECT category,product_id,price FROM a WHERE NOT (r<>2) ORDER BY category,product_id",
+          "mysqlSql": "WITH a AS (SELECT category,product_id,price,DENSE_RANK() OVER(PARTITION BY category ORDER BY price DESC) AS r FROM products WHERE price IS NOT NULL) SELECT category,product_id,price FROM a WHERE NOT (r<>2)",
+          "sqliteSql": "WITH a AS (SELECT category,product_id,price,DENSE_RANK() OVER(PARTITION BY category ORDER BY price DESC) AS r FROM products WHERE price IS NOT NULL) SELECT category,product_id,price FROM a WHERE NOT (r<>2)",
           "explanation": "用反向比较并取 NOT 表达相同三值逻辑。"
         }
       ],
       "hints": [
         "决定窗口内的分区、排序与范围，注意是否需要保留全部原行。",
         "结合《ROW_NUMBER、RANK、DENSE_RANK》：ROW_NUMBER 给每行唯一序号；RANK 同值同名次并留空档；DENSE_RANK 同值同名次不留空档。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nWITH a AS (SELECT category,product_id,price,□□□ OVER(PARTITION BY category ORDER BY price DESC) AS r FROM products WHERE price IS NOT NULL) SELECT category,product_id,price FROM a WHERE r=2 ORDER BY category,product_id"
+        "关注这个局部结构（空缺部分仍需自行完成）：\nWITH a AS (SELECT category,product_id,price,□□□ OVER(PARTITION BY category ORDER BY price DESC) AS r FROM products WHERE price IS NOT NULL) SELECT category,product_id,price FROM a WHERE r=2"
       ],
-      "explanation": "第二个不同价格不是第二行，价格相同属于同档。\n执行思路：确认products的输入记录；先明确公用表表达式的中间数据及其粒度；按筛选条件保留符合要求的记录，并考虑空值；根据窗口分区、顺序及框架计算每行的分析值；输出category、product_id、price列；遵循题设排序和并列规则。\n公开夹具实际返回 2 行、3 列；完整结果见 expectedOutput。\n另一种可用写法：用反向比较并取 NOT 表达相同三值逻辑。",
+      "explanation": "第二个不同价格不是第二行，价格相同属于同档。\n执行思路：确认products的输入记录；先明确公用表表达式的中间数据及其粒度；按筛选条件保留符合要求的记录，并考虑空值；根据窗口分区、顺序及框架计算每行的分析值；输出category、product_id、price列；结果行的先后顺序不作要求。\n公开夹具实际返回 2 行、3 列；完整结果见 expectedOutput。\n另一种可用写法：用反向比较并取 NOT 表达相同三值逻辑。",
       "commonErrors": [
         {
-          "sql": "WITH a AS (SELECT category,product_id,price,ROW_NUMBER() OVER(PARTITION BY category ORDER BY price DESC) AS r FROM products WHERE price IS NOT NULL) SELECT category,product_id,price FROM a WHERE r=2 ORDER BY category,product_id",
+          "sql": "WITH a AS (SELECT category,product_id,price,ROW_NUMBER() OVER(PARTITION BY category ORDER BY price DESC) AS r FROM products WHERE price IS NOT NULL) SELECT category,product_id,price FROM a WHERE r=2",
           "reason": "第二个不同价格不是第二行，价格相同属于同档。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
@@ -3307,24 +3307,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0218/q0218-public.json",
-          "sha256": "9aa75de59ea1e0e3839f81540e74b219772726e5784f9bb0367bd2484c3d5b3e"
+          "sha256": "192cae1908fdff5c7c01cc3961e3a2ea02f527dc820f786d8b61cc9fea38e544"
         },
         {
           "id": "q0218-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0218/q0218-boundary.json",
-          "sha256": "0b275c41cb973f53c112fbad689b7a7e28da4bfa1e10dc04be2d53695f7f0306"
+          "sha256": "15a2bf34049a3ac8ccd54de08a4ed5e0ece97f2260c6d015be22051af3d471ac"
         },
         {
           "id": "q0218-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0218/q0218-empty.json",
-          "sha256": "bc47d91a61d7862c7dc8ca304b92705f918c57d86492fee538f72b7420acaed4"
+          "sha256": "66d344da9c138e66768f314bb3fea233006fafb90edf8af0a45d2e94394043fd"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -3336,7 +3336,7 @@
         {
           "kind": "dense_rank_window",
           "status": "需运行时语法树核查；不以关键词匹配判分",
-          "requirement": "使用密集排名取得每类别降序第二个不同售价的全部商品，输出 category、product_id、price，按类别、编号升序。"
+          "requirement": "使用密集排名取得每类别降序第二个不同售价的全部商品，输出 category、product_id、price。"
         }
       ],
       "supportStatus": "直接兼容",

@@ -103,14 +103,14 @@
     {
       "kind": "fragment",
       "title": "固定输出顺序",
-      "sql": "ORDER BY id;",
-      "purpose": "按订单编号升序排列。",
+      "sql": "ORDER BY sales DESC;",
+      "purpose": "按销售额从高到低排列。",
       "reason": "查询结果的默认行序没有保证。"
     }
   ],
   "completeCode": {
-    "mysqlSql": "SELECT id, category, sales FROM orders ORDER BY id;",
-    "sqliteSql": "SELECT id, category, sales FROM orders ORDER BY id;"
+    "mysqlSql": "SELECT id, category, sales FROM orders ORDER BY sales DESC;",
+    "sqliteSql": "SELECT id, category, sales FROM orders ORDER BY sales DESC;"
   },
   "expectedResult": {
     "columns": [
@@ -120,14 +120,14 @@
     ],
     "rows": [
       [
+        5,
+        "日用品",
+        1500
+      ],
+      [
         1,
         "护肤品",
         800
-      ],
-      [
-        2,
-        "化妆品",
-        400
       ],
       [
         3,
@@ -135,14 +135,14 @@
         600
       ],
       [
+        2,
+        "化妆品",
+        400
+      ],
+      [
         4,
         "化妆品",
         300
-      ],
-      [
-        5,
-        "日用品",
-        1500
       ]
     ],
     "status": "SQLite实际执行",
@@ -212,5 +212,5 @@
     ]
   },
   "sourcePath": "source/batch1/kp01-01.json",
-  "sourceSha256": "6735de6056ae5f4ff96e22462f244cfca95790f3ae532b71c4849052f62a4f85"
+  "sourceSha256": "df4f320421baf5b88e9498a826f76a4f128705077a2b3d8135c9fd471c98abb7"
 }

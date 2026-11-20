@@ -11,14 +11,14 @@
     {
       "id": "kp15-01",
       "chapterId": "ch15",
-      "title": "OVER 与 PARTITION BY",
-      "learningObjective": "能够运用本节知识完成：同时查看单笔金额与所属类别合计",
+      "title": "窗口聚合与分区",
+      "learningObjective": "区分分组聚合与窗口聚合，计算明细占所在组的比例。",
       "prerequisites": [],
-      "concept": "普通聚合压缩行数；窗口聚合为每行计算所处窗口的指标。",
+      "concept": "分区是窗口计算的边界，不是输出分组。普通聚合把多行压缩成汇总行；窗口聚合在筛选后的输入行上附加计算值。没有分区时整个输入构成一个分区；本例没有窗口排序，因此每笔订单看见所在类别的全部订单。",
       "syntax": "SUM(v) OVER (PARTITION BY key)",
       "parameters": {
-        "key": "分区字段",
-        "v": "指标字段"
+        "v": "指标字段",
+        "key": "决定分区的维度"
       },
       "fixtureIds": [
         "lesson-orders"
@@ -108,20 +108,20 @@
           ]
         }
       ],
-      "mysqlSql": "SELECT id,category,sales,SUM(sales) OVER(PARTITION BY category) AS category_total FROM orders ORDER BY id;",
-      "sqliteSql": "SELECT id,category,sales,SUM(sales) OVER(PARTITION BY category) AS category_total FROM orders ORDER BY id;",
+      "mysqlSql": "SELECT id,category,sales,SUM(sales) OVER(PARTITION BY category) AS category_total FROM orders ORDER BY sales DESC;",
+      "sqliteSql": "SELECT id,category,sales,SUM(sales) OVER(PARTITION BY category) AS category_total FROM orders ORDER BY sales DESC;",
       "executionSteps": [
-        "按类别建立窗口",
-        "各窗口计算总额",
-        "把总额写回每一行"
+        "按类别划分窗口",
+        "计算各类别总额",
+        "保留订单明细"
       ],
-      "useCase": "同时查看单笔金额与所属类别合计",
-      "comparison": "GROUP BY 每组一行，窗口函数保留每条明细。",
+      "useCase": "销售分析需同时查看每笔订单及所在类别的总销售额，统计范围为全部五笔订单。",
+      "comparison": "GROUP BY 改变行粒度；窗口聚合本身不合并行。",
       "commonError": {
-        "example": "用 GROUP BY category 期待保留全部订单",
-        "correction": "使用 SUM(sales) OVER(PARTITION BY category)"
+        "example": "把每行的 category_total 再求和作为总销售额。",
+        "correction": "直接汇总原 sales，或者先恢复一类一行。"
       },
-      "notes": "窗口在行筛选及分组之后计算，不能在同层 WHERE 引用窗口值。",
+      "notes": "同层 WHERE 不能引用窗口结果；先在内层计算再筛选。",
       "compatibility": {
         "status": "直接兼容",
         "detail": "仅在本示例数据与语义范围验证；不代表全部 MySQL 语法兼容。"
@@ -153,9 +153,21 @@
         ],
         "rows": [
           [
+            5,
+            "日用品",
+            1500,
+            1500
+          ],
+          [
             1,
             "护肤品",
             800,
+            1400
+          ],
+          [
+            3,
+            "护肤品",
+            600,
             1400
           ],
           [
@@ -165,22 +177,10 @@
             700
           ],
           [
-            3,
-            "护肤品",
-            600,
-            1400
-          ],
-          [
             4,
             "化妆品",
             300,
             700
-          ],
-          [
-            5,
-            "日用品",
-            1500,
-            1500
           ]
         ],
         "status": "SQLite实际执行",
@@ -225,26 +225,86 @@
         "fc0119"
       ],
       "teaching": {
-        "problem": "分析单笔订单在类别中的位置时，同时需要原始行和类别合计。",
-        "codeExplanation": "PARTITION BY 定义窗口范围，OVER 从每条输入行出发补上所在分区的聚合，不压缩成一行一类。",
-        "resultExplanation": "护肤品的两行都得到 1400，可继续计算各笔占比；若报表只要各类合计则用 GROUP BY。",
+        "problem": "销售分析需同时查看每笔订单及所在类别的总销售额，统计范围为全部五笔订单。",
+        "codeExplanation": "订单编号是明细粒度。SUM 计算类别金额，OVER 指定窗口语义，PARTITION BY category 让不同类别互不影响。先比较普通分组的输出，再计算明细贡献率；分母为类别总额而非全表金额，使用 NULLIF 防止零分母。",
+        "resultExplanation": "仍为五行。护肤品两笔分别为800和600，均对应1400；化妆品对应700；日用品对应1500。重复出现的类别总额不能再直接求和。",
         "checkpoints": [],
         "mergedConcepts": [],
-        "mergeExamples": []
+        "mergeExamples": [
+          {
+            "label": "普通聚合对照",
+            "explanation": "五行缩为三类。",
+            "sql": "SELECT category,SUM(sales) AS total FROM orders GROUP BY category ORDER BY total DESC;",
+            "result": {
+              "columns": [
+                "category",
+                "total"
+              ],
+              "rows": [
+                [
+                  "日用品",
+                  1500
+                ],
+                [
+                  "护肤品",
+                  1400
+                ],
+                [
+                  "化妆品",
+                  700
+                ]
+              ]
+            }
+          },
+          {
+            "label": "类别内贡献率",
+            "explanation": "每笔金额除以其类别合计，结果为百分数。",
+            "sql": "SELECT id,ROUND(100.0*sales/NULLIF(SUM(sales) OVER(PARTITION BY category),0),2) AS share_pct FROM orders ORDER BY sales DESC;",
+            "result": {
+              "columns": [
+                "id",
+                "share_pct"
+              ],
+              "rows": [
+                [
+                  5,
+                  100.0
+                ],
+                [
+                  1,
+                  57.14
+                ],
+                [
+                  3,
+                  42.86
+                ],
+                [
+                  2,
+                  57.14
+                ],
+                [
+                  4,
+                  42.86
+                ]
+              ]
+            }
+          }
+        ]
       }
     },
     {
       "id": "kp15-02",
       "chapterId": "ch15",
-      "title": "ROW_NUMBER、RANK、DENSE_RANK",
-      "learningObjective": "能够运用本节知识完成：按薪资排名并比较并列规则",
+      "title": "序号、排名与连续排名",
+      "learningObjective": "根据是否接受并列及结果数量选择排名函数。",
       "prerequisites": [
         "kp15-01"
       ],
-      "concept": "ROW_NUMBER 给每行唯一序号；RANK 同值同名次并留空档；DENSE_RANK 同值同名次不留空档。",
-      "syntax": "RANK() OVER(ORDER BY value DESC)",
+      "concept": "序号为每行分配唯一位置，普通排名让并列共享名次且跳过被占用位置，连续排名按不同排序值连续编号。窗口排序决定名次，外层排序决定展示顺序。排名范围由分区决定。",
+      "syntax": "ROW_NUMBER() OVER(ORDER BY v DESC, id); RANK() OVER(ORDER BY v DESC); DENSE_RANK() OVER(ORDER BY v DESC)",
       "parameters": {
-        "ORDER BY": "窗口内部排名顺序"
+        "v": "排名指标",
+        "id": "唯一决胜键，仅用于需要确定行序时"
       },
       "fixtureIds": [
         "lesson-employees"
@@ -309,17 +369,17 @@
       "mysqlSql": "SELECT employee_id,salary,ROW_NUMBER() OVER(ORDER BY salary DESC,employee_id) AS rn,RANK() OVER(ORDER BY salary DESC) AS rnk,DENSE_RANK() OVER(ORDER BY salary DESC) AS dense_rnk FROM employees ORDER BY rn;",
       "sqliteSql": "SELECT employee_id,salary,ROW_NUMBER() OVER(ORDER BY salary DESC,employee_id) AS rn,RANK() OVER(ORDER BY salary DESC) AS rnk,DENSE_RANK() OVER(ORDER BY salary DESC) AS dense_rnk FROM employees ORDER BY rn;",
       "executionSteps": [
-        "8000排名1",
-        "两个5000并列2",
-        "3000的普通排名4、密集排名3"
+        "按薪资降序比较",
+        "分别计算三种名次",
+        "按序号输出"
       ],
-      "useCase": "按薪资排名并比较并列规则",
-      "comparison": "唯一序号加编号消除并列不确定性；RANK 不应随意加唯一键破坏并列。",
+      "useCase": "人事报表需按薪资排名，同时说明并列薪资是否应占用相同名次。",
+      "comparison": "固定最多两人使用序号；保留第二名的全部并列者使用普通排名。",
       "commonError": {
-        "example": "WHERE RANK() OVER(ORDER BY salary DESC)<=3",
-        "correction": "先在 CTE 计算排名，再在外层 WHERE 筛选"
+        "example": "在同层 WHERE 使用窗口函数，或给普通排名添加唯一编号导致并列消失。",
+        "correction": "内层计算排名后外层筛选；并列函数只使用定义并列的业务排序键。"
       },
-      "notes": "窗口排序并不保证最终输出排序。",
+      "notes": "若分组取前若干名，在窗口中添加分区；外层仍显式排序。",
       "compatibility": {
         "status": "直接兼容",
         "detail": "仅在本示例数据与语义范围验证；不代表全部 MySQL 语法兼容。"
@@ -429,27 +489,75 @@
         "fc0119"
       ],
       "teaching": {
-        "problem": "排行榜对并列的处理取决于实际规则。",
-        "codeExplanation": "ROW_NUMBER 加唯一决胜键产生连续位置；RANK 并列且跳号；DENSE_RANK 并列但不跳号。不能给后两者加破坏并列的唯一排序键。",
-        "resultExplanation": "同薪员工可有不同位置编号但相同排名。每组最多三人用 ROW_NUMBER，保留所有并列名次时用 RANK 或 DENSE_RANK。",
+        "problem": "人事报表需按薪资排名，同时说明并列薪资是否应占用相同名次。",
+        "codeExplanation": "两个5000同薪。ROW_NUMBER 增加编号使顺序确定；RANK 和 DENSE_RANK 不添加编号，否则会破坏同薪并列。筛选前若干名需先在公用表表达式中生成名次。",
+        "resultExplanation": "员工2及3的序号是2和3，普通排名均为2，员工4的普通排名为4，连续排名为3。",
         "checkpoints": [],
         "mergedConcepts": [],
-        "mergeExamples": []
+        "mergeExamples": [
+          {
+            "label": "固定两人",
+            "explanation": "序号小于等于2只返回两人。",
+            "sql": "WITH r AS (SELECT employee_id,ROW_NUMBER() OVER(ORDER BY salary DESC,employee_id) AS rn FROM employees) SELECT employee_id,rn FROM r WHERE rn<=2 ORDER BY rn;",
+            "result": {
+              "columns": [
+                "employee_id",
+                "rn"
+              ],
+              "rows": [
+                [
+                  1,
+                  1
+                ],
+                [
+                  2,
+                  2
+                ]
+              ]
+            }
+          },
+          {
+            "label": "保留并列第二名",
+            "explanation": "普通排名小于等于2返回三人。",
+            "sql": "WITH r AS (SELECT employee_id,RANK() OVER(ORDER BY salary DESC) AS rnk FROM employees) SELECT employee_id,rnk FROM r WHERE rnk<=2 ORDER BY rnk;",
+            "result": {
+              "columns": [
+                "employee_id",
+                "rnk"
+              ],
+              "rows": [
+                [
+                  1,
+                  1
+                ],
+                [
+                  2,
+                  2
+                ],
+                [
+                  3,
+                  2
+                ]
+              ]
+            }
+          }
+        ]
       }
     },
     {
       "id": "kp15-03",
       "chapterId": "ch15",
-      "title": "LAG 与 LEAD",
-      "learningObjective": "能够运用本节知识完成：分析月度变化",
+      "title": "前后行取值",
+      "learningObjective": "获取上期与下期记录，识别时间断档。",
       "prerequisites": [
         "kp15-02"
       ],
-      "concept": "LAG 获取分区中前一行，LEAD 获取后一行；可指定偏移和缺失默认值。",
-      "syntax": "LAG(v,1) OVER(ORDER BY month)",
+      "concept": "LAG 与 LEAD 按窗口排序后的行位置偏移，不直接理解日历。默认偏移一行，找不到目标行时默认返回空值；指定默认值只处理越界，不能自动填补目标行原有空值。",
+      "syntax": "LAG(v,1) OVER(ORDER BY month); LEAD(v,1) OVER(ORDER BY month)",
       "parameters": {
-        "1": "向前偏移一行",
-        "month": "时间顺序"
+        "v": "要读取的指标",
+        "1": "偏移行数",
+        "month": "时间排序键"
       },
       "fixtureIds": [
         "lesson-monthly"
@@ -494,17 +602,17 @@
       "mysqlSql": "SELECT month,sales,LAG(sales) OVER(ORDER BY month) AS previous_sales,LEAD(sales) OVER(ORDER BY month) AS next_sales FROM monthly ORDER BY month;",
       "sqliteSql": "SELECT month,sales,LAG(sales) OVER(ORDER BY month) AS previous_sales,LEAD(sales) OVER(ORDER BY month) AS next_sales FROM monthly ORDER BY month;",
       "executionSteps": [
-        "月份排序",
-        "每行读取相邻行指标",
-        "边界返回NULL"
+        "按月份排列",
+        "读取前后相邻行",
+        "检查首尾与缺月"
       ],
-      "useCase": "分析月度变化",
-      "comparison": "前一行不一定代表上一个自然月，需先补齐月份。",
+      "useCase": "月度销售趋势需比较相邻月份，数据表已为每月一行且月份连续。",
+      "comparison": "前一行不一定是上一个自然月。",
       "commonError": {
-        "example": "用 LAG 获取上月但数据有月份缺失",
-        "correction": "建立连续月份序列后连接并计算"
+        "example": "删去二月后仍把三月的上一行叫做二月。",
+        "correction": "先补足月份骨架，按业务定义无交易与缺报的区别。"
       },
-      "notes": "LAG/LEAD 按排序后的行偏移，不保证恰好是上月或下月；日期缺档需先补齐时间轴。并列排序键应增加稳定决胜键。",
+      "notes": "优化器的实际运行方式不等同逐行人工模拟。",
       "compatibility": {
         "status": "直接兼容",
         "detail": "仅在本示例数据与语义范围验证；不代表全部 MySQL 语法兼容。"
@@ -598,28 +706,83 @@
         "fc0120"
       ],
       "teaching": {
-        "problem": "趋势报表需要从相邻记录取上期、下期值。",
-        "codeExplanation": "按月份排序后 LAG 向前取一行、LEAD 向后取一行，边界缺邻居时返回 NULL。先确认月份行连续。",
-        "resultExplanation": "一月的上期为空，二月上期为 1000。跨门店分析需按门店分区，避免从上一家店取值。",
+        "problem": "月度销售趋势需比较相邻月份，数据表已为每月一行且月份连续。",
+        "codeExplanation": "LAG 读取上一行，LEAD 读取下一行。先验证月份唯一、连续，再将相邻行解释为上月。多门店报表应按门店分区；否则上一行可能来自另一家店。",
+        "resultExplanation": "一月无上期，四月无下期；二月上期为1000，三月上期为1500。",
         "checkpoints": [],
         "mergedConcepts": [],
-        "mergeExamples": []
+        "mergeExamples": [
+          {
+            "label": "缺月对照",
+            "explanation": "先筛除二月，再计算相邻行，三月前一行变成一月。",
+            "sql": "SELECT month,LAG(month) OVER(ORDER BY month) AS previous_month FROM monthly WHERE month<>'2026-02' ORDER BY month;",
+            "result": {
+              "columns": [
+                "month",
+                "previous_month"
+              ],
+              "rows": [
+                [
+                  "2026-01",
+                  null
+                ],
+                [
+                  "2026-03",
+                  "2026-01"
+                ],
+                [
+                  "2026-04",
+                  "2026-03"
+                ]
+              ]
+            }
+          },
+          {
+            "label": "越界默认值",
+            "explanation": "仅演示默认参数，不表示首月前真实销售为零。",
+            "sql": "SELECT month,LAG(sales,1,0) OVER(ORDER BY month) AS prev FROM monthly ORDER BY month;",
+            "result": {
+              "columns": [
+                "month",
+                "prev"
+              ],
+              "rows": [
+                [
+                  "2026-01",
+                  0
+                ],
+                [
+                  "2026-02",
+                  1000
+                ],
+                [
+                  "2026-03",
+                  1500
+                ],
+                [
+                  "2026-04",
+                  1500
+                ]
+              ]
+            }
+          }
+        ]
       }
     },
     {
       "id": "kp15-04",
       "chapterId": "ch15",
-      "title": "ROWS、RANGE 与并列累计",
-      "learningObjective": "能够运用本节知识完成：计算年度累计销售额",
+      "title": "窗口边界与累计计算",
+      "learningObjective": "明确累计窗口起止边界，判断同值行应逐行还是整组累计。",
       "prerequisites": [
         "kp15-03",
         "kp15-05"
       ],
-      "concept": "ROWS 按物理窗口行数界定范围；RANGE 按排序值与同值组界定。显式指定累计帧可避免默认帧歧义。",
+      "concept": "窗口帧是在分区内为当前行选出的计算范围。ROWS 按排序后具体行位置确定边界；RANGE 在本例的截至当前值边界包含全部同值行。带排序的聚合窗口默认帧可能包含并列，因此应显式写出业务需要的帧。",
       "syntax": "SUM(v) OVER(ORDER BY key ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)",
       "parameters": {
-        "UNBOUNDED PRECEDING": "从分区起始行",
-        "CURRENT ROW": "截至当前行"
+        "UNBOUNDED PRECEDING": "分区起点",
+        "CURRENT ROW": "当前行或当前排序值边界，取决于帧类型"
       },
       "fixtureIds": [
         "lesson-monthly"
@@ -664,17 +827,17 @@
       "mysqlSql": "SELECT month,sales,SUM(sales) OVER(ORDER BY month ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS cumulative FROM monthly ORDER BY month;",
       "sqliteSql": "SELECT month,sales,SUM(sales) OVER(ORDER BY month ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS cumulative FROM monthly ORDER BY month;",
       "executionSteps": [
-        "按月份排序",
-        "逐行扩大窗口",
-        "累计1000、2500、4000、4900"
+        "确定累计顺序",
+        "设置起点与终点",
+        "逐期累计并检查并列"
       ],
-      "useCase": "计算年度累计销售额",
-      "comparison": "存在同值排序键时 RANGE 可能同时纳入所有同值行。",
+      "useCase": "月报需要从一月起累计到当前月；另需理解按薪资排序时同薪记录的累计差异。",
+      "comparison": "同值档累计与逐笔累计是不同业务问题。",
       "commonError": {
-        "example": "省略帧并假设每行累计一定不同",
-        "correction": "明确 ROWS 并提供稳定排序键"
+        "example": "省略帧后假定同值行一定逐笔增加。",
+        "correction": "逐笔采用 ROWS 加稳定决胜键；按同值档累计采用明确的 RANGE。"
       },
-      "notes": "不同分区应添加 PARTITION BY，例如按年份重置累计。",
+      "notes": "按年度重置累计时需分区；本例只验证所示帧，不推广至所有范围偏移。",
       "compatibility": {
         "status": "直接兼容",
         "detail": "仅在本示例数据与语义范围验证；不代表全部 MySQL 语法兼容。"
@@ -766,46 +929,81 @@
         }
       ],
       "teaching": {
-        "problem": "累计金额取决于窗口包含哪些行，尤其在同日多笔交易时。",
-        "codeExplanation": "ROWS 从分区首行逐条累加到当前行，若同值行排序不唯一应加决胜键。RANGE 常把排序值相同的行纳入同一批。",
-        "resultExplanation": "前两月累计为 1000 和 2500。若需要逐笔余额，使用 ROWS 并指定稳定顺序；按自然期间看趋势时先汇总。",
+        "problem": "月报需要从一月起累计到当前月；另需理解按薪资排序时同薪记录的累计差异。",
+        "codeExplanation": "月份唯一时，ROWS 从首行累计至本行。对于同薪示例，RANGE 使用薪资作为排序值，把同薪员工一起计入；ROWS 增加员工编号作为决胜键，使逐人累计可复现。不能为了稳定输出给 RANGE 随意加唯一键。",
+        "resultExplanation": "月累计依次为1000、2500、4000、4900。并列实例中两个5000同值行的 RANGE 均为13000，而逐人累计分别为8000和13000。",
         "checkpoints": [],
         "mergedConcepts": [
           {
             "sourceId": "kp15-06",
-            "explanation": "两位员工薪资同为 5,000 时，按薪资的 RANGE 截至当前值会同时计入两位，显示相同累计；ROWS 加员工编号决胜则逐行累加，分别得到 5,000 和 10,000。两列回答的是同薪档累计与逐人累计两个问题。"
+            "explanation": "保留原四名员工的同薪累计例、窗口边界、稳定决胜键及同值组含义。"
           }
         ],
         "mergeExamples": [
           {
-            "label": "同薪时逐人累计还是同档累计",
-            "explanation": "第 1、2 行同薪。RANGE 把两行一起计入当前值；ROWS 用 employee_id 拆开同薪，再逐行累计。",
-            "sql": "WITH salaries AS (\n  SELECT 1 AS employee_id, 5000 AS salary UNION ALL\n  SELECT 2, 5000 UNION ALL SELECT 3, 6000\n)\nSELECT employee_id, salary,\n  SUM(salary) OVER (ORDER BY salary RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS range_total,\n  SUM(salary) OVER (ORDER BY salary, employee_id ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS rows_total\nFROM salaries ORDER BY salary, employee_id;",
+            "label": "同薪并列原始示例",
+            "explanation": "内联员工数据与来源课程一致，无需新增正式课程数据表。",
+            "sql": "WITH employees AS (SELECT 1 AS employee_id,8000 AS salary UNION ALL SELECT 2,5000 UNION ALL SELECT 3,5000 UNION ALL SELECT 4,3000) SELECT employee_id,salary,SUM(salary) OVER(ORDER BY salary RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS range_sum,SUM(salary) OVER(ORDER BY salary,employee_id ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS row_sum FROM employees ORDER BY salary;",
             "result": {
               "columns": [
                 "employee_id",
                 "salary",
-                "range_total",
-                "rows_total"
+                "range_sum",
+                "row_sum"
               ],
               "rows": [
                 [
-                  1,
-                  5000,
-                  10000,
-                  5000
+                  4,
+                  3000,
+                  3000,
+                  3000
                 ],
                 [
                   2,
                   5000,
-                  10000,
-                  10000
+                  13000,
+                  8000
                 ],
                 [
                   3,
-                  6000,
-                  16000,
-                  16000
+                  5000,
+                  13000,
+                  13000
+                ],
+                [
+                  1,
+                  8000,
+                  21000,
+                  21000
+                ]
+              ]
+            }
+          },
+          {
+            "label": "最近两行窗口",
+            "explanation": "当前行与上一行构成最多两行的滑动窗口。",
+            "sql": "SELECT month,SUM(sales) OVER(ORDER BY month ROWS BETWEEN 1 PRECEDING AND CURRENT ROW) AS last_two FROM monthly ORDER BY month;",
+            "result": {
+              "columns": [
+                "month",
+                "last_two"
+              ],
+              "rows": [
+                [
+                  "2026-01",
+                  1000
+                ],
+                [
+                  "2026-02",
+                  2500
+                ],
+                [
+                  "2026-03",
+                  3000
+                ],
+                [
+                  "2026-04",
+                  2400
                 ]
               ]
             }
@@ -817,15 +1015,15 @@
       "id": "kp15-05",
       "chapterId": "ch15",
       "title": "移动平均与环比",
-      "learningObjective": "能够运用本节知识完成：分析销售走势并减少波动",
+      "learningObjective": "计算连续月份的移动平均及销售环比，处理不足窗口和无定义比率。",
       "prerequisites": [
         "kp15-04"
       ],
-      "concept": "本例移动平均采用最近三行（含当前行），不足三行取现有行；仅在连续月份数据中才能解释为三个月移动平均。环比仅在上一行确为上月时成立，分母不得为零。",
-      "syntax": "AVG(v) OVER(ORDER BY key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW)",
+      "concept": "移动平均平滑短期波动；环比比较本期与上一自然期的变化率。三行窗口只有在每月一行且日期连续时才代表三个月。首两月可按已有行计算，也可按严格完整窗口口径返回空值，必须明确。",
+      "syntax": "AVG(v) OVER(ORDER BY month ROWS BETWEEN 2 PRECEDING AND CURRENT ROW)",
       "parameters": {
-        "2 PRECEDING": "向前两行",
-        "CURRENT ROW": "当前行"
+        "2 PRECEDING": "前两行",
+        "CURRENT ROW": "包含当前行"
       },
       "fixtureIds": [
         "lesson-monthly"
@@ -870,17 +1068,17 @@
       "mysqlSql": "WITH m AS (SELECT month,sales,LAG(sales) OVER(ORDER BY month) AS prev,AVG(sales) OVER(ORDER BY month ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) AS moving_avg FROM monthly) SELECT month,ROUND(moving_avg,2) AS avg3,ROUND(100.0*(sales-prev)/NULLIF(prev,0),2) AS growth_pct FROM m ORDER BY month;",
       "sqliteSql": "WITH m AS (SELECT month,sales,LAG(sales) OVER(ORDER BY month) AS prev,AVG(sales) OVER(ORDER BY month ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) AS moving_avg FROM monthly) SELECT month,ROUND(moving_avg,2) AS avg3,ROUND(100.0*(sales-prev)/NULLIF(prev,0),2) AS growth_pct FROM m ORDER BY month;",
       "executionSteps": [
-        "按月计算前三行窗口均值",
-        "取上期销售",
-        "计算环比百分数"
+        "取得上期销售与移动平均",
+        "计算安全环比",
+        "按月展示结果"
       ],
-      "useCase": "分析销售走势并减少波动",
-      "comparison": "移动平均是窗口内均值，环比是变化比率。",
+      "useCase": "月度销售报表按连续月份统计，移动平均允许不足三个月取已有记录，环比为百分数，首月和零分母不计算。",
+      "comparison": "移动平均描述平滑水平，不是增长率。",
       "commonError": {
-        "example": "直接用当前销售额作环比分母",
-        "correction": "(当前值-上期值)/NULLIF(上期值,0)"
+        "example": "把本期当分母，或将首期环比填成0。",
+        "correction": "使用上期非零值为分母；无上期保留空值。"
       },
-      "notes": "窗口不足3行时本例按现有行计算；完整3月口径需检查窗口计数。",
+      "notes": "月份缺失先补时间轴；未知销售不能自动当作零。",
       "compatibility": {
         "status": "直接兼容",
         "detail": "仅在本示例数据与语义范围验证；不代表全部 MySQL 语法兼容。"
@@ -968,14 +1166,14 @@
         "fc0118"
       ],
       "teaching": {
-        "problem": "平滑趋势与识别环比变化可在同一基础月表上完成。",
-        "codeExplanation": "用 ROWS BETWEEN 2 PRECEDING AND CURRENT ROW 得到最多三条记录的平均；LAG 读取上一月，再用 NULLIF 守住零分母。",
-        "resultExplanation": "第二月的均值是 1250，环比 50%。如业务只接受完整三个月窗口，要先检查框架内的月份数量。",
+        "problem": "月度销售报表按连续月份统计，移动平均允许不足三个月取已有记录，环比为百分数，首月和零分母不计算。",
+        "codeExplanation": "内层公用表表达式同时计算 LAG 和 AVG。外层使用 100.0*(sales-prev)/NULLIF(prev,0)；先减后除，分母为上期，最后舍入。严格三月口径还需要检查窗口内有效值数。",
+        "resultExplanation": "二月均值1250，环比50%；三月均值1333.33，环比0%；四月均值1300，环比-40%。首月环比未知。",
         "checkpoints": [
           {
             "name": "m",
             "label": "逐月补充上期销售与移动平均",
-            "sql": "WITH m AS (SELECT month,sales,LAG(sales) OVER(ORDER BY month) AS prev,AVG(sales) OVER(ORDER BY month ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) AS moving_avg FROM monthly)\nSELECT * FROM m ORDER BY 1, 2, 3, 4 LIMIT 3;",
+            "sql": "WITH m AS (SELECT month,sales,LAG(sales) OVER(ORDER BY month) AS prev,AVG(sales) OVER(ORDER BY month ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) AS moving_avg FROM monthly) SELECT * FROM m ORDER BY month;",
             "result": {
               "columns": [
                 "month",
@@ -1001,13 +1199,64 @@
                   1500,
                   1500,
                   1333.3333333333333
+                ],
+                [
+                  "2026-04",
+                  900,
+                  1500,
+                  1300.0
                 ]
               ]
             }
           }
         ],
         "mergedConcepts": [],
-        "mergeExamples": []
+        "mergeExamples": [
+          {
+            "label": "严格完整窗口",
+            "explanation": "仅在三个有效月均存在时给出平均。",
+            "sql": "SELECT month,CASE WHEN COUNT(sales) OVER w=3 THEN ROUND(AVG(sales) OVER w,2) END AS full_avg FROM monthly WINDOW w AS (ORDER BY month ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) ORDER BY month;",
+            "result": {
+              "columns": [
+                "month",
+                "full_avg"
+              ],
+              "rows": [
+                [
+                  "2026-01",
+                  null
+                ],
+                [
+                  "2026-02",
+                  null
+                ],
+                [
+                  "2026-03",
+                  1333.33
+                ],
+                [
+                  "2026-04",
+                  1300.0
+                ]
+              ]
+            }
+          },
+          {
+            "label": "零分母",
+            "explanation": "上期为零时，即使本期为正也不能计算普通环比。",
+            "sql": "SELECT 100.0*(100-0)/NULLIF(0,0) AS growth_pct;",
+            "result": {
+              "columns": [
+                "growth_pct"
+              ],
+              "rows": [
+                [
+                  null
+                ]
+              ]
+            }
+          }
+        ]
       }
     }
   ],

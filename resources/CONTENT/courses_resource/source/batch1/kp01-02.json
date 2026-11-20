@@ -98,8 +98,8 @@
       ]
     }
   ],
-  "mysqlSql": "SELECT product_id, price, stock FROM products ORDER BY product_id;",
-  "sqliteSql": "SELECT product_id, price, stock FROM products ORDER BY product_id;",
+  "mysqlSql": "SELECT product_id, price, stock FROM products ORDER BY stock DESC;",
+  "sqliteSql": "SELECT product_id, price, stock FROM products ORDER BY stock DESC;",
   "executionSteps": [
     "读取商品编号、单价与库存",
     "核对字段含义及单位",
@@ -133,16 +133,6 @@
     ],
     "rows": [
       [
-        1,
-        15,
-        150
-      ],
-      [
-        2,
-        89,
-        40
-      ],
-      [
         3,
         35,
         200
@@ -153,9 +143,19 @@
         180
       ],
       [
+        1,
+        15,
+        150
+      ],
+      [
         5,
         45,
         80
+      ],
+      [
+        2,
+        89,
+        40
       ],
       [
         6,

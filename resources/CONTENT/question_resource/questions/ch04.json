@@ -18,7 +18,7 @@
       "type": "独立编写",
       "title": "分页第二页",
       "context": "后台订单列表每页显示 2 条，需要取出第二页的内容。",
-      "requirements": "订单按 id 从小到大排列，每页 2 条，取第 2 页的 id、sales。\n输出列名称及顺序：id, sales。",
+      "requirements": "订单按 sales 从高到低排列，每页 2 条，取第 2 页的 id、sales。\n输出列名称及顺序：id, sales。",
       "datasetId": "q0043-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -40,8 +40,8 @@
             600
           ],
           [
-            4,
-            300
+            2,
+            400
           ]
         ],
         "rowCount": 2
@@ -49,13 +49,13 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT id,sales FROM orders ORDER BY id LIMIT 2 OFFSET 2",
-          "sqliteSql": "SELECT id,sales FROM orders ORDER BY id LIMIT 2 OFFSET 2"
+          "mysqlSql": "SELECT id,sales FROM orders ORDER BY sales DESC LIMIT 2 OFFSET 2",
+          "sqliteSql": "SELECT id,sales FROM orders ORDER BY sales DESC LIMIT 2 OFFSET 2"
         },
         {
           "kind": "代数或函数等价",
-          "mysqlSql": "SELECT id,sales FROM orders ORDER BY id LIMIT 2, 2",
-          "sqliteSql": "SELECT id,sales FROM orders ORDER BY id LIMIT 2, 2"
+          "mysqlSql": "SELECT id,sales FROM orders ORDER BY sales DESC LIMIT 2, 2",
+          "sqliteSql": "SELECT id,sales FROM orders ORDER BY sales DESC LIMIT 2, 2"
         }
       ],
       "hints": [
@@ -63,10 +63,10 @@
         "LIMIT 控制本页返回几行，OFFSET 控制先跳过几行；第 n 页要跳过前面 (n-1) 页的全部行。",
         "每页 2 条、取第 2 页，需要跳过的行数恰好是一整页。"
       ],
-      "explanation": "先 ORDER BY id 固定顺序，再用 LIMIT 2 OFFSET 2：跳过第一页的 2 行，返回接下来的 2 行。不写 ORDER BY 时，返回哪些行取决于数据的存放顺序，分页结果不可靠。\n易错：OFFSET 1 只跳过 1 行，得到的是把第一页向后挪一行，并不是第二页。\n另一种写法：MySQL 支持 LIMIT 2, 2（先写跳过的行数，再写返回的行数），含义相同。",
+      "explanation": "先 ORDER BY sales DESC 固定顺序，再用 LIMIT 2 OFFSET 2：跳过第一页的 2 行，返回接下来的 2 行。不写 ORDER BY 时，返回哪些行取决于数据的存放顺序，分页结果不可靠。\n易错：OFFSET 1 只跳过 1 行，得到的是把第一页向后挪一行，并不是第二页。\n另一种写法：MySQL 支持 LIMIT 2, 2（先写跳过的行数，再写返回的行数），含义相同。",
       "commonErrors": [
         {
-          "sql": "SELECT id,sales FROM orders ORDER BY id LIMIT 2 OFFSET 1",
+          "sql": "SELECT id,sales FROM orders ORDER BY sales DESC LIMIT 2 OFFSET 1",
           "reason": "第二页应跳过第一页完整的两条记录，OFFSET 1 只跳过了一条。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
@@ -82,14 +82,14 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0043/q0043-public.json",
-          "sha256": "41dbdfec6274258aa9c424109b6dabe9256b1464a3a011da96bfc767a8bedda2"
+          "sha256": "668be9f6f85767a7cce2d012292c61d7cf937f470356399ef062310adb019c12"
         },
         {
           "id": "q0043-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0043/q0043-boundary.json",
-          "sha256": "4dba67976ca967a8d6a96d0c359adc3392a6e7c3ad08118e0813f1fbb339d5a9"
+          "sha256": "597dd7d32728f9156a5185d62325874b6542bdd535125a201d3d3b506b15e8d6"
         },
         {
           "id": "q0043-empty",
@@ -125,19 +125,19 @@
             "reference": {
               "ran": true,
               "match": true,
-              "resultHash": "9d213c61fb352c9bb514fc289df77f57f899dd596a840ec648e86ca8ef88fb7d",
+              "resultHash": "a78ce6f0e825ab61c7311cb5575cbd99320a14f0242c0c9827c182772f95a01f",
               "rowCount": 2
             },
             "equivalent": {
               "ran": true,
               "match": true,
-              "resultHash": "9d213c61fb352c9bb514fc289df77f57f899dd596a840ec648e86ca8ef88fb7d",
+              "resultHash": "a78ce6f0e825ab61c7311cb5575cbd99320a14f0242c0c9827c182772f95a01f",
               "rows": 2
             },
             "wrong": {
               "ran": true,
               "match": false,
-              "resultHash": "142390563f04e93bfd578ac10404e34ca32f1bec8d27ccde0397f806ca5f97a8",
+              "resultHash": "27672a6b73227120e396dbbb2ad951c529accc1ef8f0d71504700497deb38cad",
               "rows": 2
             }
           },
@@ -146,19 +146,19 @@
             "reference": {
               "ran": true,
               "match": true,
-              "resultHash": "9452d960354f05dfe2855ecd7d518d36d057b6ef6120640c51ca41f4e5a60f03",
+              "resultHash": "5dc6c3346305088e70e0efe33649c51cc77adabd23d6b99a3eef3f0f0ce0a034",
               "rowCount": 2
             },
             "equivalent": {
               "ran": true,
               "match": true,
-              "resultHash": "9452d960354f05dfe2855ecd7d518d36d057b6ef6120640c51ca41f4e5a60f03",
+              "resultHash": "5dc6c3346305088e70e0efe33649c51cc77adabd23d6b99a3eef3f0f0ce0a034",
               "rows": 2
             },
             "wrong": {
               "ran": true,
               "match": false,
-              "resultHash": "377bb909bd3e48f5379ce0d5ed550316c3448dff6ffa63fba4e8321e96a9330e",
+              "resultHash": "e9db102f98e75f2d1e0535b1cf99b9bc212126e9f91f063c96a25fdca98e7e72",
               "rows": 2
             }
           },
@@ -222,7 +222,7 @@
       "type": "独立编写",
       "title": "最高三笔订单",
       "context": "使用课程中小型订单数据练习最高三笔订单。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "销售额降序、编号升序，返回前3条的 id、sales。\n输出列名称及顺序：id, sales。按题设排序；参考排序键：sales DESC,id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "requirements": "销售额降序，返回前3条的 id、sales。\n输出列名称及顺序：id, sales。按题设排序；参考排序键：sales DESC。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
       "datasetId": "q0044-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -257,8 +257,8 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT id,sales FROM orders ORDER BY sales DESC,id LIMIT 3",
-          "sqliteSql": "SELECT id,sales FROM orders ORDER BY sales DESC,id LIMIT 3"
+          "mysqlSql": "SELECT id,sales FROM orders ORDER BY sales DESC LIMIT 3",
+          "sqliteSql": "SELECT id,sales FROM orders ORDER BY sales DESC LIMIT 3"
         },
         {
           "kind": "独立方法等价",
@@ -270,12 +270,12 @@
       "hints": [
         "先确定主排序键和并列决胜键，再考虑需要保留的行段。",
         "结合《LIMIT 与 OFFSET》：LIMIT 控制最多返回多少行；OFFSET 跳过前几行。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT id,sales FROM orders ORDER BY sales DESC,id □□□"
+        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT id,sales FROM orders ORDER BY sales DESC □□□"
       ],
       "explanation": "限制行数与选择范围必须一致。\n执行思路：确认orders的输入记录；输出id、sales列；遵循题设排序和并列规则；按指定范围截取记录。\n公开夹具实际返回 3 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：采用另一种关系运算或查询结构计算相同结果。",
       "commonErrors": [
         {
-          "sql": "SELECT id,sales FROM orders ORDER BY sales DESC,id LIMIT 2",
+          "sql": "SELECT id,sales FROM orders ORDER BY sales DESC LIMIT 2",
           "reason": "限制行数与选择范围必须一致。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
@@ -415,7 +415,7 @@
       "type": "独立编写",
       "title": "仓库盘点优先顺序",
       "context": "使用课程中小型商品数据练习仓库盘点优先顺序。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "输出 product_id、stock，库存降序，并列商品编号升序。\n输出列名称及顺序：product_id, stock。按题设排序；参考排序键：stock DESC,product_id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "requirements": "输出 product_id、stock，库存降序，并列商品按名称升序。\n输出列名称及顺序：product_id, stock。按题设排序；参考排序键：stock DESC, product_name。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
       "datasetId": "q0045-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -462,25 +462,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT product_id,stock FROM products ORDER BY stock DESC,product_id",
-          "sqliteSql": "SELECT product_id,stock FROM products ORDER BY stock DESC,product_id"
+          "mysqlSql": "SELECT product_id,stock FROM products ORDER BY stock DESC, product_name",
+          "sqliteSql": "SELECT product_id,stock FROM products ORDER BY stock DESC, product_name"
         },
         {
           "kind": "关系结构等价",
-          "mysqlSql": "SELECT product_id,stock FROM (SELECT * FROM products) AS products ORDER BY stock DESC,product_id",
-          "sqliteSql": "SELECT product_id,stock FROM (SELECT * FROM products) AS products ORDER BY stock DESC,product_id",
+          "mysqlSql": "SELECT product_id,stock FROM (SELECT * FROM products) AS products ORDER BY stock DESC, product_name",
+          "sqliteSql": "SELECT product_id,stock FROM (SELECT * FROM products) AS products ORDER BY stock DESC, product_name",
           "explanation": "先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。"
         }
       ],
       "hints": [
         "先确定主排序键和并列决胜键，再考虑需要保留的行段。",
         "结合《ORDER BY 多列排序》：先按第一排序键排序，同值再按后续键；ASC 升序，DESC 降序。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT product_id,stock FROM products ORDER BY □□□,product_id"
+        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT product_id,stock FROM products ORDER BY □□□,product_name"
       ],
       "explanation": "盘点最多库存优先必须降序。\n执行思路：确认products的输入记录；输出product_id、stock列；遵循题设排序和并列规则。\n公开夹具实际返回 6 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
       "commonErrors": [
         {
-          "sql": "SELECT product_id,stock FROM products ORDER BY stock ASC,product_id",
+          "sql": "SELECT product_id,stock FROM products ORDER BY stock ASC, product_name",
           "reason": "盘点最多库存优先必须降序。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
@@ -503,7 +503,7 @@
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0045/q0045-boundary.json",
-          "sha256": "f88ac5557d2112b52c2537729ef456b7301e390d5595d533cff22edfc2b0c634"
+          "sha256": "d4e94caf9e71e37fe750448f69667def88c365c4aa1230239ec431bab870e66a"
         },
         {
           "id": "q0045-empty",
@@ -560,19 +560,19 @@
             "reference": {
               "ran": true,
               "match": true,
-              "resultHash": "6ff4745eccf2513d04c605ae6d64980f2c0ee5503771aad99f8a37573fbaf5ed",
+              "resultHash": "f83580d89c2f4cffae75c6a1f27b6cda8dd58649bbfda9c12683240765c451df",
               "rowCount": 21
             },
             "equivalent": {
               "ran": true,
               "match": true,
-              "resultHash": "6ff4745eccf2513d04c605ae6d64980f2c0ee5503771aad99f8a37573fbaf5ed",
+              "resultHash": "f83580d89c2f4cffae75c6a1f27b6cda8dd58649bbfda9c12683240765c451df",
               "rows": 21
             },
             "wrong": {
               "ran": true,
               "match": false,
-              "resultHash": "99bf6d2762eafa9e53915c59c27a963ebd0e9348e5877a3364d8be67c10cce0a",
+              "resultHash": "40a9f64efdf232cccab7a4c26fbb91c514b1383db5cea7d69c5e0086ddd8fd83",
               "rows": 21
             }
           },
@@ -620,7 +620,7 @@
       "type": "独立编写",
       "title": "按门店后按日期排列",
       "context": "使用课程中小型订单数据练习按门店后按日期排列。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "编写 SQL，完成以下查询要求。\n输出 orders 的 store_id、order_date、id，按门店升序、日期降序、编号升序。\n输出列名称及顺序：store_id, order_date, id。按题设排序；参考排序键：store_id,order_date DESC,id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "requirements": "编写 SQL，完成以下查询要求。\n输出 orders 的 store_id、order_date、id，按门店升序、日期降序。\n输出列名称及顺序：store_id, order_date, id。按题设排序；参考排序键：store_id, order_date DESC。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
       "datasetId": "q0048-lesson",
       "schemaVersion": 3,
       "contentVersion": "4.2.2",
@@ -669,13 +669,13 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT store_id,order_date,id FROM orders ORDER BY store_id,order_date DESC,id",
-          "sqliteSql": "SELECT store_id,order_date,id FROM orders ORDER BY store_id,order_date DESC,id"
+          "mysqlSql": "SELECT store_id,order_date,id FROM orders ORDER BY store_id, order_date DESC",
+          "sqliteSql": "SELECT store_id,order_date,id FROM orders ORDER BY store_id, order_date DESC"
         },
         {
           "kind": "关系结构等价",
-          "mysqlSql": "SELECT store_id,order_date,id FROM (SELECT * FROM orders) AS orders ORDER BY store_id,order_date DESC,id",
-          "sqliteSql": "SELECT store_id,order_date,id FROM (SELECT * FROM orders) AS orders ORDER BY store_id,order_date DESC,id",
+          "mysqlSql": "SELECT store_id,order_date,id FROM (SELECT * FROM orders) AS orders ORDER BY store_id, order_date DESC",
+          "sqliteSql": "SELECT store_id,order_date,id FROM (SELECT * FROM orders) AS orders ORDER BY store_id, order_date DESC",
           "explanation": "先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。"
         }
       ],
@@ -687,7 +687,7 @@
       "explanation": "多列排序是先按门店分区，再在排序组内按日期比较。\n执行思路：确认orders的输入记录；输出store_id、order_date、id列；遵循题设排序和并列规则。\n公开夹具实际返回 5 行、3 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
       "commonErrors": [
         {
-          "sql": "SELECT store_id,order_date,id FROM orders ORDER BY store_id,order_date ASC,id",
+          "sql": "SELECT store_id,order_date,id FROM orders ORDER BY store_id, order_date ASC",
           "reason": "多列排序是先按门店分区，再在排序组内按日期比较。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
@@ -826,14 +826,14 @@
       "type": "代码填空",
       "title": "第三至第五名库存",
       "context": "使用课程中小型商品数据练习第三至第五名库存。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "补全代码中的一个空位，使完整SQL满足以下要求。可输入具有相同语义的片段，提交后按完整代码执行结果核对。\n库存降序、编号升序，返回第3至5条 product_id、stock。\n输出列名称及顺序：product_id, stock。按题设排序；参考排序键：stock DESC,product_id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "requirements": "补全代码中的一个空位，使完整SQL满足以下要求。可输入具有相同语义的片段，提交后按完整代码执行结果核对。\n库存降序，返回第3至5条 product_id、stock。\n输出列名称及顺序：product_id, stock。按题设排序；参考排序键：stock DESC。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
       "datasetId": "q0049-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
       "sourceTables": [
         "products"
       ],
-      "initialCode": "SELECT product_id,stock FROM products ORDER BY stock DESC,product_id LIMIT 3 {{blank1}}",
+      "initialCode": "SELECT product_id,stock FROM products ORDER BY stock DESC LIMIT 3 {{blank1}}",
       "options": [],
       "acceptedBlanks": [
         {
@@ -869,8 +869,8 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT product_id,stock FROM products ORDER BY stock DESC,product_id LIMIT 3 OFFSET 2",
-          "sqliteSql": "SELECT product_id,stock FROM products ORDER BY stock DESC,product_id LIMIT 3 OFFSET 2"
+          "mysqlSql": "SELECT product_id,stock FROM products ORDER BY stock DESC LIMIT 3 OFFSET 2",
+          "sqliteSql": "SELECT product_id,stock FROM products ORDER BY stock DESC LIMIT 3 OFFSET 2"
         },
         {
           "kind": "关系结构等价",
@@ -887,7 +887,7 @@
       "explanation": "第三条的零基偏移为2。\n执行思路：确认products的输入记录；输出product_id、stock列；遵循题设排序和并列规则；按指定范围截取记录。\n公开夹具实际返回 3 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：使用相同排序生成行号，再映射分页起止行。",
       "commonErrors": [
         {
-          "sql": "SELECT product_id,stock FROM products ORDER BY stock DESC,product_id LIMIT 3 OFFSET 3",
+          "sql": "SELECT product_id,stock FROM products ORDER BY stock DESC LIMIT 3 OFFSET 3",
           "reason": "第三条的零基偏移为2。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }

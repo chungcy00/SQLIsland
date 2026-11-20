@@ -12,13 +12,16 @@
       "id": "kp04-01",
       "chapterId": "ch04",
       "title": "ORDER BY 多列排序",
-      "learningObjective": "能够运用本节知识完成：生成价格排行榜",
+      "learningObjective": "能够按业务优先级设置多级排序，明确每列方向，并用唯一编号处理并列值。",
       "prerequisites": [],
-      "concept": "先按第一排序键排序，同值再按后续键；ASC 升序，DESC 降序。",
-      "syntax": "ORDER BY col1 DESC, col2 ASC",
+      "concept": "排序只改变返回记录的排列顺序，不会自动减少行数、修改数据或计算名次。没有 ORDER BY 时，数据库不保证查询输出的顺序。ASC 表示升序，DESC 表示降序，省略方向通常为升序。多列排序按从左到右的优先级比较：先按第一列排序，只有第一列相同才比较第二列。若全部排序字段仍相同，则这些记录的相对顺序没有保证。需要可复现的排行榜或分页时，应加上稳定且唯一的决胜字段。空值的默认排序位置及文本排序规则可能因数据库而异。",
+      "syntax": "SELECT column_name FROM table_name ORDER BY key1 DESC, key2 ASC;",
       "parameters": {
-        "col1": "主要排序字段",
-        "col2": "次级排序字段"
+        "ORDER BY": "定义输出排序",
+        "key1": "主要排序字段",
+        "key2": "主字段相同后的次级排序字段",
+        "DESC": "降序",
+        "ASC": "升序"
       },
       "fixtureIds": [
         "lesson-products"
@@ -104,19 +107,20 @@
           ]
         }
       ],
-      "mysqlSql": "SELECT product_id, price FROM products ORDER BY price DESC, product_id ASC;",
-      "sqliteSql": "SELECT product_id, price FROM products ORDER BY price DESC, product_id ASC;",
+      "mysqlSql": "SELECT product_id, price FROM products ORDER BY price DESC, product_name;",
+      "sqliteSql": "SELECT product_id, price FROM products ORDER BY price DESC, product_name;",
       "executionSteps": [
-        "价格降序",
-        "同价按编号升序"
+        "按商品单价降序",
+        "同价时按商品名称升序",
+        "输出排序后的商品"
       ],
-      "useCase": "生成价格排行榜",
-      "comparison": "GROUP BY 合并行，ORDER BY 不改变行数。",
+      "useCase": "主管要求一张商品价格榜，先看高价商品；同价商品按商品名称升序展示，以便每次导出一致。",
+      "comparison": "ORDER BY 改变顺序；GROUP BY 改变统计粒度；排名函数生成名次。",
       "commonError": {
-        "example": "ORDER BY price, product_id DESC 期待两列都降序",
-        "correction": "ORDER BY price DESC, product_id DESC"
+        "example": "ORDER BY price, product_id DESC 期待两列都降序。",
+        "correction": "分别指定 price DESC, product_id DESC。"
       },
-      "notes": "每个排序键单独指定方向。",
+      "notes": "示例编号唯一且非空；分页要求所有排序键组合能确定唯一顺序。",
       "compatibility": {
         "status": "直接兼容",
         "detail": "仅在本示例数据与语义范围验证；不代表全部 MySQL 语法兼容。"
@@ -177,27 +181,66 @@
         "fc0027"
       ],
       "teaching": {
-        "problem": "展示价格榜时，相同价格也要能在两次查询中按同一顺序显示。",
-        "codeExplanation": "先按 price DESC 定主顺序，再以唯一 product_id ASC 决胜；后一列只比较前一列同值的记录。",
-        "resultExplanation": "相同价格的两个商品按编号排列。稳定排序也是分页、取首条和可复现导出的前提。",
+        "problem": "主管要求一张商品价格榜，先看高价商品；同价商品按商品名称升序展示，以便每次导出一致。",
+        "codeExplanation": "FROM products 指定来源，SELECT 返回编号与单价。ORDER BY price DESC 将最高价格放在前面，product_name 仅在单价相同时决定先后。Mask 与 Soap_1 的价格同为15，按名称升序 Mask 先显示。每个排序字段的方向单独指定。为了看出区别，补充示例只改变次级排序方向，不改变主要价格排序。",
+        "resultExplanation": "原6行全部保留，排序顺序为2、4、5、3、1、6。若将次级方向改为降序，最后两条交换位置。结果只是逐商品排序，不是计算销售排名；如需名次列，后续窗口函数章节会介绍。",
         "checkpoints": [],
         "mergedConcepts": [],
-        "mergeExamples": []
+        "mergeExamples": [
+          {
+            "label": "改变并列决胜方向",
+            "explanation": "价格仍降序，但同价时 Soap_1 先于 Mask。",
+            "sql": "SELECT product_id, price FROM products ORDER BY price DESC, product_name DESC;",
+            "result": {
+              "columns": [
+                "product_id",
+                "price"
+              ],
+              "rows": [
+                [
+                  2,
+                  89
+                ],
+                [
+                  4,
+                  65
+                ],
+                [
+                  5,
+                  45
+                ],
+                [
+                  3,
+                  35
+                ],
+                [
+                  6,
+                  15
+                ],
+                [
+                  1,
+                  15
+                ]
+              ]
+            }
+          }
+        ]
       }
     },
     {
       "id": "kp04-02",
       "chapterId": "ch04",
       "title": "LIMIT 与 OFFSET",
-      "learningObjective": "能够运用本节知识完成：实现排行榜第二页",
+      "learningObjective": "能够根据排序结果选取前几条记录或指定页，计算偏移量，并避免不稳定排序导致的分页错误。",
       "prerequisites": [
         "kp04-01"
       ],
-      "concept": "LIMIT 控制最多返回多少行；OFFSET 跳过前几行。",
-      "syntax": "ORDER BY key LIMIT count OFFSET offset",
+      "concept": "当查询结果很多时，LIMIT 限制最多返回多少行，OFFSET 指定跳过多少行。分页是在确定排序后截取结果。例如每页两条，第一页跳过0条，第二页跳过2条，第三页跳过4条；一般偏移量为（页码减一）乘每页条数，页码从1开始。LIMIT 不会自动排序，也不会自动包含所有并列记录。若业务要求保留所有并列名次，不能直接用固定行数代替排名规则。分页依赖稳定排序；即使排序稳定，如果不同页查询之间数据发生变化，也可能重复或遗漏。高页码性能问题可后续了解，不属于本节重点。",
+      "syntax": "SELECT column_name FROM table_name ORDER BY key1 DESC, key2 ASC LIMIT count OFFSET offset;",
       "parameters": {
-        "count": "返回上限",
-        "offset": "跳过的行数"
+        "LIMIT": "最多返回的行数",
+        "OFFSET": "跳过的行数",
+        "ORDER BY": "确定截取之前的排列顺序"
       },
       "fixtureIds": [
         "lesson-products"
@@ -283,20 +326,20 @@
           ]
         }
       ],
-      "mysqlSql": "SELECT product_id, price FROM products ORDER BY price DESC, product_id LIMIT 2 OFFSET 2;",
-      "sqliteSql": "SELECT product_id, price FROM products ORDER BY price DESC, product_id LIMIT 2 OFFSET 2;",
+      "mysqlSql": "SELECT product_id, price FROM products ORDER BY price DESC, product_name LIMIT 2 OFFSET 2;",
+      "sqliteSql": "SELECT product_id, price FROM products ORDER BY price DESC, product_name LIMIT 2 OFFSET 2;",
       "executionSteps": [
-        "稳定排序",
-        "跳过前2行",
-        "取接下来2行"
+        "建立稳定的价格排序",
+        "跳过第一页两行",
+        "读取接下来的两行"
       ],
-      "useCase": "实现排行榜第二页",
-      "comparison": "LIMIT 2 OFFSET 2 与 MySQL LIMIT 2,2 本例等价，但逗号形式易混淆。",
+      "useCase": "商品管理页面每页显示两件商品，按价格从高到低排列，同价按商品名称升序。现在要读取第二页，而不是重新排序某个随机子集。",
+      "comparison": "LIMIT 截取行数，OFFSET 跳过行数；窗口排名按名次筛选，可能返回不同数量。",
       "commonError": {
-        "example": "LIMIT 2 无 ORDER BY 并称是最高两名",
-        "correction": "ORDER BY price DESC, product_id LIMIT 2"
+        "example": "SELECT product_id, price FROM products LIMIT 2; 并称其为最高价前两名。",
+        "correction": "先用 ORDER BY price DESC, product_id ASC，再用 LIMIT 2。"
       },
-      "notes": "分页期间源数据变化可能导致跨页重复，生产可考虑游标分页。",
+      "notes": "在不同请求之间数据发生变化时，偏移分页仍可能出现重复或遗漏。",
       "compatibility": {
         "status": "直接兼容",
         "detail": "仅在本示例数据与语义范围验证；不代表全部 MySQL 语法兼容。"
@@ -345,12 +388,67 @@
         "fc0029"
       ],
       "teaching": {
-        "problem": "读取固定大小的第二页，并沿用第一页的稳定排序。",
-        "codeExplanation": "先 ORDER BY 建立全序，再由 OFFSET 跳过前两行，由 LIMIT 读取随后的两行。",
-        "resultExplanation": "第二页返还价格 45 和 35 的商品。高频大页码场景可用上一页的价格和编号作为起点。",
+        "problem": "商品管理页面每页显示两件商品，按价格从高到低排列，同价按商品名称升序。现在要读取第二页，而不是重新排序某个随机子集。",
+        "codeExplanation": "先用上一节的价格降序、商品名称升序形成整个列表。OFFSET 2 跳过第1和第2条，LIMIT 2 只返回剩余列表的前两条。MySQL 另有 LIMIT offset,count 写法，本例 LIMIT 2,2 等价，但关键字形式更便于理解，也与本地兼容环境一致。补充例子显示第一页和第三页，方便核对相邻页边界。",
+        "resultExplanation": "完整排序为2、4、5、3、1、6，第二页因此返回编号5（45）和3（35）。第一页是2、4，第三页是1、6。固定数据下三个页面不重不漏；如果请求第四页，将没有记录。LIMIT 2 不保证返回两行，剩余不足时只返回实际存在的行。",
         "checkpoints": [],
         "mergedConcepts": [],
-        "mergeExamples": []
+        "mergeExamples": [
+          {
+            "label": "第一页",
+            "explanation": "偏移0，读取排序后的前两条。",
+            "sql": "SELECT product_id, price FROM products ORDER BY price DESC, product_name LIMIT 2 OFFSET 0;",
+            "result": {
+              "columns": [
+                "product_id",
+                "price"
+              ],
+              "rows": [
+                [
+                  2,
+                  89
+                ],
+                [
+                  4,
+                  65
+                ]
+              ]
+            }
+          },
+          {
+            "label": "第三页",
+            "explanation": "偏移4，返回最后两条。",
+            "sql": "SELECT product_id, price FROM products ORDER BY price DESC, product_name LIMIT 2 OFFSET 4;",
+            "result": {
+              "columns": [
+                "product_id",
+                "price"
+              ],
+              "rows": [
+                [
+                  1,
+                  15
+                ],
+                [
+                  6,
+                  15
+                ]
+              ]
+            }
+          },
+          {
+            "label": "超出数据范围",
+            "explanation": "偏移6，已无剩余记录，因此返回空结果。",
+            "sql": "SELECT product_id, price FROM products ORDER BY price DESC, product_name LIMIT 2 OFFSET 6;",
+            "result": {
+              "columns": [
+                "product_id",
+                "price"
+              ],
+              "rows": []
+            }
+          }
+        ]
       }
     }
   ],

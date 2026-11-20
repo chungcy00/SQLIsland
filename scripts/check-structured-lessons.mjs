@@ -4,7 +4,10 @@ import {chromium} from 'playwright';
 import {root,readJson,loadCourseStructures} from './course-structure-resources.mjs';
 const chapters=await Promise.all(Array.from({length:20},(_,i)=>readJson(`${root}/courses/ch${String(i+1).padStart(2,'0')}.json`)));
 const status=await loadCourseStructures(chapters);
-const records=await readJson(root+'/source/batch1/执行记录.json');
+const archived=await readJson(root+'/source/batch1/执行记录.json');
+// 原始导入之后的明确修订（ORDER BY 由按 id 排序改为业务字段排序）：用修订文件里的 SQL 与结果代替原始记录。
+const revisions=(await readJson(root+'/structured/revisions.json')).revisions;
+const records=archived.map(item=>revisions.find(r=>r.id===item.id&&r.label===item.label)?{...item,...revisions.find(r=>r.id===item.id&&r.label===item.label)}:item);
 const browser=await chromium.launch({channel:'chrome',headless:true});
 const page=await browser.newPage();const errors=[];page.on('pageerror',error=>errors.push(error.message));
 try{

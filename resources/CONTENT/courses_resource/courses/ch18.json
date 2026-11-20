@@ -11,14 +11,17 @@
     {
       "id": "kp18-01",
       "chapterId": "ch18",
-      "title": "索引与执行计划",
-      "learningObjective": "能够运用本节知识完成：理解索引适合精确过滤的场景",
+      "title": "索引与查询优化基础",
+      "learningObjective": "能够识别适合索引的筛选条件，理解复合索引和执行计划，并验证优化前后的结果一致。",
       "prerequisites": [],
-      "concept": "索引是辅助访问结构；高选择性条件通常减少候选记录，但优化器仍可能选择扫描小表。",
-      "syntax": "CREATE INDEX idx_price ON products(price);",
+      "concept": "索引是辅助定位数据的结构，而不是额外的业务筛选条件。常见树形索引按键组织数据，可缩小需要检查的候选范围。选择性较高的条件通常匹配较少记录，但是否采用索引取决于统计信息、表大小、成本及优化器。复合索引按列顺序组织，门店等值加日期范围通常适合门店在前、日期在后。普通索引列上直接比较常比套函数更容易形成搜索范围。索引增加空间及写入维护成本。执行计划用于观察访问方式，不能仅凭出现索引断言已经提速。",
+      "syntax": "CREATE INDEX idx_price ON products(price);\nCREATE INDEX idx_store_date ON orders(store_id,order_date);\nEXPLAIN SELECT ...;\nEXPLAIN ANALYZE SELECT ...;",
       "parameters": {
-        "idx_price": "索引名称",
-        "price": "索引键"
+        "idx_price": "价格索引名称",
+        "store_id": "复合索引前导列",
+        "order_date": "日期范围列",
+        "EXPLAIN": "查看计划",
+        "EXPLAIN ANALYZE": "实际执行并测量"
       },
       "fixtureIds": [
         "lesson-products"
@@ -104,20 +107,21 @@
           ]
         }
       ],
-      "mysqlSql": "SELECT product_id,price FROM products WHERE price=89 ORDER BY product_id;",
-      "sqliteSql": "SELECT product_id,price FROM products WHERE price=89 ORDER BY product_id;",
+      "mysqlSql": "SELECT product_id,price FROM products WHERE price=89 ORDER BY product_name DESC;",
+      "sqliteSql": "SELECT product_id,price FROM products WHERE price=89 ORDER BY product_name DESC;",
       "executionSteps": [
-        "为价格创建索引",
-        "筛选目标价格",
-        "查询1条记录"
+        "确认常用过滤条件",
+        "建立候选索引",
+        "比较查询计划",
+        "核对结果一致"
       ],
-      "useCase": "理解索引适合精确过滤的场景",
-      "comparison": "索引不改变正确查询的业务结果；维护索引增加写入成本。",
+      "useCase": "商品检索需要查找指定价格，门店报表需要按门店和月份查交易。希望减少不必要的扫描，不改变报表口径。",
+      "comparison": "索引改变访问方式，不改变正确查询结果；全表扫描小表不必然是错误。",
       "commonError": {
-        "example": "每个字段都建索引",
-        "correction": "按实际筛选、连接和排序模式建立索引"
+        "example": "每列都建索引，或看到全表扫描就认定查询有问题。",
+        "correction": "针对真实筛选、连接和排序模式设计索引，检查代表性数据的计划、结果及耗时。"
       },
-      "notes": "本例只验证查询结果；不能据此声称性能提高。",
+      "notes": "MySQL 原生计划尚未执行。SQLite 计划仅为教学观测，计划字符串不保证跨版本稳定。",
       "compatibility": {
         "status": "直接兼容",
         "detail": "仅在本示例数据与语义范围验证；不代表全部 MySQL 语法兼容。"
@@ -177,21 +181,140 @@
         }
       ],
       "teaching": {
-        "problem": "当查询经常按价格找少量商品时，索引才有机会减少扫描。",
-        "codeExplanation": "直接比较 price=89 让引擎可使用索引范围。尽量避免在被检索列上先做表达式运算；结合 EXPLAIN 分析选择性与实际计划。复合索引先检查最左列能否匹配常用条件，范围条件后的列是否参与定位需看 EXPLAIN。",
-        "resultExplanation": "查询返回一件商品，正确结果不会因索引而改变。将这套核查用于门店日期等复合过滤时，还要看索引列顺序。",
+        "problem": "商品检索需要查找指定价格，门店报表需要按门店和月份查交易。希望减少不必要的扫描，不改变报表口径。",
+        "codeExplanation": "原查询使用 price=89 直接比较。先读取相同查询结果，再建立索引并重新核对。门店月份查询使用门店等值和左闭右开日期范围，避免仅按月份数字筛选而混入其他年份。复合索引首列不是绝对限制，跳跃扫描等受优化器影响；实际使用情况看计划。MySQL EXPLAIN 的 type、key、rows 分别帮助理解访问类型、所选索引、估计检查行数；EXPLAIN ANALYZE 实际执行查询，不能当成无副作用预览。SQLite EXPLAIN QUERY PLAN 的 SEARCH 与 SCAN 是本地计划信息，不能当成 MySQL 耗时或估计行数。",
+        "resultExplanation": "价格89仅对应商品2；索引前后结果一致。门店1在二月的订单3和5金额分别为600和1500。索引计划可能随版本变化；本地示例只证明本次访问路径，不能证明真实业务性能提升。",
         "checkpoints": [],
         "mergedConcepts": [
           {
             "sourceId": "kp18-02",
-            "explanation": "门店月报经常按门店等值和日期范围筛选，可测试 (store_id,order_date) 复合索引。只按日期查全公司时通常不能直接依赖这个前导键，应以代表性查询检查计划。"
+            "explanation": "保留门店和日期复合索引、半开区间及可搜索条件原例。"
           },
           {
             "sourceId": "kp18-03",
-            "explanation": "MySQL EXPLAIN 看估计访问方式、索引和行数，EXPLAIN ANALYZE 实际执行并报告测量结果。SQLite 可用 EXPLAIN QUERY PLAN 查看 SEARCH 和 SCAN，输出标签不能当成 MySQL 的耗时或估计行数。"
+            "explanation": "区分估计执行计划与实际执行测量；本地仅展示 EXPLAIN QUERY PLAN，不虚构 MySQL 执行计划。"
           }
         ],
-        "mergeExamples": []
+        "mergeExamples": [
+          {
+            "label": "无索引结果对照",
+            "explanation": "无索引时结果相同。",
+            "sql": "SELECT product_id,price FROM products WHERE price=89 ORDER BY product_name DESC;",
+            "result": {
+              "columns": [
+                "product_id",
+                "price"
+              ],
+              "rows": [
+                [
+                  2,
+                  89
+                ]
+              ]
+            }
+          },
+          {
+            "label": "建立价格索引后查询",
+            "explanation": "建立索引后仍只返回商品2。",
+            "sql": "CREATE INDEX idx_price ON products(price);\nSELECT product_id,price FROM products WHERE price=89 ORDER BY product_name DESC;",
+            "result": {
+              "columns": [
+                "product_id",
+                "price"
+              ],
+              "rows": [
+                [
+                  2,
+                  89
+                ]
+              ]
+            }
+          },
+          {
+            "label": "复合索引门店月报",
+            "explanation": "等值门店及日期范围共同约束候选行；使用来源课程的五条原始数据。",
+            "sql": "CREATE TABLE demo_orders(id INTEGER PRIMARY KEY,category TEXT,sales INTEGER,store_id INTEGER,order_date VARCHAR(10),customer_id INTEGER);\nINSERT INTO demo_orders VALUES (1,'护肤品',800,1,'2026-01-03',1),(2,'化妆品',400,2,'2026-01-10',2),(3,'护肤品',600,1,'2026-02-02',1),(4,'化妆品',300,2,'2026-02-15',NULL),(5,'日用品',1500,1,'2026-02-20',3);\nCREATE INDEX idx_store_date ON demo_orders(store_id,order_date);\nSELECT id,sales FROM demo_orders WHERE store_id=1 AND order_date >= '2026-02-01' AND order_date < '2026-03-01' ORDER BY sales DESC;",
+            "result": {
+              "columns": [
+                "id",
+                "sales"
+              ],
+              "rows": [
+                [
+                  5,
+                  1500
+                ],
+                [
+                  3,
+                  600
+                ]
+              ]
+            }
+          },
+          {
+            "label": "无索引计划（本地计划）",
+            "explanation": "仅展示本次 SQLite 观测结果；不同版本可能改变。",
+            "sql": "EXPLAIN QUERY PLAN SELECT product_id FROM products WHERE price=89;",
+            "result": {
+              "columns": [
+                "id",
+                "parent",
+                "notused",
+                "detail"
+              ],
+              "rows": [
+                [
+                  2,
+                  0,
+                  0,
+                  "SCAN products"
+                ]
+              ]
+            }
+          },
+          {
+            "label": "价格索引计划（本地计划）",
+            "explanation": "仅展示本次 SQLite 观测结果；不同版本可能改变。",
+            "sql": "CREATE INDEX idx_price ON products(price);\nEXPLAIN QUERY PLAN SELECT product_id FROM products WHERE price=89;",
+            "result": {
+              "columns": [
+                "id",
+                "parent",
+                "notused",
+                "detail"
+              ],
+              "rows": [
+                [
+                  3,
+                  0,
+                  0,
+                  "SEARCH products USING INDEX idx_price (price=?)"
+                ]
+              ]
+            }
+          },
+          {
+            "label": "复合索引计划（本地计划）",
+            "explanation": "仅展示本次 SQLite 观测结果；不同版本可能改变。",
+            "sql": "CREATE TABLE demo_orders(id INTEGER PRIMARY KEY,category TEXT,sales INTEGER,store_id INTEGER,order_date VARCHAR(10),customer_id INTEGER);\nINSERT INTO demo_orders VALUES (1,'护肤品',800,1,'2026-01-03',1),(2,'化妆品',400,2,'2026-01-10',2),(3,'护肤品',600,1,'2026-02-02',1),(4,'化妆品',300,2,'2026-02-15',NULL),(5,'日用品',1500,1,'2026-02-20',3);\nCREATE INDEX idx_store_date ON demo_orders(store_id,order_date);\nEXPLAIN QUERY PLAN SELECT id,sales FROM demo_orders WHERE store_id=1 AND order_date >= '2026-02-01' AND order_date < '2026-03-01';",
+            "result": {
+              "columns": [
+                "id",
+                "parent",
+                "notused",
+                "detail"
+              ],
+              "rows": [
+                [
+                  3,
+                  0,
+                  0,
+                  "SEARCH demo_orders USING INDEX idx_store_date (store_id=? AND order_date>? AND order_date<?)"
+                ]
+              ]
+            }
+          }
+        ]
       }
     }
   ],

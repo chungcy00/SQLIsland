@@ -12,12 +12,13 @@
       "id": "kp11-01",
       "chapterId": "ch11",
       "title": "CONCAT 字符串拼接",
-      "learningObjective": "能够运用本节知识完成：生成报表展示名称",
+      "learningObjective": "能生成可读标签并处理拼接时的缺失值，保留原始关联键。",
       "prerequisites": [],
-      "concept": "将多个字符串按给定次序连接，MySQL CONCAT 任一参数为 NULL 时返回 NULL。",
+      "concept": "字符串拼接按指定顺序将多个文本组合为一个新值，可以插入空格、连字符等分隔符。它常用于显示标签而不是代替独立字段。MySQL 的 CONCAT 任一参数为 NULL 时结果为 NULL；SQLite 的连接运算符 || 具有同样的空值传播效果，但 SQLite 的 concat 函数空值行为不同。若业务希望保留部分标签，先确定缺失文本的替代值，不应无条件把未知改成空文本。",
       "syntax": "CONCAT(str1,str2,...)",
       "parameters": {
-        "str1,str2": "待拼接的文本"
+        "str1,str2": "按顺序参与拼接的表达式",
+        "分隔符": "显式写入的文本常量"
       },
       "fixtureIds": [
         "lesson-products"
@@ -103,20 +104,20 @@
           ]
         }
       ],
-      "mysqlSql": "SELECT product_id, CONCAT(category, ' - ', product_name) AS label FROM products ORDER BY product_id;",
-      "sqliteSql": "SELECT product_id, category || ' - ' || product_name AS label FROM products ORDER BY product_id;",
+      "mysqlSql": "SELECT product_id, CONCAT(category, ' - ', product_name) AS label FROM products ORDER BY label DESC;",
+      "sqliteSql": "SELECT product_id, category || ' - ' || product_name AS label FROM products ORDER BY label DESC;",
       "executionSteps": [
-        "读取类别和商品名",
-        "在中间添加分隔符",
-        "拼成标签"
+        "读取类别与商品名",
+        "插入分隔符",
+        "生成显示标签"
       ],
-      "useCase": "生成报表展示名称",
-      "comparison": "SQLite 的 concat 函数会跳过 NULL；|| 遇 NULL 返回 NULL，且 MySQL 默认 || 表示逻辑 OR。",
+      "useCase": "商品销售报表需要清晰的展示名称，例如护肤品 - Mask。products 每行是一个商品，category 是类别，product_name 是名称；编号仍保留用于后续关联。",
+      "comparison": "拼接不是合并数据表；也不同于将多行聚合成一个字符串。",
       "commonError": {
-        "example": "CONCAT(category, product_name) 缺少分隔符",
-        "correction": "CONCAT(category, ' - ', product_name)"
+        "example": "CONCAT(category,product_name) 无分隔符；或直接把兼容运算符复制到 MySQL。",
+        "correction": "使用 CONCAT(category, ' - ', product_name)，SQLite 使用对应兼容写法。"
       },
-      "notes": "本例仅非空文本；转换需保留 MySQL 的 NULL 语义。",
+      "notes": "以下补充例采用内联值演示空值，不新增课程夹具。",
       "compatibility": {
         "status": "转换执行",
         "detail": "需要明确转换或原生环境验证。"
@@ -139,28 +140,28 @@
         ],
         "rows": [
           [
-            1,
-            "护肤品 - Mask"
+            6,
+            "日用品 - Soap_1"
           ],
           [
             2,
             "护肤品 - Serum"
           ],
           [
-            3,
-            "护肤品 - Cleanser"
+            1,
+            "护肤品 - Mask"
           ],
           [
-            4,
-            "化妆品 - Cream"
+            3,
+            "护肤品 - Cleanser"
           ],
           [
             5,
             "化妆品 - Sunscreen"
           ],
           [
-            6,
-            "日用品 - Soap_1"
+            4,
+            "化妆品 - Cream"
           ]
         ],
         "status": "SQLite实际执行",
@@ -174,28 +175,60 @@
         "fc0080"
       ],
       "teaching": {
-        "problem": "报表需要把类别与商品名组合成可读标签。",
-        "codeExplanation": "CONCAT 显式插入分隔符，顺序决定标签结构。MySQL 中空值会传递，需保留部分文本时先约定 COALESCE 的备用值。",
-        "resultExplanation": "得到如“护肤品 - Mask”的新列，仍是一商品一行。也能用于码表显示，原始键应单独保留供连接。",
+        "problem": "商品销售报表需要清晰的展示名称，例如护肤品 - Mask。products 每行是一个商品，category 是类别，product_name 是名称；编号仍保留用于后续关联。",
+        "codeExplanation": "先选择 category，再加入固定字符串，再拼接商品名称，使用 AS label 给新列命名。SQLite 兼容查询用 ||；MySQL 默认模式不能用 || 表达拼接。若原始文本为空，应按业务需求用 COALESCE 提供标记。",
+        "resultExplanation": "六件商品仍为六行，仅增加展示标签的表达方式，原始数据未修改。标签可能重复，不能据此断定商品编号重复。",
         "checkpoints": [],
         "mergedConcepts": [],
-        "mergeExamples": []
+        "mergeExamples": [
+          {
+            "label": "空值传播",
+            "explanation": "兼容写法：任一操作数为空值，拼接结果为空值。",
+            "sql": "SELECT '护肤品' || ' - ' || NULL AS label;",
+            "result": {
+              "columns": [
+                "label"
+              ],
+              "rows": [
+                [
+                  null
+                ]
+              ]
+            }
+          },
+          {
+            "label": "缺失标记",
+            "explanation": "将未知名称显式标为未登记，而非变成看似完整的标签。",
+            "sql": "SELECT '护肤品' || ' - ' || COALESCE(NULL,'未登记') AS label;",
+            "result": {
+              "columns": [
+                "label"
+              ],
+              "rows": [
+                [
+                  "护肤品 - 未登记"
+                ]
+              ]
+            }
+          }
+        ]
       }
     },
     {
       "id": "kp11-02",
       "chapterId": "ch11",
       "title": "文本截取、字符数与字节数",
-      "learningObjective": "能够运用本节知识完成：提取商品编码前缀",
+      "learningObjective": "能按字符位置提取文本，并区分字符长度与编码字节长度。",
       "prerequisites": [
         "kp11-01",
         "kp11-03"
       ],
-      "concept": "从指定字符位置开始截取，位置从1开始；长度表示截取字符数。",
-      "syntax": "SUBSTRING(str,pos,len)",
+      "concept": "截取函数从指定字符位置提取一段文本，常规正向位置从1开始。固定长度前缀适合编码规则明确的字段；若分隔符位置变化，应先定位分隔符。字符长度用于限制名称字符数，字节长度用于存储或接口传输预算。MySQL CHAR_LENGTH 统计字符，LENGTH 统计字节；SQLite length 对文本统计字符，对 BLOB 统计字节。在 UTF-8 中古晋是两个字符、六个字节。字符数也不必然等于视觉字形数量。",
+      "syntax": "SUBSTRING(str,pos,len); CHAR_LENGTH(str); LENGTH(str)",
       "parameters": {
-        "pos": "起始位置",
-        "len": "截取长度"
+        "str": "待处理文本",
+        "pos": "从1起的正向字符位置",
+        "len": "截取字符数"
       },
       "fixtureIds": [
         "lesson-products"
@@ -281,19 +314,20 @@
           ]
         }
       ],
-      "mysqlSql": "SELECT product_id, SUBSTRING(product_name,1,3) AS prefix FROM products ORDER BY product_id;",
-      "sqliteSql": "SELECT product_id, SUBSTRING(product_name,1,3) AS prefix FROM products ORDER BY product_id;",
+      "mysqlSql": "SELECT product_id, SUBSTRING(product_name,1,3) AS prefix FROM products ORDER BY prefix DESC;",
+      "sqliteSql": "SELECT product_id, SUBSTRING(product_name,1,3) AS prefix FROM products ORDER BY prefix DESC;",
       "executionSteps": [
-        "从名称首字符开始",
-        "取最多3个字符"
+        "读取商品名称",
+        "提取前三个字符",
+        "按商品名称展示"
       ],
-      "useCase": "提取商品编码前缀",
-      "comparison": "截取字符串不等于按分隔符拆分。",
+      "useCase": "采购分类表需要展示名称前三个字符作为临时前缀，另外接口要求核对中文名称的编码字节长度。products 每行一件商品；实际编码是否可按前三字符分组需要业务确认。",
+      "comparison": "文本截取不是按分隔符拆分；字符计数不是字节计数。",
       "commonError": {
-        "example": "SUBSTRING(product_name,0,3) 期待前三字符",
-        "correction": "SUBSTRING(product_name,1,3)"
+        "example": "SUBSTRING(product_name,0,3) 期待前三字符，或把 MySQL LENGTH 当字符计数。",
+        "correction": "正向起始位置写1；字符长度使用 CHAR_LENGTH，兼容环境使用 length(text)。"
       },
-      "notes": "负位置、零位置以及字符集差异需要单独验证。",
+      "notes": "负位置、零位置、特殊字符及字符集差异需要单独验证；本例 UTF-8。",
       "compatibility": {
         "status": "直接兼容",
         "detail": "仅在本示例数据与语义范围验证；不代表全部 MySQL 语法兼容。"
@@ -319,28 +353,28 @@
         ],
         "rows": [
           [
-            1,
-            "Mas"
-          ],
-          [
-            2,
-            "Ser"
-          ],
-          [
-            3,
-            "Cle"
-          ],
-          [
-            4,
-            "Cre"
-          ],
-          [
             5,
             "Sun"
           ],
           [
             6,
             "Soa"
+          ],
+          [
+            2,
+            "Ser"
+          ],
+          [
+            1,
+            "Mas"
+          ],
+          [
+            4,
+            "Cre"
+          ],
+          [
+            3,
+            "Cle"
           ]
         ],
         "status": "SQLite实际执行",
@@ -363,30 +397,47 @@
         }
       ],
       "teaching": {
-        "problem": "编码前缀要按字符位置提取，不能凭样例结果硬截固定字节。",
-        "codeExplanation": "SUBSTRING 从第一个字符起取三个字符，适合固定长度前缀；分隔符位置变化时先定位再截取。CHAR_LENGTH 计算字符数，LENGTH 在 MySQL 中计算字节数；多字节商品名应按字符截取。",
-        "resultExplanation": "Mask 取 Mas，Serum 取 Ser。分组使用前缀前应检查是否把不同业务含义的编码误合并。",
+        "problem": "采购分类表需要展示名称前三个字符作为临时前缀，另外接口要求核对中文名称的编码字节长度。products 每行一件商品；实际编码是否可按前三字符分组需要业务确认。",
+        "codeExplanation": "SUBSTRING(product_name,1,3) 从首字符开始提取最多三个字符，AS prefix 标记结果。如果字符串不足三个字符，只返回剩余字符。长度验证使用 MySQL CHAR_LENGTH 与 LENGTH；兼容环境使用 length(text) 与 length(CAST(text AS BLOB))。不要直接把字节数作为截取字符数。",
+        "resultExplanation": "六件商品分别得到 Mas、Ser、Cle、Cre、Sun、Soa，行数保持不变。中文长度样例返回2与6；这是编码层面的差异，不表示中文名称有六个字符。",
         "checkpoints": [],
         "mergedConcepts": [
           {
             "sourceId": "kp11-04",
-            "explanation": "字符限制用 CHAR_LENGTH，接口字节预算在 MySQL 中用 LENGTH。以 UTF-8 的“古晋”为例，2 个字符占 6 字节；SQLite 对 TEXT 的 length 数字符，转成 BLOB 后才数编码字节。"
+            "explanation": "已融入字符与字节计数、UTF-8 中文样例、MySQL 与 SQLite 函数差异、接口长度验证及误用修正。"
           }
         ],
         "mergeExamples": [
           {
-            "label": "同一名称的字符数与字节数",
-            "explanation": "条件是 UTF-8 编码。SQLite 中转为 BLOB 可核对字节长度；MySQL 使用 CHAR_LENGTH 数字符，LENGTH 数字节。",
-            "sql": "SELECT LENGTH('古晋') AS character_count,\n  LENGTH(CAST('古晋' AS BLOB)) AS byte_count;",
+            "label": "来源课：字符数与字节数",
+            "explanation": "保留原样例；原生写法 SELECT CHAR_LENGTH('古晋') AS chars, LENGTH('古晋') AS bytes; 下方为兼容写法。",
+            "sql": "SELECT length('古晋') AS chars, length(CAST('古晋' AS BLOB)) AS bytes;",
             "result": {
               "columns": [
-                "character_count",
-                "byte_count"
+                "chars",
+                "bytes"
               ],
               "rows": [
                 [
                   2,
                   6
+                ]
+              ]
+            }
+          },
+          {
+            "label": "中文字符截取与短文本",
+            "explanation": "按字符位置截取，不按字节切割；不足长度仍返回现有字符。",
+            "sql": "SELECT SUBSTRING('古晋门店',2,2) AS part,SUBSTRING('A',1,3) AS short_text;",
+            "result": {
+              "columns": [
+                "part",
+                "short_text"
+              ],
+              "rows": [
+                [
+                  "晋门",
+                  "A"
                 ]
               ]
             }
@@ -397,15 +448,16 @@
     {
       "id": "kp11-03",
       "chapterId": "ch11",
-      "title": "TRIM、REPLACE 与大小写",
-      "learningObjective": "能够运用本节知识完成：统一导入数据的文本格式",
+      "title": "文本清洗与格式统一",
+      "learningObjective": "能选择适当的文本清洗函数，识别清洗后的潜在重复而不破坏有效信息。",
       "prerequisites": [
         "kp11-02"
       ],
-      "concept": "TRIM 默认去除两端空格；REPLACE 替换匹配子串；LOWER/UPPER 转换大小写。",
-      "syntax": "LOWER(TRIM(str)); REPLACE(str, old, new)",
+      "concept": "导入数据中同一名称可能出现首尾空格、类别大小写不一致、分隔符不统一。TRIM 默认去除两端普通空格，不会清除所有类型空白；REPLACE 替换指定子串的全部匹配；LOWER 与 UPPER 调整大小写，在比较和分组前可用来统一约定。清洗规则取决于字段含义：内部空格可能是姓名或名称的一部分，不能一律删除。清洗不会自动去重，也不会自动修复金额或缺失值。",
+      "syntax": "LOWER(TRIM(str)); REPLACE(str,old,new)",
       "parameters": {
-        "old": "要替换的片段",
+        "str": "待处理文本",
+        "old": "匹配的子串",
         "new": "替换文本"
       },
       "fixtureIds": [
@@ -480,20 +532,20 @@
           ]
         }
       ],
-      "mysqlSql": "SELECT id, TRIM(name) AS clean_name, LOWER(category) AS clean_category, REPLACE(name,' ','') AS no_spaces FROM raw_data ORDER BY id;",
-      "sqliteSql": "SELECT id, TRIM(name) AS clean_name, LOWER(category) AS clean_category, REPLACE(name,' ','') AS no_spaces FROM raw_data ORDER BY id;",
+      "mysqlSql": "SELECT id, TRIM(name) AS clean_name, LOWER(category) AS clean_category, REPLACE(name,' ','') AS no_spaces FROM raw_data ORDER BY name DESC;",
+      "sqliteSql": "SELECT id, TRIM(name) AS clean_name, LOWER(category) AS clean_category, REPLACE(name,' ','') AS no_spaces FROM raw_data ORDER BY name DESC;",
       "executionSteps": [
-        "去除名称两端空格",
+        "清理名称首尾空格",
         "统一类别大小写",
-        "演示删除所有普通空格"
+        "对比删除所有普通空格"
       ],
-      "useCase": "统一导入数据的文本格式",
-      "comparison": "TRIM 不删除内部空格；REPLACE 可删除内部空格。",
+      "useCase": "汇总两套系统的商品资料前，数据分析师要统一名称和类别格式。raw_data 的 id 是原始记录标识，name 是名称，amount 是文本金额，category 是类别。本节只处理文本，不负责金额转换。",
+      "comparison": "TRIM 清理边缘；REPLACE 可改变内部；大小写转换不等于统一业务分类。",
       "commonError": {
-        "example": "用 REPLACE 删除所有空格处理合法姓名",
-        "correction": "仅用 TRIM 去除边缘空格"
+        "example": "用 REPLACE 删除合法姓名中的所有空格，或清洗后直接删除名称相同的记录。",
+        "correction": "优先 TRIM，明确替换规则；先审查重复候选再决定去重键。"
       },
-      "notes": "Unicode 大小写及特殊空白符涉及字符集；本例大小写仅ASCII。",
+      "notes": "本例仅验证 ASCII 大小写及普通空格，Unicode 大小写与排序规则存在引擎差异。",
       "compatibility": {
         "status": "直接兼容",
         "detail": "仅在本示例数据与语义范围验证；不代表全部 MySQL 语法兼容。"
@@ -522,16 +574,10 @@
         ],
         "rows": [
           [
-            1,
-            "Mask",
-            "skin",
-            "Mask"
-          ],
-          [
-            2,
-            "Mask",
-            "skin",
-            "Mask"
+            4,
+            "Soap",
+            "home",
+            "Soap"
           ],
           [
             3,
@@ -540,16 +586,22 @@
             "Serum"
           ],
           [
-            4,
-            "Soap",
-            "home",
-            "Soap"
+            2,
+            "Mask",
+            "skin",
+            "Mask"
           ],
           [
             5,
             "Cream",
             "makeup",
             "Cream"
+          ],
+          [
+            1,
+            "Mask",
+            "skin",
+            "Mask"
           ],
           [
             6,
@@ -573,12 +625,49 @@
         "fc0085"
       ],
       "teaching": {
-        "problem": "来源系统书写不一致时，在匹配前先统一清洗规则。",
-        "codeExplanation": "TRIM 删边缘空白，LOWER 归一大小写，REPLACE 按明确的字符替换；每者处理不同问题。",
-        "resultExplanation": "前两行清洗后名字和类别相同，为后续重复审查提供候选。空白可能有业务含义，不能无条件删除所有内部空格。",
+        "problem": "汇总两套系统的商品资料前，数据分析师要统一名称和类别格式。raw_data 的 id 是原始记录标识，name 是名称，amount 是文本金额，category 是类别。本节只处理文本，不负责金额转换。",
+        "codeExplanation": "TRIM(name) 移除边缘空格，LOWER(category) 将 ASCII 类别统一为小写；REPLACE(name,' ','') 另外展示删除全部普通空格的效果。三个表达式各自从原始数据取得输入，不会相互覆盖。若需要识别重复，可在规范化结果上按名称和类别分组再统计，但必须确认是否为同一业务记录。",
+        "resultExplanation": "前两行由不同书写方式变为相同名称 Mask 与类别 skin，仍是两条原始记录。第6行空名称仍为空字符串；它没有自动变为 NULL。需要明确缺失规则后才进行后续处理。",
         "checkpoints": [],
         "mergedConcepts": [],
-        "mergeExamples": []
+        "mergeExamples": [
+          {
+            "label": "内部空格对照",
+            "explanation": "TRIM 保留内部空格；REPLACE 删除全部匹配的普通空格。",
+            "sql": "SELECT TRIM('  A B  ') AS trimmed, REPLACE('  A B  ',' ','') AS removed;",
+            "result": {
+              "columns": [
+                "trimmed",
+                "removed"
+              ],
+              "rows": [
+                [
+                  "A B",
+                  "AB"
+                ]
+              ]
+            }
+          },
+          {
+            "label": "识别清洗后重复候选",
+            "explanation": "按规范化名称和类别统计，只说明存在重复候选，不证明应删除。",
+            "sql": "SELECT TRIM(name) AS clean_name,LOWER(category) AS clean_category,COUNT(*) AS n FROM raw_data GROUP BY TRIM(name),LOWER(category) HAVING COUNT(*)>1 ORDER BY clean_name,clean_category;",
+            "result": {
+              "columns": [
+                "clean_name",
+                "clean_category",
+                "n"
+              ],
+              "rows": [
+                [
+                  "Mask",
+                  "skin",
+                  2
+                ]
+              ]
+            }
+          }
+        ]
       }
     }
   ],

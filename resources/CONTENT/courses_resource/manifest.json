@@ -7,140 +7,140 @@
       "path": "courses/ch01.json",
       "title": "数据库基础",
       "knowledgePointCount": 3,
-      "sha256": "ba2883a0417bc8a8a0d254f2d34f68e97e7db06b0dd9607fa56cc0f0a34b9361"
+      "sha256": "c47356cc9cdc9a414c650f0399e4aca96a29c1c8c2d4b38640be500f1cb42a29"
     },
     {
       "id": "ch02",
       "path": "courses/ch02.json",
       "title": "基础查询",
       "knowledgePointCount": 2,
-      "sha256": "65cc7315846ff97584ebcee53e214061859c5cb953947d2b12b69fb17a493fbd"
+      "sha256": "ba92578c434974198c8623ef7d95aac28e15cc8c117e6965d62a8ab34625a7eb"
     },
     {
       "id": "ch03",
       "path": "courses/ch03.json",
       "title": "条件筛选",
       "knowledgePointCount": 4,
-      "sha256": "ac7ef079392a58b4630040f110f79056aff534ae8023dd3c91a98a5b7638de00"
+      "sha256": "087187e0a28c2f730dcd0290823ccb21c9535d176065c543a0656e2dec2b110e"
     },
     {
       "id": "ch04",
       "path": "courses/ch04.json",
       "title": "排序与分页",
       "knowledgePointCount": 2,
-      "sha256": "52ff245240a25d667f15deb97f25f773bef102aaef9b026d3d38f5551aaefdde"
+      "sha256": "77bbfea3f33710a250f27fb3bb66a9f1627830779fc58bcb52c85a79ce121ca6"
     },
     {
       "id": "ch05",
       "path": "courses/ch05.json",
       "title": "空值处理",
       "knowledgePointCount": 2,
-      "sha256": "32434ed3b096e8dde598c8696e3f560f367a94c4f468c83fe9a75fd1339dc796"
+      "sha256": "cae06069346c3c1978929d443a9f63c899881ff4938e1a43615efd811b94cce7"
     },
     {
       "id": "ch06",
       "path": "courses/ch06.json",
       "title": "聚合函数",
       "knowledgePointCount": 3,
-      "sha256": "6ef32b5996efd4163b4877bd797a8112f5599fbd79ba61d43c322e42ae9812bf"
+      "sha256": "7cb2c8892121984edb6b2b05bbb4a0ef55da57a97122a191e08a360b44008039"
     },
     {
       "id": "ch07",
       "path": "courses/ch07.json",
       "title": "分组统计",
       "knowledgePointCount": 3,
-      "sha256": "7ed3d4320629eab009c180bc70bf40d85b15adac085c20f1898b5ab5f7d6a560"
+      "sha256": "53c6080789822d1df78ed8dd994a13d32fc43f1f05047e6cb1a6799c34636252"
     },
     {
       "id": "ch08",
       "path": "courses/ch08.json",
       "title": "多表连接",
       "knowledgePointCount": 5,
-      "sha256": "ba55b1e65fb912b1d9867960a513ade88bea39ff803295b310b27a0e6368d244"
+      "sha256": "419b205efefc0121eaaa43b4bcb17bf68fc9519539cd2320cc072df915cbcee1"
     },
     {
       "id": "ch09",
       "path": "courses/ch09.json",
       "title": "条件表达式",
       "knowledgePointCount": 3,
-      "sha256": "b4e7b100af2fe681527e3960c11de7c090dfbc8657aacb1666507f50bfeb1bc4"
+      "sha256": "29b2c445f958ac1a6f9dec18cdad0f28ce16f9f944b88fe50dfa4138b651c0b0"
     },
     {
       "id": "ch10",
       "path": "courses/ch10.json",
       "title": "子查询",
       "knowledgePointCount": 4,
-      "sha256": "d8692c511b1b930d202ca1daa2dd8a3d56a7696f74d9f4ace9adb328665b2103"
+      "sha256": "64613fb7306a57028083c610faf4a6d914926d9993571ef782a0d77f4a57ee61"
     },
     {
       "id": "ch11",
       "path": "courses/ch11.json",
       "title": "字符串处理",
       "knowledgePointCount": 3,
-      "sha256": "8afddfcd70b11e2d88eb022940fe333a8d2cd67565d6000fa979c2ecb56095ea"
+      "sha256": "115838b3fb7cc76c21f382be29fbda53362f665e62e7ecbb5fb20195a47e7af9"
     },
     {
       "id": "ch12",
       "path": "courses/ch12.json",
       "title": "数值及日期函数",
       "knowledgePointCount": 4,
-      "sha256": "90af2fdc8e86695a50a7b80ff7abbf080fd1ce59bdcfd0a6b2fad3f9c57c3bdf"
+      "sha256": "1980ae0328666cb5008728658a77191055c8f6e250e89f085f95d2024259f90a"
     },
     {
       "id": "ch13",
       "path": "courses/ch13.json",
       "title": "集合运算",
       "knowledgePointCount": 2,
-      "sha256": "a4bed0633e49c632c2773d82c75eb14ae0ba0ae2e3a54c9969b30a8f5e8f53b6"
+      "sha256": "155f2595062eb867fb8d20bb103525663f49c4ecf60c745868864f9526a27c3c"
     },
     {
       "id": "ch14",
       "path": "courses/ch14.json",
       "title": "公用表表达式",
       "knowledgePointCount": 1,
-      "sha256": "3bf1d092874d934146d570925fdac3987acd7c9527a22d62d447b1bfd47025f9"
+      "sha256": "1f2079cc754f0e8c46eb03458fc7db1e8a660520324afb49edb4f351df68c75e"
     },
     {
       "id": "ch15",
       "path": "courses/ch15.json",
       "title": "窗口函数",
       "knowledgePointCount": 5,
-      "sha256": "e5d5ac4f361ae72879f56b76756b8629387b37e880b92ea646f23dad9fcbea54"
+      "sha256": "d935f168686deb44d504c91a57a6ffebb4eb38d5f7b8edcacdf757bf34e7e43e"
     },
     {
       "id": "ch16",
       "path": "courses/ch16.json",
       "title": "数据清洗",
       "knowledgePointCount": 3,
-      "sha256": "ae622b2627104d649dd8d40295c54e7ee727b2faee5877a1e28bd85e4ac65d8b"
+      "sha256": "c87f4814a5213faab75f2c12deeb174588768b3bc060018a1627af1dd1dbfa31"
     },
     {
       "id": "ch17",
       "path": "courses/ch17.json",
       "title": "数据表管理",
       "knowledgePointCount": 2,
-      "sha256": "5efc82db731d19ecb2b96190c1fc8c61ae944d9a8cf842b90f74a3228dd8a2bb"
+      "sha256": "49a9491c9d7619625a21ac6da537322ea7e5ba91671a808cf662c7ca72be9d47"
     },
     {
       "id": "ch18",
       "path": "courses/ch18.json",
       "title": "查询优化",
       "knowledgePointCount": 1,
-      "sha256": "a8babc1139d7fcdc8398e9dcd46d6317d4ac7b33b502357239f52445d73584e3"
+      "sha256": "528edd25b329c5e745a73362ed26dbeac92a91baa2730f7f65d1c5c6d8f52070"
     },
     {
       "id": "ch19",
       "path": "courses/ch19.json",
       "title": "业务数据分析",
       "knowledgePointCount": 18,
-      "sha256": "23df25d123e62bdaf539a18cd6af9385c0d4ddec459f017eb924292db8ad6604"
+      "sha256": "01ee4ca752275b2145ff0834ab7bcb60bd1406167f368b49278226200c606474"
     },
     {
       "id": "ch20",
       "path": "courses/ch20.json",
       "title": "综合挑战",
       "knowledgePointCount": 10,
-      "sha256": "218e955f707ca41475630f21acef1c8b4c253f45ed1f8ea345c0ed608608411d"
+      "sha256": "8932a419229d5fe29ab0f333941d87a3b9d91c648f63e5dea02440e2323af281"
     }
   ],
   "knowledgePointCount": 80,
@@ -152,103 +152,103 @@
     },
     {
       "path": "courses/ch01.json",
-      "bytes": 21784,
-      "sha256": "ba2883a0417bc8a8a0d254f2d34f68e97e7db06b0dd9607fa56cc0f0a34b9361"
+      "bytes": 22024,
+      "sha256": "c47356cc9cdc9a414c650f0399e4aca96a29c1c8c2d4b38640be500f1cb42a29"
     },
     {
       "path": "courses/ch02.json",
-      "bytes": 16037,
-      "sha256": "65cc7315846ff97584ebcee53e214061859c5cb953947d2b12b69fb17a493fbd"
+      "bytes": 16023,
+      "sha256": "ba92578c434974198c8623ef7d95aac28e15cc8c117e6965d62a8ab34625a7eb"
     },
     {
       "path": "courses/ch03.json",
-      "bytes": 19174,
-      "sha256": "ac7ef079392a58b4630040f110f79056aff534ae8023dd3c91a98a5b7638de00"
+      "bytes": 31656,
+      "sha256": "087187e0a28c2f730dcd0290823ccb21c9535d176065c543a0656e2dec2b110e"
     },
     {
       "path": "courses/ch04.json",
-      "bytes": 9979,
-      "sha256": "52ff245240a25d667f15deb97f25f773bef102aaef9b026d3d38f5551aaefdde"
+      "bytes": 15422,
+      "sha256": "77bbfea3f33710a250f27fb3bb66a9f1627830779fc58bcb52c85a79ce121ca6"
     },
     {
       "path": "courses/ch05.json",
-      "bytes": 16313,
-      "sha256": "32434ed3b096e8dde598c8696e3f560f367a94c4f468c83fe9a75fd1339dc796"
+      "bytes": 16370,
+      "sha256": "cae06069346c3c1978929d443a9f63c899881ff4938e1a43615efd811b94cce7"
     },
     {
       "path": "courses/ch06.json",
-      "bytes": 12550,
-      "sha256": "6ef32b5996efd4163b4877bd797a8112f5599fbd79ba61d43c322e42ae9812bf"
+      "bytes": 20791,
+      "sha256": "7cb2c8892121984edb6b2b05bbb4a0ef55da57a97122a191e08a360b44008039"
     },
     {
       "path": "courses/ch07.json",
-      "bytes": 17511,
-      "sha256": "7ed3d4320629eab009c180bc70bf40d85b15adac085c20f1898b5ab5f7d6a560"
+      "bytes": 26279,
+      "sha256": "53c6080789822d1df78ed8dd994a13d32fc43f1f05047e6cb1a6799c34636252"
     },
     {
       "path": "courses/ch08.json",
-      "bytes": 36131,
-      "sha256": "ba55b1e65fb912b1d9867960a513ade88bea39ff803295b310b27a0e6368d244"
+      "bytes": 51854,
+      "sha256": "419b205efefc0121eaaa43b4bcb17bf68fc9519539cd2320cc072df915cbcee1"
     },
     {
       "path": "courses/ch09.json",
-      "bytes": 16946,
-      "sha256": "b4e7b100af2fe681527e3960c11de7c090dfbc8657aacb1666507f50bfeb1bc4"
+      "bytes": 27933,
+      "sha256": "29b2c445f958ac1a6f9dec18cdad0f28ce16f9f944b88fe50dfa4138b651c0b0"
     },
     {
       "path": "courses/ch10.json",
-      "bytes": 22610,
-      "sha256": "d8692c511b1b930d202ca1daa2dd8a3d56a7696f74d9f4ace9adb328665b2103"
+      "bytes": 31091,
+      "sha256": "64613fb7306a57028083c610faf4a6d914926d9993571ef782a0d77f4a57ee61"
     },
     {
       "path": "courses/ch11.json",
-      "bytes": 16707,
-      "sha256": "8afddfcd70b11e2d88eb022940fe333a8d2cd67565d6000fa979c2ecb56095ea"
+      "bytes": 22736,
+      "sha256": "115838b3fb7cc76c21f382be29fbda53362f665e62e7ecbb5fb20195a47e7af9"
     },
     {
       "path": "courses/ch12.json",
-      "bytes": 17374,
-      "sha256": "90af2fdc8e86695a50a7b80ff7abbf080fd1ce59bdcfd0a6b2fad3f9c57c3bdf"
+      "bytes": 23683,
+      "sha256": "1980ae0328666cb5008728658a77191055c8f6e250e89f085f95d2024259f90a"
     },
     {
       "path": "courses/ch13.json",
-      "bytes": 10912,
-      "sha256": "a4bed0633e49c632c2773d82c75eb14ae0ba0ae2e3a54c9969b30a8f5e8f53b6"
+      "bytes": 16541,
+      "sha256": "155f2595062eb867fb8d20bb103525663f49c4ecf60c745868864f9526a27c3c"
     },
     {
       "path": "courses/ch14.json",
-      "bytes": 7606,
-      "sha256": "3bf1d092874d934146d570925fdac3987acd7c9527a22d62d447b1bfd47025f9"
+      "bytes": 9480,
+      "sha256": "1f2079cc754f0e8c46eb03458fc7db1e8a660520324afb49edb4f351df68c75e"
     },
     {
       "path": "courses/ch15.json",
-      "bytes": 29454,
-      "sha256": "e5d5ac4f361ae72879f56b76756b8629387b37e880b92ea646f23dad9fcbea54"
+      "bytes": 38113,
+      "sha256": "d935f168686deb44d504c91a57a6ffebb4eb38d5f7b8edcacdf757bf34e7e43e"
     },
     {
       "path": "courses/ch16.json",
-      "bytes": 15606,
-      "sha256": "ae622b2627104d649dd8d40295c54e7ee727b2faee5877a1e28bd85e4ac65d8b"
+      "bytes": 22541,
+      "sha256": "c87f4814a5213faab75f2c12deeb174588768b3bc060018a1627af1dd1dbfa31"
     },
     {
       "path": "courses/ch17.json",
-      "bytes": 9783,
-      "sha256": "5efc82db731d19ecb2b96190c1fc8c61ae944d9a8cf842b90f74a3228dd8a2bb"
+      "bytes": 17521,
+      "sha256": "49a9491c9d7619625a21ac6da537322ea7e5ba91671a808cf662c7ca72be9d47"
     },
     {
       "path": "courses/ch18.json",
-      "bytes": 6419,
-      "sha256": "a8babc1139d7fcdc8398e9dcd46d6317d4ac7b33b502357239f52445d73584e3"
+      "bytes": 12443,
+      "sha256": "528edd25b329c5e745a73362ed26dbeac92a91baa2730f7f65d1c5c6d8f52070"
     },
     {
       "path": "courses/ch19.json",
-      "bytes": 285781,
-      "sha256": "23df25d123e62bdaf539a18cd6af9385c0d4ddec459f017eb924292db8ad6604"
+      "bytes": 783667,
+      "sha256": "01ee4ca752275b2145ff0834ab7bcb60bd1406167f368b49278226200c606474"
     },
     {
       "path": "courses/ch20.json",
-      "bytes": 186589,
-      "sha256": "218e955f707ca41475630f21acef1c8b4c253f45ed1f8ea345c0ed608608411d"
+      "bytes": 372374,
+      "sha256": "8932a419229d5fe29ab0f333941d87a3b9d91c648f63e5dea02440e2323af281"
     },
     {
       "path": "fixtures/lesson-accounts.json",

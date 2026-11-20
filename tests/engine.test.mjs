@@ -258,22 +258,28 @@ test("course checkpoints match their recorded results in SQLite WASM", async () 
     try {
       if (lesson.setupSql) db.run(lesson.setupSql);
       for (const step of steps) {
-        if (step.sourceTables) {
-          const supplemental = initializeFixture(SQL, { tables: step.sourceTables });
-          try { assert.ok(compareResults(query(supplemental, step.sql), step.result, "ordered").pass); }
-          finally { supplemental.close(); }
-          count++;
-          continue;
+        // 扩展示例、自带建表/建索引语句的步骤和执行计划步骤，在只含本课示例表的隔离库中运行（不叠加本课的 setupSql）；
+        // EXPLAIN QUERY PLAN 的 notused 数值随 SQLite 版本变化，只核对计划说明文字。
+        const isolated = lesson.teaching.mergeExamples.includes(step) || /\bCREATE\s+(TABLE|INDEX)\b/i.test(step.sql) || /\bEXPLAIN QUERY PLAN\b/i.test(step.sql);
+        const fixture = step.sourceTables
+          ? initializeFixture(SQL, { tables: step.sourceTables })
+          : isolated ? initializeFixture(SQL, { tables: dataset ? [] : lesson.sourceTables }, base) : db;
+        try {
+          const actual = query(fixture, step.sql);
+          const plan = /\bEXPLAIN QUERY PLAN\b/i.test(step.sql);
+          const normalize = (result) => plan ? { ...result, columns: ["detail"], rows: result.rows.map((row) => [row[row.length - 1]]) } : result;
+          assert.ok(compareResults(normalize(actual), normalize(step.result), "ordered").pass, lesson.id + " " + (step.name || step.label));
+        } finally {
+          if (fixture !== db) fixture.close();
         }
-        assert.ok(compareResults(query(db, step.sql), step.result, "ordered").pass,
-          lesson.id + " " + (step.name || step.label));
         count++;
       }
     } finally {
       db.close();
     }
   }
-  assert.equal(count, 92);
+  assert.equal(count, content.chapters.flatMap(chapter => chapter.knowledgePoints).reduce((total, lesson) => total + lesson.teaching.checkpoints.length + lesson.teaching.mergeExamples.length, 0));
+  assert.ok(count >= 300);
 });
 
 test("salary RANGE frames accept both answers and reject ROWS and literal spoofing", async () => {

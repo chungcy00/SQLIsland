@@ -1,0 +1,457 @@
+{
+  "schemaVersion": 1,
+  "note": "已转换课文在原始导入之后的明确修订：ORDER BY 由按 id 排序改为业务字段排序。check-structured-lessons 对这些项目改用此处的 SQL 与结果核对。",
+  "revisions": [
+    {
+      "id": "kp01-01",
+      "label": "原有主示例",
+      "sql": "SELECT id, category, sales FROM orders ORDER BY sales DESC;",
+      "result": {
+        "columns": [
+          "id",
+          "category",
+          "sales"
+        ],
+        "rows": [
+          [
+            5,
+            "日用品",
+            1500
+          ],
+          [
+            1,
+            "护肤品",
+            800
+          ],
+          [
+            3,
+            "护肤品",
+            600
+          ],
+          [
+            2,
+            "化妆品",
+            400
+          ],
+          [
+            4,
+            "化妆品",
+            300
+          ]
+        ]
+      }
+    },
+    {
+      "id": "kp01-02",
+      "label": "原有主示例",
+      "sql": "SELECT product_id, price, stock FROM products ORDER BY stock DESC;",
+      "result": {
+        "columns": [
+          "product_id",
+          "price",
+          "stock"
+        ],
+        "rows": [
+          [
+            3,
+            35,
+            200
+          ],
+          [
+            4,
+            65,
+            180
+          ],
+          [
+            1,
+            15,
+            150
+          ],
+          [
+            5,
+            45,
+            80
+          ],
+          [
+            2,
+            89,
+            40
+          ],
+          [
+            6,
+            15,
+            0
+          ]
+        ]
+      }
+    },
+    {
+      "id": "kp01-03",
+      "label": "原有主示例",
+      "sql": "SELECT c.customer_id, COUNT(o.id) AS order_count FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id GROUP BY c.customer_id ORDER BY order_count DESC, SUM(o.sales) DESC;",
+      "result": {
+        "columns": [
+          "customer_id",
+          "order_count"
+        ],
+        "rows": [
+          [
+            1,
+            2
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            2,
+            1
+          ],
+          [
+            4,
+            0
+          ]
+        ]
+      }
+    },
+    {
+      "id": "kp01-03",
+      "label": "查看一对多匹配明细",
+      "sql": "SELECT c.customer_id, o.id AS order_id, o.sales FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id ORDER BY o.sales DESC;",
+      "result": {
+        "columns": [
+          "customer_id",
+          "order_id",
+          "sales"
+        ],
+        "rows": [
+          [
+            3,
+            5,
+            1500
+          ],
+          [
+            1,
+            1,
+            800
+          ],
+          [
+            1,
+            3,
+            600
+          ],
+          [
+            2,
+            2,
+            400
+          ],
+          [
+            4,
+            null,
+            null
+          ]
+        ]
+      }
+    },
+    {
+      "id": "kp02-01",
+      "label": "原有主示例",
+      "sql": "SELECT product_name, price FROM products ORDER BY stock DESC;",
+      "result": {
+        "columns": [
+          "product_name",
+          "price"
+        ],
+        "rows": [
+          [
+            "Cleanser",
+            35
+          ],
+          [
+            "Cream",
+            65
+          ],
+          [
+            "Mask",
+            15
+          ],
+          [
+            "Sunscreen",
+            45
+          ],
+          [
+            "Serum",
+            89
+          ],
+          [
+            "Soap_1",
+            15
+          ]
+        ]
+      }
+    },
+    {
+      "id": "kp02-01",
+      "label": "合并来源：库存售价估算",
+      "sql": "SELECT product_id, price, stock, price * stock AS stock_value FROM products ORDER BY stock_value DESC;",
+      "result": {
+        "columns": [
+          "product_id",
+          "price",
+          "stock",
+          "stock_value"
+        ],
+        "rows": [
+          [
+            4,
+            65,
+            180,
+            11700
+          ],
+          [
+            3,
+            35,
+            200,
+            7000
+          ],
+          [
+            5,
+            45,
+            80,
+            3600
+          ],
+          [
+            2,
+            89,
+            40,
+            3560
+          ],
+          [
+            1,
+            15,
+            150,
+            2250
+          ],
+          [
+            6,
+            15,
+            0,
+            0
+          ]
+        ]
+      }
+    },
+    {
+      "id": "kp02-01",
+      "label": "按派生金额筛选",
+      "sql": "SELECT product_id, price * stock AS stock_value FROM products WHERE price * stock > 1000 ORDER BY stock_value DESC;",
+      "result": {
+        "columns": [
+          "product_id",
+          "stock_value"
+        ],
+        "rows": [
+          [
+            4,
+            11700
+          ],
+          [
+            3,
+            7000
+          ],
+          [
+            5,
+            3600
+          ],
+          [
+            2,
+            3560
+          ],
+          [
+            1,
+            2250
+          ]
+        ]
+      }
+    },
+    {
+      "id": "kp02-02",
+      "label": "原有主示例",
+      "sql": "SELECT DISTINCT store_id, category FROM orders ORDER BY category;",
+      "result": {
+        "columns": [
+          "store_id",
+          "category"
+        ],
+        "rows": [
+          [
+            2,
+            "化妆品"
+          ],
+          [
+            1,
+            "护肤品"
+          ],
+          [
+            1,
+            "日用品"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "kp05-01",
+      "label": "原有主示例",
+      "sql": "SELECT id, value FROM nullable_values WHERE value <> 10 ORDER BY value;",
+      "result": {
+        "columns": [
+          "id",
+          "value"
+        ],
+        "rows": [
+          [
+            2,
+            0
+          ]
+        ]
+      }
+    },
+    {
+      "id": "kp05-01",
+      "label": "合并来源：识别缺失记录",
+      "sql": "SELECT id, value, note FROM nullable_values WHERE value IS NULL ORDER BY value;",
+      "result": {
+        "columns": [
+          "id",
+          "value",
+          "note"
+        ],
+        "rows": [
+          [
+            1,
+            null,
+            null
+          ]
+        ]
+      }
+    },
+    {
+      "id": "kp05-01",
+      "label": "同时筛选未知和非10",
+      "sql": "SELECT id,value FROM nullable_values WHERE value <> 10 OR value IS NULL ORDER BY value DESC;",
+      "result": {
+        "columns": [
+          "id",
+          "value"
+        ],
+        "rows": [
+          [
+            2,
+            0
+          ],
+          [
+            1,
+            null
+          ]
+        ]
+      }
+    },
+    {
+      "id": "kp05-01",
+      "label": "识别缺少客户编号的订单",
+      "sql": "SELECT id,customer_id FROM orders WHERE customer_id IS NULL ORDER BY order_date;",
+      "result": {
+        "columns": [
+          "id",
+          "customer_id"
+        ],
+        "rows": [
+          [
+            4,
+            null
+          ]
+        ]
+      }
+    },
+    {
+      "id": "kp05-02",
+      "label": "原有主示例",
+      "sql": "SELECT id, IFNULL(value, -1) AS filled, COALESCE(note, 'missing') AS note_filled FROM nullable_values ORDER BY filled DESC;",
+      "result": {
+        "columns": [
+          "id",
+          "filled",
+          "note_filled"
+        ],
+        "rows": [
+          [
+            3,
+            10,
+            "ok"
+          ],
+          [
+            4,
+            10,
+            "ok"
+          ],
+          [
+            2,
+            0,
+            ""
+          ],
+          [
+            1,
+            -1,
+            "missing"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "kp05-02",
+      "label": "将空文本按业务规则视作缺失",
+      "sql": "SELECT id, COALESCE(NULLIF(note, ''), 'missing') AS note_filled FROM nullable_values ORDER BY note_filled DESC;",
+      "result": {
+        "columns": [
+          "id",
+          "note_filled"
+        ],
+        "rows": [
+          [
+            3,
+            "ok"
+          ],
+          [
+            4,
+            "ok"
+          ],
+          [
+            1,
+            "missing"
+          ],
+          [
+            2,
+            "missing"
+          ]
+        ]
+      }
+    }
+  ],
+  "text": [
+    {
+      "id": "kp01-01",
+      "old": "按订单编号排序",
+      "new": "按销售额从高到低排序"
+    },
+    {
+      "id": "kp01-01",
+      "old": "ORDER BY id 指定编号升序，避免依赖数据库默认行序",
+      "new": "ORDER BY sales DESC 指定按销售额从高到低排列，避免依赖数据库默认行序"
+    },
+    {
+      "id": "kp02-01",
+      "old": "按编号排序",
+      "new": "按库存从多到少排序"
+    }
+  ]
+}

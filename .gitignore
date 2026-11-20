@@ -72,3 +72,9 @@ scripts/check-directed-revision.py
 *.apk
 *.log
 
+
+# 本地 ORDER BY 改写工具（不上传）
+scripts/order_by_lib.py
+scripts/qrun.mjs
+scripts/revise-order-by-*.py
+scripts/revise-question-order.py

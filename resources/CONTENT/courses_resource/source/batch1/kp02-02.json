@@ -100,8 +100,8 @@
       ]
     }
   ],
-  "mysqlSql": "SELECT DISTINCT store_id, category FROM orders ORDER BY store_id, category;",
-  "sqliteSql": "SELECT DISTINCT store_id, category FROM orders ORDER BY store_id, category;",
+  "mysqlSql": "SELECT DISTINCT store_id, category FROM orders ORDER BY category;",
+  "sqliteSql": "SELECT DISTINCT store_id, category FROM orders ORDER BY category;",
   "executionSteps": [
     "提取门店和类别",
     "合并重复组合",
@@ -136,16 +136,16 @@
     ],
     "rows": [
       [
+        2,
+        "化妆品"
+      ],
+      [
         1,
         "护肤品"
       ],
       [
         1,
         "日用品"
-      ],
-      [
-        2,
-        "化妆品"
       ]
     ],
     "status": "SQLite实际执行",

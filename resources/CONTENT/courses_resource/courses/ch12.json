@@ -11,32 +11,34 @@
     {
       "id": "kp12-01",
       "chapterId": "ch12",
-      "title": "数值计算、除法与舍入",
-      "learningObjective": "能够运用本节知识完成：展示金额和差异幅度",
+      "title": "数值计算、除法与精度处理",
+      "learningObjective": "区分舍入、绝对值、小数商、整数商和余数，并选择合理的金额精度。",
       "prerequisites": [
         "kp12-04"
       ],
-      "concept": "ROUND 在指定小数位舍入；ABS 返回绝对值。金额分析应优先精确十进制。",
-      "syntax": "ROUND(x,d); ABS(x)",
+      "concept": "舍入改变输出精度，绝对值去掉方向但保留幅度，两者都不是数据类型转换。计算比率时分子和分母决定业务意义；整数商用于完整单位数量，余数表示剩余量。MySQL 的 / 可保留小数，DIV 截去小数部分；SQLite 两个整数相除可能截断。金额通常使用精确十进制或整数分，先计算再按业务要求舍入。",
+      "syntax": "ROUND(x,d); ABS(x); a / b; a DIV b; MOD(a,b)",
       "parameters": {
-        "x": "数值",
-        "d": "小数位数"
+        "x": "待处理数值",
+        "d": "舍入位数",
+        "a,b": "被除数、除数"
       },
       "fixtureIds": [],
       "sourceTables": [],
       "mysqlSql": "SELECT ROUND(12.346,2) AS rounded, ABS(-25) AS magnitude;",
       "sqliteSql": "SELECT ROUND(12.346,2) AS rounded, ABS(-25) AS magnitude;",
       "executionSteps": [
-        "按两位小数舍入",
-        "计算负数绝对值"
+        "判断需要保留的精度",
+        "计算舍入与偏差幅度",
+        "按用途选择除法"
       ],
-      "useCase": "展示金额和差异幅度",
-      "comparison": "ABS 会丢失增减方向，差异报告应保留原符号。",
+      "useCase": "财务报表将12.346显示为两位小数，偏差-25另需显示幅度；包装业务有7件商品，每箱2件，区分平均箱数与完整箱数。",
+      "comparison": "ABS 与 ROUND 解决不同问题；整数商不等于四舍五入。",
       "commonError": {
-        "example": "ROUND(total,2) 后认为底层金额已经精确",
-        "correction": "使用 DECIMAL 或整数分并定义舍入点"
+        "example": "直接使用整数除法期待小数，或认为显示两位即已保证精确金额。",
+        "correction": "本地使用 1.0 提升类型；原生使用精确十进制，并明确舍入时点。"
       },
-      "notes": "本例不涉及浮点中点；MySQL 精确值和近似值的舍入行为有差异。",
+      "notes": "负数、浮点中点、溢出及精度规则需按引擎另测。",
       "compatibility": {
         "status": "直接兼容",
         "detail": "仅在本示例数据与语义范围验证；不代表全部 MySQL 语法兼容。"
@@ -92,32 +94,51 @@
         }
       ],
       "teaching": {
-        "problem": "金额报告要区分精度处理、方向和偏离幅度。",
-        "codeExplanation": "ROUND 调整结果精度，ABS 返回绝对大小。计算汇总和比率时通常先以原精度运算，最后舍入。MySQL 的 DIV 取截断后的整数商；需要小数时用 /，并用 NULLIF 防止除零。保留原精度直到最终展示。",
-        "resultExplanation": "12.346 显示为 12.35，-25 的幅度是 25。查超阈值时可按 ABS 筛选，并保留有正负方向的原差额。",
+        "problem": "财务报表将12.346显示为两位小数，偏差-25另需显示幅度；包装业务有7件商品，每箱2件，区分平均箱数与完整箱数。",
+        "codeExplanation": "ROUND(12.346,2) 保留两位；ABS(-25) 得25但不能判断超支还是节省。小数除法在本地通过7.0提升类型，完整箱数使用整数商，余数通过 % 计算。比率分母可能为零时使用 NULLIF，不能把无定义比率直接当零。",
+        "resultExplanation": "金额显示为12.35，偏差幅度25。7件可装3个完整箱，剩1件；3.5是数学商而非实际完整箱数。",
         "checkpoints": [],
         "mergedConcepts": [
           {
             "sourceId": "kp12-05",
-            "explanation": "计算单件成本应保留小数，拆箱只剩多少完整箱时则取整数商。MySQL 的 7 DIV 2 为 3，SQLite 两个整数相除也会截断，写 7.0 / 2 得 3.5；7 % 2 的余数是 1。"
+            "explanation": "保留原有小数除法、整数商和余数示例，以及零分母与精度区别。"
           }
         ],
         "mergeExamples": [
           {
-            "label": "七件两件一箱",
-            "explanation": "保留小数时是 3.5，实际只能装 3 个完整箱，余 1 件。这里用 CAST 截断得到整数商；MySQL 原生整数商也可以用 DIV。",
-            "sql": "SELECT 7.0 / 2 AS quotient, CAST(7.0 / 2 AS INTEGER) AS full_boxes,\n  7 % 2 AS spare_units;",
+            "label": "小数商、整数商与余数",
+            "explanation": "本例对应原生 7/2、7 DIV 2、MOD(7,2)。",
+            "sql": "SELECT 7.0/2 AS quotient, CAST(7/2 AS INTEGER) AS integer_part, 7%2 AS remainder;",
             "result": {
               "columns": [
                 "quotient",
-                "full_boxes",
-                "spare_units"
+                "integer_part",
+                "remainder"
               ],
               "rows": [
                 [
                   3.5,
                   3,
                   1
+                ]
+              ]
+            }
+          },
+          {
+            "label": "舍入时点与零分母",
+            "explanation": "逐笔舍入再汇总可能不同于汇总后舍入；零分母结果无定义。",
+            "sql": "SELECT ROUND(1.234+1.234,2) AS final_round, ROUND(1.234,2)+ROUND(1.234,2) AS early_round, 7.0/NULLIF(0,0) AS safe_ratio;",
+            "result": {
+              "columns": [
+                "final_round",
+                "early_round",
+                "safe_ratio"
+              ],
+              "rows": [
+                [
+                  2.47,
+                  2.46,
+                  null
                 ]
               ]
             }
@@ -129,15 +150,15 @@
       "id": "kp12-02",
       "chapterId": "ch12",
       "title": "日期格式、年份和月份",
-      "learningObjective": "能够运用本节知识完成：构建按月销售报表",
+      "learningObjective": "生成跨年不混淆的月份键，并区分文本日期标签与数值日期部分。",
       "prerequisites": [
         "kp12-01"
       ],
-      "concept": "DATE_FORMAT 用指定格式展示日期；YEAR 和 MONTH 提取数值年份与月份。",
+      "concept": "日期格式化产生用于展示或分组的文本键，年份与月份提取产生数值字段。相同月份编号可能来自不同年份，故跨年报表应使用年份与月份组合；派生日期字段本身不改变记录粒度，分组才改变粒度。",
       "syntax": "DATE_FORMAT(day,'%Y-%m'); YEAR(day); MONTH(day)",
       "parameters": {
         "day": "有效日期",
-        "%Y-%m": "四位年份和两位月份"
+        "%Y-%m": "四位年份、两位月份"
       },
       "fixtureIds": [
         "lesson-orders"
@@ -227,20 +248,20 @@
           ]
         }
       ],
-      "mysqlSql": "SELECT id, DATE_FORMAT(order_date,'%Y-%m') AS month, YEAR(order_date) AS year_no, MONTH(order_date) AS month_no FROM orders ORDER BY id;",
-      "sqliteSql": "SELECT id, strftime('%Y-%m',order_date) AS month, CAST(strftime('%Y',order_date) AS INTEGER) AS year_no, CAST(strftime('%m',order_date) AS INTEGER) AS month_no FROM orders ORDER BY id;",
+      "mysqlSql": "SELECT id, DATE_FORMAT(order_date,'%Y-%m') AS month, YEAR(order_date) AS year_no, MONTH(order_date) AS month_no FROM orders ORDER BY sales DESC;",
+      "sqliteSql": "SELECT id, strftime('%Y-%m',order_date) AS month, CAST(strftime('%Y',order_date) AS INTEGER) AS year_no, CAST(strftime('%m',order_date) AS INTEGER) AS month_no FROM orders ORDER BY sales DESC;",
       "executionSteps": [
-        "从日期提取年月",
-        "生成月份键",
-        "保持编号顺序"
+        "读取订单日期",
+        "派生年月键和日期部分",
+        "按需要汇总月份"
       ],
-      "useCase": "构建按月销售报表",
-      "comparison": "MONTH 单独分组会混合多个年份。",
+      "useCase": "分析员需生成月度销售报表；每笔订单归属其订单日期所在月份，不按付款日期或设备当前日期统计。",
+      "comparison": "格式化用于生成标签，日期区间用于筛选。",
       "commonError": {
-        "example": "GROUP BY MONTH(order_date) 处理跨年数据",
-        "correction": "GROUP BY DATE_FORMAT(order_date,'%Y-%m')"
+        "example": "只按 MONTH(order_date) 分组跨年交易。",
+        "correction": "同时使用年份和月份或完整年月键。"
       },
-      "notes": "SQLite strftime 格式与 MySQL 不完全相同；本例只转换指定格式。",
+      "notes": "原生与本地格式符并非完全等价；本例仅验证指定格式。",
       "compatibility": {
         "status": "转换执行",
         "detail": "需要明确转换或原生环境验证。"
@@ -267,13 +288,13 @@
         ],
         "rows": [
           [
-            1,
-            "2026-01",
+            5,
+            "2026-02",
             2026,
-            1
+            2
           ],
           [
-            2,
+            1,
             "2026-01",
             2026,
             1
@@ -285,13 +306,13 @@
             2
           ],
           [
-            4,
-            "2026-02",
+            2,
+            "2026-01",
             2026,
-            2
+            1
           ],
           [
-            5,
+            4,
             "2026-02",
             2026,
             2
@@ -310,44 +331,87 @@
         "fc0091"
       ],
       "teaching": {
-        "problem": "日期可以派生可排序的月份键、年份和月份编号。",
-        "codeExplanation": "DATE_FORMAT 生成含年份的月份文本，YEAR、MONTH 提取数值部分。跨年报表不能仅用 MONTH 分组。",
-        "resultExplanation": "一月订单形成同一个 2026-01 键，但各订单行仍独立。后续 GROUP BY 月键才形成月度汇总。",
+        "problem": "分析员需生成月度销售报表；每笔订单归属其订单日期所在月份，不按付款日期或设备当前日期统计。",
+        "codeExplanation": "原生 DATE_FORMAT 生成 YYYY-MM，YEAR 与 MONTH 取数值部分。本地 strftime 可生成对应文本，CAST 转为整数。先核对派生键，再用 GROUP BY 汇总金额；跨年不能只按月份编号。",
+        "resultExplanation": "五笔订单仍返回五行；一月两笔合计1200，二月三笔合计2400。",
         "checkpoints": [],
         "mergedConcepts": [],
-        "mergeExamples": []
+        "mergeExamples": [
+          {
+            "label": "按月汇总",
+            "explanation": "以完整年月键分组。",
+            "sql": "SELECT strftime('%Y-%m',order_date) AS month,SUM(sales) AS total FROM orders GROUP BY strftime('%Y-%m',order_date) ORDER BY month;",
+            "result": {
+              "columns": [
+                "month",
+                "total"
+              ],
+              "rows": [
+                [
+                  "2026-01",
+                  1200
+                ],
+                [
+                  "2026-02",
+                  2400
+                ]
+              ]
+            }
+          },
+          {
+            "label": "跨年月份对照",
+            "explanation": "两个一月具有相同月份数字，不是同一统计期间。",
+            "sql": "WITH d(t) AS (SELECT '2025-01-01' UNION ALL SELECT '2026-01-01') SELECT strftime('%Y-%m',t) AS month,CAST(strftime('%m',t) AS INTEGER) AS month_no FROM d ORDER BY month;",
+            "result": {
+              "columns": [
+                "month",
+                "month_no"
+              ],
+              "rows": [
+                [
+                  "2025-01",
+                  1
+                ],
+                [
+                  "2026-01",
+                  1
+                ]
+              ]
+            }
+          }
+        ]
       }
     },
     {
       "id": "kp12-03",
       "chapterId": "ch12",
-      "title": "DATEDIFF 与 TIMESTAMPDIFF",
-      "learningObjective": "能够运用本节知识完成：计算交付延误、账龄",
+      "title": "日期差与时间单位差",
+      "learningObjective": "正确选择日期差或完整经过单位，判断未到期与逾期。",
       "prerequisites": [
         "kp12-02"
       ],
-      "concept": "DATEDIFF(a,b) 计算日期部分之差；TIMESTAMPDIFF(unit,start,end) 按指定单位计算完整差值。",
+      "concept": "日期差忽略时分秒，比较日期部分；完整经过单位差则考虑时间部分并截取完整单位。两种函数参数方向不同。业务账龄应指定固定截止日，负值可表示未到期，不能一律取绝对值。",
       "syntax": "DATEDIFF(end_date,start_date); TIMESTAMPDIFF(DAY,start_date,end_date)",
       "parameters": {
-        "DAY": "差值单位",
-        "start_date,end_date": "起止日期"
+        "DAY": "完整天数单位",
+        "start_date,end_date": "起止值"
       },
       "fixtureIds": [],
       "sourceTables": [],
       "mysqlSql": "SELECT DATEDIFF('2026-02-03','2026-01-31') AS days, TIMESTAMPDIFF(DAY,'2026-01-31','2026-02-03') AS elapsed;",
       "sqliteSql": "SELECT CAST(julianday('2026-02-03')-julianday('2026-01-31') AS INTEGER) AS days, CAST(julianday('2026-02-03')-julianday('2026-01-31') AS INTEGER) AS elapsed;",
       "executionSteps": [
-        "固定两个日期",
-        "计算跨月天数",
-        "输出3"
+        "明确起止时间与统计口径",
+        "计算日期差或完整单位差",
+        "解释正负结果"
       ],
-      "useCase": "计算交付延误、账龄",
-      "comparison": "两个函数参数方向不同；月差不等于天数除30。",
+      "useCase": "应付账款核查以固定截止日计算经过天数。示例从2026年1月31日至2月3日，不包括起始日作为额外一天。",
+      "comparison": "日期差不是完整时间单位差。",
       "commonError": {
-        "example": "DATEDIFF(start_date,end_date) 期待正数",
-        "correction": "DATEDIFF(end_date,start_date)"
+        "example": "将起止日期顺序写反或用绝对值掩盖未到期。",
+        "correction": "按函数定义排列参数，保留方向。"
       },
-      "notes": "本例不含时刻；时区和月差须独立实现。",
+      "notes": "不将本地例推广为所有月份、时区及高精度时间戳的等价实现。",
       "compatibility": {
         "status": "转换执行",
         "detail": "需要明确转换或原生环境验证。"
@@ -391,27 +455,60 @@
         "fc0092"
       ],
       "teaching": {
-        "problem": "计算经过的天数要先明确参数顺序和是否考虑完整时间单位。",
-        "codeExplanation": "DATEDIFF(结束,开始) 比较日期，TIMESTAMPDIFF(单位,开始,结束) 按单位计算完整经过值，参数顺序不同。",
-        "resultExplanation": "从 1 月 31 日到 2 月 3 日经过 3 天。计算账龄时先确定截止日，保留负值来区分未到期。",
+        "problem": "应付账款核查以固定截止日计算经过天数。示例从2026年1月31日至2月3日，不包括起始日作为额外一天。",
+        "codeExplanation": "DATEDIFF 的结束日期在前；TIMESTAMPDIFF 的开始时间在前。当地兼容查询使用 julianday 差值；有时分秒的日期差先 date()，完整小时差需注意浮点误差，本例用整秒差除以3600。",
+        "resultExplanation": "两种计算在纯日期例中均为3天；跨午夜两分钟的日期差为1，完整小时差为0。",
         "checkpoints": [],
         "mergedConcepts": [],
-        "mergeExamples": []
+        "mergeExamples": [
+          {
+            "label": "跨午夜比较",
+            "explanation": "日期跨一天，实际仅经过两分钟。",
+            "sql": "SELECT CAST(julianday(date('2026-02-03 00:01:00'))-julianday(date('2026-02-02 23:59:00')) AS INTEGER) AS date_days,CAST((CAST(strftime('%s','2026-02-03 00:01:00') AS INTEGER)-CAST(strftime('%s','2026-02-02 23:59:00') AS INTEGER))/3600 AS INTEGER) AS full_hours;",
+            "result": {
+              "columns": [
+                "date_days",
+                "full_hours"
+              ],
+              "rows": [
+                [
+                  1,
+                  0
+                ]
+              ]
+            }
+          },
+          {
+            "label": "保留未到期方向",
+            "explanation": "截止日在到期日之前，差值为负。",
+            "sql": "SELECT CAST(julianday('2026-02-03')-julianday('2026-02-05') AS INTEGER) AS overdue_days;",
+            "result": {
+              "columns": [
+                "overdue_days"
+              ],
+              "rows": [
+                [
+                  -2
+                ]
+              ]
+            }
+          }
+        ]
       }
     },
     {
       "id": "kp12-04",
       "chapterId": "ch12",
       "title": "日期区间与月边界",
-      "learningObjective": "能够运用本节知识完成：按月统计销售额",
+      "learningObjective": "用左闭右开区间建立完整且不重叠的月报。",
       "prerequisites": [
         "kp12-03"
       ],
-      "concept": "半开区间包含开始日期但不包含下一个月首日，适用于日期与时间戳。",
+      "concept": "半开区间含起点、不含终点。月报终点用下一月第一天，而不是当月最后一天午夜，可覆盖最后一天任意时刻。相邻区间无重叠，也无需猜测数据精度。保持日期字段裸列比较通常有利于索引范围检索，但实际性能由执行计划决定。",
       "syntax": "WHERE day >= start AND day < next_start",
       "parameters": {
-        "start": "统计起点",
-        "next_start": "排除的上界"
+        "start": "包含的开始边界",
+        "next_start": "排除的结束边界"
       },
       "fixtureIds": [
         "lesson-orders"
@@ -504,17 +601,17 @@
       "mysqlSql": "SELECT SUM(sales) AS feb_sales FROM orders WHERE order_date >= '2026-02-01' AND order_date < '2026-03-01';",
       "sqliteSql": "SELECT SUM(sales) AS feb_sales FROM orders WHERE order_date >= '2026-02-01' AND order_date < '2026-03-01';",
       "executionSteps": [
-        "保留2月订单",
-        "排除1月和3月",
-        "汇总600+300+1500"
+        "确定二月月初及三月月初",
+        "筛选区间内订单",
+        "汇总销售额"
       ],
-      "useCase": "按月统计销售额",
-      "comparison": "BETWEEN 两端都包含；时间戳最后一天可能因时分秒被遗漏。",
+      "useCase": "统计2026年2月订单销售额；按订单日期归属，忽略一月及三月记录，不排除匿名订单。",
+      "comparison": "月键生成不等于日期范围筛选。",
       "commonError": {
-        "example": "WHERE order_date <= '2026-02-28'",
-        "correction": "WHERE order_date < '2026-03-01' AND order_date >= '2026-02-01'"
+        "example": "使用 <= 当月最后一天的日期字符串筛选含时分秒的数据。",
+        "correction": "改用 < 下一月第一天。"
       },
-      "notes": "固定统计窗口，不能依赖设备当前日期；比率使用 NULLIF 避免零分母。",
+      "notes": "时区及日期类型需与项目实际口径一致。",
       "compatibility": {
         "status": "直接兼容",
         "detail": "仅在本示例数据与语义范围验证；不代表全部 MySQL 语法兼容。"
@@ -552,12 +649,53 @@
         "fc0095"
       ],
       "teaching": {
-        "problem": "按月筛有时分秒的记录时，用下一月月初做独立上界。",
-        "codeExplanation": "半开区间含二月月初且不含三月月初，不依赖时间字段的小数秒精度，也无需给索引列包一层函数。",
-        "resultExplanation": "二月三笔合计 2400。用同样规则建立连续、不重叠的月报或季度报表。",
+        "problem": "统计2026年2月订单销售额；按订单日期归属，忽略一月及三月记录，不排除匿名订单。",
+        "codeExplanation": "两个条件用 AND 连接。第一个保留月初及之后，第二个排除下月月初及之后。先查看筛选明细再求和；本地 ISO 日期文本适合本示例的字典序比较。",
+        "resultExplanation": "二月订单3、4、5的金额600、300、1500合计2400。无交易月份的 SUM 可能返回 NULL，是否填零取决于业务。",
         "checkpoints": [],
         "mergedConcepts": [],
-        "mergeExamples": []
+        "mergeExamples": [
+          {
+            "label": "查看筛选明细",
+            "explanation": "确认三笔交易后再汇总。",
+            "sql": "SELECT id,sales FROM orders WHERE order_date >= '2026-02-01' AND order_date < '2026-03-01' ORDER BY sales DESC;",
+            "result": {
+              "columns": [
+                "id",
+                "sales"
+              ],
+              "rows": [
+                [
+                  5,
+                  1500
+                ],
+                [
+                  3,
+                  600
+                ],
+                [
+                  4,
+                  300
+                ]
+              ]
+            }
+          },
+          {
+            "label": "验证时间边界",
+            "explanation": "最后一天交易必须保留，下一月零时必须排除。",
+            "sql": "WITH d(t) AS (SELECT '2026-02-28 23:59:59' UNION ALL SELECT '2026-03-01 00:00:00') SELECT t FROM d WHERE t >= '2026-02-01' AND t < '2026-03-01' ORDER BY t;",
+            "result": {
+              "columns": [
+                "t"
+              ],
+              "rows": [
+                [
+                  "2026-02-28 23:59:59"
+                ]
+              ]
+            }
+          }
+        ]
       }
     }
   ],

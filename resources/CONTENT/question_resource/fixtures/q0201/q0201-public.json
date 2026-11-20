@@ -94,6 +94,16 @@
     ],
     "rows": [
       [
+        4,
+        65,
+        10
+      ],
+      [
+        5,
+        45,
+        -10
+      ],
+      [
         1,
         15,
         -31.33
@@ -109,23 +119,13 @@
         -11.33
       ],
       [
-        4,
-        65,
-        10.0
-      ],
-      [
-        5,
-        45,
-        -10.0
-      ],
-      [
         6,
         15,
-        0.0
+        0
       ]
     ]
   },
-  "orderPolicy": "ordered",
+  "orderPolicy": "unordered_multiset",
   "columnPolicy": "exact_names_in_order",
   "numericTolerance": {
     "absolute": 1e-06,

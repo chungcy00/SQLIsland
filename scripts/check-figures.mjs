@@ -27,6 +27,14 @@ try {
             const key = result.columns.indexOf(figure.keyColumn);
             out.push({id: `${figure.id}:step${index + 1}`, expected: [...step.keptKeys].sort((a, b) => a - b), actual: result.rows.map(r => r[key]).sort((a, b) => a - b)});
           }
+        } else if (figure.kind === 'stage-flow') {
+          const norm = rows => rows.map(r => JSON.stringify(r)).sort();
+          for (const [index, step] of figure.steps.entries()) {
+            if (step.skip) continue;
+            const result = await run({tables, setupSql, sql: step.sql});
+            out.push({id: `${figure.id}:step${index + 1}:columns`, expected: step.columns, actual: result.columns});
+            out.push({id: `${figure.id}:step${index + 1}:rows`, expected: norm(step.rows), actual: norm(result.rows)});
+          }
         } else if (figure.kind === 'clause-map') {
           const result = await run({tables, setupSql, sql: figure.sql});
           out.push({id: figure.id, expected: lesson.result.rows, actual: result.rows});

@@ -1,0 +1,141 @@
+{
+  "schemaVersion": 1,
+  "id": "kp01-03",
+  "lessonSha256": "d76d1b160cef8dbafa23ed2bc1c34d32ba22e26e03689c15e145b31d32f40d21",
+  "figures": [
+    {
+      "id": "kp01-03-clauses",
+      "slot": "syntax",
+      "kind": "clause-map",
+      "title": "示例查询的几个部分",
+      "sql": "SELECT c.customer_id, COUNT(o.id) AS order_count FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id GROUP BY c.customer_id ORDER BY order_count DESC, SUM(o.sales) DESC;",
+      "parts": [
+        {
+          "role": "select",
+          "label": "取数",
+          "sql": "SELECT c.customer_id, COUNT(o.id) AS order_count",
+          "note": "输出客户编号和订单数（COUNT(o.id) 不统计 NULL）"
+        },
+        {
+          "role": "from",
+          "label": "来源",
+          "sql": "FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id",
+          "note": "以 customers 为主表左连接 orders，没有订单的客户也保留"
+        },
+        {
+          "role": "group",
+          "label": "分组",
+          "sql": "GROUP BY c.customer_id",
+          "note": "每位客户汇总成一行"
+        },
+        {
+          "role": "order",
+          "label": "排序",
+          "sql": "ORDER BY order_count DESC, SUM(o.sales) DESC;",
+          "note": "按客户编号排列"
+        }
+      ]
+    },
+    {
+      "id": "kp01-03-flow",
+      "slot": "breakdown",
+      "kind": "stage-flow",
+      "merge": "breakdown",
+      "title": "每一步的数据变化",
+      "steps": [
+        {
+          "label": "FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id",
+          "sql": "SELECT c.customer_id, c.customer_name, o.id AS order_id FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id",
+          "columns": [
+            "customer_id",
+            "customer_name",
+            "order_id"
+          ],
+          "rows": [
+            [
+              1,
+              "林",
+              1
+            ],
+            [
+              1,
+              "林",
+              3
+            ],
+            [
+              2,
+              "陈",
+              2
+            ],
+            [
+              3,
+              "王",
+              5
+            ],
+            [
+              4,
+              "李",
+              null
+            ]
+          ]
+        },
+        {
+          "label": "SELECT c.customer_id, COUNT(o.id) AS order_count",
+          "skip": true
+        },
+        {
+          "label": "GROUP BY c.customer_id",
+          "sql": "SELECT c.customer_id, COUNT(o.id) AS order_count FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id GROUP BY c.customer_id",
+          "columns": [
+            "customer_id",
+            "order_count"
+          ],
+          "rows": [
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              4,
+              0
+            ]
+          ]
+        },
+        {
+          "label": "ORDER BY order_count DESC, SUM(o.sales) DESC;",
+          "sql": "SELECT c.customer_id, COUNT(o.id) AS order_count FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id GROUP BY c.customer_id ORDER BY order_count DESC, SUM(o.sales) DESC;",
+          "columns": [
+            "customer_id",
+            "order_count"
+          ],
+          "rows": [
+            [
+              1,
+              2
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              4,
+              0
+            ]
+          ]
+        }
+      ]
+    }
+  ]
+}

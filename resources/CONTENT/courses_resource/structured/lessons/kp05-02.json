@@ -107,15 +107,15 @@
     },
     {
       "kind": "fragment",
-      "title": "保留顺序与标识",
-      "sql": "ORDER BY id;",
-      "purpose": "按记录编号显示。",
+      "title": "按替换后的数值排列",
+      "sql": "ORDER BY filled DESC;",
+      "purpose": "按替换后的数值从大到小显示。",
       "reason": "便于把输出的替代标记与原始行核对。"
     }
   ],
   "completeCode": {
-    "mysqlSql": "SELECT id, IFNULL(value, -1) AS filled, COALESCE(note, 'missing') AS note_filled FROM nullable_values ORDER BY id;",
-    "sqliteSql": "SELECT id, IFNULL(value, -1) AS filled, COALESCE(note, 'missing') AS note_filled FROM nullable_values ORDER BY id;"
+    "mysqlSql": "SELECT id, IFNULL(value, -1) AS filled, COALESCE(note, 'missing') AS note_filled FROM nullable_values ORDER BY filled DESC;",
+    "sqliteSql": "SELECT id, IFNULL(value, -1) AS filled, COALESCE(note, 'missing') AS note_filled FROM nullable_values ORDER BY filled DESC;"
   },
   "expectedResult": {
     "columns": [
@@ -125,16 +125,6 @@
     ],
     "rows": [
       [
-        1,
-        -1,
-        "missing"
-      ],
-      [
-        2,
-        0,
-        ""
-      ],
-      [
         3,
         10,
         "ok"
@@ -143,6 +133,16 @@
         4,
         10,
         "ok"
+      ],
+      [
+        2,
+        0,
+        ""
+      ],
+      [
+        1,
+        -1,
+        "missing"
       ]
     ],
     "status": "SQLite实际执行",
@@ -158,7 +158,7 @@
     {
       "label": "将空文本按业务规则视作缺失",
       "explanation": "仅当业务确认空文本无有效含义时使用；编号2也显示缺失标记。",
-      "sql": "SELECT id, COALESCE(NULLIF(note, ''), 'missing') AS note_filled FROM nullable_values ORDER BY id;",
+      "sql": "SELECT id, COALESCE(NULLIF(note, ''), 'missing') AS note_filled FROM nullable_values ORDER BY note_filled DESC;",
       "result": {
         "columns": [
           "id",
@@ -166,20 +166,20 @@
         ],
         "rows": [
           [
-            1,
-            "missing"
-          ],
-          [
-            2,
-            "missing"
-          ],
-          [
             3,
             "ok"
           ],
           [
             4,
             "ok"
+          ],
+          [
+            1,
+            "missing"
+          ],
+          [
+            2,
+            "missing"
           ]
         ]
       },
@@ -232,5 +232,5 @@
     ]
   },
   "sourcePath": "source/batch1/kp05-02.json",
-  "sourceSha256": "0fba905e7fb6488d33930d172000c48243ac8ac54155bbba8392a50bbf49c93e"
+  "sourceSha256": "375bee74c10229a397214aaeb10278379884195d84c9b8bced90d952fb7b59fb"
 }

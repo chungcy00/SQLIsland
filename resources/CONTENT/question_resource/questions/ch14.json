@@ -594,14 +594,14 @@
       "type": "代码填空",
       "title": "高价值客户与其订单明细",
       "context": "使用课程中小型订单数据练习高价值客户与其订单明细。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "补全代码中的一个空位，使完整SQL满足以下要求。可输入具有相同语义的片段，提交后按完整代码执行结果核对。\n先找总销售额>=1000的已知客户，再返回其全部订单 id、customer_id、sales，按订单编号升序。\n输出列名称及顺序：id, customer_id, sales。按题设排序；参考排序键：o.id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "requirements": "补全代码中的一个空位，使完整SQL满足以下要求。可输入具有相同语义的片段，提交后按完整代码执行结果核对。\n先找总销售额>=1000的已知客户，再返回其全部订单 id、customer_id、sales，按 customer_id 升序、sales 降序。\n输出列名称及顺序：id, customer_id, sales。按题设排序；参考排序键：o.customer_id, o.sales DESC。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
       "datasetId": "q0192-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
       "sourceTables": [
         "orders"
       ],
-      "initialCode": "WITH a AS (SELECT customer_id FROM orders WHERE customer_id IS NOT NULL GROUP BY customer_id {{blank1}}) SELECT o.id,o.customer_id,o.sales FROM orders o JOIN a ON a.customer_id=o.customer_id ORDER BY o.id",
+      "initialCode": "WITH a AS (SELECT customer_id FROM orders WHERE customer_id IS NOT NULL GROUP BY customer_id {{blank1}}) SELECT o.id,o.customer_id,o.sales FROM orders o JOIN a ON a.customer_id=o.customer_id ORDER BY o.customer_id, o.sales DESC",
       "options": [],
       "acceptedBlanks": [
         {
@@ -641,13 +641,13 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "WITH a AS (SELECT customer_id FROM orders WHERE customer_id IS NOT NULL GROUP BY customer_id HAVING SUM(sales)>=1000) SELECT o.id,o.customer_id,o.sales FROM orders o JOIN a ON a.customer_id=o.customer_id ORDER BY o.id",
-          "sqliteSql": "WITH a AS (SELECT customer_id FROM orders WHERE customer_id IS NOT NULL GROUP BY customer_id HAVING SUM(sales)>=1000) SELECT o.id,o.customer_id,o.sales FROM orders o JOIN a ON a.customer_id=o.customer_id ORDER BY o.id"
+          "mysqlSql": "WITH a AS (SELECT customer_id FROM orders WHERE customer_id IS NOT NULL GROUP BY customer_id HAVING SUM(sales)>=1000) SELECT o.id,o.customer_id,o.sales FROM orders o JOIN a ON a.customer_id=o.customer_id ORDER BY o.customer_id, o.sales DESC",
+          "sqliteSql": "WITH a AS (SELECT customer_id FROM orders WHERE customer_id IS NOT NULL GROUP BY customer_id HAVING SUM(sales)>=1000) SELECT o.id,o.customer_id,o.sales FROM orders o JOIN a ON a.customer_id=o.customer_id ORDER BY o.customer_id, o.sales DESC"
         },
         {
           "kind": "语法等价",
-          "mysqlSql": "WITH a AS (SELECT ALL customer_id FROM orders WHERE customer_id IS NOT NULL GROUP BY customer_id HAVING SUM(sales)>=1000) SELECT o.id,o.customer_id,o.sales FROM orders o JOIN a ON a.customer_id=o.customer_id ORDER BY o.id",
-          "sqliteSql": "WITH a AS (SELECT ALL customer_id FROM orders WHERE customer_id IS NOT NULL GROUP BY customer_id HAVING SUM(sales)>=1000) SELECT o.id,o.customer_id,o.sales FROM orders o JOIN a ON a.customer_id=o.customer_id ORDER BY o.id",
+          "mysqlSql": "WITH a AS (SELECT ALL customer_id FROM orders WHERE customer_id IS NOT NULL GROUP BY customer_id HAVING SUM(sales)>=1000) SELECT o.id,o.customer_id,o.sales FROM orders o JOIN a ON a.customer_id=o.customer_id ORDER BY o.customer_id, o.sales DESC",
+          "sqliteSql": "WITH a AS (SELECT ALL customer_id FROM orders WHERE customer_id IS NOT NULL GROUP BY customer_id HAVING SUM(sales)>=1000) SELECT o.id,o.customer_id,o.sales FROM orders o JOIN a ON a.customer_id=o.customer_id ORDER BY o.customer_id, o.sales DESC",
           "explanation": "普通 SELECT 默认保留重复记录，显式 ALL 不改变结果。"
         }
       ],
@@ -659,7 +659,7 @@
       "explanation": "高价值按累计销售定义，不是任一单达到门槛。\n执行思路：确认orders的输入记录；先明确公用表表达式的中间数据及其粒度；按题设连接条件匹配数据，注意连接造成的行数变化；按筛选条件保留符合要求的记录，并考虑空值；按指定键分组后计算聚合值；对分组后的计算结果筛选；输出id、customer_id、sales列；遵循题设排序和并列规则。\n公开夹具实际返回 3 行、3 列；完整结果见 expectedOutput。\n另一种可用写法：普通 SELECT 默认保留重复记录，显式 ALL 不改变结果。",
       "commonErrors": [
         {
-          "sql": "WITH a AS (SELECT customer_id FROM orders WHERE customer_id IS NOT NULL GROUP BY customer_id HAVING MAX(sales)>=1000) SELECT o.id,o.customer_id,o.sales FROM orders o JOIN a ON a.customer_id=o.customer_id ORDER BY o.id",
+          "sql": "WITH a AS (SELECT customer_id FROM orders WHERE customer_id IS NOT NULL GROUP BY customer_id HAVING MAX(sales)>=1000) SELECT o.id,o.customer_id,o.sales FROM orders o JOIN a ON a.customer_id=o.customer_id ORDER BY o.customer_id, o.sales DESC",
           "reason": "高价值按累计销售定义，不是任一单达到门槛。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
@@ -682,7 +682,7 @@
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0192/q0192-boundary.json",
-          "sha256": "eb6bb469ebfe7de78488242d3e3edca788486cc0e6a76f970490c3005aa56209"
+          "sha256": "c4673d62f8d4ba51e792dd38c3e1a9282badb05e2170ee085207b4168b23dabf"
         },
         {
           "id": "q0192-empty",
@@ -739,19 +739,19 @@
             "reference": {
               "ran": true,
               "match": true,
-              "resultHash": "5fd448b18b8dfe86d51e12fef3b85662b6afd1c3f4098d1f381396009cde0c9a",
+              "resultHash": "443221460e4c28149c5ef91d43ed386216049c9879311fe1f79d098696dde47b",
               "rowCount": 7
             },
             "equivalent": {
               "ran": true,
               "match": true,
-              "resultHash": "5fd448b18b8dfe86d51e12fef3b85662b6afd1c3f4098d1f381396009cde0c9a",
+              "resultHash": "443221460e4c28149c5ef91d43ed386216049c9879311fe1f79d098696dde47b",
               "rows": 7
             },
             "wrong": {
               "ran": true,
               "match": false,
-              "resultHash": "8f5d980f2437e7e6240bc3d4421a56f63fb7cfc28dc32794a04565a3af1d506a",
+              "resultHash": "c7b24c4396ec7ed32b9e097b03fa1684ac533ac6956dbb1fea77aaf207355846",
               "rows": 2
             }
           },
@@ -983,7 +983,7 @@
       "type": "独立编写",
       "title": "两期销售额相差的门店",
       "context": "使用课程中小型订单、门店数据练习两期销售额相差的门店。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "先汇总各门店一月及二月销售额，再对所有 stores 返回 store_id、delta（2月减1月，无月份视0），按编号升序。\n输出列名称及顺序：store_id, delta。按题设排序；参考排序键：s.store_id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "requirements": "先汇总各门店一月及二月销售额，再对所有 stores 返回 store_id、delta（2月减1月，无月份视0），按 delta 降序。\n输出列名称及顺序：store_id, delta。按题设排序；参考排序键：delta DESC。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
       "datasetId": "q0195-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -1006,12 +1006,12 @@
             1300
           ],
           [
-            2,
-            -100
-          ],
-          [
             3,
             0
+          ],
+          [
+            2,
+            -100
           ]
         ],
         "rowCount": 3
@@ -1019,25 +1019,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "WITH a AS (SELECT store_id,SUM(sales) AS jan FROM orders WHERE SUBSTR(order_date,1,7)='2026-01' GROUP BY store_id),b AS (SELECT store_id,SUM(sales) AS feb FROM orders WHERE SUBSTR(order_date,1,7)='2026-02' GROUP BY store_id) SELECT s.store_id,COALESCE(b.feb,0)-COALESCE(a.jan,0) AS delta FROM stores s LEFT JOIN a ON a.store_id=s.store_id LEFT JOIN b ON b.store_id=s.store_id ORDER BY s.store_id",
-          "sqliteSql": "WITH a AS (SELECT store_id,SUM(sales) AS jan FROM orders WHERE SUBSTR(order_date,1,7)='2026-01' GROUP BY store_id),b AS (SELECT store_id,SUM(sales) AS feb FROM orders WHERE SUBSTR(order_date,1,7)='2026-02' GROUP BY store_id) SELECT s.store_id,COALESCE(b.feb,0)-COALESCE(a.jan,0) AS delta FROM stores s LEFT JOIN a ON a.store_id=s.store_id LEFT JOIN b ON b.store_id=s.store_id ORDER BY s.store_id"
+          "mysqlSql": "WITH a AS (SELECT store_id,SUM(sales) AS jan FROM orders WHERE SUBSTR(order_date,1,7)='2026-01' GROUP BY store_id),b AS (SELECT store_id,SUM(sales) AS feb FROM orders WHERE SUBSTR(order_date,1,7)='2026-02' GROUP BY store_id) SELECT s.store_id,COALESCE(b.feb,0)-COALESCE(a.jan,0) AS delta FROM stores s LEFT JOIN a ON a.store_id=s.store_id LEFT JOIN b ON b.store_id=s.store_id ORDER BY delta DESC",
+          "sqliteSql": "WITH a AS (SELECT store_id,SUM(sales) AS jan FROM orders WHERE SUBSTR(order_date,1,7)='2026-01' GROUP BY store_id),b AS (SELECT store_id,SUM(sales) AS feb FROM orders WHERE SUBSTR(order_date,1,7)='2026-02' GROUP BY store_id) SELECT s.store_id,COALESCE(b.feb,0)-COALESCE(a.jan,0) AS delta FROM stores s LEFT JOIN a ON a.store_id=s.store_id LEFT JOIN b ON b.store_id=s.store_id ORDER BY delta DESC"
         },
         {
           "kind": "语法等价",
-          "mysqlSql": "WITH a AS (SELECT store_id,SUM(sales) AS jan FROM orders WHERE SUBSTR(order_date,1,7)='2026-01' GROUP BY store_id),b AS (SELECT store_id,SUM(sales) AS feb FROM orders WHERE SUBSTR(order_date,1,7)='2026-02' GROUP BY store_id) SELECT s.store_id,COALESCE(b.feb,0)-COALESCE(a.jan,0) AS delta FROM stores s LEFT OUTER JOIN a ON a.store_id=s.store_id LEFT JOIN b ON b.store_id=s.store_id ORDER BY s.store_id",
-          "sqliteSql": "WITH a AS (SELECT store_id,SUM(sales) AS jan FROM orders WHERE SUBSTR(order_date,1,7)='2026-01' GROUP BY store_id),b AS (SELECT store_id,SUM(sales) AS feb FROM orders WHERE SUBSTR(order_date,1,7)='2026-02' GROUP BY store_id) SELECT s.store_id,COALESCE(b.feb,0)-COALESCE(a.jan,0) AS delta FROM stores s LEFT OUTER JOIN a ON a.store_id=s.store_id LEFT JOIN b ON b.store_id=s.store_id ORDER BY s.store_id",
+          "mysqlSql": "WITH a AS (SELECT store_id,SUM(sales) AS jan FROM orders WHERE SUBSTR(order_date,1,7)='2026-01' GROUP BY store_id),b AS (SELECT store_id,SUM(sales) AS feb FROM orders WHERE SUBSTR(order_date,1,7)='2026-02' GROUP BY store_id) SELECT s.store_id,COALESCE(b.feb,0)-COALESCE(a.jan,0) AS delta FROM stores s LEFT OUTER JOIN a ON a.store_id=s.store_id LEFT JOIN b ON b.store_id=s.store_id ORDER BY delta DESC",
+          "sqliteSql": "WITH a AS (SELECT store_id,SUM(sales) AS jan FROM orders WHERE SUBSTR(order_date,1,7)='2026-01' GROUP BY store_id),b AS (SELECT store_id,SUM(sales) AS feb FROM orders WHERE SUBSTR(order_date,1,7)='2026-02' GROUP BY store_id) SELECT s.store_id,COALESCE(b.feb,0)-COALESCE(a.jan,0) AS delta FROM stores s LEFT OUTER JOIN a ON a.store_id=s.store_id LEFT JOIN b ON b.store_id=s.store_id ORDER BY delta DESC",
           "explanation": "省略或写出 OUTER 不改变左连接。"
         }
       ],
       "hints": [
         "将要求拆成可独立核对的中间集合，并为递归确定起点与终点。",
         "结合《WITH 与多个 CTE》：公用表表达式为当前语句中的具名查询结果，可在后续查询引用；多表达式用逗号连接。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nWITH a AS (SELECT store_id,SUM(sales) AS jan FROM orders WHERE SUBSTR(order_date,1,7)='2026-01' GROUP BY store_id),b AS (SELECT store_id,SUM(sales) AS feb FROM orders WHERE SUBSTR(order_date,1,7)='2026-02' GROUP BY store_id) SELECT s.store_id,COALESCE(b.feb,0)-COALESCE(a.jan,0) AS delta FROM stores s □□□ ON a.store_id=s.store_id LEFT JOIN b ON b.store_id=s.store_id ORDER BY s.store_id"
+        "关注这个局部结构（空缺部分仍需自行完成）：\nWITH a AS (SELECT store_id,SUM(sales) AS jan FROM orders WHERE SUBSTR(order_date,1,7)='2026-01' GROUP BY store_id),b AS (SELECT store_id,SUM(sales) AS feb FROM orders WHERE SUBSTR(order_date,1,7)='2026-02' GROUP BY store_id) SELECT s.store_id,COALESCE(b.feb,0)-COALESCE(a.jan,0) AS delta FROM stores s □□□ ON a.store_id=s.store_id LEFT JOIN b ON b.store_id=s.store_id ORDER BY delta DESC"
       ],
       "explanation": "以完整门店为骨架，两个独立月份汇总才能保留零业务门店。\n执行思路：确认orders、stores的输入记录；先明确公用表表达式的中间数据及其粒度；按题设连接条件匹配数据，注意连接造成的行数变化；按筛选条件保留符合要求的记录，并考虑空值；按指定键分组后计算聚合值；输出store_id、delta列；遵循题设排序和并列规则。\n公开夹具实际返回 3 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：省略或写出 OUTER 不改变左连接。",
       "commonErrors": [
         {
-          "sql": "WITH a AS (SELECT store_id,SUM(sales) AS jan FROM orders WHERE SUBSTR(order_date,1,7)='2026-01' GROUP BY store_id),b AS (SELECT store_id,SUM(sales) AS feb FROM orders WHERE SUBSTR(order_date,1,7)='2026-02' GROUP BY store_id) SELECT s.store_id,COALESCE(b.feb,0)-COALESCE(a.jan,0) AS delta FROM stores s JOIN a ON a.store_id=s.store_id LEFT JOIN b ON b.store_id=s.store_id ORDER BY s.store_id",
+          "sql": "WITH a AS (SELECT store_id,SUM(sales) AS jan FROM orders WHERE SUBSTR(order_date,1,7)='2026-01' GROUP BY store_id),b AS (SELECT store_id,SUM(sales) AS feb FROM orders WHERE SUBSTR(order_date,1,7)='2026-02' GROUP BY store_id) SELECT s.store_id,COALESCE(b.feb,0)-COALESCE(a.jan,0) AS delta FROM stores s JOIN a ON a.store_id=s.store_id LEFT JOIN b ON b.store_id=s.store_id ORDER BY delta DESC",
           "reason": "以完整门店为骨架，两个独立月份汇总才能保留零业务门店。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
@@ -1053,14 +1053,14 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0195/q0195-public.json",
-          "sha256": "a3c071a6c9c718cabe97544bb1912f2e58dc1d88cd8e3bcd12fda0e04f6c554f"
+          "sha256": "901fb11581a5d55d9c5cabc93fea927b35d336e2dabe39597092e0f02976f6e8"
         },
         {
           "id": "q0195-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0195/q0195-boundary.json",
-          "sha256": "d96b0fb5d4b5f54b2b75800e3db09056a956c5c4f3337a658e76d63c8ad79340"
+          "sha256": "4a6bd768a09fa91f018214066aee4d4d40de51e5953bc751b79f5218f471516e"
         },
         {
           "id": "q0195-empty",
@@ -1096,13 +1096,13 @@
             "reference": {
               "ran": true,
               "match": true,
-              "resultHash": "c76bc9b236a0c6fc47ae7431f18fc40d9df88141eefadb5f6c9c617f695b458d",
+              "resultHash": "4f31b04fc46232e18a323e81a8314fbbde6ae135d2318246db4def1e8c4f43b5",
               "rowCount": 3
             },
             "equivalent": {
               "ran": true,
               "match": true,
-              "resultHash": "c76bc9b236a0c6fc47ae7431f18fc40d9df88141eefadb5f6c9c617f695b458d",
+              "resultHash": "4f31b04fc46232e18a323e81a8314fbbde6ae135d2318246db4def1e8c4f43b5",
               "rows": 3
             },
             "wrong": {
@@ -1117,19 +1117,19 @@
             "reference": {
               "ran": true,
               "match": true,
-              "resultHash": "3599eea703910110a7e76bd1178c93b186c6eb2542c906e61c3410bdb2bde63d",
+              "resultHash": "d82a94547a1b4cf940b4f7af7294fd6d6694aeb14a48f8985e057217e51ac208",
               "rowCount": 5
             },
             "equivalent": {
               "ran": true,
               "match": true,
-              "resultHash": "3599eea703910110a7e76bd1178c93b186c6eb2542c906e61c3410bdb2bde63d",
+              "resultHash": "d82a94547a1b4cf940b4f7af7294fd6d6694aeb14a48f8985e057217e51ac208",
               "rows": 5
             },
             "wrong": {
               "ran": true,
               "match": false,
-              "resultHash": "9552458c7e2575e9832268535231fe3af3907cdbaec5a41b37e5a1950f815f41",
+              "resultHash": "6d9831cae3520ca408bfa358470b02204260edcc6ad99f52aec58d31ef523409",
               "rows": 2
             }
           },

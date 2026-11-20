@@ -9,7 +9,7 @@
       "projectId": "retail",
       "title": "门店净销售、利润与目标达成",
       "context": "区域经理需要2025年门店经营表。",
-      "requirements": "每门店一行；有效线下订单，按原订单日期归属截至年底退货；毛利=净销售-退货冲减后成本；毛利率和目标达成率使用百分比，分母为0返回NULL；金额单位分。保留无销售门店。\n输出字段名称及顺序：store_id, net_cents, gross_cents, margin_pct, target_cents, achievement_pct。输出顺序（含决胜键）：s.store_id。金额单位为马币分；派生金额及比率按题设保留小数，零分母为NULL。",
+      "requirements": "每门店一行；有效线下订单，按原订单日期归属截至年底退货；毛利=净销售-退货冲减后成本；毛利率和目标达成率使用百分比，分母为0返回NULL；金额单位分。保留无销售门店。\n输出字段名称及顺序：store_id, net_cents, gross_cents, margin_pct, target_cents, achievement_pct。输出顺序：net_cents DESC。金额单位为马币分；派生金额及比率按题设保留小数，零分母为NULL。",
       "grain": "门店",
       "commonError": "直接连接月目标与订单明细会重复累计目标。",
       "executionSteps": [
@@ -79,13 +79,13 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "WITH a AS (SELECT store_id,SUM(net_cents) net,SUM(cost_cents) cost FROM v_sales_lines WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY store_id), b AS (SELECT store_id,SUM(target_cents) target FROM sales_targets WHERE month_key BETWEEN '2025-01' AND '2025-12' GROUP BY store_id) SELECT s.store_id,COALESCE(a.net,0) net_cents,COALESCE(a.net-a.cost,0) gross_cents,ROUND(100.0*(a.net-a.cost)/NULLIF(a.net,0),2) margin_pct,b.target target_cents,ROUND(100.0*COALESCE(a.net,0)/NULLIF(b.target,0),2) achievement_pct FROM stores s LEFT JOIN a ON a.store_id=s.store_id LEFT JOIN b ON b.store_id=s.store_id ORDER BY s.store_id",
-          "sqliteSql": "WITH a AS (SELECT store_id,SUM(net_cents) net,SUM(cost_cents) cost FROM v_sales_lines WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY store_id), b AS (SELECT store_id,SUM(target_cents) target FROM sales_targets WHERE month_key BETWEEN '2025-01' AND '2025-12' GROUP BY store_id) SELECT s.store_id,COALESCE(a.net,0) net_cents,COALESCE(a.net-a.cost,0) gross_cents,ROUND(100.0*(a.net-a.cost)/NULLIF(a.net,0),2) margin_pct,b.target target_cents,ROUND(100.0*COALESCE(a.net,0)/NULLIF(b.target,0),2) achievement_pct FROM stores s LEFT JOIN a ON a.store_id=s.store_id LEFT JOIN b ON b.store_id=s.store_id ORDER BY s.store_id"
+          "mysqlSql": "WITH a AS (SELECT store_id,SUM(net_cents) net,SUM(cost_cents) cost FROM v_sales_lines WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY store_id), b AS (SELECT store_id,SUM(target_cents) target FROM sales_targets WHERE month_key BETWEEN '2025-01' AND '2025-12' GROUP BY store_id) SELECT s.store_id,COALESCE(a.net,0) net_cents,COALESCE(a.net-a.cost,0) gross_cents,ROUND(100.0*(a.net-a.cost)/NULLIF(a.net,0),2) margin_pct,b.target target_cents,ROUND(100.0*COALESCE(a.net,0)/NULLIF(b.target,0),2) achievement_pct FROM stores s LEFT JOIN a ON a.store_id=s.store_id LEFT JOIN b ON b.store_id=s.store_id ORDER BY net_cents DESC",
+          "sqliteSql": "WITH a AS (SELECT store_id,SUM(net_cents) net,SUM(cost_cents) cost FROM v_sales_lines WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY store_id), b AS (SELECT store_id,SUM(target_cents) target FROM sales_targets WHERE month_key BETWEEN '2025-01' AND '2025-12' GROUP BY store_id) SELECT s.store_id,COALESCE(a.net,0) net_cents,COALESCE(a.net-a.cost,0) gross_cents,ROUND(100.0*(a.net-a.cost)/NULLIF(a.net,0),2) margin_pct,b.target target_cents,ROUND(100.0*COALESCE(a.net,0)/NULLIF(b.target,0),2) achievement_pct FROM stores s LEFT JOIN a ON a.store_id=s.store_id LEFT JOIN b ON b.store_id=s.store_id ORDER BY net_cents DESC"
         },
         {
           "kind": "equivalent",
-          "mysqlSql": "WITH a AS (SELECT store_id,SUM(net_cents) net,SUM(cost_cents) cost FROM v_sales_lines WHERE channel='store' AND (order_date>='2025-01-01' AND order_date<='2025-12-31') GROUP BY store_id), b AS (SELECT store_id,SUM(target_cents) target FROM sales_targets WHERE (month_key>='2025-01' AND month_key<='2025-12') GROUP BY store_id) SELECT s.store_id,COALESCE(a.net,0) net_cents,COALESCE(a.net-a.cost,0) gross_cents,ROUND(100.0*(a.net-a.cost)/NULLIF(a.net,0),2) margin_pct,b.target target_cents,ROUND(100.0*COALESCE(a.net,0)/NULLIF(b.target,0),2) achievement_pct FROM stores s LEFT JOIN a ON a.store_id=s.store_id LEFT JOIN b ON b.store_id=s.store_id ORDER BY s.store_id",
-          "sqliteSql": "WITH a AS (SELECT store_id,SUM(net_cents) net,SUM(cost_cents) cost FROM v_sales_lines WHERE channel='store' AND (order_date>='2025-01-01' AND order_date<='2025-12-31') GROUP BY store_id), b AS (SELECT store_id,SUM(target_cents) target FROM sales_targets WHERE (month_key>='2025-01' AND month_key<='2025-12') GROUP BY store_id) SELECT s.store_id,COALESCE(a.net,0) net_cents,COALESCE(a.net-a.cost,0) gross_cents,ROUND(100.0*(a.net-a.cost)/NULLIF(a.net,0),2) margin_pct,b.target target_cents,ROUND(100.0*COALESCE(a.net,0)/NULLIF(b.target,0),2) achievement_pct FROM stores s LEFT JOIN a ON a.store_id=s.store_id LEFT JOIN b ON b.store_id=s.store_id ORDER BY s.store_id"
+          "mysqlSql": "WITH a AS (SELECT store_id,SUM(net_cents) net,SUM(cost_cents) cost FROM v_sales_lines WHERE channel='store' AND (order_date>='2025-01-01' AND order_date<='2025-12-31') GROUP BY store_id), b AS (SELECT store_id,SUM(target_cents) target FROM sales_targets WHERE (month_key>='2025-01' AND month_key<='2025-12') GROUP BY store_id) SELECT s.store_id,COALESCE(a.net,0) net_cents,COALESCE(a.net-a.cost,0) gross_cents,ROUND(100.0*(a.net-a.cost)/NULLIF(a.net,0),2) margin_pct,b.target target_cents,ROUND(100.0*COALESCE(a.net,0)/NULLIF(b.target,0),2) achievement_pct FROM stores s LEFT JOIN a ON a.store_id=s.store_id LEFT JOIN b ON b.store_id=s.store_id ORDER BY net_cents DESC",
+          "sqliteSql": "WITH a AS (SELECT store_id,SUM(net_cents) net,SUM(cost_cents) cost FROM v_sales_lines WHERE channel='store' AND (order_date>='2025-01-01' AND order_date<='2025-12-31') GROUP BY store_id), b AS (SELECT store_id,SUM(target_cents) target FROM sales_targets WHERE (month_key>='2025-01' AND month_key<='2025-12') GROUP BY store_id) SELECT s.store_id,COALESCE(a.net,0) net_cents,COALESCE(a.net-a.cost,0) gross_cents,ROUND(100.0*(a.net-a.cost)/NULLIF(a.net,0),2) margin_pct,b.target target_cents,ROUND(100.0*COALESCE(a.net,0)/NULLIF(b.target,0),2) achievement_pct FROM stores s LEFT JOIN a ON a.store_id=s.store_id LEFT JOIN b ON b.store_id=s.store_id ORDER BY net_cents DESC"
         }
       ],
       "hints": [
@@ -122,46 +122,6 @@
         ],
         "rows": [
           [
-            1,
-            3909544,
-            1559185,
-            39.88,
-            40293000,
-            9.7
-          ],
-          [
-            2,
-            4244313,
-            1648352,
-            38.84,
-            41668727,
-            10.19
-          ],
-          [
-            3,
-            2422875,
-            965035,
-            39.83,
-            16716511,
-            14.49
-          ],
-          [
-            4,
-            2496443,
-            985357,
-            39.47,
-            18416544,
-            13.56
-          ],
-          [
-            5,
-            5373344,
-            2121391,
-            39.48,
-            65368327,
-            8.22
-          ],
-          [
             6,
             6969441,
             2741661,
@@ -178,28 +138,36 @@
             9.15
           ],
           [
-            8,
-            2231300,
-            873943,
-            39.17,
-            20027456,
-            11.14
+            5,
+            5373344,
+            2121391,
+            39.48,
+            65368327,
+            8.22
           ],
           [
-            9,
-            2598900,
-            1013522,
-            39.0,
-            35417426,
-            7.34
+            2,
+            4244313,
+            1648352,
+            38.84,
+            41668727,
+            10.19
           ],
           [
-            10,
-            3167056,
-            1216199,
-            38.4,
-            32419295,
-            9.77
+            1,
+            3909544,
+            1559185,
+            39.88,
+            40293000,
+            9.7
+          ],
+          [
+            12,
+            3718711,
+            1442294,
+            38.78,
+            42565796,
+            8.74
           ],
           [
             11,
@@ -210,12 +178,44 @@
             13.81
           ],
           [
-            12,
-            3718711,
-            1442294,
-            38.78,
-            42565796,
-            8.74
+            10,
+            3167056,
+            1216199,
+            38.4,
+            32419295,
+            9.77
+          ],
+          [
+            9,
+            2598900,
+            1013522,
+            39,
+            35417426,
+            7.34
+          ],
+          [
+            4,
+            2496443,
+            985357,
+            39.47,
+            18416544,
+            13.56
+          ],
+          [
+            3,
+            2422875,
+            965035,
+            39.83,
+            16716511,
+            14.49
+          ],
+          [
+            8,
+            2231300,
+            873943,
+            39.17,
+            20027456,
+            11.14
           ]
         ],
         "rowCount": 12
@@ -225,19 +225,19 @@
           "reason": "直接连接月目标与订单明细会重复累计目标。"
         },
         {
-          "sql": "WITH raw_sales AS (\n              SELECT o.store_id,o.channel,o.order_date,\n                i.quantity*i.unit_price_cents-i.discount_cents-COALESCE(r.refund_cents,0) net_cents,\n                (i.quantity-COALESCE(r.quantity,0))*i.unit_cost_cents cost_cents\n              FROM orders o JOIN order_items i ON i.order_id=o.order_id\n              LEFT JOIN returns r ON r.order_item_id=i.order_item_id AND r.return_date<='2025-12-31'\n              WHERE o.status='completed'\n            ), a AS (SELECT store_id,SUM(net_cents) net,SUM(cost_cents) cost FROM raw_sales WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY store_id), b AS (SELECT store_id,SUM(target_cents) target FROM sales_targets WHERE month_key BETWEEN '2025-01' AND '2025-12' GROUP BY store_id) SELECT s.store_id,COALESCE(a.net,0) net_cents,COALESCE(a.net-a.cost,0) gross_cents,ROUND(100.0*(a.net-a.cost)/NULLIF(a.net,0),2) margin_pct,b.target target_cents,ROUND(100.0*COALESCE(a.net,0)/NULLIF(b.target,0),2) achievement_pct FROM stores s LEFT JOIN a ON a.store_id=s.store_id LEFT JOIN b ON b.store_id=s.store_id ORDER BY s.store_id",
+          "sql": "WITH raw_sales AS (\n              SELECT o.store_id,o.channel,o.order_date,\n                i.quantity*i.unit_price_cents-i.discount_cents-COALESCE(r.refund_cents,0) net_cents,\n                (i.quantity-COALESCE(r.quantity,0))*i.unit_cost_cents cost_cents\n              FROM orders o JOIN order_items i ON i.order_id=o.order_id\n              LEFT JOIN returns r ON r.order_item_id=i.order_item_id AND r.return_date<='2025-12-31'\n              WHERE o.status='completed'\n            ), a AS (SELECT store_id,SUM(net_cents) net,SUM(cost_cents) cost FROM raw_sales WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY store_id), b AS (SELECT store_id,SUM(target_cents) target FROM sales_targets WHERE month_key BETWEEN '2025-01' AND '2025-12' GROUP BY store_id) SELECT s.store_id,COALESCE(a.net,0) net_cents,COALESCE(a.net-a.cost,0) gross_cents,ROUND(100.0*(a.net-a.cost)/NULLIF(a.net,0),2) margin_pct,b.target target_cents,ROUND(100.0*COALESCE(a.net,0)/NULLIF(b.target,0),2) achievement_pct FROM stores s LEFT JOIN a ON a.store_id=s.store_id LEFT JOIN b ON b.store_id=s.store_id ORDER BY net_cents DESC",
           "reason": "退货明细未经聚合导致重复销售",
           "validation": "最新公开及隐藏夹具实际执行拒绝",
           "counterexample": "q0251-review-multiple-partial-returns"
         },
         {
-          "sql": "WITH a AS (SELECT store_id,AVG(net_cents) net,SUM(cost_cents) cost FROM v_sales_lines WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY store_id), b AS (SELECT store_id,SUM(target_cents) target FROM sales_targets WHERE month_key BETWEEN '2025-01' AND '2025-12' GROUP BY store_id) SELECT s.store_id,COALESCE(a.net,0) net_cents,COALESCE(a.net-a.cost,0) gross_cents,ROUND(100.0*(a.net-a.cost)/NULLIF(a.net,0),2) margin_pct,b.target target_cents,ROUND(100.0*COALESCE(a.net,0)/NULLIF(b.target,0),2) achievement_pct FROM stores s LEFT JOIN a ON a.store_id=s.store_id LEFT JOIN b ON b.store_id=s.store_id ORDER BY s.store_id",
+          "sql": "WITH a AS (SELECT store_id,AVG(net_cents) net,SUM(cost_cents) cost FROM v_sales_lines WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY store_id), b AS (SELECT store_id,SUM(target_cents) target FROM sales_targets WHERE month_key BETWEEN '2025-01' AND '2025-12' GROUP BY store_id) SELECT s.store_id,COALESCE(a.net,0) net_cents,COALESCE(a.net-a.cost,0) gross_cents,ROUND(100.0*(a.net-a.cost)/NULLIF(a.net,0),2) margin_pct,b.target target_cents,ROUND(100.0*COALESCE(a.net,0)/NULLIF(b.target,0),2) achievement_pct FROM stores s LEFT JOIN a ON a.store_id=s.store_id LEFT JOIN b ON b.store_id=s.store_id ORDER BY net_cents DESC",
           "reason": "原典型错误：原典型错误：原典型错误：把累加量错误计算成均值。",
           "validation": "最新公开及隐藏夹具实际执行拒绝",
           "counterexample": "q0251-public"
         },
         {
-          "sql": "WITH a AS (SELECT store_id,AVG(net_cents) net,AVG(cost_cents) cost FROM v_sales_lines WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY store_id), b AS (SELECT store_id,AVG(target_cents) target FROM sales_targets WHERE month_key BETWEEN '2025-01' AND '2025-12' GROUP BY store_id) SELECT s.store_id,COALESCE(a.net,0) net_cents,COALESCE(a.net-a.cost,0) gross_cents,ROUND(100.0*(a.net-a.cost)/NULLIF(a.net,0),2) margin_pct,b.target target_cents,ROUND(100.0*COALESCE(a.net,0)/NULLIF(b.target,0),2) achievement_pct FROM stores s LEFT JOIN a ON a.store_id=s.store_id LEFT JOIN b ON b.store_id=s.store_id ORDER BY s.store_id",
+          "sql": "WITH a AS (SELECT store_id,AVG(net_cents) net,AVG(cost_cents) cost FROM v_sales_lines WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY store_id), b AS (SELECT store_id,AVG(target_cents) target FROM sales_targets WHERE month_key BETWEEN '2025-01' AND '2025-12' GROUP BY store_id) SELECT s.store_id,COALESCE(a.net,0) net_cents,COALESCE(a.net-a.cost,0) gross_cents,ROUND(100.0*(a.net-a.cost)/NULLIF(a.net,0),2) margin_pct,b.target target_cents,ROUND(100.0*COALESCE(a.net,0)/NULLIF(b.target,0),2) achievement_pct FROM stores s LEFT JOIN a ON a.store_id=s.store_id LEFT JOIN b ON b.store_id=s.store_id ORDER BY net_cents DESC",
           "reason": "原典型错误：原典型错误：累加误用平均",
           "validation": "最新公开及隐藏夹具实际执行拒绝",
           "counterexample": "q0251-public"
@@ -249,35 +249,35 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0251/q0251-public.json",
-          "sha256": "4f5cd5789674da0c9e6cbca5aed4a5596b56f73b59968d0bc03aafb5094a2284"
+          "sha256": "f80d3560facd79d1f75eb03c7885c5bae12c2acbf24bbd6bc5b638faf62481eb"
         },
         {
           "id": "q0251-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0251/q0251-boundary.json",
-          "sha256": "7d7e42e705f1c6751147ba2e3b88dd675dad9c2a2c9685164cefa375baa29202"
+          "sha256": "706460fb289b1166f173da43a4a8e2d3d5825298b77d8e3e80433b41a1b9f858"
         },
         {
           "id": "q0251-mini-202611171",
           "visibility": "hidden",
           "variant": "independent-enterprise",
           "path": "fixtures/q0251/q0251-mini-202611171.json",
-          "sha256": "ac6aab01f69e2407933d51e82759ab3a0fabf65f4bf631a5b640038e42be6610"
+          "sha256": "e2837e8e0c5d508821552e1b5f5b81a7e69758aa41629ab1f678d93fc0baf585"
         },
         {
           "id": "q0251-mini-202611179",
           "visibility": "hidden",
           "variant": "independent-enterprise",
           "path": "fixtures/q0251/q0251-mini-202611179.json",
-          "sha256": "01a2cc2a1f5b1b26f421b58db8155df8b54497eb9c9b02bd55b9528c8a2b1fe3"
+          "sha256": "9946bf1347f736d580ae7e1ce402f243aa8989ccdaacb31f0227a88db8dcb481"
         },
         {
           "id": "q0251-review-multiple-partial-returns",
           "visibility": "hidden",
           "variant": "multiple-partial-returns",
           "path": "fixtures/q0251/q0251-review-multiple-partial-returns.json",
-          "sha256": "1d2c643027e88b9af2dea67bb1ec500aa3480e859f19c5d5c6fd2c9237c35dec"
+          "sha256": "7853514ce15981b681b007d76e7f2fe1328900e810c5adfc21cc4be30a48e83f"
         }
       ],
       "initialCode": "",
@@ -349,7 +349,7 @@
       "projectId": "retail",
       "title": "门店月度环比同比与持续下滑",
       "context": "经营主管希望识别连续三个月环比负增长的门店。",
-      "requirements": "构造2023—2025完整门店月份轴；2025年逐月返回净销售、环比、同比及连续三月负增长标志；上期零或缺失时比率NULL。\n输出字段名称及顺序：store_id, month_key, net_cents, mom_pct, yoy_pct, three_declines。输出顺序（含决胜键）：month_key) prev,LAG(net,12) OVER(PARTITION BY store_id ORDER BY month_key) prior_year FROM b), q AS (SELECT *,CASE WHEN prev>0 AND net<prev THEN 1 ELSE 0 END falling FROM p), z AS (SELECT *,SUM(falling) OVER(PARTITION BY store_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) fall3 FROM q) SELECT store_id,month_key,net net_cents,ROUND(100.0*(net-prev)/NULLIF(prev,0),2) mom_pct,ROUND(100.0*(net-prior_year)/NULLIF(prior_year,0),2) yoy_pct,CASE WHEN fall3=3 THEN 1 ELSE 0 END three_declines FROM z WHERE month_key BETWEEN '2025-01' AND '2025-12' ORDER BY store_id,month_key。金额单位为马币分；派生金额及比率按题设保留小数，零分母为NULL。",
+      "requirements": "构造2023—2025完整门店月份轴；2025年逐月返回净销售、环比、同比及连续三月负增长标志；上期零或缺失时比率NULL。\n输出字段名称及顺序：store_id, month_key, net_cents, mom_pct, yoy_pct, three_declines。输出顺序不作要求。金额单位为马币分；派生金额及比率按题设保留小数，零分母为NULL。",
       "grain": "门店×月",
       "commonError": "先筛2025再计算窗口会丢失去年和上月。",
       "executionSteps": [
@@ -411,7 +411,7 @@
         "v_sales_lines",
         "warehouses"
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "numericTolerance": {
         "absolute": 1e-06,
         "integerExact": true,
@@ -421,13 +421,13 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "WITH m AS (SELECT DISTINCT month_key FROM calendar_days WHERE day<='2025-12-31'), a AS (SELECT store_id,SUBSTR(order_date,1,7) m,SUM(net_cents) net FROM v_sales_lines WHERE channel='store' GROUP BY store_id,SUBSTR(order_date,1,7)), b AS (SELECT s.store_id,m.month_key,COALESCE(a.net,0) net FROM stores s CROSS JOIN m LEFT JOIN a ON a.store_id=s.store_id AND a.m=m.month_key), p AS (SELECT *,LAG(net) OVER(PARTITION BY store_id ORDER BY month_key) prev,LAG(net,12) OVER(PARTITION BY store_id ORDER BY month_key) prior_year FROM b), q AS (SELECT *,CASE WHEN prev>0 AND net<prev THEN 1 ELSE 0 END falling FROM p), z AS (SELECT *,SUM(falling) OVER(PARTITION BY store_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) fall3 FROM q) SELECT store_id,month_key,net net_cents,ROUND(100.0*(net-prev)/NULLIF(prev,0),2) mom_pct,ROUND(100.0*(net-prior_year)/NULLIF(prior_year,0),2) yoy_pct,CASE WHEN fall3=3 THEN 1 ELSE 0 END three_declines FROM z WHERE month_key BETWEEN '2025-01' AND '2025-12' ORDER BY store_id,month_key",
-          "sqliteSql": "WITH m AS (SELECT DISTINCT month_key FROM calendar_days WHERE day<='2025-12-31'), a AS (SELECT store_id,SUBSTR(order_date,1,7) m,SUM(net_cents) net FROM v_sales_lines WHERE channel='store' GROUP BY store_id,SUBSTR(order_date,1,7)), b AS (SELECT s.store_id,m.month_key,COALESCE(a.net,0) net FROM stores s CROSS JOIN m LEFT JOIN a ON a.store_id=s.store_id AND a.m=m.month_key), p AS (SELECT *,LAG(net) OVER(PARTITION BY store_id ORDER BY month_key) prev,LAG(net,12) OVER(PARTITION BY store_id ORDER BY month_key) prior_year FROM b), q AS (SELECT *,CASE WHEN prev>0 AND net<prev THEN 1 ELSE 0 END falling FROM p), z AS (SELECT *,SUM(falling) OVER(PARTITION BY store_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) fall3 FROM q) SELECT store_id,month_key,net net_cents,ROUND(100.0*(net-prev)/NULLIF(prev,0),2) mom_pct,ROUND(100.0*(net-prior_year)/NULLIF(prior_year,0),2) yoy_pct,CASE WHEN fall3=3 THEN 1 ELSE 0 END three_declines FROM z WHERE month_key BETWEEN '2025-01' AND '2025-12' ORDER BY store_id,month_key"
+          "mysqlSql": "WITH m AS (SELECT DISTINCT month_key FROM calendar_days WHERE day<='2025-12-31'), a AS (SELECT store_id,SUBSTR(order_date,1,7) m,SUM(net_cents) net FROM v_sales_lines WHERE channel='store' GROUP BY store_id,SUBSTR(order_date,1,7)), b AS (SELECT s.store_id,m.month_key,COALESCE(a.net,0) net FROM stores s CROSS JOIN m LEFT JOIN a ON a.store_id=s.store_id AND a.m=m.month_key), p AS (SELECT *,LAG(net) OVER(PARTITION BY store_id ORDER BY month_key) prev,LAG(net,12) OVER(PARTITION BY store_id ORDER BY month_key) prior_year FROM b), q AS (SELECT *,CASE WHEN prev>0 AND net<prev THEN 1 ELSE 0 END falling FROM p), z AS (SELECT *,SUM(falling) OVER(PARTITION BY store_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) fall3 FROM q) SELECT store_id,month_key,net net_cents,ROUND(100.0*(net-prev)/NULLIF(prev,0),2) mom_pct,ROUND(100.0*(net-prior_year)/NULLIF(prior_year,0),2) yoy_pct,CASE WHEN fall3=3 THEN 1 ELSE 0 END three_declines FROM z WHERE month_key BETWEEN '2025-01' AND '2025-12'",
+          "sqliteSql": "WITH m AS (SELECT DISTINCT month_key FROM calendar_days WHERE day<='2025-12-31'), a AS (SELECT store_id,SUBSTR(order_date,1,7) m,SUM(net_cents) net FROM v_sales_lines WHERE channel='store' GROUP BY store_id,SUBSTR(order_date,1,7)), b AS (SELECT s.store_id,m.month_key,COALESCE(a.net,0) net FROM stores s CROSS JOIN m LEFT JOIN a ON a.store_id=s.store_id AND a.m=m.month_key), p AS (SELECT *,LAG(net) OVER(PARTITION BY store_id ORDER BY month_key) prev,LAG(net,12) OVER(PARTITION BY store_id ORDER BY month_key) prior_year FROM b), q AS (SELECT *,CASE WHEN prev>0 AND net<prev THEN 1 ELSE 0 END falling FROM p), z AS (SELECT *,SUM(falling) OVER(PARTITION BY store_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) fall3 FROM q) SELECT store_id,month_key,net net_cents,ROUND(100.0*(net-prev)/NULLIF(prev,0),2) mom_pct,ROUND(100.0*(net-prior_year)/NULLIF(prior_year,0),2) yoy_pct,CASE WHEN fall3=3 THEN 1 ELSE 0 END three_declines FROM z WHERE month_key BETWEEN '2025-01' AND '2025-12'"
         },
         {
           "kind": "equivalent",
-          "mysqlSql": "WITH m AS (SELECT DISTINCT month_key FROM calendar_days WHERE day<='2025-12-31'), a AS (SELECT store_id,SUBSTR(order_date,1,7) m,SUM(net_cents) net FROM v_sales_lines WHERE channel='store' GROUP BY store_id,SUBSTR(order_date,1,7)), b AS (SELECT s.store_id,m.month_key,COALESCE(a.net,0) net FROM stores s CROSS JOIN m LEFT JOIN a ON a.store_id=s.store_id AND a.m=m.month_key), p AS (SELECT *,LAG(net) OVER(PARTITION BY store_id ORDER BY month_key) prev,LAG(net,12) OVER(PARTITION BY store_id ORDER BY month_key) prior_year FROM b), q AS (SELECT *,CASE WHEN prev>0 AND net<prev THEN 1 ELSE 0 END falling FROM p), z AS (SELECT *,SUM(falling) OVER(PARTITION BY store_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) fall3 FROM q) SELECT store_id,month_key,net net_cents,ROUND(100.0*(net-prev)/NULLIF(prev,0),2) mom_pct,ROUND(100.0*(net-prior_year)/NULLIF(prior_year,0),2) yoy_pct,CASE WHEN fall3=3 THEN 1 ELSE 0 END three_declines FROM z WHERE (month_key>='2025-01' AND month_key<='2025-12') ORDER BY store_id,month_key",
-          "sqliteSql": "WITH m AS (SELECT DISTINCT month_key FROM calendar_days WHERE day<='2025-12-31'), a AS (SELECT store_id,SUBSTR(order_date,1,7) m,SUM(net_cents) net FROM v_sales_lines WHERE channel='store' GROUP BY store_id,SUBSTR(order_date,1,7)), b AS (SELECT s.store_id,m.month_key,COALESCE(a.net,0) net FROM stores s CROSS JOIN m LEFT JOIN a ON a.store_id=s.store_id AND a.m=m.month_key), p AS (SELECT *,LAG(net) OVER(PARTITION BY store_id ORDER BY month_key) prev,LAG(net,12) OVER(PARTITION BY store_id ORDER BY month_key) prior_year FROM b), q AS (SELECT *,CASE WHEN prev>0 AND net<prev THEN 1 ELSE 0 END falling FROM p), z AS (SELECT *,SUM(falling) OVER(PARTITION BY store_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) fall3 FROM q) SELECT store_id,month_key,net net_cents,ROUND(100.0*(net-prev)/NULLIF(prev,0),2) mom_pct,ROUND(100.0*(net-prior_year)/NULLIF(prior_year,0),2) yoy_pct,CASE WHEN fall3=3 THEN 1 ELSE 0 END three_declines FROM z WHERE (month_key>='2025-01' AND month_key<='2025-12') ORDER BY store_id,month_key"
+          "mysqlSql": "WITH m AS (SELECT DISTINCT month_key FROM calendar_days WHERE day<='2025-12-31'), a AS (SELECT store_id,SUBSTR(order_date,1,7) m,SUM(net_cents) net FROM v_sales_lines WHERE channel='store' GROUP BY store_id,SUBSTR(order_date,1,7)), b AS (SELECT s.store_id,m.month_key,COALESCE(a.net,0) net FROM stores s CROSS JOIN m LEFT JOIN a ON a.store_id=s.store_id AND a.m=m.month_key), p AS (SELECT *,LAG(net) OVER(PARTITION BY store_id ORDER BY month_key) prev,LAG(net,12) OVER(PARTITION BY store_id ORDER BY month_key) prior_year FROM b), q AS (SELECT *,CASE WHEN prev>0 AND net<prev THEN 1 ELSE 0 END falling FROM p), z AS (SELECT *,SUM(falling) OVER(PARTITION BY store_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) fall3 FROM q) SELECT store_id,month_key,net net_cents,ROUND(100.0*(net-prev)/NULLIF(prev,0),2) mom_pct,ROUND(100.0*(net-prior_year)/NULLIF(prior_year,0),2) yoy_pct,CASE WHEN fall3=3 THEN 1 ELSE 0 END three_declines FROM z WHERE (month_key>='2025-01' AND month_key<='2025-12')",
+          "sqliteSql": "WITH m AS (SELECT DISTINCT month_key FROM calendar_days WHERE day<='2025-12-31'), a AS (SELECT store_id,SUBSTR(order_date,1,7) m,SUM(net_cents) net FROM v_sales_lines WHERE channel='store' GROUP BY store_id,SUBSTR(order_date,1,7)), b AS (SELECT s.store_id,m.month_key,COALESCE(a.net,0) net FROM stores s CROSS JOIN m LEFT JOIN a ON a.store_id=s.store_id AND a.m=m.month_key), p AS (SELECT *,LAG(net) OVER(PARTITION BY store_id ORDER BY month_key) prev,LAG(net,12) OVER(PARTITION BY store_id ORDER BY month_key) prior_year FROM b), q AS (SELECT *,CASE WHEN prev>0 AND net<prev THEN 1 ELSE 0 END falling FROM p), z AS (SELECT *,SUM(falling) OVER(PARTITION BY store_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) fall3 FROM q) SELECT store_id,month_key,net net_cents,ROUND(100.0*(net-prev)/NULLIF(prev,0),2) mom_pct,ROUND(100.0*(net-prior_year)/NULLIF(prior_year,0),2) yoy_pct,CASE WHEN fall3=3 THEN 1 ELSE 0 END three_declines FROM z WHERE (month_key>='2025-01' AND month_key<='2025-12')"
         }
       ],
       "hints": [
@@ -572,7 +572,7 @@
             2,
             "2025-02",
             349211,
-            -23.0,
+            -23,
             -20.23,
             0
           ],
@@ -773,7 +773,7 @@
             "2025-03",
             197284,
             55.41,
-            -6.0,
+            -6,
             0
           ],
           [
@@ -876,7 +876,7 @@
             5,
             "2025-04",
             320684,
-            14.0,
+            14,
             6.61,
             0
           ],
@@ -1468,7 +1468,7 @@
             11,
             "2025-06",
             269085,
-            -17.0,
+            -17,
             -31.38,
             0
           ],
@@ -1624,19 +1624,19 @@
           "reason": "先筛2025再计算窗口会丢失去年和上月。"
         },
         {
-          "sql": "WITH m AS (SELECT DISTINCT month_key FROM calendar_days), a AS (SELECT store_id,SUBSTR(order_date,1,7) m,SUM(net_cents) net FROM v_sales_lines WHERE channel='store' GROUP BY store_id,SUBSTR(order_date,1,7)), b AS (SELECT s.store_id,m.month_key,COALESCE(a.net,0) net FROM stores s CROSS JOIN m JOIN a ON a.store_id=s.store_id AND a.m=m.month_key), p AS (SELECT *,LAG(net) OVER(PARTITION BY store_id ORDER BY month_key) prev,LAG(net,12) OVER(PARTITION BY store_id ORDER BY month_key) prior_year FROM b), q AS (SELECT *,CASE WHEN prev>0 AND net<prev THEN 1 ELSE 0 END falling FROM p), z AS (SELECT *,SUM(falling) OVER(PARTITION BY store_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) fall3 FROM q) SELECT store_id,month_key,net net_cents,ROUND(100.0*(net-prev)/NULLIF(prev,0),2) mom_pct,ROUND(100.0*(net-prior_year)/NULLIF(prior_year,0),2) yoy_pct,CASE WHEN fall3=3 THEN 1 ELSE 0 END three_declines FROM z WHERE month_key>='2025-01' ORDER BY store_id,month_key",
+          "sql": "WITH m AS (SELECT DISTINCT month_key FROM calendar_days), a AS (SELECT store_id,SUBSTR(order_date,1,7) m,SUM(net_cents) net FROM v_sales_lines WHERE channel='store' GROUP BY store_id,SUBSTR(order_date,1,7)), b AS (SELECT s.store_id,m.month_key,COALESCE(a.net,0) net FROM stores s CROSS JOIN m JOIN a ON a.store_id=s.store_id AND a.m=m.month_key), p AS (SELECT *,LAG(net) OVER(PARTITION BY store_id ORDER BY month_key) prev,LAG(net,12) OVER(PARTITION BY store_id ORDER BY month_key) prior_year FROM b), q AS (SELECT *,CASE WHEN prev>0 AND net<prev THEN 1 ELSE 0 END falling FROM p), z AS (SELECT *,SUM(falling) OVER(PARTITION BY store_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) fall3 FROM q) SELECT store_id,month_key,net net_cents,ROUND(100.0*(net-prev)/NULLIF(prev,0),2) mom_pct,ROUND(100.0*(net-prior_year)/NULLIF(prior_year,0),2) yoy_pct,CASE WHEN fall3=3 THEN 1 ELSE 0 END three_declines FROM z WHERE month_key>='2025-01'",
           "reason": "原典型错误：原典型错误：原典型错误：误用内连接，可能遗漏没有匹配记录的主体。",
           "validation": "最新公开及隐藏夹具实际执行拒绝",
           "counterexample": "q0252-boundary"
         },
         {
-          "sql": "WITH m AS (SELECT DISTINCT month_key FROM calendar_days WHERE day<='2025-12-31'), a AS (SELECT store_id,SUBSTR(order_date,1,7) m,AVG(net_cents) net FROM v_sales_lines WHERE channel='store' GROUP BY store_id,SUBSTR(order_date,1,7)), b AS (SELECT s.store_id,m.month_key,COALESCE(a.net,0) net FROM stores s CROSS JOIN m LEFT JOIN a ON a.store_id=s.store_id AND a.m=m.month_key), p AS (SELECT *,LAG(net) OVER(PARTITION BY store_id ORDER BY month_key) prev,LAG(net,12) OVER(PARTITION BY store_id ORDER BY month_key) prior_year FROM b), q AS (SELECT *,CASE WHEN prev>0 AND net<prev THEN 1 ELSE 0 END falling FROM p), z AS (SELECT *,AVG(falling) OVER(PARTITION BY store_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) fall3 FROM q) SELECT store_id,month_key,net net_cents,ROUND(100.0*(net-prev)/NULLIF(prev,0),2) mom_pct,ROUND(100.0*(net-prior_year)/NULLIF(prior_year,0),2) yoy_pct,CASE WHEN fall3=3 THEN 1 ELSE 0 END three_declines FROM z WHERE month_key BETWEEN '2025-01' AND '2025-12' ORDER BY store_id,month_key",
+          "sql": "WITH m AS (SELECT DISTINCT month_key FROM calendar_days WHERE day<='2025-12-31'), a AS (SELECT store_id,SUBSTR(order_date,1,7) m,AVG(net_cents) net FROM v_sales_lines WHERE channel='store' GROUP BY store_id,SUBSTR(order_date,1,7)), b AS (SELECT s.store_id,m.month_key,COALESCE(a.net,0) net FROM stores s CROSS JOIN m LEFT JOIN a ON a.store_id=s.store_id AND a.m=m.month_key), p AS (SELECT *,LAG(net) OVER(PARTITION BY store_id ORDER BY month_key) prev,LAG(net,12) OVER(PARTITION BY store_id ORDER BY month_key) prior_year FROM b), q AS (SELECT *,CASE WHEN prev>0 AND net<prev THEN 1 ELSE 0 END falling FROM p), z AS (SELECT *,AVG(falling) OVER(PARTITION BY store_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) fall3 FROM q) SELECT store_id,month_key,net net_cents,ROUND(100.0*(net-prev)/NULLIF(prev,0),2) mom_pct,ROUND(100.0*(net-prior_year)/NULLIF(prior_year,0),2) yoy_pct,CASE WHEN fall3=3 THEN 1 ELSE 0 END three_declines FROM z WHERE month_key BETWEEN '2025-01' AND '2025-12'",
           "reason": "原典型错误：原典型错误：累加误用平均",
           "validation": "最新公开及隐藏夹具实际执行拒绝",
           "counterexample": "q0252-public"
         },
         {
-          "sql": "WITH m AS (SELECT DISTINCT month_key FROM calendar_days WHERE day<='2025-12-31'), a AS (SELECT store_id,SUBSTR(order_date,1,7) m,SUM(net_cents) net FROM v_sales_lines WHERE channel='store' GROUP BY store_id,SUBSTR(order_date,1,7)), b AS (SELECT s.store_id,m.month_key,COALESCE(a.net,0) net FROM stores s CROSS JOIN m JOIN a ON a.store_id=s.store_id AND a.m=m.month_key), p AS (SELECT *,LAG(net) OVER(PARTITION BY store_id ORDER BY month_key) prev,LAG(net,12) OVER(PARTITION BY store_id ORDER BY month_key) prior_year FROM b), q AS (SELECT *,CASE WHEN prev>0 AND net<prev THEN 1 ELSE 0 END falling FROM p), z AS (SELECT *,SUM(falling) OVER(PARTITION BY store_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) fall3 FROM q) SELECT store_id,month_key,net net_cents,ROUND(100.0*(net-prev)/NULLIF(prev,0),2) mom_pct,ROUND(100.0*(net-prior_year)/NULLIF(prior_year,0),2) yoy_pct,CASE WHEN fall3=3 THEN 1 ELSE 0 END three_declines FROM z WHERE month_key BETWEEN '2025-01' AND '2025-12' ORDER BY store_id,month_key",
+          "sql": "WITH m AS (SELECT DISTINCT month_key FROM calendar_days WHERE day<='2025-12-31'), a AS (SELECT store_id,SUBSTR(order_date,1,7) m,SUM(net_cents) net FROM v_sales_lines WHERE channel='store' GROUP BY store_id,SUBSTR(order_date,1,7)), b AS (SELECT s.store_id,m.month_key,COALESCE(a.net,0) net FROM stores s CROSS JOIN m JOIN a ON a.store_id=s.store_id AND a.m=m.month_key), p AS (SELECT *,LAG(net) OVER(PARTITION BY store_id ORDER BY month_key) prev,LAG(net,12) OVER(PARTITION BY store_id ORDER BY month_key) prior_year FROM b), q AS (SELECT *,CASE WHEN prev>0 AND net<prev THEN 1 ELSE 0 END falling FROM p), z AS (SELECT *,SUM(falling) OVER(PARTITION BY store_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) fall3 FROM q) SELECT store_id,month_key,net net_cents,ROUND(100.0*(net-prev)/NULLIF(prev,0),2) mom_pct,ROUND(100.0*(net-prior_year)/NULLIF(prior_year,0),2) yoy_pct,CASE WHEN fall3=3 THEN 1 ELSE 0 END three_declines FROM z WHERE month_key BETWEEN '2025-01' AND '2025-12'",
           "reason": "原典型错误：原典型错误：遗漏主档或空行",
           "validation": "最新公开及隐藏夹具实际执行拒绝",
           "counterexample": "q0252-boundary"
@@ -1648,35 +1648,35 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0252/q0252-public.json",
-          "sha256": "1ae56506d5163c147d8ee73616cb2edc5d5e47fa3b99ee39eac25c1bf9e9ef6e"
+          "sha256": "b0c16813eb3127da6b8eff7c5b84df1d8b11033eea3b37f4bee54698c8d1b19c"
         },
         {
           "id": "q0252-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0252/q0252-boundary.json",
-          "sha256": "95d4c4dea9665f904f962fc48f67143145172a11cdf49985e959ec574b08f0a1"
+          "sha256": "5c5018dbd2d6a2cc880517e7eb136aabdff00c3f37f905c7bc32724da83381c7"
         },
         {
           "id": "q0252-mini-202611171",
           "visibility": "hidden",
           "variant": "independent-enterprise",
           "path": "fixtures/q0252/q0252-mini-202611171.json",
-          "sha256": "a7610a053959b69c55199c627d2c278368a8efcf844969f14ad1fd72b91dc6bf"
+          "sha256": "9113960125b6150a0ec6259a19102a8e553c8759a8a110c444b1ab173cc48051"
         },
         {
           "id": "q0252-mini-202611179",
           "visibility": "hidden",
           "variant": "independent-enterprise",
           "path": "fixtures/q0252/q0252-mini-202611179.json",
-          "sha256": "17bf21b13158da79159e63a9d96e465f18e27af62152f10479b83e988e5d3caf"
+          "sha256": "46b7c1b20c526897b427430c84e57c1b3a2a86b9410bba0d32f4535c1b55ad5d"
         },
         {
           "id": "q0252-review-multiple-partial-returns",
           "visibility": "hidden",
           "variant": "multiple-partial-returns",
           "path": "fixtures/q0252/q0252-review-multiple-partial-returns.json",
-          "sha256": "db92628c10e8371ba7d748fb81d205854a7f7055712f6ac93ef7ceb1797c01c4"
+          "sha256": "f46eec6bcada239a52e062b109463f3990604df8d3d89de9f196bbc6bd76dca1"
         }
       ],
       "initialCode": "",
@@ -2155,7 +2155,7 @@
       "projectId": "inventory",
       "title": "低销量高库存诊断",
       "context": "仓储经理希望优先处理积压货品。",
-      "requirements": "统计2025-10-03至12-31共90日仓库销售出库量；期末为12-31；有效商品、库存价值超过500000分且销量低于20件；无销售记0，库存覆盖天数无销售返回NULL。\n输出字段名称及顺序：warehouse_id, product_id, quantity, sold_units, stock_value_cents, cover_days。输出顺序（含决胜键）：stock_value_cents DESC,i.warehouse_id,i.product_id。金额单位为马币分；派生金额及比率按题设保留小数，零分母为NULL。",
+      "requirements": "统计2025-10-03至12-31共90日仓库销售出库量；期末为12-31；有效商品、库存价值超过500000分且销量低于20件；无销售记0，库存覆盖天数无销售返回NULL。\n输出字段名称及顺序：warehouse_id, product_id, quantity, sold_units, stock_value_cents, cover_days。输出顺序：stock_value_cents DESC, i.warehouse_id。金额单位为马币分；派生金额及比率按题设保留小数，零分母为NULL。",
       "grain": "仓库×商品",
       "commonError": "用内连接会漏掉零销售的积压商品。",
       "executionSteps": [
@@ -2233,13 +2233,13 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "WITH s AS (SELECT warehouse_id,product_id,SUM(-quantity_delta) sold FROM stock_movements WHERE movement_type='sale' AND movement_date BETWEEN '2025-10-03' AND '2025-12-31' GROUP BY warehouse_id,product_id) SELECT i.warehouse_id,i.product_id,i.quantity,COALESCE(s.sold,0) sold_units,i.quantity*i.unit_cost_cents stock_value_cents,ROUND(90.0*i.quantity/NULLIF(s.sold,0),2) cover_days FROM inventory_snapshots i JOIN products p ON p.product_id=i.product_id LEFT JOIN s ON s.warehouse_id=i.warehouse_id AND s.product_id=i.product_id WHERE p.active=1 AND i.snapshot_date='2025-12-31' AND i.quantity*i.unit_cost_cents>500000 AND COALESCE(s.sold,0)<20 ORDER BY stock_value_cents DESC,i.warehouse_id,i.product_id",
-          "sqliteSql": "WITH s AS (SELECT warehouse_id,product_id,SUM(-quantity_delta) sold FROM stock_movements WHERE movement_type='sale' AND movement_date BETWEEN '2025-10-03' AND '2025-12-31' GROUP BY warehouse_id,product_id) SELECT i.warehouse_id,i.product_id,i.quantity,COALESCE(s.sold,0) sold_units,i.quantity*i.unit_cost_cents stock_value_cents,ROUND(90.0*i.quantity/NULLIF(s.sold,0),2) cover_days FROM inventory_snapshots i JOIN products p ON p.product_id=i.product_id LEFT JOIN s ON s.warehouse_id=i.warehouse_id AND s.product_id=i.product_id WHERE p.active=1 AND i.snapshot_date='2025-12-31' AND i.quantity*i.unit_cost_cents>500000 AND COALESCE(s.sold,0)<20 ORDER BY stock_value_cents DESC,i.warehouse_id,i.product_id"
+          "mysqlSql": "WITH s AS (SELECT warehouse_id,product_id,SUM(-quantity_delta) sold FROM stock_movements WHERE movement_type='sale' AND movement_date BETWEEN '2025-10-03' AND '2025-12-31' GROUP BY warehouse_id,product_id) SELECT i.warehouse_id,i.product_id,i.quantity,COALESCE(s.sold,0) sold_units,i.quantity*i.unit_cost_cents stock_value_cents,ROUND(90.0*i.quantity/NULLIF(s.sold,0),2) cover_days FROM inventory_snapshots i JOIN products p ON p.product_id=i.product_id LEFT JOIN s ON s.warehouse_id=i.warehouse_id AND s.product_id=i.product_id WHERE p.active=1 AND i.snapshot_date='2025-12-31' AND i.quantity*i.unit_cost_cents>500000 AND COALESCE(s.sold,0)<20 ORDER BY stock_value_cents DESC, i.warehouse_id",
+          "sqliteSql": "WITH s AS (SELECT warehouse_id,product_id,SUM(-quantity_delta) sold FROM stock_movements WHERE movement_type='sale' AND movement_date BETWEEN '2025-10-03' AND '2025-12-31' GROUP BY warehouse_id,product_id) SELECT i.warehouse_id,i.product_id,i.quantity,COALESCE(s.sold,0) sold_units,i.quantity*i.unit_cost_cents stock_value_cents,ROUND(90.0*i.quantity/NULLIF(s.sold,0),2) cover_days FROM inventory_snapshots i JOIN products p ON p.product_id=i.product_id LEFT JOIN s ON s.warehouse_id=i.warehouse_id AND s.product_id=i.product_id WHERE p.active=1 AND i.snapshot_date='2025-12-31' AND i.quantity*i.unit_cost_cents>500000 AND COALESCE(s.sold,0)<20 ORDER BY stock_value_cents DESC, i.warehouse_id"
         },
         {
           "kind": "equivalent",
-          "mysqlSql": "WITH s AS (SELECT warehouse_id,product_id,SUM(-quantity_delta) sold FROM stock_movements WHERE movement_type='sale' AND (movement_date>='2025-10-03' AND movement_date<='2025-12-31') GROUP BY warehouse_id,product_id) SELECT i.warehouse_id,i.product_id,i.quantity,COALESCE(s.sold,0) sold_units,i.quantity*i.unit_cost_cents stock_value_cents,ROUND(90.0*i.quantity/NULLIF(s.sold,0),2) cover_days FROM inventory_snapshots i JOIN products p ON p.product_id=i.product_id LEFT JOIN s ON s.warehouse_id=i.warehouse_id AND s.product_id=i.product_id WHERE p.active=1 AND i.snapshot_date='2025-12-31' AND i.quantity*i.unit_cost_cents>500000 AND COALESCE(s.sold,0)<20 ORDER BY stock_value_cents DESC,i.warehouse_id,i.product_id",
-          "sqliteSql": "WITH s AS (SELECT warehouse_id,product_id,SUM(-quantity_delta) sold FROM stock_movements WHERE movement_type='sale' AND (movement_date>='2025-10-03' AND movement_date<='2025-12-31') GROUP BY warehouse_id,product_id) SELECT i.warehouse_id,i.product_id,i.quantity,COALESCE(s.sold,0) sold_units,i.quantity*i.unit_cost_cents stock_value_cents,ROUND(90.0*i.quantity/NULLIF(s.sold,0),2) cover_days FROM inventory_snapshots i JOIN products p ON p.product_id=i.product_id LEFT JOIN s ON s.warehouse_id=i.warehouse_id AND s.product_id=i.product_id WHERE p.active=1 AND i.snapshot_date='2025-12-31' AND i.quantity*i.unit_cost_cents>500000 AND COALESCE(s.sold,0)<20 ORDER BY stock_value_cents DESC,i.warehouse_id,i.product_id"
+          "mysqlSql": "WITH s AS (SELECT warehouse_id,product_id,SUM(-quantity_delta) sold FROM stock_movements WHERE movement_type='sale' AND (movement_date>='2025-10-03' AND movement_date<='2025-12-31') GROUP BY warehouse_id,product_id) SELECT i.warehouse_id,i.product_id,i.quantity,COALESCE(s.sold,0) sold_units,i.quantity*i.unit_cost_cents stock_value_cents,ROUND(90.0*i.quantity/NULLIF(s.sold,0),2) cover_days FROM inventory_snapshots i JOIN products p ON p.product_id=i.product_id LEFT JOIN s ON s.warehouse_id=i.warehouse_id AND s.product_id=i.product_id WHERE p.active=1 AND i.snapshot_date='2025-12-31' AND i.quantity*i.unit_cost_cents>500000 AND COALESCE(s.sold,0)<20 ORDER BY stock_value_cents DESC, i.warehouse_id",
+          "sqliteSql": "WITH s AS (SELECT warehouse_id,product_id,SUM(-quantity_delta) sold FROM stock_movements WHERE movement_type='sale' AND (movement_date>='2025-10-03' AND movement_date<='2025-12-31') GROUP BY warehouse_id,product_id) SELECT i.warehouse_id,i.product_id,i.quantity,COALESCE(s.sold,0) sold_units,i.quantity*i.unit_cost_cents stock_value_cents,ROUND(90.0*i.quantity/NULLIF(s.sold,0),2) cover_days FROM inventory_snapshots i JOIN products p ON p.product_id=i.product_id LEFT JOIN s ON s.warehouse_id=i.warehouse_id AND s.product_id=i.product_id WHERE p.active=1 AND i.snapshot_date='2025-12-31' AND i.quantity*i.unit_cost_cents>500000 AND COALESCE(s.sold,0)<20 ORDER BY stock_value_cents DESC, i.warehouse_id"
         }
       ],
       "hints": [
@@ -2281,7 +2281,7 @@
             282,
             9,
             2856378,
-            2820.0
+            2820
           ],
           [
             3,
@@ -2297,7 +2297,7 @@
             259,
             9,
             2208234,
-            2590.0
+            2590
           ],
           [
             3,
@@ -2321,7 +2321,7 @@
             129,
             1,
             1497432,
-            11610.0
+            11610
           ],
           [
             1,
@@ -2329,7 +2329,7 @@
             135,
             2,
             1367415,
-            6075.0
+            6075
           ],
           [
             3,
@@ -2337,7 +2337,7 @@
             120,
             4,
             1365840,
-            2700.0
+            2700
           ],
           [
             3,
@@ -2345,7 +2345,7 @@
             300,
             1,
             1326300,
-            27000.0
+            27000
           ],
           [
             1,
@@ -2353,7 +2353,7 @@
             115,
             2,
             1280640,
-            5175.0
+            5175
           ],
           [
             1,
@@ -2369,7 +2369,7 @@
             156,
             4,
             1241448,
-            3510.0
+            3510
           ],
           [
             3,
@@ -2393,7 +2393,7 @@
             180,
             6,
             1045800,
-            2700.0
+            2700
           ],
           [
             2,
@@ -2409,7 +2409,7 @@
             98,
             2,
             992642,
-            4410.0
+            4410
           ],
           [
             2,
@@ -2425,7 +2425,7 @@
             138,
             1,
             957030,
-            12420.0
+            12420
           ],
           [
             1,
@@ -2433,7 +2433,7 @@
             112,
             8,
             954912,
-            1260.0
+            1260
           ],
           [
             3,
@@ -2449,7 +2449,7 @@
             153,
             10,
             941103,
-            1377.0
+            1377
           ],
           [
             1,
@@ -2457,7 +2457,7 @@
             148,
             8,
             935656,
-            1665.0
+            1665
           ],
           [
             2,
@@ -2465,7 +2465,7 @@
             160,
             12,
             929600,
-            1200.0
+            1200
           ],
           [
             3,
@@ -2473,7 +2473,7 @@
             193,
             10,
             921575,
-            1737.0
+            1737
           ],
           [
             1,
@@ -2481,7 +2481,7 @@
             212,
             4,
             899092,
-            4770.0
+            4770
           ],
           [
             3,
@@ -2489,7 +2489,7 @@
             128,
             5,
             887680,
-            2304.0
+            2304
           ],
           [
             3,
@@ -2497,7 +2497,7 @@
             75,
             1,
             886650,
-            6750.0
+            6750
           ],
           [
             1,
@@ -2513,7 +2513,7 @@
             72,
             3,
             819504,
-            2160.0
+            2160
           ],
           [
             2,
@@ -2577,7 +2577,7 @@
             103,
             3,
             633553,
-            3090.0
+            3090
           ],
           [
             3,
@@ -2593,7 +2593,7 @@
             213,
             2,
             614718,
-            9585.0
+            9585
           ],
           [
             3,
@@ -2601,7 +2601,7 @@
             104,
             4,
             601224,
-            2340.0
+            2340
           ],
           [
             1,
@@ -2633,7 +2633,7 @@
             100,
             8,
             589100,
-            1125.0
+            1125
           ],
           [
             3,
@@ -2641,7 +2641,7 @@
             140,
             10,
             578900,
-            1260.0
+            1260
           ],
           [
             3,
@@ -2657,7 +2657,7 @@
             118,
             2,
             564512,
-            5310.0
+            5310
           ],
           [
             1,
@@ -2673,7 +2673,7 @@
             60,
             3,
             550800,
-            1800.0
+            1800
           ],
           [
             3,
@@ -2715,19 +2715,19 @@
           "reason": "用内连接会漏掉零销售的积压商品。"
         },
         {
-          "sql": "WITH s AS (SELECT warehouse_id,product_id,SUM(-quantity_delta) sold FROM stock_movements WHERE movement_type='sale' AND movement_date BETWEEN '2025-10-03' AND '2025-12-31' GROUP BY warehouse_id,product_id) SELECT i.warehouse_id,i.product_id,i.quantity,COALESCE(s.sold,0) sold_units,i.quantity*i.unit_cost_cents stock_value_cents,ROUND(90.0*i.quantity/NULLIF(s.sold,0),2) cover_days FROM inventory_snapshots i JOIN products p ON p.product_id=i.product_id JOIN s ON s.warehouse_id=i.warehouse_id AND s.product_id=i.product_id WHERE p.active=1 AND i.snapshot_date='2025-12-31' AND i.quantity*i.unit_cost_cents>500000 AND COALESCE(s.sold,0)<20 ORDER BY stock_value_cents DESC,i.warehouse_id,i.product_id",
+          "sql": "WITH s AS (SELECT warehouse_id,product_id,SUM(-quantity_delta) sold FROM stock_movements WHERE movement_type='sale' AND movement_date BETWEEN '2025-10-03' AND '2025-12-31' GROUP BY warehouse_id,product_id) SELECT i.warehouse_id,i.product_id,i.quantity,COALESCE(s.sold,0) sold_units,i.quantity*i.unit_cost_cents stock_value_cents,ROUND(90.0*i.quantity/NULLIF(s.sold,0),2) cover_days FROM inventory_snapshots i JOIN products p ON p.product_id=i.product_id JOIN s ON s.warehouse_id=i.warehouse_id AND s.product_id=i.product_id WHERE p.active=1 AND i.snapshot_date='2025-12-31' AND i.quantity*i.unit_cost_cents>500000 AND COALESCE(s.sold,0)<20 ORDER BY stock_value_cents DESC, i.warehouse_id",
           "reason": "原典型错误：原典型错误：原典型错误：误用内连接，可能遗漏没有匹配记录的主体。",
           "validation": "最新公开及隐藏夹具实际执行拒绝",
           "counterexample": "q0256-public"
         },
         {
-          "sql": "WITH s AS (SELECT warehouse_id,product_id,AVG(-quantity_delta) sold FROM stock_movements WHERE movement_type='sale' AND movement_date BETWEEN '2025-10-03' AND '2025-12-31' GROUP BY warehouse_id,product_id) SELECT i.warehouse_id,i.product_id,i.quantity,COALESCE(s.sold,0) sold_units,i.quantity*i.unit_cost_cents stock_value_cents,ROUND(90.0*i.quantity/NULLIF(s.sold,0),2) cover_days FROM inventory_snapshots i JOIN products p ON p.product_id=i.product_id LEFT JOIN s ON s.warehouse_id=i.warehouse_id AND s.product_id=i.product_id WHERE p.active=1 AND i.snapshot_date='2025-12-31' AND i.quantity*i.unit_cost_cents>500000 AND COALESCE(s.sold,0)<20 ORDER BY stock_value_cents DESC,i.warehouse_id,i.product_id",
+          "sql": "WITH s AS (SELECT warehouse_id,product_id,AVG(-quantity_delta) sold FROM stock_movements WHERE movement_type='sale' AND movement_date BETWEEN '2025-10-03' AND '2025-12-31' GROUP BY warehouse_id,product_id) SELECT i.warehouse_id,i.product_id,i.quantity,COALESCE(s.sold,0) sold_units,i.quantity*i.unit_cost_cents stock_value_cents,ROUND(90.0*i.quantity/NULLIF(s.sold,0),2) cover_days FROM inventory_snapshots i JOIN products p ON p.product_id=i.product_id LEFT JOIN s ON s.warehouse_id=i.warehouse_id AND s.product_id=i.product_id WHERE p.active=1 AND i.snapshot_date='2025-12-31' AND i.quantity*i.unit_cost_cents>500000 AND COALESCE(s.sold,0)<20 ORDER BY stock_value_cents DESC, i.warehouse_id",
           "reason": "原典型错误：原典型错误：累加误用平均",
           "validation": "最新公开及隐藏夹具实际执行拒绝",
           "counterexample": "q0256-public"
         },
         {
-          "sql": "WITH s AS (SELECT warehouse_id,product_id,SUM(-quantity_delta) sold FROM stock_movements WHERE movement_type='sale' AND movement_date BETWEEN '2025-10-03' AND '2025-12-31' GROUP BY warehouse_id,product_id) SELECT i.warehouse_id,i.product_id,i.quantity,COALESCE(s.sold,0) sold_units,i.quantity*i.unit_cost_cents stock_value_cents,ROUND(90.0*i.quantity/NULLIF(s.sold,0),2) cover_days FROM inventory_snapshots i JOIN products p ON p.product_id=i.product_id LEFT JOIN s ON s.warehouse_id=i.warehouse_id AND s.product_id=i.product_id WHERE p.active=1 AND i.snapshot_date='2025-12-31' AND i.quantity*i.unit_cost_cents>500000 AND COALESCE(s.sold,0)<20 ORDER BY stock_value_cents ASC,i.warehouse_id,i.product_id",
+          "sql": "WITH s AS (SELECT warehouse_id,product_id,SUM(-quantity_delta) sold FROM stock_movements WHERE movement_type='sale' AND movement_date BETWEEN '2025-10-03' AND '2025-12-31' GROUP BY warehouse_id,product_id) SELECT i.warehouse_id,i.product_id,i.quantity,COALESCE(s.sold,0) sold_units,i.quantity*i.unit_cost_cents stock_value_cents,ROUND(90.0*i.quantity/NULLIF(s.sold,0),2) cover_days FROM inventory_snapshots i JOIN products p ON p.product_id=i.product_id LEFT JOIN s ON s.warehouse_id=i.warehouse_id AND s.product_id=i.product_id WHERE p.active=1 AND i.snapshot_date='2025-12-31' AND i.quantity*i.unit_cost_cents>500000 AND COALESCE(s.sold,0)<20 ORDER BY stock_value_cents ASC, i.warehouse_id",
           "reason": "原典型错误：原典型错误：错误决胜顺序",
           "validation": "最新公开及隐藏夹具实际执行拒绝",
           "counterexample": "q0256-public"
@@ -2739,28 +2739,28 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0256/q0256-public.json",
-          "sha256": "fbd8861aa8945d9d5a2749ff64064a2323e28d25acce1474466f90a5c2b9b23c"
+          "sha256": "59115d43c1fefb9376c62e126ec64d6cbe25c85c7bdca0ed1f9f1ec1b042752d"
         },
         {
           "id": "q0256-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0256/q0256-boundary.json",
-          "sha256": "6049874c082afb2e96247d008957485e23bc8ce55e03161b423ec001c0150a37"
+          "sha256": "c9507d018ca19e9b8fe32031ebd3b44163e503851a414180dbef7a9d0dc886ce"
         },
         {
           "id": "q0256-mini-202611171",
           "visibility": "hidden",
           "variant": "independent-enterprise",
           "path": "fixtures/q0256/q0256-mini-202611171.json",
-          "sha256": "ad4b0e7e3e0817d509d01ecd5093af8b5e58e23d640b4e6fa25319bc649911c5"
+          "sha256": "0068f5f17f364c730316fda3a8fc59404a309d3e21ccee59f17ea486ce80e7c8"
         },
         {
           "id": "q0256-mini-202611179",
           "visibility": "hidden",
           "variant": "independent-enterprise",
           "path": "fixtures/q0256/q0256-mini-202611179.json",
-          "sha256": "719c8d92403a31895ae6f4d9b5392fe2da701a5805358f6ace3537164475071c"
+          "sha256": "ab7d24a55b99a6c4613e61b2e87577ca99a25b0e07c57cd5adc756f47e6f2437"
         }
       ],
       "initialCode": "",
@@ -2825,7 +2825,7 @@
       "projectId": "inventory",
       "title": "类别库存周转率及周转天数",
       "context": "仓储部门比较不同仓库与品类的资金效率。",
-      "requirements": "2025年：净销售出库成本含退货冲回；年初价值以2024-12-31快照、年末以2025-12-31快照；平均库存=两端均值；周转天数365/周转率，销售成本非正时天数NULL。 缺失任一商品的期初或期末快照时，该仓库类别的平均库存及周转指标返回NULL，不将缺失当作零。\n输出字段名称及顺序：warehouse_id, category_id, cogs_cents, avg_stock_cents, turnover, turnover_days。输出顺序（含决胜键）：b.warehouse_id,b.category_id。金额单位为马币分；派生金额及比率按题设保留小数，零分母为NULL。",
+      "requirements": "2025年：净销售出库成本含退货冲回；年初价值以2024-12-31快照、年末以2025-12-31快照；平均库存=两端均值；周转天数365/周转率，销售成本非正时天数NULL。 缺失任一商品的期初或期末快照时，该仓库类别的平均库存及周转指标返回NULL，不将缺失当作零。\n输出字段名称及顺序：warehouse_id, category_id, cogs_cents, avg_stock_cents, turnover, turnover_days。输出顺序：avg_stock_cents DESC。金额单位为马币分；派生金额及比率按题设保留小数，零分母为NULL。",
       "grain": "仓库×类别",
       "commonError": "销售额不是出库成本；逐商品周转率的简单平均也不是类别周转率。",
       "executionSteps": [
@@ -2903,13 +2903,13 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "WITH a AS (SELECT warehouse_id,p.category_id,SUM(CASE WHEN movement_type='sale' THEN -quantity_delta*unit_cost_cents WHEN movement_type='return' THEN -quantity_delta*unit_cost_cents ELSE 0 END) cogs FROM stock_movements m JOIN products p ON p.product_id=m.product_id WHERE movement_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY warehouse_id,p.category_id), b AS (SELECT w.warehouse_id,c.category_id,CASE WHEN COUNT(i.snapshot_id)=2*COUNT(DISTINCT p.product_id) THEN SUM(i.quantity*i.unit_cost_cents)/2.0 ELSE NULL END avg_stock FROM warehouses w CROSS JOIN categories c LEFT JOIN products p ON p.category_id=c.category_id LEFT JOIN inventory_snapshots i ON i.warehouse_id=w.warehouse_id AND i.product_id=p.product_id AND i.snapshot_date IN ('2024-12-31','2025-12-31') GROUP BY w.warehouse_id,c.category_id) SELECT b.warehouse_id,b.category_id,COALESCE(a.cogs,0) cogs_cents,b.avg_stock avg_stock_cents,ROUND(COALESCE(a.cogs,0)/NULLIF(b.avg_stock,0),4) turnover,CASE WHEN a.cogs>0 THEN ROUND(365.0*b.avg_stock/a.cogs,2) ELSE NULL END turnover_days FROM b LEFT JOIN a ON a.warehouse_id=b.warehouse_id AND a.category_id=b.category_id ORDER BY b.warehouse_id,b.category_id",
-          "sqliteSql": "WITH a AS (SELECT warehouse_id,p.category_id,SUM(CASE WHEN movement_type='sale' THEN -quantity_delta*unit_cost_cents WHEN movement_type='return' THEN -quantity_delta*unit_cost_cents ELSE 0 END) cogs FROM stock_movements m JOIN products p ON p.product_id=m.product_id WHERE movement_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY warehouse_id,p.category_id), b AS (SELECT w.warehouse_id,c.category_id,CASE WHEN COUNT(i.snapshot_id)=2*COUNT(DISTINCT p.product_id) THEN SUM(i.quantity*i.unit_cost_cents)/2.0 ELSE NULL END avg_stock FROM warehouses w CROSS JOIN categories c LEFT JOIN products p ON p.category_id=c.category_id LEFT JOIN inventory_snapshots i ON i.warehouse_id=w.warehouse_id AND i.product_id=p.product_id AND i.snapshot_date IN ('2024-12-31','2025-12-31') GROUP BY w.warehouse_id,c.category_id) SELECT b.warehouse_id,b.category_id,COALESCE(a.cogs,0) cogs_cents,b.avg_stock avg_stock_cents,ROUND(COALESCE(a.cogs,0)/NULLIF(b.avg_stock,0),4) turnover,CASE WHEN a.cogs>0 THEN ROUND(365.0*b.avg_stock/a.cogs,2) ELSE NULL END turnover_days FROM b LEFT JOIN a ON a.warehouse_id=b.warehouse_id AND a.category_id=b.category_id ORDER BY b.warehouse_id,b.category_id"
+          "mysqlSql": "WITH a AS (SELECT warehouse_id,p.category_id,SUM(CASE WHEN movement_type='sale' THEN -quantity_delta*unit_cost_cents WHEN movement_type='return' THEN -quantity_delta*unit_cost_cents ELSE 0 END) cogs FROM stock_movements m JOIN products p ON p.product_id=m.product_id WHERE movement_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY warehouse_id,p.category_id), b AS (SELECT w.warehouse_id,c.category_id,CASE WHEN COUNT(i.snapshot_id)=2*COUNT(DISTINCT p.product_id) THEN SUM(i.quantity*i.unit_cost_cents)/2.0 ELSE NULL END avg_stock FROM warehouses w CROSS JOIN categories c LEFT JOIN products p ON p.category_id=c.category_id LEFT JOIN inventory_snapshots i ON i.warehouse_id=w.warehouse_id AND i.product_id=p.product_id AND i.snapshot_date IN ('2024-12-31','2025-12-31') GROUP BY w.warehouse_id,c.category_id) SELECT b.warehouse_id,b.category_id,COALESCE(a.cogs,0) cogs_cents,b.avg_stock avg_stock_cents,ROUND(COALESCE(a.cogs,0)/NULLIF(b.avg_stock,0),4) turnover,CASE WHEN a.cogs>0 THEN ROUND(365.0*b.avg_stock/a.cogs,2) ELSE NULL END turnover_days FROM b LEFT JOIN a ON a.warehouse_id=b.warehouse_id AND a.category_id=b.category_id ORDER BY avg_stock_cents DESC",
+          "sqliteSql": "WITH a AS (SELECT warehouse_id,p.category_id,SUM(CASE WHEN movement_type='sale' THEN -quantity_delta*unit_cost_cents WHEN movement_type='return' THEN -quantity_delta*unit_cost_cents ELSE 0 END) cogs FROM stock_movements m JOIN products p ON p.product_id=m.product_id WHERE movement_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY warehouse_id,p.category_id), b AS (SELECT w.warehouse_id,c.category_id,CASE WHEN COUNT(i.snapshot_id)=2*COUNT(DISTINCT p.product_id) THEN SUM(i.quantity*i.unit_cost_cents)/2.0 ELSE NULL END avg_stock FROM warehouses w CROSS JOIN categories c LEFT JOIN products p ON p.category_id=c.category_id LEFT JOIN inventory_snapshots i ON i.warehouse_id=w.warehouse_id AND i.product_id=p.product_id AND i.snapshot_date IN ('2024-12-31','2025-12-31') GROUP BY w.warehouse_id,c.category_id) SELECT b.warehouse_id,b.category_id,COALESCE(a.cogs,0) cogs_cents,b.avg_stock avg_stock_cents,ROUND(COALESCE(a.cogs,0)/NULLIF(b.avg_stock,0),4) turnover,CASE WHEN a.cogs>0 THEN ROUND(365.0*b.avg_stock/a.cogs,2) ELSE NULL END turnover_days FROM b LEFT JOIN a ON a.warehouse_id=b.warehouse_id AND a.category_id=b.category_id ORDER BY avg_stock_cents DESC"
         },
         {
           "kind": "equivalent",
-          "mysqlSql": "WITH a AS (SELECT warehouse_id,p.category_id,SUM(CASE WHEN movement_type='sale' THEN -quantity_delta*unit_cost_cents WHEN movement_type='return' THEN -quantity_delta*unit_cost_cents ELSE 0 END) cogs FROM stock_movements m JOIN products p ON p.product_id=m.product_id WHERE (movement_date>='2025-01-01' AND movement_date<='2025-12-31') GROUP BY warehouse_id,p.category_id), b AS (SELECT w.warehouse_id,c.category_id,CASE WHEN COUNT(i.snapshot_id)=2*COUNT(DISTINCT p.product_id) THEN SUM(i.quantity*i.unit_cost_cents)/2.0 ELSE NULL END avg_stock FROM warehouses w CROSS JOIN categories c LEFT JOIN products p ON p.category_id=c.category_id LEFT JOIN inventory_snapshots i ON i.warehouse_id=w.warehouse_id AND i.product_id=p.product_id AND i.snapshot_date IN ('2024-12-31','2025-12-31') GROUP BY w.warehouse_id,c.category_id) SELECT b.warehouse_id,b.category_id,COALESCE(a.cogs,0) cogs_cents,b.avg_stock avg_stock_cents,ROUND(COALESCE(a.cogs,0)/NULLIF(b.avg_stock,0),4) turnover,CASE WHEN a.cogs>0 THEN ROUND(365.0*b.avg_stock/a.cogs,2) ELSE NULL END turnover_days FROM b LEFT JOIN a ON a.warehouse_id=b.warehouse_id AND a.category_id=b.category_id ORDER BY b.warehouse_id,b.category_id",
-          "sqliteSql": "WITH a AS (SELECT warehouse_id,p.category_id,SUM(CASE WHEN movement_type='sale' THEN -quantity_delta*unit_cost_cents WHEN movement_type='return' THEN -quantity_delta*unit_cost_cents ELSE 0 END) cogs FROM stock_movements m JOIN products p ON p.product_id=m.product_id WHERE (movement_date>='2025-01-01' AND movement_date<='2025-12-31') GROUP BY warehouse_id,p.category_id), b AS (SELECT w.warehouse_id,c.category_id,CASE WHEN COUNT(i.snapshot_id)=2*COUNT(DISTINCT p.product_id) THEN SUM(i.quantity*i.unit_cost_cents)/2.0 ELSE NULL END avg_stock FROM warehouses w CROSS JOIN categories c LEFT JOIN products p ON p.category_id=c.category_id LEFT JOIN inventory_snapshots i ON i.warehouse_id=w.warehouse_id AND i.product_id=p.product_id AND i.snapshot_date IN ('2024-12-31','2025-12-31') GROUP BY w.warehouse_id,c.category_id) SELECT b.warehouse_id,b.category_id,COALESCE(a.cogs,0) cogs_cents,b.avg_stock avg_stock_cents,ROUND(COALESCE(a.cogs,0)/NULLIF(b.avg_stock,0),4) turnover,CASE WHEN a.cogs>0 THEN ROUND(365.0*b.avg_stock/a.cogs,2) ELSE NULL END turnover_days FROM b LEFT JOIN a ON a.warehouse_id=b.warehouse_id AND a.category_id=b.category_id ORDER BY b.warehouse_id,b.category_id"
+          "mysqlSql": "WITH a AS (SELECT warehouse_id,p.category_id,SUM(CASE WHEN movement_type='sale' THEN -quantity_delta*unit_cost_cents WHEN movement_type='return' THEN -quantity_delta*unit_cost_cents ELSE 0 END) cogs FROM stock_movements m JOIN products p ON p.product_id=m.product_id WHERE (movement_date>='2025-01-01' AND movement_date<='2025-12-31') GROUP BY warehouse_id,p.category_id), b AS (SELECT w.warehouse_id,c.category_id,CASE WHEN COUNT(i.snapshot_id)=2*COUNT(DISTINCT p.product_id) THEN SUM(i.quantity*i.unit_cost_cents)/2.0 ELSE NULL END avg_stock FROM warehouses w CROSS JOIN categories c LEFT JOIN products p ON p.category_id=c.category_id LEFT JOIN inventory_snapshots i ON i.warehouse_id=w.warehouse_id AND i.product_id=p.product_id AND i.snapshot_date IN ('2024-12-31','2025-12-31') GROUP BY w.warehouse_id,c.category_id) SELECT b.warehouse_id,b.category_id,COALESCE(a.cogs,0) cogs_cents,b.avg_stock avg_stock_cents,ROUND(COALESCE(a.cogs,0)/NULLIF(b.avg_stock,0),4) turnover,CASE WHEN a.cogs>0 THEN ROUND(365.0*b.avg_stock/a.cogs,2) ELSE NULL END turnover_days FROM b LEFT JOIN a ON a.warehouse_id=b.warehouse_id AND a.category_id=b.category_id ORDER BY avg_stock_cents DESC",
+          "sqliteSql": "WITH a AS (SELECT warehouse_id,p.category_id,SUM(CASE WHEN movement_type='sale' THEN -quantity_delta*unit_cost_cents WHEN movement_type='return' THEN -quantity_delta*unit_cost_cents ELSE 0 END) cogs FROM stock_movements m JOIN products p ON p.product_id=m.product_id WHERE (movement_date>='2025-01-01' AND movement_date<='2025-12-31') GROUP BY warehouse_id,p.category_id), b AS (SELECT w.warehouse_id,c.category_id,CASE WHEN COUNT(i.snapshot_id)=2*COUNT(DISTINCT p.product_id) THEN SUM(i.quantity*i.unit_cost_cents)/2.0 ELSE NULL END avg_stock FROM warehouses w CROSS JOIN categories c LEFT JOIN products p ON p.category_id=c.category_id LEFT JOIN inventory_snapshots i ON i.warehouse_id=w.warehouse_id AND i.product_id=p.product_id AND i.snapshot_date IN ('2024-12-31','2025-12-31') GROUP BY w.warehouse_id,c.category_id) SELECT b.warehouse_id,b.category_id,COALESCE(a.cogs,0) cogs_cents,b.avg_stock avg_stock_cents,ROUND(COALESCE(a.cogs,0)/NULLIF(b.avg_stock,0),4) turnover,CASE WHEN a.cogs>0 THEN ROUND(365.0*b.avg_stock/a.cogs,2) ELSE NULL END turnover_days FROM b LEFT JOIN a ON a.warehouse_id=b.warehouse_id AND a.category_id=b.category_id ORDER BY avg_stock_cents DESC"
         }
       ],
       "hints": [
@@ -2946,20 +2946,28 @@
         ],
         "rows": [
           [
-            1,
-            1,
-            726002,
-            2919306.5,
-            0.2487,
-            1467.69
+            3,
+            7,
+            7705671,
+            17613195.5,
+            0.4375,
+            834.3
           ],
           [
-            1,
-            2,
-            767007,
-            1458974.0,
-            0.5257,
-            694.29
+            3,
+            3,
+            6343114,
+            17249974.5,
+            0.3677,
+            992.61
+          ],
+          [
+            3,
+            10,
+            1932299,
+            9629977.5,
+            0.2007,
+            1819.05
           ],
           [
             1,
@@ -2970,76 +2978,116 @@
             2282.56
           ],
           [
-            1,
+            3,
             4,
-            1673566,
-            2986761.0,
-            0.5603,
-            651.4
-          ],
-          [
-            1,
-            5,
-            425682,
-            1009589.5,
-            0.4216,
-            865.67
-          ],
-          [
-            1,
-            6,
-            308505,
-            562227.5,
-            0.5487,
-            665.19
+            6125894,
+            8280771.5,
+            0.7398,
+            493.39
           ],
           [
             1,
             7,
             2032595,
-            7737525.0,
+            7737525,
             0.2627,
             1389.45
           ],
           [
-            1,
-            8,
-            693064,
-            1665634.0,
-            0.4161,
-            877.2
+            3,
+            15,
+            5348988,
+            7603932,
+            0.7035,
+            518.87
           ],
           [
+            3,
+            13,
+            1091113,
+            7392708,
+            0.1476,
+            2473.01
+          ],
+          [
+            2,
+            3,
+            1265641,
+            6363796.5,
+            0.1989,
+            1835.26
+          ],
+          [
+            3,
+            12,
+            1597124,
+            5796070,
+            0.2756,
+            1324.61
+          ],
+          [
+            3,
             1,
-            9,
-            313808,
-            967996.5,
-            0.3242,
-            1125.91
+            2476110,
+            5747842.5,
+            0.4308,
+            847.28
+          ],
+          [
+            2,
+            7,
+            1395952,
+            5101706,
+            0.2736,
+            1333.94
+          ],
+          [
+            3,
+            14,
+            1570171,
+            4220047,
+            0.3721,
+            980.99
+          ],
+          [
+            3,
+            11,
+            2429416,
+            4130298.5,
+            0.5882,
+            620.54
           ],
           [
             1,
             10,
             586823,
-            4010974.0,
+            4010974,
             0.1463,
             2494.8
           ],
           [
             1,
-            11,
-            748019,
-            1664762.5,
-            0.4493,
-            812.33
+            15,
+            1577211,
+            4007916.5,
+            0.3935,
+            927.52
           ],
           [
-            1,
-            12,
-            355967,
-            2348356.5,
-            0.1516,
-            2407.95
+            3,
+            8,
+            2526825,
+            3554286.5,
+            0.7109,
+            513.42
+          ],
+          [
+            3,
+            2,
+            2827893,
+            3477795,
+            0.8131,
+            448.88
           ],
           [
             1,
@@ -3059,91 +3107,83 @@
           ],
           [
             1,
-            15,
-            1577211,
-            4007916.5,
-            0.3935,
-            927.52
-          ],
-          [
-            2,
-            1,
-            458232,
-            1931730.0,
-            0.2372,
-            1538.7
-          ],
-          [
-            2,
-            2,
-            476389,
-            1067578.5,
-            0.4462,
-            817.96
-          ],
-          [
-            2,
-            3,
-            1265641,
-            6363796.5,
-            0.1989,
-            1835.26
-          ],
-          [
-            2,
             4,
-            1150928,
-            2609636.0,
-            0.441,
-            827.61
+            1673566,
+            2986761,
+            0.5603,
+            651.4
           ],
           [
-            2,
-            5,
-            261148,
-            883034.0,
-            0.2957,
-            1234.19
-          ],
-          [
-            2,
-            6,
-            209748,
-            485086.5,
-            0.4324,
-            844.14
-          ],
-          [
-            2,
-            7,
-            1395952,
-            5101706.0,
-            0.2736,
-            1333.94
-          ],
-          [
-            2,
-            8,
-            533777,
-            1772915.5,
-            0.3011,
-            1212.33
-          ],
-          [
-            2,
-            9,
-            305303,
-            789060.0,
-            0.3869,
-            943.35
+            1,
+            1,
+            726002,
+            2919306.5,
+            0.2487,
+            1467.69
           ],
           [
             2,
             10,
             263349,
-            2866857.0,
+            2866857,
             0.0919,
             3973.45
+          ],
+          [
+            2,
+            15,
+            1099926,
+            2812631,
+            0.3911,
+            933.34
+          ],
+          [
+            2,
+            4,
+            1150928,
+            2609636,
+            0.441,
+            827.61
+          ],
+          [
+            1,
+            12,
+            355967,
+            2348356.5,
+            0.1516,
+            2407.95
+          ],
+          [
+            2,
+            12,
+            328687,
+            2288715.5,
+            0.1436,
+            2541.57
+          ],
+          [
+            3,
+            5,
+            1665377,
+            2272504.5,
+            0.7328,
+            498.06
+          ],
+          [
+            2,
+            14,
+            393440,
+            2154696,
+            0.1826,
+            1998.94
+          ],
+          [
+            3,
+            9,
+            1265308,
+            2082153.5,
+            0.6077,
+            600.63
           ],
           [
             2,
@@ -3155,75 +3195,51 @@
           ],
           [
             2,
-            12,
-            328687,
-            2288715.5,
-            0.1436,
-            2541.57
+            1,
+            458232,
+            1931730,
+            0.2372,
+            1538.7
+          ],
+          [
+            2,
+            8,
+            533777,
+            1772915.5,
+            0.3011,
+            1212.33
+          ],
+          [
+            1,
+            8,
+            693064,
+            1665634,
+            0.4161,
+            877.2
+          ],
+          [
+            1,
+            11,
+            748019,
+            1664762.5,
+            0.4493,
+            812.33
           ],
           [
             2,
             13,
             142415,
-            1547277.0,
+            1547277,
             0.092,
             3965.57
           ],
           [
-            2,
-            14,
-            393440,
-            2154696.0,
-            0.1826,
-            1998.94
-          ],
-          [
-            2,
-            15,
-            1099926,
-            2812631.0,
-            0.3911,
-            933.34
-          ],
-          [
-            3,
             1,
-            2476110,
-            5747842.5,
-            0.4308,
-            847.28
-          ],
-          [
-            3,
             2,
-            2827893,
-            3477795.0,
-            0.8131,
-            448.88
-          ],
-          [
-            3,
-            3,
-            6343114,
-            17249974.5,
-            0.3677,
-            992.61
-          ],
-          [
-            3,
-            4,
-            6125894,
-            8280771.5,
-            0.7398,
-            493.39
-          ],
-          [
-            3,
-            5,
-            1665377,
-            2272504.5,
-            0.7328,
-            498.06
+            767007,
+            1458974,
+            0.5257,
+            694.29
           ],
           [
             3,
@@ -3234,76 +3250,60 @@
             454.15
           ],
           [
-            3,
-            7,
-            7705671,
-            17613195.5,
-            0.4375,
-            834.3
+            2,
+            2,
+            476389,
+            1067578.5,
+            0.4462,
+            817.96
           ],
           [
-            3,
-            8,
-            2526825,
-            3554286.5,
-            0.7109,
-            513.42
+            1,
+            5,
+            425682,
+            1009589.5,
+            0.4216,
+            865.67
           ],
           [
-            3,
+            1,
             9,
-            1265308,
-            2082153.5,
-            0.6077,
-            600.63
+            313808,
+            967996.5,
+            0.3242,
+            1125.91
           ],
           [
-            3,
-            10,
-            1932299,
-            9629977.5,
-            0.2007,
-            1819.05
+            2,
+            5,
+            261148,
+            883034,
+            0.2957,
+            1234.19
           ],
           [
-            3,
-            11,
-            2429416,
-            4130298.5,
-            0.5882,
-            620.54
+            2,
+            9,
+            305303,
+            789060,
+            0.3869,
+            943.35
           ],
           [
-            3,
-            12,
-            1597124,
-            5796070.0,
-            0.2756,
-            1324.61
+            1,
+            6,
+            308505,
+            562227.5,
+            0.5487,
+            665.19
           ],
           [
-            3,
-            13,
-            1091113,
-            7392708.0,
-            0.1476,
-            2473.01
-          ],
-          [
-            3,
-            14,
-            1570171,
-            4220047.0,
-            0.3721,
-            980.99
-          ],
-          [
-            3,
-            15,
-            5348988,
-            7603932.0,
-            0.7035,
-            518.87
+            2,
+            6,
+            209748,
+            485086.5,
+            0.4324,
+            844.14
           ]
         ],
         "rowCount": 45
@@ -3313,19 +3313,19 @@
           "reason": "销售额不是出库成本；逐商品周转率的简单平均也不是类别周转率。"
         },
         {
-          "sql": "WITH a AS (SELECT warehouse_id,p.category_id,AVG(CASE WHEN movement_type='sale' THEN -quantity_delta*unit_cost_cents WHEN movement_type='return' THEN -quantity_delta*unit_cost_cents ELSE 0 END) cogs FROM stock_movements m JOIN products p ON p.product_id=m.product_id WHERE movement_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY warehouse_id,p.category_id), b AS (SELECT warehouse_id,p.category_id,SUM(quantity*unit_cost_cents)/2.0 avg_stock FROM inventory_snapshots i JOIN products p ON p.product_id=i.product_id WHERE snapshot_date IN ('2024-12-31','2025-12-31') GROUP BY warehouse_id,p.category_id) SELECT b.warehouse_id,b.category_id,COALESCE(a.cogs,0) cogs_cents,b.avg_stock avg_stock_cents,ROUND(COALESCE(a.cogs,0)/NULLIF(b.avg_stock,0),4) turnover,CASE WHEN a.cogs>0 THEN ROUND(365.0*b.avg_stock/a.cogs,2) ELSE NULL END turnover_days FROM b LEFT JOIN a ON a.warehouse_id=b.warehouse_id AND a.category_id=b.category_id ORDER BY b.warehouse_id,b.category_id",
+          "sql": "WITH a AS (SELECT warehouse_id,p.category_id,AVG(CASE WHEN movement_type='sale' THEN -quantity_delta*unit_cost_cents WHEN movement_type='return' THEN -quantity_delta*unit_cost_cents ELSE 0 END) cogs FROM stock_movements m JOIN products p ON p.product_id=m.product_id WHERE movement_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY warehouse_id,p.category_id), b AS (SELECT warehouse_id,p.category_id,SUM(quantity*unit_cost_cents)/2.0 avg_stock FROM inventory_snapshots i JOIN products p ON p.product_id=i.product_id WHERE snapshot_date IN ('2024-12-31','2025-12-31') GROUP BY warehouse_id,p.category_id) SELECT b.warehouse_id,b.category_id,COALESCE(a.cogs,0) cogs_cents,b.avg_stock avg_stock_cents,ROUND(COALESCE(a.cogs,0)/NULLIF(b.avg_stock,0),4) turnover,CASE WHEN a.cogs>0 THEN ROUND(365.0*b.avg_stock/a.cogs,2) ELSE NULL END turnover_days FROM b LEFT JOIN a ON a.warehouse_id=b.warehouse_id AND a.category_id=b.category_id ORDER BY avg_stock_cents DESC",
           "reason": "原典型错误：原典型错误：原典型错误：把累加量错误计算成均值。",
           "validation": "最新公开及隐藏夹具实际执行拒绝",
           "counterexample": "q0257-public"
         },
         {
-          "sql": "WITH a AS (SELECT warehouse_id,p.category_id,AVG(CASE WHEN movement_type='sale' THEN -quantity_delta*unit_cost_cents WHEN movement_type='return' THEN -quantity_delta*unit_cost_cents ELSE 0 END) cogs FROM stock_movements m JOIN products p ON p.product_id=m.product_id WHERE movement_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY warehouse_id,p.category_id), b AS (SELECT w.warehouse_id,c.category_id,CASE WHEN COUNT(i.snapshot_id)=2*COUNT(DISTINCT p.product_id) THEN AVG(i.quantity*i.unit_cost_cents)/2.0 ELSE NULL END avg_stock FROM warehouses w CROSS JOIN categories c LEFT JOIN products p ON p.category_id=c.category_id LEFT JOIN inventory_snapshots i ON i.warehouse_id=w.warehouse_id AND i.product_id=p.product_id AND i.snapshot_date IN ('2024-12-31','2025-12-31') GROUP BY w.warehouse_id,c.category_id) SELECT b.warehouse_id,b.category_id,COALESCE(a.cogs,0) cogs_cents,b.avg_stock avg_stock_cents,ROUND(COALESCE(a.cogs,0)/NULLIF(b.avg_stock,0),4) turnover,CASE WHEN a.cogs>0 THEN ROUND(365.0*b.avg_stock/a.cogs,2) ELSE NULL END turnover_days FROM b LEFT JOIN a ON a.warehouse_id=b.warehouse_id AND a.category_id=b.category_id ORDER BY b.warehouse_id,b.category_id",
+          "sql": "WITH a AS (SELECT warehouse_id,p.category_id,AVG(CASE WHEN movement_type='sale' THEN -quantity_delta*unit_cost_cents WHEN movement_type='return' THEN -quantity_delta*unit_cost_cents ELSE 0 END) cogs FROM stock_movements m JOIN products p ON p.product_id=m.product_id WHERE movement_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY warehouse_id,p.category_id), b AS (SELECT w.warehouse_id,c.category_id,CASE WHEN COUNT(i.snapshot_id)=2*COUNT(DISTINCT p.product_id) THEN AVG(i.quantity*i.unit_cost_cents)/2.0 ELSE NULL END avg_stock FROM warehouses w CROSS JOIN categories c LEFT JOIN products p ON p.category_id=c.category_id LEFT JOIN inventory_snapshots i ON i.warehouse_id=w.warehouse_id AND i.product_id=p.product_id AND i.snapshot_date IN ('2024-12-31','2025-12-31') GROUP BY w.warehouse_id,c.category_id) SELECT b.warehouse_id,b.category_id,COALESCE(a.cogs,0) cogs_cents,b.avg_stock avg_stock_cents,ROUND(COALESCE(a.cogs,0)/NULLIF(b.avg_stock,0),4) turnover,CASE WHEN a.cogs>0 THEN ROUND(365.0*b.avg_stock/a.cogs,2) ELSE NULL END turnover_days FROM b LEFT JOIN a ON a.warehouse_id=b.warehouse_id AND a.category_id=b.category_id ORDER BY avg_stock_cents DESC",
           "reason": "原典型错误：原典型错误：累加误用平均",
           "validation": "最新公开及隐藏夹具实际执行拒绝",
           "counterexample": "q0257-public"
         },
         {
-          "sql": "WITH a AS (SELECT warehouse_id,p.category_id,SUM(CASE WHEN movement_type='sale' THEN -quantity_delta*unit_cost_cents WHEN movement_type='return' THEN -quantity_delta*unit_cost_cents ELSE 0 END) cogs FROM stock_movements m JOIN products p ON p.product_id=m.product_id WHERE movement_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY warehouse_id,p.category_id), b AS (SELECT w.warehouse_id,c.category_id,CASE WHEN COUNT(i.snapshot_id)=2*COUNT(p.product_id) THEN SUM(i.quantity*i.unit_cost_cents)/2.0 ELSE NULL END avg_stock FROM warehouses w CROSS JOIN categories c LEFT JOIN products p ON p.category_id=c.category_id LEFT JOIN inventory_snapshots i ON i.warehouse_id=w.warehouse_id AND i.product_id=p.product_id AND i.snapshot_date IN ('2024-12-31','2025-12-31') GROUP BY w.warehouse_id,c.category_id) SELECT b.warehouse_id,b.category_id,COALESCE(a.cogs,0) cogs_cents,b.avg_stock avg_stock_cents,ROUND(COALESCE(a.cogs,0)/NULLIF(b.avg_stock,0),4) turnover,CASE WHEN a.cogs>0 THEN ROUND(365.0*b.avg_stock/a.cogs,2) ELSE NULL END turnover_days FROM b LEFT JOIN a ON a.warehouse_id=b.warehouse_id AND a.category_id=b.category_id ORDER BY b.warehouse_id,b.category_id",
+          "sql": "WITH a AS (SELECT warehouse_id,p.category_id,SUM(CASE WHEN movement_type='sale' THEN -quantity_delta*unit_cost_cents WHEN movement_type='return' THEN -quantity_delta*unit_cost_cents ELSE 0 END) cogs FROM stock_movements m JOIN products p ON p.product_id=m.product_id WHERE movement_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY warehouse_id,p.category_id), b AS (SELECT w.warehouse_id,c.category_id,CASE WHEN COUNT(i.snapshot_id)=2*COUNT(p.product_id) THEN SUM(i.quantity*i.unit_cost_cents)/2.0 ELSE NULL END avg_stock FROM warehouses w CROSS JOIN categories c LEFT JOIN products p ON p.category_id=c.category_id LEFT JOIN inventory_snapshots i ON i.warehouse_id=w.warehouse_id AND i.product_id=p.product_id AND i.snapshot_date IN ('2024-12-31','2025-12-31') GROUP BY w.warehouse_id,c.category_id) SELECT b.warehouse_id,b.category_id,COALESCE(a.cogs,0) cogs_cents,b.avg_stock avg_stock_cents,ROUND(COALESCE(a.cogs,0)/NULLIF(b.avg_stock,0),4) turnover,CASE WHEN a.cogs>0 THEN ROUND(365.0*b.avg_stock/a.cogs,2) ELSE NULL END turnover_days FROM b LEFT JOIN a ON a.warehouse_id=b.warehouse_id AND a.category_id=b.category_id ORDER BY avg_stock_cents DESC",
           "reason": "原典型错误：原典型错误：去重计数误用行数",
           "validation": "最新公开及隐藏夹具实际执行拒绝",
           "counterexample": "q0257-public"
@@ -3337,35 +3337,35 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0257/q0257-public.json",
-          "sha256": "393f696a3ffb30a97843fdad9f895cee0e2ac4121d34a0322a3464cca1e62869"
+          "sha256": "a5aca54c01d29bd1baf5ef71621835ca6a8e5310fe10f72a6a78fe556692f67d"
         },
         {
           "id": "q0257-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0257/q0257-boundary.json",
-          "sha256": "fa2dff92d099f889524f4f2e6358a99f250bb8ea1d5bb5f30fe84d509504e835"
+          "sha256": "463aeaabecae584b552e24c4ab0719d262c07cfd12dfe54dbdd5a664ec7896b8"
         },
         {
           "id": "q0257-missing-snapshot",
           "visibility": "hidden",
           "variant": "missing-snapshot",
           "path": "fixtures/q0257/q0257-missing-snapshot.json",
-          "sha256": "20d4fe6438b6df2b7c8eb88fce46fa2f895f723d55a46b4ea7ce457911af37b7"
+          "sha256": "11d64f23d2dfaacaf03dc9a1b9ce05e6e543043076a114e27616a7dd108ed5a4"
         },
         {
           "id": "q0257-mini-202611171",
           "visibility": "hidden",
           "variant": "independent-enterprise",
           "path": "fixtures/q0257/q0257-mini-202611171.json",
-          "sha256": "c0999c492fab02c5b1591b3137fca92a331636b021f94868532b6f7f9404dd54"
+          "sha256": "7486483ba4cee467b5088b29aac62bc2f467ff3c74effb4f1db863a666ce8c48"
         },
         {
           "id": "q0257-mini-202611179",
           "visibility": "hidden",
           "variant": "independent-enterprise",
           "path": "fixtures/q0257/q0257-mini-202611179.json",
-          "sha256": "92ce849aa01317819a97a60e447e3b04f4cde2c97664f100087ff5fe7fb9c32f"
+          "sha256": "3cddab5cf9b7d66c93f89fe6ed44acc868112b01d608c9529c4514b5dede211d"
         }
       ],
       "initialCode": "",
@@ -83601,7 +83601,7 @@
       "projectId": "hr",
       "title": "月度离职率与趋势",
       "context": "人资经理比较各部门真实离职率。",
-      "requirements": "2025年每部门每月真实离职人数（终止日期落月内，取终止前岗位）/期初期末平均在职数；期初以当月首日之前一天在职为准；滚动三月率用离职总数/三个月平均人数之和，非简单平均。 三个月滚动指标包含2024年11—12月历史后再筛选2025年输出，不在年度边界重新开始累计；确实不足三个月时返回NULL。\n输出字段名称及顺序：department_id, month_key, opening, closing, exits, exit_pct, rolling_pct。输出顺序（含决胜键）：month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) e3,SUM(avg_h) OVER(PARTITION BY department_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) h3,COUNT(*) OVER(PARTITION BY department_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) n3 FROM b) SELECT department_id,month_key,opening,closing,exits,ROUND(100.0*exits/NULLIF(avg_h,0),2) exit_pct,CASE WHEN n3=3 THEN ROUND(100.0*e3/NULLIF(h3,0),2) ELSE NULL END rolling_pct FROM z WHERE month_key BETWEEN '2025-01' AND '2025-12' ORDER BY department_id,month_key。金额单位为马币分；派生金额及比率按题设保留小数，零分母为NULL。",
+      "requirements": "2025年每部门每月真实离职人数（终止日期落月内，取终止前岗位）/期初期末平均在职数；期初以当月首日之前一天在职为准；滚动三月率用离职总数/三个月平均人数之和，非简单平均。 三个月滚动指标包含2024年11—12月历史后再筛选2025年输出，不在年度边界重新开始累计；确实不足三个月时返回NULL。\n输出字段名称及顺序：department_id, month_key, opening, closing, exits, exit_pct, rolling_pct。输出顺序不作要求。金额单位为马币分；派生金额及比率按题设保留小数，零分母为NULL。",
       "grain": "部门×月",
       "commonError": "把部门调动当离职会夸大离职率。",
       "executionSteps": [
@@ -83657,7 +83657,7 @@
         "stores",
         "warehouses"
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "numericTolerance": {
         "absolute": 1e-06,
         "integerExact": true,
@@ -83667,13 +83667,13 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "WITH m AS (SELECT month_key,MIN(day) first_day,MAX(day) last_day,MIN(day_index) first_idx FROM calendar_days WHERE month_key BETWEEN '2024-11' AND '2025-12' GROUP BY month_key), a AS (SELECT d.department_id,m.month_key,SUM(CASE WHEN h.start_date< m.first_day AND (h.end_date IS NULL OR h.end_date>=m.first_day) THEN 1 ELSE 0 END) opening,SUM(CASE WHEN h.start_date<=m.last_day AND (h.end_date IS NULL OR h.end_date>m.last_day) THEN 1 ELSE 0 END) closing,SUM(CASE WHEN e.termination_date BETWEEN m.first_day AND m.last_day AND h.end_date=e.termination_date THEN 1 ELSE 0 END) exits FROM departments d CROSS JOIN m LEFT JOIN employment_history h ON h.department_id=d.department_id LEFT JOIN employees e ON e.employee_id=h.employee_id GROUP BY d.department_id,m.month_key), b AS (SELECT *, (opening+closing)/2.0 avg_h FROM a), z AS (SELECT *,SUM(exits) OVER(PARTITION BY department_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) e3,SUM(avg_h) OVER(PARTITION BY department_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) h3,COUNT(*) OVER(PARTITION BY department_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) n3 FROM b) SELECT department_id,month_key,opening,closing,exits,ROUND(100.0*exits/NULLIF(avg_h,0),2) exit_pct,CASE WHEN n3=3 THEN ROUND(100.0*e3/NULLIF(h3,0),2) ELSE NULL END rolling_pct FROM z WHERE month_key BETWEEN '2025-01' AND '2025-12' ORDER BY department_id,month_key",
-          "sqliteSql": "WITH m AS (SELECT month_key,MIN(day) first_day,MAX(day) last_day,MIN(day_index) first_idx FROM calendar_days WHERE month_key BETWEEN '2024-11' AND '2025-12' GROUP BY month_key), a AS (SELECT d.department_id,m.month_key,SUM(CASE WHEN h.start_date< m.first_day AND (h.end_date IS NULL OR h.end_date>=m.first_day) THEN 1 ELSE 0 END) opening,SUM(CASE WHEN h.start_date<=m.last_day AND (h.end_date IS NULL OR h.end_date>m.last_day) THEN 1 ELSE 0 END) closing,SUM(CASE WHEN e.termination_date BETWEEN m.first_day AND m.last_day AND h.end_date=e.termination_date THEN 1 ELSE 0 END) exits FROM departments d CROSS JOIN m LEFT JOIN employment_history h ON h.department_id=d.department_id LEFT JOIN employees e ON e.employee_id=h.employee_id GROUP BY d.department_id,m.month_key), b AS (SELECT *, (opening+closing)/2.0 avg_h FROM a), z AS (SELECT *,SUM(exits) OVER(PARTITION BY department_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) e3,SUM(avg_h) OVER(PARTITION BY department_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) h3,COUNT(*) OVER(PARTITION BY department_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) n3 FROM b) SELECT department_id,month_key,opening,closing,exits,ROUND(100.0*exits/NULLIF(avg_h,0),2) exit_pct,CASE WHEN n3=3 THEN ROUND(100.0*e3/NULLIF(h3,0),2) ELSE NULL END rolling_pct FROM z WHERE month_key BETWEEN '2025-01' AND '2025-12' ORDER BY department_id,month_key"
+          "mysqlSql": "WITH m AS (SELECT month_key,MIN(day) first_day,MAX(day) last_day,MIN(day_index) first_idx FROM calendar_days WHERE month_key BETWEEN '2024-11' AND '2025-12' GROUP BY month_key), a AS (SELECT d.department_id,m.month_key,SUM(CASE WHEN h.start_date< m.first_day AND (h.end_date IS NULL OR h.end_date>=m.first_day) THEN 1 ELSE 0 END) opening,SUM(CASE WHEN h.start_date<=m.last_day AND (h.end_date IS NULL OR h.end_date>m.last_day) THEN 1 ELSE 0 END) closing,SUM(CASE WHEN e.termination_date BETWEEN m.first_day AND m.last_day AND h.end_date=e.termination_date THEN 1 ELSE 0 END) exits FROM departments d CROSS JOIN m LEFT JOIN employment_history h ON h.department_id=d.department_id LEFT JOIN employees e ON e.employee_id=h.employee_id GROUP BY d.department_id,m.month_key), b AS (SELECT *, (opening+closing)/2.0 avg_h FROM a), z AS (SELECT *,SUM(exits) OVER(PARTITION BY department_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) e3,SUM(avg_h) OVER(PARTITION BY department_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) h3,COUNT(*) OVER(PARTITION BY department_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) n3 FROM b) SELECT department_id,month_key,opening,closing,exits,ROUND(100.0*exits/NULLIF(avg_h,0),2) exit_pct,CASE WHEN n3=3 THEN ROUND(100.0*e3/NULLIF(h3,0),2) ELSE NULL END rolling_pct FROM z WHERE month_key BETWEEN '2025-01' AND '2025-12'",
+          "sqliteSql": "WITH m AS (SELECT month_key,MIN(day) first_day,MAX(day) last_day,MIN(day_index) first_idx FROM calendar_days WHERE month_key BETWEEN '2024-11' AND '2025-12' GROUP BY month_key), a AS (SELECT d.department_id,m.month_key,SUM(CASE WHEN h.start_date< m.first_day AND (h.end_date IS NULL OR h.end_date>=m.first_day) THEN 1 ELSE 0 END) opening,SUM(CASE WHEN h.start_date<=m.last_day AND (h.end_date IS NULL OR h.end_date>m.last_day) THEN 1 ELSE 0 END) closing,SUM(CASE WHEN e.termination_date BETWEEN m.first_day AND m.last_day AND h.end_date=e.termination_date THEN 1 ELSE 0 END) exits FROM departments d CROSS JOIN m LEFT JOIN employment_history h ON h.department_id=d.department_id LEFT JOIN employees e ON e.employee_id=h.employee_id GROUP BY d.department_id,m.month_key), b AS (SELECT *, (opening+closing)/2.0 avg_h FROM a), z AS (SELECT *,SUM(exits) OVER(PARTITION BY department_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) e3,SUM(avg_h) OVER(PARTITION BY department_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) h3,COUNT(*) OVER(PARTITION BY department_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) n3 FROM b) SELECT department_id,month_key,opening,closing,exits,ROUND(100.0*exits/NULLIF(avg_h,0),2) exit_pct,CASE WHEN n3=3 THEN ROUND(100.0*e3/NULLIF(h3,0),2) ELSE NULL END rolling_pct FROM z WHERE month_key BETWEEN '2025-01' AND '2025-12'"
         },
         {
           "kind": "equivalent",
-          "mysqlSql": "WITH m AS (SELECT month_key,MIN(day) first_day,MAX(day) last_day,MIN(day_index) first_idx FROM calendar_days WHERE (month_key>='2024-11' AND month_key<='2025-12') GROUP BY month_key), a AS (SELECT d.department_id,m.month_key,SUM(CASE WHEN h.start_date< m.first_day AND (h.end_date IS NULL OR h.end_date>=m.first_day) THEN 1 ELSE 0 END) opening,SUM(CASE WHEN h.start_date<=m.last_day AND (h.end_date IS NULL OR h.end_date>m.last_day) THEN 1 ELSE 0 END) closing,SUM(CASE WHEN e.termination_date BETWEEN m.first_day AND m.last_day AND h.end_date=e.termination_date THEN 1 ELSE 0 END) exits FROM departments d CROSS JOIN m LEFT JOIN employment_history h ON h.department_id=d.department_id LEFT JOIN employees e ON e.employee_id=h.employee_id GROUP BY d.department_id,m.month_key), b AS (SELECT *, (opening+closing)/2.0 avg_h FROM a), z AS (SELECT *,SUM(exits) OVER(PARTITION BY department_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) e3,SUM(avg_h) OVER(PARTITION BY department_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) h3,COUNT(*) OVER(PARTITION BY department_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) n3 FROM b) SELECT department_id,month_key,opening,closing,exits,ROUND(100.0*exits/NULLIF(avg_h,0),2) exit_pct,CASE WHEN n3=3 THEN ROUND(100.0*e3/NULLIF(h3,0),2) ELSE NULL END rolling_pct FROM z WHERE (month_key>='2025-01' AND month_key<='2025-12') ORDER BY department_id,month_key",
-          "sqliteSql": "WITH m AS (SELECT month_key,MIN(day) first_day,MAX(day) last_day,MIN(day_index) first_idx FROM calendar_days WHERE (month_key>='2024-11' AND month_key<='2025-12') GROUP BY month_key), a AS (SELECT d.department_id,m.month_key,SUM(CASE WHEN h.start_date< m.first_day AND (h.end_date IS NULL OR h.end_date>=m.first_day) THEN 1 ELSE 0 END) opening,SUM(CASE WHEN h.start_date<=m.last_day AND (h.end_date IS NULL OR h.end_date>m.last_day) THEN 1 ELSE 0 END) closing,SUM(CASE WHEN e.termination_date BETWEEN m.first_day AND m.last_day AND h.end_date=e.termination_date THEN 1 ELSE 0 END) exits FROM departments d CROSS JOIN m LEFT JOIN employment_history h ON h.department_id=d.department_id LEFT JOIN employees e ON e.employee_id=h.employee_id GROUP BY d.department_id,m.month_key), b AS (SELECT *, (opening+closing)/2.0 avg_h FROM a), z AS (SELECT *,SUM(exits) OVER(PARTITION BY department_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) e3,SUM(avg_h) OVER(PARTITION BY department_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) h3,COUNT(*) OVER(PARTITION BY department_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) n3 FROM b) SELECT department_id,month_key,opening,closing,exits,ROUND(100.0*exits/NULLIF(avg_h,0),2) exit_pct,CASE WHEN n3=3 THEN ROUND(100.0*e3/NULLIF(h3,0),2) ELSE NULL END rolling_pct FROM z WHERE (month_key>='2025-01' AND month_key<='2025-12') ORDER BY department_id,month_key"
+          "mysqlSql": "WITH m AS (SELECT month_key,MIN(day) first_day,MAX(day) last_day,MIN(day_index) first_idx FROM calendar_days WHERE (month_key>='2024-11' AND month_key<='2025-12') GROUP BY month_key), a AS (SELECT d.department_id,m.month_key,SUM(CASE WHEN h.start_date< m.first_day AND (h.end_date IS NULL OR h.end_date>=m.first_day) THEN 1 ELSE 0 END) opening,SUM(CASE WHEN h.start_date<=m.last_day AND (h.end_date IS NULL OR h.end_date>m.last_day) THEN 1 ELSE 0 END) closing,SUM(CASE WHEN e.termination_date BETWEEN m.first_day AND m.last_day AND h.end_date=e.termination_date THEN 1 ELSE 0 END) exits FROM departments d CROSS JOIN m LEFT JOIN employment_history h ON h.department_id=d.department_id LEFT JOIN employees e ON e.employee_id=h.employee_id GROUP BY d.department_id,m.month_key), b AS (SELECT *, (opening+closing)/2.0 avg_h FROM a), z AS (SELECT *,SUM(exits) OVER(PARTITION BY department_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) e3,SUM(avg_h) OVER(PARTITION BY department_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) h3,COUNT(*) OVER(PARTITION BY department_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) n3 FROM b) SELECT department_id,month_key,opening,closing,exits,ROUND(100.0*exits/NULLIF(avg_h,0),2) exit_pct,CASE WHEN n3=3 THEN ROUND(100.0*e3/NULLIF(h3,0),2) ELSE NULL END rolling_pct FROM z WHERE (month_key>='2025-01' AND month_key<='2025-12')",
+          "sqliteSql": "WITH m AS (SELECT month_key,MIN(day) first_day,MAX(day) last_day,MIN(day_index) first_idx FROM calendar_days WHERE (month_key>='2024-11' AND month_key<='2025-12') GROUP BY month_key), a AS (SELECT d.department_id,m.month_key,SUM(CASE WHEN h.start_date< m.first_day AND (h.end_date IS NULL OR h.end_date>=m.first_day) THEN 1 ELSE 0 END) opening,SUM(CASE WHEN h.start_date<=m.last_day AND (h.end_date IS NULL OR h.end_date>m.last_day) THEN 1 ELSE 0 END) closing,SUM(CASE WHEN e.termination_date BETWEEN m.first_day AND m.last_day AND h.end_date=e.termination_date THEN 1 ELSE 0 END) exits FROM departments d CROSS JOIN m LEFT JOIN employment_history h ON h.department_id=d.department_id LEFT JOIN employees e ON e.employee_id=h.employee_id GROUP BY d.department_id,m.month_key), b AS (SELECT *, (opening+closing)/2.0 avg_h FROM a), z AS (SELECT *,SUM(exits) OVER(PARTITION BY department_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) e3,SUM(avg_h) OVER(PARTITION BY department_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) h3,COUNT(*) OVER(PARTITION BY department_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) n3 FROM b) SELECT department_id,month_key,opening,closing,exits,ROUND(100.0*exits/NULLIF(avg_h,0),2) exit_pct,CASE WHEN n3=3 THEN ROUND(100.0*e3/NULLIF(h3,0),2) ELSE NULL END rolling_pct FROM z WHERE (month_key>='2025-01' AND month_key<='2025-12')"
         }
       ],
       "hints": [
@@ -83715,7 +83715,7 @@
             59,
             64,
             0,
-            0.0,
+            0,
             0.59
           ],
           [
@@ -83760,7 +83760,7 @@
             64,
             63,
             0,
-            0.0,
+            0,
             1.53
           ],
           [
@@ -83769,7 +83769,7 @@
             63,
             65,
             0,
-            0.0,
+            0,
             1.04
           ],
           [
@@ -83787,7 +83787,7 @@
             66,
             73,
             0,
-            0.0,
+            0,
             0.5
           ],
           [
@@ -83796,7 +83796,7 @@
             73,
             74,
             0,
-            0.0,
+            0,
             0.48
           ],
           [
@@ -83805,8 +83805,8 @@
             74,
             77,
             0,
-            0.0,
-            0.0
+            0,
+            0
           ],
           [
             1,
@@ -83823,8 +83823,8 @@
             16,
             16,
             0,
-            0.0,
-            0.0
+            0,
+            0
           ],
           [
             2,
@@ -83832,8 +83832,8 @@
             16,
             16,
             0,
-            0.0,
-            0.0
+            0,
+            0
           ],
           [
             2,
@@ -83841,8 +83841,8 @@
             16,
             17,
             0,
-            0.0,
-            0.0
+            0,
+            0
           ],
           [
             2,
@@ -83850,8 +83850,8 @@
             17,
             17,
             0,
-            0.0,
-            0.0
+            0,
+            0
           ],
           [
             2,
@@ -83859,8 +83859,8 @@
             17,
             18,
             0,
-            0.0,
-            0.0
+            0,
+            0
           ],
           [
             2,
@@ -83868,8 +83868,8 @@
             18,
             20,
             0,
-            0.0,
-            0.0
+            0,
+            0
           ],
           [
             2,
@@ -83877,8 +83877,8 @@
             20,
             22,
             0,
-            0.0,
-            0.0
+            0,
+            0
           ],
           [
             2,
@@ -83886,8 +83886,8 @@
             22,
             22,
             0,
-            0.0,
-            0.0
+            0,
+            0
           ],
           [
             2,
@@ -83895,8 +83895,8 @@
             22,
             21,
             0,
-            0.0,
-            0.0
+            0,
+            0
           ],
           [
             2,
@@ -83904,8 +83904,8 @@
             21,
             21,
             0,
-            0.0,
-            0.0
+            0,
+            0
           ],
           [
             2,
@@ -83913,8 +83913,8 @@
             21,
             23,
             0,
-            0.0,
-            0.0
+            0,
+            0
           ],
           [
             2,
@@ -83931,8 +83931,8 @@
             21,
             22,
             0,
-            0.0,
-            0.0
+            0,
+            0
           ],
           [
             3,
@@ -83940,8 +83940,8 @@
             22,
             24,
             0,
-            0.0,
-            0.0
+            0,
+            0
           ],
           [
             3,
@@ -83958,7 +83958,7 @@
             22,
             24,
             0,
-            0.0,
+            0,
             1.45
           ],
           [
@@ -83967,7 +83967,7 @@
             24,
             24,
             0,
-            0.0,
+            0,
             1.43
           ],
           [
@@ -83976,8 +83976,8 @@
             24,
             26,
             0,
-            0.0,
-            0.0
+            0,
+            0
           ],
           [
             3,
@@ -83985,8 +83985,8 @@
             26,
             27,
             0,
-            0.0,
-            0.0
+            0,
+            0
           ],
           [
             3,
@@ -83994,8 +83994,8 @@
             27,
             28,
             0,
-            0.0,
-            0.0
+            0,
+            0
           ],
           [
             3,
@@ -84003,8 +84003,8 @@
             28,
             27,
             0,
-            0.0,
-            0.0
+            0,
+            0
           ],
           [
             3,
@@ -84012,8 +84012,8 @@
             27,
             31,
             0,
-            0.0,
-            0.0
+            0,
+            0
           ],
           [
             3,
@@ -84021,8 +84021,8 @@
             31,
             31,
             0,
-            0.0,
-            0.0
+            0,
+            0
           ],
           [
             3,
@@ -84031,7 +84031,7 @@
             24,
             7,
             25.45,
-            8.0
+            8
           ],
           [
             4,
@@ -84039,8 +84039,8 @@
             16,
             17,
             0,
-            0.0,
-            0.0
+            0,
+            0
           ],
           [
             4,
@@ -84048,8 +84048,8 @@
             17,
             16,
             0,
-            0.0,
-            0.0
+            0,
+            0
           ],
           [
             4,
@@ -84057,8 +84057,8 @@
             16,
             16,
             0,
-            0.0,
-            0.0
+            0,
+            0
           ],
           [
             4,
@@ -84066,8 +84066,8 @@
             16,
             18,
             0,
-            0.0,
-            0.0
+            0,
+            0
           ],
           [
             4,
@@ -84075,8 +84075,8 @@
             18,
             19,
             0,
-            0.0,
-            0.0
+            0,
+            0
           ],
           [
             4,
@@ -84084,8 +84084,8 @@
             19,
             22,
             0,
-            0.0,
-            0.0
+            0,
+            0
           ],
           [
             4,
@@ -84093,8 +84093,8 @@
             22,
             23,
             0,
-            0.0,
-            0.0
+            0,
+            0
           ],
           [
             4,
@@ -84111,7 +84111,7 @@
             22,
             23,
             0,
-            0.0,
+            0,
             1.48
           ],
           [
@@ -84120,7 +84120,7 @@
             23,
             23,
             0,
-            0.0,
+            0,
             1.47
           ],
           [
@@ -84129,8 +84129,8 @@
             23,
             22,
             0,
-            0.0,
-            0.0
+            0,
+            0
           ],
           [
             4,
@@ -84147,8 +84147,8 @@
             10,
             13,
             0,
-            0.0,
-            0.0
+            0,
+            0
           ],
           [
             5,
@@ -84156,8 +84156,8 @@
             13,
             13,
             0,
-            0.0,
-            0.0
+            0,
+            0
           ],
           [
             5,
@@ -84165,8 +84165,8 @@
             13,
             15,
             0,
-            0.0,
-            0.0
+            0,
+            0
           ],
           [
             5,
@@ -84174,8 +84174,8 @@
             15,
             16,
             0,
-            0.0,
-            0.0
+            0,
+            0
           ],
           [
             5,
@@ -84183,8 +84183,8 @@
             16,
             20,
             0,
-            0.0,
-            0.0
+            0,
+            0
           ],
           [
             5,
@@ -84201,7 +84201,7 @@
             21,
             21,
             0,
-            0.0,
+            0,
             1.68
           ],
           [
@@ -84210,7 +84210,7 @@
             21,
             22,
             0,
-            0.0,
+            0,
             1.59
           ],
           [
@@ -84219,8 +84219,8 @@
             22,
             22,
             0,
-            0.0,
-            0.0
+            0,
+            0
           ],
           [
             5,
@@ -84228,8 +84228,8 @@
             22,
             23,
             0,
-            0.0,
-            0.0
+            0,
+            0
           ],
           [
             5,
@@ -84264,7 +84264,7 @@
             5,
             5,
             0,
-            0.0,
+            0,
             6.25
           ],
           [
@@ -84273,7 +84273,7 @@
             5,
             6,
             0,
-            0.0,
+            0,
             6.25
           ],
           [
@@ -84282,8 +84282,8 @@
             6,
             7,
             0,
-            0.0,
-            0.0
+            0,
+            0
           ],
           [
             6,
@@ -84300,7 +84300,7 @@
             6,
             4,
             1,
-            20.0,
+            20,
             11.11
           ],
           [
@@ -84309,7 +84309,7 @@
             4,
             7,
             0,
-            0.0,
+            0,
             11.76
           ],
           [
@@ -84318,7 +84318,7 @@
             7,
             8,
             0,
-            0.0,
+            0,
             5.56
           ],
           [
@@ -84327,8 +84327,8 @@
             8,
             9,
             0,
-            0.0,
-            0.0
+            0,
+            0
           ],
           [
             6,
@@ -84336,8 +84336,8 @@
             9,
             10,
             0,
-            0.0,
-            0.0
+            0,
+            0
           ],
           [
             6,
@@ -84345,8 +84345,8 @@
             10,
             10,
             0,
-            0.0,
-            0.0
+            0,
+            0
           ],
           [
             6,
@@ -84363,8 +84363,8 @@
             14,
             13,
             0,
-            0.0,
-            0.0
+            0,
+            0
           ],
           [
             7,
@@ -84372,8 +84372,8 @@
             13,
             17,
             0,
-            0.0,
-            0.0
+            0,
+            0
           ],
           [
             7,
@@ -84381,8 +84381,8 @@
             17,
             16,
             0,
-            0.0,
-            0.0
+            0,
+            0
           ],
           [
             7,
@@ -84390,8 +84390,8 @@
             16,
             19,
             0,
-            0.0,
-            0.0
+            0,
+            0
           ],
           [
             7,
@@ -84399,8 +84399,8 @@
             19,
             21,
             0,
-            0.0,
-            0.0
+            0,
+            0
           ],
           [
             7,
@@ -84408,8 +84408,8 @@
             21,
             23,
             0,
-            0.0,
-            0.0
+            0,
+            0
           ],
           [
             7,
@@ -84417,8 +84417,8 @@
             23,
             23,
             0,
-            0.0,
-            0.0
+            0,
+            0
           ],
           [
             7,
@@ -84426,8 +84426,8 @@
             23,
             24,
             0,
-            0.0,
-            0.0
+            0,
+            0
           ],
           [
             7,
@@ -84435,8 +84435,8 @@
             24,
             26,
             0,
-            0.0,
-            0.0
+            0,
+            0
           ],
           [
             7,
@@ -84444,8 +84444,8 @@
             26,
             27,
             0,
-            0.0,
-            0.0
+            0,
+            0
           ],
           [
             7,
@@ -84453,8 +84453,8 @@
             27,
             28,
             0,
-            0.0,
-            0.0
+            0,
+            0
           ],
           [
             7,
@@ -84473,19 +84473,19 @@
           "reason": "把部门调动当离职会夸大离职率。"
         },
         {
-          "sql": "WITH m AS (SELECT month_key,MIN(day) first_day,MAX(day) last_day,MIN(day_index) first_idx FROM calendar_days WHERE month_key>='2025-01' GROUP BY month_key), a AS (SELECT d.department_id,m.month_key,AVG(CASE WHEN h.start_date< m.first_day AND (h.end_date IS NULL OR h.end_date>=m.first_day) THEN 1 ELSE 0 END) opening,SUM(CASE WHEN h.start_date<=m.last_day AND (h.end_date IS NULL OR h.end_date>m.last_day) THEN 1 ELSE 0 END) closing,SUM(CASE WHEN e.termination_date BETWEEN m.first_day AND m.last_day AND h.end_date=e.termination_date THEN 1 ELSE 0 END) exits FROM departments d CROSS JOIN m LEFT JOIN employment_history h ON h.department_id=d.department_id LEFT JOIN employees e ON e.employee_id=h.employee_id GROUP BY d.department_id,m.month_key), b AS (SELECT *, (opening+closing)/2.0 avg_h FROM a), z AS (SELECT *,SUM(exits) OVER(PARTITION BY department_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) e3,SUM(avg_h) OVER(PARTITION BY department_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) h3,COUNT(*) OVER(PARTITION BY department_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) n3 FROM b) SELECT department_id,month_key,opening,closing,exits,ROUND(100.0*exits/NULLIF(avg_h,0),2) exit_pct,CASE WHEN n3=3 THEN ROUND(100.0*e3/NULLIF(h3,0),2) ELSE NULL END rolling_pct FROM z ORDER BY department_id,month_key",
+          "sql": "WITH m AS (SELECT month_key,MIN(day) first_day,MAX(day) last_day,MIN(day_index) first_idx FROM calendar_days WHERE month_key>='2025-01' GROUP BY month_key), a AS (SELECT d.department_id,m.month_key,AVG(CASE WHEN h.start_date< m.first_day AND (h.end_date IS NULL OR h.end_date>=m.first_day) THEN 1 ELSE 0 END) opening,SUM(CASE WHEN h.start_date<=m.last_day AND (h.end_date IS NULL OR h.end_date>m.last_day) THEN 1 ELSE 0 END) closing,SUM(CASE WHEN e.termination_date BETWEEN m.first_day AND m.last_day AND h.end_date=e.termination_date THEN 1 ELSE 0 END) exits FROM departments d CROSS JOIN m LEFT JOIN employment_history h ON h.department_id=d.department_id LEFT JOIN employees e ON e.employee_id=h.employee_id GROUP BY d.department_id,m.month_key), b AS (SELECT *, (opening+closing)/2.0 avg_h FROM a), z AS (SELECT *,SUM(exits) OVER(PARTITION BY department_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) e3,SUM(avg_h) OVER(PARTITION BY department_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) h3,COUNT(*) OVER(PARTITION BY department_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) n3 FROM b) SELECT department_id,month_key,opening,closing,exits,ROUND(100.0*exits/NULLIF(avg_h,0),2) exit_pct,CASE WHEN n3=3 THEN ROUND(100.0*e3/NULLIF(h3,0),2) ELSE NULL END rolling_pct FROM z",
           "reason": "原典型错误：原典型错误：原典型错误：把累加量错误计算成均值。",
           "validation": "最新公开及隐藏夹具实际执行拒绝",
           "counterexample": "q0272-public"
         },
         {
-          "sql": "WITH m AS (SELECT month_key,MIN(day) first_day,MAX(day) last_day,MIN(day_index) first_idx FROM calendar_days WHERE month_key BETWEEN '2024-11' AND '2025-12' GROUP BY month_key), a AS (SELECT d.department_id,m.month_key,AVG(CASE WHEN h.start_date< m.first_day AND (h.end_date IS NULL OR h.end_date>=m.first_day) THEN 1 ELSE 0 END) opening,AVG(CASE WHEN h.start_date<=m.last_day AND (h.end_date IS NULL OR h.end_date>m.last_day) THEN 1 ELSE 0 END) closing,AVG(CASE WHEN e.termination_date BETWEEN m.first_day AND m.last_day AND h.end_date=e.termination_date THEN 1 ELSE 0 END) exits FROM departments d CROSS JOIN m LEFT JOIN employment_history h ON h.department_id=d.department_id LEFT JOIN employees e ON e.employee_id=h.employee_id GROUP BY d.department_id,m.month_key), b AS (SELECT *, (opening+closing)/2.0 avg_h FROM a), z AS (SELECT *,AVG(exits) OVER(PARTITION BY department_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) e3,AVG(avg_h) OVER(PARTITION BY department_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) h3,COUNT(*) OVER(PARTITION BY department_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) n3 FROM b) SELECT department_id,month_key,opening,closing,exits,ROUND(100.0*exits/NULLIF(avg_h,0),2) exit_pct,CASE WHEN n3=3 THEN ROUND(100.0*e3/NULLIF(h3,0),2) ELSE NULL END rolling_pct FROM z WHERE month_key BETWEEN '2025-01' AND '2025-12' ORDER BY department_id,month_key",
+          "sql": "WITH m AS (SELECT month_key,MIN(day) first_day,MAX(day) last_day,MIN(day_index) first_idx FROM calendar_days WHERE month_key BETWEEN '2024-11' AND '2025-12' GROUP BY month_key), a AS (SELECT d.department_id,m.month_key,AVG(CASE WHEN h.start_date< m.first_day AND (h.end_date IS NULL OR h.end_date>=m.first_day) THEN 1 ELSE 0 END) opening,AVG(CASE WHEN h.start_date<=m.last_day AND (h.end_date IS NULL OR h.end_date>m.last_day) THEN 1 ELSE 0 END) closing,AVG(CASE WHEN e.termination_date BETWEEN m.first_day AND m.last_day AND h.end_date=e.termination_date THEN 1 ELSE 0 END) exits FROM departments d CROSS JOIN m LEFT JOIN employment_history h ON h.department_id=d.department_id LEFT JOIN employees e ON e.employee_id=h.employee_id GROUP BY d.department_id,m.month_key), b AS (SELECT *, (opening+closing)/2.0 avg_h FROM a), z AS (SELECT *,AVG(exits) OVER(PARTITION BY department_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) e3,AVG(avg_h) OVER(PARTITION BY department_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) h3,COUNT(*) OVER(PARTITION BY department_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) n3 FROM b) SELECT department_id,month_key,opening,closing,exits,ROUND(100.0*exits/NULLIF(avg_h,0),2) exit_pct,CASE WHEN n3=3 THEN ROUND(100.0*e3/NULLIF(h3,0),2) ELSE NULL END rolling_pct FROM z WHERE month_key BETWEEN '2025-01' AND '2025-12'",
           "reason": "原典型错误：原典型错误：累加误用平均",
           "validation": "最新公开及隐藏夹具实际执行拒绝",
           "counterexample": "q0272-public"
         },
         {
-          "sql": "WITH m AS (SELECT month_key,MIN(day) first_day,MAX(day) last_day,MIN(day_index) first_idx FROM calendar_days WHERE month_key BETWEEN '2024-11' AND '2025-12' GROUP BY month_key), a AS (SELECT d.department_id,m.month_key,SUM(CASE WHEN h.start_date< m.first_day AND (h.end_date IS NULL OR h.end_date>=m.first_day) THEN 1 ELSE 0 END) opening,SUM(CASE WHEN h.start_date<=m.last_day AND (h.end_date IS NULL OR h.end_date>m.last_day) THEN 1 ELSE 0 END) closing,SUM(CASE WHEN e.termination_date BETWEEN m.first_day AND m.last_day AND h.end_date=e.termination_date THEN 1 ELSE 0 END) exits FROM departments d CROSS JOIN m JOIN employment_history h ON h.department_id=d.department_id JOIN employees e ON e.employee_id=h.employee_id GROUP BY d.department_id,m.month_key), b AS (SELECT *, (opening+closing)/2.0 avg_h FROM a), z AS (SELECT *,SUM(exits) OVER(PARTITION BY department_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) e3,SUM(avg_h) OVER(PARTITION BY department_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) h3,COUNT(*) OVER(PARTITION BY department_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) n3 FROM b) SELECT department_id,month_key,opening,closing,exits,ROUND(100.0*exits/NULLIF(avg_h,0),2) exit_pct,CASE WHEN n3=3 THEN ROUND(100.0*e3/NULLIF(h3,0),2) ELSE NULL END rolling_pct FROM z WHERE month_key BETWEEN '2025-01' AND '2025-12' ORDER BY department_id,month_key",
+          "sql": "WITH m AS (SELECT month_key,MIN(day) first_day,MAX(day) last_day,MIN(day_index) first_idx FROM calendar_days WHERE month_key BETWEEN '2024-11' AND '2025-12' GROUP BY month_key), a AS (SELECT d.department_id,m.month_key,SUM(CASE WHEN h.start_date< m.first_day AND (h.end_date IS NULL OR h.end_date>=m.first_day) THEN 1 ELSE 0 END) opening,SUM(CASE WHEN h.start_date<=m.last_day AND (h.end_date IS NULL OR h.end_date>m.last_day) THEN 1 ELSE 0 END) closing,SUM(CASE WHEN e.termination_date BETWEEN m.first_day AND m.last_day AND h.end_date=e.termination_date THEN 1 ELSE 0 END) exits FROM departments d CROSS JOIN m JOIN employment_history h ON h.department_id=d.department_id JOIN employees e ON e.employee_id=h.employee_id GROUP BY d.department_id,m.month_key), b AS (SELECT *, (opening+closing)/2.0 avg_h FROM a), z AS (SELECT *,SUM(exits) OVER(PARTITION BY department_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) e3,SUM(avg_h) OVER(PARTITION BY department_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) h3,COUNT(*) OVER(PARTITION BY department_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) n3 FROM b) SELECT department_id,month_key,opening,closing,exits,ROUND(100.0*exits/NULLIF(avg_h,0),2) exit_pct,CASE WHEN n3=3 THEN ROUND(100.0*e3/NULLIF(h3,0),2) ELSE NULL END rolling_pct FROM z WHERE month_key BETWEEN '2025-01' AND '2025-12'",
           "reason": "原典型错误：原典型错误：遗漏主档或空行",
           "validation": "最新公开及隐藏夹具实际执行拒绝",
           "counterexample": "q0272-mini-202611171"
@@ -84497,28 +84497,28 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0272/q0272-public.json",
-          "sha256": "6cb44ad4c058ccea5aa3666c7f3b86cdf4cae2f4dc51452fc1ee5c366aafb7bf"
+          "sha256": "e94123d304c257a21561873180037d3f672efa494b87a06fcf43a78514f31516"
         },
         {
           "id": "q0272-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0272/q0272-boundary.json",
-          "sha256": "8dbe030258b43f29c5af97827953dee4da2918121902be559498dd4bea84efb0"
+          "sha256": "0d9bf329d81f5175b178f24c9e03f110a3598e894688bac43b166fcfc07936a6"
         },
         {
           "id": "q0272-mini-202611171",
           "visibility": "hidden",
           "variant": "independent-enterprise",
           "path": "fixtures/q0272/q0272-mini-202611171.json",
-          "sha256": "056815371cf35c610e5f7d5972c0880fa5796487cfef797c3f28b71345dd816a"
+          "sha256": "d5060eb26ad8d82e6d79568156088d040e1e22b10f2d66a9037926212c65dc4e"
         },
         {
           "id": "q0272-mini-202611179",
           "visibility": "hidden",
           "variant": "independent-enterprise",
           "path": "fixtures/q0272/q0272-mini-202611179.json",
-          "sha256": "e76fe62ec4c8fb89bda92db8ea59049ce3f419ca9124b76b20f4ee74e97c3dc8"
+          "sha256": "7ebe0208cbf92ba3e433eb9470b9199f905ba34ff8870aaa34ba6a51b1c31af5"
         }
       ],
       "initialCode": "",

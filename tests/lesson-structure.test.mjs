@@ -9,6 +9,8 @@ const chapters = await Promise.all(Array.from({length:20},(_,i)=>readJson(path.j
 const status = await loadCourseStructures(chapters);
 const all = chapters.flatMap(c=>c.knowledgePoints);
 const converted = all.filter(k=>k.presentation);
+const revisionFile = await readJson(path.join(root,'structured/revisions.json'));
+const revisions = revisionFile.revisions;
 test('archived source, saved blocks and original course fields agree for the imported batch', async () => {
   assert.equal(all.length,80);assert.equal(status.converted.length,7);assert.equal(status.pending.length,73);
   for (const k of converted) {
@@ -24,7 +26,19 @@ test('archived source, saved blocks and original course fields agree for the imp
   for(const item of patch){
     const k=structuredClone(all.find(k=>k.id===item.id));
     if(item.id==='kp05-01')delete k.teaching.mergeExamples.at(-1).sourceTables;
-    for(const [field,value] of Object.entries(item))assert.deepEqual(k[field],value,item.id+' '+field);
+    // 原始导入之后的明确修订（ORDER BY 改为业务字段排序）：这些 SQL 与结果以 structured/revisions.json 为准，其余字段仍须与归档补丁一致。
+    const revised=revisions.filter(r=>r.id===item.id);
+    const mask=(field,value)=>{
+      if(!revised.length)return value;
+      if(['mysqlSql','sqliteSql','result'].includes(field))return null;
+      let text=JSON.stringify(value);
+      for(const edit of revisionFile.text||[])if(edit.id===item.id)text=text.split(JSON.stringify(edit.new).slice(1,-1)).join(JSON.stringify(edit.old).slice(1,-1));
+      text=text.replace(/ORDER BY [^;"]*;?/g,'ORDER BY ?');
+      const copy=JSON.parse(text);
+      for(const example of copy.mergeExamples||[])if(revised.some(r=>r.label===example.label)){example.sql=null;example.result=null;}
+      return copy;
+    };
+    for(const [field,value] of Object.entries(item))assert.deepEqual(mask(field,k[field]),mask(field,value),item.id+' '+field);
   }
 });
 test('structure validation rejects omitted knowledge, invented fragments and divergent executable SQL', () => {

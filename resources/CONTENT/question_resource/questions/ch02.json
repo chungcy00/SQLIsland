@@ -212,7 +212,7 @@
       "type": "独立编写",
       "title": "门店订单明细摘录",
       "context": "使用课程中小型订单数据练习门店订单明细摘录。教学表中的金额以模拟元为单位，不使用企业库的整数分口径。",
-      "requirements": "输出 orders 的 id、store_id、order_date，先按 order_date 降序（日期新的在前），日期相同再按 id 升序。\n输出列名称及顺序：id, store_id, order_date。按题设排序；参考排序键：order_date DESC, id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
+      "requirements": "输出 orders 的 id、store_id、order_date，先按 order_date 降序（日期新的在前），日期相同再按 store_id 升序。\n输出列名称及顺序：id, store_id, order_date。按题设排序；参考排序键：order_date DESC, store_id。 未指定舍入时保留原计算精度；NULL、零、空字符串不同。",
       "datasetId": "q0011-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -261,25 +261,25 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT id,store_id,order_date FROM orders ORDER BY order_date DESC, id",
-          "sqliteSql": "SELECT id,store_id,order_date FROM orders ORDER BY order_date DESC, id"
+          "mysqlSql": "SELECT id,store_id,order_date FROM orders ORDER BY order_date DESC, store_id",
+          "sqliteSql": "SELECT id,store_id,order_date FROM orders ORDER BY order_date DESC, store_id"
         },
         {
           "kind": "关系结构等价",
-          "mysqlSql": "SELECT id,store_id,order_date FROM (SELECT * FROM orders) AS orders ORDER BY order_date DESC, id",
-          "sqliteSql": "SELECT id,store_id,order_date FROM (SELECT * FROM orders) AS orders ORDER BY order_date DESC, id",
+          "mysqlSql": "SELECT id,store_id,order_date FROM (SELECT * FROM orders) AS orders ORDER BY order_date DESC, store_id",
+          "sqliteSql": "SELECT id,store_id,order_date FROM (SELECT * FROM orders) AS orders ORDER BY order_date DESC, store_id",
           "explanation": "先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。"
         }
       ],
       "hints": [
         "明确结果需要哪些输入字段，以及是否保留原始行的重复。",
         "结合《SELECT 与 FROM》：SELECT 指定输出表达式，FROM 指定输入关系；排序用 ORDER BY，DESC 表示降序，多个排序键用逗号分隔，前一个键相同时才看下一个。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT id,□□□ FROM orders ORDER BY □□□ DESC, □□"
+        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT id,□□□ FROM orders ORDER BY □□□ DESC, □□□"
       ],
-      "explanation": "门店键与客户键不同，不应混淆。\n执行思路：确认orders的输入记录；输出id、store_id、order_date列；先按order_date降序，日期相同再按id升序。\n公开夹具实际返回 5 行、3 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、排序；保持结果语义。",
+      "explanation": "门店键与客户键不同，不应混淆。\n执行思路：确认orders的输入记录；输出id、store_id、order_date列；先按order_date降序，日期相同再按store_id升序。\n公开夹具实际返回 5 行、3 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、排序；保持结果语义。",
       "commonErrors": [
         {
-          "sql": "SELECT id,customer_id,order_date FROM orders ORDER BY order_date DESC, id",
+          "sql": "SELECT id,customer_id,order_date FROM orders ORDER BY order_date DESC, store_id",
           "reason": "门店键与客户键不同，不应混淆。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
@@ -295,14 +295,14 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0011/q0011-public.json",
-          "sha256": "cf8a37eaa10be46a6bfb13d723bcf200d73e7dfe187c0db0032b311dfb75756c"
+          "sha256": "757801b25b5472a019d2cd7aed66f1466d1409484a351511f70547a603fbba6a"
         },
         {
           "id": "q0011-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0011/q0011-boundary.json",
-          "sha256": "79c09b90f542121e9d747067c63b78dd1bde71348e420f6d8faf34a7377dd876"
+          "sha256": "b0aabff1b65dd48cee4c30cdfa24e2fe18ee094832030ea9da5a697c32ca32f1"
         },
         {
           "id": "q0011-empty",
@@ -359,19 +359,19 @@
             "reference": {
               "ran": true,
               "match": true,
-              "resultHash": "066b7eaa8f88efc698fe51a095f8e3c3b9e817506acab8daf93af2ae3e131f72",
+              "resultHash": "f0077526f2adf385b93e0fdd55dd8086eba4b0a5cf04f46fddea24e071331284",
               "rowCount": 13
             },
             "equivalent": {
               "ran": true,
               "match": true,
-              "resultHash": "066b7eaa8f88efc698fe51a095f8e3c3b9e817506acab8daf93af2ae3e131f72",
+              "resultHash": "f0077526f2adf385b93e0fdd55dd8086eba4b0a5cf04f46fddea24e071331284",
               "rows": 13
             },
             "wrong": {
               "ran": true,
               "match": false,
-              "resultHash": "e62cdcd89816dc5b071c3f2471ab95251f29e652763eb48f6e0e7dd209a279fa",
+              "resultHash": "f7126275d07aefaaf73714f821942615f4606d7caafa0b81ae4d5daa55456c5e",
               "rows": 13
             }
           },
@@ -391,7 +391,7 @@
             },
             "wrong": {
               "ran": true,
-              "match": true,
+              "match": false,
               "resultHash": "abff33bad4fff075cb66c5747682c403db1ec5506392012d76c710c671d58b67",
               "rows": 0
             }

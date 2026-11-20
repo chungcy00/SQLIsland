@@ -103,28 +103,28 @@
         null
       ],
       [
-        2,
-        2,
-        null
-      ],
-      [
         3,
         1,
         800
       ],
       [
-        4,
-        2,
-        400
-      ],
-      [
         5,
         1,
         600
+      ],
+      [
+        2,
+        2,
+        null
+      ],
+      [
+        4,
+        2,
+        400
       ]
     ]
   },
-  "orderPolicy": "ordered",
+  "orderPolicy": "unordered_multiset",
   "columnPolicy": "exact_names_in_order",
   "numericTolerance": {
     "absolute": 1e-06,

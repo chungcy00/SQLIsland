@@ -105,14 +105,14 @@
     {
       "kind": "fragment",
       "title": "稳定排列客户",
-      "sql": "ORDER BY c.customer_id;",
-      "purpose": "按客户编号排序。",
+      "sql": "ORDER BY order_count DESC, SUM(o.sales) DESC;",
+      "purpose": "按订单数从多到少排列，订单数相同时按该客户的订单金额合计从高到低排列。",
       "reason": "便于回查未下单及多次下单的客户。"
     }
   ],
   "completeCode": {
-    "mysqlSql": "SELECT c.customer_id, COUNT(o.id) AS order_count FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id GROUP BY c.customer_id ORDER BY c.customer_id;",
-    "sqliteSql": "SELECT c.customer_id, COUNT(o.id) AS order_count FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id GROUP BY c.customer_id ORDER BY c.customer_id;"
+    "mysqlSql": "SELECT c.customer_id, COUNT(o.id) AS order_count FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id GROUP BY c.customer_id ORDER BY order_count DESC, SUM(o.sales) DESC;",
+    "sqliteSql": "SELECT c.customer_id, COUNT(o.id) AS order_count FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id GROUP BY c.customer_id ORDER BY order_count DESC, SUM(o.sales) DESC;"
   },
   "expectedResult": {
     "columns": [
@@ -125,11 +125,11 @@
         2
       ],
       [
-        2,
+        3,
         1
       ],
       [
-        3,
+        2,
         1
       ],
       [
@@ -150,31 +150,37 @@
     {
       "label": "查看一对多匹配明细",
       "explanation": "观察客户1出现两次、客户4订单编号为空，再理解为什么最终需要分组。",
-      "sql": "SELECT c.customer_id, o.id AS order_id FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id ORDER BY c.customer_id,o.id;",
+      "sql": "SELECT c.customer_id, o.id AS order_id, o.sales FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id ORDER BY o.sales DESC;",
       "result": {
         "columns": [
           "customer_id",
-          "order_id"
+          "order_id",
+          "sales"
         ],
         "rows": [
           [
-            1,
-            1
+            3,
+            5,
+            1500
           ],
           [
             1,
-            3
+            1,
+            800
+          ],
+          [
+            1,
+            3,
+            600
           ],
           [
             2,
-            2
-          ],
-          [
-            3,
-            5
+            2,
+            400
           ],
           [
             4,
+            null,
             null
           ]
         ]
@@ -228,5 +234,5 @@
     ]
   },
   "sourcePath": "source/batch1/kp01-03.json",
-  "sourceSha256": "00640657f5cff66edd7d593d37b0ef3f7ee030cdb4b729cf5ebc3bd20bff4098"
+  "sourceSha256": "01223c8705780fe0e072352af5272dec4e2dc2a68a5bdd454d8cb0ab2491948e"
 }

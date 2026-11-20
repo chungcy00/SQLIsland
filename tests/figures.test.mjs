@@ -12,7 +12,7 @@ const data = await readJson(path.join(root,'structured/figures/kp05-01.json'));
 const fresh = () => structuredClone(data);
 test('pilot figures load only for converted lessons and match the sample data', () => {
   assert.equal(pilot.figures.length, 3);
-  assert.deepEqual(lessons.filter(k=>k.figures).map(k=>k.id), ['kp05-01']);
+  assert.deepEqual(lessons.filter(k=>k.figures).map(k=>k.id), ['kp01-01','kp01-02','kp01-03','kp02-01','kp02-02','kp05-01','kp05-02']);
   validateFigures(pilot, fresh());
 });
 test('figure validation rejects numbers that differ from the lesson data', () => {
@@ -45,4 +45,35 @@ test('figures render real text labels and escape content', () => {
   assert.ok(html.includes('value &lt;&gt; 10'));
   assert.ok(!html.includes('<svg'));
   assert.equal(renderFigures({figures: [], sourceTables: []}, 'concept'), '');
+});
+
+const others = ['kp01-01','kp01-02','kp01-03','kp02-01','kp02-02','kp05-02'];
+test('every figure file is bound to its lesson and its last step equals the lesson result', async () => {
+  for (const id of others) {
+    const lesson = lessons.find(k=>k.id===id);
+    const file = await readJson(path.join(root,`structured/figures/${id}.json`));
+    validateFigures(lesson, structuredClone(file));
+    const flow = lesson.figures.find(f=>f.kind==='stage-flow');
+    assert.deepEqual(flow.steps.at(-1).rows, lesson.result.rows, id);
+    assert.equal(flow.steps.length, lesson.presentation.breakdown.length, id);
+    const badges = lesson.presentation.breakdown.map((_, i)=>rowFlowStep(lesson, i)?.badge);
+    assert.ok(badges.filter(Boolean).length >= 2, id);
+    assert.match(renderFigures(lesson, 'syntax'), /取数/, id);
+  }
+});
+test('stage-flow validation rejects data that differs from the sample or the lesson result', async () => {
+  const lesson = lessons.find(k=>k.id==='kp02-02');
+  const file = await readJson(path.join(root,'structured/figures/kp02-02.json'));
+  let bad = structuredClone(file); bad.figures[1].steps[0].rows[0][2] = 999;
+  assert.throws(()=>validateFigures(lesson, bad), /first step differs from sample data/);
+  bad = structuredClone(file); bad.figures[1].steps.at(-1).rows.pop();
+  assert.throws(()=>validateFigures(lesson, bad), /differs from the lesson result/);
+  bad = structuredClone(file); bad.figures[1].steps[1].label = 'SELECT 1';
+  assert.throws(()=>validateFigures(lesson, bad), /label differs/);
+  bad = structuredClone(file); bad.figures[1].steps.pop();
+  assert.throws(()=>validateFigures(lesson, bad), /must match the breakdown/);
+  assert.equal(rowFlowStep(lesson,1).badge, '5 → 3 行');
+  const join = lessons.find(k=>k.id==='kp01-03');
+  assert.equal(rowFlowStep(join,1), null);
+  assert.equal(rowFlowStep(join,2).badge, '5 → 4 行');
 });

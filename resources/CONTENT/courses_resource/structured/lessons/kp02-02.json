@@ -73,7 +73,7 @@
   "methodBlocks": [
     {
       "type": "paragraph",
-      "text": "先选定门店与类别作为组合键，再去掉整组重复值，最后按这两列排序。"
+      "text": "先选定门店与类别作为组合键，再去掉整组重复值，最后按类别排序。"
     }
   ],
   "breakdown": [
@@ -93,15 +93,15 @@
     },
     {
       "kind": "fragment",
-      "title": "按组合排序",
-      "sql": "ORDER BY store_id, category;",
-      "purpose": "先按门店，再按类别排列。",
+      "title": "按类别排序",
+      "sql": "ORDER BY category;",
+      "purpose": "按类别排列。",
       "reason": "DISTINCT 本身不保证输出顺序。"
     }
   ],
   "completeCode": {
-    "mysqlSql": "SELECT DISTINCT store_id, category FROM orders ORDER BY store_id, category;",
-    "sqliteSql": "SELECT DISTINCT store_id, category FROM orders ORDER BY store_id, category;"
+    "mysqlSql": "SELECT DISTINCT store_id, category FROM orders ORDER BY category;",
+    "sqliteSql": "SELECT DISTINCT store_id, category FROM orders ORDER BY category;"
   },
   "expectedResult": {
     "columns": [
@@ -110,16 +110,16 @@
     ],
     "rows": [
       [
+        2,
+        "化妆品"
+      ],
+      [
         1,
         "护肤品"
       ],
       [
         1,
         "日用品"
-      ],
-      [
-        2,
-        "化妆品"
       ]
     ],
     "status": "SQLite实际执行",
@@ -201,5 +201,5 @@
     ]
   },
   "sourcePath": "source/batch1/kp02-02.json",
-  "sourceSha256": "0c15cd0cd46418a56e424fe29c87347137037e8513925933ccf1534796330518"
+  "sourceSha256": "9d95eea94ccae3b7fad6ab01f0f0200570fce83f4908d51a17fd9e30bf8e2fe7"
 }

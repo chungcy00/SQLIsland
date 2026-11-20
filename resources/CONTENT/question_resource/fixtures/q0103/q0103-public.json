@@ -125,11 +125,11 @@
     "rows": [
       [
         1,
-        "化妆品"
+        "护肤品"
       ],
       [
         1,
-        "护肤品"
+        "化妆品"
       ],
       [
         1,
@@ -137,11 +137,11 @@
       ],
       [
         2,
-        "化妆品"
+        "护肤品"
       ],
       [
         2,
-        "护肤品"
+        "化妆品"
       ],
       [
         2,
@@ -149,11 +149,11 @@
       ],
       [
         3,
-        "化妆品"
+        "护肤品"
       ],
       [
         3,
-        "护肤品"
+        "化妆品"
       ],
       [
         3,
@@ -161,7 +161,7 @@
       ]
     ]
   },
-  "orderPolicy": "ordered",
+  "orderPolicy": "unordered_multiset",
   "columnPolicy": "exact_names_in_order",
   "numericTolerance": {
     "absolute": 1e-06,

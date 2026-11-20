@@ -62,8 +62,8 @@
       ]
     }
   ],
-  "mysqlSql": "SELECT id, IFNULL(value, -1) AS filled, COALESCE(note, 'missing') AS note_filled FROM nullable_values ORDER BY id;",
-  "sqliteSql": "SELECT id, IFNULL(value, -1) AS filled, COALESCE(note, 'missing') AS note_filled FROM nullable_values ORDER BY id;",
+  "mysqlSql": "SELECT id, IFNULL(value, -1) AS filled, COALESCE(note, 'missing') AS note_filled FROM nullable_values ORDER BY filled DESC;",
+  "sqliteSql": "SELECT id, IFNULL(value, -1) AS filled, COALESCE(note, 'missing') AS note_filled FROM nullable_values ORDER BY filled DESC;",
   "executionSteps": [
     "检查原始字段",
     "为缺失值选择替代项",
@@ -100,16 +100,6 @@
     ],
     "rows": [
       [
-        1,
-        -1,
-        "missing"
-      ],
-      [
-        2,
-        0,
-        ""
-      ],
-      [
         3,
         10,
         "ok"
@@ -118,6 +108,16 @@
         4,
         10,
         "ok"
+      ],
+      [
+        2,
+        0,
+        ""
+      ],
+      [
+        1,
+        -1,
+        "missing"
       ]
     ],
     "status": "SQLite实际执行",
@@ -144,7 +144,7 @@
       {
         "label": "将空文本按业务规则视作缺失",
         "explanation": "仅当业务确认空文本无有效含义时使用；编号2也显示缺失标记。",
-        "sql": "SELECT id, COALESCE(NULLIF(note, ''), 'missing') AS note_filled FROM nullable_values ORDER BY id;",
+        "sql": "SELECT id, COALESCE(NULLIF(note, ''), 'missing') AS note_filled FROM nullable_values ORDER BY note_filled DESC;",
         "result": {
           "columns": [
             "id",
@@ -152,20 +152,20 @@
           ],
           "rows": [
             [
-              1,
-              "missing"
-            ],
-            [
-              2,
-              "missing"
-            ],
-            [
               3,
               "ok"
             ],
             [
               4,
               "ok"
+            ],
+            [
+              1,
+              "missing"
+            ],
+            [
+              2,
+              "missing"
             ]
           ]
         }
