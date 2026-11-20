@@ -135,7 +135,7 @@ const table = (columns, rows, limit = 40) =>
       "",
     )}</tbody></table></div>${rows.length > limit ? `<small>展示前 ${limit} 行，共 ${rows.length} 行</small>` : ""}`;
 const tag = (text, cls = "") => `<span class="tag ${cls}">${e(text)}</span>`;
-const cardView = createCardView({ e, table, code, tag });
+const cardView = createCardView({ e, table, code, tag, formatSql: formatSqlForDisplay, runSlot: (card, label, recordedHtml) => cardRunSlot(card, label, recordedHtml) });
 let cardPreview = { type: "concept", index: 0, face: "front" };
 // 个人闪卡是简单的“问题/答案/解释”结构，转成同一套双面结构后与正式卡共用渲染。
 const isRichCard = (c) => Array.isArray(c.back?.sections);
@@ -159,9 +159,20 @@ function cardRunResult(ex, outcome) {
   }
   const r = outcome.result;
   const note = ex.expected ? (sameResult(ex.expected, r) ? "与卡片记录的结果一致" : "与卡片记录的结果不一致（未验证）") : "";
-  return `<span class="result-tag actual">实际运行</span> <small>SQLite 兼容执行 · ${r.rowCount} 行${note ? " · " + note : ""}</small>${table(r.columns, r.rows.slice(0, 20))}`;
+  return `<span class="result-tag actual">运行结果</span> <small>${r.rowCount} 行${note && !/一致$/.test(note) ? " · " + note : ""}</small>${table(r.columns, r.rows.slice(0, 20))}`;
+}
+// 函数用法卡新版背面：运行按钮放在每个示例的“查询结果”区域，结果在原位置展示（默认显示卡片记录的结果）。
+function cardRunSlot(card, label, recordedHtml) {
+  const list = cardExamples(card);
+  const i = list.findIndex((x) => x.label === label);
+  if (i < 0) return `<div class="fc-fn-result"><div class="fc-fn-result-head"><b>查询结果</b></div>${recordedHtml}</div>`;
+  const ex = list[i];
+  const blocked = ex.localExecution?.error || ex.localExecution?.pass === false;
+  const key = card.id + "|" + i;
+  return `<div class="fc-fn-result"><div class="fc-fn-result-head"><b>查询结果</b>${blocked ? '<small class="muted">暂不支持在本应用运行</small>' : button(icon("play") + " 运行", "cardRun", key, "small-button")}</div><div class="fc-run-out" data-run="${e(key)}">${cardRuns.has(key) ? cardRuns.get(key) : recordedHtml}</div></div>`;
 }
 function cardRunBlock(c) {
+  if (cardView.hasFunctionLayout(c)) return "";
   const list = cardExamples(c);
   if (!list.length) return "";
   return `<section class="fc-sec fc-runs"><h3 class="fc-h"><i></i>运行示例</h3><p class="fc-hint">在内置示例数据上用 SQLite 兼容方式执行，并非原生 MySQL 8.4。</p>${list.map((ex, i) => {
@@ -2175,7 +2186,9 @@ async function handleAction(action, arg, element) {
       element.disabled = true;
       let outcome;
       try {
-        outcome = { result: await rpc("lesson", { tables: [], setupSql: ex.setupSql, sql: ex.sqliteSql || ex.sql }) };
+        let runSql = ex.sqliteSql || ex.sql;
+        for (const [from, to] of card.fnSpec?.runReplace || []) runSql = runSql.split(from).join(to);
+        outcome = { result: await rpc("lesson", { tables: [], setupSql: ex.setupSql, sql: runSql }) };
       } catch (error) {
         outcome = { error: error?.message || String(error) };
       } finally {

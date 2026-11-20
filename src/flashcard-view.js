@@ -15,7 +15,7 @@ export const CARD_TEMPLATES = {
   metric: { frontCode: false, flow: "map", compose: "metric" },
 };
 
-export function createCardView({ e, table, code, tag }) {
+export function createCardView({ e, table, code, tag, runSlot = null, formatSql = (x) => x }) {
   const paragraphs = (text) =>
     String(text ?? "")
       .split(/\n+/)
@@ -229,6 +229,9 @@ export function createCardView({ e, table, code, tag }) {
     pairs: (b) => `<div class="fc-tf-pairs">${tfTitle(b)}${b.items.map((p) => `<div class="fc-tf-pair ${p.tone ? "t-" + e(p.tone) : ""}"><span class="l">${e(p.left)}</span><span class="ar">→</span><span class="r">${e(p.right)}</span>${p.note ? `<small>${e(p.note)}</small>` : ""}</div>`).join("")}</div>`,
   };
   tfBlocks.matrix = tfBlocks.compare;
+  const segHtml = (segs) => segs.map((x) => `<span class="seg ${x.tone ? "t-" + e(x.tone) : ""}">${e(x.t)}</span>`).join("");
+  tfBlocks.transform = (b) => `<div class="fc-tf-transform">${tfTitle(b)}<div class="row-b"><small>${e(b.before.label || "输入")}</small><div class="segs">${segHtml(b.before.segs)}</div></div><div class="arrow"><span>↓</span>${b.op ? `<em>${e(b.op)}</em>` : ""}</div><div class="row-b"><small>${e(b.after.label || "结果")}</small><div class="segs">${segHtml(b.after.segs)}</div></div>${b.caption ? `<p class="cap">${e(b.caption)}</p>` : ""}</div>`;
+  const renderBlocks = (blocks) => blocks.map((b) => (tfBlocks[b.type] ? tfBlocks[b.type](b) : "")).join("");
   function teachFigure(spec) {
     return `<section class="fc-sec fc-fig fc-tf"><h3 class="fc-h"><i></i>${e(spec.title)}</h3>${spec.caption ? `<p class="fc-hint">${e(spec.caption)}</p>` : ""}${spec.blocks.map((b) => (tfBlocks[b.type] ? tfBlocks[b.type](b) : "")).join("")}${spec.footer || spec.blocks.some((b) => b.type === "calc" || b.type === "bars") ? `<p class="fc-tf-foot">${e(spec.footer || "图中数字来自本卡内容，计算过程已逐步核对。")}</p>` : ""}</section>`;
   }
@@ -262,6 +265,62 @@ export function createCardView({ e, table, code, tag }) {
     return sections;
   }
 
+  // ---- 函数用法卡新版背面：核心答案 → 函数语法 → 参数说明 → 返回值 → 用法示例 → 实际应用 → 注意事项 → 兼容性（折叠）----
+  const fnHeading = (title, hint) => `<h3 class="fc-h"><i></i>${e(title)}</h3>${hint ? `<p class="fc-hint">${e(hint)}</p>` : ""}`;
+  const squash = (x) => String(x || "").replace(/\s+/g, " ").trim().replace(/;$/, "");
+  // 代码按语句结构显示：短语句保持一行，长语句才按子句换行；太宽时只在代码框内左右滚动。
+  const fnSql = (sql) => {
+    const text = String(sql || "").trim();
+    const shown = squash(text).length <= 84 ? text : formatSql(text);
+    return `<div class="fc-code fc-fn-code"><pre><code>${e(shown)}</code></pre></div>`;
+  };
+  const fnPlain = (text) => `<div class="fc-code fc-fn-code"><pre><code>${e(String(text).trim())}</code></pre></div>`;
+  const examplesOf = (card) => (Array.isArray(card.examples) && card.examples.length ? card.examples : card.example ? [card.example] : []).filter(Boolean);
+  const recordedOf = (ex) => (ex.expected?.columns ? table(ex.expected.columns, ex.expected.rows || [], 30) : "");
+  const resultArea = (card, ex) => (runSlot ? runSlot(card, ex.label, recordedOf(ex)) : `<div class="fc-fn-result"><div class="fc-fn-result-head"><b>查询结果</b></div>${recordedOf(ex)}</div>`);
+  const isAlt = (ex) => squash(ex.mysqlSql) !== squash(ex.sqliteSql);
+  function compatNote(ex) {
+    if (!isAlt(ex)) return "";
+    const blocked = ex.teachingExecution?.error;
+    return `<div class="fc-fn-warn"><b>兼容提示</b><p>${blocked ? "这条 MySQL 写法在本应用的 SQLite 环境里不能直接运行。点“运行”时，本应用会执行下面的等价写法，得到的结果与上面显示的相同。" : "本应用运行的是下面这条等价写法，结果与上面显示的相同。"}</p><details><summary>查看本应用实际运行的写法</summary>${fnSql(ex.sqliteSql || ex.sql)}</details></div>`;
+  }
+  const localWarn = (text) => `<div class="fc-fn-warn"><b>兼容提示</b><p>${e(text)}</p></div>`;
+  const extraWarn = (spec, meta) => (meta?.localNote ? localWarn(meta.localNote) : spec?.runNote ? localWarn(spec.runNote) : "");
+  function fnExample(card, ex, meta) {
+    return `<section class="fc-fn-ex"><h4>${e(meta.title || ex.label)}</h4><p class="fc-fn-explain">${e(meta.explain)}</p>${meta.figure ? `<div class="fc-fn-fig">${renderBlocks(meta.figure.blocks)}</div>` : ""}<div class="fc-sub">参考代码（MySQL 8.4）</div>${fnSql(ex.mysqlSql || ex.sql)}${compatNote(ex) || extraWarn(card.fnSpec, meta)}${resultArea(card, ex)}</section>`;
+  }
+  const flat = (ex) => (ex.expected?.rows || []).map((r) => r.map((v) => (v === null ? "NULL" : v === "" ? "（空字符串）" : String(v))).join("、")).join(" ｜ ") || "（没有结果行）";
+  function functionBack(card) {
+    const spec = card.fnSpec;
+    const sections = card.back?.sections || [];
+    const syntax = sections.find((x) => x.type === "syntax");
+    const params = sections.find((x) => x.type === "table" && /参数/.test(x.title || "") && !/ · /.test(x.title || ""));
+    const returns = sections.find((x) => x.type === "text" && /返回值/.test(x.title || ""));
+    const application = sections.find((x) => x.type === "application");
+    const note = sections.find((x) => x.type === "note");
+    const exs = examplesOf(card);
+    const main = exs.filter((x) => spec.examples?.[x.label]?.kind !== "edge");
+    const edge = exs.filter((x) => spec.examples?.[x.label]?.kind === "edge");
+    const parts = [];
+    parts.push(`<section class="fc-sec fc-fn-answer">${fnHeading("核心答案")}<div class="fc-answer">${paragraphs(card.back?.answer)}</div></section>`);
+    if (syntax) parts.push(`<section class="fc-sec fc-fn-syntax">${fnHeading("函数语法", "写法模板，不能直接运行；下面的示例可以运行")}${fnPlain(syntax.content)}</section>`);
+    if (params) parts.push(`<section class="fc-sec fc-fn-params">${fnHeading("参数说明")}${table(params.columns, params.rows, 20)}</section>`);
+    if (returns) parts.push(`<section class="fc-sec fc-fn-returns">${fnHeading("返回值")}${paragraphs(returns.content)}</section>`);
+    const exampleParts = [];
+    const data = dataFigure(card);
+    if (data) exampleParts.push(data.replace('class="fc-sec fc-fig fc-data"', 'class="fc-fn-data"'));
+    for (const ex of main) exampleParts.push(fnExample(card, ex, spec.examples?.[ex.label] || { explain: "" }));
+    if (edge.length) {
+      exampleParts.push(`<section class="fc-fn-ex fc-fn-edge"><h4>${e(spec.edgeTitle || "边界情况")}</h4>${spec.edgeIntro ? `<p class="fc-fn-explain">${e(spec.edgeIntro)}</p>` : ""}<div class="fc-fn-edge-list">${edge.map((ex) => `<div class="fc-fn-edge-row"><b class="t">${e(spec.examples[ex.label].title || ex.label)}</b><code>${e(squash(ex.mysqlSql || ex.sql))}</code><div class="res"><small>结果</small><b>${e(flat(ex))}</b></div><p>${e(spec.examples[ex.label].explain)}</p>${isAlt(ex) ? '<p class="warn">兼容提示：这条写法在本应用里要用等价写法运行，详见下方代码。</p>' : spec.examples[ex.label].localNote ? `<p class="warn">兼容提示：${e(spec.examples[ex.label].localNote)}</p>` : ""}</div>`).join("")}</div><details class="fc-fn-fold"><summary>查看这些边界示例的代码并运行</summary>${edge.map((ex) => `<div class="fc-fn-edge-item"><h5>${e(spec.examples[ex.label].title || ex.label)}</h5>${fnSql(ex.mysqlSql || ex.sql)}${compatNote(ex) || extraWarn(spec, spec.examples[ex.label])}${resultArea(card, ex)}</div>`).join("")}</details></section>`);
+    }
+    if (exampleParts.length) parts.push(`<section class="fc-sec fc-fn-examples">${fnHeading("用法示例")}${exampleParts.join("")}</section>`);
+    if (application) parts.push(`<section class="fc-sec fc-fn-app">${fnHeading("实际应用")}${paragraphs(application.content)}</section>`);
+    if (note) parts.push(`<section class="fc-sec fc-note fc-fn-note">${fnHeading("注意事项")}${paragraphs(spec.note || note.content)}</section>`);
+    const compat = spec.compat || "本应用用 SQLite 兼容方式运行示例，并不是原生 MySQL 8.4。本卡的示例都已在这个兼容环境里实际运行过，结果与卡片记录一致。";
+    parts.push(`<details class="fc-sec fc-fn-compat"><summary>数据库兼容性说明</summary>${paragraphs(compat)}</details>`);
+    return parts.join("");
+  }
+
   const art = (card) => (card.illustrationKey ? `<img class="fc-art" src="assets/flashcards/${card.illustrationKey}.png" alt="">` : "");
 
   // 卡片外的标签行：类别 · 级别（一行，不重复）。
@@ -277,8 +336,8 @@ export function createCardView({ e, table, code, tag }) {
 
   function back(card, extra = "") {
     const template = CARD_TEMPLATES[card.type] || CARD_TEMPLATES.concept;
-    return `<article class="fc fc-${card.type} back" aria-label="背面"><h2 class="fc-title">${e(card.front?.prompt ?? "")}</h2><div class="fc-answer">${paragraphs(card.back?.answer)}</div>${card.teach ? teachFigure(card.teach) : ""}${template.compose ? composeBack(card, template) : decorate(card).map((x) => x.html ?? section(x.section, template)).join("")}${extra}</article>`;
+    return `<article class="fc fc-${card.type} back" aria-label="背面"><h2 class="fc-title">${e(card.front?.prompt ?? "")}</h2>${card.fnSpec ? "" : `<div class="fc-answer">${paragraphs(card.back?.answer)}</div>`}${card.fnSpec ? functionBack(card) : `${card.teach ? teachFigure(card.teach) : ""}${template.compose ? composeBack(card, template) : decorate(card).map((x) => x.html ?? section(x.section, template)).join("")}`}${extra}</article>`;
   }
 
-  return { front, back, meta };
+  return { front, back, meta, hasFunctionLayout: (card) => Boolean(card.fnSpec) };
 }

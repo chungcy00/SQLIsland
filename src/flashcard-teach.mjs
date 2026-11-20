@@ -2,7 +2,7 @@
 // 图解数据放在 resources/CONTENT/flashcard_v2/teaching-figures.json，按卡号索引，不改 332 张卡的原始内容。
 // 核对规则：图里每个数值都必须出现在这张卡自己的文字/表格里，或在 spec.derived 里明确登记为“由卡内数字算出”；
 // 计算块的每一步都会重新算一遍，必须与图上写的结果一致。
-export const BLOCK_TYPES = ["calc", "table", "compare", "chunks", "steps", "bars", "note", "flow", "pairs", "matrix"];
+export const BLOCK_TYPES = ["calc", "table", "compare", "chunks", "steps", "bars", "note", "flow", "pairs", "matrix", "transform"];
 
 const DATE = /\d{4}-\d{2}-\d{2}/g;
 const NUM = /\d+(?:\.\d+)?/g;
@@ -38,6 +38,7 @@ const cellsOf = (block) => {
     case "bars": return block.items.map((i) => String(i.value));
     case "matrix": return (block.rows || []).flat().map((v) => (typeof v === "object" && v ? v.t : String(v ?? "")));
     case "pairs": return block.items.flatMap((i) => [i.left, i.right]).map((v) => String(v ?? ""));
+    case "transform": return [block.before, block.after].flatMap((r) => (r?.segs || []).map((x) => x.t));
     case "flow": return block.items.flatMap((i) => (i.table ? i.table.rows.flat() : [])).map((v) => (v === null ? "" : String(v)));
     default: return [];
   }
@@ -84,7 +85,9 @@ export function validateFigure(id, spec, card) {
   if (!Array.isArray(spec.blocks) || !spec.blocks.length) errors.push(`${where}: 没有 blocks`);
   const text = cardText(card);
   const known = tokens(text);
-  const allowed = new Set([...known.numbers, ...(spec.derived || []).map(String)]);
+  // 卡片里的日期（如 2025-12-31）拆成年、月、日也算卡片里的数；“289.0”与“289”视为同一个数。
+  const dateParts = known.dates.flatMap((x) => x.split("-"));
+  const allowed = new Set([...known.numbers, ...known.numbers.map((n) => String(Number(n))), ...dateParts, ...dateParts.map((n) => String(Number(n))), ...(spec.derived || []).map(String)]);
   const allowedDates = new Set(known.dates);
   (spec.blocks || []).forEach((block, bi) => {
     const w = `${where} 块${bi + 1}(${block.type})`;
@@ -95,8 +98,9 @@ export function validateFigure(id, spec, card) {
     if (block.type === "chunks" && !(Array.isArray(block.items) && block.items.every((c) => c.role && c.text))) errors.push(`${w}: 语法块缺少 role/text`);
     if (block.type === "steps" && !(Array.isArray(block.items) && block.items.every((c) => c.title))) errors.push(`${w}: 步骤缺少 title`);
     if (block.type === "bars" && !(Array.isArray(block.items) && block.items.every((c) => c.label && typeof c.value === "number"))) errors.push(`${w}: 占比条缺少 label/value`);
+    if (block.type === "transform" && !(block.before?.segs?.length && block.after?.segs?.length)) errors.push(`${w}: 变换图缺少 before/after 片段`);
     if (block.type === "note" && !block.text) errors.push(`${w}: 缺少 text`);
-    if (["calc", "table", "compare", "bars", "matrix", "pairs", "flow"].includes(block.type) && Array.isArray(block.lines || block.rows || block.items)) {
+    if (["calc", "table", "compare", "bars", "matrix", "pairs", "flow", "transform"].includes(block.type) && (Array.isArray(block.lines || block.rows || block.items) || block.type === "transform")) {
       for (const cell of cellsOf(block)) {
         const t = tokens(cell);
         for (const d of t.dates) if (!allowedDates.has(d) && !allowed.has(d)) errors.push(`${w}: 日期 ${d} 不在卡片内容里`);
@@ -111,5 +115,23 @@ export function validateAll(figuresFile, cards) {
   const byId = new Map(cards.map((c) => [c.id, c]));
   const errors = [];
   for (const [id, spec] of Object.entries(figuresFile.figures || {})) errors.push(...validateFigure(id, spec, byId.get(id)));
+  for (const [id, spec] of Object.entries(figuresFile.functions || {})) errors.push(...validateFunctionLayout(id, spec, byId.get(id)));
+  return errors;
+}
+
+// 函数用法卡的新版背面（functions 段）：每个示例的说明、边界对照表、兼容说明，都要能对上卡片里真实存在的示例。
+export function validateFunctionLayout(id, spec, card) {
+  const errors = [];
+  if (!card) return [`${id}: 找不到这张卡`];
+  if (card.type !== "function") errors.push(`${id}: 不是函数用法卡`);
+  const labels = new Set((card.examples?.length ? card.examples : card.example ? [card.example] : []).map((x) => x.label));
+  for (const [label, ex] of Object.entries(spec.examples || {})) {
+    if (!labels.has(label)) errors.push(`${id}: 示例“${label}”在卡片里不存在`);
+    if (!ex.explain) errors.push(`${id} ${label}: 缺少用法说明`);
+    if (!["main", "edge"].includes(ex.kind)) errors.push(`${id} ${label}: kind 必须是 main 或 edge`);
+    if (ex.figure) errors.push(...validateFigure(`${id}/${label}`, { title: ex.title || label, ...ex.figure, derived: [...(spec.derived || []), ...(ex.figure.derived || [])] }, card));
+  }
+  for (const label of labels) if (!(label in (spec.examples || {}))) errors.push(`${id}: 示例“${label}”没有写用法说明`);
+  if (spec.edgeTable) errors.push(...validateFigure(`${id}/edgeTable`, { title: "边界", blocks: [{ type: "table", columns: spec.edgeTable.columns, rows: spec.edgeTable.rows }] }, card));
   return errors;
 }

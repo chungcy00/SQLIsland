@@ -29,3 +29,14 @@ test("教学图解核对器：能抓住算错的步骤和卡里没有的数字",
   const invented = { title: "x", blocks: [{ type: "calc", lines: [{ label: "a", value: 12345 }, { op: "−", label: "b", value: 1 }, { op: "=", label: "c", value: 12344 }] }] };
   assert.ok(validateFigure("fc2-0340", invented, card).some((m) => m.includes("12345")));
 });
+
+test("函数用法卡：53 张都有新版背面的示例说明，且与卡片里的示例一一对应", () => {
+  const ids = cards.filter((c) => c.type === "function").map((c) => c.id).sort();
+  assert.equal(ids.length, 53);
+  assert.deepEqual(Object.keys(figures.functions).sort(), ids);
+  for (const id of ids) {
+    const card = cards.find((c) => c.id === id);
+    const labels = (card.examples?.length ? card.examples : [card.example]).map((x) => x.label).sort();
+    assert.deepEqual(Object.keys(figures.functions[id].examples).sort(), labels, id);
+  }
+});

@@ -7113,5 +7113,5056 @@
     }
    ]
   }
+ },
+ "functions": {
+  "fc2-0154": {
+   "examples": {
+    "重复匹配": {
+     "kind": "main",
+     "title": "示例 1：每一处出现的位置都会被替换",
+     "explain": "把 'ABAB' 里的 'AB' 全部换成 'X'。'AB' 出现了两次，两次都被替换，不是只换第一处。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "transform",
+        "op": "REPLACE('ABAB', 'AB', 'X')：找到每一处 AB，换成 X",
+        "before": {
+         "label": "原字符串",
+         "segs": [
+          {
+           "t": "AB",
+           "tone": "hit"
+          },
+          {
+           "t": "AB",
+           "tone": "hit"
+          }
+         ]
+        },
+        "after": {
+         "label": "替换后",
+         "segs": [
+          {
+           "t": "X",
+           "tone": "new"
+          },
+          {
+           "t": "X",
+           "tone": "new"
+          }
+         ]
+        },
+        "caption": "黄色是被找到的部分，绿色是替换进去的新内容。"
+       }
+      ]
+     }
+    },
+    "大小写": {
+     "kind": "main",
+     "title": "示例 2：匹配区分大小写",
+     "explain": "在 'AaA' 里把 'A' 换成 'x'。只有大写的 A 会被替换，小写的 a 和 A 不是同一个字符，所以保持不变。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "transform",
+        "op": "REPLACE('AaA', 'A', 'x')：只匹配大写的 A",
+        "before": {
+         "label": "原字符串",
+         "segs": [
+          {
+           "t": "A",
+           "tone": "hit"
+          },
+          {
+           "t": "a",
+           "tone": "keep"
+          },
+          {
+           "t": "A",
+           "tone": "hit"
+          }
+         ]
+        },
+        "after": {
+         "label": "替换后",
+         "segs": [
+          {
+           "t": "x",
+           "tone": "new"
+          },
+          {
+           "t": "a",
+           "tone": "keep"
+          },
+          {
+           "t": "x",
+           "tone": "new"
+          }
+         ]
+        },
+        "caption": "灰色的 a 没有被匹配，所以原样保留。"
+       }
+      ]
+     }
+    },
+    "空查找": {
+     "kind": "edge",
+     "title": "查找串为空",
+     "explain": "查找串是空字符串时，没有任何内容可以匹配，原字符串原样返回。"
+    },
+    "空值": {
+     "kind": "edge",
+     "title": "参数是 NULL",
+     "explain": "任一参数为 NULL，结果就是 NULL，不会当作空字符串处理。"
+    }
+   },
+   "compat": "本应用用 SQLite 兼容方式运行示例，并不是原生 MySQL 8.4。REPLACE 在两者里表现一致：匹配区分大小写，查找串为空时不替换，任一参数为 NULL 时结果为 NULL。",
+   "edgeTitle": "边界情况：什么时候不会替换"
+  },
+  "fc2-0060": {
+   "examples": {
+    "空值、零、负数及空字符串": {
+     "kind": "main",
+     "title": "示例 1：只有第一个参数是 NULL 才用备用值",
+     "explain": "IFNULL(a, b) 只在 a 是 NULL 时返回 b；0、负数、空字符串都是真实存在的值，会原样返回，不会被备用值替换。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "pairs",
+        "items": [
+         {
+          "left": "IFNULL(NULL, 9)",
+          "right": "9",
+          "note": "第一个参数是 NULL → 用备用值 9",
+          "tone": "warn"
+         },
+         {
+          "left": "IFNULL(0, 9)",
+          "right": "0",
+          "note": "0 是值，不是 NULL"
+         },
+         {
+          "left": "IFNULL(-2, 9)",
+          "right": "-2",
+          "note": "负数是值"
+         },
+         {
+          "left": "IFNULL('', '备用')",
+          "right": "（空字符串）",
+          "note": "空字符串是值"
+         }
+        ]
+       }
+      ]
+     }
+    },
+    "两值均缺失": {
+     "kind": "edge",
+     "title": "两个参数都是 NULL",
+     "explain": "备用值本身也是 NULL 时，没有任何可用的值，结果仍然是 NULL。"
+    }
+   }
+  },
+  "fc2-0061": {
+   "examples": {
+    "优先级、零与空串": {
+     "kind": "main",
+     "title": "示例 1：从左到右，取第一个不是 NULL 的值",
+     "explain": "COALESCE 按顺序检查每个参数，遇到第一个非 NULL 的就返回。0、空字符串、负数都不是 NULL，所以会被直接选中。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "pairs",
+        "items": [
+         {
+          "left": "COALESCE(NULL, 0, 3)",
+          "right": "0",
+          "note": "跳过 NULL，第一个非 NULL 是 0"
+         },
+         {
+          "left": "COALESCE(NULL, '', 'B')",
+          "right": "（空字符串）",
+          "note": "空字符串不是 NULL，选它"
+         },
+         {
+          "left": "COALESCE(NULL, -5, 2)",
+          "right": "-5",
+          "note": "第一个非 NULL 是 -5"
+         }
+        ]
+       }
+      ]
+     }
+    },
+    "全部缺失": {
+     "kind": "edge",
+     "title": "所有参数都是 NULL",
+     "explain": "找不到非 NULL 的值时，结果是 NULL。"
+    }
+   }
+  },
+  "fc2-0124": {
+   "examples": {
+    "相等、不等、空值、空串": {
+     "kind": "main",
+     "title": "示例 1：两个值相等才变成 NULL",
+     "explain": "NULLIF(a, b)：a 等于 b 时返回 NULL，否则返回 a。与 NULL 比较得到“未知”，不算相等。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "pairs",
+        "items": [
+         {
+          "left": "NULLIF(0, 0)",
+          "right": "NULL",
+          "note": "两个值相等",
+          "tone": "warn"
+         },
+         {
+          "left": "NULLIF(-2, 0)",
+          "right": "-2",
+          "note": "不相等，返回第一个值"
+         },
+         {
+          "left": "NULLIF(5, NULL)",
+          "right": "5",
+          "note": "与 NULL 比较是“未知”，不算相等"
+         },
+         {
+          "left": "NULLIF(NULL, 5)",
+          "right": "NULL",
+          "note": "第一个本身就是 NULL"
+         },
+         {
+          "left": "NULLIF('', '')",
+          "right": "NULL",
+          "note": "两个空字符串相等",
+          "tone": "warn"
+         }
+        ]
+       }
+      ]
+     }
+    },
+    "安全除法": {
+     "kind": "main",
+     "title": "示例 2：用 NULLIF 避免除以 0",
+     "explain": "把除数用 NULLIF(除数, 0) 包起来：除数为 0 时变成 NULL，整个除法的结果就是 NULL，而不是报错。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "pairs",
+        "items": [
+         {
+          "left": "5 / NULLIF(2, 0)",
+          "right": "2.5",
+          "note": "2 不等于 0，正常相除"
+         },
+         {
+          "left": "5 / NULLIF(0, 0)",
+          "right": "NULL",
+          "note": "除数 0 变成 NULL → 结果 NULL，不会报错",
+          "tone": "warn"
+         }
+        ]
+       }
+      ]
+     }
+    }
+   }
+  },
+  "fc2-0122": {
+   "examples": {
+    "真、假、负数及未知": {
+     "kind": "main",
+     "title": "示例 1：条件真走第二支，否则走第三支",
+     "explain": "IF(条件, 真时的值, 否则的值)：条件为真（非零的数）返回第二个参数；0 和 NULL 都走第三个参数。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "pairs",
+        "items": [
+         {
+          "left": "IF(1, '是', '否')",
+          "right": "是",
+          "note": "条件为真"
+         },
+         {
+          "left": "IF(0, '是', '否')",
+          "right": "否",
+          "note": "0 是假"
+         },
+         {
+          "left": "IF(-1, '是', '否')",
+          "right": "是",
+          "note": "负数也是真（非零）"
+         },
+         {
+          "left": "IF(NULL, '是', '否')",
+          "right": "否",
+          "note": "NULL 条件走否定分支",
+          "tone": "warn"
+         }
+        ]
+       }
+      ]
+     }
+    },
+    "被选分支为空": {
+     "kind": "edge",
+     "title": "被选中的那一支本身是 NULL",
+     "explain": "IF(1, NULL, 7)：条件为真，选第二个参数；它本身是 NULL，所以结果是 NULL。"
+    }
+   }
+  },
+  "fc2-0067": {
+   "examples": {
+    "重复、零、负值及缺失": {
+     "kind": "main",
+     "title": "示例 1：SUM 与 SUM(DISTINCT) 累加的值不一样",
+     "explain": "SUM 把所有非 NULL 的值加起来，重复的值照常累加；SUM(DISTINCT x) 先去掉重复值再加。NULL 两种写法都忽略。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "calc",
+        "lines": [
+         {
+          "label": "x = -2",
+          "value": -2
+         },
+         {
+          "label": "x = 0",
+          "op": "+",
+          "value": 0
+         },
+         {
+          "label": "x = 2",
+          "op": "+",
+          "value": 2
+         },
+         {
+          "label": "x = 2（重复）",
+          "op": "+",
+          "value": 2
+         },
+         {
+          "label": "SUM(x)",
+          "op": "=",
+          "value": 2
+         }
+        ],
+        "title": "SUM(x)：重复的 2 加两次"
+       },
+       {
+        "type": "calc",
+        "lines": [
+         {
+          "label": "x = -2",
+          "value": -2
+         },
+         {
+          "label": "x = 0",
+          "op": "+",
+          "value": 0
+         },
+         {
+          "label": "x = 2",
+          "op": "+",
+          "value": 2
+         },
+         {
+          "label": "SUM(DISTINCT x)",
+          "op": "=",
+          "value": 0
+         }
+        ],
+        "title": "SUM(DISTINCT x)：重复的 2 只加一次"
+       },
+       {
+        "type": "note",
+        "text": "id 5 的 x 是 NULL，不参与累加。"
+       }
+      ]
+     }
+    },
+    "空输入与全空": {
+     "kind": "edge",
+     "title": "没有行，或全是 NULL",
+     "explain": "没有任何非 NULL 的值可加时，SUM 返回 NULL，而不是 0。"
+    },
+    "窗口保留行": {
+     "kind": "main",
+     "title": "示例 2：加上 OVER，累计和逐行显示",
+     "explain": "SUM(x) OVER (ORDER BY id ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)：不把行压缩成一个数，每一行都显示“从第一行加到当前行”的累计和。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "table",
+        "columns": [
+         "id",
+         "x",
+         "累计到本行"
+        ],
+        "rows": [
+         [
+          1,
+          -2,
+          "-2"
+         ],
+         [
+          2,
+          0,
+          "-2"
+         ],
+         [
+          3,
+          2,
+          "0"
+         ],
+         [
+          4,
+          2,
+          "2"
+         ],
+         [
+          5,
+          null,
+          "2（NULL 不增加）"
+         ]
+        ]
+       }
+      ]
+     }
+    }
+   }
+  },
+  "fc2-0068": {
+   "examples": {
+    "行数、非空值与去重": {
+     "kind": "main",
+     "title": "示例 1：三种 COUNT 数的东西不同",
+     "explain": "COUNT(*) 数行；COUNT(x) 只数 x 不是 NULL 的行；COUNT(DISTINCT x) 数不同的非 NULL 值。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "table",
+        "columns": [
+         "id",
+         "x",
+         "COUNT(*)",
+         "COUNT(x)",
+         "COUNT(DISTINCT x)"
+        ],
+        "rows": [
+         [
+          1,
+          -2,
+          "数",
+          "数",
+          "数"
+         ],
+         [
+          2,
+          0,
+          "数",
+          "数",
+          "数"
+         ],
+         [
+          3,
+          2,
+          "数",
+          "数",
+          "数"
+         ],
+         [
+          4,
+          2,
+          "数",
+          "数",
+          "重复，不再数"
+         ],
+         [
+          5,
+          null,
+          "数",
+          "不数（NULL）",
+          "不数"
+         ]
+        ],
+        "hl": [
+         3,
+         4
+        ],
+        "foot": [
+         "合计",
+         "",
+         "5",
+         "4",
+         "3"
+        ]
+       }
+      ]
+     }
+    },
+    "空结果集": {
+     "kind": "edge",
+     "title": "没有任何行",
+     "explain": "没有行时，三种 COUNT 都是 0（COUNT 不会返回 NULL）。"
+    },
+    "空串也是非空值": {
+     "kind": "edge",
+     "title": "空字符串也会被 COUNT(x) 数进去",
+     "explain": "空字符串是一个真实存在的值，不是 NULL，所以 COUNT(x) 会数它；只有 NULL 不被数。"
+    },
+    "全空记录": {
+     "kind": "edge",
+     "title": "只有一行，而且 x 是 NULL",
+     "explain": "COUNT(*) 是 1（有一行），COUNT(x) 和 COUNT(DISTINCT x) 都是 0（没有非 NULL 的值）。"
+    }
+   }
+  },
+  "fc2-0069": {
+   "examples": {
+    "有效分母与去重": {
+     "kind": "main",
+     "title": "示例 1：分母是非 NULL 值的个数",
+     "explain": "AVG 用“非 NULL 值的总和 ÷ 非 NULL 值的个数”；NULL 不算进分母，0 照常参与平均。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "calc",
+        "lines": [
+         {
+          "label": "x 的总和（-2 + 0 + 2 + 2）",
+          "value": 2
+         },
+         {
+          "label": "非 NULL 的个数",
+          "op": "÷",
+          "value": 4
+         },
+         {
+          "label": "AVG(x)",
+          "op": "=",
+          "value": 0.5
+         }
+        ],
+        "title": "AVG(x)"
+       },
+       {
+        "type": "calc",
+        "lines": [
+         {
+          "label": "不同值的总和（-2 + 0 + 2）",
+          "value": 0
+         },
+         {
+          "label": "不同值的个数",
+          "op": "÷",
+          "value": 3
+         },
+         {
+          "label": "AVG(DISTINCT x)",
+          "op": "=",
+          "value": 0
+         }
+        ],
+        "title": "AVG(DISTINCT x)：先去重再平均"
+       },
+       {
+        "type": "note",
+        "text": "id 5 的 x 是 NULL：它既不在总和里，也不在分母里。"
+       }
+      ]
+     }
+    },
+    "空与全空": {
+     "kind": "edge",
+     "title": "没有行，或全是 NULL",
+     "explain": "没有可以平均的值时，AVG 返回 NULL。"
+    },
+    "窗口均值忽略空值": {
+     "kind": "main",
+     "title": "示例 2：每行只看自己和前一行",
+     "explain": "AVG(x) OVER (ORDER BY id ROWS BETWEEN 1 PRECEDING AND CURRENT ROW)：每行的平均值只用“前一行和当前行”两个值，NULL 不参与。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "table",
+        "columns": [
+         "id",
+         "x",
+         "窗口里的非 NULL 值",
+         "平均值"
+        ],
+        "rows": [
+         [
+          1,
+          -2,
+          "-2",
+          "-2"
+         ],
+         [
+          2,
+          0,
+          "-2、0",
+          "-1"
+         ],
+         [
+          3,
+          2,
+          "0、2",
+          "1"
+         ],
+         [
+          4,
+          2,
+          "2、2",
+          "2"
+         ],
+         [
+          5,
+          null,
+          "2（NULL 忽略）",
+          "2"
+         ]
+        ],
+        "hl": [
+         4
+        ]
+       }
+      ]
+     }
+    }
+   },
+   "derived": [
+    "0",
+    "1"
+   ]
+  },
+  "fc2-0070": {
+   "examples": {
+    "数值极值含重复与缺失": {
+     "kind": "main",
+     "title": "示例 1：最小值与最大值",
+     "explain": "MIN 返回最小的非 NULL 值，MAX 返回最大的非 NULL 值；并列时只返回这个值本身，NULL 被忽略。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "pairs",
+        "items": [
+         {
+          "left": "MIN(x)",
+          "right": "-2",
+          "note": "x 的取值是 -2、0、2、2，最小的是 -2"
+         },
+         {
+          "left": "MAX(x)",
+          "right": "2",
+          "note": "最大的是 2；有两个 2 也只返回 2"
+         }
+        ]
+       }
+      ]
+     }
+    },
+    "空与全空": {
+     "kind": "edge",
+     "title": "没有行，或全是 NULL",
+     "explain": "没有有效输入时，MIN 和 MAX 都返回 NULL。"
+    },
+    "窗口极值": {
+     "kind": "main",
+     "title": "示例 2：窗口里的最小值",
+     "explain": "MIN(x) OVER (ORDER BY id ROWS BETWEEN 1 PRECEDING AND CURRENT ROW)：每行取“前一行和当前行”里的最小值。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "table",
+        "columns": [
+         "id",
+         "x",
+         "窗口里的非 NULL 值",
+         "MIN"
+        ],
+        "rows": [
+         [
+          1,
+          -2,
+          "-2",
+          "-2"
+         ],
+         [
+          2,
+          0,
+          "-2、0",
+          "-2"
+         ],
+         [
+          3,
+          2,
+          "0、2",
+          "0"
+         ],
+         [
+          4,
+          2,
+          "2、2",
+          "2"
+         ],
+         [
+          5,
+          null,
+          "2（NULL 忽略）",
+          "2"
+         ]
+        ]
+       }
+      ]
+     }
+    }
+   }
+  },
+  "fc2-0077": {
+   "examples": {
+    "三个有效值及一个空值": {
+     "kind": "main",
+     "title": "示例 1：总体与样本，差别在分母",
+     "explain": "先求均值 0，再把每个值与均值的差平方后加起来（离差平方和 8）。总体方差除以个数 n，样本方差除以 n−1；标准差是方差的平方根。NULL 不参与。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "table",
+        "columns": [
+         "x",
+         "x − 均值(0)",
+         "平方"
+        ],
+        "rows": [
+         [
+          -2,
+          -2,
+          4
+         ],
+         [
+          0,
+          0,
+          0
+         ],
+         [
+          2,
+          2,
+          4
+         ]
+        ],
+        "title": "第一步：离差平方",
+        "foot": [
+         "合计",
+         "",
+         "8"
+        ]
+       },
+       {
+        "type": "calc",
+        "lines": [
+         {
+          "label": "离差平方和",
+          "value": 8
+         },
+         {
+          "label": "n（有效值个数）",
+          "op": "÷",
+          "value": 3
+         },
+         {
+          "label": "VAR_POP",
+          "op": "=",
+          "value": 2.6667,
+          "approx": true
+         }
+        ],
+        "title": "总体方差 VAR_POP"
+       },
+       {
+        "type": "calc",
+        "lines": [
+         {
+          "label": "离差平方和",
+          "value": 8
+         },
+         {
+          "label": "n − 1",
+          "op": "÷",
+          "value": 2
+         },
+         {
+          "label": "VAR_SAMP",
+          "op": "=",
+          "value": 4
+         }
+        ],
+        "title": "样本方差 VAR_SAMP"
+       }
+      ]
+     }
+    },
+    "仅一个有效值": {
+     "kind": "edge",
+     "title": "只有一个有效值",
+     "explain": "总体标准差对单个值是 0（没有波动）；样本方差和样本标准差至少要有两个值才有意义，否则为 NULL。"
+    },
+    "全空": {
+     "kind": "edge",
+     "title": "全是 NULL",
+     "explain": "没有有效值，结果是 NULL。"
+    },
+    "空输入": {
+     "kind": "edge",
+     "title": "没有行",
+     "explain": "没有任何值时，结果是 NULL。"
+    },
+    "大基数小离差": {
+     "kind": "edge",
+     "title": "数值很大但差别很小",
+     "explain": "x 是 999999998、1000000000、1000000002：与均值的差仍是 −2、0、2，所以标准差与示例 1 相同。"
+    }
+   },
+   "compat": "本应用的 SQLite 环境没有 VAR_POP、VAR_SAMP、STDDEV_POP、STDDEV_SAMP 这些函数，示例改用“先求均值，再求离差平方”的等价写法运行。在 MySQL 里直接用这些函数即可。",
+   "derived": [
+    "2.6667",
+    "8"
+   ]
+  },
+  "fc2-0146": {
+   "examples": {
+    "中文和数字": {
+     "kind": "main",
+     "title": "示例 1：按顺序把参数连成一个字符串",
+     "explain": "CONCAT 把各个参数按顺序首尾相连，数字会先转成文本再拼接。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "transform",
+        "op": "CONCAT('门店-', 12)",
+        "before": {
+         "label": "参数",
+         "segs": [
+          {
+           "t": "门店-",
+           "tone": "hit"
+          },
+          {
+           "t": "12",
+           "tone": "hit"
+          }
+         ]
+        },
+        "after": {
+         "label": "结果",
+         "segs": [
+          {
+           "t": "门店-12",
+           "tone": "new"
+          }
+         ]
+        },
+        "caption": "两段内容被拼成一个字符串。"
+       }
+      ]
+     }
+    },
+    "空值": {
+     "kind": "edge",
+     "title": "有一个参数是 NULL",
+     "explain": "CONCAT 里只要有一个参数是 NULL，整个结果就是 NULL。",
+     "localNote": "本应用的运行环境在拼接时把 NULL 当作空字符串，所以点“运行”会得到 AB；在 MySQL 里结果是 NULL，请以上面记录的结果为准。"
+    },
+    "空串": {
+     "kind": "edge",
+     "title": "参数是空字符串",
+     "explain": "空字符串是真实的值，拼上它等于什么都没加：CONCAT('A','','B') 得到 AB。"
+    },
+    "分隔符比较": {
+     "kind": "main",
+     "title": "示例 2：CONCAT_WS 跳过 NULL，但保留空字符串",
+     "explain": "CONCAT_WS(分隔符, …) 用第一个参数作分隔符，把后面的参数连起来；NULL 会被跳过，空字符串不会，所以得到 A--B。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "transform",
+        "op": "CONCAT_WS('-', 'A', NULL, '', 'B')",
+        "before": {
+         "label": "参数",
+         "segs": [
+          {
+           "t": "A",
+           "tone": "hit"
+          },
+          {
+           "t": "NULL（跳过）",
+           "tone": "keep"
+          },
+          {
+           "t": "（空字符串）",
+           "tone": "hit"
+          },
+          {
+           "t": "B",
+           "tone": "hit"
+          }
+         ]
+        },
+        "after": {
+         "label": "结果 A--B",
+         "segs": [
+          {
+           "t": "A",
+           "tone": "new"
+          },
+          {
+           "t": "-",
+           "tone": "new"
+          },
+          {
+           "t": "（空）",
+           "tone": "new"
+          },
+          {
+           "t": "-",
+           "tone": "new"
+          },
+          {
+           "t": "B",
+           "tone": "new"
+          }
+         ]
+        },
+        "caption": "A 和（空字符串）之间、（空字符串）和 B 之间各有一个分隔符，所以出现两个连续的 -。"
+       }
+      ]
+     }
+    }
+   },
+   "compat": "“分隔符比较”这个示例，本应用的 SQLite 环境没有 CONCAT_WS，示例用 CONCAT 把同样的各部分拼起来，结果相同；在 MySQL 里直接用 CONCAT_WS。",
+   "note": "CONCAT_WS 的第一个参数是分隔符，分隔符为 NULL 时结果是 NULL；它会跳过其余的 NULL，但不会跳过空字符串。本应用的运行环境里，“分隔符比较”这个示例改用 CONCAT 显式拼出同样的结果，只适用于本例，不是通用的替代写法。"
+  },
+  "fc2-0147": {
+   "examples": {
+    "常规拼接": {
+     "kind": "main",
+     "title": "示例 1：用分隔符连接",
+     "explain": "CONCAT_WS(分隔符, 值1, 值2, …)：在相邻的非 NULL 值之间放入分隔符。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "transform",
+        "op": "CONCAT_WS('-', 'A', '001')",
+        "before": {
+         "label": "参数",
+         "segs": [
+          {
+           "t": "A",
+           "tone": "hit"
+          },
+          {
+           "t": "001",
+           "tone": "hit"
+          }
+         ]
+        },
+        "after": {
+         "label": "结果 A-001",
+         "segs": [
+          {
+           "t": "A",
+           "tone": "new"
+          },
+          {
+           "t": "-",
+           "tone": "new"
+          },
+          {
+           "t": "001",
+           "tone": "new"
+          }
+         ]
+        },
+        "caption": "分隔符只出现在值与值之间。"
+       }
+      ]
+     }
+    },
+    "跳过空值保留空串": {
+     "kind": "main",
+     "title": "示例 2：NULL 被跳过，空字符串被保留",
+     "explain": "CONCAT_WS 会跳过 NULL，但空字符串仍然参与连接，所以会留下两个连续的分隔符。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "transform",
+        "op": "CONCAT_WS('|', 'A', NULL, '', 'B')",
+        "before": {
+         "label": "参数",
+         "segs": [
+          {
+           "t": "A",
+           "tone": "hit"
+          },
+          {
+           "t": "NULL（跳过）",
+           "tone": "keep"
+          },
+          {
+           "t": "（空字符串）",
+           "tone": "hit"
+          },
+          {
+           "t": "B",
+           "tone": "hit"
+          }
+         ]
+        },
+        "after": {
+         "label": "结果 A||B",
+         "segs": [
+          {
+           "t": "A",
+           "tone": "new"
+          },
+          {
+           "t": "|",
+           "tone": "new"
+          },
+          {
+           "t": "（空）",
+           "tone": "new"
+          },
+          {
+           "t": "|",
+           "tone": "new"
+          },
+          {
+           "t": "B",
+           "tone": "new"
+          }
+         ]
+        },
+        "caption": "想去掉空字符串，要先把它转成 NULL。"
+       }
+      ]
+     }
+    },
+    "空分隔符": {
+     "kind": "edge",
+     "title": "分隔符本身是 NULL",
+     "explain": "分隔符是 NULL 时，整个结果是 NULL。"
+    },
+    "全部值为空": {
+     "kind": "edge",
+     "title": "所有值都是 NULL",
+     "explain": "没有可连接的值，结果是空字符串（不是 NULL）。"
+    }
+   },
+   "compat": "“跳过空值保留空串”这个示例，本应用的 SQLite 环境没有 CONCAT_WS，示例用 || 连接符拼出同样的结果；在 MySQL 里直接用 CONCAT_WS。",
+   "note": "空字符串不是 NULL；分隔符本身为 NULL 时不会拼接。本应用的运行环境会跳过空字符串，与 MySQL 的 CONCAT_WS 不同，所以“跳过空值保留空串”这个示例用显式拼接来保留空字符串，不是任意参数个数的通用替代。"
+  },
+  "fc2-0148": {
+   "examples": {
+    "中文截取": {
+     "kind": "main",
+     "title": "示例 1：按字符截取，位置从 1 开始数",
+     "explain": "SUBSTRING(文本, 起点, 长度)：从第 2 个字符开始取 2 个字符。位置从 1 开始，一个汉字算一个字符。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "transform",
+        "op": "SUBSTRING('马来西亚', 2, 2)",
+        "before": {
+         "label": "原文本",
+         "segs": [
+          {
+           "t": "马",
+           "tone": "keep"
+          },
+          {
+           "t": "来",
+           "tone": "hit"
+          },
+          {
+           "t": "西",
+           "tone": "hit"
+          },
+          {
+           "t": "亚",
+           "tone": "keep"
+          }
+         ]
+        },
+        "after": {
+         "label": "结果",
+         "segs": [
+          {
+           "t": "来西",
+           "tone": "new"
+          }
+         ]
+        },
+        "caption": "黄色是被取出的字符。"
+       }
+      ]
+     }
+    },
+    "负起点": {
+     "kind": "main",
+     "title": "示例 2：负数起点从末尾倒着数",
+     "explain": "起点是负数时，从字符串的末尾往前数：-2 表示倒数第 2 个字符。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "transform",
+        "op": "SUBSTRING('abc', -2, 1)",
+        "before": {
+         "label": "原文本",
+         "segs": [
+          {
+           "t": "a",
+           "tone": "keep"
+          },
+          {
+           "t": "b",
+           "tone": "hit"
+          },
+          {
+           "t": "c",
+           "tone": "keep"
+          }
+         ]
+        },
+        "after": {
+         "label": "结果",
+         "segs": [
+          {
+           "t": "b",
+           "tone": "new"
+          }
+         ]
+        },
+        "caption": "倒数第 1 个是 c，倒数第 2 个是 b。"
+       }
+      ]
+     }
+    },
+    "零起点": {
+     "kind": "edge",
+     "title": "起点是 0",
+     "explain": "位置从 1 开始，0 不是有效位置，结果是空字符串。"
+    },
+    "负长度": {
+     "kind": "edge",
+     "title": "长度是负数",
+     "explain": "长度为负数时没有字符可取，结果是空字符串。"
+    },
+    "空值": {
+     "kind": "edge",
+     "title": "文本是 NULL",
+     "explain": "输入是 NULL，结果就是 NULL。"
+    }
+   },
+   "compat": "“零起点”和“负长度”这两个示例，本应用的 SQLite 环境处理方式与 MySQL 不同，示例用 CASE 直接返回空字符串来对应 MySQL 的结果。"
+  },
+  "fc2-0149": {
+   "examples": {
+    "固定前缀": {
+     "kind": "main",
+     "title": "示例 1：取左边的前几个字符",
+     "explain": "LEFT(文本, n) 取最左边的 n 个字符。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "transform",
+        "op": "LEFT('A01-009', 3)",
+        "before": {
+         "label": "原文本",
+         "segs": [
+          {
+           "t": "A01",
+           "tone": "hit"
+          },
+          {
+           "t": "-009",
+           "tone": "keep"
+          }
+         ]
+        },
+        "after": {
+         "label": "结果",
+         "segs": [
+          {
+           "t": "A01",
+           "tone": "new"
+          }
+         ]
+        },
+        "caption": "取左边的 3 个字符。"
+       }
+      ]
+     }
+    },
+    "中文字符": {
+     "kind": "main",
+     "title": "示例 2：按字符计数，不是按字节",
+     "explain": "一个汉字算一个字符，LEFT 按字符数截取。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "transform",
+        "op": "LEFT('古晋门店', 2)",
+        "before": {
+         "label": "原文本",
+         "segs": [
+          {
+           "t": "古晋",
+           "tone": "hit"
+          },
+          {
+           "t": "门店",
+           "tone": "keep"
+          }
+         ]
+        },
+        "after": {
+         "label": "结果",
+         "segs": [
+          {
+           "t": "古晋",
+           "tone": "new"
+          }
+         ]
+        }
+       }
+      ]
+     }
+    },
+    "零长度": {
+     "kind": "edge",
+     "title": "长度是 0",
+     "explain": "取 0 个字符，结果是空字符串。"
+    },
+    "超出长度": {
+     "kind": "edge",
+     "title": "长度大于原字符串",
+     "explain": "要求的长度比原字符串还长时，返回整个字符串。"
+    },
+    "空值": {
+     "kind": "edge",
+     "title": "文本是 NULL",
+     "explain": "输入是 NULL，结果是 NULL。"
+    }
+   },
+   "compat": "本应用的 SQLite 环境里 LEFT 不能直接解析，示例改用 substr(文本, 1, 长度) 得到相同的结果。这个替代只适合非负的字符数，负长度或二进制字符串不要照搬。"
+  },
+  "fc2-0150": {
+   "examples": {
+    "末尾编号": {
+     "kind": "main",
+     "title": "示例 1：取右边的最后几个字符，保留前导零",
+     "explain": "RIGHT(文本, n) 取最右边的 n 个字符，结果是文本，所以前导的 0 会保留。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "transform",
+        "op": "RIGHT('A-001', 3)",
+        "before": {
+         "label": "原文本",
+         "segs": [
+          {
+           "t": "A-",
+           "tone": "keep"
+          },
+          {
+           "t": "001",
+           "tone": "hit"
+          }
+         ]
+        },
+        "after": {
+         "label": "结果",
+         "segs": [
+          {
+           "t": "001",
+           "tone": "new"
+          }
+         ]
+        },
+        "caption": "取右边的 3 个字符。"
+       }
+      ]
+     }
+    },
+    "中文字符": {
+     "kind": "main",
+     "title": "示例 2：按字符计数",
+     "explain": "一个汉字算一个字符，RIGHT 按字符数截取。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "transform",
+        "op": "RIGHT('古晋门店', 2)",
+        "before": {
+         "label": "原文本",
+         "segs": [
+          {
+           "t": "古晋",
+           "tone": "keep"
+          },
+          {
+           "t": "门店",
+           "tone": "hit"
+          }
+         ]
+        },
+        "after": {
+         "label": "结果",
+         "segs": [
+          {
+           "t": "门店",
+           "tone": "new"
+          }
+         ]
+        }
+       }
+      ]
+     }
+    },
+    "零长度": {
+     "kind": "edge",
+     "title": "长度是 0",
+     "explain": "取 0 个字符，结果是空字符串。"
+    },
+    "超出长度": {
+     "kind": "edge",
+     "title": "长度大于原字符串",
+     "explain": "要求的长度比原字符串还长时，返回整个字符串。"
+    },
+    "空值": {
+     "kind": "edge",
+     "title": "文本是 NULL",
+     "explain": "输入是 NULL，结果是 NULL。"
+    }
+   },
+   "compat": "本应用的 SQLite 环境里 RIGHT 不能直接解析，示例改用 substr(文本, -长度) 得到相同的结果。这个替代只适合非负的字符数。",
+   "note": "在本应用的运行环境里，RIGHT 不能直接使用：零长度要单独处理，再用 substr(文本, -长度) 取右侧的字符；长度超过字符串时返回完整文本。二进制字符串和负长度没有验证。"
+  },
+  "fc2-0151": {
+   "examples": {
+    "第一个分隔符左侧": {
+     "kind": "main",
+     "title": "示例 1：数到第 1 个分隔符，取它左边的部分",
+     "explain": "SUBSTRING_INDEX(文本, 分隔符, n)：n 为正数时，取第 n 个分隔符左边的全部内容。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "transform",
+        "op": "SUBSTRING_INDEX('A-001-X', '-', 1)",
+        "before": {
+         "label": "原文本",
+         "segs": [
+          {
+           "t": "A",
+           "tone": "hit"
+          },
+          {
+           "t": "-",
+           "tone": "keep"
+          },
+          {
+           "t": "001",
+           "tone": "keep"
+          },
+          {
+           "t": "-",
+           "tone": "keep"
+          },
+          {
+           "t": "X",
+           "tone": "keep"
+          }
+         ]
+        },
+        "after": {
+         "label": "结果",
+         "segs": [
+          {
+           "t": "A",
+           "tone": "new"
+          }
+         ]
+        },
+        "caption": "黄色是第 1 个分隔符左边的内容。"
+       }
+      ]
+     }
+    },
+    "第二个分隔符左侧": {
+     "kind": "main",
+     "title": "示例 2：数到第 2 个分隔符",
+     "explain": "n = 2：取第 2 个分隔符左边的全部内容，中间的分隔符也包括在内。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "transform",
+        "op": "SUBSTRING_INDEX('A-001-X', '-', 2)",
+        "before": {
+         "label": "原文本",
+         "segs": [
+          {
+           "t": "A",
+           "tone": "hit"
+          },
+          {
+           "t": "-",
+           "tone": "hit"
+          },
+          {
+           "t": "001",
+           "tone": "hit"
+          },
+          {
+           "t": "-",
+           "tone": "keep"
+          },
+          {
+           "t": "X",
+           "tone": "keep"
+          }
+         ]
+        },
+        "after": {
+         "label": "结果",
+         "segs": [
+          {
+           "t": "A-001",
+           "tone": "new"
+          }
+         ]
+        }
+       }
+      ]
+     }
+    },
+    "邮箱右侧（仅一个分隔符）": {
+     "kind": "main",
+     "title": "示例 3：负数从右边数",
+     "explain": "n 为负数时从右边数，取第 |n| 个分隔符右边的内容：-1 就是最后一个 @ 之后的部分。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "transform",
+        "op": "SUBSTRING_INDEX('ana@example.org', '@', -1)",
+        "before": {
+         "label": "原文本",
+         "segs": [
+          {
+           "t": "ana",
+           "tone": "keep"
+          },
+          {
+           "t": "@",
+           "tone": "keep"
+          },
+          {
+           "t": "example.org",
+           "tone": "hit"
+          }
+         ]
+        },
+        "after": {
+         "label": "结果",
+         "segs": [
+          {
+           "t": "example.org",
+           "tone": "new"
+          }
+         ]
+        }
+       }
+      ]
+     }
+    },
+    "分隔符不存在": {
+     "kind": "edge",
+     "title": "没有出现分隔符",
+     "explain": "找不到分隔符时，返回整个字符串。"
+    },
+    "零次数": {
+     "kind": "edge",
+     "title": "n 是 0",
+     "explain": "n 为 0，结果是空字符串。"
+    },
+    "空值": {
+     "kind": "edge",
+     "title": "文本是 NULL",
+     "explain": "输入是 NULL，结果是 NULL。"
+    }
+   },
+   "compat": "本应用的 SQLite 环境没有 SUBSTRING_INDEX，示例用 substr 与 instr 组合出同样的结果。在 MySQL 里直接使用这个函数。",
+   "note": "本应用的运行环境没有这个函数。示例中的替代写法只适用于单字符分隔符和固定的次数，不能当作任意次数的通用实现；缺少分隔符时返回原文，使用前要先检查数据格式。"
+  },
+  "fc2-0152": {
+   "examples": {
+    "内部空格保留": {
+     "kind": "main",
+     "title": "示例 1：TRIM 只去掉两端的空格",
+     "explain": "TRIM(文本) 默认移除首尾的空格，中间的空格保持不变。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "transform",
+        "op": "TRIM(' A B ')",
+        "before": {
+         "label": "原文本",
+         "segs": [
+          {
+           "t": "␣",
+           "tone": "hit"
+          },
+          {
+           "t": "A",
+           "tone": "keep"
+          },
+          {
+           "t": "␣",
+           "tone": "keep"
+          },
+          {
+           "t": "B",
+           "tone": "keep"
+          },
+          {
+           "t": "␣",
+           "tone": "hit"
+          }
+         ]
+        },
+        "after": {
+         "label": "结果 A B",
+         "segs": [
+          {
+           "t": "A",
+           "tone": "new"
+          },
+          {
+           "t": "␣",
+           "tone": "new"
+          },
+          {
+           "t": "B",
+           "tone": "new"
+          }
+         ]
+        },
+        "caption": "␣ 表示一个空格；黄色的是两端被去掉的空格。"
+       }
+      ]
+     }
+    },
+    "空值": {
+     "kind": "edge",
+     "title": "文本是 NULL",
+     "explain": "输入是 NULL，结果是 NULL。"
+    },
+    "整串修剪": {
+     "kind": "main",
+     "title": "示例 2：从两端反复移除指定的整段字符",
+     "explain": "TRIM('ab' FROM 文本)：从两端移除整段的 ab（不是单个字母）。左端的 ab 被移除一次，右端的 ab 也被移除一次，剩下 baa。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "transform",
+        "op": "TRIM('ab' FROM 'abbaaab')",
+        "before": {
+         "label": "原文本",
+         "segs": [
+          {
+           "t": "ab",
+           "tone": "hit"
+          },
+          {
+           "t": "baa",
+           "tone": "keep"
+          },
+          {
+           "t": "ab",
+           "tone": "hit"
+          }
+         ]
+        },
+        "after": {
+         "label": "结果",
+         "segs": [
+          {
+           "t": "baa",
+           "tone": "new"
+          }
+         ]
+        },
+        "caption": "黄色是两端被移除的 ab。"
+       }
+      ]
+     }
+    }
+   },
+   "compat": "普通的 TRIM(文本) 可以直接运行；“整串修剪”（TRIM('ab' FROM …)）这种写法本应用不支持，示例用递归查询模拟同样的效果。"
+  },
+  "fc2-0155": {
+   "examples": {
+    "英文代码": {
+     "kind": "main",
+     "title": "示例 1：小写字母变成大写",
+     "explain": "UPPER 把能转换的小写字母变成大写。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "transform",
+        "op": "UPPER('ab-001')",
+        "before": {
+         "label": "原文本",
+         "segs": [
+          {
+           "t": "a",
+           "tone": "hit"
+          },
+          {
+           "t": "b",
+           "tone": "hit"
+          },
+          {
+           "t": "-",
+           "tone": "keep"
+          },
+          {
+           "t": "001",
+           "tone": "keep"
+          }
+         ]
+        },
+        "after": {
+         "label": "结果 AB-001",
+         "segs": [
+          {
+           "t": "A",
+           "tone": "new"
+          },
+          {
+           "t": "B",
+           "tone": "new"
+          },
+          {
+           "t": "-",
+           "tone": "keep"
+          },
+          {
+           "t": "001",
+           "tone": "keep"
+          }
+         ]
+        },
+        "caption": "字母变了，连字符和数字保持不变。"
+       }
+      ]
+     }
+    },
+    "空格数字不变": {
+     "kind": "main",
+     "title": "示例 2：空格和数字原样保留",
+     "explain": "UPPER 只改变字母，空格、数字不受影响，也不会去掉空格。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "transform",
+        "op": "UPPER(' a1 ')",
+        "before": {
+         "label": "原文本",
+         "segs": [
+          {
+           "t": "␣",
+           "tone": "keep"
+          },
+          {
+           "t": "a",
+           "tone": "hit"
+          },
+          {
+           "t": "1",
+           "tone": "keep"
+          },
+          {
+           "t": "␣",
+           "tone": "keep"
+          }
+         ]
+        },
+        "after": {
+         "label": "结果",
+         "segs": [
+          {
+           "t": "␣",
+           "tone": "keep"
+          },
+          {
+           "t": "A",
+           "tone": "new"
+          },
+          {
+           "t": "1",
+           "tone": "keep"
+          },
+          {
+           "t": "␣",
+           "tone": "keep"
+          }
+         ]
+        },
+        "caption": "␣ 表示一个空格。"
+       }
+      ]
+     }
+    },
+    "空值": {
+     "kind": "edge",
+     "title": "文本是 NULL",
+     "explain": "输入是 NULL，结果是 NULL。"
+    }
+   }
+  },
+  "fc2-0156": {
+   "examples": {
+    "英文类别": {
+     "kind": "main",
+     "title": "示例 1：大写字母变成小写",
+     "explain": "LOWER 把能转换的大写字母变成小写。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "transform",
+        "op": "LOWER('RETAIL')",
+        "before": {
+         "label": "原文本",
+         "segs": [
+          {
+           "t": "R",
+           "tone": "hit"
+          },
+          {
+           "t": "E",
+           "tone": "hit"
+          },
+          {
+           "t": "T",
+           "tone": "hit"
+          },
+          {
+           "t": "A",
+           "tone": "hit"
+          },
+          {
+           "t": "I",
+           "tone": "hit"
+          },
+          {
+           "t": "L",
+           "tone": "hit"
+          }
+         ]
+        },
+        "after": {
+         "label": "结果 retail",
+         "segs": [
+          {
+           "t": "r",
+           "tone": "new"
+          },
+          {
+           "t": "e",
+           "tone": "new"
+          },
+          {
+           "t": "t",
+           "tone": "new"
+          },
+          {
+           "t": "a",
+           "tone": "new"
+          },
+          {
+           "t": "i",
+           "tone": "new"
+          },
+          {
+           "t": "l",
+           "tone": "new"
+          }
+         ]
+        }
+       }
+      ]
+     }
+    },
+    "混合字符": {
+     "kind": "main",
+     "title": "示例 2：LOWER 不负责清洗格式",
+     "explain": "LOWER 只改变字母的大小写：两端的空格和连字符都还在，不能指望它把数据“清洗干净”。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "transform",
+        "op": "LOWER(' A-001 ')",
+        "before": {
+         "label": "原文本",
+         "segs": [
+          {
+           "t": "␣",
+           "tone": "keep"
+          },
+          {
+           "t": "A",
+           "tone": "hit"
+          },
+          {
+           "t": "-",
+           "tone": "keep"
+          },
+          {
+           "t": "001",
+           "tone": "keep"
+          },
+          {
+           "t": "␣",
+           "tone": "keep"
+          }
+         ]
+        },
+        "after": {
+         "label": "结果",
+         "segs": [
+          {
+           "t": "␣",
+           "tone": "keep"
+          },
+          {
+           "t": "a",
+           "tone": "new"
+          },
+          {
+           "t": "-",
+           "tone": "keep"
+          },
+          {
+           "t": "001",
+           "tone": "keep"
+          },
+          {
+           "t": "␣",
+           "tone": "keep"
+          }
+         ]
+        },
+        "caption": "要去掉空格，需要再用 TRIM。"
+       }
+      ]
+     }
+    },
+    "空值": {
+     "kind": "edge",
+     "title": "文本是 NULL",
+     "explain": "输入是 NULL，结果是 NULL。"
+    }
+   }
+  },
+  "fc2-0160": {
+   "examples": {
+    "首次匹配": {
+     "kind": "main",
+     "title": "示例 1：返回第一次出现的位置（从 1 开始数）",
+     "explain": "LOCATE(要找的子串, 文本)：返回子串第一次出现的位置。在 zababc 里，ab 第一次出现在第 2 个字符。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "transform",
+        "op": "LOCATE('ab', 'zababc')",
+        "before": {
+         "label": "文本 zababc",
+         "segs": [
+          {
+           "t": "z",
+           "tone": "keep"
+          },
+          {
+           "t": "ab",
+           "tone": "hit"
+          },
+          {
+           "t": "ab",
+           "tone": "keep"
+          },
+          {
+           "t": "c",
+           "tone": "keep"
+          }
+         ]
+        },
+        "after": {
+         "label": "位置",
+         "segs": [
+          {
+           "t": "2",
+           "tone": "new"
+          }
+         ]
+        },
+        "caption": "黄色是第一次出现的 ab；后面的 ab 不再理会。"
+       }
+      ]
+     }
+    },
+    "指定起点": {
+     "kind": "main",
+     "title": "示例 2：从指定位置开始往后找",
+     "explain": "第三个参数是起点：从第 3 个字符开始找，前面的字符被跳过，所以找到的是第 4 个位置的 ab。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "transform",
+        "op": "LOCATE('ab', 'zababc', 3)",
+        "before": {
+         "label": "文本 zababc（从第 3 个字符起找）",
+         "segs": [
+          {
+           "t": "z",
+           "tone": "keep"
+          },
+          {
+           "t": "a",
+           "tone": "keep"
+          },
+          {
+           "t": "b",
+           "tone": "keep"
+          },
+          {
+           "t": "ab",
+           "tone": "hit"
+          },
+          {
+           "t": "c",
+           "tone": "keep"
+          }
+         ]
+        },
+        "after": {
+         "label": "位置",
+         "segs": [
+          {
+           "t": "4",
+           "tone": "new"
+          }
+         ]
+        },
+        "caption": "前两个字符被跳过；返回的位置仍从整个字符串的开头数。"
+       }
+      ]
+     }
+    },
+    "未匹配": {
+     "kind": "edge",
+     "title": "找不到子串",
+     "explain": "没有找到时返回 0。"
+    },
+    "空值": {
+     "kind": "edge",
+     "title": "有参数是 NULL",
+     "explain": "有参数是 NULL，结果是 NULL。"
+    }
+   },
+   "compat": "本应用的 SQLite 环境没有 LOCATE，示例改用 INSTR 得到同样的位置。注意 INSTR 的两个参数顺序与 LOCATE 相反（先写文本，再写子串）。"
+  },
+  "fc2-0162": {
+   "examples": {
+    "左补齐": {
+     "kind": "main",
+     "title": "示例 1：左边补零，凑够指定长度",
+     "explain": "LPAD(文本, 总长度, 补位字符)：在左边补上字符，直到总长度够。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "transform",
+        "op": "LPAD('7', 3, '0')",
+        "before": {
+         "label": "原文本",
+         "segs": [
+          {
+           "t": "7",
+           "tone": "keep"
+          }
+         ]
+        },
+        "after": {
+         "label": "结果 007",
+         "segs": [
+          {
+           "t": "0",
+           "tone": "new"
+          },
+          {
+           "t": "0",
+           "tone": "new"
+          },
+          {
+           "t": "7",
+           "tone": "keep"
+          }
+         ]
+        },
+        "caption": "补上了两个 0。"
+       }
+      ]
+     }
+    },
+    "右补齐": {
+     "kind": "main",
+     "title": "示例 2：右边补齐",
+     "explain": "RPAD 在右边补字符。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "transform",
+        "op": "RPAD('AB', 5, '-')",
+        "before": {
+         "label": "原文本",
+         "segs": [
+          {
+           "t": "A",
+           "tone": "keep"
+          },
+          {
+           "t": "B",
+           "tone": "keep"
+          }
+         ]
+        },
+        "after": {
+         "label": "结果 AB---",
+         "segs": [
+          {
+           "t": "A",
+           "tone": "keep"
+          },
+          {
+           "t": "B",
+           "tone": "keep"
+          },
+          {
+           "t": "-",
+           "tone": "new"
+          },
+          {
+           "t": "-",
+           "tone": "new"
+          },
+          {
+           "t": "-",
+           "tone": "new"
+          }
+         ]
+        }
+       }
+      ]
+     }
+    },
+    "截断": {
+     "kind": "main",
+     "title": "示例 3：原文本比目标长时会被截断",
+     "explain": "总长度小于原文本长度时，不会补位，而是只保留左边的字符。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "transform",
+        "op": "LPAD('ABCD', 2, '0')",
+        "before": {
+         "label": "原文本",
+         "segs": [
+          {
+           "t": "A",
+           "tone": "keep"
+          },
+          {
+           "t": "B",
+           "tone": "keep"
+          },
+          {
+           "t": "C",
+           "tone": "hit"
+          },
+          {
+           "t": "D",
+           "tone": "hit"
+          }
+         ]
+        },
+        "after": {
+         "label": "结果 AB",
+         "segs": [
+          {
+           "t": "A",
+           "tone": "keep"
+          },
+          {
+           "t": "B",
+           "tone": "keep"
+          }
+         ]
+        },
+        "caption": "黄色的 C、D 被截掉了。"
+       }
+      ]
+     }
+    },
+    "空填充": {
+     "kind": "edge",
+     "title": "补位字符是空字符串",
+     "explain": "补位字符为空时，无法补齐，结果是 NULL。"
+    },
+    "空值": {
+     "kind": "edge",
+     "title": "文本是 NULL",
+     "explain": "输入是 NULL，结果是 NULL。"
+    }
+   },
+   "compat": "本应用的 SQLite 环境没有 LPAD、RPAD，示例用 substr 与连接符组合出同样的结果。在 MySQL 里直接使用它们。"
+  },
+  "fc2-0164": {
+   "examples": {
+    "排序及分隔符": {
+     "kind": "main",
+     "title": "示例 1：按顺序把组内的值连成一个字符串",
+     "explain": "GROUP_CONCAT(x ORDER BY id SEPARATOR ';')：先按 id 排序，再用分号连接各行的 x；NULL 被跳过。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "transform",
+        "op": "GROUP_CONCAT(x ORDER BY id SEPARATOR ';')",
+        "before": {
+         "label": "原来的行",
+         "segs": [
+          {
+           "t": "id 2 → B",
+           "tone": "keep"
+          },
+          {
+           "t": "id 1 → A",
+           "tone": "keep"
+          },
+          {
+           "t": "id 3 → NULL（跳过）",
+           "tone": "keep"
+          }
+         ]
+        },
+        "after": {
+         "label": "结果 A;B",
+         "segs": [
+          {
+           "t": "A",
+           "tone": "new"
+          },
+          {
+           "t": ";",
+           "tone": "new"
+          },
+          {
+           "t": "B",
+           "tone": "new"
+          }
+         ]
+        },
+        "caption": "按 id 排成 1、2（3 是 NULL 被跳过），得到 A;B。"
+       }
+      ]
+     }
+    },
+    "去重": {
+     "kind": "main",
+     "title": "示例 2：DISTINCT 先去掉重复值",
+     "explain": "加上 DISTINCT，重复的值只保留一个，再按顺序连接。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "transform",
+        "op": "GROUP_CONCAT(DISTINCT x ORDER BY x SEPARATOR ';')",
+        "before": {
+         "label": "原来的行",
+         "segs": [
+          {
+           "t": "B",
+           "tone": "keep"
+          },
+          {
+           "t": "A",
+           "tone": "keep"
+          },
+          {
+           "t": "A（重复）",
+           "tone": "hit"
+          },
+          {
+           "t": "NULL（跳过）",
+           "tone": "keep"
+          }
+         ]
+        },
+        "after": {
+         "label": "结果 A;B",
+         "segs": [
+          {
+           "t": "A",
+           "tone": "new"
+          },
+          {
+           "t": ";",
+           "tone": "new"
+          },
+          {
+           "t": "B",
+           "tone": "new"
+          }
+         ]
+        }
+       }
+      ]
+     }
+    },
+    "全部空值": {
+     "kind": "edge",
+     "title": "所有值都是 NULL",
+     "explain": "没有非 NULL 的值可连接，结果是 NULL。"
+    }
+   },
+   "compat": "MySQL 用 SEPARATOR 指定分隔符；本应用的 SQLite 环境把分隔符写成第二个参数，去重则先 SELECT DISTINCT 再汇总。示例已按这个等价写法运行，结果相同。MySQL 里结果长度还受 group_concat_max_len 限制。"
+  },
+  "fc2-0165": {
+   "examples": {
+    "删除数字": {
+     "kind": "main",
+     "title": "示例 1：用正则找出连续数字并删除",
+     "explain": "REGEXP_REPLACE(文本, 模式, 替换内容)：[0-9]+ 匹配一段连续的数字，替换成空字符串就是删除。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "transform",
+        "op": "REGEXP_REPLACE('A12B3', '[0-9]+', '')",
+        "before": {
+         "label": "原文本",
+         "segs": [
+          {
+           "t": "A",
+           "tone": "keep"
+          },
+          {
+           "t": "12",
+           "tone": "hit"
+          },
+          {
+           "t": "B",
+           "tone": "keep"
+          },
+          {
+           "t": "3",
+           "tone": "hit"
+          }
+         ]
+        },
+        "after": {
+         "label": "结果 AB",
+         "segs": [
+          {
+           "t": "A",
+           "tone": "keep"
+          },
+          {
+           "t": "B",
+           "tone": "keep"
+          }
+         ]
+        },
+        "caption": "黄色是被匹配并删除的数字。"
+       }
+      ]
+     }
+    },
+    "无匹配": {
+     "kind": "edge",
+     "title": "没有匹配的内容",
+     "explain": "没有匹配时，文本保持原样。"
+    },
+    "固定分隔符": {
+     "kind": "main",
+     "title": "示例 2：也可以替换固定的字符",
+     "explain": "模式写成固定字符也行：把每个 - 换成 _。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "transform",
+        "op": "REGEXP_REPLACE('A-B-C', '-', '_')",
+        "before": {
+         "label": "原文本",
+         "segs": [
+          {
+           "t": "A",
+           "tone": "keep"
+          },
+          {
+           "t": "-",
+           "tone": "hit"
+          },
+          {
+           "t": "B",
+           "tone": "keep"
+          },
+          {
+           "t": "-",
+           "tone": "hit"
+          },
+          {
+           "t": "C",
+           "tone": "keep"
+          }
+         ]
+        },
+        "after": {
+         "label": "结果 A_B_C",
+         "segs": [
+          {
+           "t": "A",
+           "tone": "keep"
+          },
+          {
+           "t": "_",
+           "tone": "new"
+          },
+          {
+           "t": "B",
+           "tone": "keep"
+          },
+          {
+           "t": "_",
+           "tone": "new"
+          },
+          {
+           "t": "C",
+           "tone": "keep"
+          }
+         ]
+        }
+       }
+      ]
+     }
+    },
+    "空值": {
+     "kind": "edge",
+     "title": "文本是 NULL",
+     "explain": "输入是 NULL，结果是 NULL。"
+    }
+   },
+   "compat": "本应用的 SQLite 环境没有 REGEXP_REPLACE，示例改用多次 REPLACE（逐个去掉数字 0 到 9）得到同样的结果。真正的正则功能请在 MySQL 8.0 及以上使用。",
+   "note": "本应用的运行环境没有这个函数。示例中的替代写法只适用于删除 ASCII 数字这类固定任务，不支持任意正则模式、匹配组和匹配选项；真正的正则功能请在 MySQL 中使用。"
+  },
+  "fc2-0166": {
+   "examples": {
+    "首段数字": {
+     "kind": "main",
+     "title": "示例 1：提取第一段连续数字",
+     "explain": "REGEXP_SUBSTR(文本, 模式) 返回第一个匹配的内容。结果是文本，前导的 0 会保留。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "transform",
+        "op": "REGEXP_SUBSTR('A012B34', '[0-9]+')",
+        "before": {
+         "label": "原文本",
+         "segs": [
+          {
+           "t": "A",
+           "tone": "keep"
+          },
+          {
+           "t": "012",
+           "tone": "hit"
+          },
+          {
+           "t": "B",
+           "tone": "keep"
+          },
+          {
+           "t": "34",
+           "tone": "keep"
+          }
+         ]
+        },
+        "after": {
+         "label": "结果",
+         "segs": [
+          {
+           "t": "012",
+           "tone": "new"
+          }
+         ]
+        },
+        "caption": "只取第一段 012；后面的 34 不会返回。"
+       }
+      ]
+     }
+    },
+    "未匹配": {
+     "kind": "edge",
+     "title": "没有匹配的内容",
+     "explain": "没有匹配时返回 NULL。"
+    },
+    "开头数字": {
+     "kind": "main",
+     "title": "示例 2：数字在开头",
+     "explain": "模式从左到右扫描，第一段连续数字在开头：12。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "transform",
+        "op": "REGEXP_SUBSTR('12AB', '[0-9]+')",
+        "before": {
+         "label": "原文本",
+         "segs": [
+          {
+           "t": "12",
+           "tone": "hit"
+          },
+          {
+           "t": "AB",
+           "tone": "keep"
+          }
+         ]
+        },
+        "after": {
+         "label": "结果",
+         "segs": [
+          {
+           "t": "12",
+           "tone": "new"
+          }
+         ]
+        }
+       }
+      ]
+     }
+    },
+    "空值": {
+     "kind": "edge",
+     "title": "文本是 NULL",
+     "explain": "输入是 NULL，结果是 NULL。"
+    }
+   },
+   "compat": "本应用的 SQLite 环境没有 REGEXP_SUBSTR，示例改用逐字符扫描的递归查询得到同样的结果。在 MySQL 里直接使用这个函数。"
+  },
+  "fc2-0172": {
+   "examples": {
+    "正精度": {
+     "kind": "main",
+     "title": "示例 1：保留两位小数",
+     "explain": "ROUND(数, 2)：保留 2 位小数，看第 3 位：5 及以上就向前进一位。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "transform",
+        "op": "ROUND(12.345, 2)",
+        "before": {
+         "label": "原数",
+         "segs": [
+          {
+           "t": "12.34",
+           "tone": "keep"
+          },
+          {
+           "t": "5",
+           "tone": "hit"
+          }
+         ]
+        },
+        "after": {
+         "label": "结果",
+         "segs": [
+          {
+           "t": "12.35",
+           "tone": "new"
+          }
+         ]
+        },
+        "caption": "第三位是 5，进位后第二位 4 变成 5。"
+       }
+      ]
+     }
+    },
+    "负数中点": {
+     "kind": "main",
+     "title": "示例 2：恰好在中间时，向远离 0 的方向舍入",
+     "explain": "-2.5 正好在 -2 和 -3 中间，ROUND 向远离 0 的方向取，得到 -3。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "transform",
+        "op": "ROUND(-2.5, 0)",
+        "before": {
+         "label": "原数",
+         "segs": [
+          {
+           "t": "-2",
+           "tone": "keep"
+          },
+          {
+           "t": ".5",
+           "tone": "hit"
+          }
+         ]
+        },
+        "after": {
+         "label": "结果",
+         "segs": [
+          {
+           "t": "-3",
+           "tone": "new"
+          }
+         ]
+        },
+        "caption": "负数的“进位”是更小的负数。"
+       }
+      ]
+     }
+    },
+    "负精度": {
+     "kind": "main",
+     "title": "示例 3：负的精度从个位往左数",
+     "explain": "精度为 -1 表示舍入到十位：125 的个位是 5，进位后变成 130。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "transform",
+        "op": "ROUND(125, -1)",
+        "before": {
+         "label": "原数",
+         "segs": [
+          {
+           "t": "12",
+           "tone": "keep"
+          },
+          {
+           "t": "5",
+           "tone": "hit"
+          }
+         ]
+        },
+        "after": {
+         "label": "结果 130",
+         "segs": [
+          {
+           "t": "13",
+           "tone": "new"
+          },
+          {
+           "t": "0",
+           "tone": "new"
+          }
+         ]
+        },
+        "caption": "个位 5 进位，十位的 2 变成 3，个位补 0。"
+       }
+      ]
+     }
+    },
+    "空值": {
+     "kind": "edge",
+     "title": "数是 NULL",
+     "explain": "输入是 NULL，结果是 NULL。"
+    }
+   },
+   "compat": "“负精度”这个示例，本应用的 SQLite 环境不支持负的精度，示例用 ROUND(125/10.0, 0)*10 得到同样的 130。金额内部请保持整数“分”，展示时再舍入。",
+   "derived": [
+    "12.34",
+    "5",
+    "12",
+    "13"
+   ]
+  },
+  "fc2-0173": {
+   "examples": {
+    "负差异": {
+     "kind": "main",
+     "title": "示例 1：ABS 去掉负号，只保留大小",
+     "explain": "账面 90、银行 100：90 − 100 = −10；ABS 把它变成 10，只表示差了多少，不管方向。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "transform",
+        "op": "ABS(90 - 100)",
+        "before": {
+         "label": "差额",
+         "segs": [
+          {
+           "t": "-10",
+           "tone": "hit"
+          }
+         ]
+        },
+        "after": {
+         "label": "结果",
+         "segs": [
+          {
+           "t": "10",
+           "tone": "new"
+          }
+         ]
+        },
+        "caption": "负号被去掉。"
+       }
+      ]
+     }
+    },
+    "正差异": {
+     "kind": "main",
+     "title": "示例 2：方向相反，大小相同",
+     "explain": "110 − 100 = 10，本来就是正数，ABS 不改变它。所以 ±10 的差异得到同一个结果。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "transform",
+        "op": "ABS(110 - 100)",
+        "before": {
+         "label": "差额",
+         "segs": [
+          {
+           "t": "10",
+           "tone": "keep"
+          }
+         ]
+        },
+        "after": {
+         "label": "结果",
+         "segs": [
+          {
+           "t": "10",
+           "tone": "keep"
+          }
+         ]
+        }
+       }
+      ]
+     }
+    },
+    "零差异": {
+     "kind": "edge",
+     "title": "差额是 0",
+     "explain": "0 的绝对值还是 0。"
+    },
+    "空值": {
+     "kind": "edge",
+     "title": "输入是 NULL",
+     "explain": "输入是 NULL，结果是 NULL。"
+    }
+   }
+  },
+  "fc2-0174": {
+   "examples": {
+    "正数": {
+     "kind": "main",
+     "title": "示例 1：正数向上取整",
+     "explain": "CEILING 返回不小于输入的最小整数：2.3 以上的最小整数是 3。"
+    },
+    "负数": {
+     "kind": "main",
+     "title": "示例 2：负数向上取整，结果靠近 0",
+     "explain": "-2.3 以上的最小整数是 -2，而不是 -3：向上取整是朝正无穷的方向。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "pairs",
+        "items": [
+         {
+          "left": "CEILING(2.3)",
+          "right": "3"
+         },
+         {
+          "left": "CEILING(-2.3)",
+          "right": "-2",
+          "note": "−3 < −2.3 < −2：不小于 −2.3 的最小整数是 −2",
+          "tone": "warn"
+         },
+         {
+          "left": "CEILING(2)",
+          "right": "2",
+          "note": "整数不变"
+         },
+         {
+          "left": "CEILING(NULL)",
+          "right": "NULL",
+          "note": "空值仍是空值"
+         },
+         {
+          "left": "CEILING(25.0 / 10)",
+          "right": "3",
+          "note": "按整箱算要 3 箱"
+         }
+        ]
+       },
+       {
+        "type": "note",
+        "text": "负数向上取整是靠近零，不是增大绝对值。"
+       }
+      ]
+     }
+    },
+    "整数": {
+     "kind": "edge",
+     "title": "输入已经是整数",
+     "explain": "整数向上取整，还是它自己。"
+    },
+    "空值": {
+     "kind": "edge",
+     "title": "输入是 NULL",
+     "explain": "输入是 NULL，结果是 NULL。"
+    },
+    "箱数": {
+     "kind": "main",
+     "title": "示例 3：装箱需要几个箱子",
+     "explain": "25 件货、每箱装 10 件：25 ÷ 10 = 2.5，不够的部分也要一个箱子，所以向上取整得 3 箱。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "calc",
+        "lines": [
+         {
+          "label": "货物件数",
+          "value": 25
+         },
+         {
+          "label": "每箱件数",
+          "op": "÷",
+          "value": 10
+         },
+         {
+          "label": "需要的箱数（还没取整）",
+          "op": "=",
+          "value": 2.5
+         }
+        ]
+       },
+       {
+        "type": "note",
+        "text": "CEILING(2.5) = 3：向上取整，所以需要 3 个箱子。"
+       }
+      ]
+     }
+    }
+   },
+   "derived": [
+    "2.5"
+   ],
+   "runReplace": [
+    [
+     "CEILING",
+     "CEIL"
+    ]
+   ],
+   "runNote": "本应用的运行环境里暂时没有 CEILING，点“运行”时会自动改用同义的 CEIL，得到的结果相同。",
+   "compat": "本应用用 SQLite 兼容方式运行示例，并不是原生 MySQL 8.4。这个环境里暂时没有 CEILING，运行时自动改用同义的 CEIL，结果相同。"
+  },
+  "fc2-0175": {
+   "examples": {
+    "正数": {
+     "kind": "edge",
+     "title": "正数向下取整",
+     "explain": "FLOOR 返回不大于输入的最大整数：2.3 以下的最大整数是 2。"
+    },
+    "负数": {
+     "kind": "main",
+     "title": "示例 1：负数向下取整，结果远离 0",
+     "explain": "-2.3 以下的最大整数是 -3：向下取整是朝负无穷的方向，所以绝对值变大。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "table",
+        "columns": [
+         "候选整数",
+         "与 -2.3 比较",
+         "是否不大于 -2.3"
+        ],
+        "rows": [
+         [
+          "-2",
+          "比 -2.3 大",
+          "否"
+         ],
+         [
+          "-3",
+          "比 -2.3 小",
+          "是 ← 其中最大的一个"
+         ]
+        ],
+        "title": "哪个整数是“不大于 -2.3 的最大整数”？",
+        "hl": [
+         1
+        ]
+       }
+      ]
+     }
+    },
+    "整数": {
+     "kind": "edge",
+     "title": "输入已经是整数",
+     "explain": "整数向下取整，还是它自己。"
+    },
+    "空值": {
+     "kind": "edge",
+     "title": "输入是 NULL",
+     "explain": "输入是 NULL，结果是 NULL。"
+    },
+    "金额分箱": {
+     "kind": "main",
+     "title": "示例 2：把金额归到整百的区间",
+     "explain": "289 ÷ 100 = 2.89，向下取整得 2，再乘 100 就得到所在区间的下界 200。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "calc",
+        "lines": [
+         {
+          "label": "金额",
+          "value": 289
+         },
+         {
+          "label": "区间宽度",
+          "op": "÷",
+          "value": 100
+         },
+         {
+          "label": "商（还没取整）",
+          "op": "=",
+          "value": 2.89
+         }
+        ],
+        "title": "先除以区间宽度，再向下取整"
+       },
+       {
+        "type": "calc",
+        "lines": [
+         {
+          "label": "FLOOR(2.89)",
+          "value": 2
+         },
+         {
+          "label": "区间宽度",
+          "op": "×",
+          "value": 100
+         },
+         {
+          "label": "区间下界",
+          "op": "=",
+          "value": 200
+         }
+        ],
+        "title": "取整后乘回去"
+       }
+      ]
+     }
+    }
+   },
+   "derived": [
+    "2.89",
+    "2"
+   ]
+  },
+  "fc2-0179": {
+   "examples": {
+    "整数余数": {
+     "kind": "main",
+     "title": "示例 1：除法剩下的部分",
+     "explain": "MOD(17, 5)：17 里最多放得下 3 个 5（15），剩下 2。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "calc",
+        "lines": [
+         {
+          "label": "被除数",
+          "value": 17
+         },
+         {
+          "label": "商 3 × 除数 5",
+          "op": "−",
+          "value": 15
+         },
+         {
+          "label": "余数",
+          "op": "=",
+          "value": 2
+         }
+        ]
+       }
+      ]
+     }
+    },
+    "负数余数": {
+     "kind": "main",
+     "title": "示例 2：余数的符号跟着被除数",
+     "explain": "MOD(-17, 5)：被除数是负数，余数也是负数：−17 = 5 × (−3) + (−2)。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "calc",
+        "lines": [
+         {
+          "label": "被除数",
+          "value": -17
+         },
+         {
+          "label": "商 -3 × 除数 5",
+          "op": "−",
+          "value": -15
+         },
+         {
+          "label": "余数",
+          "op": "=",
+          "value": -2
+         }
+        ]
+       }
+      ]
+     }
+    },
+    "小数余数": {
+     "kind": "edge",
+     "title": "小数也能求余数",
+     "explain": "MOD(5.5, 2)：5.5 里放得下 2 个 2（4），剩下 1.5。"
+    },
+    "零除数": {
+     "kind": "edge",
+     "title": "除数是 0",
+     "explain": "除数为 0 时，MOD 返回 NULL，不会报错。"
+    },
+    "空值": {
+     "kind": "edge",
+     "title": "输入是 NULL",
+     "explain": "输入是 NULL，结果是 NULL。"
+    }
+   },
+   "compat": "本应用的 SQLite 环境里用 % 运算符求余数，得到相同的结果（符号也跟随被除数）；MySQL 里 MOD(a, b) 与 a % b 等价。",
+   "derived": [
+    "3",
+    "15"
+   ]
+  },
+  "fc2-0180": {
+   "examples": {
+    "幂运算": {
+     "kind": "main",
+     "title": "示例 1：POWER(2, 3) 是 3 个 2 相乘",
+     "explain": "POWER(底数, 指数)：把底数连乘“指数”次。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "calc",
+        "lines": [
+         {
+          "label": "2",
+          "value": 2
+         },
+         {
+          "label": "2",
+          "op": "×",
+          "value": 2
+         },
+         {
+          "label": "2",
+          "op": "×",
+          "value": 2
+         },
+         {
+          "label": "2 的 3 次方",
+          "op": "=",
+          "value": 8
+         }
+        ]
+       }
+      ]
+     }
+    },
+    "负指数": {
+     "kind": "main",
+     "title": "示例 2：负指数是倒数",
+     "explain": "POWER(2, -2) 等于 1 ÷ (2 × 2)。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "calc",
+        "lines": [
+         {
+          "label": "1",
+          "value": 1
+         },
+         {
+          "label": "2",
+          "op": "÷",
+          "value": 2
+         },
+         {
+          "label": "2",
+          "op": "÷",
+          "value": 2
+         },
+         {
+          "label": "2 的 -2 次方",
+          "op": "=",
+          "value": 0.25
+         }
+        ]
+       }
+      ]
+     }
+    },
+    "平方根": {
+     "kind": "main",
+     "title": "示例 3：平方根是“乘自己得到它”的数",
+     "explain": "SQRT(81)：9 × 9 = 81，所以平方根是 9。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "calc",
+        "lines": [
+         {
+          "label": "9",
+          "value": 9
+         },
+         {
+          "label": "9",
+          "op": "×",
+          "value": 9
+         },
+         {
+          "label": "81",
+          "op": "=",
+          "value": 81
+         }
+        ]
+       }
+      ]
+     }
+    },
+    "负数平方根": {
+     "kind": "edge",
+     "title": "负数的平方根",
+     "explain": "负数没有实数平方根，SQRT 返回 NULL。"
+    },
+    "空值": {
+     "kind": "edge",
+     "title": "输入是 NULL",
+     "explain": "输入是 NULL，结果是 NULL。"
+    }
+   },
+   "compat": "本应用的 SQLite 环境没有 POWER，示例用连乘（如 2*2*2）运行，得到同样的结果。",
+   "note": "本应用的运行环境里，数学函数是否可用取决于构建版本；整数次幂可以用有限次乘法代替，但不适用于任意指数。不要把开平方和平方混淆。"
+  },
+  "fc2-0182": {
+   "examples": {
+    "同行最大": {
+     "kind": "main",
+     "title": "示例 1：在同一行的多个值里取最大",
+     "explain": "GREATEST(3, 8, 5)：在这几个值里取最大的。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "bars",
+        "items": [
+         {
+          "label": "3",
+          "value": 3
+         },
+         {
+          "label": "8（最大）",
+          "value": 8,
+          "tone": "good"
+         },
+         {
+          "label": "5",
+          "value": 5
+         }
+        ],
+        "share": false,
+        "title": "三个值"
+       }
+      ]
+     }
+    },
+    "同行最小": {
+     "kind": "main",
+     "title": "示例 2：取最小",
+     "explain": "LEAST(3, 8, 5)：取最小的。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "bars",
+        "items": [
+         {
+          "label": "3（最小）",
+          "value": 3,
+          "tone": "good"
+         },
+         {
+          "label": "8",
+          "value": 8
+         },
+         {
+          "label": "5",
+          "value": 5
+         }
+        ],
+        "share": false,
+        "title": "三个值"
+       }
+      ]
+     }
+    },
+    "空值传播": {
+     "kind": "edge",
+     "title": "有一个值是 NULL",
+     "explain": "只要有一个参数是 NULL，GREATEST 的结果就是 NULL。"
+    },
+    "同行与跨行比较": {
+     "kind": "main",
+     "title": "示例 3：GREATEST 比较同一行，MAX 比较多行",
+     "explain": "GREATEST(a, b) 在每一行里比较 a 和 b；MAX(a) 是聚合，把所有行的 a 压在一起取最大。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "table",
+        "columns": [
+         "id",
+         "a",
+         "b",
+         "GREATEST(a, b)（本行）",
+         "MAX(a)（所有行）"
+        ],
+        "rows": [
+         [
+          1,
+          3,
+          8,
+          "8",
+          "9"
+         ],
+         [
+          2,
+          9,
+          2,
+          "9",
+          "9"
+         ]
+        ]
+       }
+      ]
+     }
+    }
+   },
+   "compat": "本应用的 SQLite 环境里，比较同一行的多个值用 MAX(a, b, …) 和 MIN(a, b, …)（多个参数的写法），示例已用它运行；在 MySQL 里用 GREATEST 和 LEAST，MAX、MIN 只用于跨行聚合。"
+  },
+  "fc2-0188": {
+   "examples": {
+    "非空当前时间": {
+     "kind": "main",
+     "title": "示例 1：NOW() 总有值",
+     "explain": "NOW() 返回查询开始时的当前日期和时间，不会是 NULL。"
+    },
+    "同语句一致性": {
+     "kind": "main",
+     "title": "示例 2：同一条语句里，每次 NOW() 都是同一个时刻",
+     "explain": "NOW() 在语句开始时取一次值，同一条语句里多次调用结果一致，所以 NOW() = NOW() 为 1（真）。"
+    },
+    "默认秒级文本长度": {
+     "kind": "edge",
+     "title": "默认精确到秒",
+     "explain": "转成文本后是 YYYY-MM-DD hh:mm:ss，共 19 个字符；需要小数秒时要额外指定精度。"
+    }
+   },
+   "compat": "本应用的 SQLite 环境没有 NOW()，示例用 datetime('now') 运行；它按 UTC 计时，而 MySQL 的 NOW() 按会话时区。"
+  },
+  "fc2-0190": {
+   "examples": {
+    "日期时间": {
+     "kind": "main",
+     "title": "示例 1：去掉时间，只留日期",
+     "explain": "DATE(日期时间) 返回日期部分。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "transform",
+        "op": "DATE('2025-02-01 10:30:00')",
+        "before": {
+         "label": "原值",
+         "segs": [
+          {
+           "t": "2025-02-01",
+           "tone": "hit"
+          },
+          {
+           "t": " 10:30:00",
+           "tone": "keep"
+          }
+         ]
+        },
+        "after": {
+         "label": "结果",
+         "segs": [
+          {
+           "t": "2025-02-01",
+           "tone": "new"
+          }
+         ]
+        },
+        "caption": "时间部分被丢掉。"
+       }
+      ]
+     }
+    },
+    "闰日": {
+     "kind": "edge",
+     "title": "闰日",
+     "explain": "纯日期保持不变，2024-02-29 是有效的闰日。"
+    },
+    "空值": {
+     "kind": "edge",
+     "title": "输入是 NULL",
+     "explain": "输入是 NULL，结果是 NULL。"
+    }
+   }
+  },
+  "fc2-0191": {
+   "examples": {
+    "年度": {
+     "kind": "main",
+     "title": "示例 1：取出年份",
+     "explain": "YEAR(日期) 返回年份，结果是整数。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "transform",
+        "op": "YEAR('2025-12-31')",
+        "before": {
+         "label": "日期",
+         "segs": [
+          {
+           "t": "2025",
+           "tone": "hit"
+          },
+          {
+           "t": "-12-31",
+           "tone": "keep"
+          }
+         ]
+        },
+        "after": {
+         "label": "结果",
+         "segs": [
+          {
+           "t": "2025",
+           "tone": "new"
+          }
+         ]
+        }
+       }
+      ]
+     }
+    },
+    "跨年": {
+     "kind": "main",
+     "title": "示例 2：跨年当天已经是新的一年",
+     "explain": "2026-01-01 的年份是 2026，不是 2025。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "transform",
+        "op": "YEAR('2026-01-01')",
+        "before": {
+         "label": "日期",
+         "segs": [
+          {
+           "t": "2026",
+           "tone": "hit"
+          },
+          {
+           "t": "-01-01",
+           "tone": "keep"
+          }
+         ]
+        },
+        "after": {
+         "label": "结果",
+         "segs": [
+          {
+           "t": "2026",
+           "tone": "new"
+          }
+         ]
+        }
+       }
+      ]
+     }
+    },
+    "空值": {
+     "kind": "edge",
+     "title": "输入是 NULL",
+     "explain": "输入是 NULL，结果是 NULL。"
+    }
+   }
+  },
+  "fc2-0192": {
+   "examples": {
+    "年末": {
+     "kind": "main",
+     "title": "示例 1：取出月份",
+     "explain": "MONTH(日期) 返回 1 到 12 的整数。注意：跨年度的报表不能只按月份分组，否则不同年份的同一个月会混在一起。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "transform",
+        "op": "MONTH('2025-12-31')",
+        "before": {
+         "label": "日期",
+         "segs": [
+          {
+           "t": "2025-",
+           "tone": "keep"
+          },
+          {
+           "t": "12",
+           "tone": "hit"
+          },
+          {
+           "t": "-31",
+           "tone": "keep"
+          }
+         ]
+        },
+        "after": {
+         "label": "结果",
+         "segs": [
+          {
+           "t": "12",
+           "tone": "new"
+          }
+         ]
+        }
+       }
+      ]
+     }
+    },
+    "年初": {
+     "kind": "main",
+     "title": "示例 2：一月是 1，不是 01",
+     "explain": "2026-01-01 的月份是整数 1。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "transform",
+        "op": "MONTH('2026-01-01')",
+        "before": {
+         "label": "日期",
+         "segs": [
+          {
+           "t": "2026-",
+           "tone": "keep"
+          },
+          {
+           "t": "01",
+           "tone": "hit"
+          },
+          {
+           "t": "-01",
+           "tone": "keep"
+          }
+         ]
+        },
+        "after": {
+         "label": "结果",
+         "segs": [
+          {
+           "t": "1",
+           "tone": "new"
+          }
+         ]
+        },
+        "caption": "结果是整数，前导的 0 不会保留。"
+       }
+      ]
+     }
+    },
+    "空值": {
+     "kind": "edge",
+     "title": "输入是 NULL",
+     "explain": "输入是 NULL，结果是 NULL。"
+    }
+   }
+  },
+  "fc2-0195": {
+   "examples": {
+    "模式0年初": {
+     "kind": "main",
+     "title": "示例 1：模式 0——星期日为一周起点，年初可能是第 0 周",
+     "explain": "模式 0 把星期日当作一周的开始，当年第一个星期日所在的周才算第 1 周。2021-01-01 是星期五，还在第一个星期日之前，所以是第 0 周。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "table",
+        "columns": [
+         "日期",
+         "星期",
+         "模式 0 的周编号"
+        ],
+        "rows": [
+         [
+          "2021-01-01",
+          "五",
+          "0（第一个星期日之前）"
+         ],
+         [
+          "2021-01-03",
+          "日",
+          "1（第一个星期日）"
+         ]
+        ],
+        "hl": [
+         0
+        ]
+       }
+      ]
+     }
+    },
+    "模式3跨年": {
+     "kind": "main",
+     "title": "示例 2：模式 3——按周编号规则，年初可能属于上一年的第 53 周",
+     "explain": "模式 3 是 ISO 周：周一为一周起点，一周属于它大部分日子所在的那一年。2021-01-01（星期五）属于上一年的最后一周，所以是第 53 周。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "table",
+        "columns": [
+         "日期",
+         "星期",
+         "模式 3 的周编号"
+        ],
+        "rows": [
+         [
+          "2021-01-01",
+          "五",
+          "53（上一年的最后一周）"
+         ],
+         [
+          "2021-01-04",
+          "一",
+          "1（新一年的第一周）"
+         ]
+        ],
+        "hl": [
+         0
+        ]
+       }
+      ]
+     }
+    },
+    "模式3首周": {
+     "kind": "main",
+     "title": "示例 3：新一年的第一周",
+     "explain": "2021-01-04 是星期一，是新一年第一个完整的周，所以是第 1 周。"
+    },
+    "模式5年初": {
+     "kind": "edge",
+     "title": "模式 5 的年初",
+     "explain": "模式 5：周一为一周起点，当年第一个星期一所在的周才算第 1 周。2021-01-03 是星期日，在第一个星期一之前，所以是第 0 周。"
+    },
+    "空值": {
+     "kind": "edge",
+     "title": "输入是 NULL",
+     "explain": "输入是 NULL，结果是 NULL。"
+    }
+   },
+   "compat": "本应用的 SQLite 环境没有 WEEK，示例改用 strftime 得到对应的周编号来演示；不同模式的周编号规则以 MySQL 为准，使用时务必显式写出模式参数，不要依赖服务器默认值。"
+  },
+  "fc2-0199": {
+   "examples": {
+    "年月日": {
+     "kind": "main",
+     "title": "示例 1：从日期里取出年、月、日",
+     "explain": "EXTRACT(单位 FROM 日期) 取出指定的部分；DAY(日期) 取月内的日。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "pairs",
+        "items": [
+         {
+          "left": "EXTRACT(YEAR FROM '2024-02-29')",
+          "right": "2024",
+          "note": "年"
+         },
+         {
+          "left": "EXTRACT(MONTH FROM '2024-02-29')",
+          "right": "2",
+          "note": "月（整数，不带前导 0）"
+         },
+         {
+          "left": "DAY('2024-02-29')",
+          "right": "29",
+          "note": "月内的日"
+         }
+        ]
+       }
+      ]
+     }
+    },
+    "季度边界": {
+     "kind": "main",
+     "title": "示例 2：季度由月份决定：1–3 月是第 1 季度",
+     "explain": "QUARTER 返回 1 到 4：3 月 31 日还是第 1 季度，4 月 1 日就进入第 2 季度。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "pairs",
+        "items": [
+         {
+          "left": "QUARTER('2025-03-31')",
+          "right": "1",
+          "note": "3 月 → 第 1 季度"
+         },
+         {
+          "left": "EXTRACT(QUARTER FROM '2025-04-01')",
+          "right": "2",
+          "note": "4 月 → 第 2 季度"
+         },
+         {
+          "left": "QUARTER('2025-12-31')",
+          "right": "4",
+          "note": "12 月 → 第 4 季度"
+         }
+        ]
+       }
+      ]
+     }
+    },
+    "空值": {
+     "kind": "edge",
+     "title": "输入是 NULL",
+     "explain": "输入是 NULL，结果是 NULL。"
+    }
+   },
+   "compat": "EXTRACT(单位 FROM 日期) 这种写法在本应用里不能直接运行，示例改用 strftime 取出对应的部分，得到同样的结果。"
+  },
+  "fc2-0200": {
+   "examples": {
+    "跨年年月": {
+     "kind": "main",
+     "title": "示例 1：格式模板决定输出的样子",
+     "explain": "DATE_FORMAT(日期, 模板)：%Y 是四位年份，%m 是两位月份，其余字符原样输出。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "transform",
+        "op": "DATE_FORMAT('2025-12-31', '%Y-%m')",
+        "before": {
+         "label": "日期",
+         "segs": [
+          {
+           "t": "2025",
+           "tone": "hit"
+          },
+          {
+           "t": "-",
+           "tone": "keep"
+          },
+          {
+           "t": "12",
+           "tone": "hit"
+          },
+          {
+           "t": "-31",
+           "tone": "keep"
+          }
+         ]
+        },
+        "after": {
+         "label": "结果 2025-12",
+         "segs": [
+          {
+           "t": "2025",
+           "tone": "new"
+          },
+          {
+           "t": "-",
+           "tone": "keep"
+          },
+          {
+           "t": "12",
+           "tone": "new"
+          }
+         ]
+        },
+        "caption": "结果是文本，不再是日期类型。"
+       }
+      ]
+     }
+    },
+    "闰日": {
+     "kind": "main",
+     "title": "示例 2：可以改变各部分的顺序",
+     "explain": "%d 日、%m 月、%Y 年：按“日/月/年”重新排列。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "transform",
+        "op": "DATE_FORMAT('2024-02-29', '%d/%m/%Y')",
+        "before": {
+         "label": "日期 2024-02-29",
+         "segs": [
+          {
+           "t": "2024",
+           "tone": "hit"
+          },
+          {
+           "t": "02",
+           "tone": "hit"
+          },
+          {
+           "t": "29",
+           "tone": "hit"
+          }
+         ]
+        },
+        "after": {
+         "label": "结果",
+         "segs": [
+          {
+           "t": "29",
+           "tone": "new"
+          },
+          {
+           "t": "/",
+           "tone": "keep"
+          },
+          {
+           "t": "02",
+           "tone": "new"
+          },
+          {
+           "t": "/",
+           "tone": "keep"
+          },
+          {
+           "t": "2024",
+           "tone": "new"
+          }
+         ]
+        }
+       }
+      ]
+     }
+    },
+    "空值": {
+     "kind": "edge",
+     "title": "输入是 NULL",
+     "explain": "输入是 NULL，结果是 NULL。"
+    },
+    "小时分钟": {
+     "kind": "edge",
+     "title": "时间部分",
+     "explain": "%H 是 24 小时制的小时，%i 是分钟：2025-01-01 13:45:00 格式化成 13:45。"
+    }
+   },
+   "compat": "本应用里 DATE_FORMAT 目前只支持 %Y、%m、%d；带小时分钟的“小时分钟”示例改用 strftime 运行（MySQL 的 %i 在 strftime 里写作 %M），结果相同。"
+  },
+  "fc2-0201": {
+   "examples": {
+    "固定日月年": {
+     "kind": "main",
+     "title": "示例 1：按模板把文本解析成日期",
+     "explain": "STR_TO_DATE(文本, 模板)：模板告诉函数文本的哪一段是日、月、年。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "transform",
+        "op": "STR_TO_DATE('29/02/2024', '%d/%m/%Y')",
+        "before": {
+         "label": "文本",
+         "segs": [
+          {
+           "t": "29",
+           "tone": "hit"
+          },
+          {
+           "t": "/",
+           "tone": "keep"
+          },
+          {
+           "t": "02",
+           "tone": "hit"
+          },
+          {
+           "t": "/",
+           "tone": "keep"
+          },
+          {
+           "t": "2024",
+           "tone": "hit"
+          }
+         ]
+        },
+        "after": {
+         "label": "结果 2024-02-29",
+         "segs": [
+          {
+           "t": "2024",
+           "tone": "new"
+          },
+          {
+           "t": "-",
+           "tone": "keep"
+          },
+          {
+           "t": "02",
+           "tone": "new"
+          },
+          {
+           "t": "-",
+           "tone": "keep"
+          },
+          {
+           "t": "29",
+           "tone": "new"
+          }
+         ]
+        },
+        "caption": "日期类型的标准格式是 年-月-日。"
+       }
+      ]
+     }
+    },
+    "固定年月日": {
+     "kind": "main",
+     "title": "示例 2：没有分隔符的文本",
+     "explain": "模板 %Y%m%d 对应连续的“年月日”。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "transform",
+        "op": "STR_TO_DATE('20251231', '%Y%m%d')",
+        "before": {
+         "label": "文本",
+         "segs": [
+          {
+           "t": "2025",
+           "tone": "hit"
+          },
+          {
+           "t": "12",
+           "tone": "hit"
+          },
+          {
+           "t": "31",
+           "tone": "hit"
+          }
+         ]
+        },
+        "after": {
+         "label": "结果 2025-12-31",
+         "segs": [
+          {
+           "t": "2025",
+           "tone": "new"
+          },
+          {
+           "t": "-",
+           "tone": "keep"
+          },
+          {
+           "t": "12",
+           "tone": "new"
+          },
+          {
+           "t": "-",
+           "tone": "keep"
+          },
+          {
+           "t": "31",
+           "tone": "new"
+          }
+         ]
+        }
+       }
+      ]
+     }
+    },
+    "空值": {
+     "kind": "edge",
+     "title": "输入是 NULL",
+     "explain": "输入是 NULL，结果是 NULL。"
+    }
+   },
+   "compat": "本应用的 SQLite 环境没有 STR_TO_DATE，示例用 substr 把文本里的年、月、日取出来再拼成日期，得到同样的结果。"
+  },
+  "fc2-0202": {
+   "examples": {
+    "月末": {
+     "kind": "main",
+     "title": "示例 1：目标月份没有这一天，就收敛到月末",
+     "explain": "1 月 31 日加 1 个月：2 月没有 31 日，结果取 2 月的最后一天 2025-02-28。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "steps",
+        "items": [
+         {
+          "title": "原日期",
+          "detail": "2025-01-31"
+         },
+         {
+          "title": "加 1 个月",
+          "detail": "2025-02-31 —— 2 月没有 31 日"
+         },
+         {
+          "title": "收敛到月末",
+          "detail": "2025-02-28"
+         }
+        ]
+       }
+      ]
+     }
+    },
+    "闰日": {
+     "kind": "main",
+     "title": "示例 2：闰日加一年",
+     "explain": "2024-02-29 加 1 年：2025 年不是闰年，2 月只有 28 天，所以得到 2025-02-28。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "steps",
+        "items": [
+         {
+          "title": "原日期",
+          "detail": "2024-02-29（闰日）"
+         },
+         {
+          "title": "加 1 年",
+          "detail": "2025-02-29 —— 2025 年没有这一天"
+         },
+         {
+          "title": "收敛到月末",
+          "detail": "2025-02-28"
+         }
+        ]
+       }
+      ]
+     }
+    },
+    "负间隔": {
+     "kind": "edge",
+     "title": "负的间隔往前推",
+     "explain": "INTERVAL -1 MONTH 表示往前推 1 个月：2025-03-31 往前一个月，2 月没有 31 日，收敛到 2025-02-28。"
+    },
+    "跨年": {
+     "kind": "edge",
+     "title": "加天数会自动进位",
+     "explain": "2025-12-31 加 1 天，进位到 2026-01-01。"
+    },
+    "空值": {
+     "kind": "edge",
+     "title": "日期是 NULL",
+     "explain": "输入是 NULL，结果是 NULL。"
+    }
+   },
+   "compat": "本应用里 DATE_ADD 的 INTERVAL 写法不能直接运行，示例改用 date(日期, '+1 month', 'floor') 这类等价写法；加月份或年份遇到不存在的日期时，都会收敛到月末。"
+  },
+  "fc2-0203": {
+   "examples": {
+    "跨月减日": {
+     "kind": "edge",
+     "title": "减天数会自动退位",
+     "explain": "2025-03-01 减 1 天，退到 2025-02-28。"
+    },
+    "闰年月末钳位": {
+     "kind": "main",
+     "title": "示例 1：往前推一个月，目标月没有这一天",
+     "explain": "2024-03-31 减 1 个月：2 月没有 31 日，收敛到月末。2024 年是闰年，2 月的最后一天是 29 日。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "steps",
+        "items": [
+         {
+          "title": "原日期",
+          "detail": "2024-03-31"
+         },
+         {
+          "title": "减 1 个月",
+          "detail": "2024-02-31 —— 2 月没有 31 日"
+         },
+         {
+          "title": "收敛到月末",
+          "detail": "2024-02-29（闰年）"
+         }
+        ]
+       }
+      ]
+     }
+    },
+    "普通年月末钳位": {
+     "kind": "main",
+     "title": "示例 2：平年的二月",
+     "explain": "2025-03-31 减 1 个月：2025 年不是闰年，2 月的最后一天是 28 日。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "steps",
+        "items": [
+         {
+          "title": "原日期",
+          "detail": "2025-03-31"
+         },
+         {
+          "title": "减 1 个月",
+          "detail": "2025-02-31 —— 2 月没有 31 日"
+         },
+         {
+          "title": "收敛到月末",
+          "detail": "2025-02-28（平年）"
+         }
+        ]
+       }
+      ]
+     }
+    },
+    "保留时间": {
+     "kind": "edge",
+     "title": "日期时间的时间部分",
+     "explain": "日期时间减 1 天，只改日期，时间 12:30:00 保持不变。"
+    },
+    "空日期": {
+     "kind": "edge",
+     "title": "日期是 NULL",
+     "explain": "输入是 NULL，结果是 NULL。"
+    }
+   },
+   "compat": "本应用里 DATE_SUB 的 INTERVAL 写法不能直接运行，示例改用 date(日期, '-1 month') 这类等价写法，并按月末收敛的规则得到同样的结果。"
+  },
+  "fc2-0204": {
+   "examples": {
+    "跨午夜": {
+     "kind": "main",
+     "title": "示例 1：DATEDIFF 只比较日期，忽略时间",
+     "explain": "DATEDIFF(a, b) = a 的日期 − b 的日期。虽然只差 1 秒，但日期已经差了 1 天，所以结果是 1；它也不会计算小时。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "table",
+        "columns": [
+         "",
+         "原值",
+         "只取日期部分"
+        ],
+        "rows": [
+         [
+          "a",
+          "2025-01-02 00:00:00",
+          "2025-01-02"
+         ],
+         [
+          "b",
+          "2025-01-01 23:59:59",
+          "2025-01-01"
+         ]
+        ],
+        "foot": [
+         "a − b",
+         "",
+         "1 天"
+        ]
+       }
+      ]
+     }
+    },
+    "负数": {
+     "kind": "edge",
+     "title": "第一个日期更早",
+     "explain": "第一个日期比第二个早，结果是负数：2024-02-28 到 2024-03-01 相差 2 天（闰年有 2 月 29 日），所以是 -2。"
+    },
+    "同日": {
+     "kind": "edge",
+     "title": "同一天",
+     "explain": "日期相同，差是 0。"
+    },
+    "空值": {
+     "kind": "edge",
+     "title": "有参数是 NULL",
+     "explain": "有参数是 NULL，结果是 NULL。"
+    }
+   }
+  },
+  "fc2-0205": {
+   "examples": {
+    "不足一小时": {
+     "kind": "main",
+     "title": "示例 1：只数“完整”的单位，不足的部分截掉",
+     "explain": "TIMESTAMPDIFF(单位, a, b) = b − a，只返回完整的单位数。从 23:30 到 00:00 只有 30 分钟，不足 1 小时，结果是 0。注意方向与 DATEDIFF 相反：这里是后者减前者。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "calc",
+        "lines": [
+         {
+          "label": "相差的分钟数",
+          "value": 30
+         },
+         {
+          "label": "每小时的分钟数",
+          "op": "÷",
+          "value": 60
+         },
+         {
+          "label": "相差的小时（含小数）",
+          "op": "=",
+          "value": 0.5
+         }
+        ]
+       },
+       {
+        "type": "note",
+        "text": "只保留完整的 0 小时，0.5 被截掉。"
+       }
+      ]
+     }
+    },
+    "负数截断": {
+     "kind": "main",
+     "title": "示例 2：往回算是负数，向 0 截断",
+     "explain": "从 02:30 到 00:00，是往回 2.5 小时。截断时向 0 靠拢，得到 -2（不是 -3）。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "calc",
+        "lines": [
+         {
+          "label": "相差的分钟数",
+          "value": -150
+         },
+         {
+          "label": "每小时的分钟数",
+          "op": "÷",
+          "value": 60
+         },
+         {
+          "label": "相差的小时（含小数）",
+          "op": "=",
+          "value": -2.5
+         }
+        ]
+       },
+       {
+        "type": "note",
+        "text": "向 0 截断：-2.5 → -2。"
+       }
+      ]
+     }
+    },
+    "完整两天": {
+     "kind": "edge",
+     "title": "日期时间跨过完整的两天",
+     "explain": "2024-02-28 12:00 到 2024-03-01 12:00：2024 年有 2 月 29 日，所以正好是 2 个完整的天。"
+    },
+    "空值": {
+     "kind": "edge",
+     "title": "有参数是 NULL",
+     "explain": "有参数是 NULL，结果是 NULL。"
+    }
+   },
+   "compat": "本应用的 SQLite 环境不能直接运行 TIMESTAMPDIFF，示例用 unixepoch 算出秒数差，再换算成单位并向 0 截断，得到同样的结果。",
+   "derived": [
+    "150",
+    "60",
+    "0.5",
+    "2.5"
+   ]
+  },
+  "fc2-0207": {
+   "examples": {
+    "普通二月": {
+     "kind": "main",
+     "title": "示例 1：平年的二月",
+     "explain": "LAST_DAY 返回日期所在月份的最后一天，自动处理大小月和闰年：2025 年不是闰年，2 月最后一天是 28 日。"
+    },
+    "闰年二月": {
+     "kind": "main",
+     "title": "示例 2：闰年的二月",
+     "explain": "2024 年是闰年，2 月最后一天是 29 日。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "pairs",
+        "items": [
+         {
+          "left": "LAST_DAY('2025-02-10')",
+          "right": "2025-02-28",
+          "note": "平年：二月 28 天"
+         },
+         {
+          "left": "LAST_DAY('2024-02-10')",
+          "right": "2024-02-29",
+          "note": "闰年：二月 29 天",
+          "tone": "warn"
+         },
+         {
+          "left": "LAST_DAY('2025-12-15')",
+          "right": "2025-12-31",
+          "note": "十二月 31 天"
+         }
+        ]
+       }
+      ]
+     }
+    },
+    "跨年十二月": {
+     "kind": "edge",
+     "title": "十二月",
+     "explain": "十二月的最后一天是 31 日。"
+    },
+    "空值": {
+     "kind": "edge",
+     "title": "输入是 NULL",
+     "explain": "输入是 NULL，结果是 NULL。"
+    }
+   },
+   "compat": "本应用的 SQLite 环境没有 LAST_DAY，示例用 date(日期, 'start of month', '+1 month', '-1 day') 得到同样的结果。"
+  },
+  "fc2-0278": {
+   "examples": {
+    "合法整数文本": {
+     "kind": "main",
+     "title": "示例 1：把文本明确转成整数",
+     "explain": "CAST(值 AS 类型) 明确指定目标类型：文本 0012 转成整数后，前导的 0 没有了。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "transform",
+        "op": "CAST('0012' AS SIGNED)",
+        "before": {
+         "label": "文本",
+         "segs": [
+          {
+           "t": "00",
+           "tone": "hit"
+          },
+          {
+           "t": "12",
+           "tone": "keep"
+          }
+         ]
+        },
+        "after": {
+         "label": "整数",
+         "segs": [
+          {
+           "t": "12",
+           "tone": "new"
+          }
+         ]
+        },
+        "caption": "文本变成了真正的数。"
+       }
+      ]
+     }
+    },
+    "负整数": {
+     "kind": "edge",
+     "title": "负数文本",
+     "explain": "CAST('-5' AS SIGNED) 得到整数 -5。"
+    },
+    "空值": {
+     "kind": "edge",
+     "title": "输入是 NULL",
+     "explain": "输入是 NULL，结果是 NULL。"
+    },
+    "日期转换": {
+     "kind": "main",
+     "title": "示例 2：文本转成日期",
+     "explain": "CAST(文本 AS DATE) 把标准格式的日期文本转成日期类型。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "transform",
+        "op": "CAST('2025-12-31' AS DATE)",
+        "before": {
+         "label": "文本",
+         "segs": [
+          {
+           "t": "2025-12-31",
+           "tone": "keep"
+          }
+         ]
+        },
+        "after": {
+         "label": "日期",
+         "segs": [
+          {
+           "t": "2025-12-31",
+           "tone": "new"
+          }
+         ]
+        },
+        "caption": "显示出来的内容一样，但类型变成了日期，可以参与日期计算。"
+       }
+      ]
+     }
+    },
+    "字符类型": {
+     "kind": "main",
+     "title": "示例 3：数字转成文本",
+     "explain": "CAST(12 AS CHAR) 把数字 12 转成文本 '12'。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "transform",
+        "op": "CAST(12 AS CHAR)",
+        "before": {
+         "label": "数字",
+         "segs": [
+          {
+           "t": "12",
+           "tone": "keep"
+          }
+         ]
+        },
+        "after": {
+         "label": "文本",
+         "segs": [
+          {
+           "t": "12",
+           "tone": "new"
+          }
+         ]
+        },
+        "caption": "类型从数字变成文本，之后按文本的规则比较。"
+       }
+      ]
+     }
+    }
+   },
+   "compat": "本应用的 SQLite 环境里，CAST(… AS DATE) 和 CAST(… AS CHAR) 的行为与 MySQL 不同，这两个示例改用 date() 等函数运行，得到同样的结果。MySQL 里目标类型写 SIGNED、CHAR、DATE 等。"
+  },
+  "fc2-0294": {
+   "examples": {
+    "字符串、JSON空值与缺路径": {
+     "kind": "main",
+     "title": "示例 1：三种“没有值”不一样",
+     "explain": "JSON_EXTRACT 返回的是 JSON 值：字符串带引号；JSON 里的 null 是一个值（还是 JSON）；路径不存在才是 SQL 的 NULL。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "table",
+        "columns": [
+         "路径",
+         "JSON 里是什么",
+         "JSON_EXTRACT 返回"
+        ],
+        "rows": [
+         [
+          "$.a",
+          "字符串 text",
+          "\"text\"（JSON 字符串，带引号）"
+         ],
+         [
+          "$.b",
+          "null",
+          "null（JSON 的 null，是一个值）"
+         ],
+         [
+          "$.c",
+          "没有这个字段",
+          "SQL NULL（真正的空）"
+         ]
+        ],
+        "title": "JSON：{\"a\":\"text\", \"b\":null, \"n\":12, \"items\":[7,8]}",
+        "hl": [
+         2
+        ]
+       }
+      ]
+     }
+    },
+    "提取普通文本": {
+     "kind": "main",
+     "title": "示例 2：JSON_UNQUOTE 去掉引号",
+     "explain": "JSON_UNQUOTE 把 JSON 字符串转成普通文本。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "transform",
+        "op": "JSON_UNQUOTE(JSON_EXTRACT(json, '$.a'))",
+        "before": {
+         "label": "JSON_EXTRACT 的结果",
+         "segs": [
+          {
+           "t": "\"text\"",
+           "tone": "hit"
+          }
+         ]
+        },
+        "after": {
+         "label": "普通文本",
+         "segs": [
+          {
+           "t": "text",
+           "tone": "new"
+          }
+         ]
+        },
+        "caption": "引号被去掉。"
+       }
+      ]
+     }
+    },
+    "数组元素": {
+     "kind": "edge",
+     "title": "数组里的元素",
+     "explain": "$.items[0] 取数组 items 的第 1 个元素（下标从 0 开始），经 JSON_UNQUOTE 后是文本 7。"
+    },
+    "区分两类空值": {
+     "kind": "edge",
+     "title": "怎样区分两类空值",
+     "explain": "JSON_TYPE 能看出 JSON 里的 null 是 NULL 类型；路径不存在时返回 SQL NULL。"
+    }
+   },
+   "compat": "JSON_EXTRACT、JSON_UNQUOTE、JSON_TYPE 在本应用的 SQLite 环境里没有同名函数，示例改用 json_extract、json_quote、json_type 的等价写法，并让输出格式与 MySQL 一致。"
+  },
+  "fc2-0240": {
+   "examples": {
+    "并列与分区": {
+     "kind": "main",
+     "title": "示例 1：并列也给不同的编号",
+     "explain": "ROW_NUMBER 在每个分区里给每一行一个连续的唯一编号。并列的行（id 1、2 的 x 都是 100）也得到不同的编号，先后靠 ORDER BY 里追加的唯一列 id 决定。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "table",
+        "columns": [
+         "id",
+         "分组 g",
+         "x",
+         "ROW_NUMBER"
+        ],
+        "rows": [
+         [
+          1,
+          "A",
+          100,
+          {
+           "t": "1",
+           "tone": "good"
+          }
+         ],
+         [
+          2,
+          "A",
+          100,
+          {
+           "t": "2",
+           "tone": "good"
+          }
+         ],
+         [
+          3,
+          "A",
+          80,
+          "3"
+         ],
+         [
+          4,
+          "B",
+          90,
+          {
+           "t": "1",
+           "tone": "good"
+          }
+         ],
+         [
+          5,
+          "B",
+          null,
+          "2"
+         ]
+        ],
+        "title": "PARTITION BY g ORDER BY x DESC, id",
+        "hl": [
+         0,
+         1
+        ]
+       }
+      ]
+     }
+    },
+    "单行": {
+     "kind": "edge",
+     "title": "只有一行",
+     "explain": "只有一行时，编号就是 1。"
+    },
+    "空结果": {
+     "kind": "edge",
+     "title": "没有行",
+     "explain": "没有行就没有编号，结果为空。"
+    }
+   }
+  },
+  "fc2-0241": {
+   "examples": {
+    "并列与分区": {
+     "kind": "main",
+     "title": "示例 1：并列同名次，之后跳号",
+     "explain": "RANK 给并列的行同一个名次，下一个名次会跳过被占用的号：两个第 1 名之后是第 3 名。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "table",
+        "columns": [
+         "id",
+         "分组 g",
+         "x",
+         "RANK"
+        ],
+        "rows": [
+         [
+          1,
+          "A",
+          100,
+          {
+           "t": "1",
+           "tone": "good"
+          }
+         ],
+         [
+          2,
+          "A",
+          100,
+          {
+           "t": "1",
+           "tone": "good"
+          }
+         ],
+         [
+          3,
+          "A",
+          80,
+          {
+           "t": "3",
+           "tone": "warn"
+          }
+         ],
+         [
+          4,
+          "B",
+          90,
+          "1"
+         ],
+         [
+          5,
+          "B",
+          null,
+          "2"
+         ]
+        ],
+        "title": "PARTITION BY g ORDER BY x DESC",
+        "hl": [
+         0,
+         1,
+         2
+        ]
+       }
+      ]
+     }
+    },
+    "单行": {
+     "kind": "edge",
+     "title": "只有一行",
+     "explain": "只有一行时，名次是 1。"
+    },
+    "空结果": {
+     "kind": "edge",
+     "title": "没有行",
+     "explain": "没有行就没有名次，结果为空。"
+    }
+   }
+  },
+  "fc2-0242": {
+   "examples": {
+    "并列与分区": {
+     "kind": "main",
+     "title": "示例 1：并列同名次，之后连续",
+     "explain": "DENSE_RANK 给并列的行同一个名次，下一个名次紧接着：两个第 1 名之后是第 2 名，不跳号。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "table",
+        "columns": [
+         "id",
+         "分组 g",
+         "x",
+         "DENSE_RANK"
+        ],
+        "rows": [
+         [
+          1,
+          "A",
+          100,
+          {
+           "t": "1",
+           "tone": "good"
+          }
+         ],
+         [
+          2,
+          "A",
+          100,
+          {
+           "t": "1",
+           "tone": "good"
+          }
+         ],
+         [
+          3,
+          "A",
+          80,
+          {
+           "t": "2",
+           "tone": "warn"
+          }
+         ],
+         [
+          4,
+          "B",
+          90,
+          "1"
+         ],
+         [
+          5,
+          "B",
+          null,
+          "2"
+         ]
+        ],
+        "title": "PARTITION BY g ORDER BY x DESC",
+        "hl": [
+         0,
+         1,
+         2
+        ]
+       },
+       {
+        "type": "table",
+        "columns": [
+         "id",
+         "x",
+         "ROW_NUMBER",
+         "RANK",
+         "DENSE_RANK"
+        ],
+        "rows": [
+         [
+          1,
+          100,
+          "1",
+          "1",
+          "1"
+         ],
+         [
+          2,
+          100,
+          "2",
+          "1",
+          "1"
+         ],
+         [
+          3,
+          80,
+          "3",
+          "3",
+          "2"
+         ]
+        ],
+        "title": "A 组：三种编号对照",
+        "hl": [
+         2
+        ]
+       }
+      ]
+     }
+    },
+    "单行": {
+     "kind": "edge",
+     "title": "只有一行",
+     "explain": "只有一行时，名次是 1。"
+    },
+    "空结果": {
+     "kind": "edge",
+     "title": "没有行",
+     "explain": "没有行就没有名次，结果为空。"
+    }
+   }
+  },
+  "fc2-0244": {
+   "examples": {
+    "前后方向及分区": {
+     "kind": "main",
+     "title": "示例 1：LAG 读前一行，LEAD 读后一行",
+     "explain": "LAG(x) 读取同一分区里前一行的 x，LEAD(x) 读取后一行；每个分区的第一行没有前一行、最后一行没有后一行，得到 NULL。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "table",
+        "columns": [
+         "id",
+         "分组 g",
+         "x",
+         "LAG(x) 前一行",
+         "LEAD(x) 后一行"
+        ],
+        "rows": [
+         [
+          1,
+          "A",
+          100,
+          null,
+          "100"
+         ],
+         [
+          2,
+          "A",
+          100,
+          "100",
+          "80"
+         ],
+         [
+          3,
+          "A",
+          80,
+          "100",
+          null
+         ],
+         [
+          4,
+          "B",
+          90,
+          null,
+          null
+         ],
+         [
+          5,
+          "B",
+          null,
+          "90",
+          null
+         ]
+        ],
+        "title": "LAG(x) 与 LEAD(x) OVER (PARTITION BY g ORDER BY id)"
+       }
+      ]
+     }
+    },
+    "默认值与真实空值": {
+     "kind": "main",
+     "title": "示例 2：默认值只补“没有这一行”，不替换真实的 NULL",
+     "explain": "LAG(x, 1, 0) 的第三个参数是默认值：只在前一行不存在时才使用。前一行存在但值是 NULL 时，结果仍是 NULL。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "table",
+        "columns": [
+         "id",
+         "x",
+         "LAG(x,1,0)",
+         "原因"
+        ],
+        "rows": [
+         [
+          5,
+          null,
+          {
+           "t": "0",
+           "tone": "good"
+          },
+          "没有前一行：用默认值 0"
+         ],
+         [
+          4,
+          90,
+          {
+           "t": "NULL",
+           "tone": "warn"
+          },
+          "前一行（id 5）存在，它的 x 本身就是 NULL"
+         ],
+         [
+          3,
+          80,
+          "90",
+          "前一行是 id 4"
+         ],
+         [
+          2,
+          100,
+          "80",
+          "前一行是 id 3"
+         ],
+         [
+          1,
+          100,
+          "100",
+          "前一行是 id 2"
+         ]
+        ],
+        "title": "LAG(x, 1, 0)：默认值只填“没有前一行”，不替换真实的 NULL（按 id 倒序读）",
+        "hl": [
+         0,
+         1
+        ]
+       }
+      ]
+     }
+    },
+    "零偏移": {
+     "kind": "edge",
+     "title": "偏移 0 行",
+     "explain": "LAG(x, 0) 的偏移是 0，读的就是当前行自己。"
+    }
+   }
+  },
+  "fc2-0245": {
+   "examples": {
+    "默认偏移及分区": {
+     "kind": "main",
+     "title": "示例 1：读同一门店的下一条记录",
+     "explain": "LEAD(amount) 读取同一门店下一条记录的金额；最后一条没有下一条，得到 NULL（默认值）。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "table",
+        "columns": [
+         "门店",
+         "seq",
+         "amount",
+         "LEAD(amount)",
+         "LEAD(amount,1,-1)"
+        ],
+        "rows": [
+         [
+          "A",
+          1,
+          100,
+          {
+           "t": "NULL",
+           "tone": "warn"
+          },
+          {
+           "t": "NULL",
+           "tone": "warn"
+          }
+         ],
+         [
+          "A",
+          2,
+          null,
+          "130",
+          "130"
+         ],
+         [
+          "A",
+          3,
+          130,
+          {
+           "t": "NULL",
+           "tone": "bad"
+          },
+          {
+           "t": "-1",
+           "tone": "good"
+          }
+         ],
+         [
+          "B",
+          1,
+          50,
+          "80",
+          "80"
+         ],
+         [
+          "B",
+          2,
+          80,
+          {
+           "t": "NULL",
+           "tone": "bad"
+          },
+          {
+           "t": "-1",
+           "tone": "good"
+          }
+         ]
+        ],
+        "title": "LEAD(amount) 与 LEAD(amount, 1, -1)",
+        "hl": [
+         0
+        ]
+       }
+      ]
+     }
+    },
+    "显式默认及真实空值": {
+     "kind": "main",
+     "title": "示例 2：显式的默认值只替换“没有下一行”",
+     "explain": "LEAD(amount, 1, -1)：没有下一行时返回 -1；下一行存在但金额是 NULL，仍返回 NULL。"
+    },
+    "偏移两行": {
+     "kind": "edge",
+     "title": "偏移 2 行",
+     "explain": "LEAD(amount, 2) 读后面第 2 行；不够 2 行时返回 NULL。"
+    },
+    "偏移零行": {
+     "kind": "edge",
+     "title": "偏移 0 行",
+     "explain": "LEAD(amount, 0) 读的是当前行自己。"
+    }
+   }
+  },
+  "fc2-0247": {
+   "examples": {
+    "整分区与空值": {
+     "kind": "main",
+     "title": "示例 1：框架不同，首值/末值不同",
+     "explain": "FIRST_VALUE、LAST_VALUE 读的是“窗口框架”的第一行和最后一行，而不是固定的整组首末行。下表列出三种框架下的（首值 / 末值）；首末行是 NULL 时结果就是 NULL，不会自动跳过。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "table",
+        "columns": [
+         "g",
+         "id",
+         "k",
+         "x"
+        ],
+        "rows": [
+         [
+          "A",
+          1,
+          1,
+          10
+         ],
+         [
+          "A",
+          2,
+          2,
+          20
+         ],
+         [
+          "A",
+          3,
+          2,
+          null
+         ],
+         [
+          "A",
+          4,
+          3,
+          40
+         ],
+         [
+          "B",
+          5,
+          1,
+          null
+         ],
+         [
+          "B",
+          6,
+          2,
+          5
+         ]
+        ],
+        "title": "教学数据（A 组 id 2、3 的 k 相同）"
+       },
+       {
+        "type": "table",
+        "columns": [
+         "id",
+         "整个分区",
+         "第一行到当前行",
+         "前一行到当前行"
+        ],
+        "rows": [
+         [
+          1,
+          "10 / 40",
+          "10 / 10",
+          "10 / 10"
+         ],
+         [
+          2,
+          "10 / 40",
+          "10 / 20",
+          "10 / 20"
+         ],
+         [
+          3,
+          "10 / 40",
+          {
+           "t": "10 / NULL",
+           "tone": "warn"
+          },
+          "20 / NULL"
+         ],
+         [
+          4,
+          "10 / 40",
+          "10 / 40",
+          "NULL / 40"
+         ],
+         [
+          5,
+          "NULL / 5",
+          "NULL / NULL",
+          "NULL / NULL"
+         ],
+         [
+          6,
+          "NULL / 5",
+          "NULL / 5",
+          "NULL / 5"
+         ]
+        ],
+        "title": "三种框架下的（首值 / 末值）"
+       }
+      ]
+     }
+    },
+    "累计框架": {
+     "kind": "main",
+     "title": "示例 2：框架是“第一行到当前行”",
+     "explain": "框架只到当前行，所以 LAST_VALUE 就是当前行自己的值。"
+    },
+    "移动框架": {
+     "kind": "main",
+     "title": "示例 3：框架是“前一行到当前行”",
+     "explain": "框架只有前一行和当前行：FIRST_VALUE 是前一行的值，LAST_VALUE 是当前行的值。"
+    }
+   }
+  },
+  "fc2-0250": {
+   "examples": {
+    "不均匀分桶与同分跨桶": {
+     "kind": "main",
+     "title": "示例 1：按记录数分桶，较大的桶在前",
+     "explain": "NTILE(3) 把每个分区的行尽量平均分成 3 个桶：A 组 5 行分成 2、2、1。同样是 90 分的行可能被分进不同的桶，所以同分要加唯一列保证稳定。",
+     "figure": {
+      "blocks": [
+       {
+        "type": "table",
+        "columns": [
+         "id",
+         "score",
+         "分组 g",
+         "桶号"
+        ],
+        "rows": [
+         [
+          1,
+          100,
+          "A",
+          {
+           "t": "1",
+           "tone": "good"
+          }
+         ],
+         [
+          2,
+          90,
+          "A",
+          {
+           "t": "1",
+           "tone": "good"
+          }
+         ],
+         [
+          3,
+          90,
+          "A",
+          {
+           "t": "2",
+           "tone": "warn"
+          }
+         ],
+         [
+          4,
+          90,
+          "A",
+          {
+           "t": "2",
+           "tone": "warn"
+          }
+         ],
+         [
+          5,
+          50,
+          "A",
+          "3"
+         ],
+         [
+          6,
+          20,
+          "B",
+          "1"
+         ],
+         [
+          7,
+          10,
+          "B",
+          "2"
+         ]
+        ],
+        "title": "PARTITION BY g ORDER BY score DESC, id",
+        "hl": [
+         1,
+         2,
+         3
+        ]
+       }
+      ]
+     }
+    },
+    "桶数多于行数": {
+     "kind": "edge",
+     "title": "桶比行还多",
+     "explain": "NTILE(8) 但只有 7 行：每行各占一个桶，只会用到前 7 个桶。"
+    },
+    "单桶": {
+     "kind": "edge",
+     "title": "只分 1 个桶",
+     "explain": "NTILE(1)：所有行都在第 1 个桶。"
+    }
+   }
+  }
  }
 }

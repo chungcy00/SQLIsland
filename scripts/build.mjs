@@ -75,6 +75,7 @@ cards.push(
 {
   const teaching = JSON.parse(await readFile(`${contentSource}/flashcard_v2/teaching-figures.json`));
   for (const card of cards) if (teaching.figures?.[card.id]) card.teach = teaching.figures[card.id];
+  for (const card of cards) if (teaching.functions?.[card.id]) card.fnSpec = teaching.functions[card.id];
 }
 const courseStructureStatus = await loadCourseStructures(chapters);
 const integerPolicies = JSON.parse(await readFile("src/integer-column-policy.json"));

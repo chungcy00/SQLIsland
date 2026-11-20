@@ -3294,3 +3294,58 @@ nav .nav-svg { color: var(--primary); }
 .fc-tf .table-wrap { overflow-x: visible; }
 .fc-tf table { table-layout: auto; width: 100%; }
 .fc-tf th, .fc-tf td { white-space: normal; overflow-wrap: anywhere; word-break: break-word; vertical-align: top; }
+
+/* 函数用法卡新版背面：核心答案 → 语法 → 参数 → 返回值 → 示例（说明、图解、代码、结果）→ 应用 → 注意 → 兼容性（折叠） */
+.fc-fn-answer .fc-answer { margin-bottom: 0; }
+.fc-fn-code pre { white-space: pre; overflow-x: auto; overflow-y: visible; max-height: none; word-break: normal; overflow-wrap: normal; -webkit-overflow-scrolling: touch; }
+.fc-fn-code { padding: 10px 12px; background: var(--lake); border-radius: var(--r-code); }
+.fc-fn-syntax .fc-h small, .fc-fn-answer .fc-h small { display: block; margin-left: 12px; font-weight: 400; font-size: 0.75rem; color: var(--ink2); }
+.fc-fn-ex { border: 1px solid var(--line); border-radius: var(--r-ctl); padding: 12px; margin-bottom: 12px; background: var(--card); }
+.fc-fn-ex h4 { margin: 0 0 6px; font-size: 0.9375rem; }
+.fc-fn-ex h5 { margin: 10px 0 4px; font-size: 0.875rem; }
+.fc-fn-explain { margin: 0 0 8px; color: var(--ink2); font-size: 0.875rem; line-height: 1.6; }
+.fc-fn-fig { margin: 4px 0 10px; }
+.fc-fn-ex .fc-sub { margin: 8px 0 4px; font-size: 0.75rem; font-weight: 600; color: var(--ink2); }
+.fc-fn-result { margin-top: 10px; }
+.fc-fn-result-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
+.fc-fn-result-head b { font-size: 0.8125rem; color: var(--ink2); }
+.fc-fn-result .small-button { min-height: 44px; }
+.fc-fn-fold { margin-top: 10px; border-top: 1px dashed var(--line); padding-top: 8px; }
+.fc-fn-fold summary { cursor: pointer; font-size: 0.8125rem; font-weight: 600; color: var(--primary); padding: 6px 0; min-height: 44px; display: flex; align-items: center; }
+.fc-fn-compat { border: 1px solid var(--line); border-radius: var(--r-ctl); padding: 0 12px; background: var(--card); }
+.fc-fn-compat summary { cursor: pointer; font-size: 0.875rem; font-weight: 600; color: var(--ink2); padding: 10px 0; min-height: 44px; display: flex; align-items: center; }
+.fc-fn-compat p { color: var(--ink2); font-size: 0.8125rem; margin: 0 0 10px; }
+/* 字符串变换图：高亮被找到的部分，并排显示替换前后 */
+.fc-tf-transform { margin-bottom: 8px; }
+.fc-tf-transform .row-b small { display: block; font-size: 0.6875rem; color: var(--ink2); margin-bottom: 4px; }
+.fc-tf-transform .segs { display: flex; flex-wrap: wrap; gap: 6px; }
+.fc-tf-transform .seg { font-family: var(--font-mono); font-size: 1.125rem; padding: 6px 12px; border-radius: var(--r-code); background: var(--lake); border: 1px solid var(--line); min-width: 2.25rem; text-align: center; }
+.fc-tf-transform .seg.t-hit { background: var(--sun-bg); border-color: var(--sun); color: var(--sun-ink); font-weight: 700; }
+.fc-tf-transform .seg.t-new { background: var(--ok-bg); border-color: var(--ok); color: var(--ok); font-weight: 700; }
+.fc-tf-transform .seg.t-keep { color: var(--ink2); }
+.fc-tf-transform .arrow { display: flex; align-items: center; gap: 8px; margin: 8px 0; color: var(--ink2); }
+.fc-tf-transform .arrow span { font-size: 1.125rem; }
+.fc-tf-transform .arrow em { font-style: normal; font-size: 0.8125rem; font-family: var(--font-mono); overflow-wrap: anywhere; }
+.fc-tf-transform .cap { margin: 8px 0 0; font-size: 0.75rem; color: var(--ink2); }
+.fc-fn-ex .table-wrap { overflow-x: visible; }
+.fc-fn-ex table { width: 100%; table-layout: auto; }
+.fc-fn-ex th, .fc-fn-ex td { white-space: normal; overflow-wrap: anywhere; vertical-align: top; }
+.fc-fn-edge-list { display: grid; gap: 8px; margin: 4px 0 8px; }
+.fc-fn-edge-row { border: 1px solid var(--line); border-radius: var(--r-ctl); padding: 8px 10px; background: var(--lake); }
+.fc-fn-edge-row code { display: block; white-space: pre; overflow-x: auto; font-size: 0.8125rem; background: none; padding: 0; }
+.fc-fn-edge-row .res { display: flex; align-items: baseline; gap: 8px; margin-top: 6px; }
+.fc-fn-edge-row .res small { color: var(--ink2); font-size: 0.6875rem; }
+.fc-fn-edge-row .res b { font-family: var(--font-mono); }
+.fc-fn-edge-row p { margin: 4px 0 0; font-size: 0.8125rem; color: var(--ink2); }
+.fc-fn-compat[open] { padding-bottom: 8px; }
+.fc-fn-warn { margin: 10px 0 0; padding: 8px 10px; border-left: 3px solid var(--sun); background: var(--sun-bg); border-radius: 0 var(--r-ctl) var(--r-ctl) 0; }
+.fc-fn-warn b { font-size: 0.75rem; color: var(--sun-ink); }
+.fc-fn-warn p { margin: 4px 0 6px; font-size: 0.8125rem; color: var(--sun-ink); }
+.fc-fn-warn details summary { cursor: pointer; font-size: 0.8125rem; font-weight: 600; color: var(--primary); min-height: 44px; display: flex; align-items: center; }
+.fc-fn-warn .fc-fn-code { margin-top: 4px; background: var(--card); }
+.fc-fn-edge-row .t { display: block; font-size: 0.8125rem; margin-bottom: 4px; }
+.fc-fn-edge-row p.warn { color: var(--sun-ink); }
+.fc-fn-data { margin-bottom: 12px; }
+.fc-fn-data .fc-h { margin-top: 0; }
+.fc-fn-data h4 { margin: 8px 0 4px; font-size: 0.8125rem; }
+.fc-fn-data .fc-h small { display: block; margin-left: 12px; font-weight: 400; font-size: 0.75rem; color: var(--ink2); }
