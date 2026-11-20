@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp01-02",
-  "lessonSha256": "8455cab9242ccad4b07e33749eae92d154387265c57087548a0f49ccdec4e504",
+  "lessonSha256": "ca8dcaac8d1339f985beaf819053a26091b4c07b41f473d1655690bbd108a7b6",
   "figures": [
     {
       "id": "kp01-02-clauses",
@@ -175,6 +175,95 @@
           ]
         }
       ]
+    },
+    {
+      "id": "kp01-02-map",
+      "slot": "concept",
+      "kind": "compare-card",
+      "title": "同样是整数：编号用来识别，数量才适合求和",
+      "panels": [
+        {
+          "label": "把商品编号相加",
+          "tone": "bad",
+          "columns": [
+            "product_id"
+          ],
+          "rows": [
+            [
+              1
+            ],
+            [
+              2
+            ],
+            [
+              3
+            ],
+            [
+              4
+            ],
+            [
+              5
+            ],
+            [
+              6
+            ]
+          ],
+          "big": {
+            "label": "SUM(product_id)",
+            "value": 21
+          },
+          "check": {
+            "sql": "SELECT SUM(product_id) FROM products",
+            "expected": [
+              [
+                21
+              ]
+            ]
+          },
+          "note": "编号只是识别用的名字，加起来没有业务意义。"
+        },
+        {
+          "label": "把库存数量相加",
+          "tone": "good",
+          "columns": [
+            "stock"
+          ],
+          "rows": [
+            [
+              150
+            ],
+            [
+              40
+            ],
+            [
+              200
+            ],
+            [
+              180
+            ],
+            [
+              80
+            ],
+            [
+              0
+            ]
+          ],
+          "big": {
+            "label": "SUM(stock)：总库存",
+            "value": 650
+          },
+          "check": {
+            "sql": "SELECT SUM(stock) FROM products",
+            "expected": [
+              [
+                650
+              ]
+            ]
+          },
+          "note": "数量可以相加，得到总库存（件）。"
+        }
+      ],
+      "conclusion": "数字外观相同，业务含义不同：编号不能当成可求和的指标。"
     }
   ]
 }

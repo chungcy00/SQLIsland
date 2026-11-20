@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp01-03",
-  "lessonSha256": "cec911f746cf1404e1aa33442cabef6c5bf423c4b403eea948bd9f0cbe112647",
+  "lessonSha256": "70e3dfb08cf15aca3fc8568e9c4ca7b36fa13a17c84478b5843dedf37afb5971",
   "figures": [
     {
       "id": "kp01-03-clauses",
@@ -136,6 +136,195 @@
           ]
         }
       ]
+    },
+    {
+      "id": "kp01-03-map",
+      "slot": "concept",
+      "kind": "flow-map",
+      "title": "主键、外键和一对多：用 customer_id 把两张表连起来",
+      "stages": [
+        {
+          "label": "① 两张表：customers 的主键是 customer_id；orders 的 customer_id 是外键",
+          "tables": [
+            {
+              "columns": [
+                "customer_id",
+                "customer_name"
+              ],
+              "rows": [
+                [
+                  1,
+                  "林"
+                ],
+                [
+                  2,
+                  "陈"
+                ],
+                [
+                  3,
+                  "王"
+                ],
+                [
+                  4,
+                  "李"
+                ]
+              ],
+              "name": "customers（父表）",
+              "source": "customers",
+              "sql": "SELECT customer_id, customer_name FROM customers ORDER BY customer_id",
+              "ordered": true
+            },
+            {
+              "columns": [
+                "id",
+                "customer_id",
+                "sales"
+              ],
+              "rows": [
+                [
+                  1,
+                  1,
+                  800
+                ],
+                [
+                  2,
+                  2,
+                  400
+                ],
+                [
+                  3,
+                  1,
+                  600
+                ],
+                [
+                  4,
+                  null,
+                  300
+                ],
+                [
+                  5,
+                  3,
+                  1500
+                ]
+              ],
+              "name": "orders（子表）",
+              "source": "orders",
+              "tags": [
+                {
+                  "text": "指向 1（林）",
+                  "tone": "take"
+                },
+                {
+                  "text": "指向 2（陈）",
+                  "tone": "take"
+                },
+                {
+                  "text": "指向 1（林）",
+                  "tone": "take"
+                },
+                {
+                  "text": "外键为空",
+                  "tone": "tie"
+                },
+                {
+                  "text": "指向 3（王）",
+                  "tone": "take"
+                }
+              ],
+              "sql": "SELECT id, customer_id, sales FROM orders ORDER BY id",
+              "ordered": true
+            }
+          ]
+        },
+        {
+          "label": "② 一个客户可以对应多条订单（一对多）",
+          "via": "按外键 customer_id 数一数：每个客户在 orders 里出现几次",
+          "tables": [
+            {
+              "columns": [
+                "customer_id",
+                "客户名",
+                "订单数"
+              ],
+              "rows": [
+                [
+                  1,
+                  "林",
+                  2
+                ],
+                [
+                  2,
+                  "陈",
+                  1
+                ],
+                [
+                  3,
+                  "王",
+                  1
+                ],
+                [
+                  4,
+                  "李",
+                  0
+                ]
+              ],
+              "tags": [
+                {
+                  "text": "2 条 · 一对多",
+                  "tone": "merge"
+                },
+                {
+                  "text": "1 条",
+                  "tone": "take"
+                },
+                {
+                  "text": "1 条",
+                  "tone": "take"
+                },
+                {
+                  "text": "0 条",
+                  "tone": "skip"
+                }
+              ],
+              "sql": "SELECT c.customer_id, c.customer_name AS \"客户名\", (SELECT COUNT(*) FROM orders o WHERE o.customer_id = c.customer_id) AS \"订单数\" FROM customers c ORDER BY c.customer_id",
+              "ordered": true
+            }
+          ]
+        },
+        {
+          "label": "③ 处理后：每个客户一行，订单数从多到少",
+          "via": "LEFT JOIN + GROUP BY：没有订单的客户也保留，订单数是 0",
+          "tables": [
+            {
+              "columns": [
+                "customer_id",
+                "order_count"
+              ],
+              "rows": [
+                [
+                  1,
+                  2
+                ],
+                [
+                  3,
+                  1
+                ],
+                [
+                  2,
+                  1
+                ],
+                [
+                  4,
+                  0
+                ]
+              ],
+              "sql": "SELECT c.customer_id, COUNT(o.id) AS order_count FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id GROUP BY c.customer_id ORDER BY order_count DESC, SUM(o.sales) DESC;",
+              "ordered": true
+            }
+          ]
+        }
+      ],
+      "conclusion": "主键唯一标识一行（customer_id 不会重复）；外键指向父表的主键，同一个值可以在子表里出现多次，这就是一对多。"
     }
   ]
 }

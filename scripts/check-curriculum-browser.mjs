@@ -6,7 +6,7 @@ const content = await (await fetch(base + 'content.json')).json();
 const points = content.chapters.flatMap(chapter => chapter.knowledgePoints);
 assert.equal(points.length, 80);
 assert.equal(content.questions.length, 200);
-assert.equal(content.cards.length, 200);
+assert.equal(content.cards.length, 332);
 const browser = await chromium.launch({channel:'chrome', headless:true});
 const page = await browser.newPage({viewport:{width:390,height:844}});
 const errors = [];

@@ -28,7 +28,7 @@
       "path": "courses/ch04.json",
       "title": "排序与分页",
       "knowledgePointCount": 2,
-      "sha256": "77bbfea3f33710a250f27fb3bb66a9f1627830779fc58bcb52c85a79ce121ca6"
+      "sha256": "362aa62d5fa6755bd396dd16f12b9c743c3189bc7bf025e1db374653f0c4111c"
     },
     {
       "id": "ch05",
@@ -63,7 +63,7 @@
       "path": "courses/ch09.json",
       "title": "条件表达式",
       "knowledgePointCount": 3,
-      "sha256": "29b2c445f958ac1a6f9dec18cdad0f28ce16f9f944b88fe50dfa4138b651c0b0"
+      "sha256": "19a0fdfe72b6cabb5aab8b7c1ad90fbd3016e165be4cc6877c5ca2f3f905e753"
     },
     {
       "id": "ch10",
@@ -84,7 +84,7 @@
       "path": "courses/ch12.json",
       "title": "数值及日期函数",
       "knowledgePointCount": 4,
-      "sha256": "1980ae0328666cb5008728658a77191055c8f6e250e89f085f95d2024259f90a"
+      "sha256": "3215388872c58b67258d29deed6c26e8dd73d4752f3393d00953f4483d40905d"
     },
     {
       "id": "ch13",
@@ -167,8 +167,8 @@
     },
     {
       "path": "courses/ch04.json",
-      "bytes": 15422,
-      "sha256": "77bbfea3f33710a250f27fb3bb66a9f1627830779fc58bcb52c85a79ce121ca6"
+      "bytes": 16115,
+      "sha256": "362aa62d5fa6755bd396dd16f12b9c743c3189bc7bf025e1db374653f0c4111c"
     },
     {
       "path": "courses/ch05.json",
@@ -192,8 +192,8 @@
     },
     {
       "path": "courses/ch09.json",
-      "bytes": 27933,
-      "sha256": "29b2c445f958ac1a6f9dec18cdad0f28ce16f9f944b88fe50dfa4138b651c0b0"
+      "bytes": 28001,
+      "sha256": "19a0fdfe72b6cabb5aab8b7c1ad90fbd3016e165be4cc6877c5ca2f3f905e753"
     },
     {
       "path": "courses/ch10.json",
@@ -207,8 +207,8 @@
     },
     {
       "path": "courses/ch12.json",
-      "bytes": 23683,
-      "sha256": "1980ae0328666cb5008728658a77191055c8f6e250e89f085f95d2024259f90a"
+      "bytes": 23918,
+      "sha256": "3215388872c58b67258d29deed6c26e8dd73d4752f3393d00953f4483d40905d"
     },
     {
       "path": "courses/ch13.json",
@@ -602,8 +602,8 @@
     },
     {
       "path": "validation/mysql/kp04-02.sql",
-      "bytes": 812,
-      "sha256": "ac54300075ae68b75cfca67202633c9364b1e196a0ac98d56deafa36a8917f4b"
+      "bytes": 814,
+      "sha256": "7f8a8f83566bdf5a50996299ae77a531cdd0ad23eb4fcaf3a92010ee89958021"
     },
     {
       "path": "validation/mysql/kp05-01.sql",

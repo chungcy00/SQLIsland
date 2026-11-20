@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp02-02",
-  "lessonSha256": "88bea23f7dcf816a457fc1e398404afdf71f527dc15c62c8441d605300ab7032",
+  "lessonSha256": "fdd2f6ef41129e98850d5866f32dae0c9b20b9c26aeb878445c0f4846025467f",
   "figures": [
     {
       "id": "kp02-02-clauses",
@@ -136,6 +136,143 @@
           ]
         }
       ]
+    },
+    {
+      "id": "kp02-02-map",
+      "slot": "concept",
+      "kind": "flow-map",
+      "title": "DISTINCT：整行相同的结果合并成一条",
+      "stages": [
+        {
+          "label": "① 处理前：orders（5 行）",
+          "tables": [
+            {
+              "columns": [
+                "id",
+                "store_id",
+                "category"
+              ],
+              "rows": [
+                [
+                  1,
+                  1,
+                  "护肤品"
+                ],
+                [
+                  2,
+                  2,
+                  "化妆品"
+                ],
+                [
+                  3,
+                  1,
+                  "护肤品"
+                ],
+                [
+                  4,
+                  2,
+                  "化妆品"
+                ],
+                [
+                  5,
+                  1,
+                  "日用品"
+                ]
+              ],
+              "source": "orders",
+              "sql": "SELECT id, store_id, category FROM orders ORDER BY id",
+              "ordered": true
+            }
+          ]
+        },
+        {
+          "label": "② 只看 SELECT 里的两列：整行（两列合在一起）相同就是重复",
+          "via": "SELECT DISTINCT store_id, category：只取这两列",
+          "tables": [
+            {
+              "columns": [
+                "store_id",
+                "category"
+              ],
+              "rows": [
+                [
+                  1,
+                  "护肤品"
+                ],
+                [
+                  2,
+                  "化妆品"
+                ],
+                [
+                  1,
+                  "护肤品"
+                ],
+                [
+                  2,
+                  "化妆品"
+                ],
+                [
+                  1,
+                  "日用品"
+                ]
+              ],
+              "tags": [
+                {
+                  "text": "保留",
+                  "tone": "take"
+                },
+                {
+                  "text": "保留",
+                  "tone": "take"
+                },
+                {
+                  "text": "与第 1 行重复",
+                  "tone": "merge"
+                },
+                {
+                  "text": "与第 2 行重复",
+                  "tone": "merge"
+                },
+                {
+                  "text": "保留",
+                  "tone": "take"
+                }
+              ],
+              "sql": "SELECT store_id, category FROM orders ORDER BY id",
+              "ordered": true
+            }
+          ]
+        },
+        {
+          "label": "③ 处理后：重复的行合并成一条（3 行）",
+          "via": "DISTINCT：重复的行只留一条",
+          "tables": [
+            {
+              "columns": [
+                "store_id",
+                "category"
+              ],
+              "rows": [
+                [
+                  2,
+                  "化妆品"
+                ],
+                [
+                  1,
+                  "护肤品"
+                ],
+                [
+                  1,
+                  "日用品"
+                ]
+              ],
+              "sql": "SELECT DISTINCT store_id, category FROM orders ORDER BY category;",
+              "ordered": true
+            }
+          ]
+        }
+      ],
+      "conclusion": "去重比较的是 SELECT 里所有列合在一起的整行；源表 orders 的 5 条记录并没有被删除。"
     }
   ]
 }

@@ -60,7 +60,7 @@
       "id": "ch06",
       "path": "questions/ch06.json",
       "count": 12,
-      "sha256": "25c4d72cf87f4fc519aaf23d08807af4208dcdfa756177b0a44db97c2b2276d5"
+      "sha256": "9c5f52bd38af29526b24802ed8f66dca6b719deb9f3622f2bb3e87ccc321dca1"
     },
     {
       "id": "ch07",
@@ -78,7 +78,7 @@
       "id": "ch09",
       "path": "questions/ch09.json",
       "count": 10,
-      "sha256": "ae00bafe5c1cbccf75bf6d035e369287fa60739350dbd88564e9f6c3fa96c4b6"
+      "sha256": "dbf4517c526d82442a55fb3b04ffb4db03717df2df50a02bb0ffc4d0cb608e35"
     },
     {
       "id": "ch10",
@@ -96,7 +96,7 @@
       "id": "ch12",
       "path": "questions/ch12.json",
       "count": 10,
-      "sha256": "9e45b959a847807663c72939289c5ce072368baf53b7f8caa52f5adc0849be49"
+      "sha256": "888d04842e90cdcdaa26f58b1d8ff6cba6a0eaae8d83d7281e8ec40e39772f79"
     },
     {
       "id": "ch13",

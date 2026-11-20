@@ -578,7 +578,7 @@
       "prerequisites": [
         "kp09-02"
       ],
-      "concept": "NULLIF(a,b) 比较两个表达式；相等时返回 NULL，否则返回第一个表达式。用于除法时，可将零分母转换为 NULL，从而让无定义的结果明确显示为空。与 IFNULL 或 COALESCE 的方向不同，后者将缺失值替换为其他值。计算比率前必须确定分子、分母、统计范围及单位；不要因为分母为零就自动报告0%。SQLite 中两个整数相除可能截断小数，乘以1.0可使示例进行实数除法；MySQL 的 / 与整数除法 DIV 不同，具体精度仍由数据类型和引擎决定。ROUND 用于最终展示，而不是在聚合前随意舍入。",
+      "concept": "NULLIF(a,b) 比较两个表达式；相等时返回 NULL，否则返回第一个表达式。用于除法时，可将零分母转换为 NULL，从而让无定义的结果明确显示为空。与 IFNULL 或 COALESCE 的方向不同，后者将缺失值替换为其他值。计算比率前必须确定分子、分母、统计范围及单位；不要因为分母为零就自动报告0%。原生 SQLite 里两个整数相除会截断小数，需要乘以1.0才是实数除法；MySQL 的 / 保留小数、整数除法是 DIV，本应用的本地执行也让 / 保留小数，暂不支持 DIV。具体精度仍由数据类型和引擎决定。ROUND 用于最终展示，而不是在聚合前随意舍入。",
       "syntax": "ROUND(1.0 * numerator / NULLIF(denominator,0), 2)",
       "parameters": {
         "numerator": "分子",
@@ -745,7 +745,7 @@
       ],
       "teaching": {
         "problem": "本例使用商品单价除以库存数量演示除法边界，输出仅为语法练习，不是库存周转率或实际经营指标。实际业务中可将相同方法用于利润率、转化率等已明确定义的指标。",
-        "codeExplanation": "先计算 NULLIF(stock,0)：库存为0的记录得到 NULL，其余保持原数值。分子乘1.0后相除，避免 SQLite 整数截断；NULL 分母使结果仍为 NULL。最后 ROUND 保留两位小数的数值精度，实际界面是否补足尾随零由格式化处理。",
+        "codeExplanation": "先计算 NULLIF(stock,0)：库存为0的记录得到 NULL，其余保持原数值。分子乘1.0后相除，这样在原生 SQLite 等会截断整数的环境里也能保留小数；NULL 分母使结果仍为 NULL。最后 ROUND 保留两位小数的数值精度，实际界面是否补足尾随零由格式化处理。",
         "resultExplanation": "编号6无有效分母，结果为空；其他5件返回比率。结果为空并不表示真实比率为0；若制作经营报表应解释是无定义还是输入缺失。原例不是库存经营指标，不据此对商品进行经营评价。",
         "checkpoints": [],
         "mergedConcepts": [],
@@ -795,12 +795,12 @@
             }
           },
           {
-            "label": "整数与小数除法对照",
-            "explanation": "本地兼容执行层按 MySQL 习惯把 / 当作小数除法，所以 7/2 也得到 3.5（列名 integer_result 只是示例别名）；MySQL 要取整数商应使用 DIV，本地兼容执行暂不支持。",
-            "sql": "SELECT 7/2 AS integer_result,1.0*7/2 AS real_result,1.0*7/NULLIF(0,0) AS undefined_result;",
+            "label": "两种写法的除法对照",
+            "explanation": "本地兼容执行层按 MySQL 习惯把 / 当作小数除法，所以 7/2 也得到 3.5；MySQL 要取整数商应使用 DIV，本地兼容执行暂不支持。",
+            "sql": "SELECT 7/2 AS plain_result,1.0*7/2 AS real_result,1.0*7/NULLIF(0,0) AS undefined_result;",
             "result": {
               "columns": [
-                "integer_result",
+                "plain_result",
                 "real_result",
                 "undefined_result"
               ],

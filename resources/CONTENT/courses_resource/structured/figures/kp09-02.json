@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp09-02",
-  "lessonSha256": "491fe0775d005de3dbbb0f0d8b8f73483cf08ae56051756c19fad1bb4d0543c3",
+  "lessonSha256": "3975302d663549f7e4dedee32987dc6fd34b5bdcac188fd6ab029d7ad999cca7",
   "figures": [
     {
       "id": "kp09-02-clauses",
@@ -101,6 +101,129 @@
           ]
         }
       ]
+    },
+    {
+      "id": "kp09-02-map",
+      "slot": "concept",
+      "kind": "flow-map",
+      "title": "条件聚合：先把条件变成每行的 1 或 0，再相加",
+      "stages": [
+        {
+          "label": "① 处理前：products（6 行）",
+          "tables": [
+            {
+              "columns": [
+                "product_id",
+                "stock"
+              ],
+              "rows": [
+                [
+                  1,
+                  150
+                ],
+                [
+                  2,
+                  40
+                ],
+                [
+                  3,
+                  200
+                ],
+                [
+                  4,
+                  180
+                ],
+                [
+                  5,
+                  80
+                ],
+                [
+                  6,
+                  0
+                ]
+              ],
+              "source": "products",
+              "sql": "SELECT product_id, stock FROM products ORDER BY product_id",
+              "ordered": true
+            }
+          ]
+        },
+        {
+          "label": "② 每一行按条件变成 1 或 0",
+          "via": "CASE WHEN 条件 THEN 1 ELSE 0 END：满足记 1，不满足记 0",
+          "tables": [
+            {
+              "columns": [
+                "product_id",
+                "stock",
+                "stock<50",
+                "stock>=50"
+              ],
+              "rows": [
+                [
+                  1,
+                  150,
+                  0,
+                  1
+                ],
+                [
+                  2,
+                  40,
+                  1,
+                  0
+                ],
+                [
+                  3,
+                  200,
+                  0,
+                  1
+                ],
+                [
+                  4,
+                  180,
+                  0,
+                  1
+                ],
+                [
+                  5,
+                  80,
+                  0,
+                  1
+                ],
+                [
+                  6,
+                  0,
+                  1,
+                  0
+                ]
+              ],
+              "sql": "SELECT product_id, stock, CASE WHEN stock<50 THEN 1 ELSE 0 END AS \"stock<50\", CASE WHEN stock>=50 THEN 1 ELSE 0 END AS \"stock>=50\" FROM products ORDER BY product_id",
+              "ordered": true
+            }
+          ]
+        },
+        {
+          "label": "③ 处理后：每一列加起来，只剩一行",
+          "via": "SUM(...)：把每一列的 1 和 0 相加，就是满足条件的行数",
+          "tables": [
+            {
+              "columns": [
+                "low_count",
+                "normal_count"
+              ],
+              "rows": [
+                [
+                  2,
+                  4
+                ]
+              ],
+              "sql": "SELECT SUM(CASE WHEN stock<50 THEN 1 ELSE 0 END) AS low_count, SUM(CASE WHEN stock>=50 THEN 1 ELSE 0 END) AS normal_count FROM products;",
+              "ordered": true
+            }
+          ]
+        }
+      ],
+      "conclusion": "低库存 2 件、正常 4 件：条件聚合就是“先打标记，再求和”。"
     }
   ]
 }

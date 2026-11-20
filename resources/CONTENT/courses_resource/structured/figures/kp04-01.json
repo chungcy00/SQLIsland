@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp04-01",
-  "lessonSha256": "79061455f7bf5cbb629c2faa9af668bf29d30b9e1f65af73fdcc94f444291c55",
+  "lessonSha256": "71c626739d4e8263b92059535c6842e49d98a73bd96cbe79b0b8ff282be290a7",
   "figures": [
     {
       "id": "kp04-01-clauses",
@@ -161,6 +161,184 @@
           ]
         }
       ]
+    },
+    {
+      "id": "kp04-01-map",
+      "slot": "concept",
+      "kind": "flow-map",
+      "title": "多列排序：先看第 1 个键，相同再看第 2 个键",
+      "stages": [
+        {
+          "label": "① 处理前：products（6 行，按表里存放的顺序）",
+          "tables": [
+            {
+              "columns": [
+                "product_id",
+                "product_name",
+                "price"
+              ],
+              "rows": [
+                [
+                  1,
+                  "Mask",
+                  15
+                ],
+                [
+                  2,
+                  "Serum",
+                  89
+                ],
+                [
+                  3,
+                  "Cleanser",
+                  35
+                ],
+                [
+                  4,
+                  "Cream",
+                  65
+                ],
+                [
+                  5,
+                  "Sunscreen",
+                  45
+                ],
+                [
+                  6,
+                  "Soap_1",
+                  15
+                ]
+              ],
+              "source": "products",
+              "sql": "SELECT product_id, product_name, price FROM products ORDER BY product_id",
+              "ordered": true
+            }
+          ]
+        },
+        {
+          "label": "② 只按第 1 个键 price 排好",
+          "via": "第 1 个排序键 price DESC：价格从高到低",
+          "note": "价格相同的行，谁先谁后没有保证。",
+          "tables": [
+            {
+              "columns": [
+                "product_id",
+                "product_name",
+                "price"
+              ],
+              "rows": [
+                [
+                  2,
+                  "Serum",
+                  89
+                ],
+                [
+                  4,
+                  "Cream",
+                  65
+                ],
+                [
+                  5,
+                  "Sunscreen",
+                  45
+                ],
+                [
+                  3,
+                  "Cleanser",
+                  35
+                ],
+                [
+                  1,
+                  "Mask",
+                  15
+                ],
+                [
+                  6,
+                  "Soap_1",
+                  15
+                ]
+              ],
+              "tags": [
+                null,
+                null,
+                null,
+                null,
+                {
+                  "text": "同价 · 先后不定",
+                  "tone": "tie"
+                },
+                {
+                  "text": "同价 · 先后不定",
+                  "tone": "tie"
+                }
+              ],
+              "sql": "SELECT product_id, product_name, price FROM products ORDER BY price DESC"
+            }
+          ]
+        },
+        {
+          "label": "③ 处理后：同价的行再按第 2 个键排好",
+          "via": "第 2 个排序键 product_name：只在 price 相同时起作用，名称升序",
+          "tables": [
+            {
+              "columns": [
+                "product_id",
+                "product_name",
+                "price"
+              ],
+              "rows": [
+                [
+                  2,
+                  "Serum",
+                  89
+                ],
+                [
+                  4,
+                  "Cream",
+                  65
+                ],
+                [
+                  5,
+                  "Sunscreen",
+                  45
+                ],
+                [
+                  3,
+                  "Cleanser",
+                  35
+                ],
+                [
+                  1,
+                  "Mask",
+                  15
+                ],
+                [
+                  6,
+                  "Soap_1",
+                  15
+                ]
+              ],
+              "tags": [
+                null,
+                null,
+                null,
+                null,
+                {
+                  "text": "同价 · 按名称",
+                  "tone": "merge"
+                },
+                {
+                  "text": "同价 · 按名称",
+                  "tone": "merge"
+                }
+              ],
+              "sql": "SELECT product_id, product_name, price FROM products ORDER BY price DESC, product_name",
+              "ordered": true
+            }
+          ]
+        }
+      ],
+      "conclusion": "第 1 个排序键决定大顺序；只有它相同的行，才轮到第 2 个排序键。"
     }
   ]
 }

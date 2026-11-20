@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp19-47",
-  "lessonSha256": "fc22ba6c6ec96161669c37330a9ef15643df0dd35a0505c01fb757828c0b63f1",
+  "lessonSha256": "9a704efcb2c634806bb5f7b769fac869c7716e6a5a9a9f340c6a76782fdd939e",
   "figures": [
     {
       "id": "kp19-47-clauses",
@@ -29,6 +29,148 @@
           "note": "按 balance_cents DESC,supplier_invoice_id 排列结果。"
         }
       ]
+    },
+    {
+      "id": "kp19-47-map",
+      "slot": "concept",
+      "kind": "flow-map",
+      "title": "发票与付款核对：先算余额，再按顺序判断状态",
+      "stages": [
+        {
+          "label": "① 处理前：几张发票的开票金额和已付金额（分）",
+          "tables": [
+            {
+              "columns": [
+                "supplier_invoice_id",
+                "billed_cents",
+                "paid_cents"
+              ],
+              "rows": [
+                [
+                  2,
+                  157276,
+                  157276
+                ],
+                [
+                  3,
+                  345254,
+                  190828
+                ],
+                [
+                  18,
+                  240166,
+                  0
+                ],
+                [
+                  62,
+                  117547,
+                  132392
+                ]
+              ],
+              "sql": "SELECT supplier_invoice_id, billed_cents, paid_cents FROM v_invoice_balance WHERE supplier_invoice_id IN (62,2,3,18) ORDER BY supplier_invoice_id",
+              "ordered": true
+            }
+          ]
+        },
+        {
+          "label": "② 算出余额",
+          "via": "余额 = 开票金额 − 已付金额（发票与付款通常一对多，要先汇总付款再比较）",
+          "tables": [
+            {
+              "columns": [
+                "supplier_invoice_id",
+                "billed_cents",
+                "paid_cents",
+                "balance_cents"
+              ],
+              "rows": [
+                [
+                  2,
+                  157276,
+                  157276,
+                  0
+                ],
+                [
+                  3,
+                  345254,
+                  190828,
+                  154426
+                ],
+                [
+                  18,
+                  240166,
+                  0,
+                  240166
+                ],
+                [
+                  62,
+                  117547,
+                  132392,
+                  -14845
+                ]
+              ],
+              "sql": "SELECT supplier_invoice_id, billed_cents, paid_cents, balance_cents FROM v_invoice_balance WHERE supplier_invoice_id IN (62,2,3,18) ORDER BY supplier_invoice_id",
+              "ordered": true
+            }
+          ]
+        },
+        {
+          "label": "③ 按顺序判断付款状态",
+          "via": "先判余额是否为 0，再判是否一分钱没付，之后看余额的正负",
+          "tables": [
+            {
+              "columns": [
+                "supplier_invoice_id",
+                "balance_cents",
+                "payment_state"
+              ],
+              "rows": [
+                [
+                  2,
+                  0,
+                  "paid"
+                ],
+                [
+                  3,
+                  154426,
+                  "partial"
+                ],
+                [
+                  18,
+                  240166,
+                  "unpaid"
+                ],
+                [
+                  62,
+                  -14845,
+                  "overpaid"
+                ]
+              ],
+              "sql": "SELECT supplier_invoice_id, balance_cents, CASE WHEN balance_cents=0 THEN 'paid' WHEN paid_cents=0 THEN 'unpaid' WHEN balance_cents>0 THEN 'partial' ELSE 'overpaid' END payment_state FROM v_invoice_balance WHERE supplier_invoice_id IN (62,2,3,18) ORDER BY supplier_invoice_id",
+              "ordered": true,
+              "tags": [
+                {
+                  "text": "第 1 条：余额为 0",
+                  "tone": "take"
+                },
+                {
+                  "text": "第 3 条：余额大于 0",
+                  "tone": "merge"
+                },
+                {
+                  "text": "第 2 条：一分钱没付",
+                  "tone": "merge"
+                },
+                {
+                  "text": "第 4 条：余额为负",
+                  "tone": "tie"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "conclusion": "判断的先后顺序很重要：余额为 0 的先归入已结清；余额为负（多付）要单独审核。"
     }
   ]
 }

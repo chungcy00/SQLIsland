@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp14-01",
-  "lessonSha256": "fe789b5c511a88a38698788c22e0bd8ab877a1d2daa277a5c17f273a21e304ad",
+  "lessonSha256": "d78f6c613138400c5bf92adfb1de9eacf77e138057ed00e7ef5c7f49d77984bf",
   "figures": [
     {
       "id": "kp14-01-clauses",
@@ -41,6 +41,124 @@
           "note": "按 total DESC 排列结果。"
         }
       ]
+    },
+    {
+      "id": "kp14-01-map",
+      "slot": "concept",
+      "kind": "flow-map",
+      "title": "CTE：把一个大查询拆成命名的几步，后一步用前一步的结果",
+      "stages": [
+        {
+          "label": "① 处理前：orders（5 行）",
+          "tables": [
+            {
+              "columns": [
+                "id",
+                "category",
+                "sales"
+              ],
+              "rows": [
+                [
+                  1,
+                  "护肤品",
+                  800
+                ],
+                [
+                  2,
+                  "化妆品",
+                  400
+                ],
+                [
+                  3,
+                  "护肤品",
+                  600
+                ],
+                [
+                  4,
+                  "化妆品",
+                  300
+                ],
+                [
+                  5,
+                  "日用品",
+                  1500
+                ]
+              ],
+              "source": "orders",
+              "sql": "SELECT id, category, sales FROM orders ORDER BY id",
+              "ordered": true
+            }
+          ]
+        },
+        {
+          "label": "② 第 1 步 totals：每个 category 汇总一行（3 行）",
+          "via": "WITH totals AS (… GROUP BY category)：先给这一步的结果起名 totals",
+          "note": "下一步 qualified 会从 totals 里筛选 total > 1000。",
+          "tables": [
+            {
+              "columns": [
+                "category",
+                "total"
+              ],
+              "rows": [
+                [
+                  "化妆品",
+                  700
+                ],
+                [
+                  "护肤品",
+                  1400
+                ],
+                [
+                  "日用品",
+                  1500
+                ]
+              ],
+              "tags": [
+                {
+                  "text": "不大于 1000 · 去掉",
+                  "tone": "skip"
+                },
+                {
+                  "text": "大于 1000 · 留",
+                  "tone": "take"
+                },
+                {
+                  "text": "大于 1000 · 留",
+                  "tone": "take"
+                }
+              ],
+              "sql": "SELECT category, SUM(sales) AS total FROM orders GROUP BY category ORDER BY category",
+              "ordered": true
+            }
+          ]
+        },
+        {
+          "label": "③ 第 2 步 qualified，再由最后的 SELECT 取出（2 行）",
+          "via": "qualified AS (SELECT … FROM totals WHERE total>1000)，最后 SELECT * FROM qualified ORDER BY total DESC",
+          "tables": [
+            {
+              "columns": [
+                "category",
+                "total"
+              ],
+              "rows": [
+                [
+                  "日用品",
+                  1500
+                ],
+                [
+                  "护肤品",
+                  1400
+                ]
+              ],
+              "sql": "WITH totals AS (SELECT category,SUM(sales) AS total FROM orders GROUP BY category), qualified AS (SELECT category,total FROM totals WHERE total>1000) SELECT * FROM qualified ORDER BY total DESC;",
+              "ordered": true
+            }
+          ]
+        }
+      ],
+      "conclusion": "每个 CTE 都像一张临时的小表：先得到 totals，再从 totals 得到 qualified，最后查询 qualified。"
     }
   ]
 }

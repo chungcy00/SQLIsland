@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp10-02",
-  "lessonSha256": "7a88f3a806d4e75fb092b3a5f136826799320dd5d1e16b68bb92f9a2f4d0bf40",
+  "lessonSha256": "18312278ca6d6e6d64bc26ea10247dacbca3d6da09993767f8f4b0a2a2a6eaee",
   "figures": [
     {
       "id": "kp10-02-clauses",
@@ -124,6 +124,112 @@
           ]
         }
       ]
+    },
+    {
+      "id": "kp10-02-map",
+      "slot": "concept",
+      "kind": "flow-map",
+      "title": "IN 与多行子查询：内层先给出一组值，外层看“在不在里面”",
+      "stages": [
+        {
+          "label": "① 先单独执行内层子查询：销售额 ≥ 600 的订单属于哪些客户",
+          "note": "返回的是一组值（可以有重复，IN 只看“有没有”）。",
+          "tables": [
+            {
+              "columns": [
+                "customer_id"
+              ],
+              "rows": [
+                [
+                  1
+                ],
+                [
+                  1
+                ],
+                [
+                  3
+                ]
+              ],
+              "sql": "SELECT customer_id FROM orders WHERE sales >= 600"
+            }
+          ]
+        },
+        {
+          "label": "② 外层：每个客户的 customer_id 在这组值里吗？",
+          "via": "customer_id IN（1、3）：在里面就留下",
+          "tables": [
+            {
+              "columns": [
+                "customer_id",
+                "customer_name"
+              ],
+              "rows": [
+                [
+                  1,
+                  "林"
+                ],
+                [
+                  2,
+                  "陈"
+                ],
+                [
+                  3,
+                  "王"
+                ],
+                [
+                  4,
+                  "李"
+                ]
+              ],
+              "source": "customers",
+              "tags": [
+                {
+                  "text": "在集合里 · 留",
+                  "tone": "take"
+                },
+                {
+                  "text": "不在集合里 · 去掉",
+                  "tone": "skip"
+                },
+                {
+                  "text": "在集合里 · 留",
+                  "tone": "take"
+                },
+                {
+                  "text": "不在集合里 · 去掉",
+                  "tone": "skip"
+                }
+              ],
+              "sql": "SELECT customer_id, customer_name FROM customers ORDER BY customer_id",
+              "ordered": true
+            }
+          ]
+        },
+        {
+          "label": "③ 处理后：留下的客户（2 行）",
+          "tables": [
+            {
+              "columns": [
+                "customer_id",
+                "customer_name"
+              ],
+              "rows": [
+                [
+                  3,
+                  "王"
+                ],
+                [
+                  1,
+                  "林"
+                ]
+              ],
+              "sql": "SELECT customer_id, customer_name FROM customers WHERE customer_id IN (SELECT customer_id FROM orders WHERE sales >= 600) ORDER BY customer_name DESC;",
+              "ordered": true
+            }
+          ]
+        }
+      ],
+      "conclusion": "多行子查询返回一组候选值，IN 判断外层的值是否出现在这组值里。"
     }
   ]
 }

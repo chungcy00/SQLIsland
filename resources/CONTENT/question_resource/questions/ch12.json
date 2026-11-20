@@ -438,7 +438,7 @@
         {
           "id": "C",
           "text": "二者均为3",
-          "explanation": "这会混淆MySQL与SQLite整数除法。"
+          "explanation": "二者均为 3 是原生 SQLite 整数相除的结果，MySQL 的 / 得 3.5，不能混淆。"
         },
         {
           "id": "D",
@@ -465,7 +465,7 @@
         "回想本章《数值除法与整数除法》中定义的运算对象和限制，再逐个排除不满足题设的选项。",
         "将每个候选与题设的明确条件对照，不能把偶然成立的情况当成通用规则。"
       ],
-      "explanation": "/执行除法，DIV截断整数商。\nA. 余数运算使用MOD或%，不是DIV。\nB. /执行除法，DIV截断整数商。\nC. 这会混淆MySQL与SQLite整数除法。\nD. DIV只返回整数商。",
+      "explanation": "/执行除法，DIV截断整数商。\nA. 余数运算使用MOD或%，不是DIV。\nB. /执行除法，DIV截断整数商。\nC. 二者均为 3 是原生 SQLite 整数相除的结果，MySQL 的 / 得 3.5，不能混淆。\nD. DIV只返回整数商。\n补充：本应用的本地执行也让 / 保留小数（7 / 2 得 3.5），暂不支持 DIV，只能靠理解，不能在应用里运行。",
       "commonErrors": [
         {
           "optionId": "A",
@@ -473,7 +473,7 @@
         },
         {
           "optionId": "C",
-          "reason": "这会混淆MySQL与SQLite整数除法。"
+          "reason": "二者均为 3 是原生 SQLite 整数相除的结果，MySQL 的 / 得 3.5，不能混淆。"
         },
         {
           "optionId": "D",
@@ -1557,10 +1557,10 @@
       ],
       "hints": [
         "比例 = 收货数量 ÷ 订购数量，要用收货记录连接采购明细。",
-        "NULLIF(分母,0) 避免除零；乘以 1.0 避免整数除法截断。",
+        "NULLIF(分母,0) 避免除零；乘以 1.0 是让结果按小数计算的通用写法（原生 SQLite 里两个整数相除会截断，本应用的 / 本来就保留小数）。",
         "题目要的是小数比例，不要乘以 100。"
       ],
-      "explanation": "收货表连接采购明细后，用 quantity_received / NULLIF(quantity_ordered,0)：分母为 0 时得到 NULL；1.0* 避免整数除法，ROUND(…,2) 保留两位小数。\n易错：乘以 100 得到的是百分比，而题目要求小数比例。",
+      "explanation": "收货表连接采购明细后，用 quantity_received / NULLIF(quantity_ordered,0)：分母为 0 时得到 NULL；1.0* 让结果按小数计算，ROUND(…,2) 保留两位小数。\n易错：乘以 100 得到的是百分比，而题目要求小数比例。",
       "commonErrors": [
         {
           "sql": "SELECT r.receipt_id,ROUND(100.0*r.quantity_received/NULLIF(i.quantity_ordered,0),2) AS receipt_ratio FROM receipts r JOIN purchase_items i ON i.po_item_id=r.po_item_id",

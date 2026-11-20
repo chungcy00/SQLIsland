@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp16-03",
-  "lessonSha256": "9133b201037c83b4338683f310013326f4b324ec5e0518fefe5d8dc687dabc38",
+  "lessonSha256": "8df9ba4c2745f367ae97047b454ec62d9672a1a74b4ac0cf25e7b1a17fcb540f",
   "figures": [
     {
       "id": "kp16-03-clauses",
@@ -168,6 +168,65 @@
           ]
         }
       ]
+    },
+    {
+      "id": "kp16-03-map",
+      "slot": "concept",
+      "kind": "compare-card",
+      "title": "类型转换：合法文本能转成数字，非法文本却不报错",
+      "panels": [
+        {
+          "label": "合法文本 '15'",
+          "tone": "good",
+          "columns": [
+            "原文本"
+          ],
+          "rows": [
+            [
+              "15"
+            ]
+          ],
+          "big": {
+            "label": "CAST('15' AS DECIMAL(12,2))",
+            "value": 15
+          },
+          "check": {
+            "sql": "SELECT CAST('15' AS DECIMAL(12,2))",
+            "expected": [
+              [
+                15
+              ]
+            ]
+          },
+          "note": "格式合法，转换后可以参与计算。"
+        },
+        {
+          "label": "非法文本 'abc'",
+          "tone": "bad",
+          "columns": [
+            "原文本"
+          ],
+          "rows": [
+            [
+              "abc"
+            ]
+          ],
+          "big": {
+            "label": "CAST('abc' AS DECIMAL(12,2))",
+            "value": 0
+          },
+          "check": {
+            "sql": "SELECT CAST('abc' AS DECIMAL(12,2))",
+            "expected": [
+              [
+                0
+              ]
+            ]
+          },
+          "note": "没有报错，悄悄变成了 0。"
+        }
+      ],
+      "conclusion": "转换前要先验证格式和范围；否则汇总时，非法值会被当成 0 混进去。"
     }
   ]
 }

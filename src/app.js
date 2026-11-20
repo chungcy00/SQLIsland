@@ -14,6 +14,8 @@ import { mountErd } from "./erd.js";
 import { businessErdDictionary } from "./erd-dictionary.js";
 import { requirementSections, readingChunks } from "./lesson-presentation.js";
 import { formatSqlForDisplay } from "./sql-format.js";
+import { createCardView } from "./flashcard-view.js";
+import { TYPE_ORDER, TYPE_LABELS, TIER_ORDER } from "./flashcard-model.mjs";
 import { fsrs, createEmptyCard } from "ts-fsrs";
 import * as XLSX from "xlsx";
 import {
@@ -133,6 +135,41 @@ const table = (columns, rows, limit = 40) =>
       "",
     )}</tbody></table></div>${rows.length > limit ? `<small>展示前 ${limit} 行，共 ${rows.length} 行</small>` : ""}`;
 const tag = (text, cls = "") => `<span class="tag ${cls}">${e(text)}</span>`;
+const cardView = createCardView({ e, table, code, tag });
+let cardPreview = { type: "concept", index: 0, face: "front" };
+// 个人闪卡是简单的“问题/答案/解释”结构，转成同一套双面结构后与正式卡共用渲染。
+const isRichCard = (c) => Array.isArray(c.back?.sections);
+function asRichCard(c) {
+  if (isRichCard(c)) return c;
+  const sections = [];
+  if (c.back?.explanation) sections.push({ type: "text", title: "补充解释", content: c.back.explanation });
+  const sql = c.back?.sqliteCode || c.back?.code;
+  if (sql) sections.push({ type: "code", title: "SQL 示例", content: sql });
+  return { id: c.id, type: "user", typeLabel: "个人闪卡", tags: c.tags || [], front: { prompt: c.front?.question ?? "", code: c.front?.code }, back: { answer: c.back?.answer ?? "", sections }, illustrationKey: null };
+}
+const cardRuns = new Map();
+function cardExamples(c) {
+  const list = Array.isArray(c.examples) && c.examples.length ? c.examples : c.example ? [c.example] : [];
+  return list.filter((x) => x && typeof x.setupSql === "string" && (x.sqliteSql || x.sql));
+}
+const sameResult = (a, b) => JSON.stringify(a.columns) === JSON.stringify(b.columns) && JSON.stringify(a.rows) === JSON.stringify(b.rows);
+function cardRunResult(ex, outcome) {
+  if (outcome.error) {
+    return ex.expectedError || ex.expected?.error ? `<span class="result-tag actual">预期报错</span> <small>${e(outcome.error)}</small>` : `<span class="result-tag">运行出错</span> <small>${e(outcome.error)}</small>`;
+  }
+  const r = outcome.result;
+  const note = ex.expected ? (sameResult(ex.expected, r) ? "与卡片记录的结果一致" : "与卡片记录的结果不一致（未验证）") : "";
+  return `<span class="result-tag actual">实际运行</span> <small>SQLite 兼容执行 · ${r.rowCount} 行${note ? " · " + note : ""}</small>${table(r.columns, r.rows.slice(0, 20))}`;
+}
+function cardRunBlock(c) {
+  const list = cardExamples(c);
+  if (!list.length) return "";
+  return `<section class="fc-sec fc-runs"><h3 class="fc-h"><i></i>运行示例</h3><p class="fc-hint">在内置示例数据上用 SQLite 兼容方式执行，并非原生 MySQL 8.4。</p>${list.map((ex, i) => {
+    const blocked = ex.teachingExecution?.error || ex.localExecution?.error;
+    const key = c.id + "|" + i;
+    return `<div class="fc-run"><div class="row between"><b>${e(ex.label || "示例 " + (i + 1))}</b>${blocked ? '<small class="muted">暂不支持本地执行</small>' : button(icon("play") + " 运行", "cardRun", key, "small-button")}</div><div class="fc-run-out" data-run="${e(key)}">${cardRuns.has(key) ? cardRuns.get(key) : ""}</div></div>`;
+  }).join("")}</section>`;
+}
 // B10：新版插画（resources/ASSETS/v2/illustrations/final）。空态默认 08 问号；搜索无结果传 09。
 const finalArt = (name, cls = "") => image("v2/illustrations/final/" + name, cls);
 const businessArt = (name, cls = "") => finalArt({ retail_sales: "02", ecommerce_customer: "03", inventory_management: "04", procurement_data: "05", financial_data: "06", human_resources: "07" }[name] + "_business_" + name, cls);
@@ -179,7 +216,7 @@ let importData = null,
   importFileName = "";
 let newMode = "每日到期";
 let cardChapter = "ch01", cardSearch = "", cardBrowseLimit = 40;
-let cardScheduled = true, spotId = null, spotBack = false, cardBrowseChapter = "";
+let cardScheduled = true, spotId = null, spotBack = false, cardBrowseChapter = "", cardTypeFilter = "", cardTierFilter = "";
 const cardFlipped = new Set();
 const modeLabels = { 每日到期: "今日待复习", 新卡: "新卡", 薄弱: "困难/薄弱", 章节: "按章节", 自定义: "自定义卡", 收藏: "收藏卡", 随机: "随机自由浏览" };
 const labResults = new Map();
@@ -1207,17 +1244,6 @@ function interval(date) {
       ? Math.round(minutes / 60) + " 小时"
       : Math.round(minutes / 1440) + " 天";
 }
-function cardCode(c) {
-  const sql = c.front.code || "";
-  return sql ? `<div class="code-sample">${e(formatSqlForDisplay(sql))}</div>` : "";
-}
-function cardBackCode(c) {
-  const sql = c.back.code || c.back.sqliteCode || "";
-  return sql ? `<div class="code-sample">${e(formatSqlForDisplay(sql))}</div>` : "";
-}
-function cardBackBody(card, withRun = true) {
-  return `<p class="aux">原题：${e(card.front.question || "")}</p><div class="sec3"><h3>核心答案</h3><p>${e(card.back.answer || "")}</p></div>${card.back.explanation ? `<div class="sec3"><h3>原理拆解</h3><p>${e(card.back.explanation)}</p></div>` : ""}${card.back.correctionReason ? `<p class="note">补充提示：${e(card.back.correctionReason)}</p>` : ""}${cardBackCode(card)}${withRun && card.back.sqliteCode ? button(icon("play") + "本地实操运行示例", "cardLab", card.id, "outline full") : ""}`;
-}
 function cardStatus(c) {
   const r = state.reviews[c.id];
   return r ? `<span class="st o">已复习 ${r.reps || 0} 次 · S=${(r.stability || 0).toFixed(1)}</span>` : `<span class="st">新卡 · 待初学</span>`;
@@ -1225,8 +1251,8 @@ function cardStatus(c) {
 function cardsPage() {
   const fresh = allCards().filter((c) => !state.reviews[c.id]);
   const query = cardSearch.trim().toLowerCase();
-  const matching = content.cards.filter((c) => (!cardBrowseChapter || c.chapterId === cardBrowseChapter) && (!query ||
-    [c.id, c.front.question, c.back.answer, c.back.explanation, ...(c.tags || [])]
+  const matching = [...content.cards, ...state.userCards].filter((c) => (!cardBrowseChapter || (c.chapterIds || []).includes(cardBrowseChapter)) && (!cardTypeFilter || c.type === cardTypeFilter) && (!cardTierFilter || c.interviewTier === cardTierFilter) && (!query ||
+    [c.id, c.front.question, c.front.prompt, c.title, c.back.answer, c.back.explanation, ...(c.tags || [])]
       .some((value) => String(value || "").toLowerCase().includes(query))));
   const all = allCards();
   if (!spotId || !all.some((c) => c.id === spotId)) spotId = all[Math.floor(Math.random() * all.length)]?.id;
@@ -1244,16 +1270,35 @@ function cardsPage() {
     ${button(icon("flip") + `<span>进入「${modeText}」3D 翻卡学习</span>`, "startCards", newMode, "primary full start-flip")}${state.flashSession ? button("继续上次复习", "resumeCards", "", "tonal full") : ""}</section>
     ${spot ? `<div class="section-heading"><h2>随手翻一张</h2>${button(icon("skip") + " 换一张", "spotNext", "", "text-button")}</div>
     ${spotBack
-      ? `<div class="card-flip big back" role="button" tabindex="0" data-action="spotFlip" aria-label="点击翻回正面"><div class="row"><span class="aux">${e(spot.id.toUpperCase())} · 答案 · 解析</span><span class="tools">${labelled(button(icon("copy"), "copyCard", spot.id, "icon-button"), "复制为个人卡片")}</span></div>${cardBackBody(spot)}</div>`
-      : `<button class="card-flip big" data-action="spotFlip" aria-label="点击翻面"><div class="t">${tag(spot.id.toUpperCase())}<span class="ic">${icon("flip")}</span><span class="aux">正面 · 点击翻面</span></div><div class="q">${e(spot.front.question || "")}</div>${cardCode(spot)}<div class="hint">先默想答案，再点击卡片翻面核对</div></button>`}` : ""}
+      ? `<div class="fc-open"><div class="fc-tap" role="button" tabindex="0" data-action="spotFlip" aria-label="点击卡片翻回正面">${cardView.back(asRichCard(spot), cardRunBlock(spot))}</div><div class="actions">${button("复制为个人卡片", "copyCard", spot.id, "outline")}</div></div>`
+      : `<div class="fc-tap" role="button" tabindex="0" data-action="spotFlip" aria-label="点击翻面">${cardView.front(asRichCard(spot))}</div><p class="fc-hint center">先默想答案，再点击卡片翻面核对</p>`}` : ""}
     <div class="section-heading"><small class="card-match-count">匹配到 ${matching.length} 张 · 点击卡片直接翻面</small>${cardFlipped.size ? button(icon("reset") + " 全部正面", "allFront", "", "text-button") : ""}</div>
     <div class="search">${icon("search")}<input id="card-search" value="${e(cardSearch)}" placeholder="搜索闪卡问题、答案、卡号或标签…" aria-label="搜索闪卡"></div>
-    <div class="chips">${button("全部章", "browseChapter", "", "chip " + (!cardBrowseChapter ? "selected" : ""))}${chapterChips(cardBrowseChapter, "browseChapter")}</div>
-    ${matching.slice(0, cardBrowseLimit).map((c) => cardFlipped.has(c.id)
-      ? `<div class="card-flip mini back" role="button" tabindex="0" data-action="miniFlip" data-arg="${c.id}" aria-label="点击翻回正面"><div class="row"><span class="aux">${e(c.id.toUpperCase())} · 答案 · 解析</span><span class="tools">${labelled(button(icon("copy"), "copyCard", c.id, "icon-button"), "复制为个人卡片")}</span></div>${cardBackBody(c)}</div>`
-      : `<button class="card-flip mini" data-action="miniFlip" data-arg="${c.id}"><div class="t"><span class="ic">${icon("flip")}</span><span class="q">${e(c.front.question)}</span></div>${cardCode(c)}<div class="row">${cardStatus(c)}<span class="tap">${icon("reset")}轻触翻面看答案</span></div></button>`).join("")}
+    <div class="chips mode-scroll">${button("全部类别", "cardType", "", "chip " + (!cardTypeFilter ? "selected" : ""))}${TYPE_ORDER.map((t) => button(TYPE_LABELS[t], "cardType", t, "chip " + (cardTypeFilter === t ? "selected" : ""))).join("")}</div>
+    <div class="chips mode-scroll">${button("全部级别", "cardTier", "", "chip " + (!cardTierFilter ? "selected" : ""))}${TIER_ORDER.map((t) => button(t, "cardTier", t, "chip " + (cardTierFilter === t ? "selected" : ""))).join("")}</div>
+    <div class="chips mode-scroll">${button("全部章", "browseChapter", "", "chip " + (!cardBrowseChapter ? "selected" : ""))}${chapterChips(cardBrowseChapter, "browseChapter")}</div>
+    ${matching.slice(0, cardBrowseLimit).map((c) => {
+      const rich = asRichCard(c);
+      return cardFlipped.has(c.id)
+        ? `<div class="fc-open"><div class="fc-tap" role="button" tabindex="0" data-action="miniFlip" data-arg="${e(c.id)}" aria-label="点击卡片翻回正面">${cardView.back(rich, cardRunBlock(c))}</div><div class="actions">${button("复制为个人卡片", "copyCard", c.id, "outline")}</div></div>`
+        : `<button class="fc-mini" data-action="miniFlip" data-arg="${e(c.id)}"><span class="fc-mini-tags">${e(rich.typeLabel)}${c.interviewTier ? " · " + e(c.interviewTier) : ""}</span><span class="fc-mini-q">${e(rich.front.prompt)}</span><span class="row between">${cardStatus(c)}<span class="tap">${icon("reset")}轻触翻面看答案</span></span></button>`;
+    }).join("")}
     ${matching.length > cardBrowseLimit ? button("加载更多闪卡", "moreCards", "", "outline full") : ""}${matching.length ? "" : empty("暂无匹配闪卡", "", button("清除搜索", "resetCardSearch", "", "outline"), "09_empty_magnifier")}`,
     "flashcards",
+  );
+}
+function cardPreviewPage() {
+  const list = content.cards.filter((c) => c.type === cardPreview.type);
+  cardPreview.index = Math.min(Math.max(0, cardPreview.index), Math.max(0, list.length - 1));
+  const card = list[cardPreview.index];
+  shell(
+    "闪卡样式预览",
+    `<div class="chips mode-scroll">${TYPE_ORDER.map((t) => button(TYPE_LABELS[t], "cpType", t, "chip " + (cardPreview.type === t ? "selected" : ""))).join("")}</div>
+    <div class="row between fc-pager"><small>${e(card.id)} · ${cardPreview.index + 1} / ${list.length}</small><div class="row">${button("上一张", "cpStep", "-1", "small-button")}${button("下一张", "cpStep", "1", "small-button")}</div></div>
+    <div class="chips"><span class="chip ${cardPreview.face === "front" ? "selected" : ""}" data-action="cpFace" data-arg="front" role="button" tabindex="0">正面</span><span class="chip ${cardPreview.face === "back" ? "selected" : ""}" data-action="cpFace" data-arg="back" role="button" tabindex="0">背面</span><span class="chip ${cardPreview.face === "both" ? "selected" : ""}" data-action="cpFace" data-arg="both" role="button" tabindex="0">双面</span></div>
+    ${cardPreview.face !== "back" ? cardView.front(card) : ""}${cardPreview.face !== "front" ? cardView.back(card) : ""}`,
+    "flashcards",
+    true,
   );
 }
 async function startCards(mode, relatedIds) {
@@ -1292,7 +1337,7 @@ async function startCards(mode, relatedIds) {
   if (mode === "自定义") list = state.userCards;
   if (mode === "关联") list = all.filter((c) => relatedIds.includes(c.id));
   if (mode === "章节") {
-    list = content.cards.filter((c) => c.chapterId === cardChapter);
+    list = content.cards.filter((c) => (c.chapterIds || []).includes(cardChapter));
   }
   state.flashSession = {
     ids: list.map((c) => c.id),
@@ -1351,11 +1396,13 @@ function reviewPage() {
       : createEmptyCard(),
     now(),
   );
+  const rich = asRichCard(card);
   shell(
     session.mode + "复习",
-    `<div class="row between"><small>${session.index + 1} / ${session.ids.length}</small><div class="row">${tag(session.scheduled ? "计入复习计划" : "自由浏览")}${session.lastRating ? button(icon("undo") + '<span class="sr-only">撤回上次评分</span>', "undoRating", "", "icon-button") : ""}</div></div><div class="progress"><span style="width:${(session.index / session.ids.length) * 100}%"></span></div><div class="row between flash-meta"><div class="flash-tags">${[card.type, ...(card.tags || [])].filter((t, i, a) => t && a.indexOf(t) === i).map((t) => tag(t)).join("")}</div>${favButton(card.id)}</div>
-    <section class="flashcard ${flashBack ? "back" : "front"}" role="button" tabindex="0" data-action="${flashBack ? "unflip" : "flip"}" aria-label="${flashBack ? "点击卡片翻回正面" : "点击卡片翻开答案"}"><div class="flash-top"><span class="flash-lab">${flashBack ? "答案 · 解析" : "正面 · 待翻卡"}</span></div>${flashBack
-      ? cardBackBody(card) : `<div class="question">${e(card.front.question || "")}</div>${cardCode(card)}${card.front.dataNote ? `<p class="aux">${e(card.front.dataNote)}</p>` : ""}${card.front.sourceTables?.length ? rich({ sourceTables: card.front.sourceTables }) : ""}`}</section>${!flashBack ? button(icon("skip") + "跳过", "skipCard", "", "outline full flash-under") : session.scheduled ? `<div class="rating">${["重来", "困难", "良好", "简单"].map((label, i) => button(label + `<small>${interval(schedule[i + 1].card.due)}</small>`, "rate", i + 1, "rate-" + (i + 1))).join("")}</div>` : button("下一张", "skipCard", "", "primary full flash-under")}<div class="actions">${goButton("暂停复习", "/cards", "outline")}${button("复制为个人闪卡", "copyCard", card.id, "outline")}</div>`,
+    `<div class="row between"><small>${session.index + 1} / ${session.ids.length}</small><div class="row">${tag(session.scheduled ? "计入复习计划" : "自由浏览")}${session.lastRating ? button(icon("undo") + '<span class="sr-only">撤回上次评分</span>', "undoRating", "", "icon-button") : ""}</div></div><div class="progress"><span style="width:${(session.index / session.ids.length) * 100}%"></span></div><div class="row between flash-meta"><small class="muted">${flashBack ? "背面 · 点击卡片翻回正面" : "正面 · 点击卡片翻面"}</small>${favButton(card.id)}</div>
+    ${flashBack
+      ? `<div class="fc-open"><div class="fc-tap" role="button" tabindex="0" data-action="unflip" aria-label="点击卡片翻回正面">${cardView.back(rich, cardRunBlock(card))}</div></div>`
+      : `<div class="fc-tap" role="button" tabindex="0" data-action="flip" aria-label="点击卡片翻开答案">${cardView.front(rich)}</div>`}${!flashBack ? button(icon("skip") + "跳过", "skipCard", "", "outline full flash-under") : session.scheduled ? `<div class="rating">${["忘记", "困难", "记得", "熟练"].map((label, i) => button(label + `<small>${interval(schedule[i + 1].card.due)}</small>`, "rate", i + 1, "rate-" + (i + 1))).join("")}</div>` : button("下一张", "skipCard", "", "primary full flash-under")}<div class="actions">${goButton("暂停复习", "/cards", "outline")}${button("复制为个人闪卡", "copyCard", card.id, "outline")}</div>`,
     "flashcards",
     true,
   );
@@ -1799,6 +1846,7 @@ async function render() {
       await questionPage(path.split("/")[2]);
     else if (path === "/cards") cardsPage();
     else if (path === "/review") reviewPage();
+    else if (path === "/card-preview") cardPreviewPage();
     else if (path === "/card-chapters")
       shell(
         "按章节复习",
@@ -2125,6 +2173,18 @@ async function handleAction(action, arg, element) {
       cardScheduled = !cardScheduled;
       await render();
       break;
+    case "cpType":
+      cardPreview = { ...cardPreview, type: arg, index: 0 };
+      await render();
+      break;
+    case "cpStep":
+      cardPreview.index += Number(arg);
+      await render();
+      break;
+    case "cpFace":
+      cardPreview.face = arg;
+      await render();
+      break;
     case "spotFlip":
       spotBack = !spotBack;
       await render();
@@ -2142,6 +2202,35 @@ async function handleAction(action, arg, element) {
       break;
     case "allFront":
       cardFlipped.clear();
+      await render();
+      break;
+    case "cardRun": {
+      const [cardId, index] = arg.split("|");
+      const card = allCards().find((x) => x.id === cardId);
+      const ex = card && cardExamples(card)[Number(index)];
+      if (!ex) break;
+      element.disabled = true;
+      let outcome;
+      try {
+        outcome = { result: await rpc("lesson", { tables: [], setupSql: ex.setupSql, sql: ex.sqliteSql || ex.sql }) };
+      } catch (error) {
+        outcome = { error: error?.message || String(error) };
+      } finally {
+        element.disabled = false;
+      }
+      const html = cardRunResult(ex, outcome);
+      cardRuns.set(arg, html);
+      document.querySelectorAll(".fc-run-out").forEach((node) => { if (node.dataset.run === arg) node.innerHTML = html; });
+      break;
+    }
+    case "cardType":
+      cardTypeFilter = arg;
+      cardBrowseLimit = 40;
+      await render();
+      break;
+    case "cardTier":
+      cardTierFilter = arg;
+      cardBrowseLimit = 40;
       await render();
       break;
     case "browseChapter":
@@ -2641,12 +2730,14 @@ async function handleAction(action, arg, element) {
     case "chapterCards":
       await startCards(
         "关联",
-        content.cards.filter((c) => c.chapterId === arg).map((c) => c.id),
+        content.cards.filter((c) => (c.chapterIds || []).includes(arg)).map((c) => c.id),
       );
       break;
     case "copyCard": {
       const source = allCards().find((c) => c.id === arg);
-      const c = JSON.parse(JSON.stringify(source));
+      const c = isRichCard(source)
+        ? { front: { question: source.front.prompt, ...(source.front.code ? { code: source.front.code } : {}) }, back: { answer: source.back.answer, explanation: "" }, tags: [source.typeLabel, ...(source.interviewTier ? [source.interviewTier] : [])] }
+        : JSON.parse(JSON.stringify(source));
       c.id = "user-" + Date.now();
       state.userCards.push(c);
       await persist();

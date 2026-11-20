@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp02-01",
-  "lessonSha256": "fbf37d02cc650c88dc8a35f242f30530346f102937e677ce0f4a63322f3f591b",
+  "lessonSha256": "70e40adb2023073557057a467f2042277d5a3b72613e4930284eecd68f43a3cf",
   "figures": [
     {
       "id": "kp02-01-clauses",
@@ -161,6 +161,97 @@
           ]
         }
       ]
+    },
+    {
+      "id": "kp02-01-map",
+      "slot": "concept",
+      "kind": "compare-card",
+      "title": "原字段、派生列和别名：以 Mask 这一行为例",
+      "panels": [
+        {
+          "label": "直接读取原字段 price",
+          "tone": "neutral",
+          "columns": [
+            "product_name",
+            "price"
+          ],
+          "rows": [
+            [
+              "Mask",
+              15
+            ]
+          ],
+          "big": {
+            "label": "price",
+            "value": 15
+          },
+          "check": {
+            "sql": "SELECT price FROM products WHERE product_name = 'Mask'",
+            "expected": [
+              [
+                15
+              ]
+            ]
+          }
+        },
+        {
+          "label": "逐行计算派生列 price * stock",
+          "tone": "neutral",
+          "columns": [
+            "product_name",
+            "price",
+            "stock"
+          ],
+          "rows": [
+            [
+              "Mask",
+              15,
+              150
+            ]
+          ],
+          "big": {
+            "label": "price * stock",
+            "value": 2250
+          },
+          "check": {
+            "sql": "SELECT price * stock FROM products WHERE product_name = 'Mask'",
+            "expected": [
+              [
+                2250
+              ]
+            ]
+          },
+          "note": "新值仍属于当前这一行，不是跨行汇总。"
+        },
+        {
+          "label": "给结果列起别名 AS retail_value",
+          "tone": "neutral",
+          "columns": [
+            "product_name",
+            "retail_value"
+          ],
+          "rows": [
+            [
+              "Mask",
+              2250
+            ]
+          ],
+          "big": {
+            "label": "retail_value 的值",
+            "value": 2250
+          },
+          "check": {
+            "sql": "SELECT price * stock AS retail_value FROM products WHERE product_name = 'Mask'",
+            "expected": [
+              [
+                2250
+              ]
+            ]
+          },
+          "note": "别名只改输出的列名，值和源表都不变。"
+        }
+      ],
+      "conclusion": "原字段直接读取；派生列由表达式逐行计算；别名只修改输出名称。"
     }
   ]
 }

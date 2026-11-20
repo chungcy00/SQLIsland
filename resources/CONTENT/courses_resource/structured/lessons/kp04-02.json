@@ -11,43 +11,22 @@
     },
     {
       "type": "paragraph",
-      "text": "当查询结果很多时，LIMIT 限制最多返回多少行，OFFSET 指定跳过多少行。",
+      "text": "当查询结果很多时，LIMIT 限制最多取出多少条记录，OFFSET 指定先跳过前多少条记录。",
       "emphasis": []
     },
     {
       "type": "list",
       "items": [
         "分页是在确定排序后截取结果。",
-        "例如每页两条，第一页跳过0条，第二页跳过2条，第三页跳过4条；一般偏移量为（页码减一）乘每页条数，页码从1开始。",
+        "例如每页两条，第一页跳过0条，第二页跳过2条，第三页跳过4条；一般要跳过的记录数为（页码减一）乘每页条数，页码从1开始。",
         "LIMIT 不会自动排序，也不会自动包含所有并列记录。"
       ]
     },
     {
-      "type": "table",
-      "columns": [
-        "页码",
-        "LIMIT",
-        "OFFSET"
-      ],
-      "rows": [
-        [
-          "第 1 页",
-          "2",
-          "0"
-        ],
-        [
-          "第 2 页",
-          "2",
-          "2"
-        ],
-        [
-          "第 3 页",
-          "2",
-          "4"
-        ]
-      ],
-      "title": "每页 2 条时的分页参数",
-      "caption": "OFFSET = （页码 − 1）× 每页条数；本例就是每页 2 条的第 2 页。"
+      "type": "figure",
+      "ids": [
+        "kp04-02-pages"
+      ]
     },
     {
       "type": "heading",
@@ -73,21 +52,21 @@
   "dataDescriptions": {
     "products": "共 6 行；字段：product_id、product_name、category、price、stock。"
   },
-  "problem": "商品管理页面每页显示两件商品，按价格从高到低排列，同价按商品名称升序。现在要读取第二页，而不是重新排序某个随机子集。",
+  "problem": "商品管理页面要查看价格排在第 3 到第 5 位的商品，按价格从高到低排列，同价按商品名称升序。做法是先跳过前 2 件商品，再取出接下来的 3 件，而不是重新排序某个随机子集。",
   "methodBlocks": [
     {
       "type": "paragraph",
-      "text": "先用上一节的价格降序、商品名称升序形成整个列表。OFFSET 2 跳过第1和第2条，LIMIT 2 只返回剩余列表的前两条。",
+      "text": "先用上一节的价格降序、商品名称升序形成整个列表。OFFSET 2 跳过前 2 条（第 1、2 条），LIMIT 3 再取出接下来的 3 条（第 3、4、5 条）。",
       "emphasis": []
     },
     {
       "type": "paragraph",
-      "text": "MySQL 另有 LIMIT offset,count 写法，本例 LIMIT 2,2 等价，但关键字形式更便于理解，也与本地兼容环境一致。",
+      "text": "MySQL 另有 LIMIT offset,count 写法，本例 LIMIT 2,3 等价，但关键字形式更便于理解，也与本地兼容环境一致。",
       "emphasis": []
     },
     {
       "type": "paragraph",
-      "text": "补充例子显示第一页和第三页，方便核对相邻页边界。",
+      "text": "补充例子按每页 2 条显示第一页和第三页，方便核对相邻页边界。",
       "emphasis": []
     }
   ],
@@ -115,15 +94,15 @@
     },
     {
       "kind": "fragment",
-      "title": "截取行数",
-      "sql": "LIMIT 2 OFFSET 2;",
-      "purpose": "先跳过前 2 行，再取接下来的 2 行（相当于每页 2 条的第 2 页）。",
-      "reason": "先排序再截取，取到的才是确定的那一段；OFFSET 等于（页码 − 1）× 每页条数。"
+      "title": "跳过并取出记录",
+      "sql": "LIMIT 3 OFFSET 2;",
+      "purpose": "先跳过前 2 条记录，再取出接下来的 3 条记录（也就是排名第 3 到第 5 的商品）。",
+      "reason": "先排序再截取，取到的才是确定的那一段；OFFSET 是要跳过的条数，LIMIT 是跳过之后取出的条数。"
     }
   ],
   "completeCode": {
-    "mysqlSql": "SELECT product_id, price FROM products ORDER BY price DESC, product_name LIMIT 2 OFFSET 2;",
-    "sqliteSql": "SELECT product_id, price FROM products ORDER BY price DESC, product_name LIMIT 2 OFFSET 2;"
+    "mysqlSql": "SELECT product_id, price FROM products ORDER BY price DESC, product_name LIMIT 3 OFFSET 2;",
+    "sqliteSql": "SELECT product_id, price FROM products ORDER BY price DESC, product_name LIMIT 3 OFFSET 2;"
   },
   "expectedResult": {
     "columns": [
@@ -138,6 +117,10 @@
       [
         3,
         35
+      ],
+      [
+        1,
+        15
       ]
     ],
     "status": "SQLite实际执行",
@@ -146,12 +129,12 @@
   "resultBlocks": [
     {
       "type": "paragraph",
-      "text": "完整排序为2、4、5、3、1、6，第二页因此返回编号5（45）和3（35）。第一页是2、4，第三页是1、6。固定数据下三个页面不重不漏；如果请求第四页，将没有记录。",
+      "text": "完整排序为2、4、5、3、1、6：跳过前 2 条（编号 2、4），再取出接下来的 3 条，因此返回编号5（45）、3（35）和1（15），编号6排在取出范围之外。若每页 2 条，第一页是2、4，第二页是5、3，第三页是1、6，三页不重不漏；如果请求第四页，将没有记录。",
       "emphasis": []
     },
     {
       "type": "paragraph",
-      "text": "LIMIT 2 不保证返回两行，剩余不足时只返回实际存在的行。",
+      "text": "LIMIT 3 不保证返回三行，剩余不足时只返回实际存在的行。",
       "emphasis": []
     }
   ],
@@ -161,7 +144,7 @@
       "explanationBlocks": [
         {
           "type": "paragraph",
-          "text": "偏移0，读取排序后的前两条。",
+          "text": "每页 2 条：每页 2 条：每页 2 条：每页 2 条：每页 2 条：跳过前 0 条，取出排序后的前两条。",
           "emphasis": []
         }
       ],
@@ -188,7 +171,7 @@
       "explanationBlocks": [
         {
           "type": "paragraph",
-          "text": "偏移4，返回最后两条。",
+          "text": "每页 2 条：每页 2 条：每页 2 条：每页 2 条：每页 2 条：跳过前 4 条，取出最后两条。",
           "emphasis": []
         }
       ],
@@ -215,7 +198,7 @@
       "explanationBlocks": [
         {
           "type": "paragraph",
-          "text": "偏移6，已无剩余记录，因此返回空结果。",
+          "text": "每页 2 条：每页 2 条：每页 2 条：每页 2 条：每页 2 条：跳过前 6 条后已无剩余记录，因此返回空结果。",
           "emphasis": []
         }
       ],
@@ -233,7 +216,7 @@
     "comparison": [
       {
         "type": "paragraph",
-        "text": "LIMIT 截取行数，OFFSET 跳过行数；窗口排名按名次筛选，可能返回不同数量。",
+        "text": "LIMIT 限定取出几条记录，OFFSET 指定跳过前几条记录；窗口排名按名次筛选，可能返回不同数量。",
         "emphasis": []
       }
     ],
@@ -267,5 +250,5 @@
     ]
   },
   "sourcePath": "source/unified73/kp04-02.json",
-  "sourceSha256": "c79fe782c92d4d8df94dc052f8607eca6bbb9063ca04b2dd70e81471535ec10b"
+  "sourceSha256": "baa71fa1e31ee5defeb4e2c3b8a6041b935e2999739abb390f337fd290820f80"
 }

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp19-49",
-  "lessonSha256": "b5c8aaa62667eeb8227db099535082f8b682ea2358e493e4c370d696650a2907",
+  "lessonSha256": "7ee552dd4a208fcdb770ca1660dbc8f8a0b42f16825dde14b92e92a27c6b6803",
   "figures": [
     {
       "id": "kp19-49-clauses",
@@ -53,6 +53,128 @@
           "note": "按 ref,reference_kind 排列结果。"
         }
       ]
+    },
+    {
+      "id": "kp19-49-map",
+      "slot": "concept",
+      "kind": "flow-map",
+      "title": "银行流水与凭证对账：先各自汇总，再按参考号对齐",
+      "stages": [
+        {
+          "label": "① 处理前：账簿和银行各自按参考号汇总（分）",
+          "note": "银行的支出原本是负数，取负号后求和；没有参考号的银行行按银行流水编号单独保留。",
+          "tables": [
+            {
+              "columns": [
+                "ref",
+                "ledger_cents"
+              ],
+              "rows": [
+                [
+                  "J000002",
+                  65928
+                ],
+                [
+                  "J000041",
+                  83294
+                ]
+              ],
+              "sql": "SELECT reference_no ref, SUM(expense_cents) ledger_cents FROM v_expenses WHERE entry_date BETWEEN '2025-01-01' AND '2025-12-31' AND reference_no IN ('J000002','J000041') GROUP BY reference_no ORDER BY ref",
+              "ordered": true,
+              "name": "账簿费用 v_expenses"
+            },
+            {
+              "columns": [
+                "ref",
+                "bank_cents"
+              ],
+              "rows": [
+                [
+                  "17888",
+                  723
+                ],
+                [
+                  "BANK-086E2C1C",
+                  2809
+                ],
+                [
+                  "J000002",
+                  64705
+                ]
+              ],
+              "sql": "SELECT COALESCE(reference_no,CAST(bank_id AS CHAR)) ref, SUM(-amount_cents) bank_cents FROM bank_transactions WHERE transaction_date BETWEEN '2025-01-01' AND '2025-12-31' AND (reference_no IN ('J000002','BANK-086E2C1C') OR bank_id=17888) GROUP BY COALESCE(reference_no,CAST(bank_id AS CHAR)) ORDER BY ref",
+              "ordered": true,
+              "name": "银行交易 bank_transactions"
+            }
+          ]
+        },
+        {
+          "label": "② 按参考号对齐，算差额并标记问题",
+          "via": "两边参考号合并后对齐：差额 = 银行净支出 − 账簿费用；一边没有的参考号，那边的金额是 NULL",
+          "tables": [
+            {
+              "columns": [
+                "ref",
+                "ledger_cents",
+                "bank_cents",
+                "difference_cents",
+                "issue"
+              ],
+              "rows": [
+                [
+                  "BANK-086E2C1C",
+                  null,
+                  2809,
+                  2809,
+                  "bank_only"
+                ],
+                [
+                  "BANK-17888",
+                  null,
+                  723,
+                  723,
+                  "bank_only"
+                ],
+                [
+                  "J000002",
+                  65928,
+                  64705,
+                  -1223,
+                  "difference"
+                ],
+                [
+                  "J000041",
+                  83294,
+                  null,
+                  -83294,
+                  "ledger_only"
+                ]
+              ],
+              "sql": "SELECT ref, ledger_cents, bank_cents, difference_cents, issue FROM (WITH a AS (\n  SELECT 0 unreferenced, reference_no ref, SUM(expense_cents) ledger\n  FROM v_expenses WHERE entry_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY reference_no\n), b AS (\n  SELECT CASE WHEN reference_no IS NULL THEN 1 ELSE 0 END unreferenced,\n    COALESCE(reference_no,CAST(bank_id AS CHAR)) ref, SUM(-amount_cents) bank\n  FROM bank_transactions WHERE transaction_date BETWEEN '2025-01-01' AND '2025-12-31'\n  GROUP BY CASE WHEN reference_no IS NULL THEN 1 ELSE 0 END,COALESCE(reference_no,CAST(bank_id AS CHAR))\n), k AS (\n  SELECT unreferenced,ref FROM a UNION SELECT unreferenced,ref FROM b\n)\nSELECT CASE WHEN k.unreferenced=1 THEN CONCAT('BANK-',k.ref) ELSE k.ref END ref,\n  a.ledger ledger_cents,b.bank bank_cents,COALESCE(b.bank,0)-COALESCE(a.ledger,0) difference_cents,\n  CASE WHEN a.ref IS NULL THEN 'bank_only' WHEN b.ref IS NULL THEN 'ledger_only' ELSE 'difference' END issue,\n  CASE WHEN k.unreferenced=1 THEN 'unreferenced_bank' ELSE 'reference' END reference_kind\nFROM k LEFT JOIN a ON a.ref=k.ref AND a.unreferenced=k.unreferenced\nLEFT JOIN b ON b.ref=k.ref AND b.unreferenced=k.unreferenced\nWHERE a.ref IS NULL OR b.ref IS NULL OR a.ledger<>b.bank ORDER BY ref,reference_kind) WHERE ref IN ('J000002','J000041','BANK-086E2C1C','BANK-17888') ORDER BY ref",
+              "ordered": true,
+              "tags": [
+                {
+                  "text": "只在银行 · 账簿没有",
+                  "tone": "tie"
+                },
+                {
+                  "text": "只在银行 · 账簿没有",
+                  "tone": "tie"
+                },
+                {
+                  "text": "两边都有 · 金额不同",
+                  "tone": "merge"
+                },
+                {
+                  "text": "只在账簿 · 银行没有",
+                  "tone": "tie"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "conclusion": "用参考号匹配，而不是金额相等：金额相同也可能不是同一笔；只在一边出现的参考号要单独列出来复核。"
     }
   ]
 }

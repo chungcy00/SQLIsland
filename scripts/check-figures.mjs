@@ -55,6 +55,22 @@ try {
             const result = await run({tables, setupSql, path, sql: input.check.sql});
             out.push({id: `${figure.id}:${input.name}`, expected: [[input.value]], actual: result.rows});
           }
+        } else if (figure.kind === 'flow-map') {
+          const norm = rows => rows.map(row => JSON.stringify(row)).sort();
+          let count = 0;
+          for (const variant of figure.variants || [{stages: figure.stages}]) for (const stage of variant.stages) for (const tbl of stage.tables) {
+            const result = await run({tables, setupSql, path, sql: tbl.sql});
+            count++;
+            out.push({id: `${figure.id}:t${count}:columns`, expected: tbl.columns, actual: result.columns});
+            out.push({id: `${figure.id}:t${count}:rows`, expected: tbl.ordered ? tbl.rows : norm(tbl.rows), actual: tbl.ordered ? result.rows : norm(result.rows)});
+          }
+        } else if (figure.kind === 'page-map') {
+          const main = await run({tables, setupSql, path, sql: `SELECT ${figure.columns.join(', ')} FROM ${figure.table} ORDER BY ${figure.orderBy} LIMIT ${figure.example.limit} OFFSET ${figure.example.offset}`});
+          out.push({id: `${figure.id}:example`, expected: figure.rows.slice(figure.example.offset, figure.example.offset + figure.example.limit), actual: main.rows});
+          for (const page of figure.pages) {
+            const result = await run({tables, setupSql, path, sql: `SELECT ${figure.columns.join(', ')} FROM ${figure.table} ORDER BY ${figure.orderBy} LIMIT ${figure.pageSize} OFFSET ${page.offset}`});
+            out.push({id: `${figure.id}:page${page.page}`, expected: figure.rows.slice(page.offset, page.offset + figure.pageSize), actual: result.rows});
+          }
         } else if (figure.kind === 'compare-card') {
           for (const [index, panel] of figure.panels.entries()) {
             const result = await run({tables, setupSql, path, sql: panel.check.sql});

@@ -26,7 +26,11 @@ function clauseMap(figure) {
 }
 // 行数变化并入“分步执行”：返回第 index 步的行数徽章与数据变化表。
 const scroll = (html) => `<div class="fig-scroll">${html}</div>`;
-const plainTable = (columns, rows, marks, keep = [], cls = "") => `<table class="fig-table ${cls}"><thead><tr>${columns.map((name, i) => `<th${keep.includes(i) ? ' class="new"' : ""}>${esc(name)}</th>`).join("")}${marks ? "<th></th>" : ""}</tr></thead><tbody>${rows.map((row, i) => `<tr class="fig-row ${marks?.[i] === false ? "dropped" : "kept"}">${row.map((v, c) => `<td${keep.includes(c) ? ' class="new"' : ""}>${cell(v)}</td>`).join("")}${marks ? `<td>${marks[i] === false ? '<span class="fig-out">排除</span>' : ""}</td>` : ""}</tr>`).join("")}</tbody></table>`;
+// 分页步骤的行角色：跳过 / 本次取出 / 超出取出范围（不是“排除”）。
+const pageRoleName = { skip: "跳过", take: "本次取出", beyond: "超出取出范围" };
+const roleTag = (role) => `<span class="fig-role ${role}">${pageRoleName[role]}</span>`;
+const markCell = (mark) => (mark === false ? '<span class="fig-out">排除</span>' : typeof mark === "string" ? roleTag(mark) : "");
+const plainTable = (columns, rows, marks, keep = [], cls = "") => `<table class="fig-table ${cls}"><thead><tr>${columns.map((name, i) => `<th${keep.includes(i) ? ' class="new"' : ""}>${esc(name)}</th>`).join("")}${marks ? "<th></th>" : ""}</tr></thead><tbody>${rows.map((row, i) => `<tr class="fig-row ${marks?.[i] === false ? "dropped" : typeof marks?.[i] === "string" ? "role-" + marks[i] : "kept"}">${row.map((v, c) => `<td${keep.includes(c) ? ' class="new"' : ""}>${cell(v)}</td>`).join("")}${marks ? `<td>${markCell(marks[i])}</td>` : ""}</tr>`).join("")}</tbody></table>`;
 // 行数变化并入“分步执行”：返回第 index 步的行数徽章与数据变化表；没有可展示数据的步骤返回 null。
 export function rowFlowStep(lesson, index) {
   const figure = (lesson.figures || []).find((item) => item.merge === "breakdown");
@@ -40,6 +44,13 @@ export function rowFlowStep(lesson, index) {
     if (!previous) return { badge, html: label(`这一步得到的数据（${step.rows.length} 行）`) + scroll(plainTable(step.columns, step.rows, undefined, [], "fig-result")) };
     // 列没变时，把处理前里“这一步之后不再出现”的行标出来；列变了（例如只取其中几列）就只并排给出前后两张表。
     let marks;
+    if (step.roles) {
+      marks = step.roles;
+      const count = (role) => step.roles.filter((item) => item === role).length;
+      const before = previous.rows.length > 8 ? { rows: previous.rows.slice(0, 8), extra: marks.slice(0, 8), more: previous.rows.length } : { rows: previous.rows, extra: marks, more: 0 };
+      const keep = step.columns.every((name) => previous.columns.includes(name)) && step.columns.length < previous.columns.length ? step.columns.map((name) => previous.columns.indexOf(name)) : [];
+      return { badge, html: label(`处理前（${previous.rows.length} 行已排好序：跳过 ${count("skip")} 条 · 本次取出 ${count("take")} 条${count("beyond") ? ` · 超出取出范围 ${count("beyond")} 条` : ""}）`) + scroll(plainTable(previous.columns, before.rows, before.extra, keep)) + (before.more ? `<p class="fig-flow-label">…共 ${before.more} 行</p>` : "") + label(`处理后（${step.rows.length} 行，就是“本次取出”的记录）`) + scroll(plainTable(step.columns, step.rows, undefined, [], "fig-result")) };
+    }
     if (JSON.stringify(previous.columns) === JSON.stringify(step.columns)) {
       const left = new Map(); for (const row of step.rows) left.set(JSON.stringify(row), (left.get(JSON.stringify(row)) || 0) + 1);
       marks = previous.rows.map((row) => { const key = JSON.stringify(row), n = left.get(key) || 0; if (n > 0) { left.set(key, n - 1); return true; } return false; });
@@ -58,6 +69,41 @@ export function rowFlowStep(lesson, index) {
   const rows = before.map((id) => table.rows.find((r) => r[key] === id));
   const badge = index === 0 ? `${kept.size} 行` : `${before.length} → ${kept.size} 行`;
   return { badge, html: scroll(plainTable(figure.columns, rows.map((row) => columns.map((c) => row[c])), rows.map((row) => kept.has(row[key])))) };
+}
+// 分页位置示意图：已排好序的记录，标出 跳过 / 本次取出 / 超出取出范围。两个标签页：本节例子（LIMIT 3 OFFSET 2），以及每页 2 条时各页的位置。
+function pageMap(figure) {
+  const { limit, offset } = figure.example;
+  const roleOf = (skip, take, index) => (index < skip ? "skip" : index < skip + take ? "take" : "beyond");
+  const rec = (row, index, compact) => `<span class="fig-pos">${index + 1}</span><b>${esc(row[1])}</b><small>${compact ? "" : `编号 ${esc(row[0])} · `}价格 ${esc(row[2])}</small>`;
+  const group = esc(figure.id) + "-tabs";
+  const single = `<p class="fig-flow-label">先按 ${esc(figure.orderBy)} 排好序，再 <code>LIMIT ${limit} OFFSET ${offset}</code>：</p><ol class="fig-case">${figure.rows.map((row, index) => `<li class="fig-case-row role-${roleOf(offset, limit, index)}"><span class="fig-case-rec">${rec(row, index)}</span>${roleTag(roleOf(offset, limit, index))}</li>`).join("")}</ol><p class="fig-legend">${roleTag("skip")} OFFSET ${offset}：先跳过前 ${offset} 条　${roleTag("take")} LIMIT ${limit}：再取出 ${limit} 条　${roleTag("beyond")} 排在后面，这次用不到</p>${figure.conclusion ? `<p class="fig-conclusion"><b>结论</b>${esc(figure.conclusion)}</p>` : ""}`;
+  const n = figure.pageSize;
+  const head = figure.pages.map((page) => `<th class="fig-page-h"><code>LIMIT ${n}</code><code>OFFSET ${page.offset}</code></th>`).join("");
+  const body = figure.rows.map((row, index) => `<tr><td class="fig-page-rec">${rec(row, index, true)}</td>${figure.pages.map((page) => `<td class="fig-page-cell role-${roleOf(page.offset, n, index)}">${roleTag(roleOf(page.offset, n, index))}</td>`).join("")}</tr>`).join("");
+  const pages = `<p class="fig-flow-label">每页 ${n} 条时，每一页都是 <code>LIMIT ${n} OFFSET 要跳过的条数</code>，各页跳过、取出的记录如下：</p>${scroll(`<table class="fig-table fig-page-map"><thead><tr><th>排好序的记录</th>${head}</tr></thead><tbody>${body}</tbody></table>`)}<p class="fig-legend">${roleTag("skip")} OFFSET 跳过的记录　${roleTag("take")} LIMIT 取出的 ${n} 条　${roleTag("beyond")} 这一页用不到</p>${figure.pagesNote ? `<p class="fig-conclusion"><b>结论</b>${esc(figure.pagesNote)}</p>` : ""}`;
+  const tabs = ["本节例子：跳过 2 取 3", `分页：每页 ${n} 条`].map((label, i) => `<button type="button" role="tab" class="fig-tab" data-action="figTab" data-arg="${group}:${i}" aria-selected="${i === 0}" tabindex="${i === 0 ? 0 : -1}">${label}</button>`).join("");
+  return `<div class="fig-tabs" role="tablist" aria-label="示意图">${tabs}</div><div class="fig-panel" role="tabpanel">${single}</div><div class="fig-panel" role="tabpanel" hidden>${pages}</div>`;
+}
+// 处理前 → 处理中 → 处理后：每个阶段一张（或两张并排）表，相同分组键的行同色，行尾标签说明这一行发生了什么。
+function flowMap(figure) {
+  const flowTable = (tbl) => {
+    const bandCols = (Array.isArray(tbl.bandBy) ? tbl.bandBy : tbl.bandBy ? [tbl.bandBy] : []).map((name) => tbl.columns.indexOf(name));
+    const bandKey = (row) => JSON.stringify(bandCols.map((i) => row[i]));
+    const band = bandCols.length ? 0 : -1;
+    const order = []; if (band >= 0) for (const row of tbl.rows) if (!order.includes(bandKey(row))) order.push(bandKey(row));
+    // 标签放在行尾会把宽表撑出框：列多或标签长时，改成每行下面单独一行显示标签。
+    const longest = tbl.tags ? Math.max(0, ...tbl.tags.map((t) => (t ? t.text.length : 0))) : 0;
+    const stack = !!tbl.tags && (tbl.columns.length >= 4 || (tbl.columns.length >= 3 && longest > 10));
+    const side = !!tbl.tags && !stack;
+    const dense = tbl.columns.length >= 4 || tbl.columns.length + (side ? 1 : 0) >= 5;
+    const tagHtml = (t) => (t ? `<span class="fig-role ${t.tone}">${esc(t.text)}</span>` : "");
+    return `${tbl.name ? `<p class="fig-flow-name">${esc(tbl.name)}（${tbl.rows.length} 行）</p>` : ""}${scroll(`<table class="fig-table fig-flow-table${dense ? " dense" : ""}${stack ? " stacked" : ""}"><thead><tr>${tbl.columns.map((name) => `<th>${esc(name).replace(/_/g, "_<wbr>")}</th>`).join("")}${side ? "<th></th>" : ""}</tr></thead><tbody>${tbl.rows.map((row, i) => `<tr class="${band >= 0 ? "band-" + (order.indexOf(bandKey(row)) % 4) : ""}${stack && tbl.tags[i] ? " has-tag" : ""}">${row.map((v) => `<td>${cell(v)}</td>`).join("")}${side ? `<td>${tagHtml(tbl.tags[i])}</td>` : ""}</tr>${stack && tbl.tags[i] ? `<tr class="tag-row ${band >= 0 ? "band-" + (order.indexOf(bandKey(row)) % 4) : ""}"><td colspan="${tbl.columns.length}">${tagHtml(tbl.tags[i])}</td></tr>` : ""}`).join("")}</tbody></table>`)}`;
+  };
+  const flow = (variant) => `<div class="fig-flow-map">${variant.stages.map((stage, i) => `${stage.via ? `<div class="fig-step-arrow"><span aria-hidden="true">↓</span><em>${esc(stage.via)}</em></div>` : ""}<div class="fig-stage"><p class="fig-flow-label">${esc(stage.label)}</p>${stage.note ? `<p class="fig-stage-note">${esc(stage.note)}</p>` : ""}${stage.tables.map(flowTable).join("")}</div>`).join("")}</div>${variant.conclusion ? `<p class="fig-conclusion"><b>结论</b>${esc(variant.conclusion)}</p>` : ""}`;
+  if (!figure.variants) return flow({ stages: figure.stages, conclusion: figure.conclusion });
+  const group = esc(figure.id) + "-tabs";
+  const tabs = figure.variants.map((variant, i) => `<button type="button" role="tab" class="fig-tab" data-action="figTab" data-arg="${group}:${i}" aria-selected="${i === 0}" tabindex="${i === 0 ? 0 : -1}">${esc(variant.label)}</button>`).join("");
+  return `<div class="fig-tabs" role="tablist" aria-label="示意图">${tabs}</div>${figure.variants.map((variant, i) => `<div class="fig-panel" role="tabpanel"${i ? " hidden" : ""}>${flow(variant)}</div>`).join("")}`;
 }
 const shown = 4;
 const miniTable = (columns, rows, marks = [], attrs = [], limit = shown, cls = "") => `<div class="fig-scroll"><table class="fig-table fig-mini ${cls}"><thead><tr>${columns.map((name, i) => `<th${marks.includes(i) ? ' class="new"' : ""}${attrs[i] || ""}>${esc(name)}</th>`).join("")}</tr></thead><tbody>${rows.slice(0, limit).map((row) => `<tr class="fig-row kept">${row.map((v, i) => `<td${marks.includes(i) ? ' class="new"' : ""}${attrs[i] || ""}>${cell(v)}</td>`).join("")}</tr>`).join("")}${rows.length > limit ? `<tr class="fig-more"><td colspan="${columns.length}">…共 ${rows.length} 行</td></tr>` : ""}</tbody></table></div>`;
@@ -95,7 +141,11 @@ function vennSmall(joinType) {
 // 对比卡：并列几块“原始数据 → 处理 → 数字”，用大数字突出正确与错误的结果。
 function compareCard(figure) {
   const tone = { bad: "有问题", good: "正确", neutral: "" };
-  return `<div class="fig-compare">${figure.panels.map((panel) => `<section class="fig-panel-card ${panel.tone}"><h4><span class="fig-tone">${esc(tone[panel.tone])}</span>${esc(panel.label)}</h4>${panel.note ? `<p class="fig-panel-note">${esc(panel.note)}</p>` : ""}${miniTable(panel.columns, panel.rows, [], [], 12, "fig-wrap")}<div class="fig-big"><small>${esc(panel.big.label)}</small><b>${esc(panel.big.value)}</b></div></section>`).join("")}</div>`;
+  return `<div class="fig-compare">${figure.panels.map((panel) => `<section class="fig-panel-card ${panel.tone}"><h4><span class="fig-tone">${esc(tone[panel.tone])}</span>${esc(panel.label)}</h4>${panel.note ? `<p class="fig-panel-note">${esc(panel.note)}</p>` : ""}${miniTable(panel.columns, panel.rows, [], [], 12, "fig-wrap")}<div class="fig-big"><small>${esc(panel.big.label)}</small><b>${esc(panel.big.value === null ? "NULL" : panel.big.value)}</b></div></section>`).join("")}</div>`;
+}
+function tipCard(figure) {
+  const name = { good: "可以这样", bad: "要当心", neutral: "先弄清" };
+  return `<div class="fig-tips">${figure.items.map((item) => `<section class="fig-tip ${item.tone}"><h4><span class="fig-tone">${name[item.tone]}</span>${esc(item.label)}</h4><p>${esc(item.text)}</p></section>`).join("")}</div>`;
 }
 const joinCn = { inner: "内连接", left: "左连接", right: "右连接", full: "全连接" };
 const joinRule = {
@@ -171,7 +221,7 @@ export function renderFigures(lesson, slot) {
       const conclusion = joins.find((item) => item.conclusion)?.conclusion;
       return `<figure class="figure figure-join-map figure-tabs" data-figure-group="${group}"><figcaption>连接方式对比</figcaption><div class="fig-tabs" role="tablist" aria-label="连接方式">${tabs}</div>${panels}${conclusion ? `<p class="fig-conclusion"><b>结论</b>${esc(conclusion)}</p>` : ""}</figure>`;
     }
-    const body = figure.kind === "truth-table" ? truthTable(figure, lesson) : figure.kind === "metric-card" ? metricCard(figure) : figure.kind === "function-map" ? functionMap(figure) : figure.kind === "join-map" ? joinMap(figure, lesson) : figure.kind === "compare-card" ? compareCard(figure) : clauseMap(figure);
-    return `<figure class="figure figure-${figure.kind}" data-figure="${esc(figure.id)}"><figcaption>${esc(figure.title)}</figcaption>${body}${figure.conclusion ? `<p class="fig-conclusion"><b>结论</b>${esc(figure.conclusion)}</p>` : ""}</figure>`;
+    const body = figure.kind === "truth-table" ? truthTable(figure, lesson) : figure.kind === "metric-card" ? metricCard(figure) : figure.kind === "function-map" ? functionMap(figure) : figure.kind === "join-map" ? joinMap(figure, lesson) : figure.kind === "compare-card" ? compareCard(figure) : figure.kind === "page-map" ? pageMap(figure) : figure.kind === "flow-map" ? flowMap(figure) : figure.kind === "tip-card" ? tipCard(figure) : clauseMap(figure);
+    return `<figure class="figure figure-${figure.kind}" data-figure="${esc(figure.id)}"${figure.kind === "page-map" || (figure.kind === "flow-map" && figure.variants) ? ` data-figure-group="${esc(figure.id)}-tabs"` : ""}><figcaption>${esc(figure.title)}</figcaption>${body}${figure.conclusion && !["page-map", "flow-map"].includes(figure.kind) ? `<p class="fig-conclusion"><b>结论</b>${esc(figure.conclusion)}</p>` : ""}</figure>`;
   }).join("");
 }

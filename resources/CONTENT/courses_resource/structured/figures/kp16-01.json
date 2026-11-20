@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp16-01",
-  "lessonSha256": "e3292e924e795f54bac21ad9b8428e5129ec58714b47a9eece2b3582c58b8e27",
+  "lessonSha256": "8292e40106a317bcb6c253cf2de2410d54f146af353495283daf242dd784e55f",
   "figures": [
     {
       "id": "kp16-01-clauses",
@@ -35,6 +35,161 @@
           "note": "仅保留满足 COUNT(*)>1 的分组。"
         }
       ]
+    },
+    {
+      "id": "kp16-01-map",
+      "slot": "concept",
+      "kind": "flow-map",
+      "title": "识别重复：先统一写法，再比较是否相同",
+      "stages": [
+        {
+          "label": "① 处理前：raw_data（6 行，写法不统一）",
+          "tables": [
+            {
+              "columns": [
+                "id",
+                "name",
+                "amount",
+                "category"
+              ],
+              "rows": [
+                [
+                  1,
+                  "  Mask ",
+                  "15",
+                  "SKIN"
+                ],
+                [
+                  2,
+                  "Mask",
+                  "15",
+                  "skin"
+                ],
+                [
+                  3,
+                  "Serum",
+                  null,
+                  "Skin"
+                ],
+                [
+                  4,
+                  "Soap",
+                  "-5",
+                  "HOME"
+                ],
+                [
+                  5,
+                  "Cream",
+                  "0",
+                  "makeup"
+                ],
+                [
+                  6,
+                  "",
+                  "20",
+                  "HOME"
+                ]
+              ],
+              "source": "raw_data",
+              "sql": "SELECT id, name, amount, category FROM raw_data ORDER BY id",
+              "ordered": true
+            }
+          ]
+        },
+        {
+          "label": "② 清洗后再比较：去掉名称两端空格，类别统一成小写",
+          "via": "TRIM(name)、LOWER(category)：清洗后相同的行才算重复",
+          "tables": [
+            {
+              "columns": [
+                "id",
+                "clean_name",
+                "amount",
+                "clean_category"
+              ],
+              "rows": [
+                [
+                  1,
+                  "Mask",
+                  "15",
+                  "skin"
+                ],
+                [
+                  2,
+                  "Mask",
+                  "15",
+                  "skin"
+                ],
+                [
+                  3,
+                  "Serum",
+                  null,
+                  "skin"
+                ],
+                [
+                  4,
+                  "Soap",
+                  "-5",
+                  "home"
+                ],
+                [
+                  5,
+                  "Cream",
+                  "0",
+                  "makeup"
+                ],
+                [
+                  6,
+                  "",
+                  "20",
+                  "home"
+                ]
+              ],
+              "tags": [
+                {
+                  "text": "与第 2 行重复",
+                  "tone": "merge"
+                },
+                {
+                  "text": "与第 1 行重复",
+                  "tone": "merge"
+                },
+                null,
+                null,
+                null,
+                null
+              ],
+              "sql": "SELECT id, TRIM(name) AS clean_name, amount, LOWER(category) AS clean_category FROM raw_data ORDER BY id",
+              "ordered": true
+            }
+          ]
+        },
+        {
+          "label": "③ 处理后：按清洗后的值分组，数出出现次数大于 1 的",
+          "via": "GROUP BY … HAVING COUNT(*)>1",
+          "tables": [
+            {
+              "columns": [
+                "clean_name",
+                "amount",
+                "clean_category",
+                "duplicate_count"
+              ],
+              "rows": [
+                [
+                  "Mask",
+                  "15",
+                  "skin",
+                  2
+                ]
+              ],
+              "sql": "SELECT TRIM(name) AS clean_name,amount,LOWER(category) AS clean_category,COUNT(*) AS duplicate_count FROM raw_data GROUP BY TRIM(name),amount,LOWER(category) HAVING COUNT(*)>1;",
+              "ordered": true
+            }
+          ]
+        }
+      ],
+      "conclusion": "第 1、2 行直接比较并不相同（空格和大小写不同），清洗后才发现是同一条记录。"
     }
   ]
 }

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp16-02",
-  "lessonSha256": "bd02206e76cb82dc4c6946d9d90cf4daafbe9a827c5011b2d508d38268dd3699",
+  "lessonSha256": "54643f8b4fb2db8892538245bc95a5b52e74986a11ff757f199099d4b5d077f4",
   "figures": [
     {
       "id": "kp16-02-clauses",
@@ -154,6 +154,173 @@
           ]
         }
       ]
+    },
+    {
+      "id": "kp16-02-map",
+      "slot": "concept",
+      "kind": "flow-map",
+      "title": "缺失与异常检测：逐条检查，给每行一个结论",
+      "stages": [
+        {
+          "label": "① 处理前：raw_data（6 行）",
+          "tables": [
+            {
+              "columns": [
+                "id",
+                "name",
+                "amount"
+              ],
+              "rows": [
+                [
+                  1,
+                  "  Mask ",
+                  "15"
+                ],
+                [
+                  2,
+                  "Mask",
+                  "15"
+                ],
+                [
+                  3,
+                  "Serum",
+                  null
+                ],
+                [
+                  4,
+                  "Soap",
+                  "-5"
+                ],
+                [
+                  5,
+                  "Cream",
+                  "0"
+                ],
+                [
+                  6,
+                  "",
+                  "20"
+                ]
+              ],
+              "source": "raw_data",
+              "sql": "SELECT id, name, amount FROM raw_data ORDER BY id",
+              "ordered": true
+            }
+          ]
+        },
+        {
+          "label": "② 每一行从上到下检查，得到一个结论",
+          "via": "CASE WHEN 名称为空 → 名称缺失；金额为 NULL → 金额缺失；金额小于 0 → 负金额待核；否则通过",
+          "tables": [
+            {
+              "columns": [
+                "id",
+                "name",
+                "amount",
+                "quality"
+              ],
+              "rows": [
+                [
+                  1,
+                  "  Mask ",
+                  "15",
+                  "通过"
+                ],
+                [
+                  2,
+                  "Mask",
+                  "15",
+                  "通过"
+                ],
+                [
+                  3,
+                  "Serum",
+                  null,
+                  "金额缺失"
+                ],
+                [
+                  4,
+                  "Soap",
+                  "-5",
+                  "负金额待核"
+                ],
+                [
+                  5,
+                  "Cream",
+                  "0",
+                  "通过"
+                ],
+                [
+                  6,
+                  "",
+                  "20",
+                  "名称缺失"
+                ]
+              ],
+              "tags": [
+                null,
+                null,
+                {
+                  "text": "需要处理",
+                  "tone": "tie"
+                },
+                {
+                  "text": "需要处理",
+                  "tone": "tie"
+                },
+                null,
+                {
+                  "text": "需要处理",
+                  "tone": "tie"
+                }
+              ],
+              "sql": "SELECT id, name, amount, CASE WHEN name IS NULL OR TRIM(name)='' THEN '名称缺失' WHEN amount IS NULL THEN '金额缺失' WHEN CAST(amount AS DECIMAL(12,2))<0 THEN '负金额待核' ELSE '通过' END AS quality FROM raw_data ORDER BY id",
+              "ordered": true
+            }
+          ]
+        },
+        {
+          "label": "③ 处理后：编号和结论（6 行）",
+          "via": "只显示 id 和 quality，并按 name 倒序",
+          "tables": [
+            {
+              "columns": [
+                "id",
+                "quality"
+              ],
+              "rows": [
+                [
+                  4,
+                  "负金额待核"
+                ],
+                [
+                  3,
+                  "金额缺失"
+                ],
+                [
+                  2,
+                  "通过"
+                ],
+                [
+                  5,
+                  "通过"
+                ],
+                [
+                  1,
+                  "通过"
+                ],
+                [
+                  6,
+                  "名称缺失"
+                ]
+              ],
+              "sql": "SELECT id,CASE WHEN name IS NULL OR TRIM(name)='' THEN '名称缺失' WHEN amount IS NULL THEN '金额缺失' WHEN CAST(amount AS DECIMAL(12,2))<0 THEN '负金额待核' ELSE '通过' END AS quality FROM raw_data ORDER BY name DESC;",
+              "ordered": true
+            }
+          ]
+        }
+      ],
+      "conclusion": "缺失（没有值）和异常（值违反规则）要分开标记；检测只做标记，不会擅自修改原数据。"
     }
   ]
 }

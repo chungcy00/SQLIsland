@@ -41,6 +41,12 @@
       ]
     },
     {
+      "type": "figure",
+      "ids": [
+        "kp01-02-map"
+      ]
+    },
+    {
       "type": "table",
       "columns": [
         "字段含义",

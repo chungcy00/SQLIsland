@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp13-01",
-  "lessonSha256": "d5f7968d689735107b235d493f93a55e1817b4c9af55d63fdccfc50ca44b4198",
+  "lessonSha256": "1dc22c6d7f0fd5d628cd478cd6414a1aa5c48d1efc392900c1605bd145b236eb",
   "figures": [
     {
       "id": "kp13-01-clauses",
@@ -35,6 +35,164 @@
           "note": "按 customer_name 排列结果。"
         }
       ]
+    },
+    {
+      "id": "kp13-01-map",
+      "slot": "concept",
+      "kind": "flow-map",
+      "title": "UNION ALL 与 UNION：上下叠加，要不要合并重复行",
+      "stages": [
+        {
+          "label": "① 处理前：两张表（共 7 行）",
+          "tables": [
+            {
+              "name": "old_customers",
+              "columns": [
+                "customer_id",
+                "customer_name"
+              ],
+              "rows": [
+                [
+                  1,
+                  "林"
+                ],
+                [
+                  2,
+                  "陈"
+                ],
+                [
+                  2,
+                  "陈"
+                ],
+                [
+                  3,
+                  "王"
+                ]
+              ],
+              "source": "old_customers",
+              "sql": "SELECT customer_id, customer_name FROM old_customers",
+              "ordered": true
+            },
+            {
+              "name": "new_customers",
+              "columns": [
+                "customer_id",
+                "customer_name"
+              ],
+              "rows": [
+                [
+                  2,
+                  "陈"
+                ],
+                [
+                  3,
+                  "王"
+                ],
+                [
+                  4,
+                  "李"
+                ]
+              ],
+              "source": "new_customers",
+              "sql": "SELECT customer_id, customer_name FROM new_customers",
+              "ordered": true
+            }
+          ]
+        },
+        {
+          "label": "② UNION ALL：直接上下叠加（7 行）",
+          "via": "UNION ALL：把两张表的行上下叠在一起，一行不少",
+          "tables": [
+            {
+              "columns": [
+                "customer_id",
+                "customer_name"
+              ],
+              "rows": [
+                [
+                  1,
+                  "林"
+                ],
+                [
+                  2,
+                  "陈"
+                ],
+                [
+                  2,
+                  "陈"
+                ],
+                [
+                  3,
+                  "王"
+                ],
+                [
+                  2,
+                  "陈"
+                ],
+                [
+                  3,
+                  "王"
+                ],
+                [
+                  4,
+                  "李"
+                ]
+              ],
+              "tags": [
+                null,
+                null,
+                {
+                  "text": "UNION 会合并",
+                  "tone": "merge"
+                },
+                null,
+                {
+                  "text": "UNION 会合并",
+                  "tone": "merge"
+                },
+                {
+                  "text": "UNION 会合并",
+                  "tone": "merge"
+                },
+                null
+              ],
+              "sql": "SELECT customer_id, customer_name FROM old_customers UNION ALL SELECT customer_id, customer_name FROM new_customers"
+            }
+          ]
+        },
+        {
+          "label": "③ UNION：再把整行相同的合并（4 行）",
+          "via": "UNION：整行完全相同的行合并成一条",
+          "tables": [
+            {
+              "columns": [
+                "customer_id",
+                "customer_name"
+              ],
+              "rows": [
+                [
+                  1,
+                  "林"
+                ],
+                [
+                  2,
+                  "陈"
+                ],
+                [
+                  3,
+                  "王"
+                ],
+                [
+                  4,
+                  "李"
+                ]
+              ],
+              "sql": "SELECT customer_id, customer_name FROM old_customers UNION SELECT customer_id, customer_name FROM new_customers"
+            }
+          ]
+        }
+      ],
+      "conclusion": "UNION ALL 保留全部 7 行；UNION 把完全相同的行合并，只剩 4 行。本节例子用的是 UNION ALL。"
     }
   ]
 }

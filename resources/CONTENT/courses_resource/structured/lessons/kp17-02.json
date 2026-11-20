@@ -21,6 +21,12 @@
       ]
     },
     {
+      "type": "figure",
+      "ids": [
+        "kp17-02-map"
+      ]
+    },
+    {
       "type": "table",
       "columns": [
         "操作",

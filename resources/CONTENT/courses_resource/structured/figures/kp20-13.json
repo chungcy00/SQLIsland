@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp20-13",
-  "lessonSha256": "f1a1fa02d201f27593cff17f5215ffb1c6df7d63ac6f834a636d7834cda93686",
+  "lessonSha256": "57a4f8b2ea6b03464a8f3cf64d9fb49f43f54e145f248657d23b2c72867787c0",
   "figures": [
     {
       "id": "kp20-13-clauses",
@@ -47,6 +47,130 @@
           "note": "按 difference_cents DESC 排列结果。"
         }
       ]
+    },
+    {
+      "id": "kp20-13-map",
+      "slot": "concept",
+      "kind": "flow-map",
+      "title": "订单结算与收入核对：净销售对比 成功收款 − 退款",
+      "stages": [
+        {
+          "label": "① 处理前：按订单汇集成功收款与退款（分）",
+          "note": "没有退款的订单在退款表里没有行，对比时按 0 处理。",
+          "tables": [
+            {
+              "columns": [
+                "order_id",
+                "paid"
+              ],
+              "rows": [
+                [
+                  2,
+                  2110
+                ],
+                [
+                  3,
+                  1310
+                ],
+                [
+                  27277,
+                  33360
+                ]
+              ],
+              "sql": "WITH a AS (SELECT order_id,SUM(amount_cents) paid FROM payments WHERE status='settled' AND payment_date<='2025-12-31' GROUP BY order_id), b AS (SELECT i.order_id,SUM(r.refund_cents) refunded FROM returns r JOIN order_items i ON i.order_item_id=r.order_item_id WHERE r.return_date<='2025-12-31' GROUP BY i.order_id) SELECT order_id, paid FROM a WHERE order_id IN (2,3,27277) ORDER BY order_id",
+              "ordered": true,
+              "name": "成功收款（截至 2025-12-31）"
+            },
+            {
+              "columns": [
+                "order_id",
+                "refunded"
+              ],
+              "rows": [
+                [
+                  2,
+                  1810
+                ],
+                [
+                  27277,
+                  2440
+                ]
+              ],
+              "sql": "WITH a AS (SELECT order_id,SUM(amount_cents) paid FROM payments WHERE status='settled' AND payment_date<='2025-12-31' GROUP BY order_id), b AS (SELECT i.order_id,SUM(r.refund_cents) refunded FROM returns r JOIN order_items i ON i.order_item_id=r.order_item_id WHERE r.return_date<='2025-12-31' GROUP BY i.order_id) SELECT order_id, refunded FROM b WHERE order_id IN (2,3,27277) ORDER BY order_id",
+              "ordered": true,
+              "name": "实际退款（截至 2025-12-31）"
+            }
+          ]
+        },
+        {
+          "label": "② 现金净额 = 成功收款 − 退款，和订单净销售对比",
+          "via": "差额 = 现金净额 − 净销售；差额为 0 说明这张订单对得上",
+          "tables": [
+            {
+              "columns": [
+                "order_id",
+                "net_cents",
+                "cash_net_cents",
+                "difference_cents"
+              ],
+              "rows": [
+                [
+                  2,
+                  300,
+                  300,
+                  0
+                ],
+                [
+                  3,
+                  1310,
+                  1310,
+                  0
+                ],
+                [
+                  27277,
+                  30920,
+                  30920,
+                  0
+                ]
+              ],
+              "sql": "WITH a AS (SELECT order_id,SUM(amount_cents) paid FROM payments WHERE status='settled' AND payment_date<='2025-12-31' GROUP BY order_id), b AS (SELECT i.order_id,SUM(r.refund_cents) refunded FROM returns r JOIN order_items i ON i.order_item_id=r.order_item_id WHERE r.return_date<='2025-12-31' GROUP BY i.order_id) SELECT o.order_id,o.net_cents,COALESCE(a.paid,0)-COALESCE(b.refunded,0) cash_net_cents,COALESCE(a.paid,0)-COALESCE(b.refunded,0)-o.net_cents difference_cents FROM v_order_net o LEFT JOIN a ON a.order_id=o.order_id LEFT JOIN b ON b.order_id=o.order_id WHERE o.order_id IN (2,3,27277) ORDER BY o.order_id",
+              "ordered": true,
+              "tags": [
+                {
+                  "text": "一致 · 不列出",
+                  "tone": "take"
+                },
+                {
+                  "text": "一致 · 不列出",
+                  "tone": "take"
+                },
+                {
+                  "text": "一致 · 不列出",
+                  "tone": "take"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "label": "③ 处理后：只列出差额非零的订单",
+          "via": "WHERE 现金净额 <> 净销售",
+          "tables": [
+            {
+              "columns": [
+                "order_id",
+                "net_cents",
+                "cash_net_cents",
+                "difference_cents"
+              ],
+              "rows": [],
+              "sql": "WITH a AS (SELECT order_id,SUM(amount_cents) paid FROM payments WHERE status='settled' AND payment_date<='2025-12-31' GROUP BY order_id), b AS (SELECT i.order_id,SUM(r.refund_cents) refunded FROM returns r JOIN order_items i ON i.order_item_id=r.order_item_id WHERE r.return_date<='2025-12-31' GROUP BY i.order_id) SELECT o.order_id,o.net_cents,COALESCE(a.paid,0)-COALESCE(b.refunded,0) cash_net_cents,COALESCE(a.paid,0)-COALESCE(b.refunded,0)-o.net_cents difference_cents FROM v_order_net o LEFT JOIN a ON a.order_id=o.order_id LEFT JOIN b ON b.order_id=o.order_id WHERE o.order_date BETWEEN '2025-01-01' AND '2025-12-31' AND COALESCE(a.paid,0)-COALESCE(b.refunded,0)<>o.net_cents ORDER BY difference_cents DESC",
+              "ordered": true
+            }
+          ]
+        }
+      ],
+      "conclusion": "2025 年已完成订单全部对得上，所以结果是 0 行：没有差异，本身就是核对的结论。"
     }
   ]
 }

@@ -32,10 +32,10 @@ try {
   await evaluate('document.querySelector("[data-action=runQuestion]").click()'); await waitFor('!!document.querySelector("table")', '题目运行结果');
   await evaluate('document.querySelector("[data-action=submitQuestion]").click()'); await waitFor('document.body.innerText.includes("回答正确")', '提交判题'); report.flows.push('独立编写题运行与判题');
   await route('/cards'); await evaluate('document.querySelector("[data-action=cardMode][data-arg=新卡]").click()'); await sleep(300);
-  await evaluate('document.querySelector("[data-action=startCards]").click()'); await waitFor('!!document.querySelector(".flashcard.front")', '闪卡正面');
-  const box = await evaluate('(()=>{const r=document.querySelector(".flashcard").getBoundingClientRect(),d=devicePixelRatio;const top=innerHeight*d<2400?0:0;return [Math.round((r.left+r.right)/2*d),Math.round((r.top+r.bottom)/2*d)+Math.round(window.outerHeight*0+0)]})()');
+  await evaluate('document.querySelector("[data-action=startCards]").click()'); await waitFor('!!document.querySelector(".fc.front")', '闪卡正面');
+  const box = await evaluate('(()=>{const r=document.querySelector(".fc-tap").getBoundingClientRect(),d=devicePixelRatio;const top=innerHeight*d<2400?0:0;return [Math.round((r.left+r.right)/2*d),Math.round((r.top+r.bottom)/2*d)+Math.round(window.outerHeight*0+0)]})()');
   const offset = Number(sh('wm', 'size').match(/(\d+)x(\d+)/)[2]) - Math.round(await evaluate('innerHeight * devicePixelRatio'));
-  sh('input', 'tap', String(box[0]), String(box[1] + offset)); await waitFor('!!document.querySelector(".flashcard.back")', '真实触摸翻面'); report.flows.push('闪卡真实触摸翻面');
+  sh('input', 'tap', String(box[0]), String(box[1] + offset)); await waitFor('!!document.querySelector(".fc.back")', '真实触摸翻面'); report.flows.push('闪卡真实触摸翻面');
   await route('/lab'); await evaluate('document.querySelector("[data-action=labTab][data-arg=代码]")?.click()'); await waitFor('!!document.querySelector("#sql-editor")', '实验室编辑器'); await evaluate(`(()=>{const s=document.querySelector('#lab-dataset');s.value='retail-v2';s.dispatchEvent(new Event('change',{bubbles:true}))})()`); await sleep(4000);
   await evaluate(`(()=>{const e=document.querySelector('#sql-editor');e.value='SELECT * FROM v_sales_lines LIMIT 8';e.dispatchEvent(new Event('input',{bubbles:true}))})()`); await sleep(400);
   await evaluate('document.querySelector("[data-action=runLab]").click()'); await waitFor('!!document.querySelector(".table-wrap table")', '实验室结果', 40000); report.flows.push('实验室真实查询');

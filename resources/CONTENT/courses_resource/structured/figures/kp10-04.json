@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp10-04",
-  "lessonSha256": "d458e472cc15ad5a94e175ef7f5f7f08a815915c2ae5e75ad395a40188ae9fd0",
+  "lessonSha256": "0309368734604e7eebb2ec61b2837c6d6e50c804ebf9c780ab87a0a99b3649bd",
   "figures": [
     {
       "id": "kp10-04-clauses",
@@ -106,6 +106,261 @@
               4
             ]
           ]
+        }
+      ]
+    },
+    {
+      "id": "kp10-04-map",
+      "slot": "concept",
+      "kind": "flow-map",
+      "title": "反向匹配：谁一次都没出现过",
+      "variants": [
+        {
+          "label": "NOT EXISTS",
+          "stages": [
+            {
+              "label": "① 处理前：两张表",
+              "tables": [
+                {
+                  "columns": [
+                    "customer_id",
+                    "customer_name"
+                  ],
+                  "rows": [
+                    [
+                      1,
+                      "林"
+                    ],
+                    [
+                      2,
+                      "陈"
+                    ],
+                    [
+                      3,
+                      "王"
+                    ],
+                    [
+                      4,
+                      "李"
+                    ]
+                  ],
+                  "name": "customers",
+                  "source": "customers",
+                  "sql": "SELECT customer_id, customer_name FROM customers ORDER BY customer_id",
+                  "ordered": true
+                },
+                {
+                  "columns": [
+                    "id",
+                    "customer_id",
+                    "sales"
+                  ],
+                  "rows": [
+                    [
+                      1,
+                      1,
+                      800
+                    ],
+                    [
+                      2,
+                      2,
+                      400
+                    ],
+                    [
+                      3,
+                      1,
+                      600
+                    ],
+                    [
+                      4,
+                      null,
+                      300
+                    ],
+                    [
+                      5,
+                      3,
+                      1500
+                    ]
+                  ],
+                  "name": "orders",
+                  "source": "orders",
+                  "sql": "SELECT id, customer_id, sales FROM orders ORDER BY id",
+                  "ordered": true
+                }
+              ]
+            },
+            {
+              "label": "② 对每个客户：去 orders 里找他的订单（找到几条）",
+              "via": "NOT EXISTS（子查询）：每处理一个客户，就拿他的 customer_id 去 orders 里找；只关心找没找到",
+              "tables": [
+                {
+                  "columns": [
+                    "customer_id",
+                    "customer_name",
+                    "订单数"
+                  ],
+                  "rows": [
+                    [
+                      1,
+                      "林",
+                      2
+                    ],
+                    [
+                      2,
+                      "陈",
+                      1
+                    ],
+                    [
+                      3,
+                      "王",
+                      1
+                    ],
+                    [
+                      4,
+                      "李",
+                      0
+                    ]
+                  ],
+                  "tags": [
+                    {
+                      "text": "有 · 去掉",
+                      "tone": "skip"
+                    },
+                    {
+                      "text": "有 · 去掉",
+                      "tone": "skip"
+                    },
+                    {
+                      "text": "有 · 去掉",
+                      "tone": "skip"
+                    },
+                    {
+                      "text": "无 · 留",
+                      "tone": "take"
+                    }
+                  ],
+                  "sql": "SELECT c.customer_id, c.customer_name, (SELECT COUNT(*) FROM orders o WHERE o.customer_id = c.customer_id) AS \"订单数\" FROM customers c ORDER BY c.customer_id",
+                  "ordered": true
+                }
+              ]
+            },
+            {
+              "label": "③ 处理后：留下的客户（1 行）",
+              "tables": [
+                {
+                  "columns": [
+                    "customer_id"
+                  ],
+                  "rows": [
+                    [
+                      4
+                    ]
+                  ],
+                  "sql": "SELECT c.customer_id FROM customers c WHERE NOT EXISTS (SELECT 1 FROM orders o WHERE o.customer_id=c.customer_id) ORDER BY customer_name DESC;",
+                  "ordered": true
+                }
+              ]
+            }
+          ],
+          "conclusion": "NOT EXISTS 只看“找没找到”，订单里有 NULL 的客户编号也不影响结果。"
+        },
+        {
+          "label": "NOT IN 的陷阱",
+          "stages": [
+            {
+              "label": "① 内层子查询返回的一组值（含 NULL）",
+              "note": "orders 里有一条订单没有客户编号（NULL）。",
+              "tables": [
+                {
+                  "columns": [
+                    "customer_id"
+                  ],
+                  "rows": [
+                    [
+                      1
+                    ],
+                    [
+                      2
+                    ],
+                    [
+                      1
+                    ],
+                    [
+                      null
+                    ],
+                    [
+                      3
+                    ]
+                  ],
+                  "sql": "SELECT customer_id FROM orders"
+                }
+              ]
+            },
+            {
+              "label": "② 外层：customer_id NOT IN 这组值",
+              "via": "NOT IN：既不在集合里、也要和每个值比较都为真才留下；和 NULL 比较结果是“未知”",
+              "tables": [
+                {
+                  "columns": [
+                    "customer_id",
+                    "customer_name"
+                  ],
+                  "rows": [
+                    [
+                      1,
+                      "林"
+                    ],
+                    [
+                      2,
+                      "陈"
+                    ],
+                    [
+                      3,
+                      "王"
+                    ],
+                    [
+                      4,
+                      "李"
+                    ]
+                  ],
+                  "source": "customers",
+                  "tags": [
+                    {
+                      "text": "在集合里 · 去掉",
+                      "tone": "skip"
+                    },
+                    {
+                      "text": "在集合里 · 去掉",
+                      "tone": "skip"
+                    },
+                    {
+                      "text": "在集合里 · 去掉",
+                      "tone": "skip"
+                    },
+                    {
+                      "text": "NULL 比较未知 · 去掉",
+                      "tone": "tie"
+                    }
+                  ],
+                  "sql": "SELECT customer_id, customer_name FROM customers ORDER BY customer_id",
+                  "ordered": true
+                }
+              ]
+            },
+            {
+              "label": "③ 处理后：一行都没有（0 行）",
+              "tables": [
+                {
+                  "columns": [
+                    "customer_id"
+                  ],
+                  "rows": [],
+                  "sql": "SELECT c.customer_id FROM customers c WHERE c.customer_id NOT IN (SELECT customer_id FROM orders)"
+                }
+              ]
+            }
+          ],
+          "conclusion": "集合里只要有 NULL，NOT IN 对没出现过的值也得不到“真”，会漏掉本该返回的客户 4；找“没有记录的对象”优先用 NOT EXISTS。"
         }
       ]
     }

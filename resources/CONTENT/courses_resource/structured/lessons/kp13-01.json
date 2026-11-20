@@ -22,6 +22,12 @@
       ]
     },
     {
+      "type": "figure",
+      "ids": [
+        "kp13-01-map"
+      ]
+    },
+    {
       "type": "table",
       "columns": [
         "写法",

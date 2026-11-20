@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp20-23",
-  "lessonSha256": "bdbf9c7a22ea70c9463c78dc4735c075804056c223621d4bd8d15c5a308cdd3a",
+  "lessonSha256": "f14318ce8356c0355085cf531bec96dd32a1f5004b47dd55ee33b997822e739e",
   "figures": [
     {
       "id": "kp20-23-clauses",
@@ -65,6 +65,148 @@
           "note": "按 m.month_key 排列结果。"
         }
       ]
+    },
+    {
+      "id": "kp20-23-map",
+      "slot": "concept",
+      "kind": "flow-map",
+      "title": "月度经营汇总：各来源独立汇总，再放进同一行（以 2025-01 为例）",
+      "stages": [
+        {
+          "label": "① 处理前：2025-01 的各个来源，各自按自己的日期口径汇总（分）",
+          "note": "销售按订单日期、费用按分录日期、人工按员工月份、采购按订单日期、广告按活动月份。",
+          "tables": [
+            {
+              "columns": [
+                "item",
+                "amount_cents"
+              ],
+              "rows": [
+                [
+                  "销售（净额）",
+                  7319364
+                ],
+                [
+                  "毛利",
+                  2944637
+                ],
+                [
+                  "费用",
+                  65219277
+                ],
+                [
+                  "人工",
+                  51797482
+                ],
+                [
+                  "广告",
+                  455218
+                ],
+                [
+                  "采购承诺",
+                  12292884
+                ]
+              ],
+              "sql": "WITH m AS (SELECT DISTINCT month_key FROM calendar_days WHERE month_key BETWEEN '2025-01' AND '2025-12'), s AS (SELECT SUBSTR(order_date,1,7) m,SUM(net_cents) net,SUM(net_cents-cost_cents) gross FROM v_sales_lines WHERE order_date>='2025-01-01' GROUP BY SUBSTR(order_date,1,7)), f AS (SELECT SUBSTR(entry_date,1,7) m,SUM(expense_cents) expense FROM v_expenses WHERE entry_date>='2025-01-01' GROUP BY SUBSTR(entry_date,1,7)), h AS (SELECT month_key,SUM(labor_cents) labor FROM v_staff_month WHERE month_key BETWEEN '2025-01' AND '2025-12' GROUP BY month_key), p AS (SELECT SUBSTR(order_date,1,7) m,SUM(ordered_cents) procurement FROM v_po_lines WHERE order_date>='2025-01-01' GROUP BY SUBSTR(order_date,1,7)), a AS (SELECT month_key,SUM(spend_cents) spend FROM marketing_campaigns WHERE month_key BETWEEN '2025-01' AND '2025-12' GROUP BY month_key) SELECT item, amount_cents FROM (SELECT 1 n,'销售（净额）' item, COALESCE(s.net,0) amount_cents FROM m LEFT JOIN s ON s.m=m.month_key WHERE m.month_key='2025-01' UNION ALL SELECT 2,'毛利', COALESCE(s.gross,0) FROM m LEFT JOIN s ON s.m=m.month_key WHERE m.month_key='2025-01' UNION ALL SELECT 3,'费用', COALESCE(f.expense,0) FROM m LEFT JOIN f ON f.m=m.month_key WHERE m.month_key='2025-01' UNION ALL SELECT 4,'人工', COALESCE(h.labor,0) FROM m LEFT JOIN h ON h.month_key=m.month_key WHERE m.month_key='2025-01' UNION ALL SELECT 5,'广告', COALESCE(a.spend,0) FROM m LEFT JOIN a ON a.month_key=m.month_key WHERE m.month_key='2025-01' UNION ALL SELECT 6,'采购承诺', COALESCE(p.procurement,0) FROM m LEFT JOIN p ON p.m=m.month_key WHERE m.month_key='2025-01') ORDER BY n",
+              "ordered": true
+            }
+          ]
+        },
+        {
+          "label": "② 计算经营贡献",
+          "via": "经营贡献 = 毛利 − 费用 − 人工；广告与采购承诺单列，不重复扣减",
+          "tables": [
+            {
+              "columns": [
+                "item",
+                "amount_cents"
+              ],
+              "rows": [
+                [
+                  "毛利",
+                  2944637
+                ],
+                [
+                  "费用",
+                  65219277
+                ],
+                [
+                  "人工",
+                  51797482
+                ],
+                [
+                  "经营贡献",
+                  -114072122
+                ]
+              ],
+              "sql": "SELECT item, amount_cents FROM (SELECT 1 n,'毛利' item, 2944637 amount_cents UNION ALL SELECT 2,'费用', 65219277 UNION ALL SELECT 3,'人工', 51797482 UNION ALL SELECT 4,'经营贡献', -114072122) ORDER BY n",
+              "ordered": true,
+              "tags": [
+                {
+                  "text": "+",
+                  "tone": "take"
+                },
+                {
+                  "text": "−",
+                  "tone": "skip"
+                },
+                {
+                  "text": "−",
+                  "tone": "skip"
+                },
+                {
+                  "text": "= 毛利 − 费用 − 人工",
+                  "tone": "merge"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "label": "③ 处理后：2025-01 这一个月在报表里的一行（竖着看）",
+          "tables": [
+            {
+              "columns": [
+                "item",
+                "amount_cents"
+              ],
+              "rows": [
+                [
+                  "净销售",
+                  7319364
+                ],
+                [
+                  "毛利",
+                  2944637
+                ],
+                [
+                  "费用",
+                  65219277
+                ],
+                [
+                  "人工",
+                  51797482
+                ],
+                [
+                  "广告",
+                  455218
+                ],
+                [
+                  "采购承诺",
+                  12292884
+                ],
+                [
+                  "经营贡献",
+                  -114072122
+                ]
+              ],
+              "sql": "SELECT item, amount_cents FROM (SELECT 1 n,'净销售' item, net_cents amount_cents FROM (WITH m AS (SELECT DISTINCT month_key FROM calendar_days WHERE month_key BETWEEN '2025-01' AND '2025-12'), s AS (SELECT SUBSTR(order_date,1,7) m,SUM(net_cents) net,SUM(net_cents-cost_cents) gross FROM v_sales_lines WHERE order_date>='2025-01-01' GROUP BY SUBSTR(order_date,1,7)), f AS (SELECT SUBSTR(entry_date,1,7) m,SUM(expense_cents) expense FROM v_expenses WHERE entry_date>='2025-01-01' GROUP BY SUBSTR(entry_date,1,7)), h AS (SELECT month_key,SUM(labor_cents) labor FROM v_staff_month WHERE month_key BETWEEN '2025-01' AND '2025-12' GROUP BY month_key), p AS (SELECT SUBSTR(order_date,1,7) m,SUM(ordered_cents) procurement FROM v_po_lines WHERE order_date>='2025-01-01' GROUP BY SUBSTR(order_date,1,7)), a AS (SELECT month_key,SUM(spend_cents) spend FROM marketing_campaigns WHERE month_key BETWEEN '2025-01' AND '2025-12' GROUP BY month_key) SELECT m.month_key,COALESCE(s.net,0) net_cents,COALESCE(s.gross,0) gross_cents,COALESCE(f.expense,0) expense_cents,COALESCE(h.labor,0) labor_cents,COALESCE(a.spend,0) advertising_cents,COALESCE(p.procurement,0) committed_purchase_cents,COALESCE(s.gross,0)-COALESCE(f.expense,0)-COALESCE(h.labor,0) operating_contribution_cents FROM m LEFT JOIN s ON s.m=m.month_key LEFT JOIN f ON f.m=m.month_key LEFT JOIN h ON h.month_key=m.month_key LEFT JOIN p ON p.m=m.month_key LEFT JOIN a ON a.month_key=m.month_key ORDER BY m.month_key) WHERE month_key='2025-01' UNION ALL SELECT 2,'毛利', gross_cents FROM (WITH m AS (SELECT DISTINCT month_key FROM calendar_days WHERE month_key BETWEEN '2025-01' AND '2025-12'), s AS (SELECT SUBSTR(order_date,1,7) m,SUM(net_cents) net,SUM(net_cents-cost_cents) gross FROM v_sales_lines WHERE order_date>='2025-01-01' GROUP BY SUBSTR(order_date,1,7)), f AS (SELECT SUBSTR(entry_date,1,7) m,SUM(expense_cents) expense FROM v_expenses WHERE entry_date>='2025-01-01' GROUP BY SUBSTR(entry_date,1,7)), h AS (SELECT month_key,SUM(labor_cents) labor FROM v_staff_month WHERE month_key BETWEEN '2025-01' AND '2025-12' GROUP BY month_key), p AS (SELECT SUBSTR(order_date,1,7) m,SUM(ordered_cents) procurement FROM v_po_lines WHERE order_date>='2025-01-01' GROUP BY SUBSTR(order_date,1,7)), a AS (SELECT month_key,SUM(spend_cents) spend FROM marketing_campaigns WHERE month_key BETWEEN '2025-01' AND '2025-12' GROUP BY month_key) SELECT m.month_key,COALESCE(s.net,0) net_cents,COALESCE(s.gross,0) gross_cents,COALESCE(f.expense,0) expense_cents,COALESCE(h.labor,0) labor_cents,COALESCE(a.spend,0) advertising_cents,COALESCE(p.procurement,0) committed_purchase_cents,COALESCE(s.gross,0)-COALESCE(f.expense,0)-COALESCE(h.labor,0) operating_contribution_cents FROM m LEFT JOIN s ON s.m=m.month_key LEFT JOIN f ON f.m=m.month_key LEFT JOIN h ON h.month_key=m.month_key LEFT JOIN p ON p.m=m.month_key LEFT JOIN a ON a.month_key=m.month_key ORDER BY m.month_key) WHERE month_key='2025-01' UNION ALL SELECT 3,'费用', expense_cents FROM (WITH m AS (SELECT DISTINCT month_key FROM calendar_days WHERE month_key BETWEEN '2025-01' AND '2025-12'), s AS (SELECT SUBSTR(order_date,1,7) m,SUM(net_cents) net,SUM(net_cents-cost_cents) gross FROM v_sales_lines WHERE order_date>='2025-01-01' GROUP BY SUBSTR(order_date,1,7)), f AS (SELECT SUBSTR(entry_date,1,7) m,SUM(expense_cents) expense FROM v_expenses WHERE entry_date>='2025-01-01' GROUP BY SUBSTR(entry_date,1,7)), h AS (SELECT month_key,SUM(labor_cents) labor FROM v_staff_month WHERE month_key BETWEEN '2025-01' AND '2025-12' GROUP BY month_key), p AS (SELECT SUBSTR(order_date,1,7) m,SUM(ordered_cents) procurement FROM v_po_lines WHERE order_date>='2025-01-01' GROUP BY SUBSTR(order_date,1,7)), a AS (SELECT month_key,SUM(spend_cents) spend FROM marketing_campaigns WHERE month_key BETWEEN '2025-01' AND '2025-12' GROUP BY month_key) SELECT m.month_key,COALESCE(s.net,0) net_cents,COALESCE(s.gross,0) gross_cents,COALESCE(f.expense,0) expense_cents,COALESCE(h.labor,0) labor_cents,COALESCE(a.spend,0) advertising_cents,COALESCE(p.procurement,0) committed_purchase_cents,COALESCE(s.gross,0)-COALESCE(f.expense,0)-COALESCE(h.labor,0) operating_contribution_cents FROM m LEFT JOIN s ON s.m=m.month_key LEFT JOIN f ON f.m=m.month_key LEFT JOIN h ON h.month_key=m.month_key LEFT JOIN p ON p.m=m.month_key LEFT JOIN a ON a.month_key=m.month_key ORDER BY m.month_key) WHERE month_key='2025-01' UNION ALL SELECT 4,'人工', labor_cents FROM (WITH m AS (SELECT DISTINCT month_key FROM calendar_days WHERE month_key BETWEEN '2025-01' AND '2025-12'), s AS (SELECT SUBSTR(order_date,1,7) m,SUM(net_cents) net,SUM(net_cents-cost_cents) gross FROM v_sales_lines WHERE order_date>='2025-01-01' GROUP BY SUBSTR(order_date,1,7)), f AS (SELECT SUBSTR(entry_date,1,7) m,SUM(expense_cents) expense FROM v_expenses WHERE entry_date>='2025-01-01' GROUP BY SUBSTR(entry_date,1,7)), h AS (SELECT month_key,SUM(labor_cents) labor FROM v_staff_month WHERE month_key BETWEEN '2025-01' AND '2025-12' GROUP BY month_key), p AS (SELECT SUBSTR(order_date,1,7) m,SUM(ordered_cents) procurement FROM v_po_lines WHERE order_date>='2025-01-01' GROUP BY SUBSTR(order_date,1,7)), a AS (SELECT month_key,SUM(spend_cents) spend FROM marketing_campaigns WHERE month_key BETWEEN '2025-01' AND '2025-12' GROUP BY month_key) SELECT m.month_key,COALESCE(s.net,0) net_cents,COALESCE(s.gross,0) gross_cents,COALESCE(f.expense,0) expense_cents,COALESCE(h.labor,0) labor_cents,COALESCE(a.spend,0) advertising_cents,COALESCE(p.procurement,0) committed_purchase_cents,COALESCE(s.gross,0)-COALESCE(f.expense,0)-COALESCE(h.labor,0) operating_contribution_cents FROM m LEFT JOIN s ON s.m=m.month_key LEFT JOIN f ON f.m=m.month_key LEFT JOIN h ON h.month_key=m.month_key LEFT JOIN p ON p.m=m.month_key LEFT JOIN a ON a.month_key=m.month_key ORDER BY m.month_key) WHERE month_key='2025-01' UNION ALL SELECT 5,'广告', advertising_cents FROM (WITH m AS (SELECT DISTINCT month_key FROM calendar_days WHERE month_key BETWEEN '2025-01' AND '2025-12'), s AS (SELECT SUBSTR(order_date,1,7) m,SUM(net_cents) net,SUM(net_cents-cost_cents) gross FROM v_sales_lines WHERE order_date>='2025-01-01' GROUP BY SUBSTR(order_date,1,7)), f AS (SELECT SUBSTR(entry_date,1,7) m,SUM(expense_cents) expense FROM v_expenses WHERE entry_date>='2025-01-01' GROUP BY SUBSTR(entry_date,1,7)), h AS (SELECT month_key,SUM(labor_cents) labor FROM v_staff_month WHERE month_key BETWEEN '2025-01' AND '2025-12' GROUP BY month_key), p AS (SELECT SUBSTR(order_date,1,7) m,SUM(ordered_cents) procurement FROM v_po_lines WHERE order_date>='2025-01-01' GROUP BY SUBSTR(order_date,1,7)), a AS (SELECT month_key,SUM(spend_cents) spend FROM marketing_campaigns WHERE month_key BETWEEN '2025-01' AND '2025-12' GROUP BY month_key) SELECT m.month_key,COALESCE(s.net,0) net_cents,COALESCE(s.gross,0) gross_cents,COALESCE(f.expense,0) expense_cents,COALESCE(h.labor,0) labor_cents,COALESCE(a.spend,0) advertising_cents,COALESCE(p.procurement,0) committed_purchase_cents,COALESCE(s.gross,0)-COALESCE(f.expense,0)-COALESCE(h.labor,0) operating_contribution_cents FROM m LEFT JOIN s ON s.m=m.month_key LEFT JOIN f ON f.m=m.month_key LEFT JOIN h ON h.month_key=m.month_key LEFT JOIN p ON p.m=m.month_key LEFT JOIN a ON a.month_key=m.month_key ORDER BY m.month_key) WHERE month_key='2025-01' UNION ALL SELECT 6,'采购承诺', committed_purchase_cents FROM (WITH m AS (SELECT DISTINCT month_key FROM calendar_days WHERE month_key BETWEEN '2025-01' AND '2025-12'), s AS (SELECT SUBSTR(order_date,1,7) m,SUM(net_cents) net,SUM(net_cents-cost_cents) gross FROM v_sales_lines WHERE order_date>='2025-01-01' GROUP BY SUBSTR(order_date,1,7)), f AS (SELECT SUBSTR(entry_date,1,7) m,SUM(expense_cents) expense FROM v_expenses WHERE entry_date>='2025-01-01' GROUP BY SUBSTR(entry_date,1,7)), h AS (SELECT month_key,SUM(labor_cents) labor FROM v_staff_month WHERE month_key BETWEEN '2025-01' AND '2025-12' GROUP BY month_key), p AS (SELECT SUBSTR(order_date,1,7) m,SUM(ordered_cents) procurement FROM v_po_lines WHERE order_date>='2025-01-01' GROUP BY SUBSTR(order_date,1,7)), a AS (SELECT month_key,SUM(spend_cents) spend FROM marketing_campaigns WHERE month_key BETWEEN '2025-01' AND '2025-12' GROUP BY month_key) SELECT m.month_key,COALESCE(s.net,0) net_cents,COALESCE(s.gross,0) gross_cents,COALESCE(f.expense,0) expense_cents,COALESCE(h.labor,0) labor_cents,COALESCE(a.spend,0) advertising_cents,COALESCE(p.procurement,0) committed_purchase_cents,COALESCE(s.gross,0)-COALESCE(f.expense,0)-COALESCE(h.labor,0) operating_contribution_cents FROM m LEFT JOIN s ON s.m=m.month_key LEFT JOIN f ON f.m=m.month_key LEFT JOIN h ON h.month_key=m.month_key LEFT JOIN p ON p.m=m.month_key LEFT JOIN a ON a.month_key=m.month_key ORDER BY m.month_key) WHERE month_key='2025-01' UNION ALL SELECT 7,'经营贡献', operating_contribution_cents FROM (WITH m AS (SELECT DISTINCT month_key FROM calendar_days WHERE month_key BETWEEN '2025-01' AND '2025-12'), s AS (SELECT SUBSTR(order_date,1,7) m,SUM(net_cents) net,SUM(net_cents-cost_cents) gross FROM v_sales_lines WHERE order_date>='2025-01-01' GROUP BY SUBSTR(order_date,1,7)), f AS (SELECT SUBSTR(entry_date,1,7) m,SUM(expense_cents) expense FROM v_expenses WHERE entry_date>='2025-01-01' GROUP BY SUBSTR(entry_date,1,7)), h AS (SELECT month_key,SUM(labor_cents) labor FROM v_staff_month WHERE month_key BETWEEN '2025-01' AND '2025-12' GROUP BY month_key), p AS (SELECT SUBSTR(order_date,1,7) m,SUM(ordered_cents) procurement FROM v_po_lines WHERE order_date>='2025-01-01' GROUP BY SUBSTR(order_date,1,7)), a AS (SELECT month_key,SUM(spend_cents) spend FROM marketing_campaigns WHERE month_key BETWEEN '2025-01' AND '2025-12' GROUP BY month_key) SELECT m.month_key,COALESCE(s.net,0) net_cents,COALESCE(s.gross,0) gross_cents,COALESCE(f.expense,0) expense_cents,COALESCE(h.labor,0) labor_cents,COALESCE(a.spend,0) advertising_cents,COALESCE(p.procurement,0) committed_purchase_cents,COALESCE(s.gross,0)-COALESCE(f.expense,0)-COALESCE(h.labor,0) operating_contribution_cents FROM m LEFT JOIN s ON s.m=m.month_key LEFT JOIN f ON f.m=m.month_key LEFT JOIN h ON h.month_key=m.month_key LEFT JOIN p ON p.m=m.month_key LEFT JOIN a ON a.month_key=m.month_key ORDER BY m.month_key) WHERE month_key='2025-01') ORDER BY n",
+              "ordered": true
+            }
+          ]
+        }
+      ],
+      "conclusion": "每个来源先按自己的日期口径独立聚合，再按月份对齐；没有业务的月份保留，确认数据完整后才补零。"
     }
   ]
 }

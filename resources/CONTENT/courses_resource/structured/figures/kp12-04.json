@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp12-04",
-  "lessonSha256": "28feb774b21dbf1a9e5c22befd56bc495162077aeb23fccb273f85b374285e1b",
+  "lessonSha256": "8fefca64ffada0b4c212c72e9d25976d46cafc20f1309caecf414d839410a10c",
   "figures": [
     {
       "id": "kp12-04-clauses",
@@ -142,6 +142,139 @@
           ]
         }
       ]
+    },
+    {
+      "id": "kp12-04-map",
+      "slot": "concept",
+      "kind": "flow-map",
+      "title": "半开日期区间：含起点、不含终点",
+      "stages": [
+        {
+          "label": "① 处理前：orders（5 行）",
+          "tables": [
+            {
+              "columns": [
+                "id",
+                "order_date",
+                "sales"
+              ],
+              "rows": [
+                [
+                  1,
+                  "2026-01-03",
+                  800
+                ],
+                [
+                  2,
+                  "2026-01-10",
+                  400
+                ],
+                [
+                  3,
+                  "2026-02-02",
+                  600
+                ],
+                [
+                  4,
+                  "2026-02-15",
+                  300
+                ],
+                [
+                  5,
+                  "2026-02-20",
+                  1500
+                ]
+              ],
+              "source": "orders",
+              "sql": "SELECT id, order_date, sales FROM orders ORDER BY id",
+              "ordered": true
+            }
+          ]
+        },
+        {
+          "label": "② 逐行判断：order_date >= '2026-02-01' AND order_date < '2026-03-01'",
+          "via": "起点 2026-02-01 包含在内，终点 2026-03-01 不包含：3 月 1 日的记录属于 3 月",
+          "tables": [
+            {
+              "columns": [
+                "id",
+                "order_date",
+                "sales"
+              ],
+              "rows": [
+                [
+                  1,
+                  "2026-01-03",
+                  800
+                ],
+                [
+                  2,
+                  "2026-01-10",
+                  400
+                ],
+                [
+                  3,
+                  "2026-02-02",
+                  600
+                ],
+                [
+                  4,
+                  "2026-02-15",
+                  300
+                ],
+                [
+                  5,
+                  "2026-02-20",
+                  1500
+                ]
+              ],
+              "tags": [
+                {
+                  "text": "不在区间 · 去掉",
+                  "tone": "skip"
+                },
+                {
+                  "text": "不在区间 · 去掉",
+                  "tone": "skip"
+                },
+                {
+                  "text": "在区间内 · 留",
+                  "tone": "take"
+                },
+                {
+                  "text": "在区间内 · 留",
+                  "tone": "take"
+                },
+                {
+                  "text": "在区间内 · 留",
+                  "tone": "take"
+                }
+              ],
+              "sql": "SELECT id, order_date, sales FROM orders ORDER BY id",
+              "ordered": true
+            }
+          ]
+        },
+        {
+          "label": "③ 处理后：留下的行 sales 相加",
+          "via": "SUM(sales)",
+          "tables": [
+            {
+              "columns": [
+                "feb_sales"
+              ],
+              "rows": [
+                [
+                  2400
+                ]
+              ],
+              "sql": "SELECT SUM(sales) AS feb_sales FROM orders WHERE order_date >= '2026-02-01' AND order_date < '2026-03-01';",
+              "ordered": true
+            }
+          ]
+        }
+      ],
+      "conclusion": "相邻月份的区间首尾相接、互不重叠：2 月是 [2 月 1 日, 3 月 1 日)，下个月从 3 月 1 日开始。"
     }
   ]
 }

@@ -24,6 +24,12 @@
       ]
     },
     {
+      "type": "figure",
+      "ids": [
+        "kp01-03-map"
+      ]
+    },
+    {
       "type": "table",
       "columns": [
         "属性",

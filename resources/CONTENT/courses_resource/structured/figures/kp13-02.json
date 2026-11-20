@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp13-02",
-  "lessonSha256": "9114f105b774632b8dd81ca3cbdf5b0702a8ce005b26090f7fac8bd8dc42962a",
+  "lessonSha256": "682269def9a1d129484a4db2a8625787945dbb68ba1abf5f11f8fe82809f14a9",
   "figures": [
     {
       "id": "kp13-02-clauses",
@@ -33,6 +33,344 @@
           "label": "排序",
           "sql": "ORDER BY customer_name;",
           "note": "按 customer_name 排列结果。"
+        }
+      ]
+    },
+    {
+      "id": "kp13-02-map",
+      "slot": "concept",
+      "kind": "flow-map",
+      "title": "交集与差集：比较整行，看哪边有哪边没有",
+      "variants": [
+        {
+          "label": "交集 INTERSECT",
+          "stages": [
+            {
+              "label": "① 处理前：两张表（共 7 行）",
+              "tables": [
+                {
+                  "name": "old_customers",
+                  "columns": [
+                    "customer_id",
+                    "customer_name"
+                  ],
+                  "rows": [
+                    [
+                      1,
+                      "林"
+                    ],
+                    [
+                      2,
+                      "陈"
+                    ],
+                    [
+                      2,
+                      "陈"
+                    ],
+                    [
+                      3,
+                      "王"
+                    ]
+                  ],
+                  "source": "old_customers",
+                  "sql": "SELECT customer_id, customer_name FROM old_customers",
+                  "ordered": true
+                },
+                {
+                  "name": "new_customers",
+                  "columns": [
+                    "customer_id",
+                    "customer_name"
+                  ],
+                  "rows": [
+                    [
+                      2,
+                      "陈"
+                    ],
+                    [
+                      3,
+                      "王"
+                    ],
+                    [
+                      4,
+                      "李"
+                    ]
+                  ],
+                  "source": "new_customers",
+                  "sql": "SELECT customer_id, customer_name FROM new_customers",
+                  "ordered": true
+                }
+              ]
+            },
+            {
+              "label": "② 逐行对照：这一行在对方表里有没有",
+              "via": "INTERSECT：只留下两张表里都有的整行",
+              "tables": [
+                {
+                  "name": "old_customers",
+                  "columns": [
+                    "customer_id",
+                    "customer_name"
+                  ],
+                  "rows": [
+                    [
+                      1,
+                      "林"
+                    ],
+                    [
+                      2,
+                      "陈"
+                    ],
+                    [
+                      2,
+                      "陈"
+                    ],
+                    [
+                      3,
+                      "王"
+                    ]
+                  ],
+                  "tags": [
+                    {
+                      "text": "新表没有 · 去掉",
+                      "tone": "skip"
+                    },
+                    {
+                      "text": "两边都有 · 留",
+                      "tone": "take"
+                    },
+                    {
+                      "text": "两边都有 · 留",
+                      "tone": "take"
+                    },
+                    {
+                      "text": "两边都有 · 留",
+                      "tone": "take"
+                    }
+                  ],
+                  "sql": "SELECT customer_id, customer_name FROM old_customers",
+                  "ordered": true
+                },
+                {
+                  "name": "new_customers",
+                  "columns": [
+                    "customer_id",
+                    "customer_name"
+                  ],
+                  "rows": [
+                    [
+                      2,
+                      "陈"
+                    ],
+                    [
+                      3,
+                      "王"
+                    ],
+                    [
+                      4,
+                      "李"
+                    ]
+                  ],
+                  "tags": [
+                    {
+                      "text": "两边都有 · 留",
+                      "tone": "take"
+                    },
+                    {
+                      "text": "两边都有 · 留",
+                      "tone": "take"
+                    },
+                    {
+                      "text": "旧表没有 · 去掉",
+                      "tone": "skip"
+                    }
+                  ],
+                  "sql": "SELECT customer_id, customer_name FROM new_customers",
+                  "ordered": true
+                }
+              ]
+            },
+            {
+              "label": "③ 处理后：INTERSECT 的结果（2 行）",
+              "via": "重复的行合并成一条",
+              "tables": [
+                {
+                  "columns": [
+                    "customer_id",
+                    "customer_name"
+                  ],
+                  "rows": [
+                    [
+                      3,
+                      "王"
+                    ],
+                    [
+                      2,
+                      "陈"
+                    ]
+                  ],
+                  "sql": "SELECT customer_id, customer_name FROM old_customers INTERSECT SELECT customer_id, customer_name FROM new_customers ORDER BY customer_name;",
+                  "ordered": true
+                }
+              ]
+            }
+          ],
+          "conclusion": "交集：两边都有的整行才留下，并去掉重复。"
+        },
+        {
+          "label": "差集 EXCEPT",
+          "stages": [
+            {
+              "label": "① 处理前：两张表（共 7 行）",
+              "tables": [
+                {
+                  "name": "old_customers",
+                  "columns": [
+                    "customer_id",
+                    "customer_name"
+                  ],
+                  "rows": [
+                    [
+                      1,
+                      "林"
+                    ],
+                    [
+                      2,
+                      "陈"
+                    ],
+                    [
+                      2,
+                      "陈"
+                    ],
+                    [
+                      3,
+                      "王"
+                    ]
+                  ],
+                  "source": "old_customers",
+                  "sql": "SELECT customer_id, customer_name FROM old_customers",
+                  "ordered": true
+                },
+                {
+                  "name": "new_customers",
+                  "columns": [
+                    "customer_id",
+                    "customer_name"
+                  ],
+                  "rows": [
+                    [
+                      2,
+                      "陈"
+                    ],
+                    [
+                      3,
+                      "王"
+                    ],
+                    [
+                      4,
+                      "李"
+                    ]
+                  ],
+                  "source": "new_customers",
+                  "sql": "SELECT customer_id, customer_name FROM new_customers",
+                  "ordered": true
+                }
+              ]
+            },
+            {
+              "label": "② 逐行对照：左边这一行在右边有没有",
+              "via": "EXCEPT：只留下左表有、右表没有的整行",
+              "tables": [
+                {
+                  "name": "old_customers（左）",
+                  "columns": [
+                    "customer_id",
+                    "customer_name"
+                  ],
+                  "rows": [
+                    [
+                      1,
+                      "林"
+                    ],
+                    [
+                      2,
+                      "陈"
+                    ],
+                    [
+                      2,
+                      "陈"
+                    ],
+                    [
+                      3,
+                      "王"
+                    ]
+                  ],
+                  "tags": [
+                    {
+                      "text": "新表没有 · 留",
+                      "tone": "take"
+                    },
+                    {
+                      "text": "新表也有 · 去掉",
+                      "tone": "skip"
+                    },
+                    {
+                      "text": "新表也有 · 去掉",
+                      "tone": "skip"
+                    },
+                    {
+                      "text": "新表也有 · 去掉",
+                      "tone": "skip"
+                    }
+                  ],
+                  "sql": "SELECT customer_id, customer_name FROM old_customers",
+                  "ordered": true
+                },
+                {
+                  "name": "new_customers（右，只用来对照）",
+                  "columns": [
+                    "customer_id",
+                    "customer_name"
+                  ],
+                  "rows": [
+                    [
+                      2,
+                      "陈"
+                    ],
+                    [
+                      3,
+                      "王"
+                    ],
+                    [
+                      4,
+                      "李"
+                    ]
+                  ],
+                  "sql": "SELECT customer_id, customer_name FROM new_customers",
+                  "ordered": true
+                }
+              ]
+            },
+            {
+              "label": "③ 处理后：EXCEPT 的结果（1 行）",
+              "tables": [
+                {
+                  "columns": [
+                    "customer_id",
+                    "customer_name"
+                  ],
+                  "rows": [
+                    [
+                      1,
+                      "林"
+                    ]
+                  ],
+                  "sql": "SELECT customer_id, customer_name FROM old_customers EXCEPT SELECT customer_id, customer_name FROM new_customers"
+                }
+              ]
+            }
+          ],
+          "conclusion": "差集：只留左边有、右边没有的整行；顺序换过来（右 EXCEPT 左）结果就不同。"
         }
       ]
     }

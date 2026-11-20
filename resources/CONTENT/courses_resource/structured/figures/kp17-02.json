@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp17-02",
-  "lessonSha256": "965dd3dfa3073d920c5944d37199aed7adf00029213936d925dddfca2d3b5723",
+  "lessonSha256": "f23e86b3c8eb2a1fa427f1b4161a47c7c6b6282fe1ac52bcff48ac70d91e4677",
   "figures": [
     {
       "id": "kp17-02-clauses",
@@ -90,6 +90,199 @@
               10
             ]
           ]
+        }
+      ]
+    },
+    {
+      "id": "kp17-02-map",
+      "slot": "concept",
+      "kind": "flow-map",
+      "title": "数据修改与事务：改完要么提交，要么撤销",
+      "variants": [
+        {
+          "label": "提交 COMMIT",
+          "stages": [
+            {
+              "label": "① 修改前：demo_stock 里有 3 行（INSERT 之后）",
+              "tables": [
+                {
+                  "columns": [
+                    "id",
+                    "qty"
+                  ],
+                  "rows": [
+                    [
+                      1,
+                      10
+                    ],
+                    [
+                      2,
+                      20
+                    ],
+                    [
+                      3,
+                      30
+                    ]
+                  ],
+                  "sql": "SELECT 1 AS id, 10 AS qty UNION ALL SELECT 2 AS id, 20 AS qty UNION ALL SELECT 3 AS id, 30 AS qty",
+                  "ordered": true,
+                  "tags": [
+                    null,
+                    null,
+                    null
+                  ]
+                }
+              ]
+            },
+            {
+              "label": "② 修改中：先 UPDATE 再 DELETE",
+              "via": "UPDATE … WHERE id=2：把 id 为 2 的 qty 改成 25；DELETE … WHERE id=3：删除 id 为 3 的行",
+              "tables": [
+                {
+                  "columns": [
+                    "id",
+                    "qty"
+                  ],
+                  "rows": [
+                    [
+                      1,
+                      10
+                    ],
+                    [
+                      2,
+                      25
+                    ],
+                    [
+                      3,
+                      30
+                    ]
+                  ],
+                  "tags": [
+                    null,
+                    {
+                      "text": "UPDATE：20 → 25",
+                      "tone": "merge"
+                    },
+                    {
+                      "text": "DELETE：删除",
+                      "tone": "skip"
+                    }
+                  ],
+                  "sql": "SELECT 1 AS id, 10 AS qty UNION ALL SELECT 2, 25 UNION ALL SELECT 3, 30",
+                  "ordered": true
+                }
+              ]
+            },
+            {
+              "label": "③ COMMIT 之后：修改保留（2 行）",
+              "via": "COMMIT：确认，这次修改成为最终结果",
+              "tables": [
+                {
+                  "columns": [
+                    "id",
+                    "qty"
+                  ],
+                  "rows": [
+                    [
+                      2,
+                      25
+                    ],
+                    [
+                      1,
+                      10
+                    ]
+                  ],
+                  "sql": "SELECT id,qty FROM demo_stock ORDER BY qty DESC;",
+                  "ordered": true
+                }
+              ]
+            }
+          ],
+          "conclusion": "数据修改会改变已有的行；提交后，修改成为最终结果（本节例子的最后查询看到的就是这个状态）。"
+        },
+        {
+          "label": "撤销 ROLLBACK",
+          "stages": [
+            {
+              "label": "① 事务开始前：3 行",
+              "tables": [
+                {
+                  "columns": [
+                    "id",
+                    "qty"
+                  ],
+                  "rows": [
+                    [
+                      1,
+                      10
+                    ],
+                    [
+                      2,
+                      20
+                    ],
+                    [
+                      3,
+                      30
+                    ]
+                  ],
+                  "sql": "SELECT 1 AS id, 10 AS qty UNION ALL SELECT 2 AS id, 20 AS qty UNION ALL SELECT 3 AS id, 30 AS qty",
+                  "ordered": true
+                }
+              ]
+            },
+            {
+              "label": "② 事务中：UPDATE 和 DELETE 都做完了，但还没有提交",
+              "tables": [
+                {
+                  "columns": [
+                    "id",
+                    "qty"
+                  ],
+                  "rows": [
+                    [
+                      1,
+                      10
+                    ],
+                    [
+                      2,
+                      25
+                    ]
+                  ],
+                  "sql": "SELECT 1 AS id, 10 AS qty UNION ALL SELECT 2 AS id, 25 AS qty",
+                  "ordered": true
+                }
+              ]
+            },
+            {
+              "label": "③ ROLLBACK 之后：全部撤销，回到事务开始前",
+              "via": "ROLLBACK：事务里的修改一起撤销（要么全部成功，要么全部撤销）",
+              "tables": [
+                {
+                  "columns": [
+                    "id",
+                    "qty"
+                  ],
+                  "rows": [
+                    [
+                      1,
+                      10
+                    ],
+                    [
+                      2,
+                      20
+                    ],
+                    [
+                      3,
+                      30
+                    ]
+                  ],
+                  "sql": "SELECT 1 AS id, 10 AS qty UNION ALL SELECT 2 AS id, 20 AS qty UNION ALL SELECT 3 AS id, 30 AS qty",
+                  "ordered": true
+                }
+              ]
+            }
+          ],
+          "conclusion": "事务把几步修改当成一个整体：全部成功就提交，中途出问题就整体撤销，不会停在“改了一半”。"
         }
       ]
     }

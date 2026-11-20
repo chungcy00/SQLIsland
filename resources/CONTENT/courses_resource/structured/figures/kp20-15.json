@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp20-15",
-  "lessonSha256": "a0d46b2b9f603b873da2025354df5d4af306c7820a911114e1f5de1f46ed90d5",
+  "lessonSha256": "8b7fb6380fa1ee43c285d9f71aa69c731d1e9ed4f27b96dad84ed8fd03aec8df",
   "figures": [
     {
       "id": "kp20-15-clauses",
@@ -41,6 +41,114 @@
           "note": "按 balance_cents DESC 排列结果。"
         }
       ]
+    },
+    {
+      "id": "kp20-15-map",
+      "slot": "concept",
+      "kind": "flow-map",
+      "title": "采购敞口：承诺、收货、开票、付款是不同的事件（供应商 2）",
+      "stages": [
+        {
+          "label": "① 处理前：采购侧和财务侧各自先按供应商汇总（分）",
+          "tables": [
+            {
+              "columns": [
+                "item",
+                "amount_cents"
+              ],
+              "rows": [
+                [
+                  "订购承诺",
+                  37317086
+                ],
+                [
+                  "合格收货",
+                  35717666
+                ]
+              ],
+              "sql": "WITH a AS (SELECT supplier_id,SUM(ordered_cents) ordered,SUM(accepted*unit_price_cents) received FROM v_po_lines GROUP BY supplier_id), b AS (SELECT supplier_id,SUM(billed_cents) billed,SUM(paid_cents) paid,SUM(balance_cents) balance FROM v_invoice_balance GROUP BY supplier_id) SELECT '订购承诺' item, ordered amount_cents FROM a WHERE supplier_id=2 UNION ALL SELECT '合格收货', received FROM a WHERE supplier_id=2",
+              "ordered": true,
+              "name": "采购侧（v_po_lines）"
+            },
+            {
+              "columns": [
+                "item",
+                "amount_cents"
+              ],
+              "rows": [
+                [
+                  "净开票",
+                  36165673
+                ],
+                [
+                  "已付款",
+                  25365505
+                ],
+                [
+                  "未付余额",
+                  10800168
+                ]
+              ],
+              "sql": "WITH a AS (SELECT supplier_id,SUM(ordered_cents) ordered,SUM(accepted*unit_price_cents) received FROM v_po_lines GROUP BY supplier_id), b AS (SELECT supplier_id,SUM(billed_cents) billed,SUM(paid_cents) paid,SUM(balance_cents) balance FROM v_invoice_balance GROUP BY supplier_id) SELECT '净开票' item, billed amount_cents FROM b WHERE supplier_id=2 UNION ALL SELECT '已付款', paid FROM b WHERE supplier_id=2 UNION ALL SELECT '未付余额', balance FROM b WHERE supplier_id=2",
+              "ordered": true,
+              "name": "财务侧（v_invoice_balance）"
+            }
+          ]
+        },
+        {
+          "label": "② 对齐成同一个供应商的一条“链”",
+          "via": "各自先聚合到供应商，再对齐；未付余额是净开票减付款，并非未收货承诺",
+          "tables": [
+            {
+              "columns": [
+                "item",
+                "amount_cents"
+              ],
+              "rows": [
+                [
+                  "订购承诺",
+                  37317086
+                ],
+                [
+                  "合格收货",
+                  35717666
+                ],
+                [
+                  "净开票",
+                  36165673
+                ],
+                [
+                  "已付款",
+                  25365505
+                ],
+                [
+                  "未付余额",
+                  10800168
+                ]
+              ],
+              "sql": "WITH a AS (SELECT supplier_id,SUM(ordered_cents) ordered,SUM(accepted*unit_price_cents) received FROM v_po_lines GROUP BY supplier_id), b AS (SELECT supplier_id,SUM(billed_cents) billed,SUM(paid_cents) paid,SUM(balance_cents) balance FROM v_invoice_balance GROUP BY supplier_id) SELECT item, amount_cents FROM (SELECT 1 n,'订购承诺' item, COALESCE(a.ordered,0) amount_cents FROM suppliers s LEFT JOIN a ON a.supplier_id=s.supplier_id WHERE s.supplier_id=2 UNION ALL SELECT 2,'合格收货', COALESCE(a.received,0) FROM suppliers s LEFT JOIN a ON a.supplier_id=s.supplier_id WHERE s.supplier_id=2 UNION ALL SELECT 3,'净开票', COALESCE(b.billed,0) FROM suppliers s LEFT JOIN b ON b.supplier_id=s.supplier_id WHERE s.supplier_id=2 UNION ALL SELECT 4,'已付款', COALESCE(b.paid,0) FROM suppliers s LEFT JOIN b ON b.supplier_id=s.supplier_id WHERE s.supplier_id=2 UNION ALL SELECT 5,'未付余额', COALESCE(b.balance,0) FROM suppliers s LEFT JOIN b ON b.supplier_id=s.supplier_id WHERE s.supplier_id=2) ORDER BY n",
+              "ordered": true,
+              "tags": [
+                null,
+                {
+                  "text": "比承诺少 1599420",
+                  "tone": "merge"
+                },
+                {
+                  "text": "和收货相差 448007",
+                  "tone": "merge"
+                },
+                null,
+                {
+                  "text": "= 净开票 − 已付款",
+                  "tone": "take"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "conclusion": "金额不会一一对应：承诺 ≠ 收货 ≠ 开票 ≠ 付款，每一步之间的差额都是需要解释的业务事件。"
     }
   ]
 }

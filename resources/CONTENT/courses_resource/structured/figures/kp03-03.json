@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp03-03",
-  "lessonSha256": "8d3479f25d1e3ff309c63e4f08ad622b5f93ffe5a85714e2fe3e234238b1edc0",
+  "lessonSha256": "f5082a63a22a46bf703fa9abb27f83cb2764bcdcc97823505cab59fee95b2c4f",
   "figures": [
     {
       "id": "kp03-03-clauses",
@@ -177,6 +177,157 @@
           ]
         }
       ]
+    },
+    {
+      "id": "kp03-03-map",
+      "slot": "concept",
+      "kind": "flow-map",
+      "title": "IN 与 BETWEEN：一个看“在不在清单里”，一个看“在不在范围内”",
+      "stages": [
+        {
+          "label": "① 处理前：products（6 行）",
+          "tables": [
+            {
+              "columns": [
+                "product_id",
+                "category",
+                "price"
+              ],
+              "rows": [
+                [
+                  1,
+                  "护肤品",
+                  15
+                ],
+                [
+                  2,
+                  "护肤品",
+                  89
+                ],
+                [
+                  3,
+                  "护肤品",
+                  35
+                ],
+                [
+                  4,
+                  "化妆品",
+                  65
+                ],
+                [
+                  5,
+                  "化妆品",
+                  45
+                ],
+                [
+                  6,
+                  "日用品",
+                  15
+                ]
+              ],
+              "source": "products",
+              "sql": "SELECT product_id, category, price FROM products ORDER BY product_id",
+              "ordered": true
+            }
+          ]
+        },
+        {
+          "label": "② 逐行判断两个条件，都成立才留下",
+          "via": "category IN ('护肤品','化妆品')：类别在清单里；price BETWEEN 35 AND 65：价格在 35 到 65 之间（含 35 和 65）",
+          "tables": [
+            {
+              "columns": [
+                "id",
+                "category",
+                "price",
+                "IN",
+                "BETWEEN",
+                "结果"
+              ],
+              "rows": [
+                [
+                  1,
+                  "护肤品",
+                  15,
+                  "是",
+                  "否",
+                  "去掉"
+                ],
+                [
+                  2,
+                  "护肤品",
+                  89,
+                  "是",
+                  "否",
+                  "去掉"
+                ],
+                [
+                  3,
+                  "护肤品",
+                  35,
+                  "是",
+                  "是",
+                  "留"
+                ],
+                [
+                  4,
+                  "化妆品",
+                  65,
+                  "是",
+                  "是",
+                  "留"
+                ],
+                [
+                  5,
+                  "化妆品",
+                  45,
+                  "是",
+                  "是",
+                  "留"
+                ],
+                [
+                  6,
+                  "日用品",
+                  15,
+                  "否",
+                  "否",
+                  "去掉"
+                ]
+              ],
+              "sql": "SELECT product_id AS id, category, price, CASE WHEN category IN ('护肤品','化妆品') THEN '是' ELSE '否' END AS \"IN\", CASE WHEN price BETWEEN 35 AND 65 THEN '是' ELSE '否' END AS \"BETWEEN\", CASE WHEN category IN ('护肤品','化妆品') AND price BETWEEN 35 AND 65 THEN '留' ELSE '去掉' END AS \"结果\" FROM products ORDER BY product_id",
+              "ordered": true
+            }
+          ]
+        },
+        {
+          "label": "③ 处理后：留下的行（3 行）",
+          "tables": [
+            {
+              "columns": [
+                "product_id",
+                "price"
+              ],
+              "rows": [
+                [
+                  4,
+                  65
+                ],
+                [
+                  5,
+                  45
+                ],
+                [
+                  3,
+                  35
+                ]
+              ],
+              "sql": "SELECT product_id, price FROM products WHERE category IN ('护肤品','化妆品') AND price BETWEEN 35 AND 65 ORDER BY price DESC;",
+              "ordered": true
+            }
+          ]
+        }
+      ],
+      "conclusion": "BETWEEN 包含两个端点：价格正好是 35 和 65 的 Cleanser、Cream 都被留下。"
     }
   ]
 }

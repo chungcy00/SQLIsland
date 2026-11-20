@@ -1,6 +1,6 @@
 // “图示”数据契约（B9）：图示数据独立存放，不改动已转换课文；所有数值须能追溯到课程示例数据，并由执行检查核对。
 const SLOTS = ['concept', 'syntax', 'breakdown', 'problem'];
-const KINDS = ['truth-table', 'clause-map', 'row-flow', 'stage-flow', 'metric-card', 'function-map', 'join-map', 'compare-card'];
+const KINDS = ['truth-table', 'clause-map', 'row-flow', 'stage-flow', 'metric-card', 'function-map', 'join-map', 'compare-card', 'page-map', 'flow-map', 'tip-card'];
 const TRUTH = ['true', 'false', 'unknown'];
 const ROLES = ['select', 'from', 'where', 'group', 'having', 'order', 'limit', 'cte', 'setop'];
 export function validateFigures(lesson, data) {
@@ -20,6 +20,69 @@ export function validateFigures(lesson, data) {
     const source = figure.table && lesson.sourceTables?.find(table => table.name === figure.table);
     const column = name => source?.columns.findIndex(item => item.name === name);
     if (figure.conclusion !== undefined) text(figure.conclusion, 'conclusion ' + figure.id);
+    if (figure.kind === 'tip-card') {
+      // 提示卡：每条提示必须逐字引用课文（概念、使用要点、易错点），不新增课文里没有的说法。
+      if (figure.slot !== 'concept' || figure.merge) fail('tip-card belongs to the concept slot ' + figure.id);
+      if (!Array.isArray(figure.items) || figure.items.length < 2 || figure.items.length > 4) fail('items ' + figure.id);
+      const corpus = [];
+      const walk = value => { if (typeof value === 'string') corpus.push(value); else if (Array.isArray(value)) value.forEach(walk); else if (value && typeof value === 'object') Object.values(value).forEach(walk); };
+      walk(lesson.presentation?.conceptBlocks); walk(lesson.presentation?.cautions);
+      const all = corpus.join('\n');
+      for (const item of figure.items) {
+        if (!['good', 'bad', 'neutral'].includes(item.tone)) fail('item tone ' + figure.id);
+        text(item.label, 'item label ' + figure.id); text(item.text, 'item text ' + figure.id);
+        if (!all.includes(item.text)) fail('tip text is not quoted from the lesson: ' + item.text);
+      }
+      continue;
+    }
+    if (figure.kind === 'flow-map') {
+      // 处理前 → 处理中 → 处理后：每个阶段的每张表都带 sql，由 check-figures 实际执行核对；标 source 的表必须等于课程示例表（按所列列）。
+      if (figure.slot !== 'concept' || figure.merge) fail('flow-map belongs to the concept slot ' + figure.id);
+      const variants = figure.variants || [{stages: figure.stages, conclusion: figure.conclusion}];
+      if (!variants.length || variants.length > 3) fail('variants ' + figure.id);
+      for (const variant of variants) {
+        if (!Array.isArray(variant.stages) || variant.stages.length < 2 || variant.stages.length > 4) fail('stages ' + figure.id);
+        if (variants.length > 1) text(variant.label, 'variant label ' + figure.id);
+        if (variant.conclusion !== undefined) text(variant.conclusion, 'variant conclusion ' + figure.id);
+        for (const stage of variant.stages) {
+          text(stage.label, 'stage label ' + figure.id);
+          if (stage.via !== undefined) text(stage.via, 'stage via ' + figure.id);
+          if (!Array.isArray(stage.tables) || !stage.tables.length || stage.tables.length > 2) fail('stage tables ' + figure.id);
+          for (const tbl of stage.tables) {
+            text(tbl.sql, 'table sql ' + figure.id);
+            if (!/^(select|with)\b/i.test(tbl.sql.trim())) fail('table sql must be a SELECT ' + figure.id);
+            if (!Array.isArray(tbl.columns) || !tbl.columns.length || !Array.isArray(tbl.rows) || tbl.rows.some(row => !Array.isArray(row) || row.length !== tbl.columns.length)) fail('table rows ' + figure.id);
+            if (tbl.tags !== undefined && (!Array.isArray(tbl.tags) || tbl.tags.length !== tbl.rows.length || tbl.tags.some(tag => tag !== null && (typeof tag.text !== 'string' || !['take', 'skip', 'beyond', 'merge', 'tie'].includes(tag.tone))))) fail('table tags ' + figure.id);
+            if (tbl.bandBy !== undefined && ![].concat(tbl.bandBy).every(name => tbl.columns.includes(name))) fail('bandBy ' + figure.id);
+            if (tbl.source) {
+              const src = lesson.sourceTables?.find(item => item.name === tbl.source) || fail('unknown source table ' + tbl.source);
+              const idx = tbl.columns.map(name => { const i = src.columns.findIndex(c => c.name === name); if (i < 0) fail('unknown column ' + name); return i; });
+              if (JSON.stringify(src.rows.map(row => idx.map(i => row[i]))) !== JSON.stringify(tbl.rows)) fail('source table rows differ from the sample data ' + figure.id);
+            }
+          }
+        }
+      }
+      continue;
+    }
+    if (figure.kind === 'page-map') {
+      // 分页位置示意图：用课程示例表按排序键排好，展示每一页“跳过 / 本次取出 / 超出取出范围”哪些记录；取出的记录由 check-figures 用 LIMIT/OFFSET 实际执行核对。
+      if (figure.slot !== 'concept' || figure.merge) fail('page-map belongs to the concept slot ' + figure.id);
+      const tbl = lesson.sourceTables?.find(item => item.name === figure.table) || fail('unknown table ' + figure.table);
+      const idx = name => { const i = tbl.columns.findIndex(c => c.name === name); if (i < 0) fail('unknown column ' + name); return i; };
+      const shown = figure.columns.map(idx);
+      const keys = (figure.orderKeys || []).map(k => ({i: idx(k.column), sign: k.dir === 'desc' ? -1 : 1}));
+      if (!keys.length) fail('orderKeys ' + figure.id);
+      const sorted = [...tbl.rows].sort((a, b) => { for (const k of keys) { if (a[k.i] === b[k.i]) continue; return (a[k.i] < b[k.i] ? -1 : 1) * k.sign; } return 0; }).map(row => shown.map(i => row[i]));
+      if (JSON.stringify(sorted) !== JSON.stringify(figure.rows)) fail('rows differ from the sample data sorted by orderKeys ' + figure.id);
+      if (!Number.isInteger(figure.pageSize) || figure.pageSize < 1) fail('pageSize ' + figure.id);
+      if (!normalized(lesson.sqliteSql).includes(normalized('ORDER BY ' + figure.orderBy))) fail('orderBy is not in the lesson query ' + figure.id);
+      if (!Array.isArray(figure.pages) || !figure.pages.length || figure.pages.some(page => page.offset !== (page.page - 1) * figure.pageSize)) fail('pages must follow offset = (page - 1) * pageSize ' + figure.id);
+      const ex = figure.example;
+      if (!ex || !Number.isInteger(ex.limit) || !Number.isInteger(ex.offset) || ex.limit < 1 || ex.offset < 0) fail('example limit/offset ' + figure.id);
+      if (!normalized(lesson.sqliteSql).includes(normalized(`LIMIT ${ex.limit} OFFSET ${ex.offset}`))) fail('example is not the lesson query ' + figure.id);
+      if (figure.pagesNote !== undefined) text(figure.pagesNote, 'pagesNote ' + figure.id);
+      continue;
+    }
     if (figure.kind === 'compare-card') {
       // 对比卡：并列几块“原始数据 → 处理 → 数字”，大数字由 check.sql 实际执行核对（见 check-figures）。
       if (figure.slot !== 'concept' || figure.merge) fail('compare-card belongs to the concept slot ' + figure.id);
@@ -162,6 +225,17 @@ export function validateFigures(lesson, data) {
         const whole = /^select \* from (\w+);?$/i.exec(step.sql.trim());
         const table = whole && lesson.sourceTables?.find(item => item.name === whole[1]);
         if (table && (JSON.stringify(step.rows) !== JSON.stringify(table.rows) || JSON.stringify(step.columns) !== JSON.stringify(table.columns.map(column => column.name)))) fail('first step differs from sample data ' + (index + 1));
+      }
+      const limited = figure.steps.at(-1);
+      if (limited.roles) {
+        // 分页步骤：标出 跳过 / 本次取出 / 超出取出范围，必须与 LIMIT n OFFSET m 和取出的行一致。
+        const match = /limit\s+(\d+)\s+offset\s+(\d+)/i.exec(limited.sql);
+        const before = figure.steps.slice(0, -1).filter(step => !step.skip).at(-1);
+        if (!match || !before) fail('roles need LIMIT n OFFSET m after a data step ' + figure.id);
+        const [take, skip] = [Number(match[1]), Number(match[2])];
+        const expectedRoles = before.rows.map((_, k) => k < skip ? 'skip' : k < skip + take ? 'take' : 'beyond');
+        if (JSON.stringify(limited.roles) !== JSON.stringify(expectedRoles)) fail('roles differ from LIMIT/OFFSET ' + figure.id);
+        if (JSON.stringify(before.rows.slice(skip, skip + take)) !== JSON.stringify(limited.rows)) fail('taken rows differ from the last step ' + figure.id);
       }
       const last = figure.steps.at(-1);
       if (last.skip || normalized(last.sql) !== normalized(lesson.sqliteSql)) fail('last step must be the full query ' + figure.id);

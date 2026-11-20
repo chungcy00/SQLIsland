@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp09-01",
-  "lessonSha256": "f2bb15121cd8d32ff63ae8f2adc57884ad00d649c41af7050ce1e0f4a3af4926",
+  "lessonSha256": "3778db9416168e01a6aedf4139d20e22e99ee42db33f6f49e1efc60663c9b802",
   "figures": [
     {
       "id": "kp09-01-clauses",
@@ -161,6 +161,168 @@
           ]
         }
       ]
+    },
+    {
+      "id": "kp09-01-map",
+      "slot": "concept",
+      "kind": "flow-map",
+      "title": "CASE WHEN：从上到下判断，第一个成立的就停",
+      "stages": [
+        {
+          "label": "① 处理前：products（6 行）",
+          "tables": [
+            {
+              "columns": [
+                "product_id",
+                "stock"
+              ],
+              "rows": [
+                [
+                  1,
+                  150
+                ],
+                [
+                  2,
+                  40
+                ],
+                [
+                  3,
+                  200
+                ],
+                [
+                  4,
+                  180
+                ],
+                [
+                  5,
+                  80
+                ],
+                [
+                  6,
+                  0
+                ]
+              ],
+              "source": "products",
+              "sql": "SELECT product_id, stock FROM products ORDER BY product_id",
+              "ordered": true
+            }
+          ]
+        },
+        {
+          "label": "② 每一行从上到下检查 WHEN，得到一个类别",
+          "via": "CASE WHEN stock=0 → '缺货'；WHEN stock<50 → '低库存'；都不成立 → '正常'",
+          "tables": [
+            {
+              "columns": [
+                "product_id",
+                "stock",
+                "stock_level"
+              ],
+              "rows": [
+                [
+                  1,
+                  150,
+                  "正常"
+                ],
+                [
+                  2,
+                  40,
+                  "低库存"
+                ],
+                [
+                  3,
+                  200,
+                  "正常"
+                ],
+                [
+                  4,
+                  180,
+                  "正常"
+                ],
+                [
+                  5,
+                  80,
+                  "正常"
+                ],
+                [
+                  6,
+                  0,
+                  "缺货"
+                ]
+              ],
+              "tags": [
+                {
+                  "text": "都不成立 → ELSE",
+                  "tone": "skip"
+                },
+                {
+                  "text": "stock<50 成立",
+                  "tone": "merge"
+                },
+                {
+                  "text": "都不成立 → ELSE",
+                  "tone": "skip"
+                },
+                {
+                  "text": "都不成立 → ELSE",
+                  "tone": "skip"
+                },
+                {
+                  "text": "都不成立 → ELSE",
+                  "tone": "skip"
+                },
+                {
+                  "text": "stock=0 成立 · 停",
+                  "tone": "tie"
+                }
+              ],
+              "sql": "SELECT product_id, stock, CASE WHEN stock=0 THEN '缺货' WHEN stock<50 THEN '低库存' ELSE '正常' END AS stock_level FROM products ORDER BY product_id",
+              "ordered": true
+            }
+          ]
+        },
+        {
+          "label": "③ 处理后：只显示编号和类别（6 行）",
+          "via": "SELECT product_id, stock_level，再按 product_name 排序",
+          "tables": [
+            {
+              "columns": [
+                "product_id",
+                "stock_level"
+              ],
+              "rows": [
+                [
+                  5,
+                  "正常"
+                ],
+                [
+                  6,
+                  "缺货"
+                ],
+                [
+                  2,
+                  "低库存"
+                ],
+                [
+                  1,
+                  "正常"
+                ],
+                [
+                  4,
+                  "正常"
+                ],
+                [
+                  3,
+                  "正常"
+                ]
+              ],
+              "sql": "SELECT product_id, CASE WHEN stock=0 THEN '缺货' WHEN stock<50 THEN '低库存' ELSE '正常' END AS stock_level FROM products ORDER BY product_name DESC;",
+              "ordered": true
+            }
+          ]
+        }
+      ],
+      "conclusion": "库存为 0 同时满足 stock<50，但 CASE 先遇到的 WHEN stock=0 成立就停，所以是“缺货”；条件的先后顺序会改变结果。"
     }
   ]
 }

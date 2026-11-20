@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp03-02",
-  "lessonSha256": "04c802a4b9f8d8aa9e0ebc7e71f30ba863bb8695229868bd07e83e1230527f4a",
+  "lessonSha256": "50e63de6706c600870d1b50539d7d89b0b432e53f2ece70750ecdcaa36578a0b",
   "figures": [
     {
       "id": "kp03-02-clauses",
@@ -169,6 +169,153 @@
           ]
         }
       ]
+    },
+    {
+      "id": "kp03-02-map",
+      "slot": "concept",
+      "kind": "flow-map",
+      "title": "AND、OR、NOT：先算括号里，再合并成真或假",
+      "stages": [
+        {
+          "label": "① 处理前：products（6 行）",
+          "tables": [
+            {
+              "columns": [
+                "product_id",
+                "price",
+                "stock"
+              ],
+              "rows": [
+                [
+                  1,
+                  15,
+                  150
+                ],
+                [
+                  2,
+                  89,
+                  40
+                ],
+                [
+                  3,
+                  35,
+                  200
+                ],
+                [
+                  4,
+                  65,
+                  180
+                ],
+                [
+                  5,
+                  45,
+                  80
+                ],
+                [
+                  6,
+                  15,
+                  0
+                ]
+              ],
+              "source": "products",
+              "sql": "SELECT product_id, price, stock FROM products ORDER BY product_id",
+              "ordered": true
+            }
+          ]
+        },
+        {
+          "label": "② 逐行判断：(price < 40 OR stock > 100) AND NOT stock = 0",
+          "via": "先算括号里的 OR，再算 NOT，最后用 AND 把两边合起来：两边都为真才留下",
+          "tables": [
+            {
+              "columns": [
+                "id",
+                "price<40",
+                "stock>100",
+                "括号 OR",
+                "NOT stock=0",
+                "结果"
+              ],
+              "rows": [
+                [
+                  1,
+                  "真",
+                  "真",
+                  "真",
+                  "真",
+                  "留"
+                ],
+                [
+                  2,
+                  "假",
+                  "假",
+                  "假",
+                  "真",
+                  "去掉"
+                ],
+                [
+                  3,
+                  "真",
+                  "真",
+                  "真",
+                  "真",
+                  "留"
+                ],
+                [
+                  4,
+                  "假",
+                  "真",
+                  "真",
+                  "真",
+                  "留"
+                ],
+                [
+                  5,
+                  "假",
+                  "假",
+                  "假",
+                  "真",
+                  "去掉"
+                ],
+                [
+                  6,
+                  "真",
+                  "假",
+                  "真",
+                  "假",
+                  "去掉"
+                ]
+              ],
+              "sql": "SELECT product_id AS id, CASE WHEN price < 40 THEN '真' ELSE '假' END AS \"price<40\", CASE WHEN stock > 100 THEN '真' ELSE '假' END AS \"stock>100\", CASE WHEN price < 40 OR stock > 100 THEN '真' ELSE '假' END AS \"括号 OR\", CASE WHEN NOT stock = 0 THEN '真' ELSE '假' END AS \"NOT stock=0\", CASE WHEN (price < 40 OR stock > 100) AND NOT stock = 0 THEN '留' ELSE '去掉' END AS \"结果\" FROM products ORDER BY product_id",
+              "ordered": true
+            }
+          ]
+        },
+        {
+          "label": "③ 处理后：留下的行（3 行）",
+          "tables": [
+            {
+              "columns": [
+                "product_id"
+              ],
+              "rows": [
+                [
+                  1
+                ],
+                [
+                  4
+                ],
+                [
+                  3
+                ]
+              ],
+              "sql": "SELECT product_id FROM products WHERE (price < 40 OR stock > 100) AND NOT stock = 0 ORDER BY product_name DESC;",
+              "ordered": true
+            }
+          ]
+        }
+      ],
+      "conclusion": "括号决定先算谁：Soap_1 价格低却是零库存，“NOT stock = 0”为假，整体就被去掉。"
     }
   ]
 }

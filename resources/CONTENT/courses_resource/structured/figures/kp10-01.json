@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp10-01",
-  "lessonSha256": "9fc976ae1b6a3407b31b93f134b21a01c56b692a30f7c8c05c78760eda2c5246",
+  "lessonSha256": "0c0145397d1fbb9bfa29bfe1c7dd5d892047ef6ae30799092027124355a6d7a0",
   "figures": [
     {
       "id": "kp10-01-clauses",
@@ -177,6 +177,127 @@
           ]
         }
       ]
+    },
+    {
+      "id": "kp10-01-map",
+      "slot": "concept",
+      "kind": "flow-map",
+      "title": "标量子查询：内层先算出一个值，外层再拿它比较",
+      "stages": [
+        {
+          "label": "① 先单独执行内层子查询：只得到一个值",
+          "note": "products 的 6 个价格取平均。",
+          "tables": [
+            {
+              "columns": [
+                "AVG(price)"
+              ],
+              "rows": [
+                [
+                  44
+                ]
+              ],
+              "sql": "SELECT AVG(price) FROM products"
+            }
+          ]
+        },
+        {
+          "label": "② 外层 WHERE：每一行的 price 都和这个值比较",
+          "via": "把子查询当成一个普通数字 44 代入：WHERE price > 44",
+          "tables": [
+            {
+              "columns": [
+                "product_id",
+                "price"
+              ],
+              "rows": [
+                [
+                  1,
+                  15
+                ],
+                [
+                  2,
+                  89
+                ],
+                [
+                  3,
+                  35
+                ],
+                [
+                  4,
+                  65
+                ],
+                [
+                  5,
+                  45
+                ],
+                [
+                  6,
+                  15
+                ]
+              ],
+              "source": "products",
+              "tags": [
+                {
+                  "text": "15 不大于 44 · 去掉",
+                  "tone": "skip"
+                },
+                {
+                  "text": "89 > 44 · 留",
+                  "tone": "take"
+                },
+                {
+                  "text": "35 不大于 44 · 去掉",
+                  "tone": "skip"
+                },
+                {
+                  "text": "65 > 44 · 留",
+                  "tone": "take"
+                },
+                {
+                  "text": "45 > 44 · 留",
+                  "tone": "take"
+                },
+                {
+                  "text": "15 不大于 44 · 去掉",
+                  "tone": "skip"
+                }
+              ],
+              "sql": "SELECT product_id, price FROM products ORDER BY product_id",
+              "ordered": true
+            }
+          ]
+        },
+        {
+          "label": "③ 处理后：留下的行（3 行）",
+          "via": "只留下比较为真的行，再 ORDER BY price",
+          "tables": [
+            {
+              "columns": [
+                "product_id",
+                "price"
+              ],
+              "rows": [
+                [
+                  5,
+                  45
+                ],
+                [
+                  4,
+                  65
+                ],
+                [
+                  2,
+                  89
+                ]
+              ],
+              "sql": "SELECT product_id, price FROM products WHERE price > (SELECT AVG(price) FROM products) ORDER BY price;",
+              "ordered": true
+            }
+          ]
+        }
+      ],
+      "conclusion": "标量子查询只返回一个值（一列一行），所以可以像普通数字一样参与比较。"
     }
   ]
 }

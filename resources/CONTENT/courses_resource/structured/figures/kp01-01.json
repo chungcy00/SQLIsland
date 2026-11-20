@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp01-01",
-  "lessonSha256": "3888d5d1361ed2556d15eb3022316838125a40372b3a2d15a14fb70d8bcf1677",
+  "lessonSha256": "5d31f7aa718ea946feecdd744f619488a3d7b4cd32600f287594daca854de7ca",
   "figures": [
     {
       "id": "kp01-01-clauses",
@@ -164,6 +164,89 @@
           ]
         }
       ]
+    },
+    {
+      "id": "kp01-01-map",
+      "slot": "concept",
+      "kind": "compare-card",
+      "title": "一行代表什么，决定了怎么数",
+      "panels": [
+        {
+          "label": "把订单行数当成客户数",
+          "tone": "bad",
+          "columns": [
+            "id",
+            "customer_id"
+          ],
+          "rows": [
+            [
+              1,
+              1
+            ],
+            [
+              2,
+              2
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              4,
+              null
+            ],
+            [
+              5,
+              3
+            ]
+          ],
+          "big": {
+            "label": "COUNT(*)：订单行数",
+            "value": 5
+          },
+          "check": {
+            "sql": "SELECT COUNT(*) FROM orders",
+            "expected": [
+              [
+                5
+              ]
+            ]
+          },
+          "note": "orders 一行是一笔订单：同一位客户（如 1）有两行。"
+        },
+        {
+          "label": "数不同的客户编号",
+          "tone": "good",
+          "columns": [
+            "customer_id"
+          ],
+          "rows": [
+            [
+              1
+            ],
+            [
+              2
+            ],
+            [
+              3
+            ]
+          ],
+          "big": {
+            "label": "COUNT(DISTINCT customer_id)：客户数",
+            "value": 3
+          },
+          "check": {
+            "sql": "SELECT COUNT(DISTINCT customer_id) FROM orders",
+            "expected": [
+              [
+                3
+              ]
+            ]
+          },
+          "note": "没有客户编号（NULL）的匿名订单不算在内。"
+        }
+      ],
+      "conclusion": "5 笔订单只来自 3 位有编号的客户：记录数并不等于客户数。"
     }
   ]
 }

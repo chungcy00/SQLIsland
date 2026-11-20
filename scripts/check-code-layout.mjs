@@ -6,11 +6,11 @@ try {
  for(const w of [320,390,975]){await page.setViewportSize({width:w,height:844});assert.ok(await page.locator('pre').evaluateAll(nodes=>nodes.every(n=>n.scrollWidth<=n.clientWidth+1)));}
  await page.goto('http://127.0.0.1:4173/#/cards');
  await page.locator('[data-action=startCards]').waitFor();
- await page.locator('[data-action=startCards]').click();
- await page.locator('.flashcard').waitFor();
- await page.locator('.flashcard').evaluate(n=>{const pre=document.createElement('pre');pre.textContent='SELECT product_id,100.0*stock_value_cents/NULLIF(□,0) AS inventory_pct FROM share_mini';n.append(pre);});
+ await page.locator('[data-action=startCards]').click();await page.waitForURL('**/#/review');
+ await page.locator('.fc').waitFor();
+ await page.locator('.fc').evaluate(n=>{const pre=document.createElement('pre');pre.textContent='SELECT product_id,100.0*stock_value_cents/NULLIF(□,0) AS inventory_pct FROM share_mini';n.append(pre);});
  await page.setViewportSize({width:320,height:844});
- assert.ok(await page.locator('.flashcard pre').evaluateAll(nodes=>nodes.every(n=>n.scrollWidth<=n.clientWidth+1)));
+ assert.ok(await page.locator('.fc pre').evaluateAll(nodes=>nodes.every(n=>n.scrollWidth<=n.clientWidth+1)));
  await page.goto('http://127.0.0.1:4173/#/question/q0009');await page.locator('#sql-editor').waitFor();
  const sql="SELECT product_id,100.0*stock_value_cents/NULLIF(SUM(stock_value_cents) OVER(),0) AS inventory_pct FROM share_mini;\nSELECT 'this is a very very very long line with spaces and a_string_without_spaces_abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz' AS note;\nSELECT 1;";
  await page.locator('#sql-editor').fill(sql);

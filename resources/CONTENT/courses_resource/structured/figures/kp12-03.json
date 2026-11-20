@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp12-03",
-  "lessonSha256": "1fbf4b31b1742c839619bc2fb3da13f61881d360aaf5cb8371b1d6bdce478829",
+  "lessonSha256": "10b24dc968ce0246d7958f6b189c55442ed71f9ae836e5adf547b94c94c283f7",
   "figures": [
     {
       "id": "kp12-03-clauses",
@@ -23,6 +23,69 @@
           "note": "结果表最终显示 1 列：elapsed。"
         }
       ]
+    },
+    {
+      "id": "kp12-03-map",
+      "slot": "concept",
+      "kind": "compare-card",
+      "title": "日期差：参数顺序决定正负",
+      "panels": [
+        {
+          "label": "（结束日期 − 开始日期）",
+          "tone": "good",
+          "columns": [
+            "开始日期",
+            "结束日期"
+          ],
+          "rows": [
+            [
+              "2026-01-31",
+              "2026-02-03"
+            ]
+          ],
+          "big": {
+            "label": "日期差（天）",
+            "value": 3
+          },
+          "check": {
+            "sql": "SELECT CAST(julianday('2026-02-03') - julianday('2026-01-31') AS INTEGER)",
+            "expected": [
+              [
+                3
+              ]
+            ]
+          },
+          "note": "从 1 月 31 日到 2 月 3 日，经过 3 天。"
+        },
+        {
+          "label": "顺序写反：（开始日期 − 结束日期）",
+          "tone": "bad",
+          "columns": [
+            "开始日期",
+            "结束日期"
+          ],
+          "rows": [
+            [
+              "2026-01-31",
+              "2026-02-03"
+            ]
+          ],
+          "big": {
+            "label": "日期差（天）",
+            "value": -3
+          },
+          "check": {
+            "sql": "SELECT CAST(julianday('2026-01-31') - julianday('2026-02-03') AS INTEGER)",
+            "expected": [
+              [
+                -3
+              ]
+            ]
+          },
+          "note": "结果变成负数。"
+        }
+      ],
+      "conclusion": "负数可以表示“还没到期”：用绝对值把它改成正数，会掩盖这个信息。"
     }
   ]
 }

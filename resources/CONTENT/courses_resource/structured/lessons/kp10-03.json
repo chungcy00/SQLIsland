@@ -21,6 +21,12 @@
       ]
     },
     {
+      "type": "figure",
+      "ids": [
+        "kp10-03-map"
+      ]
+    },
+    {
       "type": "table",
       "columns": [
         "做法",

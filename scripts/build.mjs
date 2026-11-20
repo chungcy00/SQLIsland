@@ -1,5 +1,6 @@
 import { loadCourseStructures } from "./course-structure-resources.mjs";
 import { build } from "esbuild";
+import { normalizeCards } from "../src/flashcard-model.mjs";
 import {
   mkdir,
   cp,
@@ -58,12 +59,15 @@ for (let i = 1; i <= 20; i++) {
       await readFile(`${contentSource}/question_resource/questions/${file}`),
     ).questions,
   );
-  cards.push(
-    ...JSON.parse(
-      await readFile(`${contentSource}/flashcard_resource/flashcards/${file}`),
-    ).cards,
-  );
 }
+// 闪卡：以 332 张统一数据为唯一内容来源（旧 200 张不再打包）；原始 JSON 不改，打包副本去掉 examples 的 actual。
+cards.push(
+  ...normalizeCards(
+    JSON.parse(await readFile(`${contentSource}/flashcard_v2/cards.json`)),
+    JSON.parse(await readFile(`${contentSource}/flashcard_v2/illustration-map.json`)),
+    { slim: true },
+  ),
+);
 const courseStructureStatus = await loadCourseStructures(chapters);
 const integerPolicies = JSON.parse(await readFile("src/integer-column-policy.json"));
 for (const question of questions) {

@@ -99,15 +99,16 @@ try {
   await page.locator('[data-action=cardMode][data-arg=章节]').click();
   await page.locator('[data-action=cardChapter][data-arg=ch02]').click();
   await page.locator('[data-action=startCards]').click();
-  await page.locator('.flashcard.front').waitFor();
+  await page.waitForURL('**/#/review');
+  await page.locator('.fc-tap .fc.front').waitFor();
   assert.equal(await page.locator('[data-action=rate]').count(), 0);
   // 卡片库：搜索卡号、整卡点击翻面看答案、复制为自定义卡
   await route('/cards');
-  await page.locator('#card-search').fill('fc0005');
-  await page.waitForFunction(() => document.querySelectorAll('.card-flip.mini').length === 1);
-  await page.locator('.card-flip.mini').click();
-  await page.locator('.card-flip.mini.back').waitFor();
-  await page.locator('.card-flip.mini.back [data-action=copyCard]').click();
+  await page.locator('#card-search').fill('fc2-0005');
+  await page.waitForFunction(() => document.querySelectorAll('.fc-mini').length === 1);
+  await page.locator('.fc-mini').click();
+  await page.locator('.fc-open .fc.back').waitFor();
+  await page.locator('.fc-open [data-action=copyCard]').click();
   await page.waitForURL('**/#/card-edit/user-*');
   assert.ok((await page.locator('#card-front').inputValue()).length);
   await route('/mine');

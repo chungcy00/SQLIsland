@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp19-58",
-  "lessonSha256": "5b45ec2430450ad65332af180378734e438c30ef97d8afdd1493a0bc3de25ab2",
+  "lessonSha256": "ae3dfa1f753dafa9e81224f7ab222c3795bcadbe772427f9699d3cafd522cef9",
   "figures": [
     {
       "id": "kp19-58-clauses",
@@ -47,6 +47,163 @@
           "note": "按 po_item_id 排列结果。"
         }
       ]
+    },
+    {
+      "id": "kp19-58-map",
+      "slot": "concept",
+      "kind": "flow-map",
+      "title": "采购、收货与发票三方核对：订购、收货、开票逐行对比",
+      "stages": [
+        {
+          "label": "① 处理前：每个采购行的三种数量",
+          "note": "采购行是连接键；开票数量取截至 2025-12-31 的原始开票数量。",
+          "tables": [
+            {
+              "columns": [
+                "po_item_id",
+                "quantity_ordered",
+                "accepted",
+                "billed"
+              ],
+              "rows": [
+                [
+                  4,
+                  77,
+                  0,
+                  0
+                ],
+                [
+                  22,
+                  8,
+                  7,
+                  7
+                ],
+                [
+                  23,
+                  13,
+                  13,
+                  15
+                ],
+                [
+                  30,
+                  9,
+                  8,
+                  8
+                ]
+              ],
+              "sql": "WITH billed AS (\n  SELECT x.po_item_id,SUM(x.quantity_billed) billed,SUM(x.quantity_billed*x.unit_price_cents) billed_cents\n  FROM supplier_invoice_items x JOIN supplier_invoices f ON f.supplier_invoice_id=x.supplier_invoice_id\n  WHERE f.invoice_date<='2025-12-31' GROUP BY x.po_item_id\n), checked AS (\n  SELECT v.po_item_id,v.po_id,v.supplier_id,v.product_id,v.quantity_ordered,v.accepted,\n    COALESCE(b.billed,0) billed,COALESCE(b.billed_cents,0) billed_cents,v.accepted*v.unit_price_cents expected_cents\n  FROM v_po_lines v LEFT JOIN billed b ON b.po_item_id=v.po_item_id\n  WHERE v.order_date BETWEEN '2025-01-01' AND '2025-12-31'\n)\nSELECT po_item_id, quantity_ordered, accepted, billed FROM checked WHERE po_item_id IN (4,22,23,30) ORDER BY po_item_id",
+              "ordered": true
+            }
+          ]
+        },
+        {
+          "label": "② 金额对比：应核金额 = 合格收货量 × 采购单价",
+          "via": "金额差 = 原始开票金额 − 应核金额",
+          "tables": [
+            {
+              "columns": [
+                "po_item_id",
+                "billed_cents",
+                "expected_cents",
+                "variance_cents"
+              ],
+              "rows": [
+                [
+                  4,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  22,
+                  39326,
+                  39326,
+                  0
+                ],
+                [
+                  23,
+                  42210,
+                  36582,
+                  5628
+                ],
+                [
+                  30,
+                  23320,
+                  23320,
+                  0
+                ]
+              ],
+              "sql": "WITH billed AS (\n  SELECT x.po_item_id,SUM(x.quantity_billed) billed,SUM(x.quantity_billed*x.unit_price_cents) billed_cents\n  FROM supplier_invoice_items x JOIN supplier_invoices f ON f.supplier_invoice_id=x.supplier_invoice_id\n  WHERE f.invoice_date<='2025-12-31' GROUP BY x.po_item_id\n), checked AS (\n  SELECT v.po_item_id,v.po_id,v.supplier_id,v.product_id,v.quantity_ordered,v.accepted,\n    COALESCE(b.billed,0) billed,COALESCE(b.billed_cents,0) billed_cents,v.accepted*v.unit_price_cents expected_cents\n  FROM v_po_lines v LEFT JOIN billed b ON b.po_item_id=v.po_item_id\n  WHERE v.order_date BETWEEN '2025-01-01' AND '2025-12-31'\n)\nSELECT po_item_id, billed_cents, expected_cents, billed_cents-expected_cents variance_cents FROM checked WHERE po_item_id IN (4,22,23,30) ORDER BY po_item_id",
+              "ordered": true
+            }
+          ]
+        },
+        {
+          "label": "③ 数量不等或金额差非零的采购行，进入复核名单",
+          "tables": [
+            {
+              "columns": [
+                "po_item_id",
+                "quantity_ordered",
+                "accepted",
+                "billed",
+                "variance_cents"
+              ],
+              "rows": [
+                [
+                  4,
+                  77,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  22,
+                  8,
+                  7,
+                  7,
+                  0
+                ],
+                [
+                  23,
+                  13,
+                  13,
+                  15,
+                  5628
+                ],
+                [
+                  30,
+                  9,
+                  8,
+                  8,
+                  0
+                ]
+              ],
+              "sql": "SELECT po_item_id, quantity_ordered, accepted, billed, variance_cents FROM (WITH billed AS (\n  SELECT x.po_item_id,SUM(x.quantity_billed) billed,SUM(x.quantity_billed*x.unit_price_cents) billed_cents\n  FROM supplier_invoice_items x JOIN supplier_invoices f ON f.supplier_invoice_id=x.supplier_invoice_id\n  WHERE f.invoice_date<='2025-12-31' GROUP BY x.po_item_id\n), checked AS (\n  SELECT v.po_item_id,v.po_id,v.supplier_id,v.product_id,v.quantity_ordered,v.accepted,\n    COALESCE(b.billed,0) billed,COALESCE(b.billed_cents,0) billed_cents,v.accepted*v.unit_price_cents expected_cents\n  FROM v_po_lines v LEFT JOIN billed b ON b.po_item_id=v.po_item_id\n  WHERE v.order_date BETWEEN '2025-01-01' AND '2025-12-31'\n)\nSELECT po_item_id,po_id,supplier_id,product_id,quantity_ordered,accepted,billed,billed_cents,expected_cents,\n  billed_cents-expected_cents variance_cents FROM checked\nWHERE quantity_ordered<>accepted OR accepted<>billed OR billed_cents<>expected_cents ORDER BY po_item_id) WHERE po_item_id IN (4,22,23,30) ORDER BY po_item_id",
+              "ordered": true,
+              "tags": [
+                {
+                  "text": "未收货 → 复核",
+                  "tone": "tie"
+                },
+                {
+                  "text": "少收 1 → 复核",
+                  "tone": "tie"
+                },
+                {
+                  "text": "超开票 2 · 金额有差 → 复核",
+                  "tone": "tie"
+                },
+                {
+                  "text": "少收 1 → 复核",
+                  "tone": "tie"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "conclusion": "三方（订购、收货、开票）数量不一致，或金额差不为零，都要复核；后续贷项不在本题冲减。"
     }
   ]
 }

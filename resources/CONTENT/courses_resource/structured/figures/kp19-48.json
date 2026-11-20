@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp19-48",
-  "lessonSha256": "d23a5a8cac5202ffc140c9ae28fc0235fe8cb554d18bc1ed1733af1b756cf0d1",
+  "lessonSha256": "a029fa804b857b452dfdf2b19073090888807a643da991961d4f2da0c0500fc8",
   "figures": [
     {
       "id": "kp19-48-clauses",
@@ -41,6 +41,213 @@
           "note": "按 outstanding_cents DESC 排列结果。"
         }
       ]
+    },
+    {
+      "id": "kp19-48-map",
+      "slot": "concept",
+      "kind": "flow-map",
+      "title": "应付账款账龄：按到期日分档，再汇总欠款（以供应商 11 的发票为例）",
+      "stages": [
+        {
+          "label": "① 处理前：还有余额的发票（只统计正余额）",
+          "tables": [
+            {
+              "columns": [
+                "supplier_invoice_id",
+                "due_date",
+                "balance_cents"
+              ],
+              "rows": [
+                [
+                  1565,
+                  "2026-01-26",
+                  11435
+                ],
+                [
+                  1176,
+                  "2026-01-14",
+                  17952
+                ],
+                [
+                  4412,
+                  "2025-12-30",
+                  28916
+                ],
+                [
+                  3633,
+                  "2025-12-23",
+                  30292
+                ],
+                [
+                  292,
+                  "2025-11-11",
+                  25578
+                ],
+                [
+                  1259,
+                  "2025-10-22",
+                  8104
+                ],
+                [
+                  1162,
+                  "2024-09-23",
+                  40035
+                ],
+                [
+                  574,
+                  "2023-09-16",
+                  11173
+                ]
+              ],
+              "sql": "SELECT supplier_invoice_id, due_date, balance_cents FROM v_invoice_balance WHERE balance_cents>0 AND supplier_invoice_id IN (292,574,1162,1176,1259,1565,3633,4412) ORDER BY due_date DESC, supplier_invoice_id",
+              "ordered": true
+            }
+          ]
+        },
+        {
+          "label": "② 按到期日（不是开票日）归入账龄区间",
+          "via": "固定截止日 2025-12-31：到期当日未逾期；其余按逾期天数分成 1–30、31–60、61–90、90 天以上",
+          "tables": [
+            {
+              "columns": [
+                "supplier_invoice_id",
+                "due_date",
+                "balance_cents",
+                "bucket"
+              ],
+              "rows": [
+                [
+                  1565,
+                  "2026-01-26",
+                  11435,
+                  "current"
+                ],
+                [
+                  1176,
+                  "2026-01-14",
+                  17952,
+                  "current"
+                ],
+                [
+                  4412,
+                  "2025-12-30",
+                  28916,
+                  "01-30"
+                ],
+                [
+                  3633,
+                  "2025-12-23",
+                  30292,
+                  "01-30"
+                ],
+                [
+                  292,
+                  "2025-11-11",
+                  25578,
+                  "31-60"
+                ],
+                [
+                  1259,
+                  "2025-10-22",
+                  8104,
+                  "61-90"
+                ],
+                [
+                  1162,
+                  "2024-09-23",
+                  40035,
+                  "90+"
+                ],
+                [
+                  574,
+                  "2023-09-16",
+                  11173,
+                  "90+"
+                ]
+              ],
+              "sql": "SELECT supplier_invoice_id, due_date, balance_cents, CASE WHEN due_date>='2025-12-31' THEN 'current' WHEN due_date>='2025-12-01' THEN '01-30' WHEN due_date>='2025-11-01' THEN '31-60' WHEN due_date>='2025-10-02' THEN '61-90' ELSE '90+' END bucket FROM v_invoice_balance WHERE balance_cents>0 AND supplier_invoice_id IN (292,574,1162,1176,1259,1565,3633,4412) ORDER BY due_date DESC, supplier_invoice_id",
+              "ordered": true,
+              "tags": [
+                {
+                  "text": "到期日 ≥ 12-31：还没逾期",
+                  "tone": "take"
+                },
+                {
+                  "text": "到期日 ≥ 12-31：还没逾期",
+                  "tone": "take"
+                },
+                {
+                  "text": "逾期 1 到 30 天",
+                  "tone": "merge"
+                },
+                {
+                  "text": "逾期 1 到 30 天",
+                  "tone": "merge"
+                },
+                {
+                  "text": "逾期 31 到 60 天",
+                  "tone": "merge"
+                },
+                {
+                  "text": "逾期 61 到 90 天",
+                  "tone": "merge"
+                },
+                {
+                  "text": "逾期超过 90 天",
+                  "tone": "merge"
+                },
+                {
+                  "text": "逾期超过 90 天",
+                  "tone": "merge"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "label": "③ 同一区间的发票合并：数发票张数、加欠款",
+          "via": "GROUP BY 账龄区间：COUNT(*) 数张数，SUM(余额) 加欠款",
+          "tables": [
+            {
+              "columns": [
+                "bucket",
+                "invoices",
+                "outstanding_cents"
+              ],
+              "rows": [
+                [
+                  "current",
+                  2,
+                  29387
+                ],
+                [
+                  "01-30",
+                  2,
+                  59208
+                ],
+                [
+                  "31-60",
+                  1,
+                  25578
+                ],
+                [
+                  "61-90",
+                  1,
+                  8104
+                ],
+                [
+                  "90+",
+                  2,
+                  51208
+                ]
+              ],
+              "sql": "SELECT bucket, COUNT(*) invoices, SUM(balance_cents) outstanding_cents FROM (SELECT balance_cents, CASE WHEN due_date>='2025-12-31' THEN 'current' WHEN due_date>='2025-12-01' THEN '01-30' WHEN due_date>='2025-11-01' THEN '31-60' WHEN due_date>='2025-10-02' THEN '61-90' ELSE '90+' END bucket FROM v_invoice_balance WHERE balance_cents>0 AND supplier_invoice_id IN (292,574,1162,1176,1259,1565,3633,4412)) GROUP BY bucket ORDER BY MIN(CASE bucket WHEN 'current' THEN 0 WHEN '01-30' THEN 1 WHEN '31-60' THEN 2 WHEN '61-90' THEN 3 ELSE 4 END)",
+              "ordered": true
+            }
+          ]
+        }
+      ],
+      "conclusion": "账龄看的是合同到期日；各区间互斥且覆盖所有有效到期日，部分付款只统计剩余金额。"
     }
   ]
 }

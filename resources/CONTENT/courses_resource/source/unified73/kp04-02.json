@@ -2,15 +2,15 @@
   "id": "kp04-02",
   "chapterId": "ch04",
   "title": "LIMIT 与 OFFSET",
-  "learningObjective": "能够根据排序结果选取前几条记录或指定页，计算偏移量，并避免不稳定排序导致的分页错误。",
+  "learningObjective": "能够根据排序结果选取前几条记录或指定页，计算要跳过的记录数，并避免不稳定排序导致的分页错误。",
   "prerequisites": [
     "kp04-01"
   ],
-  "concept": "当查询结果很多时，LIMIT 限制最多返回多少行，OFFSET 指定跳过多少行。分页是在确定排序后截取结果。例如每页两条，第一页跳过0条，第二页跳过2条，第三页跳过4条；一般偏移量为（页码减一）乘每页条数，页码从1开始。LIMIT 不会自动排序，也不会自动包含所有并列记录。若业务要求保留所有并列名次，不能直接用固定行数代替排名规则。分页依赖稳定排序；即使排序稳定，如果不同页查询之间数据发生变化，也可能重复或遗漏。高页码性能问题可后续了解，不属于本节重点。",
-  "syntax": "SELECT column_name FROM table_name ORDER BY key1 DESC, key2 ASC LIMIT count OFFSET offset;",
+  "concept": "当查询结果很多时，LIMIT 限制最多取出多少条记录，OFFSET 指定先跳过前多少条记录。分页是在确定排序后截取结果。例如每页两条，第一页跳过0条，第二页跳过2条，第三页跳过4条；一般要跳过的记录数为（页码减一）乘每页条数，页码从1开始。LIMIT 不会自动排序，也不会自动包含所有并列记录。若业务要求保留所有并列名次，不能直接用固定行数代替排名规则。分页依赖稳定排序；即使排序稳定，如果不同页查询之间数据发生变化，也可能重复或遗漏。高页码性能问题可后续了解，不属于本节重点。",
+  "syntax": "SELECT column_name FROM table_name ORDER BY key1 DESC, key2 ASC LIMIT row_count OFFSET skip_rows;",
   "parameters": {
-    "LIMIT": "最多返回的行数",
-    "OFFSET": "跳过的行数",
+    "LIMIT": "最多取出多少条记录",
+    "OFFSET": "跳过前多少条记录",
     "ORDER BY": "确定截取之前的排列顺序"
   },
   "fixtureIds": [
@@ -97,15 +97,15 @@
       ]
     }
   ],
-  "mysqlSql": "SELECT product_id, price FROM products ORDER BY price DESC, product_name LIMIT 2 OFFSET 2;",
-  "sqliteSql": "SELECT product_id, price FROM products ORDER BY price DESC, product_name LIMIT 2 OFFSET 2;",
+  "mysqlSql": "SELECT product_id, price FROM products ORDER BY price DESC, product_name LIMIT 3 OFFSET 2;",
+  "sqliteSql": "SELECT product_id, price FROM products ORDER BY price DESC, product_name LIMIT 3 OFFSET 2;",
   "executionSteps": [
     "建立稳定的价格排序",
-    "跳过第一页两行",
-    "读取接下来的两行"
+    "跳过前 2 条记录",
+    "取出接下来的 3 条记录"
   ],
-  "useCase": "商品管理页面每页显示两件商品，按价格从高到低排列，同价按商品名称升序。现在要读取第二页，而不是重新排序某个随机子集。",
-  "comparison": "LIMIT 截取行数，OFFSET 跳过行数；窗口排名按名次筛选，可能返回不同数量。",
+  "useCase": "商品管理页面要查看价格排在第 3 到第 5 位的商品，按价格从高到低排列，同价按商品名称升序。做法是先跳过前 2 件商品，再取出接下来的 3 件，而不是重新排序某个随机子集。",
+  "comparison": "LIMIT 限定取出几条记录，OFFSET 指定跳过前几条记录；窗口排名按名次筛选，可能返回不同数量。",
   "commonError": {
     "example": "SELECT product_id, price FROM products LIMIT 2; 并称其为最高价前两名。",
     "correction": "先用 ORDER BY price DESC, product_id ASC，再用 LIMIT 2。"
@@ -141,6 +141,10 @@
       [
         3,
         35
+      ],
+      [
+        1,
+        15
       ]
     ],
     "status": "SQLite实际执行",
@@ -159,15 +163,15 @@
     "fc0029"
   ],
   "teaching": {
-    "problem": "商品管理页面每页显示两件商品，按价格从高到低排列，同价按商品名称升序。现在要读取第二页，而不是重新排序某个随机子集。",
-    "codeExplanation": "先用上一节的价格降序、商品名称升序形成整个列表。OFFSET 2 跳过第1和第2条，LIMIT 2 只返回剩余列表的前两条。MySQL 另有 LIMIT offset,count 写法，本例 LIMIT 2,2 等价，但关键字形式更便于理解，也与本地兼容环境一致。补充例子显示第一页和第三页，方便核对相邻页边界。",
-    "resultExplanation": "完整排序为2、4、5、3、1、6，第二页因此返回编号5（45）和3（35）。第一页是2、4，第三页是1、6。固定数据下三个页面不重不漏；如果请求第四页，将没有记录。LIMIT 2 不保证返回两行，剩余不足时只返回实际存在的行。",
+    "problem": "商品管理页面要查看价格排在第 3 到第 5 位的商品，按价格从高到低排列，同价按商品名称升序。做法是先跳过前 2 件商品，再取出接下来的 3 件，而不是重新排序某个随机子集。",
+    "codeExplanation": "先用上一节的价格降序、商品名称升序形成整个列表。OFFSET 2 跳过前 2 条（第 1、2 条），LIMIT 3 再取出接下来的 3 条（第 3、4、5 条）。MySQL 另有 LIMIT offset,count 写法，本例 LIMIT 2,3 等价，但关键字形式更便于理解，也与本地兼容环境一致。补充例子按每页 2 条显示第一页和第三页，方便核对相邻页边界。",
+    "resultExplanation": "完整排序为2、4、5、3、1、6：跳过前 2 条（编号 2、4），再取出接下来的 3 条，因此返回编号5（45）、3（35）和1（15），编号6排在取出范围之外。若每页 2 条，第一页是2、4，第二页是5、3，第三页是1、6，三页不重不漏；如果请求第四页，将没有记录。LIMIT 3 不保证返回三行，剩余不足时只返回实际存在的行。",
     "checkpoints": [],
     "mergedConcepts": [],
     "mergeExamples": [
       {
         "label": "第一页",
-        "explanation": "偏移0，读取排序后的前两条。",
+        "explanation": "每页 2 条：每页 2 条：每页 2 条：每页 2 条：每页 2 条：跳过前 0 条，取出排序后的前两条。",
         "sql": "SELECT product_id, price FROM products ORDER BY price DESC, product_name LIMIT 2 OFFSET 0;",
         "result": {
           "columns": [
@@ -188,7 +192,7 @@
       },
       {
         "label": "第三页",
-        "explanation": "偏移4，返回最后两条。",
+        "explanation": "每页 2 条：每页 2 条：每页 2 条：每页 2 条：每页 2 条：跳过前 4 条，取出最后两条。",
         "sql": "SELECT product_id, price FROM products ORDER BY price DESC, product_name LIMIT 2 OFFSET 4;",
         "result": {
           "columns": [
@@ -209,7 +213,7 @@
       },
       {
         "label": "超出数据范围",
-        "explanation": "偏移6，已无剩余记录，因此返回空结果。",
+        "explanation": "每页 2 条：每页 2 条：每页 2 条：每页 2 条：每页 2 条：跳过前 6 条后已无剩余记录，因此返回空结果。",
         "sql": "SELECT product_id, price FROM products ORDER BY price DESC, product_name LIMIT 2 OFFSET 6;",
         "result": {
           "columns": [

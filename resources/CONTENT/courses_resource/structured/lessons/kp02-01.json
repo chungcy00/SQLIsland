@@ -23,6 +23,12 @@
       ]
     },
     {
+      "type": "figure",
+      "ids": [
+        "kp02-01-map"
+      ]
+    },
+    {
       "type": "heading",
       "text": "什么是逐行表达式与别名？",
       "emphasis": []

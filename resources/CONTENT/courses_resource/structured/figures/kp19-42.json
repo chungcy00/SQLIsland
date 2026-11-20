@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp19-42",
-  "lessonSha256": "83f69f9796a646248dec2c8f920bf82d7fdb63e1b0f3a0a561aa90ce16ce2a62",
+  "lessonSha256": "df24dfa563ba7fc3daf91e3c518431891acb0b219327f258ad87a4fb31f7b9d3",
   "figures": [
     {
       "id": "kp19-42-clauses",
@@ -41,6 +41,154 @@
           "note": "按 net_cents DESC, recency_days, freq 排列结果。"
         }
       ]
+    },
+    {
+      "id": "kp19-42-map",
+      "slot": "concept",
+      "kind": "flow-map",
+      "title": "客户消费分层：三项指标各自打分，再加总分层",
+      "stages": [
+        {
+          "label": "① 处理前：每位客户的三项原始指标（2025 年线上有效订单）",
+          "note": "最近一次消费距截止日的天数、订单数、净额（分）——量纲不同，不能直接相加。",
+          "tables": [
+            {
+              "columns": [
+                "customer_id",
+                "recency_days",
+                "freq",
+                "net_cents"
+              ],
+              "rows": [
+                [
+                  114,
+                  95,
+                  25,
+                  386802
+                ],
+                [
+                  3434,
+                  9,
+                  23,
+                  629303
+                ],
+                [
+                  3862,
+                  196,
+                  17,
+                  255417
+                ],
+                [
+                  4932,
+                  336,
+                  1,
+                  49128
+                ]
+              ],
+              "sql": "WITH a AS (SELECT customer_id,MAX(order_date) last_day,COUNT(*) freq,SUM(net_cents) money FROM v_order_net WHERE channel='online' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY customer_id), b AS (SELECT *,6-NTILE(5) OVER(ORDER BY last_day DESC,customer_id) r_score,6-NTILE(5) OVER(ORDER BY freq DESC,customer_id) f_score,6-NTILE(5) OVER(ORDER BY money DESC,customer_id) m_score FROM a) SELECT b.customer_id, 1095-d.day_index recency_days, freq, money net_cents FROM b JOIN calendar_days d ON d.day=b.last_day WHERE b.customer_id IN (3434,114,3862,4932) ORDER BY b.customer_id",
+              "ordered": true
+            }
+          ]
+        },
+        {
+          "label": "② 三项各自按排名分成 5 档，得到 1 到 5 分（5 分最好）",
+          "via": "NTILE(5)：把所有客户按该指标排好序后均分成 5 档，不是固定的金额区间",
+          "tables": [
+            {
+              "columns": [
+                "customer_id",
+                "r_score",
+                "f_score",
+                "m_score"
+              ],
+              "rows": [
+                [
+                  114,
+                  2,
+                  5,
+                  5
+                ],
+                [
+                  3434,
+                  4,
+                  5,
+                  5
+                ],
+                [
+                  3862,
+                  1,
+                  5,
+                  5
+                ],
+                [
+                  4932,
+                  1,
+                  1,
+                  4
+                ]
+              ],
+              "sql": "WITH a AS (SELECT customer_id,MAX(order_date) last_day,COUNT(*) freq,SUM(net_cents) money FROM v_order_net WHERE channel='online' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY customer_id), b AS (SELECT *,6-NTILE(5) OVER(ORDER BY last_day DESC,customer_id) r_score,6-NTILE(5) OVER(ORDER BY freq DESC,customer_id) f_score,6-NTILE(5) OVER(ORDER BY money DESC,customer_id) m_score FROM a) SELECT b.customer_id, r_score, f_score, m_score FROM b WHERE b.customer_id IN (3434,114,3862,4932) ORDER BY b.customer_id",
+              "ordered": true
+            }
+          ]
+        },
+        {
+          "label": "③ 三项得分相加，按总分划分层级",
+          "via": "总分 ≥ 13 为高价值，≤ 6 为低活跃，其余为常规",
+          "tables": [
+            {
+              "columns": [
+                "customer_id",
+                "total_score",
+                "segment"
+              ],
+              "rows": [
+                [
+                  114,
+                  12,
+                  "regular"
+                ],
+                [
+                  3434,
+                  14,
+                  "high_value"
+                ],
+                [
+                  3862,
+                  11,
+                  "regular"
+                ],
+                [
+                  4932,
+                  6,
+                  "low_activity"
+                ]
+              ],
+              "sql": "WITH a AS (SELECT customer_id,MAX(order_date) last_day,COUNT(*) freq,SUM(net_cents) money FROM v_order_net WHERE channel='online' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY customer_id), b AS (SELECT *,6-NTILE(5) OVER(ORDER BY last_day DESC,customer_id) r_score,6-NTILE(5) OVER(ORDER BY freq DESC,customer_id) f_score,6-NTILE(5) OVER(ORDER BY money DESC,customer_id) m_score FROM a) SELECT b.customer_id, r_score+f_score+m_score total_score, CASE WHEN r_score+f_score+m_score>=13 THEN 'high_value' WHEN r_score+f_score+m_score<=6 THEN 'low_activity' ELSE 'regular' END segment FROM b WHERE b.customer_id IN (3434,114,3862,4932) ORDER BY b.customer_id",
+              "ordered": true,
+              "tags": [
+                {
+                  "text": "12，介于 7 和 12 之间 → 常规",
+                  "tone": "merge"
+                },
+                {
+                  "text": "14 ≥ 13 → 高价值",
+                  "tone": "take"
+                },
+                {
+                  "text": "11，介于 7 和 12 之间 → 常规",
+                  "tone": "merge"
+                },
+                {
+                  "text": "6 ≤ 6 → 低活跃",
+                  "tone": "skip"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "conclusion": "三个指标先各自打分再加总：最近消费很久的客户即使次数和金额都是满分（5 + 5），总分也可能进不了高价值。"
     }
   ]
 }

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp18-01",
-  "lessonSha256": "bb9c945b45a4333d81110a47a8ef05a6fac7629c96eddd5289604a84200c3512",
+  "lessonSha256": "da92d47994a411b6c26f19133a3670aa4dad69c3f2ba03ba31c76d2863ef0c1c",
   "figures": [
     {
       "id": "kp18-01-clauses",
@@ -145,6 +145,34 @@
               89
             ]
           ]
+        }
+      ]
+    },
+    {
+      "id": "kp18-01-map",
+      "slot": "concept",
+      "kind": "tip-card",
+      "title": "索引：作用、写法和代价",
+      "items": [
+        {
+          "tone": "neutral",
+          "label": "索引是什么",
+          "text": "索引是辅助定位数据的结构，而不是额外的业务筛选条件。"
+        },
+        {
+          "tone": "good",
+          "label": "怎样写更容易用上",
+          "text": "普通索引列上直接比较常比套函数更容易形成搜索范围。"
+        },
+        {
+          "tone": "bad",
+          "label": "要付出的代价",
+          "text": "索引增加空间及写入维护成本。"
+        },
+        {
+          "tone": "neutral",
+          "label": "怎样判断有没有提速",
+          "text": "执行计划用于观察访问方式，不能仅凭出现索引断言已经提速。"
         }
       ]
     }

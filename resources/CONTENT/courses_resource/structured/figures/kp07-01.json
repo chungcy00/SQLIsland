@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp07-01",
-  "lessonSha256": "1cde5f246a727e60abb8f8fee440dbd6e632b1b00c164cf20ff22cb9389b5229",
+  "lessonSha256": "9f40f51e85e5fab6f85b536b954f9cd062e6934ec1c99455626131b0127bffe8",
   "figures": [
     {
       "id": "kp07-01-clauses",
@@ -146,6 +146,143 @@
           ]
         }
       ]
+    },
+    {
+      "id": "kp07-01-map",
+      "slot": "concept",
+      "kind": "flow-map",
+      "title": "GROUP BY：相同的值放进同一组，每组变成一行",
+      "stages": [
+        {
+          "label": "① 处理前：orders（5 行）",
+          "tables": [
+            {
+              "columns": [
+                "id",
+                "category",
+                "sales"
+              ],
+              "rows": [
+                [
+                  1,
+                  "护肤品",
+                  800
+                ],
+                [
+                  2,
+                  "化妆品",
+                  400
+                ],
+                [
+                  3,
+                  "护肤品",
+                  600
+                ],
+                [
+                  4,
+                  "化妆品",
+                  300
+                ],
+                [
+                  5,
+                  "日用品",
+                  1500
+                ]
+              ],
+              "source": "orders",
+              "sql": "SELECT id, category, sales FROM orders ORDER BY id",
+              "ordered": true
+            }
+          ]
+        },
+        {
+          "label": "② 处理中：按 category 分成 3 组（同色的行属于同一组）",
+          "via": "GROUP BY category：把 category 相同的行放进同一组",
+          "tables": [
+            {
+              "columns": [
+                "id",
+                "category",
+                "sales"
+              ],
+              "rows": [
+                [
+                  2,
+                  "化妆品",
+                  400
+                ],
+                [
+                  4,
+                  "化妆品",
+                  300
+                ],
+                [
+                  1,
+                  "护肤品",
+                  800
+                ],
+                [
+                  3,
+                  "护肤品",
+                  600
+                ],
+                [
+                  5,
+                  "日用品",
+                  1500
+                ]
+              ],
+              "bandBy": "category",
+              "sql": "SELECT id, category, sales FROM orders ORDER BY category, id",
+              "ordered": true
+            }
+          ]
+        },
+        {
+          "label": "③ 处理后：每组一行（3 行）",
+          "via": "SUM(sales)：每一组把 sales 加起来，每组只留一行",
+          "tables": [
+            {
+              "columns": [
+                "category",
+                "total_sales"
+              ],
+              "rows": [
+                [
+                  "化妆品",
+                  700
+                ],
+                [
+                  "护肤品",
+                  1400
+                ],
+                [
+                  "日用品",
+                  1500
+                ]
+              ],
+              "bandBy": "category",
+              "tags": [
+                {
+                  "text": "400 + 300",
+                  "tone": "merge"
+                },
+                {
+                  "text": "800 + 600",
+                  "tone": "merge"
+                },
+                {
+                  "text": "1500",
+                  "tone": "merge"
+                }
+              ],
+              "sql": "SELECT category, SUM(sales) AS total_sales FROM orders GROUP BY category ORDER BY category",
+              "ordered": true
+            }
+          ]
+        }
+      ],
+      "conclusion": "分组把 5 行变成 3 行：每个 category 一行，sales 在组内相加。"
     }
   ]
 }

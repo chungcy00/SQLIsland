@@ -40,13 +40,14 @@ try {
   // 闪卡界面改版后：选“新卡”模式开始，整张卡点击翻面，再评“良好”进入下一张；刷新后会话恢复。
   await page.locator("[data-action=cardMode][data-arg=新卡]").click();
   await page.locator("[data-action=startCards]").click();
-  await page.locator(".flashcard.front").waitFor();
-  await page.locator(".flashcard.front").click();
-  await page.locator(".flashcard.back").waitFor();
-  await page.getByRole("button", { name: /良好/ }).click();
-  await page.locator(".flashcard.front").waitFor();
+  await page.waitForURL("**/#/review");
+  await page.locator(".fc-tap .fc.front").waitFor();
+  await page.locator(".fc-tap .fc.front").click();
+  await page.locator(".fc-tap .fc.back").waitFor();
+  await page.getByRole("button", { name: /记得/ }).click();
+  await page.locator(".fc-tap .fc.front").waitFor();
   await page.reload();
-  await page.locator(".flashcard").waitFor();
+  await page.locator(".fc-tap").waitFor();
   await route("/card-edit/new");
   await page.locator("#card-front").fill("COUNT(*) 计算什么？");
   await page.locator("#card-back").fill("输入记录的行数。");

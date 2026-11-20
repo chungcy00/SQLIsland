@@ -1,14 +1,90 @@
 {
   "schemaVersion": 1,
   "id": "kp04-02",
-  "lessonSha256": "c3fb68936ece80939990434b680ac840b3c0471b53569886608725da16c591f7",
+  "lessonSha256": "44400066882ddf48ad46b72389689156a7bc583ecceee6a84d0603b30c14ba24",
   "figures": [
+    {
+      "id": "kp04-02-pages",
+      "slot": "concept",
+      "kind": "page-map",
+      "title": "OFFSET 跳过、LIMIT 取出：看每条记录去了哪里",
+      "table": "products",
+      "columns": [
+        "product_id",
+        "product_name",
+        "price"
+      ],
+      "orderKeys": [
+        {
+          "column": "price",
+          "dir": "desc"
+        },
+        {
+          "column": "product_name",
+          "dir": "asc"
+        }
+      ],
+      "orderBy": "price DESC, product_name",
+      "example": {
+        "limit": 3,
+        "offset": 2
+      },
+      "pageSize": 2,
+      "pages": [
+        {
+          "page": 1,
+          "offset": 0
+        },
+        {
+          "page": 2,
+          "offset": 2
+        },
+        {
+          "page": 3,
+          "offset": 4
+        }
+      ],
+      "rows": [
+        [
+          2,
+          "Serum",
+          89
+        ],
+        [
+          4,
+          "Cream",
+          65
+        ],
+        [
+          5,
+          "Sunscreen",
+          45
+        ],
+        [
+          3,
+          "Cleanser",
+          35
+        ],
+        [
+          1,
+          "Mask",
+          15
+        ],
+        [
+          6,
+          "Soap_1",
+          15
+        ]
+      ],
+      "pagesNote": "OFFSET（要跳过的条数）=（页码 − 1）× 每页条数；例如每页 2 条的第 3 页要跳过前 4 条，所以是 LIMIT 2 OFFSET 4。",
+      "conclusion": "本节例子：OFFSET 2 先跳过前 2 条，LIMIT 3 再取出 3 条；排在最后的 Soap_1 超出取出范围。"
+    },
     {
       "id": "kp04-02-clauses",
       "slot": "syntax",
       "kind": "clause-map",
       "title": "示例查询的几个部分",
-      "sql": "SELECT product_id, price FROM products ORDER BY price DESC, product_name LIMIT 2 OFFSET 2;",
+      "sql": "SELECT product_id, price FROM products ORDER BY price DESC, product_name LIMIT 3 OFFSET 2;",
       "parts": [
         {
           "role": "select",
@@ -31,8 +107,8 @@
         {
           "role": "limit",
           "label": "截取",
-          "sql": "LIMIT 2 OFFSET 2;",
-          "note": "先跳过前 2 行，再最多取 2 行。"
+          "sql": "LIMIT 3 OFFSET 2;",
+          "note": "先跳过前 2 条记录，再最多取出 3 条记录。"
         }
       ]
     },
@@ -167,8 +243,8 @@
           ]
         },
         {
-          "label": "LIMIT 2 OFFSET 2;",
-          "sql": "SELECT product_id, price FROM products ORDER BY price DESC, product_name LIMIT 2 OFFSET 2;",
+          "label": "LIMIT 3 OFFSET 2;",
+          "sql": "SELECT product_id, price FROM products ORDER BY price DESC, product_name LIMIT 3 OFFSET 2;",
           "columns": [
             "product_id",
             "price"
@@ -181,7 +257,19 @@
             [
               3,
               35
+            ],
+            [
+              1,
+              15
             ]
+          ],
+          "roles": [
+            "skip",
+            "skip",
+            "take",
+            "take",
+            "take",
+            "beyond"
           ]
         }
       ]

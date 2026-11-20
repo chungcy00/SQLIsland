@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp17-01",
-  "lessonSha256": "b48f08e195c3bd3b1a41d866b8f37e2d7c6a2538875b6e61fd9c454860561c2c",
+  "lessonSha256": "7352872f95176277f0f2090d557a301502664ff2d9fa2daaf9a5d4c274f45e75",
   "figures": [
     {
       "id": "kp17-01-clauses",
@@ -92,6 +92,90 @@
           ]
         }
       ]
+    },
+    {
+      "id": "kp17-01-map",
+      "slot": "concept",
+      "kind": "compare-card",
+      "title": "CHECK(qty>=0)：遇到 NULL 不会拒绝",
+      "panels": [
+        {
+          "label": "qty = 5",
+          "tone": "good",
+          "columns": [
+            "qty"
+          ],
+          "rows": [
+            [
+              5
+            ]
+          ],
+          "big": {
+            "label": "qty>=0 的结果（1 真，0 假）",
+            "value": 1
+          },
+          "check": {
+            "sql": "SELECT 5 >= 0",
+            "expected": [
+              [
+                1
+              ]
+            ]
+          },
+          "note": "条件为真，允许写入。"
+        },
+        {
+          "label": "qty = -1",
+          "tone": "neutral",
+          "columns": [
+            "qty"
+          ],
+          "rows": [
+            [
+              -1
+            ]
+          ],
+          "big": {
+            "label": "qty>=0 的结果（1 真，0 假）",
+            "value": 0
+          },
+          "check": {
+            "sql": "SELECT -1 >= 0",
+            "expected": [
+              [
+                0
+              ]
+            ]
+          },
+          "note": "条件为假，写入被拒绝。"
+        },
+        {
+          "label": "qty = NULL",
+          "tone": "bad",
+          "columns": [
+            "qty"
+          ],
+          "rows": [
+            [
+              null
+            ]
+          ],
+          "big": {
+            "label": "qty>=0 的结果（NULL 表示未知）",
+            "value": null
+          },
+          "check": {
+            "sql": "SELECT NULL >= 0",
+            "expected": [
+              [
+                null
+              ]
+            ]
+          },
+          "note": "结果是未知，数据库不会因为“未知”而拒绝。"
+        }
+      ],
+      "conclusion": "所以 NULL 仍然能写入；库存数量要同时设置 NOT NULL 和非负约束。"
     }
   ]
 }

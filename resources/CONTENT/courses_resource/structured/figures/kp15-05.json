@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp15-05",
-  "lessonSha256": "4d7c7a26c6ac39a72c424219d7a509ebc265ace311480e5568fd680d3de9d277",
+  "lessonSha256": "15816549d526127df1af79065742fe4a63c88dd2044ac0e498b9ad77f6670285",
   "figures": [
     {
       "id": "kp15-05-clauses",
@@ -35,6 +35,144 @@
           "note": "按 month 排列结果。"
         }
       ]
+    },
+    {
+      "id": "kp15-05-map",
+      "slot": "concept",
+      "kind": "flow-map",
+      "title": "移动平均与环比：窗口一行一行往下滑",
+      "stages": [
+        {
+          "label": "① 处理前：monthly（4 行，按月份排好）",
+          "tables": [
+            {
+              "columns": [
+                "month",
+                "sales"
+              ],
+              "rows": [
+                [
+                  "2026-01",
+                  1000
+                ],
+                [
+                  "2026-02",
+                  1500
+                ],
+                [
+                  "2026-03",
+                  1500
+                ],
+                [
+                  "2026-04",
+                  900
+                ]
+              ],
+              "source": "monthly",
+              "sql": "SELECT month, sales FROM monthly ORDER BY month",
+              "ordered": true
+            }
+          ]
+        },
+        {
+          "label": "② 每一行：取上月，并对“本月 + 前 2 个月”求平均",
+          "via": "LAG(sales) 取上一行；AVG(…) ROWS BETWEEN 2 PRECEDING AND CURRENT ROW 取最近 3 行（不足就用现有的行）",
+          "tables": [
+            {
+              "columns": [
+                "month",
+                "sales",
+                "prev",
+                "avg3"
+              ],
+              "rows": [
+                [
+                  "2026-01",
+                  1000,
+                  null,
+                  1000.0
+                ],
+                [
+                  "2026-02",
+                  1500,
+                  1000,
+                  1250.0
+                ],
+                [
+                  "2026-03",
+                  1500,
+                  1500,
+                  1333.33
+                ],
+                [
+                  "2026-04",
+                  900,
+                  1500,
+                  1300.0
+                ]
+              ],
+              "tags": [
+                {
+                  "text": "(1000) ÷ 1",
+                  "tone": "merge"
+                },
+                {
+                  "text": "(1000 + 1500) ÷ 2",
+                  "tone": "merge"
+                },
+                {
+                  "text": "(1000 + 1500 + 1500) ÷ 3",
+                  "tone": "merge"
+                },
+                {
+                  "text": "(1500 + 1500 + 900) ÷ 3",
+                  "tone": "merge"
+                }
+              ],
+              "sql": "SELECT month, sales, LAG(sales) OVER(ORDER BY month) AS prev, ROUND(AVG(sales) OVER(ORDER BY month ROWS BETWEEN 2 PRECEDING AND CURRENT ROW), 2) AS avg3 FROM monthly ORDER BY month",
+              "ordered": true
+            }
+          ]
+        },
+        {
+          "label": "③ 处理后：取整并算环比",
+          "via": "环比增长率 = （本月 − 上月）÷ 上月 × 100；第一个月没有上月，结果是 NULL",
+          "tables": [
+            {
+              "columns": [
+                "month",
+                "avg3",
+                "growth_pct"
+              ],
+              "rows": [
+                [
+                  "2026-01",
+                  1000.0,
+                  null
+                ],
+                [
+                  "2026-02",
+                  1250.0,
+                  50.0
+                ],
+                [
+                  "2026-03",
+                  1333.33,
+                  0.0
+                ],
+                [
+                  "2026-04",
+                  1300.0,
+                  -40.0
+                ]
+              ],
+              "sql": "WITH m AS (SELECT month,sales,LAG(sales) OVER(ORDER BY month) AS prev,AVG(sales) OVER(ORDER BY month ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) AS moving_avg FROM monthly) SELECT month,ROUND(moving_avg,2) AS avg3,ROUND(100.0*(sales-prev)/NULLIF(prev,0),2) AS growth_pct FROM m ORDER BY month;",
+              "ordered": true
+            }
+          ]
+        }
+      ],
+      "conclusion": "移动平均用“滑动的窗口”平滑波动；环比只和上一行比。"
     }
   ]
 }

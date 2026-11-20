@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp12-01",
-  "lessonSha256": "a86ac6bccdb101ca96b4c37b6f338bd6b528e952feee044ffb0ee2b3f1fb18c8",
+  "lessonSha256": "2f96f37ed6ff31ffaa3528ba87fd2b794ffce830b7d173c97ac86040bf81e126",
   "figures": [
     {
       "id": "kp12-01-clauses",
@@ -23,6 +23,65 @@
           "note": "结果表最终显示 1 列：magnitude。"
         }
       ]
+    },
+    {
+      "id": "kp12-01-map",
+      "slot": "concept",
+      "kind": "compare-card",
+      "title": "ROUND 和 ABS：一个改精度，一个去方向",
+      "panels": [
+        {
+          "label": "ROUND(12.346, 2)：舍入到 2 位小数",
+          "tone": "neutral",
+          "columns": [
+            "输入"
+          ],
+          "rows": [
+            [
+              12.346
+            ]
+          ],
+          "big": {
+            "label": "舍入后",
+            "value": 12.35
+          },
+          "check": {
+            "sql": "SELECT ROUND(12.346, 2)",
+            "expected": [
+              [
+                12.35
+              ]
+            ]
+          },
+          "note": "改变的是输出精度。"
+        },
+        {
+          "label": "ABS(-25)：绝对值",
+          "tone": "neutral",
+          "columns": [
+            "输入"
+          ],
+          "rows": [
+            [
+              -25
+            ]
+          ],
+          "big": {
+            "label": "绝对值",
+            "value": 25
+          },
+          "check": {
+            "sql": "SELECT ABS(-25)",
+            "expected": [
+              [
+                25
+              ]
+            ]
+          },
+          "note": "去掉方向（正负号），保留幅度。"
+        }
+      ],
+      "conclusion": "舍入改变输出精度，绝对值去掉方向但保留幅度，两者都不是数据类型转换。"
     }
   ]
 }

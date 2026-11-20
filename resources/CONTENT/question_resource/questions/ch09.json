@@ -407,9 +407,9 @@
       "hints": [
         "除数为 0 没有意义，库存为 0 的商品要返回 NULL。",
         "NULLIF(stock,0) 在库存为 0 时返回 NULL，任何数除以 NULL 都得到 NULL。",
-        "被除数是价格；两个整数相除可能被截断，可以先乘以 1.0 保留小数。"
+        "被除数是价格；先乘以 1.0 是让结果按小数计算的通用写法（原生 SQLite 里两个整数相除会截断，本应用的 / 本来就保留小数）。"
       ],
-      "explanation": "NULLIF(stock,0) 把库存 0 变成 NULL，除以 NULL 得到 NULL，避免了除零。被除数写 1.0*price 让整数相除保留小数，再用 ROUND(…,2) 保留两位。\n易错：被除数写成 stock，得到的是 stock/stock（恒为 1 或 NULL），而不是价格比。",
+      "explanation": "NULLIF(stock,0) 把库存 0 变成 NULL，除以 NULL 得到 NULL，避免了除零。被除数写 1.0*price 让结果按小数计算（原生 SQLite 里两个整数相除会截断，本应用的 / 本来就保留小数），再用 ROUND(…,2) 保留两位。\n易错：被除数写成 stock，得到的是 stock/stock（恒为 1 或 NULL），而不是价格比。",
       "commonErrors": [
         {
           "sql": "SELECT product_id,ROUND(1.0*stock/NULLIF(stock,0),2) AS price_per_stock FROM products",

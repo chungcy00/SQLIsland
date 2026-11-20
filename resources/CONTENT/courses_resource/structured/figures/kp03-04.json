@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp03-04",
-  "lessonSha256": "b4d8ebb7182a7fa0d5e1867b0e38e8cedbb5e798e323b7ccbc7b5f97a27085b6",
+  "lessonSha256": "1c6b60d97a79ad1af70a9ec8870f03cf6d2e5d90baed9146efcf205dd966fc2c",
   "figures": [
     {
       "id": "kp03-04-clauses",
@@ -141,6 +141,294 @@
               "Soap_1"
             ]
           ]
+        }
+      ]
+    },
+    {
+      "id": "kp03-04-map",
+      "slot": "concept",
+      "kind": "flow-map",
+      "title": "LIKE：通配符有特殊含义，找真正的 _ 要转义",
+      "variants": [
+        {
+          "label": "转义（本例）",
+          "stages": [
+            {
+              "label": "① 处理前：products（6 行）",
+              "tables": [
+                {
+                  "columns": [
+                    "product_id",
+                    "product_name"
+                  ],
+                  "rows": [
+                    [
+                      1,
+                      "Mask"
+                    ],
+                    [
+                      2,
+                      "Serum"
+                    ],
+                    [
+                      3,
+                      "Cleanser"
+                    ],
+                    [
+                      4,
+                      "Cream"
+                    ],
+                    [
+                      5,
+                      "Sunscreen"
+                    ],
+                    [
+                      6,
+                      "Soap_1"
+                    ]
+                  ],
+                  "source": "products",
+                  "sql": "SELECT product_id, product_name FROM products ORDER BY product_id",
+                  "ordered": true
+                }
+              ]
+            },
+            {
+              "label": "② 逐行匹配：LIKE '%!_%' ESCAPE '!'",
+              "via": "ESCAPE '!'：! 后面的 _ 当作普通的下划线字符，不再是通配符",
+              "tables": [
+                {
+                  "columns": [
+                    "product_id",
+                    "product_name"
+                  ],
+                  "rows": [
+                    [
+                      1,
+                      "Mask"
+                    ],
+                    [
+                      2,
+                      "Serum"
+                    ],
+                    [
+                      3,
+                      "Cleanser"
+                    ],
+                    [
+                      4,
+                      "Cream"
+                    ],
+                    [
+                      5,
+                      "Sunscreen"
+                    ],
+                    [
+                      6,
+                      "Soap_1"
+                    ]
+                  ],
+                  "tags": [
+                    {
+                      "text": "没有下划线 · 去掉",
+                      "tone": "skip"
+                    },
+                    {
+                      "text": "没有下划线 · 去掉",
+                      "tone": "skip"
+                    },
+                    {
+                      "text": "没有下划线 · 去掉",
+                      "tone": "skip"
+                    },
+                    {
+                      "text": "没有下划线 · 去掉",
+                      "tone": "skip"
+                    },
+                    {
+                      "text": "没有下划线 · 去掉",
+                      "tone": "skip"
+                    },
+                    {
+                      "text": "含真正的下划线 · 留",
+                      "tone": "take"
+                    }
+                  ],
+                  "sql": "SELECT product_id, product_name FROM products ORDER BY product_id",
+                  "ordered": true
+                }
+              ]
+            },
+            {
+              "label": "③ 处理后：名称里真有下划线的（1 行）",
+              "tables": [
+                {
+                  "columns": [
+                    "product_name"
+                  ],
+                  "rows": [
+                    [
+                      "Soap_1"
+                    ]
+                  ],
+                  "sql": "SELECT product_name FROM products WHERE product_name LIKE '%!_%' ESCAPE '!' ORDER BY product_name DESC;",
+                  "ordered": true
+                }
+              ]
+            }
+          ],
+          "conclusion": "转义后，只有名称里真的有“_”的 Soap_1 被找到。"
+        },
+        {
+          "label": "不转义（对照）",
+          "stages": [
+            {
+              "label": "① 处理前：products（6 行）",
+              "tables": [
+                {
+                  "columns": [
+                    "product_id",
+                    "product_name"
+                  ],
+                  "rows": [
+                    [
+                      1,
+                      "Mask"
+                    ],
+                    [
+                      2,
+                      "Serum"
+                    ],
+                    [
+                      3,
+                      "Cleanser"
+                    ],
+                    [
+                      4,
+                      "Cream"
+                    ],
+                    [
+                      5,
+                      "Sunscreen"
+                    ],
+                    [
+                      6,
+                      "Soap_1"
+                    ]
+                  ],
+                  "source": "products",
+                  "sql": "SELECT product_id, product_name FROM products ORDER BY product_id",
+                  "ordered": true
+                }
+              ]
+            },
+            {
+              "label": "② 逐行匹配：LIKE '%_%'（没有转义）",
+              "via": "_ 是通配符，表示“任意一个字符”：只要名称至少有 1 个字符就匹配",
+              "tables": [
+                {
+                  "columns": [
+                    "product_id",
+                    "product_name"
+                  ],
+                  "rows": [
+                    [
+                      1,
+                      "Mask"
+                    ],
+                    [
+                      2,
+                      "Serum"
+                    ],
+                    [
+                      3,
+                      "Cleanser"
+                    ],
+                    [
+                      4,
+                      "Cream"
+                    ],
+                    [
+                      5,
+                      "Sunscreen"
+                    ],
+                    [
+                      6,
+                      "Soap_1"
+                    ]
+                  ],
+                  "tags": [
+                    {
+                      "text": "_ 匹配任意一个字符 · 留",
+                      "tone": "take"
+                    },
+                    {
+                      "text": "_ 匹配任意一个字符 · 留",
+                      "tone": "take"
+                    },
+                    {
+                      "text": "_ 匹配任意一个字符 · 留",
+                      "tone": "take"
+                    },
+                    {
+                      "text": "_ 匹配任意一个字符 · 留",
+                      "tone": "take"
+                    },
+                    {
+                      "text": "_ 匹配任意一个字符 · 留",
+                      "tone": "take"
+                    },
+                    {
+                      "text": "_ 匹配任意一个字符 · 留",
+                      "tone": "take"
+                    }
+                  ],
+                  "sql": "SELECT product_id, product_name FROM products WHERE product_name LIKE '%_%' ORDER BY product_id",
+                  "ordered": true
+                }
+              ]
+            },
+            {
+              "label": "③ 处理后：全部 6 行都留下",
+              "tables": [
+                {
+                  "columns": [
+                    "product_id",
+                    "product_name"
+                  ],
+                  "rows": [
+                    [
+                      1,
+                      "Mask"
+                    ],
+                    [
+                      2,
+                      "Serum"
+                    ],
+                    [
+                      3,
+                      "Cleanser"
+                    ],
+                    [
+                      4,
+                      "Cream"
+                    ],
+                    [
+                      5,
+                      "Sunscreen"
+                    ],
+                    [
+                      6,
+                      "Soap_1"
+                    ]
+                  ],
+                  "sql": "SELECT product_id, product_name FROM products WHERE product_name LIKE '%_%' ORDER BY product_id",
+                  "ordered": true
+                }
+              ]
+            }
+          ],
+          "conclusion": "不转义时 _ 匹配任何字符，几乎所有名称都会被选中，不是想要的结果。"
         }
       ]
     }

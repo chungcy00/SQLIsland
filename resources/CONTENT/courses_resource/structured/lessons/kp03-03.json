@@ -23,6 +23,12 @@
       ]
     },
     {
+      "type": "figure",
+      "ids": [
+        "kp03-03-map"
+      ]
+    },
+    {
       "type": "table",
       "columns": [
         "写法",
