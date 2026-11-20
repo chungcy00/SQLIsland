@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp06-02",
-  "lessonSha256": "3facae399a5a848e158f85f5968051086b86d7877ab0acae3f9089919190d182",
+  "lessonSha256": "115f99e4bd12a549741f5bbbdb62da75a601d60b249b1aa425fa01be14ec23b2",
   "figures": [
     {
       "id": "kp06-02-clauses",
@@ -14,13 +14,13 @@
           "role": "select",
           "label": "取数",
           "sql": "SELECT SUM(value) AS total, AVG(value) AS mean",
-          "note": "输出 SUM(value) AS total, AVG(value) AS mean。"
+          "note": "结果表最终显示 2 列：total、mean。"
         },
         {
           "role": "from",
           "label": "来源",
           "sql": "FROM nullable_values;",
-          "note": "从 nullable_values 读取输入数据。"
+          "note": "数据来自表 nullable_values。"
         }
       ]
     },
@@ -119,7 +119,8 @@
           "sql": "AVG(value)",
           "value": 6.666666666666667
         }
-      ]
+      ],
+      "conclusion": "SUM 和 AVG 都跳过 NULL；AVG 的分母是非空值的个数 3，而不是总行数 4。"
     }
   ]
 }

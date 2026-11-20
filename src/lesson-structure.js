@@ -10,7 +10,8 @@ export function validateStructuredLesson(lesson, value) {
       else if (block.type === 'list') {
         if (!Array.isArray(block.items) || !block.items.length) fail(label + '.items');
         for (const item of block.items) required(typeof item === 'string' ? item : item.text, label + '.item');
-      } else if (block.type === 'table') result(block, label);
+      } else if (block.type === 'figure') { if (!Array.isArray(block.ids) || !block.ids.length || block.ids.some(id => typeof id !== 'string')) fail(label + '.figure'); }
+      else if (block.type === 'table') result(block, label);
       else if (block.type === 'code') required(block.sql, label + '.sql');
       else fail(label + '.type');
       if (block.emphasis && (!Array.isArray(block.emphasis) || block.emphasis.some(word => !block.text?.includes(word)))) fail(label + '.emphasis');

@@ -6,7 +6,7 @@
   "conceptBlocks": [
     {
       "type": "heading",
-      "text": "基本含义",
+      "text": "什么是表约束？",
       "emphasis": []
     },
     {
@@ -19,22 +19,6 @@
       "items": [
         "主键标识每条记录；唯一约束保护业务编号；非空约束保证必填；检查约束限制值域；外键要求非空引用对应父记录。",
         "检查条件遇到未知值不一定拒绝，因此库存数量应同时设置非空和非负约束。"
-      ]
-    },
-    {
-      "type": "heading",
-      "text": "使用要点",
-      "emphasis": []
-    },
-    {
-      "type": "paragraph",
-      "text": "外键允许多个子记录对应同一父记录，除非另加唯一约束。",
-      "emphasis": []
-    },
-    {
-      "type": "list",
-      "items": [
-        "修改结构与修改数据是不同任务：新增列通常保留原行，而删除表会移除结构及数据。"
       ]
     },
     {
@@ -67,6 +51,22 @@
       ],
       "title": "常见约束的作用",
       "caption": "检查条件遇到未知值不一定拒绝，所以库存数量应同时设置非空和非负约束。"
+    },
+    {
+      "type": "heading",
+      "text": "使用要点",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "外键允许多个子记录对应同一父记录，除非另加唯一约束。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "修改结构与修改数据是不同任务：新增列通常保留原行，而删除表会移除结构及数据。"
+      ]
     }
   ],
   "syntax": {
@@ -91,22 +91,22 @@
       "kind": "fragment",
       "title": "指定来源",
       "sql": "FROM demo_stock",
-      "purpose": "从 demo_stock 读取输入数据。",
-      "reason": "后面的子句都基于这里得到的行。"
+      "purpose": "读取示例表 demo_stock，里面是遵守约束写入的库存记录。",
+      "reason": "约束在写入数据时起作用，这里读到的是已经通过约束的数据。"
     },
     {
       "kind": "fragment",
       "title": "选择输出",
       "sql": "SELECT id,qty",
-      "purpose": "输出 id,qty。",
-      "reason": "输出列的顺序与别名决定结果表的形状。"
+      "purpose": "显示每条记录的编号和库存数量。",
+      "reason": "SELECT 只决定显示哪些列，不改变行数。"
     },
     {
       "kind": "fragment",
       "title": "排序",
       "sql": "ORDER BY qty DESC;",
-      "purpose": "按 qty DESC 排列结果。",
-      "reason": "查询结果的默认行序没有保证，需要显式排序。"
+      "purpose": "按库存数量从大到小排列。",
+      "reason": "没有 ORDER BY 时数据库不保证行的顺序，写出来才能让输出顺序固定。"
     }
   ],
   "completeCode": {
@@ -255,7 +255,13 @@
         "emphasis": []
       }
     ],
-    "reason": [],
+    "reason": [
+      {
+        "type": "paragraph",
+        "text": "CHECK(qty>=0) 对 NULL 的判断结果是“未知”，数据库不会因为未知而拒绝，所以 NULL 仍然能写入；要保证必填，还需要 NOT NULL。",
+        "emphasis": []
+      }
+    ],
     "correction": [
       {
         "type": "paragraph",

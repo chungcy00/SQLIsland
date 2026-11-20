@@ -6,7 +6,7 @@
   "conceptBlocks": [
     {
       "type": "heading",
-      "text": "基本含义",
+      "text": "什么是预算差异？",
       "emphasis": []
     },
     {
@@ -62,8 +62,8 @@
       "kind": "runnable",
       "title": "汇总各部门科目预算",
       "sql": "WITH b AS (SELECT department_id,account_id,SUM(budget_cents) budget FROM budgets WHERE month_key BETWEEN '2025-01' AND '2025-12' GROUP BY department_id,account_id)\nSELECT * FROM b ORDER BY 1, 2, 3 LIMIT 3;",
-      "purpose": "汇总各部门科目预算（b）的实际执行结果。",
-      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "purpose": "先按部门和科目汇总 2025 年全年的预算 budget。",
+      "reason": "预算表是按月存放的，要先汇总到“部门 × 科目”这一级。",
       "sourceTables": [
         {
           "name": "budgets",
@@ -209,8 +209,8 @@
       "kind": "runnable",
       "title": "汇总各部门科目实际费用",
       "sql": "WITH b AS (SELECT department_id,account_id,SUM(budget_cents) budget FROM budgets WHERE month_key BETWEEN '2025-01' AND '2025-12' GROUP BY department_id,account_id), a AS (SELECT department_id,account_id,SUM(expense_cents) actual FROM v_expenses WHERE entry_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY department_id,account_id)\nSELECT * FROM a ORDER BY 1, 2, 3 LIMIT 3;",
-      "purpose": "汇总各部门科目实际费用（a）的实际执行结果。",
-      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "purpose": "再按部门和科目汇总 2025 年的实际费用 actual。",
+      "reason": "实际费用来自凭证行，也先汇总到同一粒度，才能和预算一一对应；冲销保留方向，不取绝对值。",
       "sourceTables": [
         {
           "name": "budgets",
@@ -356,8 +356,8 @@
       "kind": "runnable",
       "title": "计算预算差异与超支标记",
       "sql": "WITH b AS (SELECT department_id,account_id,SUM(budget_cents) budget FROM budgets WHERE month_key BETWEEN '2025-01' AND '2025-12' GROUP BY department_id,account_id), a AS (SELECT department_id,account_id,SUM(expense_cents) actual FROM v_expenses WHERE entry_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY department_id,account_id) SELECT b.department_id,b.account_id,b.budget budget_cents,COALESCE(a.actual,0) actual_cents,COALESCE(a.actual,0)-b.budget variance_cents,ROUND(100.0*(COALESCE(a.actual,0)-b.budget)/NULLIF(b.budget,0),2) variance_pct,CASE WHEN COALESCE(a.actual,0)>b.budget*1.1 THEN 1 ELSE 0 END over_budget FROM b LEFT JOIN a ON a.department_id=b.department_id AND a.account_id=b.account_id ORDER BY budget_cents DESC",
-      "purpose": "在前面各步中间结果的基础上完成最终计算，输出题目要求的完整结果。",
-      "reason": "前面的步骤只是分块准备；把它们组合起来，才能得到最终的业务结果。",
+      "purpose": "以预算为准连接实际费用，算出差额、偏差率，并标记超过预算 110% 的行。",
+      "reason": "预算在左侧保留，没有发生额的视作 0（前提是账务来源完整）；恰好 110% 不标记，预算为 0 时偏差率为空。",
       "sourceTables": [
         {
           "name": "budgets",
@@ -1334,7 +1334,13 @@
         "emphasis": []
       }
     ],
-    "reason": [],
+    "reason": [
+      {
+        "type": "paragraph",
+        "text": "预算月行和实际凭证行直接连接后再求和，每条凭证会和多个预算月配对，金额被重复计算；用 ABS 汇总费用会把冲销也加成正数，实际费用就偏大。",
+        "emphasis": []
+      }
+    ],
     "correction": [
       {
         "type": "paragraph",

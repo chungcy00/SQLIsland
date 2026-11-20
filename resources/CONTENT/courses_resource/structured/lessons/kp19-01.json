@@ -6,7 +6,7 @@
   "conceptBlocks": [
     {
       "type": "heading",
-      "text": "基本含义",
+      "text": "怎样衡量门店的销售、利润与目标？",
       "emphasis": []
     },
     {
@@ -48,8 +48,8 @@
       "kind": "runnable",
       "title": "按门店汇总净销售与成本",
       "sql": "WITH a AS (SELECT store_id,SUM(net_cents) net,SUM(cost_cents) cost FROM v_sales_lines WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY store_id)\nSELECT * FROM a ORDER BY 1, 2, 3 LIMIT 3;",
-      "purpose": "按门店汇总净销售与成本（a）的实际执行结果。",
-      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "purpose": "先按门店汇总 2025 年线下的净销售 net 和销售成本 cost，每家门店一行（这里只看前 3 行）。",
+      "reason": "先把销售明细压缩到“门店”这一级，后面才能和按门店汇总的目标一一对应；只看前 3 行是为了方便核对。",
       "sourceTables": [
         {
           "name": "sales_targets",
@@ -280,8 +280,8 @@
       "kind": "runnable",
       "title": "按门店合并月度目标",
       "sql": "WITH a AS (SELECT store_id,SUM(net_cents) net,SUM(cost_cents) cost FROM v_sales_lines WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY store_id), b AS (SELECT store_id,SUM(target_cents) target FROM sales_targets WHERE month_key BETWEEN '2025-01' AND '2025-12' GROUP BY store_id)\nSELECT * FROM b ORDER BY 1, 2 LIMIT 3;",
-      "purpose": "按门店合并月度目标（b）的实际执行结果。",
-      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "purpose": "再按门店汇总 2025 年全年的销售目标 target，同样每家门店一行。",
+      "reason": "目标表是按月存放的，直接和销售明细连接再求和会把数字重复放大，所以先各自汇总到门店。",
       "sourceTables": [
         {
           "name": "sales_targets",
@@ -508,8 +508,8 @@
       "kind": "runnable",
       "title": "汇总净销售、利润率与目标达成率",
       "sql": "WITH a AS (SELECT store_id,SUM(net_cents) net,SUM(cost_cents) cost FROM v_sales_lines WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY store_id), b AS (SELECT store_id,SUM(target_cents) target FROM sales_targets WHERE month_key BETWEEN '2025-01' AND '2025-12' GROUP BY store_id) SELECT s.store_id,COALESCE(a.net,0) net_cents,COALESCE(a.net-a.cost,0) gross_cents,ROUND(100.0*(a.net-a.cost)/NULLIF(a.net,0),2) margin_pct,b.target target_cents,ROUND(100.0*COALESCE(a.net,0)/NULLIF(b.target,0),2) achievement_pct FROM stores s LEFT JOIN a ON a.store_id=s.store_id LEFT JOIN b ON b.store_id=s.store_id ORDER BY net_cents DESC",
-      "purpose": "在前面各步中间结果的基础上完成最终计算，输出题目要求的完整结果。",
-      "reason": "前面的步骤只是分块准备；把它们组合起来，才能得到最终的业务结果。",
+      "purpose": "把两个汇总按门店连起来，算出净销售、毛利率和目标达成率。",
+      "reason": "门店表左连接两个汇总，没有销售的门店也保留；净额或目标为 0 时用 NULLIF 让比率为空，而不是报错或写成 0。",
       "sourceTables": [
         {
           "name": "sales_targets",
@@ -1109,7 +1109,13 @@
         "emphasis": []
       }
     ],
-    "reason": [],
+    "reason": [
+      {
+        "type": "paragraph",
+        "text": "目标表按月存放，销售明细按订单行存放，两者直接连接后每条销售明细都会和一年里的多条目标月记录配对，求和时目标金额被重复计算很多倍，达成率就严重失真；应当先各自汇总到门店，再连接。",
+        "emphasis": []
+      }
+    ],
     "correction": [
       {
         "type": "paragraph",

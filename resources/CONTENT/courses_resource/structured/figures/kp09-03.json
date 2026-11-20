@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp09-03",
-  "lessonSha256": "f0633cff5f87897e219c8656ec529247b17dcee75bd24eb29e1b5ee6766474ef",
+  "lessonSha256": "b9272df8b7002734b0203ea49c2b545e71e102216a62b5de12d79bf47423be49",
   "figures": [
     {
       "id": "kp09-03-clauses",
@@ -14,13 +14,13 @@
           "role": "select",
           "label": "取数",
           "sql": "SELECT product_id, ROUND(1.0*price/NULLIF(stock,0),2) AS ratio",
-          "note": "输出 product_id, ROUND(1.0*price/NULLIF(stock,0),2) AS ratio。"
+          "note": "结果表最终显示 2 列：product_id、ratio。"
         },
         {
           "role": "from",
           "label": "来源",
           "sql": "FROM products",
-          "note": "从 products 读取输入数据。"
+          "note": "数据来自表 products。"
         },
         {
           "role": "order",

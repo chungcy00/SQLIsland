@@ -6,7 +6,7 @@
   "conceptBlocks": [
     {
       "type": "heading",
-      "text": "基本含义",
+      "text": "什么是筛选与 WHERE？",
       "emphasis": []
     },
     {
@@ -20,24 +20,6 @@
         "WHERE 对输入中的每一行判断条件，只保留判断结果为真的行。",
         "例如商品价格必须在某个范围，分析师需要明确临界值是否算合格。",
         "等于使用 =，不等于使用 <>（也可用 !=），大于和小于分别使用 >、<，带等号的 >=、<= 包含边界。"
-      ]
-    },
-    {
-      "type": "heading",
-      "text": "使用要点",
-      "emphasis": []
-    },
-    {
-      "type": "paragraph",
-      "text": "多个条件可以同时约束同一行。",
-      "emphasis": []
-    },
-    {
-      "type": "list",
-      "items": [
-        "筛选前后通常仍是一行一个商品，只是行数改变。",
-        "若字段为空，普通比较通常得到未知，不能认为它自动满足“不等于”。",
-        "日期、文本和金额比较还必须确认字段类型及单位。"
       ]
     },
     {
@@ -84,6 +66,24 @@
       "codeColumns": [
         0
       ]
+    },
+    {
+      "type": "heading",
+      "text": "使用要点",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "多个条件可以同时约束同一行。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "筛选前后通常仍是一行一个商品，只是行数改变。",
+        "若字段为空，普通比较通常得到未知，不能认为它自动满足“不等于”。",
+        "日期、文本和金额比较还必须确认字段类型及单位。"
+      ]
     }
   ],
   "syntax": {
@@ -120,29 +120,29 @@
       "kind": "fragment",
       "title": "指定来源",
       "sql": "FROM products",
-      "purpose": "从 products 读取输入数据。",
-      "reason": "后面的子句都基于这里得到的行。"
+      "purpose": "先确定数据来自 products 表，每一行是一件商品。",
+      "reason": "WHERE、SELECT、ORDER BY 都是在这张表的行上工作的，所以要先有数据来源。"
     },
     {
       "kind": "fragment",
       "title": "筛选行",
       "sql": "WHERE price >= 35 AND price <= 65",
-      "purpose": "仅保留满足 price >= 35 AND price <= 65 的行。",
-      "reason": "条件结果为真才保留；未知（NULL）的行会被排除。"
+      "purpose": "逐行检查价格：大于等于 35 且小于等于 65 的商品才留下。",
+      "reason": "用 >= 和 <= 让 35 和 65 这两个边界价格也算合格；AND 要求两个条件同时成立，只满足一个的行会被去掉。"
     },
     {
       "kind": "fragment",
       "title": "选择输出",
       "sql": "SELECT product_id, price",
-      "purpose": "输出 product_id, price。",
-      "reason": "输出列的顺序与别名决定结果表的形状。"
+      "purpose": "从留下的商品里只取商品编号 product_id 和单价 price 两列。",
+      "reason": "SELECT 只决定显示哪些列，不改变行数，只改变结果表有几列。"
     },
     {
       "kind": "fragment",
       "title": "排序",
       "sql": "ORDER BY price DESC;",
-      "purpose": "按 price DESC 排列结果。",
-      "reason": "查询结果的默认行序没有保证，需要显式排序。"
+      "purpose": "按 price 从高到低排列结果。",
+      "reason": "没有 ORDER BY 时数据库不保证行的顺序；DESC 让最贵的排在最前面，结果顺序才固定。"
     }
   ],
   "completeCode": {
@@ -262,7 +262,13 @@
         "emphasis": []
       }
     ],
-    "reason": [],
+    "reason": [
+      {
+        "type": "paragraph",
+        "text": "price => 35 不是合法的比较符号，会直接报语法错误；而 price > 35 不包含 35，价格恰好是 35 的商品会被漏掉，所以要先想清楚边界值算不算。",
+        "emphasis": []
+      }
+    ],
     "correction": [
       {
         "type": "paragraph",

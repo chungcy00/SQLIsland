@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp18-01",
-  "lessonSha256": "af4c6491f7b897d4551995883ac52eb068a74c9f4a4148765366bb53ae09878d",
+  "lessonSha256": "bb9c945b45a4333d81110a47a8ef05a6fac7629c96eddd5289604a84200c3512",
   "figures": [
     {
       "id": "kp18-01-clauses",
@@ -14,19 +14,19 @@
           "role": "select",
           "label": "取数",
           "sql": "SELECT product_id,price",
-          "note": "输出 product_id,price。"
+          "note": "结果表最终显示 2 列：product_id、price。"
         },
         {
           "role": "from",
           "label": "来源",
           "sql": "FROM products",
-          "note": "从 products 读取输入数据。"
+          "note": "数据来自表 products。"
         },
         {
           "role": "where",
           "label": "筛选",
           "sql": "WHERE price=89",
-          "note": "仅保留满足 price=89 的行。"
+          "note": "只保留满足这个条件的行：price=89。"
         },
         {
           "role": "order",

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp11-03",
-  "lessonSha256": "e3333e1669def82d75af3a741310856f7026410953b41c145a6e89b16f72d1e4",
+  "lessonSha256": "50ba5bee9e9cad13c08c41938e8f9ac768f1061be68eb74a35b3bfd239ce8d0c",
   "figures": [
     {
       "id": "kp11-03-clauses",
@@ -14,13 +14,13 @@
           "role": "select",
           "label": "取数",
           "sql": "SELECT id, TRIM(name) AS clean_name, LOWER(category) AS clean_category, REPLACE(name,' ','') AS no_spaces",
-          "note": "输出查询需要的列与计算表达式。"
+          "note": "结果表最终显示 4 列：id、clean_name、clean_category、no_spaces。"
         },
         {
           "role": "from",
           "label": "来源",
           "sql": "FROM raw_data",
-          "note": "从 raw_data 读取输入数据。"
+          "note": "数据来自表 raw_data。"
         },
         {
           "role": "order",
@@ -182,6 +182,91 @@
           ]
         }
       ]
+    },
+    {
+      "id": "kp11-03-fn",
+      "slot": "concept",
+      "kind": "function-map",
+      "title": "清洗函数逐行整理文本",
+      "form": "scalar",
+      "table": "raw_data",
+      "inputColumns": [
+        "id",
+        "name",
+        "category"
+      ],
+      "orderBy": "id",
+      "inputRows": [
+        [
+          1,
+          "  Mask ",
+          "SKIN"
+        ],
+        [
+          2,
+          "Mask",
+          "skin"
+        ],
+        [
+          3,
+          "Serum",
+          "Skin"
+        ],
+        [
+          4,
+          "Soap",
+          "HOME"
+        ],
+        [
+          5,
+          "Cream",
+          "makeup"
+        ],
+        [
+          6,
+          "",
+          "HOME"
+        ]
+      ],
+      "outputs": [
+        {
+          "label": "clean_name",
+          "sql": "TRIM(name)",
+          "values": [
+            "Mask",
+            "Mask",
+            "Serum",
+            "Soap",
+            "Cream",
+            ""
+          ]
+        },
+        {
+          "label": "clean_category",
+          "sql": "LOWER(category)",
+          "values": [
+            "skin",
+            "skin",
+            "skin",
+            "home",
+            "makeup",
+            "home"
+          ]
+        },
+        {
+          "label": "no_spaces",
+          "sql": "REPLACE(name,' ','')",
+          "values": [
+            "Mask",
+            "Mask",
+            "Serum",
+            "Soap",
+            "Cream",
+            ""
+          ]
+        }
+      ],
+      "conclusion": "TRIM 只去两端空格，LOWER 统一大小写，REPLACE 去掉所有空格；它们都是逐行整理，不改变行数。"
     }
   ]
 }

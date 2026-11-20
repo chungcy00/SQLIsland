@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp03-02",
-  "lessonSha256": "320a9da6fe6f5d81fda109aefd81c3e041ca7598498a5cb4a1ed3622bca37f39",
+  "lessonSha256": "04c802a4b9f8d8aa9e0ebc7e71f30ba863bb8695229868bd07e83e1230527f4a",
   "figures": [
     {
       "id": "kp03-02-clauses",
@@ -14,19 +14,19 @@
           "role": "select",
           "label": "取数",
           "sql": "SELECT product_id",
-          "note": "输出 product_id。"
+          "note": "结果表最终显示 1 列：product_id。"
         },
         {
           "role": "from",
           "label": "来源",
           "sql": "FROM products",
-          "note": "从 products 读取输入数据。"
+          "note": "数据来自表 products。"
         },
         {
           "role": "where",
           "label": "筛选",
           "sql": "WHERE (price < 40 OR stock > 100) AND NOT stock = 0",
-          "note": "仅保留满足 (price < 40 OR stock > 100) AND NOT stock = 0 的行。"
+          "note": "只保留满足这个条件的行：(price < 40 OR stock > 100) AND NOT stock = 0。"
         },
         {
           "role": "order",

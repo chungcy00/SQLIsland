@@ -240,8 +240,10 @@ async function persist() {
   await save(state);
 }
 async function markActivity() {
+  const firstToday = !state.activity[today()];
   state.activity[today()] = (state.activity[today()] || 0) + 1;
   await persist();
+  cheerStreak(firstToday);
 }
 const getChapter = (id) => content.chapters.find((c) => c.id === id);
 const knowledgePoints = () => content.chapters.flatMap((c) => c.knowledgePoints);
@@ -347,6 +349,39 @@ function confirmDialog({ title, message, confirmLabel = "确认", danger = true 
     });
     dialog.querySelector('[data-dialog="cancel"]').focus();
   });
+}
+// 里程碑 / 鼓励弹窗（B10）：章节学完、全部课程学完、连续学习、首次答对难题。
+// 弹窗依次排队，不叠加；里程碑矢量只在弹窗里出现一次，系统“减少动画”时直接显示最终态。
+let celebrationChain = Promise.resolve();
+function cheer(options) {
+  celebrationChain = celebrationChain.then(() => celebrate(options)).catch(() => {});
+}
+function celebrate({ art, title, message, actionLabel, route: target }) {
+  return new Promise((resolve) => {
+    const dialog = document.createElement("div");
+    dialog.className = "dialog celebrate";
+    dialog.setAttribute("role", "dialog");
+    dialog.setAttribute("aria-modal", "true");
+    dialog.innerHTML = `${art}<h2>${e(title)}</h2><p>${e(message)}</p><div class="dialog-actions"><button class="outline" data-dialog="close">关闭</button>${target ? `<button class="primary" data-dialog="go">${e(actionLabel)}</button>` : ""}</div>`;
+    const scrim = document.createElement("div");
+    scrim.className = "scrim dialog-scrim";
+    let toRoute = false;
+    const layer = showLayer(dialog, scrim, () => { if (toRoute && target) navigate(target); resolve(); });
+    dialog.addEventListener("click", (event) => {
+      const choice = event.target.closest("[data-dialog]")?.dataset.dialog;
+      if (!choice) return;
+      toRoute = choice === "go";
+      layer.dismiss();
+    });
+    requestAnimationFrame(() => playMilestone({}));
+    dialog.querySelector("button")?.focus();
+  });
+}
+const HARD_LEVELS = ["困难", "挑战"];
+function cheerStreak(firstToday) {
+  if (!firstToday) return;
+  const streak = studyStreak();
+  if ([7, 30, 100].includes(streak)) cheer({ art: finalArt("13_encourage", "summary-illustration"), title: `连续学习 ${streak} 天`, message: "每天坚持一点点，数据岛正在一块一块亮起来。", actionLabel: "继续学习", route: "/learn" });
 }
 // 选择类底部面板：options = [{value, label}]；resolve(选中值 | null)
 function openSheet({ title, options, value }) {
@@ -673,8 +708,9 @@ function renderTables(tables, expandable = true, descriptions = {}) {
     const rows = t.rows || [];
     const rowCount = t.rowCount ?? rows.length;
     const displayedRows = expandable ? rows.length : Math.min(5, rows.length);
-    const preview = table(t.columns, rows.slice(0, 5));
-    return `<section class="source-table"><div class="row between table-heading"><h3><span class="source-table-name" title="${e(t.name)}">${e(t.name)}</span></h3><small>${rowCount} 行</small></div>${descriptions[t.name] ? `<p class="source-table-description">${teachingText(descriptions[t.name])}</p>` : ""}${preview}${expandable && rows.length > 5 ? `<details class="remaining-rows"><summary>查看其余 ${rows.length - 5} 行</summary>${table(t.columns, rows.slice(5), rows.length)}</details>` : ""}${rowCount > displayedRows ? `<small>预览前 ${displayedRows} 行</small>` : ""}</section>`;
+    // 课文里的示例数据表：样例数据整张直接展示，不折叠；其余场景（练习页等）仍只预览前 5 行。
+    const preview = expandable ? table(t.columns, rows, Math.max(rows.length, 1)) : table(t.columns, rows.slice(0, 5));
+    return `<section class="source-table"><div class="row between table-heading"><h3><span class="source-table-name" title="${e(t.name)}">${e(t.name)}</span></h3><small>${rowCount} 行</small></div>${descriptions[t.name] ? `<p class="source-table-description">${teachingText(descriptions[t.name])}</p>` : ""}${preview}${rowCount > displayedRows ? `<small>预览前 ${displayedRows} 行</small>` : ""}</section>`;
   }).join("");
 }
 function codeWrapPreferred() {
@@ -687,7 +723,7 @@ function codeBlock(inner) {
 function lessonCode(sql) {
   const formatted = formatSqlForDisplay(sql || "");
   if (formatted.split("\n").length <= 14) return codeBlock(code(sql));
-  return codeBlock(`<details class="long-code"><summary><span class="code-expand-label">展开完整 SQL</span><span class="code-collapse-label">收起 SQL</span></summary>${code(sql)}</details><div class="code-excerpt" aria-hidden="true">${code(formatted.split("\n").slice(0, 10).join("\n"))}</div>`);
+  return codeBlock(`<details class="long-code"><summary><span class="code-expand-label">展开完整 SQL</span><span class="code-collapse-label">收起 SQL</span></summary>${code(sql)}</details><div class="code-excerpt" tabindex="0" role="region" aria-label="SQL 代码（可上下滑动）">${code(sql)}</div>`);
 }
 function sequenceButtons(previous, next, kind) {
   const item = (entry, direction) => `<button class="${direction === "next" ? "primary" : "outline"}" data-action="${kind === "lesson" ? "go" : "adjacentQuestion"}" data-arg="${entry ? (kind === "lesson" ? "/lesson/" : "/question/") + entry.id : ""}" ${!entry || busy ? "disabled" : ""}>${direction === "previous" ? actionIcon("back") : ""}${kind === "lesson" ? (direction === "previous" ? "上一节" : "下一节") : (direction === "previous" ? "上一题" : "下一题")}${direction === "next" ? actionIcon("right") : ""}</button>`;
@@ -748,7 +784,7 @@ function renderTeachingBlocks(blocks = []) {
       case "table": {
         const cells = (row) => row.map((v, c) => `<td>${(block.codeColumns || []).includes(c) ? `<code>${e(v)}</code>` : e(v)}</td>`).join("");
         const grid = `<div class="fig-scroll"><table class="fig-table fig-concept"><thead><tr>${block.columns.map(c => `<th>${e(c)}</th>`).join("")}</tr></thead><tbody>${block.rows.map(row => `<tr class="fig-row kept">${cells(row)}</tr>`).join("")}</tbody></table></div>`;
-        return block.title ? `<figure class="figure figure-table"><figcaption>${e(block.title)}</figcaption>${grid}${block.caption ? `<div class="fig-caption">${e(block.caption)}</div>` : ""}</figure>` : `<div class="concept-comparison">${table(block.columns, block.rows)}</div>`;
+        return block.title ? `<figure class="figure figure-table"><figcaption>${e(block.title)}</figcaption>${grid}${block.caption ? `<p class="fig-conclusion"><b>结论</b>${e(block.caption)}</p>` : ""}</figure>` : `<div class="concept-comparison">${table(block.columns, block.rows)}</div>`;
       }
       case "code": return code(block.sql);
       default: return "";
@@ -756,12 +792,23 @@ function renderTeachingBlocks(blocks = []) {
   }).join("");
 }
 function conceptContent(k) {
+  // 核心概念：讲一个概念 → 紧跟对应的图示卡片 → 再讲下一个概念。课文数据里的 figure 块（ids）决定图示出现的位置，
+  // 没有被任何块引用的概念图示才追加在末尾（兼容未重排的课文）。
   const figures = (k.figures || []).filter((figure) => figure.slot === "concept");
+  const placed = new Set();
   const replacing = figures.find((figure) => figure.replacesTable);
   const blocks = (list) => {
-    let placed = false;
-    const body = list.map((block) => block.type === "table" && replacing && !placed ? (placed = true, renderFigures({ ...k, figures: [replacing] }, "concept")) : renderTeachingBlocks([block])).join("");
-    const rest = renderFigures({ ...k, figures: figures.filter((figure) => figure !== replacing) }, "concept");
+    let replaced = false;
+    const body = list.map((block) => {
+      if (block.type === "figure") {
+        const picked = figures.filter((figure) => block.ids.includes(figure.id));
+        picked.forEach((figure) => placed.add(figure.id));
+        return renderFigures({ ...k, figures: picked }, "concept");
+      }
+      if (block.type === "table" && replacing && !placed.has(replacing.id) && !replaced) { replaced = true; placed.add(replacing.id); return renderFigures({ ...k, figures: [replacing] }, "concept"); }
+      return renderTeachingBlocks([block]);
+    }).join("");
+    const rest = renderFigures({ ...k, figures: figures.filter((figure) => !placed.has(figure.id)) }, "concept");
     return body + rest;
   };
   return `<div class="concept-group">${k.presentation ? blocks(k.presentation.conceptBlocks) : `<p>${e(k.concept)}</p>${(k.teaching?.mergedConcepts || []).map(item => `<p>${e(item.explanation)}</p>`).join("")}`}</div>`;
@@ -930,7 +977,7 @@ function practice(path) {
     <div class="chips question-difficulties" aria-label="难度筛选">${["", "入门", "简单", "中等", "困难", "挑战"].map((difficulty) => button(difficulty || "全部难度", "questionDifficulty", difficulty, "chip " + (questionFilters.difficulty === difficulty ? "selected" : ""))).join("")}</div>
     <div class="practice-selectors"><select data-filter="chapter" aria-label="章节筛选">${opts(content.chapters, questionFilters.chapter, "全部章节")}</select><select data-filter="type" aria-label="题型筛选">${opts([...new Set(content.questions.map((q) => q.type))], questionFilters.type, "全部题型")}</select><select data-filter="status" aria-label="状态筛选">${opts(["未作答", "已作答", "待巩固", "已独立完成"], questionFilters.status, "全部状态")}</select><button class="icon-button" data-action="resetQuestions" aria-label="重置筛选" title="重置筛选">${icon("reset")}</button></div>
     <small class="practice-match-count">${filtered.length} 道题</small>
-    ${practiceChapters(list, filtered)}${filtered.length ? "" : empty("暂无匹配题目", "", button("重置筛选", "resetQuestions", "", "outline"))}`,
+    ${practiceChapters(list, filtered)}${filtered.length ? "" : empty("暂无匹配题目", "", button("重置筛选", "resetQuestions", "", "outline"), "09_empty_magnifier")}`,
     "practice",
     title !== "练习",
   );
@@ -1205,7 +1252,7 @@ function cardsPage() {
     ${matching.slice(0, cardBrowseLimit).map((c) => cardFlipped.has(c.id)
       ? `<div class="card-flip mini back" role="button" tabindex="0" data-action="miniFlip" data-arg="${c.id}" aria-label="点击翻回正面"><div class="row"><span class="aux">${e(c.id.toUpperCase())} · 答案 · 解析</span><span class="tools">${button(icon("copy"), "copyCard", c.id, "icon-button")}</span></div>${cardBackBody(c)}</div>`
       : `<button class="card-flip mini" data-action="miniFlip" data-arg="${c.id}"><div class="t"><span class="ic">${icon("flip")}</span><span class="q">${e(c.front.question)}</span></div>${cardCode(c)}<div class="row">${cardStatus(c)}<span class="tap">${icon("reset")}轻触翻面看答案</span></div></button>`).join("")}
-    ${matching.length > cardBrowseLimit ? button("加载更多闪卡", "moreCards", "", "outline full") : ""}${matching.length ? "" : empty("暂无匹配闪卡", "", button("清除搜索", "resetCardSearch", "", "outline"))}`,
+    ${matching.length > cardBrowseLimit ? button("加载更多闪卡", "moreCards", "", "outline full") : ""}${matching.length ? "" : empty("暂无匹配闪卡", "", button("清除搜索", "resetCardSearch", "", "outline"), "09_empty_magnifier")}`,
     "flashcards",
   );
 }
@@ -1533,9 +1580,10 @@ function statsPage() {
     });
   }
   const max = Math.max(...days.map((d) => d.count), 1);
+  const hasStatsData = completedKnowledgePoints() > 0 || stats.count > 0 || Object.keys(state.activity || {}).length > 0;
   shell(
     "学习统计",
-    `<div class="stats"><div class="stat"><strong>${completedKnowledgePoints()}<small> / ${knowledgePoints().length}</small></strong><small>累计学完知识点</small></div><div class="stat"><strong>${stats.count}<small> / ${content.questions.length}</small></strong><small>累计作答题目</small></div><div class="stat"><strong>${streak}</strong><small>连续学习天数</small></div></div><h2>最近 7 天</h2><small>学习操作次数</small><div class="bar-chart">${days.map((d) => `<div class="bar-day"><div>${d.count}</div><div class="bar" style="height:${Math.max(2, (d.count / max) * 88)}px"></div>${d.label}</div>`).join("")}</div><h2>练习表现</h2><div class="panel"><div class="setting-row"><span>首次独立正确率</span><strong>${stats.rate === null ? "暂无数据" : stats.rate + "%"}</strong></div><div class="setting-row"><span>已独立完成</span><strong>${stats.done} 题</strong></div><div class="setting-row"><span>已完成章节</span><strong>${completed} / 20</strong></div></div><details><summary>统计口径</summary><p class="muted">学习操作包括完成知识点、提交练习和闪卡评级。学习天数包含有效阅读，学习时长从 0.2.0 版本起记录。首次独立正确率按每道已提交题目的首次作答计算，使用提示或参考答案的作答计入辅助学习。</p></details><h2>各章进度</h2>${content.chapters.map((c) => `<div style="margin-bottom:18px"><div class="row between"><small>${c.number}. ${e(c.title)}</small><small>${c.knowledgePoints.filter((k) => completedLesson(k.id)).length}/${c.knowledgePoints.length}</small></div><div class="progress" style="margin:7px 0"><span style="width:${(c.knowledgePoints.filter((k) => completedLesson(k.id)).length / c.knowledgePoints.length) * 100}%"></span></div></div>`).join("")}`,
+    `${hasStatsData ? "" : empty("暂无统计数据", "完成一节课程或一道练习后，这里就会显示你的学习进度。", "", "09_empty_magnifier")}<div class="stats"><div class="stat"><strong>${completedKnowledgePoints()}<small> / ${knowledgePoints().length}</small></strong><small>累计学完知识点</small></div><div class="stat"><strong>${stats.count}<small> / ${content.questions.length}</small></strong><small>累计作答题目</small></div><div class="stat"><strong>${streak}</strong><small>连续学习天数</small></div></div><h2>最近 7 天</h2><small>学习操作次数</small><div class="bar-chart">${days.map((d) => `<div class="bar-day"><div>${d.count}</div><div class="bar" style="height:${Math.max(2, (d.count / max) * 88)}px"></div>${d.label}</div>`).join("")}</div><h2>练习表现</h2><div class="panel"><div class="setting-row"><span>首次独立正确率</span><strong>${stats.rate === null ? "暂无数据" : stats.rate + "%"}</strong></div><div class="setting-row"><span>已独立完成</span><strong>${stats.done} 题</strong></div><div class="setting-row"><span>已完成章节</span><strong>${completed} / 20</strong></div></div><details><summary>统计口径</summary><p class="muted">学习操作包括完成知识点、提交练习和闪卡评级。学习天数包含有效阅读，学习时长从 0.2.0 版本起记录。首次独立正确率按每道已提交题目的首次作答计算，使用提示或参考答案的作答计入辅助学习。</p></details><h2>各章进度</h2>${content.chapters.map((c) => `<div style="margin-bottom:18px"><div class="row between"><small>${c.number}. ${e(c.title)}</small><small>${c.knowledgePoints.filter((k) => completedLesson(k.id)).length}/${c.knowledgePoints.length}</small></div><div class="progress" style="margin:7px 0"><span style="width:${(c.knowledgePoints.filter((k) => completedLesson(k.id)).length / c.knowledgePoints.length) * 100}%"></span></div></div>`).join("")}`,
     "mine",
     true,
   );
@@ -1678,7 +1726,7 @@ function updatesPage() {
         .filter(Boolean);
   shell(
     "版本更新",
-    `<div class="update-version-card"><div class="update-phone">${icon("phone")}</div><h1>数屿SQL</h1><p class="update-version">v${e(current)}</p><small>构建 ${nativeVersion?.versionCode || release.versionCode}</small><div class="update-status ${status === "latest" || ready ? "success" : status === "error" ? "error" : ""}" role="status">${e(updateState.message)}</div>${status === "downloading" ? `<progress value="${updateState.progress}" max="100" aria-label="下载进度"></progress><small>${updateState.progress}%</small>` : ""}${available && ["available", "downloading", "ready", "permission"].includes(status) ? `<p class="new-version">新版本 v${e(available.versionName)}</p>` : ""}</div><section class="panel update-notes"><div class="row between"><h2>更新说明</h2><small>${e(available?.releaseDate || release.releaseDate)}</small></div><ul>${lines.map((line) => `<li>${e(line)}</li>`).join("")}</ul></section><div class="notice">覆盖更新会保留本地学习记录。安装由安卓系统确认。</div><div class="update-actions">${button(status === "checking" ? "正在检查…" : status === "downloading" ? "正在下载…" : "检查更新", "checkUpdate", "", "primary full")}${status === "available" ? button("下载并校验更新", "downloadUpdate", "", "tonal full") : ""}${ready ? button("安装更新", "installUpdate", "", "primary full") : ""}</div><details><summary>更新来源</summary><p class="muted">GitHub · ${UPDATE_REPOSITORY}<br>下载后核对 SHA-256、包名、版本与签名。</p></details>${!window.AndroidUpdates ? '<p class="muted">安装更新需在安卓应用中完成。</p>' : ""}`,
+    `<div class="update-version-card"><div class="update-brand">${finalArt("01_brand_island")}</div><h1>数屿SQL</h1><p class="update-version">v${e(current)}</p><small>构建 ${nativeVersion?.versionCode || release.versionCode}</small><div class="update-status ${status === "latest" || ready ? "success" : status === "error" ? "error" : ""}" role="status">${e(updateState.message)}</div>${status === "downloading" ? `<progress value="${updateState.progress}" max="100" aria-label="下载进度"></progress><small>${updateState.progress}%</small>` : ""}${available && ["available", "downloading", "ready", "permission"].includes(status) ? `<p class="new-version">新版本 v${e(available.versionName)}</p>` : ""}</div><section class="panel update-notes"><div class="row between"><h2>更新说明</h2><small>${e(available?.releaseDate || release.releaseDate)}</small></div><ul>${lines.map((line) => `<li>${e(line)}</li>`).join("")}</ul></section><div class="notice">覆盖更新会保留本地学习记录。安装由安卓系统确认。</div><div class="update-actions">${button(status === "checking" ? "正在检查…" : status === "downloading" ? "正在下载…" : "检查更新", "checkUpdate", "", "primary full")}${status === "available" ? button("下载并校验更新", "downloadUpdate", "", "tonal full") : ""}${ready ? button("安装更新", "installUpdate", "", "primary full") : ""}</div><details><summary>更新来源</summary><p class="muted">GitHub · ${UPDATE_REPOSITORY}<br>下载后核对 SHA-256、包名、版本与签名。</p></details>${!window.AndroidUpdates ? '<p class="muted">安装更新需在安卓应用中完成。</p>' : ""}`,
     "mine",
     true,
   );
@@ -1833,9 +1881,14 @@ async function recordAttempt(q, input, result, assistance = { hints, answerShown
         }
       : null,
   };
+  const hardIds = new Set(content.questions.filter((item) => HARD_LEVELS.includes(item.difficulty)).map((item) => item.id));
+  const firstHardPass = attempt.pass && !ungraded && hardIds.has(q.id) && !state.attempts.some((a) => a.pass && !a.ungraded && hardIds.has(a.questionId));
+  const firstToday = !ungraded && !state.activity[today()];
   state.attempts.push(attempt);
   if (!ungraded) state.activity[today()] = (state.activity[today()] || 0) + 1;
   await persist();
+  cheerStreak(firstToday);
+  if (firstHardPass) cheer({ art: finalArt("13_encourage", "summary-illustration"), title: "第一次答对难题", message: `「${q.title.split(" · ")[0]}」是${q.difficulty}题，你做对了。这是一个很好的开始。`, actionLabel: "继续练习", route: "/practice" });
 }
 async function evaluateQuestion(id, submit) {
   if (busy) return;
@@ -2164,15 +2217,26 @@ async function handleAction(action, arg, element) {
       element.setAttribute("aria-label", favorite(arg) ? "取消收藏" : "收藏");
       toast(favorite(arg) ? "已收藏" : "已取消收藏");
       break;
-    case "completeLesson":
+    case "completeLesson": {
+      let finished = null;
       if (!completedLesson(arg)) {
+        const chapter = content.chapters.find((c) => c.knowledgePoints.some((k) => k.id === arg));
+        const wasDone = chapter ? completedChapter(chapter) : true;
         if (lessonNoteKey(content.curriculumMigration, arg) === arg) state.completed.push(arg);
         else (state.consolidatedCompleted ??= []).push(arg);
         await markActivity();
         toast("已记录学习进度。");
+        if (chapter && !wasDone && completedChapter(chapter)) finished = chapter;
       }
       await render();
+      if (finished) {
+        const all = content.chapters.every(completedChapter);
+        cheer(all
+          ? { art: milestoneArt(), title: "全部课程学完了！", message: `你已经学完全部 ${knowledgePoints().length} 个知识点。回到练习和闪卡继续巩固吧。`, actionLabel: "去练习", route: "/practice" }
+          : { art: milestoneArt(), title: `第 ${finished.number} 章学完了`, message: `「${finished.title}」的 ${finished.knowledgePoints.length} 个知识点都已完成。`, actionLabel: "继续学习", route: "/learn" });
+      }
       break;
+    }
     case "lessonLab": {
       const k = getKP(arg);
       const dataset = k.datasetId || "example-" + arg;
@@ -2223,6 +2287,30 @@ async function handleAction(action, arg, element) {
       stem.classList.remove("mini");
       stem.classList.add("open");
       element.hidden = true;
+      break;
+    }
+    case "figTab": {
+      const [group, index] = String(arg).split(":");
+      const card = [...document.querySelectorAll("[data-figure-group]")].find((item) => item.dataset.figureGroup === group);
+      if (!card) break;
+      card.querySelectorAll(".fig-tab").forEach((tab, i) => { const on = String(i) === index; tab.setAttribute("aria-selected", String(on)); tab.tabIndex = on ? 0 : -1; });
+      card.querySelectorAll(".fig-panel").forEach((panel, i) => { panel.hidden = String(i) !== index; });
+      break;
+    }
+    case "fnPick": {
+      const [figureId, index] = String(arg).split(":");
+      const figure = [...document.querySelectorAll("[data-figure]")].find((item) => item.dataset.figure === figureId);
+      const button = figure?.querySelector(`.fig-call[data-arg="${CSS.escape(arg)}"]`);
+      if (!figure || !button) break;
+      const on = button.getAttribute("aria-pressed") !== "true";
+      figure.querySelectorAll(".fig-call").forEach((item) => item.setAttribute("aria-pressed", "false"));
+      figure.querySelectorAll(".hl").forEach((item) => item.classList.remove("hl"));
+      figure.classList.toggle("picking", on);
+      if (on) {
+        button.setAttribute("aria-pressed", "true");
+        const columns = (button.dataset.cols || "").split("|").filter(Boolean);
+        figure.querySelectorAll("[data-col],[data-out]").forEach((cell) => { if ((cell.dataset.out === index) || columns.includes(cell.dataset.col)) cell.classList.add("hl"); });
+      }
       break;
     }
     case "lessonJump": {

@@ -6,7 +6,7 @@
   "conceptBlocks": [
     {
       "type": "heading",
-      "text": "基本含义",
+      "text": "什么是计数 COUNT？",
       "emphasis": []
     },
     {
@@ -23,21 +23,9 @@
       ]
     },
     {
-      "type": "heading",
-      "text": "使用要点",
-      "emphasis": []
-    },
-    {
-      "type": "paragraph",
-      "text": "COUNT(DISTINCT value) 在非空值中去重再计数，重复的10只算一次。",
-      "emphasis": []
-    },
-    {
-      "type": "list",
-      "items": [
-        "三种写法都可以将多行压缩成一行统计结果；加上分组后则每组产生一个计数。",
-        "若输入为空，三种计数均返回0。",
-        "计数的对象与数据粒度必须一致：订单号用于数订单，客户号用于数客户；若一笔订单有多行明细，直接数行会高估订单量。"
+      "type": "figure",
+      "ids": [
+        "kp06-01-fn"
       ]
     },
     {
@@ -77,6 +65,24 @@
       "codeColumns": [
         0
       ]
+    },
+    {
+      "type": "heading",
+      "text": "使用要点",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "COUNT(DISTINCT value) 在非空值中去重再计数，重复的10只算一次。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "三种写法都可以将多行压缩成一行统计结果；加上分组后则每组产生一个计数。",
+        "若输入为空，三种计数均返回0。",
+        "计数的对象与数据粒度必须一致：订单号用于数订单，客户号用于数客户；若一笔订单有多行明细，直接数行会高估订单量。"
+      ]
     }
   ],
   "syntax": {
@@ -108,15 +114,15 @@
       "kind": "fragment",
       "title": "指定来源",
       "sql": "FROM nullable_values;",
-      "purpose": "从 nullable_values 读取输入数据。",
-      "reason": "后面的子句都基于这里得到的行。"
+      "purpose": "读取 nullable_values 表的 4 行，其中一行 value 为 NULL。",
+      "reason": "计数函数统计的是这张表的行，没有 WHERE 时统计全部 4 行。"
     },
     {
       "kind": "fragment",
       "title": "选择输出",
       "sql": "SELECT COUNT(*) AS rows_count, COUNT(value) AS nonnull_count, COUNT(DISTINCT value) AS unique_count",
-      "purpose": "输出查询需要的列与计算表达式。",
-      "reason": "输出列的顺序与别名决定结果表的形状。"
+      "purpose": "同时算出三个数：总行数、value 不为空的行数、value 不同取值的个数（本例是 4、3、2）。",
+      "reason": "COUNT(*) 数行，COUNT(value) 只数 value 不是 NULL 的行，COUNT(DISTINCT value) 在非空值里去重后再数，三者回答的问题不同，所以结果可以不一样。"
     }
   ],
   "completeCode": {
@@ -218,7 +224,13 @@
         "emphasis": []
       }
     ],
-    "reason": [],
+    "reason": [
+      {
+        "type": "paragraph",
+        "text": "COUNT(value) 会跳过 NULL，只数到 3 行，不是总行数 4；COUNT(0) 里的 0 是一个非空常量，每一行都会被计入，并不是在统计 value 等于 0 的行。",
+        "emphasis": []
+      }
+    ],
     "correction": [
       {
         "type": "paragraph",

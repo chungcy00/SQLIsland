@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp09-01",
-  "lessonSha256": "13403fa662fe5238c975f3813e88490d1dc99343cc1c26f7c3831c66409f42de",
+  "lessonSha256": "f2bb15121cd8d32ff63ae8f2adc57884ad00d649c41af7050ce1e0f4a3af4926",
   "figures": [
     {
       "id": "kp09-01-clauses",
@@ -14,13 +14,13 @@
           "role": "select",
           "label": "取数",
           "sql": "SELECT product_id, CASE WHEN stock=0 THEN '缺货' WHEN stock<50 THEN '低库存' ELSE '正常' END AS stock_level",
-          "note": "输出查询需要的列与计算表达式。"
+          "note": "结果表最终显示 2 列：product_id、stock_level。"
         },
         {
           "role": "from",
           "label": "来源",
           "sql": "FROM products",
-          "note": "从 products 读取输入数据。"
+          "note": "数据来自表 products。"
         },
         {
           "role": "order",

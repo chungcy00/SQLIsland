@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp19-56",
-  "lessonSha256": "d5f19ad3745d602a9a5d7cddd55ef715672eb4331cf70fc7a6a3af89581618fc",
+  "lessonSha256": "1046a980f2f784ca8888d54d4ffeec1e13ea4c0753d2885bcb133e5179a8ed08",
   "figures": [
     {
       "id": "kp19-56-clauses",
@@ -14,25 +14,25 @@
           "role": "cte",
           "label": "中间结果",
           "sql": "WITH a AS (SELECT i.po_item_id,p.supplier_id,i.product_id,p.order_date,i.unit_price_cents,c.unit_price_cents contract_cents,LAG(i.unit_price_cents) OVER(PARTITION BY p.supplier_id,i.product_id ORDER BY p.order_date,i.po_item_id) previous_cents FROM purchase_order_items i JOIN purchase_orders p ON p.po_id=i.po_id JOIN supplier_contracts c ON c.contract_id=i.contract_id WHERE p.status<>'cancelled')",
-          "note": "先把名为 a 的中间结果算出来，供后面的查询引用。"
+          "note": "先单独算出一张临时结果 a，下面的查询可以把它当作普通表来用。"
         },
         {
           "role": "select",
           "label": "取数",
           "sql": "SELECT po_item_id,supplier_id,product_id,unit_price_cents,contract_cents,unit_price_cents-contract_cents contract_variance_cents,previous_cents,ROUND(100.0*(unit_price_cents-previous_cents)/NULLIF(previous_cents,0),2) change_pct",
-          "note": "输出查询需要的列与计算表达式。"
+          "note": "结果表最终显示 8 列：po_item_id、supplier_id、product_id、unit_price_cents、contract_cents、contract_variance_cents…。"
         },
         {
           "role": "from",
           "label": "来源",
           "sql": "FROM a",
-          "note": "从 a 读取输入数据。"
+          "note": "数据来自中间结果 a。"
         },
         {
           "role": "where",
           "label": "筛选",
           "sql": "WHERE order_date BETWEEN '2025-01-01' AND '2025-12-31'",
-          "note": "仅保留满足 order_date BETWEEN '2025-01-01' AND '2025-12-31' 的行。"
+          "note": "只保留满足这个条件的行：order_date BETWEEN '2025-01-01' AND '2025-12-31'。"
         },
         {
           "role": "order",

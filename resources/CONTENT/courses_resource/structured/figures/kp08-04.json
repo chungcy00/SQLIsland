@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp08-04",
-  "lessonSha256": "df030fc94624e0e1a9670c567495c2c09851542bb50198e242bdc639dff89cdd",
+  "lessonSha256": "f502023451224a8ae7766158272a5f3ebf6b2dccc5ccdef21d99a661ea1e1fb1",
   "figures": [
     {
       "id": "kp08-04-clauses",
@@ -14,13 +14,13 @@
           "role": "select",
           "label": "取数",
           "sql": "SELECT e.employee_name, m.employee_name AS manager",
-          "note": "输出 e.employee_name, m.employee_name AS manager。"
+          "note": "结果表最终显示 2 列：employee_name、manager。"
         },
         {
           "role": "from",
           "label": "来源",
           "sql": "FROM employees e LEFT JOIN employees m ON e.manager_id=m.employee_id",
-          "note": "读取查询需要的输入数据。"
+          "note": "数据来自 表 employees、表 employees，并用 ON 后面的条件把它们的行配起来。"
         },
         {
           "role": "order",
@@ -94,6 +94,91 @@
           ]
         }
       ]
+    },
+    {
+      "id": "kp08-04-join",
+      "slot": "concept",
+      "kind": "join-map",
+      "title": "自连接：员工找到自己的主管",
+      "joinType": "left",
+      "left": {
+        "table": "employees",
+        "key": "manager_id",
+        "show": [
+          "employee_name",
+          "manager_id"
+        ]
+      },
+      "right": {
+        "table": "employees",
+        "key": "employee_id",
+        "show": [
+          "employee_id",
+          "employee_name"
+        ]
+      },
+      "on": "e.manager_id=m.employee_id",
+      "sql": "SELECT e.employee_name, e.manager_id, m.employee_id, m.employee_name FROM employees e LEFT JOIN employees m ON e.manager_id=m.employee_id",
+      "pairs": [
+        {
+          "left": [
+            "A",
+            null
+          ],
+          "right": null,
+          "kept": true
+        },
+        {
+          "left": [
+            "B",
+            1
+          ],
+          "right": [
+            1,
+            "A"
+          ],
+          "kept": true
+        },
+        {
+          "left": [
+            "C",
+            1
+          ],
+          "right": [
+            1,
+            "A"
+          ],
+          "kept": true
+        },
+        {
+          "left": [
+            "D",
+            2
+          ],
+          "right": [
+            2,
+            "B"
+          ],
+          "kept": true
+        },
+        {
+          "left": null,
+          "right": [
+            3,
+            "C"
+          ],
+          "kept": false
+        },
+        {
+          "left": null,
+          "right": [
+            4,
+            "D"
+          ],
+          "kept": false
+        }
+      ],
+      "conclusion": "自连接把同一张表当成两张表用；最高层员工没有主管，主管列显示 NULL。"
     }
   ]
 }

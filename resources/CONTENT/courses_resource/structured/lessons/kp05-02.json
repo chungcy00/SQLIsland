@@ -6,7 +6,7 @@
   "conceptBlocks": [
     {
       "type": "heading",
-      "text": "按优先级选择值",
+      "text": "怎样按优先级选择值？",
       "emphasis": []
     },
     {
@@ -22,21 +22,9 @@
       ]
     },
     {
-      "type": "heading",
-      "text": "保留真实零与空文本",
-      "emphasis": []
-    },
-    {
-      "type": "paragraph",
-      "text": "若所有候选均为空，结果仍为空。",
-      "emphasis": []
-    },
-    {
-      "type": "list",
-      "items": [
-        "零和空字符串不是 NULL，因此不会被这两个函数替换。",
-        "替代值仅是报表处理规则，不代表原始缺失真实变成了零或其他值。",
-        "若业务明确把空文本也视为缺失，可先使用 NULLIF 将其转换为空值，再选择替代文本。"
+      "type": "figure",
+      "ids": [
+        "kp05-02-fn"
       ]
     },
     {
@@ -72,6 +60,24 @@
       "caption": "IFNULL 与 COALESCE 只替换 NULL；0 和空字符串不会被替换。",
       "codeColumns": [
         1
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "为什么要保留真实的 0 和空文本？",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "若所有候选均为空，结果仍为空。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "零和空字符串不是 NULL，因此不会被这两个函数替换。",
+        "替代值仅是报表处理规则，不代表原始缺失真实变成了零或其他值。",
+        "若业务明确把空文本也视为缺失，可先使用 NULLIF 将其转换为空值，再选择替代文本。"
       ]
     }
   ],

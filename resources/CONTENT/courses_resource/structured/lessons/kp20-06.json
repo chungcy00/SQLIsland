@@ -6,7 +6,7 @@
   "conceptBlocks": [
     {
       "type": "heading",
-      "text": "基本含义",
+      "text": "什么是销售与库存错配？",
       "emphasis": []
     },
     {
@@ -79,8 +79,8 @@
       "kind": "runnable",
       "title": "汇总商品销售",
       "sql": "WITH a AS (SELECT product_id,SUM(net_cents) net FROM v_sales_lines WHERE order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY product_id)\nSELECT * FROM a ORDER BY 1, 2 LIMIT 3;",
-      "purpose": "汇总商品销售（a）的实际执行结果。",
-      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "purpose": "先汇总 2025 年每个商品的净销售 net。",
+      "reason": "销售是全年的流量，按商品汇总。",
       "sourceTables": [
         {
           "name": "inventory_snapshots",
@@ -342,8 +342,8 @@
       "kind": "runnable",
       "title": "汇总商品期末库存金额",
       "sql": "WITH a AS (SELECT product_id,SUM(net_cents) net FROM v_sales_lines WHERE order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY product_id), b AS (SELECT product_id,SUM(quantity*unit_cost_cents) stock FROM inventory_snapshots WHERE snapshot_date='2025-12-31' GROUP BY product_id)\nSELECT * FROM b ORDER BY 1, 2 LIMIT 3;",
-      "purpose": "汇总商品期末库存金额（b）的实际执行结果。",
-      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "purpose": "再汇总每个商品在 2025-12-31 的库存成本价值 stock。",
+      "reason": "库存是某一天的存量，只取年底这一天的快照。",
       "sourceTables": [
         {
           "name": "inventory_snapshots",
@@ -605,8 +605,8 @@
       "kind": "runnable",
       "title": "将两个指标对齐到商品",
       "sql": "WITH a AS (SELECT product_id,SUM(net_cents) net FROM v_sales_lines WHERE order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY product_id), b AS (SELECT product_id,SUM(quantity*unit_cost_cents) stock FROM inventory_snapshots WHERE snapshot_date='2025-12-31' GROUP BY product_id), z AS (SELECT p.product_id,COALESCE(a.net,0) net,COALESCE(b.stock,0) stock FROM products p LEFT JOIN a ON a.product_id=p.product_id LEFT JOIN b ON b.product_id=p.product_id)\nSELECT * FROM z ORDER BY 1, 2, 3 LIMIT 3;",
-      "purpose": "将两个指标对齐到商品（z）的实际执行结果。",
-      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "purpose": "以商品主档为基准，把销售和库存对齐到商品，缺的补 0。",
+      "reason": "以完整商品表为基准做左连接，没有销售或没有库存的商品也不会丢。",
       "sourceTables": [
         {
           "name": "inventory_snapshots",
@@ -872,8 +872,8 @@
       "kind": "runnable",
       "title": "分别计算占比",
       "sql": "WITH a AS (SELECT product_id,SUM(net_cents) net FROM v_sales_lines WHERE order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY product_id), b AS (SELECT product_id,SUM(quantity*unit_cost_cents) stock FROM inventory_snapshots WHERE snapshot_date='2025-12-31' GROUP BY product_id), z AS (SELECT p.product_id,COALESCE(a.net,0) net,COALESCE(b.stock,0) stock FROM products p LEFT JOIN a ON a.product_id=p.product_id LEFT JOIN b ON b.product_id=p.product_id), q AS (SELECT *,100.0*net/NULLIF(SUM(net) OVER(),0) sales_share,100.0*stock/NULLIF(SUM(stock) OVER(),0) stock_share FROM z)\nSELECT * FROM q ORDER BY 1, 2, 3, 4, 5 LIMIT 3;",
-      "purpose": "分别计算占比（q）的实际执行结果。",
-      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "purpose": "分别算出每个商品占全部销售和全部库存的百分比。",
+      "reason": "分母是全体商品的合计，用窗口函数 SUM(...) OVER() 在每一行上取得。",
       "sourceTables": [
         {
           "name": "inventory_snapshots",
@@ -1147,8 +1147,8 @@
       "kind": "runnable",
       "title": "计算占比差距并筛选错配商品",
       "sql": "WITH a AS (SELECT product_id,SUM(net_cents) net FROM v_sales_lines WHERE order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY product_id), b AS (SELECT product_id,SUM(quantity*unit_cost_cents) stock FROM inventory_snapshots WHERE snapshot_date='2025-12-31' GROUP BY product_id), z AS (SELECT p.product_id,COALESCE(a.net,0) net,COALESCE(b.stock,0) stock FROM products p LEFT JOIN a ON a.product_id=p.product_id LEFT JOIN b ON b.product_id=p.product_id), q AS (SELECT *,100.0*net/NULLIF(SUM(net) OVER(),0) sales_share,100.0*stock/NULLIF(SUM(stock) OVER(),0) stock_share FROM z) SELECT product_id,net net_cents,stock stock_cents,ROUND(sales_share,4) sales_pct,ROUND(stock_share,4) stock_pct,ROUND(stock_share-sales_share,4) gap_points FROM q ORDER BY gap_points DESC",
-      "purpose": "在前面各步中间结果的基础上完成最终计算，输出题目要求的完整结果。",
-      "reason": "前面的步骤只是分块准备；把它们组合起来，才能得到最终的业务结果。",
+      "purpose": "计算库存占比减销售占比的差距，差距越大说明库存占用远大于销售贡献。",
+      "reason": "按差距从大到小排序，最前面的就是“销售贡献低但库存占用高”的商品。",
       "sourceTables": [
         {
           "name": "inventory_snapshots",
@@ -9665,7 +9665,13 @@
         "emphasis": []
       }
     ],
-    "reason": [],
+    "reason": [
+      {
+        "type": "paragraph",
+        "text": "先筛有销售的商品再算库存占比，库存占比的分母就少了没有销售的商品，占比会偏高；直接连接销售明细和库存快照，每条明细会重复配对多条快照，金额被放大。",
+        "emphasis": []
+      }
+    ],
     "correction": [
       {
         "type": "paragraph",

@@ -6,7 +6,7 @@
   "conceptBlocks": [
     {
       "type": "heading",
-      "text": "基本含义",
+      "text": "什么是多列分组？",
       "emphasis": []
     },
     {
@@ -19,23 +19,6 @@
       "items": [
         "例如每家门店内各类别的销售额，结果的一行代表门店与类别的组合，而不是单独一个门店或类别。",
         "GROUP BY store_id, category 按联合键分组，只有两个字段都相同的记录才归入同一组。"
-      ]
-    },
-    {
-      "type": "heading",
-      "text": "使用要点",
-      "emphasis": []
-    },
-    {
-      "type": "paragraph",
-      "text": "增加分组键通常使统计粒度更细，删除键通常合并原有组，但实际组数取决于数据。",
-      "emphasis": []
-    },
-    {
-      "type": "list",
-      "items": [
-        "严格分组要求输出的非聚合表达式属于分组键，或能够由分组键唯一决定，或符合数据库允许的单值限制。",
-        "MySQL 默认严格分组模式会拒绝多数来源不确定的裸列，SQLite 可能接受并返回某个输入行的值；能运行不代表结果有明确业务含义。"
       ]
     },
     {
@@ -66,6 +49,23 @@
       "caption": "增加分组键通常使统计粒度更细，实际组数取决于数据。",
       "codeColumns": [
         0
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "使用要点",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "增加分组键通常使统计粒度更细，删除键通常合并原有组，但实际组数取决于数据。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "严格分组要求输出的非聚合表达式属于分组键，或能够由分组键唯一决定，或符合数据库允许的单值限制。",
+        "MySQL 默认严格分组模式会拒绝多数来源不确定的裸列，SQLite 可能接受并返回某个输入行的值；能运行不代表结果有明确业务含义。"
       ]
     }
   ],
@@ -98,29 +98,29 @@
       "kind": "fragment",
       "title": "指定来源",
       "sql": "FROM orders",
-      "purpose": "从 orders 读取输入数据。",
-      "reason": "后面的子句都基于这里得到的行。"
+      "purpose": "读取 orders 表，每一行是一笔订单。",
+      "reason": "先有订单行，才能分组汇总。"
     },
     {
       "kind": "fragment",
       "title": "分组",
       "sql": "GROUP BY store_id, category",
-      "purpose": "按 store_id, category 把行归入各个分组。",
-      "reason": "聚合函数在每个分组内分别计算。"
+      "purpose": "按 store_id 和 category 两个字段一起分组：两个都相同的订单才算同一组。",
+      "reason": "每一组代表“某家门店的某个类别”，所以结果的一行也是这个组合，比只按类别分组更细。"
     },
     {
       "kind": "fragment",
       "title": "选择输出",
       "sql": "SELECT store_id, category, SUM(sales) AS total",
-      "purpose": "输出 store_id, category, SUM(sales) AS total。",
-      "reason": "输出列的顺序与别名决定结果表的形状。"
+      "purpose": "显示门店、类别以及该组 sales 合计。",
+      "reason": "SELECT 里的 store_id、category 都出现在 GROUP BY 中，每一组各有唯一的取值，可以直接显示。"
     },
     {
       "kind": "fragment",
       "title": "排序",
       "sql": "ORDER BY total DESC;",
-      "purpose": "按 total DESC 排列结果。",
-      "reason": "查询结果的默认行序没有保证，需要显式排序。"
+      "purpose": "按合计从高到低排列。",
+      "reason": "分组本身不保证输出顺序，要排序必须显式写 ORDER BY。"
     }
   ],
   "completeCode": {
@@ -243,7 +243,13 @@
         "emphasis": []
       }
     ],
-    "reason": [],
+    "reason": [
+      {
+        "type": "paragraph",
+        "text": "按 category 分组时，同一类别下可能有很多订单编号 id，一组里该显示哪个 id 并不确定；严格模式的数据库会直接报错，宽松的数据库可能随便给一个值。",
+        "emphasis": []
+      }
+    ],
     "correction": [
       {
         "type": "paragraph",

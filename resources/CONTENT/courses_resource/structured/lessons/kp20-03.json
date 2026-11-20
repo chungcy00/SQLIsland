@@ -6,7 +6,7 @@
   "conceptBlocks": [
     {
       "type": "heading",
-      "text": "基本含义",
+      "text": "什么是分组内排名？",
       "emphasis": []
     },
     {
@@ -66,8 +66,8 @@
       "kind": "runnable",
       "title": "按门店和商品累计净销售",
       "sql": "WITH sales AS (\n SELECT store_id,product_id,SUM(net_cents) net_cents FROM v_sales_lines\n WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31'\n GROUP BY store_id,product_id HAVING SUM(net_cents)>0\n)\nSELECT * FROM sales ORDER BY 1, 2, 3 LIMIT 3;",
-      "purpose": "按门店和商品累计净销售（sales）的实际执行结果。",
-      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "purpose": "先按门店和商品累计 2025 年的净销售，只保留净销售大于 0 的组合。",
+      "reason": "排名的对象是“门店 × 商品”，不是单笔交易，所以先汇总到这个粒度。",
       "sourceTables": [
         {
           "name": "stores",
@@ -686,8 +686,8 @@
       "kind": "runnable",
       "title": "每家门店独立编号",
       "sql": "WITH sales AS (\n SELECT store_id,product_id,SUM(net_cents) net_cents FROM v_sales_lines\n WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31'\n GROUP BY store_id,product_id HAVING SUM(net_cents)>0\n), ranked AS (\n SELECT store_id,product_id,net_cents,ROW_NUMBER() OVER(PARTITION BY store_id ORDER BY net_cents DESC,product_id) sales_rank FROM sales\n)\nSELECT * FROM ranked ORDER BY 1, 2, 3, 4 LIMIT 3;",
-      "purpose": "每家门店独立编号（ranked）的实际执行结果。",
-      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "purpose": "在每家门店内部按净销售从高到低给商品编号 sales_rank。",
+      "reason": "PARTITION BY store_id 让每家门店独立排名；金额相同时再用商品编号决定先后。",
       "sourceTables": [
         {
           "name": "stores",
@@ -1310,8 +1310,8 @@
       "kind": "runnable",
       "title": "取每店前三名",
       "sql": "WITH sales AS (\n SELECT store_id,product_id,SUM(net_cents) net_cents FROM v_sales_lines\n WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31'\n GROUP BY store_id,product_id HAVING SUM(net_cents)>0\n), ranked AS (\n SELECT store_id,product_id,net_cents,ROW_NUMBER() OVER(PARTITION BY store_id ORDER BY net_cents DESC,product_id) sales_rank FROM sales\n)\nSELECT store_id,product_id,net_cents,sales_rank FROM ranked WHERE sales_rank<=3 ORDER BY net_cents DESC, sales_rank DESC",
-      "purpose": "在前面各步中间结果的基础上完成最终计算，输出题目要求的完整结果。",
-      "reason": "前面的步骤只是分块准备；把它们组合起来，才能得到最终的业务结果。",
+      "purpose": "只保留每家门店排名前三的商品。",
+      "reason": "窗口函数的结果不能直接在同一层 WHERE 里筛选，所以放到外层查询里用 sales_rank<=3。",
       "sourceTables": [
         {
           "name": "stores",
@@ -2271,7 +2271,13 @@
         "emphasis": []
       }
     ],
-    "reason": [],
+    "reason": [
+      {
+        "type": "paragraph",
+        "text": "直接对订单明细排名，排的是单笔交易而不是商品；在 RANK 的排序里加入唯一编号，并列就消失了，变成了连续的名次。",
+        "emphasis": []
+      }
+    ],
     "correction": [
       {
         "type": "paragraph",

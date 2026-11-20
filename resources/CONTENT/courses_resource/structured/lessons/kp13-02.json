@@ -6,7 +6,7 @@
   "conceptBlocks": [
     {
       "type": "heading",
-      "text": "基本含义",
+      "text": "什么是交集与差集？",
       "emphasis": []
     },
     {
@@ -19,22 +19,6 @@
       "items": [
         "默认均去重。",
         "差集不可交换左右侧；交集的成员不取决于方向。"
-      ]
-    },
-    {
-      "type": "heading",
-      "text": "使用要点",
-      "emphasis": []
-    },
-    {
-      "type": "paragraph",
-      "text": "集合运算比较对应的整行，不等于普通等号处理空值的逻辑。",
-      "emphasis": []
-    },
-    {
-      "type": "list",
-      "items": [
-        "原生 MySQL 8.4 支持两类运算，SQLite 不支持其 ALL 形式；组合运算宜用具名表达式明确范围。"
       ]
     },
     {
@@ -60,6 +44,22 @@
       "caption": "默认都会去重；比较的是对应的整行。",
       "codeColumns": [
         0
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "使用要点",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "集合运算比较对应的整行，不等于普通等号处理空值的逻辑。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "原生 MySQL 8.4 支持两类运算，SQLite 不支持其 ALL 形式；组合运算宜用具名表达式明确范围。"
       ]
     }
   ],
@@ -88,29 +88,29 @@
       "kind": "fragment",
       "title": "选择输出",
       "sql": "SELECT customer_id, customer_name FROM old_customers",
-      "purpose": "输出 customer_id, customer_name FROM old_customers。",
-      "reason": "输出列的顺序与别名决定结果表的形状。"
+      "purpose": "先查出旧客户表 old_customers 里的客户编号和姓名。",
+      "reason": "集合运算合并的是两个查询的结果，所以先各自写出一个完整的查询。"
     },
     {
       "kind": "fragment",
       "title": "合并结果",
       "sql": "INTERSECT",
-      "purpose": "用 INTERSECT 合并前后两个查询的结果。",
-      "reason": "两侧输出列的数量和含义必须一致。"
+      "purpose": "用 INTERSECT 只保留上下两个结果里都出现的行（本例是客户 2 和 3）。",
+      "reason": "INTERSECT 比较的是整行，两个查询都得到的行才保留，并且会去掉重复。"
     },
     {
       "kind": "fragment",
       "title": "选择输出",
       "sql": "SELECT customer_id, customer_name FROM new_customers",
-      "purpose": "输出 customer_id, customer_name FROM new_customers。",
-      "reason": "输出列的顺序与别名决定结果表的形状。"
+      "purpose": "再查出新客户表 new_customers 里的客户编号和姓名。",
+      "reason": "两个查询的列数必须相同，对应位置的含义也要一致，才能比较整行。"
     },
     {
       "kind": "fragment",
       "title": "排序",
       "sql": "ORDER BY customer_name;",
-      "purpose": "按 customer_name 排列结果。",
-      "reason": "查询结果的默认行序没有保证，需要显式排序。"
+      "purpose": "对合并后的整个结果按姓名排序。",
+      "reason": "ORDER BY 写在最后，排序的是集合运算之后的结果。"
     }
   ],
   "completeCode": {
@@ -205,7 +205,13 @@
         "emphasis": []
       }
     ],
-    "reason": [],
+    "reason": [
+      {
+        "type": "paragraph",
+        "text": "INTERSECT 找的是两边共同的行；想找“在旧表里但不在新表里”的行要用差集 EXCEPT，而且左右两侧不能交换，交换后得到的是另一组行。",
+        "emphasis": []
+      }
+    ],
     "correction": [
       {
         "type": "paragraph",

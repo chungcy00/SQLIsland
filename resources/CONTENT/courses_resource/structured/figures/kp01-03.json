@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp01-03",
-  "lessonSha256": "609d61ec67bdd39563ae8bccfb25bcd6a32a8bff5b281f7b87b42dc0f75683f5",
+  "lessonSha256": "cec911f746cf1404e1aa33442cabef6c5bf423c4b403eea948bd9f0cbe112647",
   "figures": [
     {
       "id": "kp01-03-clauses",
@@ -14,13 +14,13 @@
           "role": "select",
           "label": "取数",
           "sql": "SELECT c.customer_id, COUNT(o.id) AS order_count",
-          "note": "输出客户编号和订单数（COUNT(o.id) 不统计 NULL）"
+          "note": "结果表最终显示 2 列：customer_id、order_count。"
         },
         {
           "role": "from",
           "label": "来源",
           "sql": "FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id",
-          "note": "以 customers 为主表左连接 orders，没有订单的客户也保留"
+          "note": "数据来自 表 customers、表 orders，并用 ON 后面的条件把它们的行配起来。"
         },
         {
           "role": "group",

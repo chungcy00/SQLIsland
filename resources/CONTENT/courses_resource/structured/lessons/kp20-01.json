@@ -6,7 +6,7 @@
   "conceptBlocks": [
     {
       "type": "heading",
-      "text": "基本含义",
+      "text": "什么是销售贡献率？",
       "emphasis": []
     },
     {
@@ -76,8 +76,8 @@
       "kind": "runnable",
       "title": "汇总各门店净销售并保留无销售门店",
       "sql": "WITH totals AS (\n SELECT s.store_id, COALESCE(SUM(o.net_cents),0) net_cents\n FROM stores s LEFT JOIN v_order_net o ON o.store_id=s.store_id\n  AND o.channel='store' AND o.order_date BETWEEN '2025-01-01' AND '2025-12-31'\n GROUP BY s.store_id\n)\nSELECT * FROM totals ORDER BY 1, 2 LIMIT 3;",
-      "purpose": "汇总各门店净销售并保留无销售门店（totals）的实际执行结果。",
-      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "purpose": "先汇总 2025 年各实体门店的线下净销售，没有销售的门店记为 0。",
+      "reason": "门店表左连接订单，日期和渠道条件写在 ON 里，没有订单的门店才不会被删掉。",
       "sourceTables": [
         {
           "name": "stores",
@@ -692,8 +692,8 @@
       "kind": "runnable",
       "title": "计算门店销售额占比",
       "sql": "WITH totals AS (\n SELECT s.store_id, COALESCE(SUM(o.net_cents),0) net_cents\n FROM stores s LEFT JOIN v_order_net o ON o.store_id=s.store_id\n  AND o.channel='store' AND o.order_date BETWEEN '2025-01-01' AND '2025-12-31'\n GROUP BY s.store_id\n)\nSELECT store_id,net_cents,ROUND(100.0*net_cents/NULLIF(SUM(net_cents) OVER(),0),2) sales_pct\nFROM totals ORDER BY net_cents DESC",
-      "purpose": "在上一步的中间结果之上完成最终计算，得到题目要求的结果。",
-      "reason": "中间结果只是过渡，最终结果还需要汇总、计算或筛选后才能回答业务问题。",
+      "purpose": "用每家门店的净销售除以所有门店净销售合计，得到销售贡献率 sales_pct。",
+      "reason": "SUM(...) OVER() 在所有行上求合计，每一行都能同时看到自己和总体。",
       "sourceTables": [
         {
           "name": "stores",
@@ -1494,7 +1494,13 @@
         "emphasis": []
       }
     ],
-    "reason": [],
+    "reason": [
+      {
+        "type": "paragraph",
+        "text": "先筛出前三家门店再算总体，分母就变成这三家的合计，贡献率全部虚高；右表的过滤条件放在 WHERE 里，没有销售的门店会被删掉。",
+        "emphasis": []
+      }
+    ],
     "correction": [
       {
         "type": "paragraph",

@@ -6,7 +6,7 @@
   "conceptBlocks": [
     {
       "type": "heading",
-      "text": "基本含义",
+      "text": "什么是 UNION 合并？",
       "emphasis": []
     },
     {
@@ -19,22 +19,6 @@
       "items": [
         "各分支列数相同、位置及业务含义对应。",
         "UNION ALL 保留全部行，UNION 对全部输出列去重，包括同样的空值组合。"
-      ]
-    },
-    {
-      "type": "heading",
-      "text": "使用要点",
-      "emphasis": []
-    },
-    {
-      "type": "paragraph",
-      "text": "添加来源列会改变整行去重规则；如需保留来源又按客户去重，应另按客户汇总。",
-      "emphasis": []
-    },
-    {
-      "type": "list",
-      "items": [
-        "整个集合的排序写在末尾。"
       ]
     },
     {
@@ -60,6 +44,22 @@
       "caption": "各分支列数要相同，位置和业务含义要对应；整个集合的排序写在末尾。",
       "codeColumns": [
         0
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "使用要点",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "添加来源列会改变整行去重规则；如需保留来源又按客户去重，应另按客户汇总。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "整个集合的排序写在末尾。"
       ]
     }
   ],
@@ -88,29 +88,29 @@
       "kind": "fragment",
       "title": "选择输出",
       "sql": "SELECT customer_id, customer_name FROM old_customers",
-      "purpose": "输出 customer_id, customer_name FROM old_customers。",
-      "reason": "输出列的顺序与别名决定结果表的形状。"
+      "purpose": "先查出旧客户表 old_customers 里的客户编号和姓名。",
+      "reason": "集合运算合并的是两个查询的结果，所以先各自写出一个完整的查询。"
     },
     {
       "kind": "fragment",
       "title": "合并结果",
       "sql": "UNION ALL",
-      "purpose": "用 UNION ALL 合并前后两个查询的结果。",
-      "reason": "两侧输出列的数量和含义必须一致。"
+      "purpose": "用 UNION ALL 把上下两个结果叠在一起，重复的行也全部保留。",
+      "reason": "UNION ALL 是纵向叠加，不是按字段连接；它不去重，所以同时出现在两张表里的客户（王）会出现两次，UNION 才会去重。"
     },
     {
       "kind": "fragment",
       "title": "选择输出",
       "sql": "SELECT customer_id, customer_name FROM new_customers",
-      "purpose": "输出 customer_id, customer_name FROM new_customers。",
-      "reason": "输出列的顺序与别名决定结果表的形状。"
+      "purpose": "再查出新客户表 new_customers 里的客户编号和姓名。",
+      "reason": "两个查询的列数必须相同，对应位置的含义也要一致，才能上下叠在一起。"
     },
     {
       "kind": "fragment",
       "title": "排序",
       "sql": "ORDER BY customer_name;",
-      "purpose": "按 customer_name 排列结果。",
-      "reason": "查询结果的默认行序没有保证，需要显式排序。"
+      "purpose": "对合并后的整个结果按姓名排序。",
+      "reason": "ORDER BY 写在最后，排序的是合并后的全部行，而不是只排最后一个查询。"
     }
   ],
   "completeCode": {
@@ -299,7 +299,13 @@
         "emphasis": []
       }
     ],
-    "reason": [],
+    "reason": [
+      {
+        "type": "paragraph",
+        "text": "加入来源字段后，两个查询的每一行都因为来源不同而变得不一样，UNION 的去重不会把它们合并，同一个客户仍会出现两行；要每个客户一行，应只输出客户键去重，或者在外层按客户汇总。",
+        "emphasis": []
+      }
+    ],
     "correction": [
       {
         "type": "paragraph",

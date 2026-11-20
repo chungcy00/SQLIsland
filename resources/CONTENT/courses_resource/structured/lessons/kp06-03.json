@@ -6,7 +6,7 @@
   "conceptBlocks": [
     {
       "type": "heading",
-      "text": "基本含义",
+      "text": "什么是最小值 MIN 与最大值 MAX？",
       "emphasis": []
     },
     {
@@ -23,20 +23,9 @@
       ]
     },
     {
-      "type": "heading",
-      "text": "使用要点",
-      "emphasis": []
-    },
-    {
-      "type": "paragraph",
-      "text": "如果输入为空或全部为 NULL，则返回 NULL。",
-      "emphasis": []
-    },
-    {
-      "type": "list",
-      "items": [
-        "只需要范围时使用聚合即可；需要对应商品明细时必须进一步筛选或排序。",
-        "若业务要求所有并列第一名，应使用极值比较，不应直接限制为一行。"
+      "type": "figure",
+      "ids": [
+        "kp06-03-fn"
       ]
     },
     {
@@ -65,6 +54,23 @@
       ],
       "title": "MIN 与 MAX 在不同输入下的结果",
       "caption": "需要对应的商品明细时，必须再筛选或排序。"
+    },
+    {
+      "type": "heading",
+      "text": "使用要点",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "如果输入为空或全部为 NULL，则返回 NULL。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "只需要范围时使用聚合即可；需要对应商品明细时必须进一步筛选或排序。",
+        "若业务要求所有并列第一名，应使用极值比较，不应直接限制为一行。"
+      ]
     }
   ],
   "syntax": {
@@ -91,15 +97,15 @@
       "kind": "fragment",
       "title": "指定来源",
       "sql": "FROM products;",
-      "purpose": "从 products 读取输入数据。",
-      "reason": "后面的子句都基于这里得到的行。"
+      "purpose": "读取 products 表的商品价格。",
+      "reason": "MIN 和 MAX 是对这一列的值比较大小。"
     },
     {
       "kind": "fragment",
       "title": "选择输出",
       "sql": "SELECT MIN(price) AS min_price, MAX(price) AS max_price",
-      "purpose": "输出 MIN(price) AS min_price, MAX(price) AS max_price。",
-      "reason": "输出列的顺序与别名决定结果表的形状。"
+      "purpose": "求价格的最小值和最大值。",
+      "reason": "MIN 和 MAX 只返回一个值，不返回“哪件商品”；本例最低价 15 对应不止一件商品。"
     }
   ],
   "completeCode": {
@@ -194,7 +200,13 @@
         "emphasis": []
       }
     ],
-    "reason": [],
+    "reason": [
+      {
+        "type": "paragraph",
+        "text": "MAX(price) 只给出一个值，SELECT 里的 product_name 并不对应最高价那一行，数据库可能随便给出某一行的名称（严格模式的数据库会直接报错）。",
+        "emphasis": []
+      }
+    ],
     "correction": [
       {
         "type": "paragraph",

@@ -6,7 +6,7 @@
   "conceptBlocks": [
     {
       "type": "heading",
-      "text": "基本含义",
+      "text": "什么是自连接与交叉连接？",
       "emphasis": []
     },
     {
@@ -22,20 +22,9 @@
       ]
     },
     {
-      "type": "heading",
-      "text": "使用要点",
-      "emphasis": []
-    },
-    {
-      "type": "paragraph",
-      "text": "交叉连接则在没有匹配条件时产生两侧所有行对，n行与m行得到n×m行。",
-      "emphasis": []
-    },
-    {
-      "type": "list",
-      "items": [
-        "它适合有意构建门店×月份等完整维度，而不是随意连接两张交易明细。",
-        "完整报表应先构造唯一的维度组合，再按相同组合键连接已汇总事实；没有交易是否填零需核对营业状态及数据是否完整。"
+      "type": "figure",
+      "ids": [
+        "kp08-04-join"
       ]
     },
     {
@@ -65,6 +54,23 @@
       "codeColumns": [
         1
       ]
+    },
+    {
+      "type": "heading",
+      "text": "使用要点",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "交叉连接则在没有匹配条件时产生两侧所有行对，n行与m行得到n×m行。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "它适合有意构建门店×月份等完整维度，而不是随意连接两张交易明细。",
+        "完整报表应先构造唯一的维度组合，再按相同组合键连接已汇总事实；没有交易是否填零需核对营业状态及数据是否完整。"
+      ]
     }
   ],
   "syntax": {
@@ -91,22 +97,22 @@
       "kind": "fragment",
       "title": "指定来源",
       "sql": "FROM employees e LEFT JOIN employees m ON e.manager_id=m.employee_id",
-      "purpose": "读取查询需要的输入数据。",
-      "reason": "后面的子句都基于这里得到的行。"
+      "purpose": "同一张 employees 表用两个别名：e 代表员工，m 代表主管，用 e.manager_id = m.employee_id 配对。",
+      "reason": "员工的主管也是 employees 里的一行，所以要把这张表连接到它自己；别名让两个角色能区分开。LEFT JOIN 保留没有主管的最高层员工。"
     },
     {
       "kind": "fragment",
       "title": "选择输出",
       "sql": "SELECT e.employee_name, m.employee_name AS manager",
-      "purpose": "输出 e.employee_name, m.employee_name AS manager。",
-      "reason": "输出列的顺序与别名决定结果表的形状。"
+      "purpose": "显示员工姓名和主管姓名。",
+      "reason": "e.employee_name 是员工，m.employee_name 是主管，起别名 manager 避免两列同名。"
     },
     {
       "kind": "fragment",
       "title": "排序",
       "sql": "ORDER BY e.salary, e.employee_name;",
-      "purpose": "按 e.salary, e.employee_name 排列结果。",
-      "reason": "查询结果的默认行序没有保证，需要显式排序。"
+      "purpose": "按工资从低到高排列，工资相同再按姓名排。",
+      "reason": "工资相同的员工需要第二个排序条件才有确定的先后。"
     }
   ],
   "completeCode": {
@@ -275,7 +281,13 @@
         "emphasis": []
       }
     ],
-    "reason": [],
+    "reason": [
+      {
+        "type": "paragraph",
+        "text": "自连接如果不起别名，两个 employees 无法区分，数据库不知道 employee_name 指员工还是主管；CROSS JOIN 没有配对条件，会把两边每一行都两两组合，n 行和 m 行得到 n×m 行。",
+        "emphasis": []
+      }
+    ],
     "correction": [
       {
         "type": "paragraph",

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp01-01",
-  "lessonSha256": "6f7d2617c396667063a48aee85ee11631c73d9977768bb45ca5fe1103ce8ecea",
+  "lessonSha256": "3888d5d1361ed2556d15eb3022316838125a40372b3a2d15a14fb70d8bcf1677",
   "figures": [
     {
       "id": "kp01-01-clauses",
@@ -14,13 +14,13 @@
           "role": "select",
           "label": "取数",
           "sql": "SELECT id, category, sales",
-          "note": "输出 id、category、sales 三列"
+          "note": "结果表最终显示 3 列：id、category、sales。"
         },
         {
           "role": "from",
           "label": "来源",
           "sql": "FROM orders",
-          "note": "读取 orders 表的全部行"
+          "note": "数据来自表 orders。"
         },
         {
           "role": "order",

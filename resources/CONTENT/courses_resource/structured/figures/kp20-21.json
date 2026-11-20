@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp20-21",
-  "lessonSha256": "e33a0d1112477f69e8ae0d0fc3fffffc02a3746c4b832a104333887b459240f1",
+  "lessonSha256": "a213697653946ceba81c57575392db69139c2a252d4ebd344c6abdeac0c8d743",
   "figures": [
     {
       "id": "kp20-21-clauses",
@@ -14,25 +14,25 @@
           "role": "cte",
           "label": "中间结果",
           "sql": "WITH a AS (SELECT store_id,SUM(net_cents) net FROM v_sales_lines WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY store_id),",
-          "note": "先把名为 a 的中间结果算出来，供后面的查询引用。"
+          "note": "先单独算出一张临时结果 a，下面的查询可以把它当作普通表来用。"
         },
         {
           "role": "cte",
           "label": "中间结果",
           "sql": "b AS (SELECT store_id,SUM(labor_cents) labor,SUM(worked_minutes+overtime_minutes) minutes_worked FROM v_staff_month WHERE month_key BETWEEN '2025-01' AND '2025-12' AND store_id IS NOT NULL GROUP BY store_id)",
-          "note": "先把名为 b 的中间结果算出来，供后面的查询引用。"
+          "note": "先单独算出一张临时结果 b，下面的查询可以把它当作普通表来用。"
         },
         {
           "role": "select",
           "label": "取数",
           "sql": "SELECT s.store_id,COALESCE(a.net,0) net_cents,COALESCE(b.labor,0) labor_cents,ROUND(1.0*COALESCE(b.minutes_worked,0)/60,2) worked_hours,ROUND(60.0*COALESCE(a.net,0)/NULLIF(b.minutes_worked,0),2) sales_per_hour_cents,ROUND(100.0*COALESCE(b.labor,0)/NULLIF(a.net,0),2) labor_pct",
-          "note": "输出查询需要的列与计算表达式。"
+          "note": "结果表最终显示 6 列：store_id、net_cents、labor_cents、worked_hours、sales_per_hour_cents、labor_pct。"
         },
         {
           "role": "from",
           "label": "来源",
           "sql": "FROM stores s LEFT JOIN a ON a.store_id=s.store_id LEFT JOIN b ON b.store_id=s.store_id",
-          "note": "读取查询需要的输入数据。"
+          "note": "数据来自 表 stores、中间结果 a、中间结果 b，并用 ON 后面的条件把它们的行配起来。"
         },
         {
           "role": "order",

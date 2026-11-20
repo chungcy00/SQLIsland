@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp15-01",
-  "lessonSha256": "bd433955fa11203c1f93711e2a31b1d2f1897bd030e5539ed926817acac0a2d8",
+  "lessonSha256": "5700a98ea6260b29ff0d0ffdacb5263d68bfc925a854ad4c9ec701e6210b126d",
   "figures": [
     {
       "id": "kp15-01-clauses",
@@ -14,13 +14,13 @@
           "role": "select",
           "label": "取数",
           "sql": "SELECT id,category,sales,SUM(sales) OVER(PARTITION BY category) AS category_total",
-          "note": "输出查询需要的列与计算表达式。"
+          "note": "结果表最终显示 4 列：id、category、sales、category_total。"
         },
         {
           "role": "from",
           "label": "来源",
           "sql": "FROM orders",
-          "note": "从 orders 读取输入数据。"
+          "note": "数据来自表 orders。"
         },
         {
           "role": "order",
@@ -229,7 +229,8 @@
             1500
           ]
         }
-      ]
+      ],
+      "conclusion": "窗口聚合保留每一行，同一类别的行得到同一个合计；它不会把多行合成一行。"
     }
   ]
 }

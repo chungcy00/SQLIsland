@@ -6,7 +6,7 @@
   "conceptBlocks": [
     {
       "type": "heading",
-      "text": "基本含义",
+      "text": "什么是内连接 INNER JOIN？",
       "emphasis": []
     },
     {
@@ -23,20 +23,9 @@
       ]
     },
     {
-      "type": "heading",
-      "text": "使用要点",
-      "emphasis": []
-    },
-    {
-      "type": "paragraph",
-      "text": "普通等值连接不会匹配 NULL。",
-      "emphasis": []
-    },
-    {
-      "type": "list",
-      "items": [
-        "内连接不保留无对应客户的匿名订单，也不保留没有订单的客户。",
-        "分析之前应先明确希望保留哪些业务对象，而不是默认所有连接都用内连接。"
+      "type": "figure",
+      "ids": [
+        "kp08-01-join"
       ]
     },
     {
@@ -63,6 +52,23 @@
       "codeColumns": [
         0,
         2
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "使用要点",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "普通等值连接不会匹配 NULL。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "内连接不保留无对应客户的匿名订单，也不保留没有订单的客户。",
+        "分析之前应先明确希望保留哪些业务对象，而不是默认所有连接都用内连接。"
       ]
     }
   ],
@@ -91,22 +97,22 @@
       "kind": "fragment",
       "title": "指定来源",
       "sql": "FROM orders o INNER JOIN customers c ON o.customer_id=c.customer_id",
-      "purpose": "读取查询需要的输入数据。",
-      "reason": "后面的子句都基于这里得到的行。"
+      "purpose": "把订单表和客户表连起来：o.customer_id 与 c.customer_id 相等的行配成一行。",
+      "reason": "ON 写明用哪一列配对；INNER JOIN 只保留两边都配上的行，所以没有客户的订单和没有订单的客户都不会出现。"
     },
     {
       "kind": "fragment",
       "title": "选择输出",
       "sql": "SELECT o.id, c.customer_name",
-      "purpose": "输出 o.id, c.customer_name。",
-      "reason": "输出列的顺序与别名决定结果表的形状。"
+      "purpose": "从配好的行里显示订单编号和客户姓名。",
+      "reason": "连接之后每一行同时带着订单和客户两部分信息，所以能在同一行里取到两张表的列。"
     },
     {
       "kind": "fragment",
       "title": "排序",
       "sql": "ORDER BY sales DESC;",
-      "purpose": "按 sales DESC 排列结果。",
-      "reason": "查询结果的默认行序没有保证，需要显式排序。"
+      "purpose": "按订单金额从高到低排列。",
+      "reason": "金额 sales 来自订单表；连接后的行序没有保证，要排序必须显式写。"
     }
   ],
   "completeCode": {
@@ -241,7 +247,13 @@
         "emphasis": []
       }
     ],
-    "reason": [],
+    "reason": [
+      {
+        "type": "paragraph",
+        "text": "o.id 是订单自己的编号，c.customer_id 是客户的编号，二者含义不同；用订单编号去匹配客户编号，只有数字碰巧相等才会配上，配出来的客户也是错的。",
+        "emphasis": []
+      }
+    ],
     "correction": [
       {
         "type": "paragraph",

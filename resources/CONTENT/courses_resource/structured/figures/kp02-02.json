@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp02-02",
-  "lessonSha256": "715b93b3626a85afc1129de621ebe1d998c083595948178d371051a8b4ae3a01",
+  "lessonSha256": "88bea23f7dcf816a457fc1e398404afdf71f527dc15c62c8441d605300ab7032",
   "figures": [
     {
       "id": "kp02-02-clauses",
@@ -14,13 +14,13 @@
           "role": "select",
           "label": "取数",
           "sql": "SELECT DISTINCT store_id, category",
-          "note": "输出 store_id 与 category 的组合，并去掉重复行"
+          "note": "结果表最终显示 2 列：store_id、category。"
         },
         {
           "role": "from",
           "label": "来源",
           "sql": "FROM orders",
-          "note": "读取 orders 表"
+          "note": "数据来自表 orders。"
         },
         {
           "role": "order",

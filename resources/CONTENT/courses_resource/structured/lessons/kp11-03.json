@@ -6,7 +6,7 @@
   "conceptBlocks": [
     {
       "type": "heading",
-      "text": "基本含义",
+      "text": "什么是文本清洗？",
       "emphasis": []
     },
     {
@@ -21,19 +21,9 @@
       ]
     },
     {
-      "type": "heading",
-      "text": "使用要点",
-      "emphasis": []
-    },
-    {
-      "type": "paragraph",
-      "text": "清洗规则取决于字段含义：内部空格可能是姓名或名称的一部分，不能一律删除。",
-      "emphasis": []
-    },
-    {
-      "type": "list",
-      "items": [
-        "清洗不会自动去重，也不会自动修复金额或缺失值。"
+      "type": "figure",
+      "ids": [
+        "kp11-03-fn"
       ]
     },
     {
@@ -65,6 +55,22 @@
       "codeColumns": [
         0
       ]
+    },
+    {
+      "type": "heading",
+      "text": "使用要点",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "清洗规则取决于字段含义：内部空格可能是姓名或名称的一部分，不能一律删除。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "清洗不会自动去重，也不会自动修复金额或缺失值。"
+      ]
     }
   ],
   "syntax": {
@@ -91,22 +97,22 @@
       "kind": "fragment",
       "title": "指定来源",
       "sql": "FROM raw_data",
-      "purpose": "从 raw_data 读取输入数据。",
-      "reason": "后面的子句都基于这里得到的行。"
+      "purpose": "读取 raw_data 表，里面是还没整理的原始记录。",
+      "reason": "清洗函数是对每一行的文本列逐行处理，不会改动原表。"
     },
     {
       "kind": "fragment",
       "title": "选择输出",
       "sql": "SELECT id, TRIM(name) AS clean_name, LOWER(category) AS clean_category, REPLACE(name,' ','') AS no_spaces",
-      "purpose": "输出查询需要的列与计算表达式。",
-      "reason": "输出列的顺序与别名决定结果表的形状。"
+      "purpose": "同时整理三列：TRIM 去掉名称两端的空格，LOWER 把类别统一成小写，REPLACE 去掉名称里所有的空格。",
+      "reason": "TRIM 只去两端，保留名称中间合法的空格；REPLACE 会去掉全部空格，所以只用在确实不需要空格的场合。"
     },
     {
       "kind": "fragment",
       "title": "排序",
       "sql": "ORDER BY name DESC;",
-      "purpose": "按 name DESC 排列结果。",
-      "reason": "查询结果的默认行序没有保证，需要显式排序。"
+      "purpose": "按名称倒序排列。",
+      "reason": "没有 ORDER BY 时数据库不保证行的顺序，写出来才能让输出顺序固定。"
     }
   ],
   "completeCode": {
@@ -233,7 +239,13 @@
         "emphasis": []
       }
     ],
-    "reason": [],
+    "reason": [
+      {
+        "type": "paragraph",
+        "text": "REPLACE(name,' ','') 会把名称中间合法的空格也删掉（例如“Ann Lee”变成“AnnLee”）；清洗后名称相同也不一定是同一个人，直接删除会丢掉真实记录。",
+        "emphasis": []
+      }
+    ],
     "correction": [
       {
         "type": "paragraph",

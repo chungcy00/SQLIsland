@@ -1185,7 +1185,7 @@
     ],
     "fixtureHashes": {
       "fixtures/q0199/q0199-public.json": "ebe209359320177bb3cd85afb3e025c44f4c7cf48c55824d7922253d5ddc2ab2",
-      "fixtures/q0199/q0199-boundary.json": "1d462daf0cf25aa217351f328e6f765245f089b579bc98cff0ce2212ed62800d",
+      "fixtures/q0199/q0199-boundary.json": "a81e9498e45490b8b6b2da1cb7c6238e0fe3aebb473a6d6773d9b7ffd876eb7b",
       "fixtures/q0199/q0199-empty.json": "69554ed29b8ee8c0c065e4ef5d6eedb2fb8f7794042c78a327b201ce36f58b1f"
     }
   },
@@ -1335,9 +1335,9 @@
       "customer_id"
     ],
     "fixtureHashes": {
-      "fixtures/q0219/q0219-public.json": "c5613bf4b1163af6b2ebed1fc3c8c261999cf705c189edf962c941b609ebf5d3",
-      "fixtures/q0219/q0219-boundary.json": "867635dfd89caae2c93c31f7eb132564bb01054d6face774dea5d2c93ddef421",
-      "fixtures/q0219/q0219-empty.json": "726b1b47d2ab4116db84e1a952f9242776429bf189f41c82afc2e297196dc1cd"
+      "fixtures/q0219/q0219-public.json": "5b7979fcfb0cb6bc865209f5c526410fb80a2c22f339ce21548a3cffd73c23c6",
+      "fixtures/q0219/q0219-boundary.json": "0aa42d3ff9c4fc805f2a087abd4a1d881c5773594c76556378313a8591a62f1f",
+      "fixtures/q0219/q0219-empty.json": "c3f0368b6e59419c1a416008c9d122e4b32e0ff24a31cdaf8117c47245abe9b4"
     }
   },
   "q0222": {
@@ -1352,12 +1352,12 @@
   },
   "q0223": {
     "exactColumns": [
-      "id",
-      "numeric_amount"
+      "id"
     ],
     "fixtureHashes": {
       "fixtures/q0223/q0223-public.json": "dbb4e1e48fb27f4456820a654ca5514e9dd17980660f8b949d023bfb6bd25507",
       "fixtures/q0223/q0223-boundary.json": "31fb27ecae8e95baab7126f4c915312853559b94fd8f37de3ecbd09def56abb6",
+      "fixtures/q0223/q0223-multi-negative.json": "64f1a874fc6a91abd673b07223cc5471b38a25cd3b9eebc7c9ac19150363ff55",
       "fixtures/q0223/q0223-empty.json": "e3a6d709082890ad5763daf2afc9d3068d27b6d8a2e7967bfcfa24d52a0450c9"
     }
   },
@@ -1376,9 +1376,10 @@
       "n"
     ],
     "fixtureHashes": {
-      "fixtures/q0227/q0227-public.json": "f45daa0e60d54769e6d44d48cf9bf81dc1340d29b7e833e88370c956c51e462a",
-      "fixtures/q0227/q0227-boundary.json": "7d28d87f5e64704ea054fb5a2404cb30d0d706aecd3bdefce0bef5c99ee8079b",
-      "fixtures/q0227/q0227-empty.json": "421532fbbc0ab3813b6bf6435493609851f51ec4007c4b03573d57d193df11e3"
+      "fixtures/q0227/q0227-public.json": "2d68b67f9c894ad1815071dd18f934b49cdeb7f5e37305066612eaacadd24ddc",
+      "fixtures/q0227/q0227-boundary.json": "4b02b3e7d029ba1ab5fa742648650947c01e7f37b183698ed7ebf2f29ff4ae7a",
+      "fixtures/q0227/q0227-multi-groups.json": "9c376725d82b65ae37ce9b7ef25bb397d8424a653df86219a5c9b0464540cabd",
+      "fixtures/q0227/q0227-empty.json": "1d740e03add9661825c7a7f91ab74e551425a9c2b5e3759d48781d2ceeb5dc1b"
     }
   },
   "q0229": {

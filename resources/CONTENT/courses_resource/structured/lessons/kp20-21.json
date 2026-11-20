@@ -6,7 +6,7 @@
   "conceptBlocks": [
     {
       "type": "heading",
-      "text": "基本含义",
+      "text": "什么是门店人效？",
       "emphasis": []
     },
     {
@@ -62,8 +62,8 @@
       "kind": "runnable",
       "title": "按门店汇总净销售",
       "sql": "WITH a AS (SELECT store_id,SUM(net_cents) net FROM v_sales_lines WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY store_id)\nSELECT * FROM a ORDER BY 1, 2 LIMIT 3;",
-      "purpose": "按门店汇总净销售（a）的实际执行结果。",
-      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "purpose": "先按门店汇总 2025 年线下净销售 net。",
+      "reason": "销售按订单行汇总，先压缩到门店一行。",
       "sourceTables": [
         {
           "name": "stores",
@@ -332,8 +332,8 @@
       "kind": "runnable",
       "title": "按门店汇总人工及工作分钟",
       "sql": "WITH a AS (SELECT store_id,SUM(net_cents) net FROM v_sales_lines WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY store_id), b AS (SELECT store_id,SUM(labor_cents) labor,SUM(worked_minutes+overtime_minutes) minutes_worked FROM v_staff_month WHERE month_key BETWEEN '2025-01' AND '2025-12' AND store_id IS NOT NULL GROUP BY store_id)\nSELECT * FROM b ORDER BY 1, 2, 3 LIMIT 3;",
-      "purpose": "按门店汇总人工及工作分钟（b）的实际执行结果。",
-      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "purpose": "再按门店汇总 2025 年的人工成本和工作分钟（含加班）。",
+      "reason": "员工可能跨月调店，必须用员工月记录里当月的门店，不能用员工现在所在的门店。",
       "sourceTables": [
         {
           "name": "stores",
@@ -606,8 +606,8 @@
       "kind": "runnable",
       "title": "计算每小时销售额与人工占比",
       "sql": "WITH a AS (SELECT store_id,SUM(net_cents) net FROM v_sales_lines WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY store_id), b AS (SELECT store_id,SUM(labor_cents) labor,SUM(worked_minutes+overtime_minutes) minutes_worked FROM v_staff_month WHERE month_key BETWEEN '2025-01' AND '2025-12' AND store_id IS NOT NULL GROUP BY store_id) SELECT s.store_id,COALESCE(a.net,0) net_cents,COALESCE(b.labor,0) labor_cents,ROUND(1.0*COALESCE(b.minutes_worked,0)/60,2) worked_hours,ROUND(60.0*COALESCE(a.net,0)/NULLIF(b.minutes_worked,0),2) sales_per_hour_cents,ROUND(100.0*COALESCE(b.labor,0)/NULLIF(a.net,0),2) labor_pct FROM stores s LEFT JOIN a ON a.store_id=s.store_id LEFT JOIN b ON b.store_id=s.store_id ORDER BY net_cents DESC",
-      "purpose": "在前面各步中间结果的基础上完成最终计算，输出题目要求的完整结果。",
-      "reason": "前面的步骤只是分块准备；把它们组合起来，才能得到最终的业务结果。",
+      "purpose": "计算每小时销售额和人工费用占净销售的百分比。",
+      "reason": "每小时销售 = 60 × 净销售 ÷ 工作分钟；两个分母分别用 NULLIF 保护，缺数据时显示 NULL。",
       "sourceTables": [
         {
           "name": "stores",
@@ -1323,7 +1323,13 @@
         "emphasis": []
       }
     ],
-    "reason": [],
+    "reason": [
+      {
+        "type": "paragraph",
+        "text": "直接连接销售与员工月明细，每笔销售会和每个员工月配对，金额被放大；按员工当前所在门店回填历史数据，调过店的员工会把成本算到错的门店；加班工时重复计入也会让比率偏高。",
+        "emphasis": []
+      }
+    ],
     "correction": [
       {
         "type": "paragraph",

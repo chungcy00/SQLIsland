@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp10-01",
-  "lessonSha256": "99a045d008e4e9e2e292b3d2ca2de7a60cc9fcf9226d30a2448e83521508dd1b",
+  "lessonSha256": "9fc976ae1b6a3407b31b93f134b21a01c56b692a30f7c8c05c78760eda2c5246",
   "figures": [
     {
       "id": "kp10-01-clauses",
@@ -14,19 +14,19 @@
           "role": "select",
           "label": "取数",
           "sql": "SELECT product_id, price",
-          "note": "输出 product_id, price。"
+          "note": "结果表最终显示 2 列：product_id、price。"
         },
         {
           "role": "from",
           "label": "来源",
           "sql": "FROM products",
-          "note": "从 products 读取输入数据。"
+          "note": "数据来自表 products。"
         },
         {
           "role": "where",
           "label": "筛选",
           "sql": "WHERE price > (SELECT AVG(price) FROM products)",
-          "note": "仅保留满足 price > (SELECT AVG(price) FROM products) 的行。"
+          "note": "只保留满足这个条件的行：price > (SELECT AVG(price) FROM products)。"
         },
         {
           "role": "order",

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp15-04",
-  "lessonSha256": "d5eb13221b8c56abaa8be983de9d223ad087f71c14c6400fb55907709b248107",
+  "lessonSha256": "ab7cc82b7744bb65e1e5bd54022a47f3b83647dfef532cce5ff06a2b06abb4b1",
   "figures": [
     {
       "id": "kp15-04-clauses",
@@ -14,13 +14,13 @@
           "role": "select",
           "label": "取数",
           "sql": "SELECT month,sales,SUM(sales) OVER(ORDER BY month ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS cumulative",
-          "note": "输出查询需要的列与计算表达式。"
+          "note": "结果表最终显示 3 列：month、sales、cumulative。"
         },
         {
           "role": "from",
           "label": "来源",
           "sql": "FROM monthly",
-          "note": "从 monthly 读取输入数据。"
+          "note": "数据来自表 monthly。"
         },
         {
           "role": "order",
@@ -168,7 +168,8 @@
             4900
           ]
         }
-      ]
+      ],
+      "conclusion": "累计值从第一个月一路加到当前月，逐月增加：1000、2500、4000、4900。"
     }
   ]
 }

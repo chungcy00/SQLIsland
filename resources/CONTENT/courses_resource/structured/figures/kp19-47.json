@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp19-47",
-  "lessonSha256": "0dd0df604ee8ed18a530e8db68192594e5f8abb21f289664f79ad4785ae877de",
+  "lessonSha256": "fc22ba6c6ec96161669c37330a9ef15643df0dd35a0505c01fb757828c0b63f1",
   "figures": [
     {
       "id": "kp19-47-clauses",
@@ -14,13 +14,13 @@
           "role": "select",
           "label": "取数",
           "sql": "SELECT supplier_invoice_id,supplier_id,billed_cents,paid_cents,balance_cents,CASE WHEN balance_cents=0 THEN 'paid' WHEN paid_cents=0 THEN 'unpaid' WHEN balance_cents>0 THEN 'partial' ELSE 'overpaid' END payment_state",
-          "note": "输出查询需要的列与计算表达式。"
+          "note": "结果表最终显示 6 列：supplier_invoice_id、supplier_id、billed_cents、paid_cents、balance_cents、payment_state。"
         },
         {
           "role": "from",
           "label": "来源",
           "sql": "FROM v_invoice_balance",
-          "note": "从 v_invoice_balance 读取输入数据。"
+          "note": "数据来自表 v_invoice_balance。"
         },
         {
           "role": "order",

@@ -6,7 +6,7 @@
   "conceptBlocks": [
     {
       "type": "heading",
-      "text": "基本含义",
+      "text": "什么是库存周转率与周转天数？",
       "emphasis": []
     },
     {
@@ -71,8 +71,8 @@
       "kind": "runnable",
       "title": "按仓库类别汇总出库成本",
       "sql": "WITH a AS (SELECT warehouse_id,p.category_id,SUM(CASE WHEN movement_type='sale' THEN -quantity_delta*unit_cost_cents WHEN movement_type='return' THEN -quantity_delta*unit_cost_cents ELSE 0 END) cogs FROM stock_movements m JOIN products p ON p.product_id=m.product_id WHERE movement_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY warehouse_id,p.category_id)\nSELECT * FROM a ORDER BY 1, 2, 3 LIMIT 3;",
-      "purpose": "按仓库类别汇总出库成本（a）的实际执行结果。",
-      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "purpose": "先按仓库和类别汇总 2025 年的出库成本 cogs。",
+      "reason": "销售出库和退货入库都取负号乘以单位成本，退货因此冲减出库成本；采购入库不计入。",
       "sourceTables": [
         {
           "name": "categories",
@@ -382,8 +382,8 @@
       "kind": "runnable",
       "title": "期初期末库存价值取平均",
       "sql": "WITH a AS (SELECT warehouse_id,p.category_id,SUM(CASE WHEN movement_type='sale' THEN -quantity_delta*unit_cost_cents WHEN movement_type='return' THEN -quantity_delta*unit_cost_cents ELSE 0 END) cogs FROM stock_movements m JOIN products p ON p.product_id=m.product_id WHERE movement_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY warehouse_id,p.category_id), b AS (SELECT w.warehouse_id,c.category_id,CASE WHEN COUNT(i.snapshot_id)=2*COUNT(DISTINCT p.product_id) THEN SUM(i.quantity*i.unit_cost_cents)/2.0 ELSE NULL END avg_stock FROM warehouses w CROSS JOIN categories c LEFT JOIN products p ON p.category_id=c.category_id LEFT JOIN inventory_snapshots i ON i.warehouse_id=w.warehouse_id AND i.product_id=p.product_id AND i.snapshot_date IN ('2024-12-31','2025-12-31') GROUP BY w.warehouse_id,c.category_id)\nSELECT * FROM b ORDER BY 1, 2, 3 LIMIT 3;",
-      "purpose": "期初期末库存价值取平均（b）的实际执行结果。",
-      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "purpose": "再取 2024-12-31 期初和 2025-12-31 期末两个日期的库存成本价值，平均后得到平均库存 avg_stock。",
+      "reason": "周转率的分母是平均库存；只有每个商品每个日期都有快照时才计算，缺失不当作 0。",
       "sourceTables": [
         {
           "name": "categories",
@@ -693,8 +693,8 @@
       "kind": "runnable",
       "title": "计算周转率与周转天数",
       "sql": "WITH a AS (SELECT warehouse_id,p.category_id,SUM(CASE WHEN movement_type='sale' THEN -quantity_delta*unit_cost_cents WHEN movement_type='return' THEN -quantity_delta*unit_cost_cents ELSE 0 END) cogs FROM stock_movements m JOIN products p ON p.product_id=m.product_id WHERE movement_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY warehouse_id,p.category_id), b AS (SELECT w.warehouse_id,c.category_id,CASE WHEN COUNT(i.snapshot_id)=2*COUNT(DISTINCT p.product_id) THEN SUM(i.quantity*i.unit_cost_cents)/2.0 ELSE NULL END avg_stock FROM warehouses w CROSS JOIN categories c LEFT JOIN products p ON p.category_id=c.category_id LEFT JOIN inventory_snapshots i ON i.warehouse_id=w.warehouse_id AND i.product_id=p.product_id AND i.snapshot_date IN ('2024-12-31','2025-12-31') GROUP BY w.warehouse_id,c.category_id) SELECT b.warehouse_id,b.category_id,COALESCE(a.cogs,0) cogs_cents,b.avg_stock avg_stock_cents,ROUND(COALESCE(a.cogs,0)/NULLIF(b.avg_stock,0),4) turnover,CASE WHEN a.cogs>0 THEN ROUND(365.0*b.avg_stock/a.cogs,2) ELSE NULL END turnover_days FROM b LEFT JOIN a ON a.warehouse_id=b.warehouse_id AND a.category_id=b.category_id ORDER BY cogs_cents DESC",
-      "purpose": "在前面各步中间结果的基础上完成最终计算，输出题目要求的完整结果。",
-      "reason": "前面的步骤只是分块准备；把它们组合起来，才能得到最终的业务结果。",
+      "purpose": "用出库成本除以平均库存得到周转率，用 365 × 平均库存 ÷ 出库成本得到周转天数。",
+      "reason": "没有销售成本时天数没有定义，用 CASE 让结果为 NULL，而不是除以 0。",
       "sourceTables": [
         {
           "name": "categories",
@@ -1913,7 +1913,13 @@
         "emphasis": []
       }
     ],
-    "reason": [],
+    "reason": [
+      {
+        "type": "paragraph",
+        "text": "用期末售价金额当分母，会把“售价”和“成本”混在一起，周转率就不再是销售成本除以库存成本；快照缺失时填 0 会让平均库存偏低，周转率被虚高。",
+        "emphasis": []
+      }
+    ],
     "correction": [
       {
         "type": "paragraph",

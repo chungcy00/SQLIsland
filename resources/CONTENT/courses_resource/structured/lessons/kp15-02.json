@@ -6,7 +6,7 @@
   "conceptBlocks": [
     {
       "type": "heading",
-      "text": "基本含义",
+      "text": "什么是排名窗口函数？",
       "emphasis": []
     },
     {
@@ -19,6 +19,12 @@
       "items": [
         "窗口排序决定名次，外层排序决定展示顺序。",
         "排名范围由分区决定。"
+      ]
+    },
+    {
+      "type": "figure",
+      "ids": [
+        "kp15-02-fn"
       ]
     },
     {
@@ -71,22 +77,22 @@
       "kind": "fragment",
       "title": "指定来源",
       "sql": "FROM employees",
-      "purpose": "从 employees 读取输入数据。",
-      "reason": "后面的子句都基于这里得到的行。"
+      "purpose": "读取 employees 表，每一行是一位员工。",
+      "reason": "排名函数是在员工行上附加名次列。"
     },
     {
       "kind": "fragment",
       "title": "选择输出",
       "sql": "SELECT employee_id,salary,ROW_NUMBER() OVER(ORDER BY salary DESC,employee_id) AS rn,RANK() OVER(ORDER BY salary DESC) AS rnk,DENSE_RANK() OVER(ORDER BY salary DESC) AS dense_rnk",
-      "purpose": "输出查询需要的列与计算表达式。",
-      "reason": "输出列的顺序与别名决定结果表的形状。"
+      "purpose": "给每位员工按工资从高到低算出三种名次：rn 连续编号，rnk 并列后跳号，dense_rnk 并列后不跳号。",
+      "reason": "工资 5000 的两位员工并列：ROW_NUMBER 仍给 2、3，RANK 都是 2 且下一名是 4，DENSE_RANK 都是 2 且下一名是 3。"
     },
     {
       "kind": "fragment",
       "title": "排序",
       "sql": "ORDER BY rn;",
-      "purpose": "按 rn 排列结果。",
-      "reason": "查询结果的默认行序没有保证，需要显式排序。"
+      "purpose": "按 rn 从小到大排列。",
+      "reason": "窗口里的 ORDER BY 决定名次，最外层的 ORDER BY 决定展示顺序，两者是两回事。"
     }
   ],
   "completeCode": {
@@ -216,7 +222,13 @@
         "emphasis": []
       }
     ],
-    "reason": [],
+    "reason": [
+      {
+        "type": "paragraph",
+        "text": "窗口函数在 SELECT 阶段才计算，不能直接写在同一层的 WHERE 里，要先在内层查询算出排名，再在外层筛选；另外给 RANK 的排序再加一个唯一编号，并列就会消失，名次变成 ROW_NUMBER。",
+        "emphasis": []
+      }
+    ],
     "correction": [
       {
         "type": "paragraph",

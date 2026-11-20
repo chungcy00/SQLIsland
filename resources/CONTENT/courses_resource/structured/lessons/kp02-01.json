@@ -6,7 +6,7 @@
   "conceptBlocks": [
     {
       "type": "heading",
-      "text": "确定来源与输出",
+      "text": "查询的来源和输出是什么？",
       "emphasis": []
     },
     {
@@ -24,7 +24,7 @@
     },
     {
       "type": "heading",
-      "text": "逐行表达式与别名",
+      "text": "什么是逐行表达式与别名？",
       "emphasis": []
     },
     {

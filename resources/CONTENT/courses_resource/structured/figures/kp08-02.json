@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp08-02",
-  "lessonSha256": "c35265384c90c36b078629cb7e4d1b161d6dbc3928dcc840b719f55cb1064996",
+  "lessonSha256": "854fcf1e1aeb4a33e30dd3c4dce0e936a1232980bac6aa739678d0bf09d8a9b3",
   "figures": [
     {
       "id": "kp08-02-clauses",
@@ -14,13 +14,13 @@
           "role": "select",
           "label": "取数",
           "sql": "SELECT c.customer_id, o.id AS order_id, o.sales",
-          "note": "输出 c.customer_id, o.id AS order_id, o.sales。"
+          "note": "结果表最终显示 3 列：customer_id、order_id、sales。"
         },
         {
           "role": "from",
           "label": "来源",
           "sql": "FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id",
-          "note": "读取查询需要的输入数据。"
+          "note": "数据来自 表 customers、表 orders，并用 ON 后面的条件把它们的行配起来。"
         },
         {
           "role": "order",
@@ -134,11 +134,12 @@
         "key": "customer_id",
         "show": [
           "id",
+          "customer_id",
           "sales"
         ]
       },
       "on": "c.customer_id=o.customer_id",
-      "sql": "SELECT c.customer_id, c.customer_name, o.id, o.sales FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id",
+      "sql": "SELECT c.customer_id, c.customer_name, o.id, o.customer_id, o.sales FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id",
       "pairs": [
         {
           "left": [
@@ -146,6 +147,7 @@
             "林"
           ],
           "right": [
+            1,
             1,
             800
           ],
@@ -158,6 +160,7 @@
           ],
           "right": [
             3,
+            1,
             600
           ],
           "kept": true
@@ -168,6 +171,7 @@
             "陈"
           ],
           "right": [
+            2,
             2,
             400
           ],
@@ -180,6 +184,7 @@
           ],
           "right": [
             5,
+            3,
             1500
           ],
           "kept": true
@@ -196,9 +201,198 @@
           "left": null,
           "right": [
             4,
+            null,
             300
           ],
           "kept": false
+        }
+      ],
+      "caption": "LEFT JOIN 保留左表，RIGHT JOIN 保留右表；另一侧的输出字段用 NULL 补齐。",
+      "conclusion": "三种连接的差别只在没有配上的行：LEFT 保留左表，RIGHT 保留右表，FULL 两边都保留，缺的一侧补 NULL。"
+    },
+    {
+      "id": "kp08-02-right",
+      "slot": "concept",
+      "kind": "join-map",
+      "title": "右连接保留右表全部行",
+      "joinType": "right",
+      "left": {
+        "table": "customers",
+        "key": "customer_id",
+        "show": [
+          "customer_id",
+          "customer_name"
+        ]
+      },
+      "right": {
+        "table": "orders",
+        "key": "customer_id",
+        "show": [
+          "id",
+          "customer_id",
+          "sales"
+        ]
+      },
+      "on": "c.customer_id=o.customer_id",
+      "sql": "SELECT c.customer_id, c.customer_name, o.id, o.customer_id, o.sales FROM customers c RIGHT JOIN orders o ON c.customer_id=o.customer_id",
+      "pairs": [
+        {
+          "left": [
+            1,
+            "林"
+          ],
+          "right": [
+            1,
+            1,
+            800
+          ],
+          "kept": true
+        },
+        {
+          "left": [
+            1,
+            "林"
+          ],
+          "right": [
+            3,
+            1,
+            600
+          ],
+          "kept": true
+        },
+        {
+          "left": [
+            2,
+            "陈"
+          ],
+          "right": [
+            2,
+            2,
+            400
+          ],
+          "kept": true
+        },
+        {
+          "left": [
+            3,
+            "王"
+          ],
+          "right": [
+            5,
+            3,
+            1500
+          ],
+          "kept": true
+        },
+        {
+          "left": [
+            4,
+            "李"
+          ],
+          "right": null,
+          "kept": false
+        },
+        {
+          "left": null,
+          "right": [
+            4,
+            null,
+            300
+          ],
+          "kept": true
+        }
+      ]
+    },
+    {
+      "id": "kp08-02-full",
+      "slot": "concept",
+      "kind": "join-map",
+      "title": "全连接两侧都保留",
+      "joinType": "full",
+      "left": {
+        "table": "customers",
+        "key": "customer_id",
+        "show": [
+          "customer_id",
+          "customer_name"
+        ]
+      },
+      "right": {
+        "table": "orders",
+        "key": "customer_id",
+        "show": [
+          "id",
+          "customer_id",
+          "sales"
+        ]
+      },
+      "on": "c.customer_id=o.customer_id",
+      "sql": "SELECT c.customer_id, c.customer_name, o.id, o.customer_id, o.sales FROM customers c FULL JOIN orders o ON c.customer_id=o.customer_id",
+      "pairs": [
+        {
+          "left": [
+            1,
+            "林"
+          ],
+          "right": [
+            1,
+            1,
+            800
+          ],
+          "kept": true
+        },
+        {
+          "left": [
+            1,
+            "林"
+          ],
+          "right": [
+            3,
+            1,
+            600
+          ],
+          "kept": true
+        },
+        {
+          "left": [
+            2,
+            "陈"
+          ],
+          "right": [
+            2,
+            2,
+            400
+          ],
+          "kept": true
+        },
+        {
+          "left": [
+            3,
+            "王"
+          ],
+          "right": [
+            5,
+            3,
+            1500
+          ],
+          "kept": true
+        },
+        {
+          "left": [
+            4,
+            "李"
+          ],
+          "right": null,
+          "kept": true
+        },
+        {
+          "left": null,
+          "right": [
+            4,
+            null,
+            300
+          ],
+          "kept": true
         }
       ]
     }

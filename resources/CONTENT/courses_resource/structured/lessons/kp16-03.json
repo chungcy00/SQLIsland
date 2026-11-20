@@ -6,7 +6,7 @@
   "conceptBlocks": [
     {
       "type": "heading",
-      "text": "基本含义",
+      "text": "什么是类型转换与类别标准化？",
       "emphasis": []
     },
     {
@@ -68,22 +68,22 @@
       "kind": "fragment",
       "title": "指定来源",
       "sql": "FROM raw_data",
-      "purpose": "从 raw_data 读取输入数据。",
-      "reason": "后面的子句都基于这里得到的行。"
+      "purpose": "读取 raw_data 表。",
+      "reason": "转换和标准化都是对每一行逐行处理，不改动原表。"
     },
     {
       "kind": "fragment",
       "title": "选择输出",
       "sql": "SELECT id,CAST(amount AS DECIMAL(12,2)) AS numeric_amount,CASE WHEN LOWER(TRIM(category))='skin' THEN '护肤品' WHEN LOWER(TRIM(category))='home' THEN '日用品' WHEN LOWER(TRIM(category))='makeup' THEN '化妆品' ELSE '待分类' END AS clean_category",
-      "purpose": "输出查询需要的列与计算表达式。",
-      "reason": "输出列的顺序与别名决定结果表的形状。"
+      "purpose": "把金额文本转成数字，并把不同写法的类别统一成标准类别（认不出的标为“待分类”）。",
+      "reason": "CAST 解决“怎样参与计算”，CASE 映射解决“哪些写法算同一类”；先 TRIM 和 LOWER 再比较，大小写和空格不同的写法才能对上。"
     },
     {
       "kind": "fragment",
       "title": "排序",
       "sql": "ORDER BY name DESC;",
-      "purpose": "按 name DESC 排列结果。",
-      "reason": "查询结果的默认行序没有保证，需要显式排序。"
+      "purpose": "按名称倒序排列。",
+      "reason": "没有 ORDER BY 时数据库不保证行的顺序，写出来才能让输出顺序固定。"
     }
   ],
   "completeCode": {
@@ -228,7 +228,13 @@
         "emphasis": []
       }
     ],
-    "reason": [],
+    "reason": [
+      {
+        "type": "paragraph",
+        "text": "CAST 对非法文本不会报错，而是悄悄变成 0 或 NULL，汇总后金额就不对；转换前要先验证格式和范围，并保留原值和转换状态。",
+        "emphasis": []
+      }
+    ],
     "correction": [
       {
         "type": "paragraph",

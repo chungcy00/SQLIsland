@@ -6,7 +6,7 @@
   "conceptBlocks": [
     {
       "type": "heading",
-      "text": "基本含义",
+      "text": "什么是索引？",
       "emphasis": []
     },
     {
@@ -20,23 +20,6 @@
         "常见树形索引按键组织数据，可缩小需要检查的候选范围。",
         "选择性较高的条件通常匹配较少记录，但是否采用索引取决于统计信息、表大小、成本及优化器。",
         "复合索引按列顺序组织，门店等值加日期范围通常适合门店在前、日期在后。"
-      ]
-    },
-    {
-      "type": "heading",
-      "text": "使用要点",
-      "emphasis": []
-    },
-    {
-      "type": "paragraph",
-      "text": "普通索引列上直接比较常比套函数更容易形成搜索范围。",
-      "emphasis": []
-    },
-    {
-      "type": "list",
-      "items": [
-        "索引增加空间及写入维护成本。",
-        "执行计划用于观察访问方式，不能仅凭出现索引断言已经提速。"
       ]
     },
     {
@@ -65,6 +48,23 @@
       ],
       "title": "索引的使用要点",
       "caption": "索引是辅助定位数据的结构，不是额外的业务筛选条件。"
+    },
+    {
+      "type": "heading",
+      "text": "使用要点",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "普通索引列上直接比较常比套函数更容易形成搜索范围。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "索引增加空间及写入维护成本。",
+        "执行计划用于观察访问方式，不能仅凭出现索引断言已经提速。"
+      ]
     }
   ],
   "syntax": {
@@ -101,29 +101,29 @@
       "kind": "fragment",
       "title": "指定来源",
       "sql": "FROM products",
-      "purpose": "从 products 读取输入数据。",
-      "reason": "后面的子句都基于这里得到的行。"
+      "purpose": "读取 products 表。",
+      "reason": "索引不改变查询的写法和结果，只影响数据库怎样找到这些行。"
     },
     {
       "kind": "fragment",
       "title": "筛选行",
       "sql": "WHERE price=89",
-      "purpose": "仅保留满足 price=89 的行。",
-      "reason": "条件结果为真才保留；未知（NULL）的行会被排除。"
+      "purpose": "只保留价格恰好是 89 的商品。",
+      "reason": "price=89 是在列上直接比较，数据库可以借助 price 上的索引直接定位而不必逐行检查；是否真的使用索引，由数据库根据数据量和成本决定。"
     },
     {
       "kind": "fragment",
       "title": "选择输出",
       "sql": "SELECT product_id,price",
-      "purpose": "输出 product_id,price。",
-      "reason": "输出列的顺序与别名决定结果表的形状。"
+      "purpose": "显示商品编号和价格。",
+      "reason": "SELECT 只决定显示哪些列，不改变行数。"
     },
     {
       "kind": "fragment",
       "title": "排序",
       "sql": "ORDER BY product_name DESC;",
-      "purpose": "按 product_name DESC 排列结果。",
-      "reason": "查询结果的默认行序没有保证，需要显式排序。"
+      "purpose": "按商品名称倒序排列。",
+      "reason": "没有 ORDER BY 时数据库不保证行的顺序，写出来才能让输出顺序固定。"
     }
   ],
   "completeCode": {
@@ -322,7 +322,13 @@
         "emphasis": []
       }
     ],
-    "reason": [],
+    "reason": [
+      {
+        "type": "paragraph",
+        "text": "每列都建索引会占用更多空间，也让每次写入都要同时更新这些索引；全表扫描也不一定是问题，小表上它可能比用索引更快，要结合执行计划和真实耗时判断。",
+        "emphasis": []
+      }
+    ],
     "correction": [
       {
         "type": "paragraph",

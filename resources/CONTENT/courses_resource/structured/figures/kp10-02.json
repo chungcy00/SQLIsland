@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp10-02",
-  "lessonSha256": "2d9238ff373b74eeaa50d02694f72d20df8ee16d7adf09c39a4776078d452804",
+  "lessonSha256": "7a88f3a806d4e75fb092b3a5f136826799320dd5d1e16b68bb92f9a2f4d0bf40",
   "figures": [
     {
       "id": "kp10-02-clauses",
@@ -14,19 +14,19 @@
           "role": "select",
           "label": "取数",
           "sql": "SELECT customer_id, customer_name",
-          "note": "输出 customer_id, customer_name。"
+          "note": "结果表最终显示 2 列：customer_id、customer_name。"
         },
         {
           "role": "from",
           "label": "来源",
           "sql": "FROM customers",
-          "note": "从 customers 读取输入数据。"
+          "note": "数据来自表 customers。"
         },
         {
           "role": "where",
           "label": "筛选",
           "sql": "WHERE customer_id IN (SELECT customer_id FROM orders WHERE sales >= 600)",
-          "note": "仅保留满足条件的行。"
+          "note": "只保留满足这个条件的行：customer_id IN (SELECT customer_id FROM orders WHERE sales >= 600)。"
         },
         {
           "role": "order",

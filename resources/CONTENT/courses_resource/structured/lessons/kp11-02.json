@@ -6,7 +6,7 @@
   "conceptBlocks": [
     {
       "type": "heading",
-      "text": "基本含义",
+      "text": "什么是文本截取与长度？",
       "emphasis": []
     },
     {
@@ -22,20 +22,9 @@
       ]
     },
     {
-      "type": "heading",
-      "text": "使用要点",
-      "emphasis": []
-    },
-    {
-      "type": "paragraph",
-      "text": "MySQL CHAR_LENGTH 统计字符，LENGTH 统计字节；SQLite length 对文本统计字符，对 BLOB 统计字节。",
-      "emphasis": []
-    },
-    {
-      "type": "list",
-      "items": [
-        "在 UTF-8 中古晋是两个字符、六个字节。",
-        "字符数也不必然等于视觉字形数量。"
+      "type": "figure",
+      "ids": [
+        "kp11-02-fn"
       ]
     },
     {
@@ -72,6 +61,23 @@
       "codeColumns": [
         0
       ]
+    },
+    {
+      "type": "heading",
+      "text": "使用要点",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "MySQL CHAR_LENGTH 统计字符，LENGTH 统计字节；SQLite length 对文本统计字符，对 BLOB 统计字节。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "在 UTF-8 中古晋是两个字符、六个字节。",
+        "字符数也不必然等于视觉字形数量。"
+      ]
     }
   ],
   "syntax": {
@@ -103,22 +109,22 @@
       "kind": "fragment",
       "title": "指定来源",
       "sql": "FROM products",
-      "purpose": "从 products 读取输入数据。",
-      "reason": "后面的子句都基于这里得到的行。"
+      "purpose": "读取 products 表，每一行是一件商品。",
+      "reason": "后面的步骤都是对这些商品行进行计算。"
     },
     {
       "kind": "fragment",
       "title": "选择输出",
       "sql": "SELECT product_id, SUBSTRING(product_name,1,3) AS prefix",
-      "purpose": "输出 product_id, SUBSTRING(product_name,1,3) AS prefix。",
-      "reason": "输出列的顺序与别名决定结果表的形状。"
+      "purpose": "取商品名称的前 3 个字符作为前缀 prefix。",
+      "reason": "SUBSTRING(文本, 起始位置, 长度) 的起始位置从 1 开始，所以 (product_name,1,3) 就是从第 1 个字符起取 3 个字符。"
     },
     {
       "kind": "fragment",
       "title": "排序",
       "sql": "ORDER BY prefix DESC;",
-      "purpose": "按 prefix DESC 排列结果。",
-      "reason": "查询结果的默认行序没有保证，需要显式排序。"
+      "purpose": "按前缀倒序排列。",
+      "reason": "可以直接使用 SELECT 里起的别名 prefix 排序；没有 ORDER BY 时行的顺序没有保证。"
     }
   ],
   "completeCode": {
@@ -229,7 +235,13 @@
         "emphasis": []
       }
     ],
-    "reason": [],
+    "reason": [
+      {
+        "type": "paragraph",
+        "text": "起始位置从 1 开始，写成 0 时 MySQL 会返回空文本，得不到前三个字符；LENGTH 在 MySQL 里数的是字节，中文名称会比字符数多。",
+        "emphasis": []
+      }
+    ],
     "correction": [
       {
         "type": "paragraph",

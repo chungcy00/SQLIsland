@@ -6,7 +6,7 @@
   "conceptBlocks": [
     {
       "type": "heading",
-      "text": "基本含义",
+      "text": "什么是价格偏离？",
       "emphasis": []
     },
     {
@@ -58,8 +58,8 @@
       "kind": "runnable",
       "title": "在采购行匹配合同并取历史上一笔价格",
       "sql": "WITH a AS (SELECT i.po_item_id,p.supplier_id,i.product_id,p.order_date,i.unit_price_cents,c.unit_price_cents contract_cents,LAG(i.unit_price_cents) OVER(PARTITION BY p.supplier_id,i.product_id ORDER BY p.order_date,i.po_item_id) previous_cents FROM purchase_order_items i JOIN purchase_orders p ON p.po_id=i.po_id JOIN supplier_contracts c ON c.contract_id=i.contract_id WHERE p.status<>'cancelled')\nSELECT * FROM a ORDER BY 1, 2, 3, 4, 5, 6, 7 LIMIT 3;",
-      "purpose": "在采购行匹配合同并取历史上一笔价格（a）的实际执行结果。",
-      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "purpose": "给每行采购匹配合同价 contract_cents，并取同一供应商、同一商品的上一笔采购单价 previous_cents。",
+      "reason": "LAG 按供应商和商品分区、按日期排序，才是“同一商品的上一次采购价”；已取消的采购行不参与。",
       "sourceTables": [
         {
           "name": "purchase_order_items",
@@ -292,8 +292,8 @@
       "kind": "runnable",
       "title": "计算合同价差与价格环比",
       "sql": "WITH a AS (SELECT i.po_item_id,p.supplier_id,i.product_id,p.order_date,i.unit_price_cents,c.unit_price_cents contract_cents,LAG(i.unit_price_cents) OVER(PARTITION BY p.supplier_id,i.product_id ORDER BY p.order_date,i.po_item_id) previous_cents FROM purchase_order_items i JOIN purchase_orders p ON p.po_id=i.po_id JOIN supplier_contracts c ON c.contract_id=i.contract_id WHERE p.status<>'cancelled') SELECT po_item_id,supplier_id,product_id,unit_price_cents,contract_cents,unit_price_cents-contract_cents contract_variance_cents,previous_cents,ROUND(100.0*(unit_price_cents-previous_cents)/NULLIF(previous_cents,0),2) change_pct FROM a WHERE order_date BETWEEN '2025-01-01' AND '2025-12-31' ORDER BY po_item_id",
-      "purpose": "在上一步的中间结果之上完成最终计算，得到题目要求的结果。",
-      "reason": "中间结果只是过渡，最终结果还需要汇总、计算或筛选后才能回答业务问题。",
+      "purpose": "计算与合同价的差额、与上一笔价格的变动百分比，只保留 2025 年的采购行。",
+      "reason": "先用全部历史算出上一笔价格，最后才筛 2025 年，年初的第一笔才有上一笔可以比较。",
       "sourceTables": [
         {
           "name": "purchase_order_items",
@@ -953,7 +953,13 @@
         "emphasis": []
       }
     ],
-    "reason": [],
+    "reason": [
+      {
+        "type": "paragraph",
+        "text": "先筛 2025 年再用 LAG，2025 年的第一笔采购就找不到上一笔价格；直接平均各次采购单价会忽略采购数量，应当用总金额除以总数量得到加权价。",
+        "emphasis": []
+      }
+    ],
     "correction": [
       {
         "type": "paragraph",

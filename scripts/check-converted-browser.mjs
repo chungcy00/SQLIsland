@@ -18,7 +18,7 @@ try{
   assert.equal(await page.locator('#sql-editor').inputValue(),'');
   assert.equal(await page.locator('#prediction').count(),0);
   assert.match(await page.locator('[data-action=hint]').innerText(),/0\/3/);
-  await page.locator('#sql-editor').fill(formatSqlForDisplay(q.referenceSolutions[1].mysqlSql));
+  await page.locator('#sql-editor').fill(formatSqlForDisplay((q.referenceSolutions[1] || q.referenceSolutions[0]).mysqlSql));
   await page.locator('[data-action=submitQuestion]').click();
   await page.waitForFunction(()=>document.querySelector('.judge-feedback')?.textContent.includes('回答正确'));
  }

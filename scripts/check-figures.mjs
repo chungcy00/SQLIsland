@@ -49,11 +49,16 @@ try {
             out.push({id: figure.id + ':input', expected: figure.inputRows, actual: result.rows.map(row => row.slice(0, width))});
             figure.outputs.forEach((output, i) => out.push({id: figure.id + ':' + output.label, expected: output.values, actual: result.rows.map(row => row[width + i])}));
           }
+        } else if (figure.kind === 'compare-card') {
+          for (const [index, panel] of figure.panels.entries()) {
+            const result = await run({tables, setupSql, path, sql: panel.check.sql});
+            out.push({id: `${figure.id}:panel${index + 1}`, expected: panel.check.expected, actual: result.rows});
+          }
         } else if (figure.kind === 'join-map') {
           const result = await run({tables, setupSql, path, sql: figure.sql});
           const norm = rows => rows.map(row => JSON.stringify(row)).sort();
           const shownRight = figure.right.show.length;
-          out.push({id: figure.id, expected: norm(figure.pairs.filter(pair => pair.kept).map(pair => [...pair.left, ...(pair.right || Array(shownRight).fill(null))])), actual: norm(result.rows)});
+          out.push({id: figure.id, expected: norm(figure.pairs.filter(pair => pair.kept).map(pair => [...(pair.left || Array(figure.left.show.length).fill(null)), ...(pair.right || Array(shownRight).fill(null))])), actual: norm(result.rows)});
         } else if (figure.kind === 'clause-map') {
           const result = await run({tables, setupSql, path, sql: figure.sql});
           out.push({id: figure.id, expected: lesson.result.rows, actual: lesson.result.totalRows > lesson.result.rows.length ? result.rows.slice(0, lesson.result.rows.length) : result.rows});

@@ -6,7 +6,7 @@
   "conceptBlocks": [
     {
       "type": "heading",
-      "text": "基本含义",
+      "text": "什么是外连接 LEFT / RIGHT JOIN？",
       "emphasis": []
     },
     {
@@ -23,20 +23,11 @@
       ]
     },
     {
-      "type": "heading",
-      "text": "使用要点",
-      "emphasis": []
-    },
-    {
-      "type": "paragraph",
-      "text": "判断是否匹配应使用匹配侧原本非空的主键，而不是可能缺失的备注或金额。",
-      "emphasis": []
-    },
-    {
-      "type": "list",
-      "items": [
-        "统计匹配数量时，COUNT(订单主键) 忽略补出的空值；COUNT(*) 会把补齐行也统计在内。",
-        "右连接交换表的位置即可改写为左连接，不能直接只替换关键字而不检查保留侧。"
+      "type": "figure",
+      "ids": [
+        "kp08-02-join",
+        "kp08-02-right",
+        "kp08-02-full"
       ]
     },
     {
@@ -68,6 +59,23 @@
       "codeColumns": [
         0
       ]
+    },
+    {
+      "type": "heading",
+      "text": "使用要点",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "判断是否匹配应使用匹配侧原本非空的主键，而不是可能缺失的备注或金额。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "统计匹配数量时，COUNT(订单主键) 忽略补出的空值；COUNT(*) 会把补齐行也统计在内。",
+        "右连接交换表的位置即可改写为左连接，不能直接只替换关键字而不检查保留侧。"
+      ]
     }
   ],
   "syntax": {
@@ -95,22 +103,22 @@
       "kind": "fragment",
       "title": "指定来源",
       "sql": "FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id",
-      "purpose": "读取查询需要的输入数据。",
-      "reason": "后面的子句都基于这里得到的行。"
+      "purpose": "以 customers 为主，把 orders 配上去：客户编号相同的订单配成一行，没有订单的客户也保留。",
+      "reason": "LEFT JOIN 保留左表（customers）的每一行；左表某一行配不上时，右表的列显示 NULL。"
     },
     {
       "kind": "fragment",
       "title": "选择输出",
       "sql": "SELECT c.customer_id, o.id AS order_id, o.sales",
-      "purpose": "输出 c.customer_id, o.id AS order_id, o.sales。",
-      "reason": "输出列的顺序与别名决定结果表的形状。"
+      "purpose": "显示客户编号、订单编号和金额。",
+      "reason": "没有订单的客户，这里的订单编号和金额就是 NULL。"
     },
     {
       "kind": "fragment",
       "title": "排序",
       "sql": "ORDER BY o.sales DESC;",
-      "purpose": "按 o.sales DESC 排列结果。",
-      "reason": "查询结果的默认行序没有保证，需要显式排序。"
+      "purpose": "按金额从高到低排列。",
+      "reason": "NULL 排在哪里取决于数据库，需要稳定顺序时要额外说明。"
     }
   ],
   "completeCode": {
@@ -273,7 +281,13 @@
         "emphasis": []
       }
     ],
-    "reason": [],
+    "reason": [
+      {
+        "type": "paragraph",
+        "text": "COUNT(*) 数的是结果的行数，无订单的客户补出的那一行也会被数成 1；如果在 WHERE 里写 o.id IS NOT NULL，又会把这些补出的行删掉，LEFT JOIN 就失去了保留全部客户的作用。",
+        "emphasis": []
+      }
+    ],
     "correction": [
       {
         "type": "paragraph",

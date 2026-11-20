@@ -6,7 +6,7 @@
   "conceptBlocks": [
     {
       "type": "heading",
-      "text": "基本含义",
+      "text": "什么是新客与回头客？",
       "emphasis": []
     },
     {
@@ -48,8 +48,8 @@
       "kind": "runnable",
       "title": "为客户线上订单标记历史购买顺序",
       "sql": "WITH a AS (SELECT *,ROW_NUMBER() OVER(PARTITION BY customer_id ORDER BY order_date,order_id) rn FROM v_order_net WHERE channel='online')\nSELECT * FROM a ORDER BY 1, 2, 3, 4, 5, 6, 7, 8, 9 LIMIT 3;",
-      "purpose": "为客户线上订单标记历史购买顺序（a）的实际执行结果。",
-      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "purpose": "先给每位客户的线上订单按日期、订单编号排序编号，rn=1 就是客户的第一笔订单。",
+      "reason": "首购必须用客户的完整历史订单来判断，所以这一步不限制年份。",
       "sourceTables": [
         {
           "name": "customers",
@@ -297,8 +297,8 @@
       "kind": "runnable",
       "title": "区分新客与回头客并汇总",
       "sql": "WITH a AS (SELECT *,ROW_NUMBER() OVER(PARTITION BY customer_id ORDER BY order_date,order_id) rn FROM v_order_net WHERE channel='online') SELECT CASE WHEN rn=1 THEN 'new' ELSE 'returning' END segment,COUNT(DISTINCT customer_id) customers,COUNT(*) orders,SUM(net_cents) net_cents,ROUND(1.0*SUM(net_cents)/COUNT(*),2) avg_order_cents FROM a WHERE order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY CASE WHEN rn=1 THEN 'new' ELSE 'returning' END ORDER BY segment",
-      "purpose": "在上一步的中间结果之上完成最终计算，得到题目要求的结果。",
-      "reason": "中间结果只是过渡，最终结果还需要汇总、计算或筛选后才能回答业务问题。",
+      "purpose": "再按 rn 把订单分成新客（首购）和回头客，统计 2025 年各自的客户数、订单数、净收入和平均订单净额。",
+      "reason": "平均订单净额 = 净收入合计 ÷ 订单数；客户可以在两个组里各出现一次，所以按订单数而不是客户数当分母。",
       "sourceTables": [
         {
           "name": "customers",
@@ -729,7 +729,13 @@
         "emphasis": []
       }
     ],
-    "reason": [],
+    "reason": [
+      {
+        "type": "paragraph",
+        "text": "先过滤出 2025 年再排名，会把 2025 年之前就买过的老客户在 2025 年的第一笔订单当成“首购”；用客户人数做客单价的分母，得到的是人均消费，不是每笔订单的平均金额。",
+        "emphasis": []
+      }
+    ],
     "correction": [
       {
         "type": "paragraph",

@@ -6,7 +6,7 @@
   "conceptBlocks": [
     {
       "type": "heading",
-      "text": "基本含义",
+      "text": "什么是排序 ORDER BY？",
       "emphasis": []
     },
     {
@@ -20,23 +20,6 @@
         "没有 ORDER BY 时，数据库不保证查询输出的顺序。",
         "ASC 表示升序，DESC 表示降序，省略方向通常为升序。",
         "多列排序按从左到右的优先级比较：先按第一列排序，只有第一列相同才比较第二列。"
-      ]
-    },
-    {
-      "type": "heading",
-      "text": "使用要点",
-      "emphasis": []
-    },
-    {
-      "type": "paragraph",
-      "text": "若全部排序字段仍相同，则这些记录的相对顺序没有保证。",
-      "emphasis": []
-    },
-    {
-      "type": "list",
-      "items": [
-        "需要可复现的排行榜或分页时，应加上稳定且唯一的决胜字段。",
-        "空值的默认排序位置及文本排序规则可能因数据库而异。"
       ]
     },
     {
@@ -68,6 +51,23 @@
       "codeColumns": [
         0
       ]
+    },
+    {
+      "type": "heading",
+      "text": "使用要点",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "若全部排序字段仍相同，则这些记录的相对顺序没有保证。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "需要可复现的排行榜或分页时，应加上稳定且唯一的决胜字段。",
+        "空值的默认排序位置及文本排序规则可能因数据库而异。"
+      ]
     }
   ],
   "syntax": {
@@ -94,22 +94,22 @@
       "kind": "fragment",
       "title": "指定来源",
       "sql": "FROM products",
-      "purpose": "从 products 读取输入数据。",
-      "reason": "后面的子句都基于这里得到的行。"
+      "purpose": "先确定数据来自 products 表，每一行是一件商品。",
+      "reason": "WHERE、SELECT、ORDER BY 都是在这张表的行上工作的，所以要先有数据来源。"
     },
     {
       "kind": "fragment",
       "title": "选择输出",
       "sql": "SELECT product_id, price",
-      "purpose": "输出 product_id, price。",
-      "reason": "输出列的顺序与别名决定结果表的形状。"
+      "purpose": "显示商品编号和价格。",
+      "reason": "排序用的 product_name 可以不出现在结果里，ORDER BY 仍然可以使用它。"
     },
     {
       "kind": "fragment",
       "title": "排序",
       "sql": "ORDER BY price DESC, product_name;",
-      "purpose": "按 price DESC, product_name 排列结果。",
-      "reason": "查询结果的默认行序没有保证，需要显式排序。"
+      "purpose": "先按 price 从高到低排，价格相同的再按 product_name 从小到大排。",
+      "reason": "多列排序从左到右比较，第二列只在第一列相同时才起作用；这样价格相同的商品也有确定的先后。"
     }
   ],
   "completeCode": {
@@ -217,7 +217,13 @@
         "emphasis": []
       }
     ],
-    "reason": [],
+    "reason": [
+      {
+        "type": "paragraph",
+        "text": "DESC 只作用在紧挨着它的那一列：ORDER BY price, product_id DESC 里 price 仍是升序，只有 product_id 是降序。",
+        "emphasis": []
+      }
+    ],
     "correction": [
       {
         "type": "paragraph",

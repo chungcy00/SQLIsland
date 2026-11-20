@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp09-02",
-  "lessonSha256": "37b34d41c6c0d8ff1100ba2d504e1f02b07338b4524ae2fda40a3260d038c784",
+  "lessonSha256": "491fe0775d005de3dbbb0f0d8b8f73483cf08ae56051756c19fad1bb4d0543c3",
   "figures": [
     {
       "id": "kp09-02-clauses",
@@ -14,13 +14,13 @@
           "role": "select",
           "label": "取数",
           "sql": "SELECT SUM(CASE WHEN stock<50 THEN 1 ELSE 0 END) AS low_count, SUM(CASE WHEN stock>=50 THEN 1 ELSE 0 END) AS normal_count",
-          "note": "输出查询需要的列与计算表达式。"
+          "note": "结果表最终显示 2 列：low_count、normal_count。"
         },
         {
           "role": "from",
           "label": "来源",
           "sql": "FROM products;",
-          "note": "从 products 读取输入数据。"
+          "note": "数据来自表 products。"
         }
       ]
     },

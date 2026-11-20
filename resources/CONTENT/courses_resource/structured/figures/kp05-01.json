@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp05-01",
-  "lessonSha256": "3f5e4e536cb5c175430382f65c3bc36afded65f1854db65d2095d98282c1515e",
+  "lessonSha256": "9e60bfb5e08d22c36907a578072979d42c3f860ba0ed2a152ab8c78d0303e154",
   "figures": [
     {
       "id": "kp05-01-truth",
@@ -35,7 +35,8 @@
           "truth": "false"
         }
       ],
-      "replacesTable": true
+      "replacesTable": true,
+      "conclusion": "WHERE 只保留条件结果为“真”的行；“假”和“未知”都会被排除，所以 NULL 所在的行不会出现在结果里。"
     },
     {
       "id": "kp05-01-clauses",
@@ -48,19 +49,19 @@
           "role": "select",
           "label": "取数",
           "sql": "SELECT id, value",
-          "note": "输出记录编号和数值"
+          "note": "结果表最终显示 2 列：id、value。"
         },
         {
           "role": "from",
           "label": "来源",
           "sql": "FROM nullable_values",
-          "note": "读取待检查的记录"
+          "note": "数据来自表 nullable_values。"
         },
         {
           "role": "where",
           "label": "筛选",
           "sql": "WHERE value <> 10",
-          "note": "只保留条件为真的行"
+          "note": "只保留满足这个条件的行：value <> 10。"
         },
         {
           "role": "order",

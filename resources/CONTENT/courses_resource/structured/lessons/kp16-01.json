@@ -6,7 +6,7 @@
   "conceptBlocks": [
     {
       "type": "heading",
-      "text": "基本含义",
+      "text": "什么是重复记录？",
       "emphasis": []
     },
     {
@@ -46,29 +46,29 @@
       "kind": "fragment",
       "title": "指定来源",
       "sql": "FROM raw_data",
-      "purpose": "从 raw_data 读取输入数据。",
-      "reason": "后面的子句都基于这里得到的行。"
+      "purpose": "读取 raw_data 表，里面是还没整理的原始记录。",
+      "reason": "找重复之前，先要有原始记录。"
     },
     {
       "kind": "fragment",
       "title": "分组",
       "sql": "GROUP BY TRIM(name),amount,LOWER(category)",
-      "purpose": "按 TRIM(name),amount,LOWER(category) 把行归入各个分组。",
-      "reason": "聚合函数在每个分组内分别计算。"
+      "purpose": "把名称去掉两端空格、类别统一成小写后，按（名称，金额，类别）分组。",
+      "reason": "先做同样的整理再分组，写法不同但实质相同的记录（如“ Mask ”和“Mask”）才会被归到同一组。"
     },
     {
       "kind": "fragment",
       "title": "筛选分组",
       "sql": "HAVING COUNT(*)>1;",
-      "purpose": "仅保留满足 COUNT(*)>1 的分组。",
-      "reason": "聚合值在分组之后才存在，所以要用 HAVING 而不是 WHERE。"
+      "purpose": "只保留组里记录数大于 1 的分组。",
+      "reason": "COUNT(*) 要在分组之后才有结果，所以用 HAVING，不能用 WHERE。"
     },
     {
       "kind": "fragment",
       "title": "选择输出",
       "sql": "SELECT TRIM(name) AS clean_name,amount,LOWER(category) AS clean_category,COUNT(*) AS duplicate_count",
-      "purpose": "输出查询需要的列与计算表达式。",
-      "reason": "输出列的顺序与别名决定结果表的形状。"
+      "purpose": "显示整理后的名称、金额、类别和每组的记录数 duplicate_count。",
+      "reason": "这些只是“疑似重复”的候选，需要结合业务凭证核对，不能直接当作可以删除的重复。"
     }
   ],
   "completeCode": {
@@ -167,7 +167,13 @@
         "emphasis": []
       }
     ],
-    "reason": [],
+    "reason": [
+      {
+        "type": "paragraph",
+        "text": "金额相同或名称相同的记录，可能是合法的多次交易；只凭这些字段就删除，会丢掉真实的业务记录，必须先核对业务凭证和唯一编号，再确定保留哪一条。",
+        "emphasis": []
+      }
+    ],
     "correction": [
       {
         "type": "paragraph",

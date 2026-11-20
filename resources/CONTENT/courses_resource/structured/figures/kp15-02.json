@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp15-02",
-  "lessonSha256": "54b1885b508deb0be526531620ec92f59e2722d36e975f33f5553c1e4d085d92",
+  "lessonSha256": "eeb8b8539816167499b3ac7847a3c5921122a3f7f720399ab6e7260eaa73956a",
   "figures": [
     {
       "id": "kp15-02-clauses",
@@ -14,13 +14,13 @@
           "role": "select",
           "label": "取数",
           "sql": "SELECT employee_id,salary,ROW_NUMBER() OVER(ORDER BY salary DESC,employee_id) AS rn,RANK() OVER(ORDER BY salary DESC) AS rnk,DENSE_RANK() OVER(ORDER BY salary DESC) AS dense_rnk",
-          "note": "输出查询需要的列与计算表达式。"
+          "note": "结果表最终显示 5 列：employee_id、salary、rn、rnk、dense_rnk。"
         },
         {
           "role": "from",
           "label": "来源",
           "sql": "FROM employees",
-          "note": "从 employees 读取输入数据。"
+          "note": "数据来自表 employees。"
         },
         {
           "role": "order",
@@ -218,7 +218,8 @@
             3
           ]
         }
-      ]
+      ],
+      "conclusion": "工资 5000 并列时：ROW_NUMBER 仍给 2、3，RANK 并列都是 2 且下一名是 4，DENSE_RANK 并列都是 2 且下一名是 3。"
     }
   ]
 }

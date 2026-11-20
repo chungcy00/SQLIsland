@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp20-08",
-  "lessonSha256": "caa5688df37fc59f27140ed27618afb2a7718b1bf700eef8da83bd0932d7db5f",
+  "lessonSha256": "26ee0392f4b4622a02334e6a5733a088e3f6f96973575b99651ea74ec28ebc04",
   "figures": [
     {
       "id": "kp20-08-clauses",
@@ -14,25 +14,25 @@
           "role": "cte",
           "label": "中间结果",
           "sql": "WITH a AS (SELECT p.category_id,SUM(s.net_cents-s.cost_cents) gross FROM v_sales_lines s JOIN products p ON p.product_id=s.product_id WHERE s.order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY p.category_id),",
-          "note": "先把名为 a 的中间结果算出来，供后面的查询引用。"
+          "note": "先单独算出一张临时结果 a，下面的查询可以把它当作普通表来用。"
         },
         {
           "role": "cte",
           "label": "中间结果",
           "sql": "b AS (SELECT p.category_id,CASE WHEN COUNT(i.snapshot_id)=2*COUNT(DISTINCT p.product_id)*(SELECT COUNT(*) FROM warehouses) THEN SUM(i.quantity*i.unit_cost_cents)/2.0 ELSE NULL END avg_stock FROM products p CROSS JOIN warehouses w LEFT JOIN inventory_snapshots i ON i.product_id=p.product_id AND i.warehouse_id=w.warehouse_id AND i.snapshot_date IN ('2024-12-31','2025-12-31') GROUP BY p.category_id)",
-          "note": "先把名为 b 的中间结果算出来，供后面的查询引用。"
+          "note": "先单独算出一张临时结果 b，下面的查询可以把它当作普通表来用。"
         },
         {
           "role": "select",
           "label": "取数",
           "sql": "SELECT c.category_id,COALESCE(a.gross,0) gross_cents,b.avg_stock avg_stock_cents,ROUND(COALESCE(a.gross,0)/NULLIF(b.avg_stock,0),4) gmroi",
-          "note": "输出查询需要的列与计算表达式。"
+          "note": "结果表最终显示 4 列：category_id、gross_cents、avg_stock_cents、gmroi。"
         },
         {
           "role": "from",
           "label": "来源",
           "sql": "FROM categories c LEFT JOIN a ON a.category_id=c.category_id LEFT JOIN b ON b.category_id=c.category_id",
-          "note": "读取查询需要的输入数据。"
+          "note": "数据来自 表 categories、中间结果 a、中间结果 b，并用 ON 后面的条件把它们的行配起来。"
         },
         {
           "role": "order",

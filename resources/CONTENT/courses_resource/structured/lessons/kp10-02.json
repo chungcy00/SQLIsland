@@ -6,7 +6,7 @@
   "conceptBlocks": [
     {
       "type": "heading",
-      "text": "基本含义",
+      "text": "什么是多行子查询与 IN？",
       "emphasis": []
     },
     {
@@ -19,22 +19,6 @@
       "items": [
         "IN 判断左侧值是否等于集合中任一值；重复候选不会重复输出外层行。",
         "单列比较要求子查询返回一列，多列元组比较须匹配列数。"
-      ]
-    },
-    {
-      "type": "heading",
-      "text": "使用要点",
-      "emphasis": []
-    },
-    {
-      "type": "paragraph",
-      "text": "对于无匹配且集合含 NULL 的情况，判断可能为未知。",
-      "emphasis": []
-    },
-    {
-      "type": "list",
-      "items": [
-        "若只需要客户名单，成员判断通常比直接连接订单明细更符合目标粒度。"
       ]
     },
     {
@@ -61,6 +45,22 @@
       "caption": "只需要客户名单时，用成员判断比直接连接订单明细更符合目标粒度。",
       "codeColumns": [
         0
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "使用要点",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "对于无匹配且集合含 NULL 的情况，判断可能为未知。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "若只需要客户名单，成员判断通常比直接连接订单明细更符合目标粒度。"
       ]
     }
   ],
@@ -89,29 +89,29 @@
       "kind": "fragment",
       "title": "指定来源",
       "sql": "FROM customers",
-      "purpose": "从 customers 读取输入数据。",
-      "reason": "后面的子句都基于这里得到的行。"
+      "purpose": "读取 customers 表，每一行是一位客户。",
+      "reason": "要找的是客户，所以外层查询从客户表出发。"
     },
     {
       "kind": "fragment",
       "title": "筛选行",
       "sql": "WHERE customer_id IN (SELECT customer_id FROM orders WHERE sales >= 600)",
-      "purpose": "仅保留满足条件的行。",
-      "reason": "条件结果为真才保留；未知（NULL）的行会被排除。"
+      "purpose": "子查询先找出下过金额不小于 600 的订单的客户编号，外层只保留编号在这个集合里的客户。",
+      "reason": "子查询返回的是一组编号，所以要用 IN 判断“是否在集合里”；一位客户有多笔符合的订单，也只保留一行。"
     },
     {
       "kind": "fragment",
       "title": "选择输出",
       "sql": "SELECT customer_id, customer_name",
-      "purpose": "输出 customer_id, customer_name。",
-      "reason": "输出列的顺序与别名决定结果表的形状。"
+      "purpose": "显示客户编号和姓名。",
+      "reason": "只需要客户名单，所以不用把订单明细连进来。"
     },
     {
       "kind": "fragment",
       "title": "排序",
       "sql": "ORDER BY customer_name DESC;",
-      "purpose": "按 customer_name DESC 排列结果。",
-      "reason": "查询结果的默认行序没有保证，需要显式排序。"
+      "purpose": "按客户姓名倒序排列。",
+      "reason": "没有 ORDER BY 时数据库不保证行的顺序，写出来才能让输出顺序固定。"
     }
   ],
   "completeCode": {
@@ -218,7 +218,13 @@
         "emphasis": []
       }
     ],
-    "reason": [],
+    "reason": [
+      {
+        "type": "paragraph",
+        "text": "= 只能和一个值比较，子查询返回多行时会报错或只取其中一个值；判断“是否属于一组值”应当用 IN。",
+        "emphasis": []
+      }
+    ],
     "correction": [
       {
         "type": "paragraph",

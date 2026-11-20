@@ -6,7 +6,7 @@
   "conceptBlocks": [
     {
       "type": "heading",
-      "text": "基本含义",
+      "text": "什么是 NULLIF 与安全除法？",
       "emphasis": []
     },
     {
@@ -19,23 +19,6 @@
       "items": [
         "用于除法时，可将零分母转换为 NULL，从而让无定义的结果明确显示为空。",
         "与 IFNULL 或 COALESCE 的方向不同，后者将缺失值替换为其他值。"
-      ]
-    },
-    {
-      "type": "heading",
-      "text": "使用要点",
-      "emphasis": []
-    },
-    {
-      "type": "paragraph",
-      "text": "计算比率前必须确定分子、分母、统计范围及单位；不要因为分母为零就自动报告0%。",
-      "emphasis": []
-    },
-    {
-      "type": "list",
-      "items": [
-        "SQLite 中两个整数相除可能截断小数，乘以1.0可使示例进行实数除法；MySQL 的 / 与整数除法 DIV 不同，具体精度仍由数据类型和引擎决定。",
-        "ROUND 用于最终展示，而不是在聚合前随意舍入。"
       ]
     },
     {
@@ -61,6 +44,23 @@
       "caption": "不要因为分母为零就自动报告 0%。",
       "codeColumns": [
         1
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "使用要点",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "计算比率前必须确定分子、分母、统计范围及单位；不要因为分母为零就自动报告0%。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "SQLite 中两个整数相除可能截断小数，乘以1.0可使示例进行实数除法；MySQL 的 / 与整数除法 DIV 不同，具体精度仍由数据类型和引擎决定。",
+        "ROUND 用于最终展示，而不是在聚合前随意舍入。"
       ]
     }
   ],
@@ -88,22 +88,22 @@
       "kind": "fragment",
       "title": "指定来源",
       "sql": "FROM products",
-      "purpose": "从 products 读取输入数据。",
-      "reason": "后面的子句都基于这里得到的行。"
+      "purpose": "读取 products 表的 6 件商品。",
+      "reason": "比值是用每件商品自己的价格和库存算出来的。"
     },
     {
       "kind": "fragment",
       "title": "选择输出",
       "sql": "SELECT product_id, ROUND(1.0*price/NULLIF(stock,0),2) AS ratio",
-      "purpose": "输出 product_id, ROUND(1.0*price/NULLIF(stock,0),2) AS ratio。",
-      "reason": "输出列的顺序与别名决定结果表的形状。"
+      "purpose": "计算每件商品的价格库存比：价格 ÷ 库存，保留 2 位小数；库存为 0 时结果是 NULL。",
+      "reason": "NULLIF(stock,0) 在库存为 0 时返回 NULL，除以 NULL 得到 NULL，避免除以零；乘 1.0 让整数相除保留小数，ROUND 只用在最后展示。"
     },
     {
       "kind": "fragment",
       "title": "排序",
       "sql": "ORDER BY ratio DESC;",
-      "purpose": "按 ratio DESC 排列结果。",
-      "reason": "查询结果的默认行序没有保证，需要显式排序。"
+      "purpose": "按比值从大到小排列。",
+      "reason": "NULL 排在哪里取决于数据库，需要稳定顺序时要额外说明。"
     }
   ],
   "completeCode": {
@@ -248,7 +248,13 @@
         "emphasis": []
       }
     ],
-    "reason": [],
+    "reason": [
+      {
+        "type": "paragraph",
+        "text": "两个整数直接相除，SQLite 等数据库会把结果截断成整数（例如 89÷40 得到 2 而不是 2.23）；分母为 0 时若强行把结果写成 0，会把“没有定义”误报成“比值为 0”。",
+        "emphasis": []
+      }
+    ],
     "correction": [
       {
         "type": "paragraph",

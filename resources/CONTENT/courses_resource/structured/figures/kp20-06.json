@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp20-06",
-  "lessonSha256": "3a5ea43c8468c3f2806b680feb30ea4eb4331302b32c2b0109a4bd479d132431",
+  "lessonSha256": "00f3f29e9514522ef7e39b56cdd78f0a5f7827562e63135a61089348e56cae46",
   "figures": [
     {
       "id": "kp20-06-clauses",
@@ -14,37 +14,37 @@
           "role": "cte",
           "label": "中间结果",
           "sql": "WITH a AS (SELECT product_id,SUM(net_cents) net FROM v_sales_lines WHERE order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY product_id),",
-          "note": "先把名为 a 的中间结果算出来，供后面的查询引用。"
+          "note": "先单独算出一张临时结果 a，下面的查询可以把它当作普通表来用。"
         },
         {
           "role": "cte",
           "label": "中间结果",
           "sql": "b AS (SELECT product_id,SUM(quantity*unit_cost_cents) stock FROM inventory_snapshots WHERE snapshot_date='2025-12-31' GROUP BY product_id),",
-          "note": "先把名为 b 的中间结果算出来，供后面的查询引用。"
+          "note": "先单独算出一张临时结果 b，下面的查询可以把它当作普通表来用。"
         },
         {
           "role": "cte",
           "label": "中间结果",
           "sql": "z AS (SELECT p.product_id,COALESCE(a.net,0) net,COALESCE(b.stock,0) stock FROM products p LEFT JOIN a ON a.product_id=p.product_id LEFT JOIN b ON b.product_id=p.product_id),",
-          "note": "先把名为 z 的中间结果算出来，供后面的查询引用。"
+          "note": "先单独算出一张临时结果 z，下面的查询可以把它当作普通表来用。"
         },
         {
           "role": "cte",
           "label": "中间结果",
           "sql": "q AS (SELECT *,100.0*net/NULLIF(SUM(net) OVER(),0) sales_share,100.0*stock/NULLIF(SUM(stock) OVER(),0) stock_share FROM z)",
-          "note": "先把名为 q 的中间结果算出来，供后面的查询引用。"
+          "note": "先单独算出一张临时结果 q，下面的查询可以把它当作普通表来用。"
         },
         {
           "role": "select",
           "label": "取数",
           "sql": "SELECT product_id,net net_cents,stock stock_cents,ROUND(sales_share,4) sales_pct,ROUND(stock_share,4) stock_pct,ROUND(stock_share-sales_share,4) gap_points",
-          "note": "输出查询需要的列与计算表达式。"
+          "note": "结果表最终显示 6 列：product_id、net_cents、stock_cents、sales_pct、stock_pct、gap_points。"
         },
         {
           "role": "from",
           "label": "来源",
           "sql": "FROM q",
-          "note": "从 q 读取输入数据。"
+          "note": "数据来自中间结果 q。"
         },
         {
           "role": "order",

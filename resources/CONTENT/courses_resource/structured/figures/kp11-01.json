@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp11-01",
-  "lessonSha256": "b3c92f2395975ea5c94cacfd6422ddb1c45bee39b3df7df1183a5979ba9e3e59",
+  "lessonSha256": "51117d6900ea82b5e66385d3f7208a2d7c371d2423557cc6876308bf84af8092",
   "figures": [
     {
       "id": "kp11-01-clauses",
@@ -14,13 +14,13 @@
           "role": "select",
           "label": "取数",
           "sql": "SELECT product_id, category || ' - ' || product_name AS label",
-          "note": "输出 product_id, category || ' - ' || product_name AS label。"
+          "note": "结果表最终显示 2 列：product_id、label。"
         },
         {
           "role": "from",
           "label": "来源",
           "sql": "FROM products",
-          "note": "从 products 读取输入数据。"
+          "note": "数据来自表 products。"
         },
         {
           "role": "order",
@@ -161,6 +161,67 @@
           ]
         }
       ]
+    },
+    {
+      "id": "kp11-01-fn",
+      "slot": "concept",
+      "kind": "function-map",
+      "title": "拼接把多列合成一列",
+      "form": "scalar",
+      "table": "products",
+      "inputColumns": [
+        "product_id",
+        "category",
+        "product_name"
+      ],
+      "orderBy": "product_id",
+      "inputRows": [
+        [
+          1,
+          "护肤品",
+          "Mask"
+        ],
+        [
+          2,
+          "护肤品",
+          "Serum"
+        ],
+        [
+          3,
+          "护肤品",
+          "Cleanser"
+        ],
+        [
+          4,
+          "化妆品",
+          "Cream"
+        ],
+        [
+          5,
+          "化妆品",
+          "Sunscreen"
+        ],
+        [
+          6,
+          "日用品",
+          "Soap_1"
+        ]
+      ],
+      "outputs": [
+        {
+          "label": "label",
+          "sql": "category || ' - ' || product_name",
+          "values": [
+            "护肤品 - Mask",
+            "护肤品 - Serum",
+            "护肤品 - Cleanser",
+            "化妆品 - Cream",
+            "化妆品 - Sunscreen",
+            "日用品 - Soap_1"
+          ]
+        }
+      ],
+      "conclusion": "拼接把几列合成一个新的显示列，行数不变；分隔符要自己写进去。"
     }
   ]
 }

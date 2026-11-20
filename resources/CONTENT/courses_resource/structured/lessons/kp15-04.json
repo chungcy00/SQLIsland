@@ -6,7 +6,7 @@
   "conceptBlocks": [
     {
       "type": "heading",
-      "text": "基本含义",
+      "text": "什么是窗口范围与累计？",
       "emphasis": []
     },
     {
@@ -19,6 +19,12 @@
       "items": [
         "ROWS 按排序后具体行位置确定边界；RANGE 在本例的截至当前值边界包含全部同值行。",
         "带排序的聚合窗口默认帧可能包含并列，因此应显式写出业务需要的帧。"
+      ]
+    },
+    {
+      "type": "figure",
+      "ids": [
+        "kp15-04-fn"
       ]
     },
     {
@@ -73,22 +79,22 @@
       "kind": "fragment",
       "title": "指定来源",
       "sql": "FROM monthly",
-      "purpose": "从 monthly 读取输入数据。",
-      "reason": "后面的子句都基于这里得到的行。"
+      "purpose": "读取 monthly 表，每一行是一个月。",
+      "reason": "累计是沿着月份顺序逐行累加。"
     },
     {
       "kind": "fragment",
       "title": "选择输出",
       "sql": "SELECT month,sales,SUM(sales) OVER(ORDER BY month ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS cumulative",
-      "purpose": "输出查询需要的列与计算表达式。",
-      "reason": "输出列的顺序与别名决定结果表的形状。"
+      "purpose": "给每个月算出从第一个月累计到当前月的销售额 cumulative。",
+      "reason": "ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW 明确规定窗口是“从第一行到当前行”，所以累计值逐月增加：1000、2500、4000、4900。"
     },
     {
       "kind": "fragment",
       "title": "排序",
       "sql": "ORDER BY month;",
-      "purpose": "按 month 排列结果。",
-      "reason": "查询结果的默认行序没有保证，需要显式排序。"
+      "purpose": "按月份从早到晚排列。",
+      "reason": "窗口里的 ORDER BY 决定累计的顺序，最外层的 ORDER BY 决定展示顺序。"
     }
   ],
   "completeCode": {
@@ -230,7 +236,13 @@
         "emphasis": []
       }
     ],
-    "reason": [],
+    "reason": [
+      {
+        "type": "paragraph",
+        "text": "只写 ORDER BY 不写窗口范围时，默认范围按排序值包含所有同值行，排序值相同的行会得到同一个累计值，并不是一行一行增加；想逐行累计就要明确写 ROWS。",
+        "emphasis": []
+      }
+    ],
     "correction": [
       {
         "type": "paragraph",

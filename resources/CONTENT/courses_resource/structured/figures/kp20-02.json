@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp20-02",
-  "lessonSha256": "c66653ae861ec84887d9a11c9a2d63a1cb62ab77471853f13784b1a0428820ef",
+  "lessonSha256": "411109a60cac2773df09c7279c4f464d10815a0eca1627540deac8461719cf5f",
   "figures": [
     {
       "id": "kp20-02-clauses",
@@ -14,37 +14,37 @@
           "role": "cte",
           "label": "中间结果",
           "sql": "WITH months AS (\n SELECT DISTINCT month_key FROM calendar_days WHERE month_key BETWEEN '2025-01' AND '2025-12'\n),",
-          "note": "先把名为 months 的中间结果算出来，供后面的查询引用。"
+          "note": "先单独算出一张临时结果 months，下面的查询可以把它当作普通表来用。"
         },
         {
           "role": "cte",
           "label": "中间结果",
           "sql": "sales AS (\n SELECT SUBSTR(order_date,1,7) month_key,SUM(net_cents) net_cents FROM v_order_net\n WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY SUBSTR(order_date,1,7)\n),",
-          "note": "先把名为 sales 的中间结果算出来，供后面的查询引用。"
+          "note": "先单独算出一张临时结果 sales，下面的查询可以把它当作普通表来用。"
         },
         {
           "role": "cte",
           "label": "中间结果",
           "sql": "complete AS (\n SELECT m.month_key,COALESCE(s.net_cents,0) net_cents FROM months m LEFT JOIN sales s ON m.month_key=s.month_key\n),",
-          "note": "先把名为 complete 的中间结果算出来，供后面的查询引用。"
+          "note": "先单独算出一张临时结果 complete，下面的查询可以把它当作普通表来用。"
         },
         {
           "role": "cte",
           "label": "中间结果",
           "sql": "previous AS (\n SELECT month_key,net_cents,LAG(net_cents) OVER(ORDER BY month_key) previous_net_cents FROM complete\n)",
-          "note": "先把名为 previous 的中间结果算出来，供后面的查询引用。"
+          "note": "先单独算出一张临时结果 previous，下面的查询可以把它当作普通表来用。"
         },
         {
           "role": "select",
           "label": "取数",
           "sql": "SELECT month_key,net_cents,previous_net_cents,net_cents-previous_net_cents change_cents,\n ROUND(100.0*(net_cents-previous_net_cents)/NULLIF(previous_net_cents,0),2) change_pct",
-          "note": "输出查询需要的列与计算表达式。"
+          "note": "结果表最终显示 5 列：month_key、net_cents、previous_net_cents、change_cents、change_pct。"
         },
         {
           "role": "from",
           "label": "来源",
           "sql": "FROM previous",
-          "note": "从 previous 读取输入数据。"
+          "note": "数据来自中间结果 previous。"
         },
         {
           "role": "order",

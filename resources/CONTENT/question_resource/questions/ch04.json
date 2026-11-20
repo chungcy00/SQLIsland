@@ -268,11 +268,11 @@
         }
       ],
       "hints": [
-        "先确定主排序键和并列决胜键，再考虑需要保留的行段。",
-        "结合《LIMIT 与 OFFSET》：LIMIT 控制最多返回多少行；OFFSET 跳过前几行。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT id,sales FROM orders ORDER BY sales DESC □□□"
+        "要先按金额从高到低排好，才能“取前几条”。",
+        "LIMIT n 只返回最多 n 行，它截取的是已经排好序的结果。",
+        "排序方向要从大到小，截取的行数要和题目一致。"
       ],
-      "explanation": "限制行数与选择范围必须一致。\n执行思路：确认orders的输入记录；输出id、sales列；遵循题设排序和并列规则；按指定范围截取记录。\n公开夹具实际返回 3 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：采用另一种关系运算或查询结构计算相同结果。",
+      "explanation": "ORDER BY sales DESC 把订单按金额从高到低排好，LIMIT 3 取排在最前面的 3 条。\n易错：LIMIT 的数字和要求不一致（例如写成 2）会少取行；没有 ORDER BY 就 LIMIT，取到的只是碰巧排在前面的行。",
       "commonErrors": [
         {
           "sql": "SELECT id,sales FROM orders ORDER BY sales DESC LIMIT 2",
@@ -473,11 +473,11 @@
         }
       ],
       "hints": [
-        "先确定主排序键和并列决胜键，再考虑需要保留的行段。",
-        "结合《ORDER BY 多列排序》：先按第一排序键排序，同值再按后续键；ASC 升序，DESC 降序。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT product_id,stock FROM products ORDER BY □□□,product_name"
+        "“库存多的排在前面”说明要按库存从大到小排序。",
+        "ORDER BY 列 DESC 是从大到小；多个排序键用逗号分隔，库存相同时由后一个键决定先后。",
+        "库存相同的商品还需要一个排序键（例如商品名称）让顺序固定。"
       ],
-      "explanation": "盘点最多库存优先必须降序。\n执行思路：确认products的输入记录；输出product_id、stock列；遵循题设排序和并列规则。\n公开夹具实际返回 6 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
+      "explanation": "ORDER BY stock DESC, product_name 先按库存从多到少排，库存相同再按商品名称排，这样每次输出的顺序都一样。\n易错：省略 DESC（或写成 ASC）会让库存最少的商品排在最前面，和“库存多的优先盘点”相反。",
       "commonErrors": [
         {
           "sql": "SELECT product_id,stock FROM products ORDER BY stock ASC, product_name",
@@ -680,11 +680,11 @@
         }
       ],
       "hints": [
-        "先确定主排序键和并列决胜键，再考虑需要保留的行段。",
-        "结合《ORDER BY 多列排序》：先按第一排序键排序，同值再按后续键；ASC 升序，DESC 降序。",
-        "按题设编写投影、筛选及分组，使用运行检查列名、NULL、重复记录和排序。"
+        "多列排序要先确定“先按哪一列，再按哪一列”。",
+        "第一个排序键相同的行，才会用第二个排序键比较；每个键各自可以写 ASC 或 DESC。",
+        "同一门店内要让日期从新到旧，而门店本身是从小到大排。"
       ],
-      "explanation": "多列排序是先按门店分区，再在排序组内按日期比较。\n执行思路：确认orders的输入记录；输出store_id、order_date、id列；遵循题设排序和并列规则。\n公开夹具实际返回 5 行、3 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
+      "explanation": "ORDER BY store_id, order_date DESC 先按门店编号排，把同一门店的订单放在一起，再在每个门店内部按日期从新到旧排。\n易错：把日期写成升序（ASC）会让同一门店里最早的订单排在最前面。",
       "commonErrors": [
         {
           "sql": "SELECT store_id,order_date,id FROM orders ORDER BY store_id, order_date ASC",
@@ -880,11 +880,11 @@
         }
       ],
       "hints": [
-        "先确定主排序键和并列决胜键，再考虑需要保留的行段。",
-        "结合《LIMIT 与 OFFSET》：LIMIT 控制最多返回多少行；OFFSET 跳过前几行。",
-        "回想空位所在子句的功能：LIMIT 与 OFFSET；保留周围代码，填入实现题设的表达式。"
+        "“第 3 至第 5 条”是先跳过前面几条，再取 3 条。",
+        "LIMIT 控制取几条，OFFSET 控制跳过几条；它们都作用在排好序的结果上。",
+        "OFFSET 数的是“要跳过的行数”，而不是“从第几条开始”。"
       ],
-      "explanation": "第三条的零基偏移为2。\n执行思路：确认products的输入记录；输出product_id、stock列；遵循题设排序和并列规则；按指定范围截取记录。\n公开夹具实际返回 3 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：使用相同排序生成行号，再映射分页起止行。",
+      "explanation": "ORDER BY stock DESC 先排序，LIMIT 3 OFFSET 2 先跳过前 2 条，再取接下来的 3 条，也就是第 3 到第 5 条。\n易错：OFFSET 写成 3 会跳过前 3 条，取到的是第 4 到第 6 条；要跳过的行数比起始位置小 1。",
       "commonErrors": [
         {
           "sql": "SELECT product_id,stock FROM products ORDER BY stock DESC LIMIT 3 OFFSET 3",

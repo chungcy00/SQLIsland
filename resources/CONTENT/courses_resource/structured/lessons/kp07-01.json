@@ -6,7 +6,7 @@
   "conceptBlocks": [
     {
       "type": "heading",
-      "text": "基本含义",
+      "text": "什么是分组 GROUP BY？",
       "emphasis": []
     },
     {
@@ -20,23 +20,6 @@
         "例如订单表中每行是一笔订单，主管想知道每类商品总销售额时，输出应改成每类商品一行。",
         "GROUP BY category 将相同类别的记录放进同一组，SUM(sales) 分别计算各组销售额。",
         "分组键决定结果粒度，聚合函数决定指标。"
-      ]
-    },
-    {
-      "type": "heading",
-      "text": "使用要点",
-      "emphasis": []
-    },
-    {
-      "type": "paragraph",
-      "text": "没有分组的聚合通常得到一个整体统计值，有分组就得到每个存在的组的统计值。",
-      "emphasis": []
-    },
-    {
-      "type": "list",
-      "items": [
-        "NULL 分组键会形成一个组；原表不存在的类别不会凭空生成零销售组。",
-        "分组本身不保证结果顺序，需要显式排序。"
       ]
     },
     {
@@ -67,6 +50,23 @@
       "caption": "分组键决定结果粒度，聚合函数决定指标。",
       "codeColumns": [
         0
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "使用要点",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "没有分组的聚合通常得到一个整体统计值，有分组就得到每个存在的组的统计值。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "NULL 分组键会形成一个组；原表不存在的类别不会凭空生成零销售组。",
+        "分组本身不保证结果顺序，需要显式排序。"
       ]
     }
   ],
@@ -99,29 +99,29 @@
       "kind": "fragment",
       "title": "指定来源",
       "sql": "FROM orders",
-      "purpose": "从 orders 读取输入数据。",
-      "reason": "后面的子句都基于这里得到的行。"
+      "purpose": "读取 orders 表，每一行是一笔订单。",
+      "reason": "GROUP BY 是把这些订单行归组，所以先要有订单行。"
     },
     {
       "kind": "fragment",
       "title": "分组",
       "sql": "GROUP BY category",
-      "purpose": "按 category 把行归入各个分组。",
-      "reason": "聚合函数在每个分组内分别计算。"
+      "purpose": "按 category 把订单分成若干组，同一类别的订单放进同一组。",
+      "reason": "分组之后，SUM 才是对每个类别分别求和，而不是对全表求一个总数；结果每个类别一行。"
     },
     {
       "kind": "fragment",
       "title": "选择输出",
       "sql": "SELECT category, SUM(sales) AS total_sales",
-      "purpose": "输出 category, SUM(sales) AS total_sales。",
-      "reason": "输出列的顺序与别名决定结果表的形状。"
+      "purpose": "显示类别，以及每组 sales 的合计 total_sales。",
+      "reason": "SELECT 里的非聚合列 category 就是分组依据，SUM 则对每一组各算一次。"
     },
     {
       "kind": "fragment",
       "title": "排序",
       "sql": "ORDER BY total_sales DESC;",
-      "purpose": "按 total_sales DESC 排列结果。",
-      "reason": "查询结果的默认行序没有保证，需要显式排序。"
+      "purpose": "按各类别的销售合计从高到低排列。",
+      "reason": "分组本身不保证输出顺序，要排序必须显式写 ORDER BY；这里可以直接使用 SELECT 里起的别名 total_sales。"
     }
   ],
   "completeCode": {
@@ -228,7 +228,13 @@
         "emphasis": []
       }
     ],
-    "reason": [],
+    "reason": [
+      {
+        "type": "paragraph",
+        "text": "只写 SUM(sales) 却没有 GROUP BY 时，SUM 会把所有订单加成一个数，而 category 该显示哪一行的值就不明确——严格模式的数据库会报错，宽松的数据库可能悄悄给出一个没有意义的类别。",
+        "emphasis": []
+      }
+    ],
     "correction": [
       {
         "type": "paragraph",

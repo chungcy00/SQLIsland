@@ -54,11 +54,11 @@
         }
       ],
       "hints": [
-        "明确每一行结果代表哪一个组；区分分组前后筛选。",
-        "结合《HAVING 与 WHERE》：WHERE 在聚合前筛行，HAVING 在聚合后筛组；无 GROUP BY 的聚合查询也可有 HAVING。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT SUM(sales) AS total FROM orders HAVING SUM(sales)□□□"
+        "不分组也可以对整体汇总。",
+        "HAVING 判断的是聚合之后的结果，没有 GROUP BY 时整张表就是一组。",
+        "总额达到 1000 才返回，所以条件是“大于等于”。"
       ],
-      "explanation": "HAVING 可以用于无显式 GROUP BY 的单组聚合。\n执行思路：确认orders的输入记录；对分组后的计算结果筛选；输出total列。\n公开夹具实际返回 1 行、1 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
+      "explanation": "没有 GROUP BY 时，整张表是一组，SUM(sales) 得到全部订单的总额，HAVING SUM(sales)>=1000 只在总额达到 1000 时才返回这一行，否则一行也不返回。\n易错：条件写反（<1000）得到的是总额没有达到门槛时的结果。",
       "commonErrors": [
         {
           "sql": "SELECT SUM(sales) AS total FROM orders HAVING SUM(sales)<1000",
@@ -1326,11 +1326,11 @@
         }
       ],
       "hints": [
-        "明确每一行结果代表哪一个组；区分分组前后筛选。",
-        "结合《多字段分组与严格分组》：多个分组字段形成联合键；MySQL 默认 ONLY_FULL_GROUP_BY 要求非聚合表达式在分组键中、由其函数决定或符合允许的单值条件。",
-        "回想空位所在子句的功能：多字段分组与严格分组；保留周围代码，填入实现题设的表达式。"
+        "先看清结果想要的排序：按销售额合计从高到低。",
+        "排序可以使用 SELECT 里起的别名，销售额合计的别名是 total。",
+        "合计相同的行还要靠后面的 store_id、category 决定先后。"
       ],
-      "explanation": "总额排序必须在聚合完成之后执行。\n执行思路：确认orders的输入记录；按指定键分组后计算聚合值；输出store_id、category、total列；遵循题设排序和并列规则。\n公开夹具实际返回 3 行、3 列；完整结果见 expectedOutput。\n另一种可用写法：用相同分区键的聚合窗口计算结果，再去重恢复分组粒度。",
+      "explanation": "先按门店和类别分组求 SUM(sales)，再 ORDER BY total DESC, store_id, category：先按合计从高到低排，合计相同再按门店、类别排，顺序就固定了。\n易错：写成 ASC 会把合计最小的排在最前面，和题目的“从高到低”相反。",
       "commonErrors": [
         {
           "sql": "SELECT store_id,category,SUM(sales) AS total FROM orders GROUP BY store_id,category ORDER BY total ASC,store_id,category",

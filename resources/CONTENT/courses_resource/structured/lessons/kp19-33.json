@@ -6,7 +6,7 @@
   "conceptBlocks": [
     {
       "type": "heading",
-      "text": "基本含义",
+      "text": "什么是高销售低毛利商品？",
       "emphasis": []
     },
     {
@@ -46,8 +46,8 @@
       "kind": "runnable",
       "title": "按商品汇总净额、成本、折扣及退款",
       "sql": "WITH a AS (SELECT product_id,SUM(net_cents) net,SUM(cost_cents) cost,SUM(discount_cents) discount,SUM(refund_cents) refund FROM v_sales_lines WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY product_id)\nSELECT * FROM a ORDER BY 1, 2, 3, 4, 5 LIMIT 3;",
-      "purpose": "按商品汇总净额、成本、折扣及退款（a）的实际执行结果。",
-      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "purpose": "先按商品汇总 2025 年线下的净销售 net、成本 cost、折扣和退款。",
+      "reason": "所有指标先汇总到商品粒度，后面的分档和毛利率才是“每个商品一个数”。",
       "sourceTables": [
         {
           "name": "v_sales_lines",
@@ -200,8 +200,8 @@
       "kind": "runnable",
       "title": "按销售额划分商品档位",
       "sql": "WITH a AS (SELECT product_id,SUM(net_cents) net,SUM(cost_cents) cost,SUM(discount_cents) discount,SUM(refund_cents) refund FROM v_sales_lines WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY product_id), b AS (SELECT *,NTILE(4) OVER(ORDER BY net DESC,product_id) bucket FROM a)\nSELECT * FROM b ORDER BY 1, 2, 3, 4, 5, 6 LIMIT 3;",
-      "purpose": "按销售额划分商品档位（b）的实际执行结果。",
-      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "purpose": "按净销售额把全部商品分成四档，bucket=1 是销售额最高的一档。",
+      "reason": "必须先对全部商品分档，再筛毛利率；分档的对象是全体目标商品。",
       "sourceTables": [
         {
           "name": "v_sales_lines",
@@ -358,8 +358,8 @@
       "kind": "runnable",
       "title": "筛选高销售低毛利商品",
       "sql": "WITH a AS (SELECT product_id,SUM(net_cents) net,SUM(cost_cents) cost,SUM(discount_cents) discount,SUM(refund_cents) refund FROM v_sales_lines WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY product_id), b AS (SELECT *,NTILE(4) OVER(ORDER BY net DESC,product_id) bucket FROM a) SELECT product_id,net net_cents,ROUND(100.0*(net-cost)/NULLIF(net,0),2) margin_pct,discount discount_cents,refund refund_cents FROM b WHERE bucket=1 AND 100.0*(net-cost)/NULLIF(net,0)<30 ORDER BY net DESC",
-      "purpose": "在前面各步中间结果的基础上完成最终计算，输出题目要求的完整结果。",
-      "reason": "前面的步骤只是分块准备；把它们组合起来，才能得到最终的业务结果。",
+      "purpose": "只保留第一档里毛利率严格低于 30% 的商品，按净销售额从高到低输出。",
+      "reason": "毛利率用未舍入的（净额−成本）÷ 净额 与 30 比较，避免舍入后恰好卡在边界上。",
       "sourceTables": [
         {
           "name": "v_sales_lines",
@@ -1007,7 +1007,13 @@
         "emphasis": []
       }
     ],
-    "reason": [],
+    "reason": [
+      {
+        "type": "paragraph",
+        "text": "先筛毛利率低于 30% 再分档，档位就只在低毛利商品里划分了，“销售额最高的一档”变成低毛利商品里的相对排名，结果和题目要的不是同一批商品。",
+        "emphasis": []
+      }
+    ],
     "correction": [
       {
         "type": "paragraph",

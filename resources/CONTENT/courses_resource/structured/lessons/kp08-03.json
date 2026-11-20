@@ -6,7 +6,7 @@
   "conceptBlocks": [
     {
       "type": "heading",
-      "text": "基本含义",
+      "text": "ON 与 WHERE 有什么区别？",
       "emphasis": []
     },
     {
@@ -22,20 +22,9 @@
       ]
     },
     {
-      "type": "heading",
-      "text": "使用要点",
-      "emphasis": []
-    },
-    {
-      "type": "paragraph",
-      "text": "如果在 WHERE 中对右侧日期做普通比较，补齐行的日期是 NULL，条件未知，因而被排除。",
-      "emphasis": []
-    },
-    {
-      "type": "list",
-      "items": [
-        "更隐蔽的是：只有其他月份订单的客户在连接时已有匹配，WHERE 删除这些订单后也不会重新补齐。",
-        "仅追加 OR 右键 IS NULL 不能补救这种情况。"
+      "type": "figure",
+      "ids": [
+        "kp08-03-join"
       ]
     },
     {
@@ -61,6 +50,23 @@
       "caption": "外连接中，ON 与 WHERE 不能机械互换。",
       "codeColumns": [
         0
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "使用要点",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "如果在 WHERE 中对右侧日期做普通比较，补齐行的日期是 NULL，条件未知，因而被排除。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "更隐蔽的是：只有其他月份订单的客户在连接时已有匹配，WHERE 删除这些订单后也不会重新补齐。",
+        "仅追加 OR 右键 IS NULL 不能补救这种情况。"
       ]
     }
   ],
@@ -89,29 +95,29 @@
       "kind": "fragment",
       "title": "指定来源",
       "sql": "FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id AND o.order_date >= '2026-02-01' AND o.order_date < '2026-03-01'",
-      "purpose": "读取查询需要的输入数据。",
-      "reason": "后面的子句都基于这里得到的行。"
+      "purpose": "以 customers 为主做左连接，并把“2026 年 2 月”这个日期条件写进 ON 里。",
+      "reason": "条件在 ON 里时，只是限制哪些订单可以和客户配对；配不上的客户仍然保留，订单列为 NULL。"
     },
     {
       "kind": "fragment",
       "title": "分组",
       "sql": "GROUP BY c.customer_id",
-      "purpose": "按 c.customer_id 把行归入各个分组。",
-      "reason": "聚合函数在每个分组内分别计算。"
+      "purpose": "按客户编号分组。",
+      "reason": "这样每位客户一行，才能数出各自 2 月的订单数。"
     },
     {
       "kind": "fragment",
       "title": "选择输出",
       "sql": "SELECT c.customer_id, COUNT(o.id) AS feb_orders",
-      "purpose": "输出 c.customer_id, COUNT(o.id) AS feb_orders。",
-      "reason": "输出列的顺序与别名决定结果表的形状。"
+      "purpose": "统计每位客户 2 月的订单数。",
+      "reason": "COUNT(o.id) 只数订单编号不是 NULL 的行，补出来的 NULL 行不计入，所以没有 2 月订单的客户显示 0。"
     },
     {
       "kind": "fragment",
       "title": "排序",
       "sql": "ORDER BY feb_orders DESC, SUM(o.sales) DESC;",
-      "purpose": "按 feb_orders DESC, SUM(o.sales) DESC 排列结果。",
-      "reason": "查询结果的默认行序没有保证，需要显式排序。"
+      "purpose": "先按 2 月订单数从多到少排，订单数相同再按销售合计排。",
+      "reason": "订单数相同的客户需要第二个排序条件才有确定的先后。"
     }
   ],
   "completeCode": {
@@ -230,7 +236,13 @@
         "emphasis": []
       }
     ],
-    "reason": [],
+    "reason": [
+      {
+        "type": "paragraph",
+        "text": "把日期条件挪到 WHERE，补出来的行日期是 NULL，条件不成立被删掉，没有 2 月订单的客户就从结果里消失了；只在后面加 OR o.id IS NULL 也不行，因为只有其他月份订单的客户已经配上了订单，WHERE 删除这些订单行后不会重新补出一行。",
+        "emphasis": []
+      }
+    ],
     "correction": [
       {
         "type": "paragraph",

@@ -6,7 +6,7 @@
   "conceptBlocks": [
     {
       "type": "heading",
-      "text": "基本含义",
+      "text": "什么是留存与同期群？",
       "emphasis": []
     },
     {
@@ -62,8 +62,8 @@
       "kind": "runnable",
       "title": "确定客户首购月份",
       "sql": "WITH a AS (SELECT customer_id,MIN(SUBSTR(order_date,1,7)) cohort FROM v_order_net WHERE channel='online' GROUP BY customer_id)\nSELECT * FROM a ORDER BY 1, 2 LIMIT 3;",
-      "purpose": "确定客户首购月份（a）的实际执行结果。",
-      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "purpose": "先找出每位线上客户的首购月份 cohort。",
+      "reason": "同期群就是首购月份相同的客户；首购必须看完整历史。",
       "sourceTables": [
         {
           "name": "calendar_days",
@@ -198,8 +198,8 @@
       "kind": "runnable",
       "title": "统计同期群初始人数",
       "sql": "WITH a AS (SELECT customer_id,MIN(SUBSTR(order_date,1,7)) cohort FROM v_order_net WHERE channel='online' GROUP BY customer_id), b AS (SELECT cohort,COUNT(*) n FROM a GROUP BY cohort)\nSELECT * FROM b ORDER BY 1, 2 LIMIT 3;",
-      "purpose": "统计同期群初始人数（b）的实际执行结果。",
-      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "purpose": "统计每个同期群的初始人数 n。",
+      "reason": "留存率的分母始终是这个初始人数，不是上个月的活跃人数。",
       "sourceTables": [
         {
           "name": "calendar_days",
@@ -334,8 +334,8 @@
       "kind": "runnable",
       "title": "建立日期维度月份",
       "sql": "WITH a AS (SELECT customer_id,MIN(SUBSTR(order_date,1,7)) cohort FROM v_order_net WHERE channel='online' GROUP BY customer_id), b AS (SELECT cohort,COUNT(*) n FROM a GROUP BY cohort), m AS (SELECT DISTINCT month_key FROM calendar_days WHERE day<='2025-12-31')\nSELECT * FROM m ORDER BY 1 LIMIT 3;",
-      "purpose": "建立日期维度月份（m）的实际执行结果。",
-      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "purpose": "建立截至 2025-12-31 的月份列表。",
+      "reason": "只展示已经观察到的月份，未来的月份不能补 0。",
       "sourceTables": [
         {
           "name": "calendar_days",
@@ -466,8 +466,8 @@
       "kind": "runnable",
       "title": "生成同期群观察月份及月偏移",
       "sql": "WITH a AS (SELECT customer_id,MIN(SUBSTR(order_date,1,7)) cohort FROM v_order_net WHERE channel='online' GROUP BY customer_id), b AS (SELECT cohort,COUNT(*) n FROM a GROUP BY cohort), m AS (SELECT DISTINCT month_key FROM calendar_days WHERE day<='2025-12-31'), x AS (SELECT b.cohort,m.month_key,b.n,(CAST(SUBSTR(m.month_key,1,4) AS INTEGER)-CAST(SUBSTR(b.cohort,1,4) AS INTEGER))*12+CAST(SUBSTR(m.month_key,6,2) AS INTEGER)-CAST(SUBSTR(b.cohort,6,2) AS INTEGER) k FROM b CROSS JOIN m WHERE m.month_key>=b.cohort)\nSELECT * FROM x ORDER BY 1, 2, 3, 4 LIMIT 3;",
-      "purpose": "生成同期群观察月份及月偏移（x）的实际执行结果。",
-      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "purpose": "把每个同期群和它之后的月份配成组合，算出月偏移 k（首购当月是 0）。",
+      "reason": "偏移表示这是首购后的第几个月，留存分析按偏移而不是日历月份对比。",
       "sourceTables": [
         {
           "name": "calendar_days",
@@ -610,8 +610,8 @@
       "kind": "runnable",
       "title": "统计各期活跃客户",
       "sql": "WITH a AS (SELECT customer_id,MIN(SUBSTR(order_date,1,7)) cohort FROM v_order_net WHERE channel='online' GROUP BY customer_id), b AS (SELECT cohort,COUNT(*) n FROM a GROUP BY cohort), m AS (SELECT DISTINCT month_key FROM calendar_days WHERE day<='2025-12-31'), x AS (SELECT b.cohort,m.month_key,b.n,(CAST(SUBSTR(m.month_key,1,4) AS INTEGER)-CAST(SUBSTR(b.cohort,1,4) AS INTEGER))*12+CAST(SUBSTR(m.month_key,6,2) AS INTEGER)-CAST(SUBSTR(b.cohort,6,2) AS INTEGER) k FROM b CROSS JOIN m WHERE m.month_key>=b.cohort), y AS (SELECT a.cohort,SUBSTR(o.order_date,1,7) m,COUNT(DISTINCT o.customer_id) active FROM a JOIN v_order_net o ON o.customer_id=a.customer_id AND o.channel='online' GROUP BY a.cohort,SUBSTR(o.order_date,1,7))\nSELECT * FROM y ORDER BY 1, 2, 3 LIMIT 3;",
-      "purpose": "统计各期活跃客户（y）的实际执行结果。",
-      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "purpose": "统计每个同期群每个月有购买的客户数 active。",
+      "reason": "用 COUNT(DISTINCT customer_id) 按客户去重，同一客户一个月买几次只算一人。",
       "sourceTables": [
         {
           "name": "calendar_days",
@@ -750,8 +750,8 @@
       "kind": "runnable",
       "title": "计算同期群留存率",
       "sql": "WITH a AS (SELECT customer_id,MIN(SUBSTR(order_date,1,7)) cohort FROM v_order_net WHERE channel='online' GROUP BY customer_id), b AS (SELECT cohort,COUNT(*) n FROM a GROUP BY cohort), m AS (SELECT DISTINCT month_key FROM calendar_days WHERE day<='2025-12-31'), x AS (SELECT b.cohort,m.month_key,b.n,(CAST(SUBSTR(m.month_key,1,4) AS INTEGER)-CAST(SUBSTR(b.cohort,1,4) AS INTEGER))*12+CAST(SUBSTR(m.month_key,6,2) AS INTEGER)-CAST(SUBSTR(b.cohort,6,2) AS INTEGER) k FROM b CROSS JOIN m WHERE m.month_key>=b.cohort), y AS (SELECT a.cohort,SUBSTR(o.order_date,1,7) m,COUNT(DISTINCT o.customer_id) active FROM a JOIN v_order_net o ON o.customer_id=a.customer_id AND o.channel='online' GROUP BY a.cohort,SUBSTR(o.order_date,1,7)) SELECT x.cohort,x.k month_offset,x.n cohort_size,COALESCE(y.active,0) active_customers,ROUND(100.0*COALESCE(y.active,0)/x.n,2) retention_pct FROM x LEFT JOIN y ON y.cohort=x.cohort AND y.m=x.month_key WHERE x.k BETWEEN 0 AND 6 ORDER BY x.cohort,x.k",
-      "purpose": "在前面各步中间结果的基础上完成最终计算，输出题目要求的完整结果。",
-      "reason": "前面的步骤只是分块准备；把它们组合起来，才能得到最终的业务结果。",
+      "purpose": "用活跃客户数除以同期群初始人数得到留存率，保留月偏移 0 到 6。",
+      "reason": "已观察但没有购买的月份记 0；分母始终是初始人数。",
       "sourceTables": [
         {
           "name": "calendar_days",
@@ -1309,7 +1309,13 @@
         "emphasis": []
       }
     ],
-    "reason": [],
+    "reason": [
+      {
+        "type": "paragraph",
+        "text": "把分母换成上个月的活跃人数，算出来的是月环比而不是留存率；把还没有发生的未来月份补成 0，会让最近的同期群看起来留存很差。",
+        "emphasis": []
+      }
+    ],
     "correction": [
       {
         "type": "paragraph",

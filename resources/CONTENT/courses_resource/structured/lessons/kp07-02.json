@@ -6,7 +6,7 @@
   "conceptBlocks": [
     {
       "type": "heading",
-      "text": "基本含义",
+      "text": "什么是分组后筛选 HAVING？",
       "emphasis": []
     },
     {
@@ -19,23 +19,6 @@
       "items": [
         "WHERE 在逻辑上先筛选输入行，决定哪些交易参与后续统计；HAVING 在分组聚合之后筛选统计结果。",
         "比如只统计二月订单，应先按日期筛行；如果要求类别销售合计超过1000，则必须等组内金额计算完成再判断。"
-      ]
-    },
-    {
-      "type": "heading",
-      "text": "使用要点",
-      "emphasis": []
-    },
-    {
-      "type": "paragraph",
-      "text": "两个条件可以同时存在。",
-      "emphasis": []
-    },
-    {
-      "type": "list",
-      "items": [
-        "将合计阈值误写为单笔金额阈值会改变分子和样本范围，得到完全不同的报告。",
-        "聚合查询没有 GROUP BY 时也可以使用 HAVING 判断整体聚合结果，并非所有 HAVING 都必须配合显式分组。"
       ]
     },
     {
@@ -69,6 +52,23 @@
       ],
       "title": "WHERE 与 HAVING 的区别",
       "caption": "两者可以同时出现：先用 WHERE 筛行，再用 HAVING 筛组。"
+    },
+    {
+      "type": "heading",
+      "text": "使用要点",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "两个条件可以同时存在。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "将合计阈值误写为单笔金额阈值会改变分子和样本范围，得到完全不同的报告。",
+        "聚合查询没有 GROUP BY 时也可以使用 HAVING 判断整体聚合结果，并非所有 HAVING 都必须配合显式分组。"
+      ]
     }
   ],
   "syntax": {
@@ -100,36 +100,36 @@
       "kind": "fragment",
       "title": "指定来源",
       "sql": "FROM orders",
-      "purpose": "从 orders 读取输入数据。",
-      "reason": "后面的子句都基于这里得到的行。"
+      "purpose": "读取 orders 表，每一行是一笔订单。",
+      "reason": "先有订单行，才能分组汇总。"
     },
     {
       "kind": "fragment",
       "title": "分组",
       "sql": "GROUP BY category",
-      "purpose": "按 category 把行归入各个分组。",
-      "reason": "聚合函数在每个分组内分别计算。"
+      "purpose": "按 category 分组。",
+      "reason": "先分组才能得到每个类别的合计，HAVING 才有对象可以判断。"
     },
     {
       "kind": "fragment",
       "title": "筛选分组",
       "sql": "HAVING SUM(sales) > 1000",
-      "purpose": "仅保留满足 SUM(sales) > 1000 的分组。",
-      "reason": "聚合值在分组之后才存在，所以要用 HAVING 而不是 WHERE。"
+      "purpose": "分组汇总之后，只留下销售合计大于 1000 的类别。",
+      "reason": "HAVING 判断的是每一组算出来的结果，所以可以直接使用 SUM(sales)；WHERE 在分组之前执行，那时还没有合计可用。"
     },
     {
       "kind": "fragment",
       "title": "选择输出",
       "sql": "SELECT category, SUM(sales) AS total_sales",
-      "purpose": "输出 category, SUM(sales) AS total_sales。",
-      "reason": "输出列的顺序与别名决定结果表的形状。"
+      "purpose": "显示类别和销售合计。",
+      "reason": "SELECT 只决定显示哪些列。"
     },
     {
       "kind": "fragment",
       "title": "排序",
       "sql": "ORDER BY total_sales DESC;",
-      "purpose": "按 total_sales DESC 排列结果。",
-      "reason": "查询结果的默认行序没有保证，需要显式排序。"
+      "purpose": "按销售合计从高到低排列。",
+      "reason": "分组本身不保证输出顺序，要排序必须显式写 ORDER BY。"
     }
   ],
   "completeCode": {
@@ -224,7 +224,13 @@
         "emphasis": []
       }
     ],
-    "reason": [],
+    "reason": [
+      {
+        "type": "paragraph",
+        "text": "WHERE 在分组之前执行，这时每一组的合计还没算出来，所以不能写 SUM；如果改成 WHERE sales > 1000，筛选的是单笔订单，回答的就不是“类别合计超过 1000”这个问题。",
+        "emphasis": []
+      }
+    ],
     "correction": [
       {
         "type": "paragraph",

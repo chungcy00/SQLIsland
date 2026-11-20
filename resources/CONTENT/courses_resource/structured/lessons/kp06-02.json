@@ -6,7 +6,7 @@
   "conceptBlocks": [
     {
       "type": "heading",
-      "text": "基本含义",
+      "text": "什么是求和 SUM 与平均 AVG？",
       "emphasis": []
     },
     {
@@ -22,20 +22,9 @@
       ]
     },
     {
-      "type": "heading",
-      "text": "使用要点",
-      "emphasis": []
-    },
-    {
-      "type": "paragraph",
-      "text": "若没有任何非空输入，SUM 和 AVG 返回 NULL，而不是自动返回零；这与 COUNT 不同。",
-      "emphasis": []
-    },
-    {
-      "type": "list",
-      "items": [
-        "业务上必须明确平均的是订单金额、门店营收还是商品价格，统计对象改变时，平均值含义也改变。",
-        "多个组的平均值不能直接再平均，除非组大小相同或符合另行规定的等权口径；总体平均应合并总和及有效计数。"
+      "type": "figure",
+      "ids": [
+        "kp06-02-fn"
       ]
     },
     {
@@ -64,6 +53,23 @@
       ],
       "title": "SUM 与 AVG 如何对待不同的值",
       "caption": "平均值的分母只包括已知数值，不是表的总行数。"
+    },
+    {
+      "type": "heading",
+      "text": "使用要点",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "若没有任何非空输入，SUM 和 AVG 返回 NULL，而不是自动返回零；这与 COUNT 不同。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "业务上必须明确平均的是订单金额、门店营收还是商品价格，统计对象改变时，平均值含义也改变。",
+        "多个组的平均值不能直接再平均，除非组大小相同或符合另行规定的等权口径；总体平均应合并总和及有效计数。"
+      ]
     }
   ],
   "syntax": {
@@ -90,15 +96,15 @@
       "kind": "fragment",
       "title": "指定来源",
       "sql": "FROM nullable_values;",
-      "purpose": "从 nullable_values 读取输入数据。",
-      "reason": "后面的子句都基于这里得到的行。"
+      "purpose": "读取 nullable_values 表的 4 行，其中一行 value 为 NULL。",
+      "reason": "SUM 和 AVG 都是对这些行里的 value 计算。"
     },
     {
       "kind": "fragment",
       "title": "选择输出",
       "sql": "SELECT SUM(value) AS total, AVG(value) AS mean",
-      "purpose": "输出 SUM(value) AS total, AVG(value) AS mean。",
-      "reason": "输出列的顺序与别名决定结果表的形状。"
+      "purpose": "对 value 求和并求平均：NULL 被跳过，0 照常参与。",
+      "reason": "SUM 把非空值 0、10、10 加起来得到 20；AVG 的分母是非空值的个数 3，而不是总行数 4。"
     }
   ],
   "completeCode": {
@@ -191,7 +197,13 @@
         "emphasis": []
       }
     ],
-    "reason": [],
+    "reason": [
+      {
+        "type": "paragraph",
+        "text": "SUM(value)/COUNT(*) 的分母是总行数 4，而 AVG 的分母只数非空的 3 行，两者结果不同（20÷4=5，20÷3≈6.67）。",
+        "emphasis": []
+      }
+    ],
     "correction": [
       {
         "type": "paragraph",

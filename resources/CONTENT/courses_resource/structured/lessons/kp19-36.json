@@ -6,7 +6,7 @@
   "conceptBlocks": [
     {
       "type": "heading",
-      "text": "基本含义",
+      "text": "什么是库存覆盖天数？",
       "emphasis": []
     },
     {
@@ -53,8 +53,8 @@
       "kind": "runnable",
       "title": "按仓库商品汇总期间出库量",
       "sql": "WITH s AS (SELECT warehouse_id,product_id,SUM(-quantity_delta) sold FROM stock_movements WHERE movement_type='sale' AND movement_date BETWEEN '2025-10-03' AND '2025-12-31' GROUP BY warehouse_id,product_id)\nSELECT * FROM s ORDER BY 1, 2, 3 LIMIT 3;",
-      "purpose": "按仓库商品汇总期间出库量（s）的实际执行结果。",
-      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "purpose": "先按仓库和商品汇总 2025-10-03 到 12-31 这 90 天的销售出库数量 sold。",
+      "reason": "出库数量是负数，取负号变成销量；只统计销售出库，不扣退货。",
       "sourceTables": [
         {
           "name": "inventory_snapshots",
@@ -306,8 +306,8 @@
       "kind": "runnable",
       "title": "关联库存快照，计算覆盖天数并筛选",
       "sql": "WITH s AS (SELECT warehouse_id,product_id,SUM(-quantity_delta) sold FROM stock_movements WHERE movement_type='sale' AND movement_date BETWEEN '2025-10-03' AND '2025-12-31' GROUP BY warehouse_id,product_id) SELECT i.warehouse_id,i.product_id,i.quantity,COALESCE(s.sold,0) sold_units,i.quantity*i.unit_cost_cents stock_value_cents,ROUND(90.0*i.quantity/NULLIF(s.sold,0),2) cover_days FROM inventory_snapshots i JOIN products p ON p.product_id=i.product_id LEFT JOIN s ON s.warehouse_id=i.warehouse_id AND s.product_id=i.product_id WHERE p.active=1 AND i.snapshot_date='2025-12-31' AND i.quantity*i.unit_cost_cents>500000 AND COALESCE(s.sold,0)<20 ORDER BY stock_value_cents DESC, product_name",
-      "purpose": "在上一步的中间结果之上完成最终计算，得到题目要求的结果。",
-      "reason": "中间结果只是过渡，最终结果还需要汇总、计算或筛选后才能回答业务问题。",
+      "purpose": "把期末库存快照和销量按仓库、商品配起来，算出库存成本价值和覆盖天数，只保留库存成本价值大于 500000 分、销量小于 20 件的有效商品。",
+      "reason": "覆盖天数 = 90 × 库存数量 ÷ 销量；零销量时分母为空，覆盖天数保持 NULL，不能写成 0。",
       "sourceTables": [
         {
           "name": "inventory_snapshots",
@@ -1616,7 +1616,13 @@
         "emphasis": []
       }
     ],
-    "reason": [],
+    "reason": [
+      {
+        "type": "paragraph",
+        "text": "用全公司销量去匹配单个仓库的库存，会把别的仓库的销量算进来，覆盖天数就偏短；零销量的覆盖天数是“没有定义”，填 0 会让积压最严重的商品看起来周转最快。",
+        "emphasis": []
+      }
+    ],
     "correction": [
       {
         "type": "paragraph",

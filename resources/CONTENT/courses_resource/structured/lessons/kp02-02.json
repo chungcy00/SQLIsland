@@ -6,7 +6,7 @@
   "conceptBlocks": [
     {
       "type": "heading",
-      "text": "整行去重的含义",
+      "text": "什么是整行去重？",
       "emphasis": []
     },
     {
@@ -23,7 +23,7 @@
     },
     {
       "type": "heading",
-      "text": "输出列如何改变粒度",
+      "text": "输出列如何改变粒度？",
       "emphasis": []
     },
     {

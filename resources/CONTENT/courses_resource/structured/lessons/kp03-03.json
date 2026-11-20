@@ -6,7 +6,7 @@
   "conceptBlocks": [
     {
       "type": "heading",
-      "text": "基本含义",
+      "text": "什么是 IN 和 BETWEEN？",
       "emphasis": []
     },
     {
@@ -20,23 +20,6 @@
         "对于非空候选值，IN 可理解为多个等于条件用 OR 组合，避免重复书写字段。",
         "BETWEEN 适用于连续范围，并包含上下界，相当于在通常的同类型比较中同时应用 >= 和 <=。",
         "上下界顺序不能任意交换。"
-      ]
-    },
-    {
-      "type": "heading",
-      "text": "使用要点",
-      "emphasis": []
-    },
-    {
-      "type": "paragraph",
-      "text": "两种条件可以结合，分别约束类别与金额。",
-      "emphasis": []
-    },
-    {
-      "type": "list",
-      "items": [
-        "在时间戳筛选中，业务人员说“整个一月”时，常用大于等于一月一日且小于二月一日，而不是小于等于一月三十一日零点，以免漏掉最后一天的记录。",
-        "NOT IN 遇到未知候选值会产生特殊情况，后续子查询章节详讲。"
       ]
     },
     {
@@ -64,6 +47,23 @@
         0,
         1
       ]
+    },
+    {
+      "type": "heading",
+      "text": "使用要点",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "两种条件可以结合，分别约束类别与金额。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "在时间戳筛选中，业务人员说“整个一月”时，常用大于等于一月一日且小于二月一日，而不是小于等于一月三十一日零点，以免漏掉最后一天的记录。",
+        "NOT IN 遇到未知候选值会产生特殊情况，后续子查询章节详讲。"
+      ]
     }
   ],
   "syntax": {
@@ -90,29 +90,29 @@
       "kind": "fragment",
       "title": "指定来源",
       "sql": "FROM products",
-      "purpose": "从 products 读取输入数据。",
-      "reason": "后面的子句都基于这里得到的行。"
+      "purpose": "先确定数据来自 products 表，每一行是一件商品。",
+      "reason": "WHERE、SELECT、ORDER BY 都是在这张表的行上工作的，所以要先有数据来源。"
     },
     {
       "kind": "fragment",
       "title": "筛选行",
       "sql": "WHERE category IN ('护肤品','化妆品') AND price BETWEEN 35 AND 65",
-      "purpose": "仅保留满足 category IN ('护肤品','化妆品') AND price BETWEEN 35 AND 65 的行。",
-      "reason": "条件结果为真才保留；未知（NULL）的行会被排除。"
+      "purpose": "先要求类别是护肤品或化妆品，再要求价格在 35 到 65 之间（含两端）。",
+      "reason": "IN 适合列出几个允许的值，BETWEEN 适合表示连续范围；两个条件用 AND 同时要求。"
     },
     {
       "kind": "fragment",
       "title": "选择输出",
       "sql": "SELECT product_id, price",
-      "purpose": "输出 product_id, price。",
-      "reason": "输出列的顺序与别名决定结果表的形状。"
+      "purpose": "只显示商品编号和价格。",
+      "reason": "SELECT 只决定显示哪些列，不改变筛选出来的行数。"
     },
     {
       "kind": "fragment",
       "title": "排序",
       "sql": "ORDER BY price DESC;",
-      "purpose": "按 price DESC 排列结果。",
-      "reason": "查询结果的默认行序没有保证，需要显式排序。"
+      "purpose": "按 price 从高到低排列结果。",
+      "reason": "没有 ORDER BY 时数据库不保证行的顺序，写出来才能让输出顺序固定。"
     }
   ],
   "completeCode": {
@@ -246,7 +246,13 @@
         "emphasis": []
       }
     ],
-    "reason": [],
+    "reason": [
+      {
+        "type": "paragraph",
+        "text": "BETWEEN 要按“下界 AND 上界”来写，写成 65 AND 35 时，没有任何数值既不小于 65 又不大于 35，结果会是空的，数据库不会自动交换上下界。",
+        "emphasis": []
+      }
+    ],
     "correction": [
       {
         "type": "paragraph",

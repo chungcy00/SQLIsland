@@ -6,7 +6,7 @@
   "conceptBlocks": [
     {
       "type": "heading",
-      "text": "基本含义",
+      "text": "什么是窗口聚合？",
       "emphasis": []
     },
     {
@@ -19,6 +19,12 @@
       "items": [
         "普通聚合把多行压缩成汇总行；窗口聚合在筛选后的输入行上附加计算值。",
         "没有分区时整个输入构成一个分区；本例没有窗口排序，因此每笔订单看见所在类别的全部订单。"
+      ]
+    },
+    {
+      "type": "figure",
+      "ids": [
+        "kp15-01-fn"
       ]
     },
     {
@@ -68,22 +74,22 @@
       "kind": "fragment",
       "title": "指定来源",
       "sql": "FROM orders",
-      "purpose": "从 orders 读取输入数据。",
-      "reason": "后面的子句都基于这里得到的行。"
+      "purpose": "读取 orders 表，每一行是一笔订单。",
+      "reason": "窗口函数在每一行上附加一个计算值，输入有几行，输出还是几行。"
     },
     {
       "kind": "fragment",
       "title": "选择输出",
       "sql": "SELECT id,category,sales,SUM(sales) OVER(PARTITION BY category) AS category_total",
-      "purpose": "输出查询需要的列与计算表达式。",
-      "reason": "输出列的顺序与别名决定结果表的形状。"
+      "purpose": "显示每笔订单，并在每一行旁边附上它所在类别的销售合计 category_total。",
+      "reason": "PARTITION BY category 把订单分成类别窗口，SUM 在每个窗口内求和后附加到窗口里的每一行，行数不会减少。"
     },
     {
       "kind": "fragment",
       "title": "排序",
       "sql": "ORDER BY sales DESC;",
-      "purpose": "按 sales DESC 排列结果。",
-      "reason": "查询结果的默认行序没有保证，需要显式排序。"
+      "purpose": "按单笔销售额从高到低排列。",
+      "reason": "窗口函数不决定输出顺序，要排序必须显式写 ORDER BY。"
     }
   ],
   "completeCode": {
@@ -226,7 +232,13 @@
         "emphasis": []
       }
     ],
-    "reason": [],
+    "reason": [
+      {
+        "type": "paragraph",
+        "text": "category_total 在同一类别的每一行里都是同一个合计（例如护肤品的两行都是 1400）；再把这一列加起来，同一类别会被重复计算，总销售额会变大。",
+        "emphasis": []
+      }
+    ],
     "correction": [
       {
         "type": "paragraph",

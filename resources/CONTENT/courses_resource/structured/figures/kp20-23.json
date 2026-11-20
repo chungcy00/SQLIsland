@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp20-23",
-  "lessonSha256": "0d5b2b98195976ba3231f3ce30d9f602afb2b06a89f242ed1983547a1679309f",
+  "lessonSha256": "bdbf9c7a22ea70c9463c78dc4735c075804056c223621d4bd8d15c5a308cdd3a",
   "figures": [
     {
       "id": "kp20-23-clauses",
@@ -14,49 +14,49 @@
           "role": "cte",
           "label": "中间结果",
           "sql": "WITH m AS (SELECT DISTINCT month_key FROM calendar_days WHERE month_key BETWEEN '2025-01' AND '2025-12'),",
-          "note": "先把名为 m 的中间结果算出来，供后面的查询引用。"
+          "note": "先单独算出一张临时结果 m，下面的查询可以把它当作普通表来用。"
         },
         {
           "role": "cte",
           "label": "中间结果",
           "sql": "s AS (SELECT SUBSTR(order_date,1,7) m,SUM(net_cents) net,SUM(net_cents-cost_cents) gross FROM v_sales_lines WHERE order_date>='2025-01-01' GROUP BY SUBSTR(order_date,1,7)),",
-          "note": "先把名为 s 的中间结果算出来，供后面的查询引用。"
+          "note": "先单独算出一张临时结果 s，下面的查询可以把它当作普通表来用。"
         },
         {
           "role": "cte",
           "label": "中间结果",
           "sql": "f AS (SELECT SUBSTR(entry_date,1,7) m,SUM(expense_cents) expense FROM v_expenses WHERE entry_date>='2025-01-01' GROUP BY SUBSTR(entry_date,1,7)),",
-          "note": "先把名为 f 的中间结果算出来，供后面的查询引用。"
+          "note": "先单独算出一张临时结果 f，下面的查询可以把它当作普通表来用。"
         },
         {
           "role": "cte",
           "label": "中间结果",
           "sql": "h AS (SELECT month_key,SUM(labor_cents) labor FROM v_staff_month WHERE month_key BETWEEN '2025-01' AND '2025-12' GROUP BY month_key),",
-          "note": "先把名为 h 的中间结果算出来，供后面的查询引用。"
+          "note": "先单独算出一张临时结果 h，下面的查询可以把它当作普通表来用。"
         },
         {
           "role": "cte",
           "label": "中间结果",
           "sql": "p AS (SELECT SUBSTR(order_date,1,7) m,SUM(ordered_cents) procurement FROM v_po_lines WHERE order_date>='2025-01-01' GROUP BY SUBSTR(order_date,1,7)),",
-          "note": "先把名为 p 的中间结果算出来，供后面的查询引用。"
+          "note": "先单独算出一张临时结果 p，下面的查询可以把它当作普通表来用。"
         },
         {
           "role": "cte",
           "label": "中间结果",
           "sql": "a AS (SELECT month_key,SUM(spend_cents) spend FROM marketing_campaigns WHERE month_key BETWEEN '2025-01' AND '2025-12' GROUP BY month_key)",
-          "note": "先把名为 a 的中间结果算出来，供后面的查询引用。"
+          "note": "先单独算出一张临时结果 a，下面的查询可以把它当作普通表来用。"
         },
         {
           "role": "select",
           "label": "取数",
           "sql": "SELECT m.month_key,COALESCE(s.net,0) net_cents,COALESCE(s.gross,0) gross_cents,COALESCE(f.expense,0) expense_cents,COALESCE(h.labor,0) labor_cents,COALESCE(a.spend,0) advertising_cents,COALESCE(p.procurement,0) committed_purchase_cents,COALESCE(s.gross,0)-COALESCE(f.expense,0)-COALESCE(h.labor,0) operating_contribution_cents",
-          "note": "输出查询需要的列与计算表达式。"
+          "note": "结果表最终显示 8 列：month_key、net_cents、gross_cents、expense_cents、labor_cents、advertising_cents…。"
         },
         {
           "role": "from",
           "label": "来源",
           "sql": "FROM m LEFT JOIN s ON s.m=m.month_key LEFT JOIN f ON f.m=m.month_key LEFT JOIN h ON h.month_key=m.month_key LEFT JOIN p ON p.m=m.month_key LEFT JOIN a ON a.month_key=m.month_key",
-          "note": "读取查询需要的输入数据。"
+          "note": "数据来自 中间结果 m、中间结果 s、中间结果 f、中间结果 h、中间结果 p、中间结果 a，并用 ON 后面的条件把它们的行配起来。"
         },
         {
           "role": "order",

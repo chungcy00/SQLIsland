@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp04-01",
-  "lessonSha256": "4b518699d77892773f28f926b4b32f212e30dce4f166dc17f74afd741b44ea3d",
+  "lessonSha256": "79061455f7bf5cbb629c2faa9af668bf29d30b9e1f65af73fdcc94f444291c55",
   "figures": [
     {
       "id": "kp04-01-clauses",
@@ -14,13 +14,13 @@
           "role": "select",
           "label": "取数",
           "sql": "SELECT product_id, price",
-          "note": "输出 product_id, price。"
+          "note": "结果表最终显示 2 列：product_id、price。"
         },
         {
           "role": "from",
           "label": "来源",
           "sql": "FROM products",
-          "note": "从 products 读取输入数据。"
+          "note": "数据来自表 products。"
         },
         {
           "role": "order",

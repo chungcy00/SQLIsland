@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp12-04",
-  "lessonSha256": "f9b7dd5709cd7d84b14ae8b86c9d12196f89b756a323f61a4426ccffc305a49f",
+  "lessonSha256": "28feb774b21dbf1a9e5c22befd56bc495162077aeb23fccb273f85b374285e1b",
   "figures": [
     {
       "id": "kp12-04-clauses",
@@ -14,19 +14,19 @@
           "role": "select",
           "label": "取数",
           "sql": "SELECT SUM(sales) AS feb_sales",
-          "note": "输出 SUM(sales) AS feb_sales。"
+          "note": "结果表最终显示 1 列：feb_sales。"
         },
         {
           "role": "from",
           "label": "来源",
           "sql": "FROM orders",
-          "note": "从 orders 读取输入数据。"
+          "note": "数据来自表 orders。"
         },
         {
           "role": "where",
           "label": "筛选",
           "sql": "WHERE order_date >= '2026-02-01' AND order_date < '2026-03-01';",
-          "note": "仅保留满足 order_date >= '2026-02-01' AND order_date < '2026-03-01' 的行。"
+          "note": "只保留满足这个条件的行：order_date >= '2026-02-01' AND order_date < '2026-03-01'。"
         }
       ]
     },

@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "kp12-03",
+  "lessonSha256": "1fbf4b31b1742c839619bc2fb3da13f61881d360aaf5cb8371b1d6bdce478829",
+  "figures": [
+    {
+      "id": "kp12-03-clauses",
+      "slot": "syntax",
+      "kind": "clause-map",
+      "title": "示例查询的几个部分",
+      "sql": "SELECT CAST(julianday('2026-02-03')-julianday('2026-01-31') AS INTEGER) AS days, CAST(julianday('2026-02-03')-julianday('2026-01-31') AS INTEGER) AS elapsed;",
+      "parts": [
+        {
+          "role": "select",
+          "label": "取数",
+          "sql": "SELECT CAST(julianday('2026-02-03')-julianday('2026-01-31') AS INTEGER) AS days,",
+          "note": "结果表最终显示 1 列：days。"
+        },
+        {
+          "role": "select",
+          "label": "取数",
+          "sql": "CAST(julianday('2026-02-03')-julianday('2026-01-31') AS INTEGER) AS elapsed;",
+          "note": "结果表最终显示 1 列：elapsed。"
+        }
+      ]
+    }
+  ]
+}

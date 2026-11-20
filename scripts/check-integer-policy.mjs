@@ -12,7 +12,6 @@ for (const question of content.questions) {
   const exactColumns = question.numericTolerance?.exactColumns || [];
   if (!exactColumns.length) continue;
   report.policyQuestions++;
-  if (Number(question.id.slice(1)) < 251) continue;
   for (const entry of question.testFixtures) {
     let fixture = JSON.parse(await readFile('dist/' + entry.path));
     if (fixture.sharedDataPath) {
@@ -44,7 +43,9 @@ for (const question of content.questions) {
     break;
   }
 }
-assert.ok(report.checks.some(check => check.question === 'q0279' && check.column === 'product_id'));
+// 题库精简为 200 道后原先的 q0279 已不存在：改为要求至少有一次检查，且每次把整数列加上小数偏移后都被拒绝。
+assert.ok(report.checks.length > 0);
+assert.ok(report.checks.every(check => check.nowRejected), 'some fractional offsets are still accepted');
 report.rejectedFractionalQueries = report.checks.length;
 report.previouslyAcceptedQueries = report.checks.filter(check => check.previouslyAccepted).length;
 await writeFile('artifacts/enterprise-audit/integer-policy-validation.json', JSON.stringify(report, null, 2));

@@ -23,12 +23,11 @@ try {
   await page.getByRole("button", { name: "已完成学习" }).waitFor();
   await page.reload();
   await page.getByRole("button", { name: "已完成学习" }).waitFor();
-  await route("/question/q0002");
-  await page.locator("[data-action=option][data-arg=C]").click();
+  await route("/question/q0005");
+  await page.locator("[data-action=option][data-arg=D]").click();
   await page.getByRole("button", { name: "提交答案", exact: true }).click();
   await page.getByText("回答正确", { exact: true }).waitFor();
   await route("/question/q0009");
-  await page.locator("[data-action=quizTab][data-arg=代码]").first().click();
   await page
     .locator("#sql-editor")
     .fill("SELECT DISTINCT price FROM products ORDER BY price");
@@ -38,10 +37,14 @@ try {
   await page.getByRole("button", { name: "提交答案", exact: true }).click();
   await page.getByText("回答正确", { exact: false }).waitFor();
   await route("/cards");
-  await page.getByRole("button", { name: "开始今日复习" }).click();
-  await page.getByRole("button", { name: "翻开答案", exact: true }).click();
-  await page.locator('[data-action=rate][data-arg="3"]').click();
-  await page.getByRole("button", { name: "翻开答案", exact: true }).waitFor();
+  // 闪卡界面改版后：选“新卡”模式开始，整张卡点击翻面，再评“良好”进入下一张；刷新后会话恢复。
+  await page.locator("[data-action=cardMode][data-arg=新卡]").click();
+  await page.locator("[data-action=startCards]").click();
+  await page.locator(".flashcard.front").waitFor();
+  await page.locator(".flashcard.front").click();
+  await page.locator(".flashcard.back").waitFor();
+  await page.getByRole("button", { name: /良好/ }).click();
+  await page.locator(".flashcard.front").waitFor();
   await page.reload();
   await page.locator(".flashcard").waitFor();
   await route("/card-edit/new");

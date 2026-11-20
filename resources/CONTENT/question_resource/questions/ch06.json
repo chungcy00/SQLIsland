@@ -54,11 +54,11 @@
         }
       ],
       "hints": [
-        "先确定统计对象是行、有效观测、不同值还是累计量。",
-        "结合《COUNT 的三个形式》：COUNT(*) 统计行；COUNT(col) 忽略该列 NULL；COUNT(DISTINCT col) 统计不同非空值。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT □□□ AS order_count FROM orders"
+        "要统计的是订单一共有多少行。",
+        "COUNT(*) 数所有行，COUNT(列) 只数该列不是 NULL 的行。",
+        "有些订单的客户编号为空，统计订单总数时这些订单也要算进去。"
       ],
-      "explanation": "COUNT(*)包含空客户键，统计记录时不能漏掉。\n执行思路：确认orders的输入记录；输出order_count列。\n公开夹具实际返回 1 行、1 列；完整结果见 expectedOutput。\n另一种可用写法：常量1对每行非NULL，因此 COUNT(1) 与 COUNT(*) 同计行数。",
+      "explanation": "COUNT(*) 统计表里的全部行，不检查任何列是否为空，所以匿名订单（customer_id 为 NULL）也会被数到。\n易错：写成 COUNT(customer_id) 会跳过客户编号为空的订单，得到的数字比订单总数少。",
       "commonErrors": [
         {
           "sql": "SELECT COUNT(customer_id) AS order_count FROM orders",
@@ -253,11 +253,11 @@
         }
       ],
       "hints": [
-        "先确定统计对象是行、有效观测、不同值还是累计量。",
-        "结合《SUM 与 AVG》：SUM 汇总非空数值；AVG 的分母是非空数值个数，不是总行数。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT □□□ AS total_sales FROM orders"
+        "求总额要用把一列的值加起来的聚合函数。",
+        "SUM 会忽略 NULL，把其余的数值加起来；没有任何可加的值时结果是 NULL。",
+        "注意区分总额和平均值：一个是加起来，一个是加起来再除以个数。"
       ],
-      "explanation": "总额与平均值有不同统计含义。\n执行思路：确认orders的输入记录；输出total_sales列。\n公开夹具实际返回 1 行、1 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
+      "explanation": "SUM(sales) 把 sales 列里不是 NULL 的值相加，表为空或全是 NULL 时返回 NULL，正好符合题目要求。\n易错：把 SUM 写成 AVG 得到的是平均值，不是总额。",
       "commonErrors": [
         {
           "sql": "SELECT AVG(sales) AS total_sales FROM orders",
@@ -453,11 +453,11 @@
         }
       ],
       "hints": [
-        "先确定统计对象是行、有效观测、不同值还是累计量。",
-        "结合《MIN 与 MAX》：MIN/MAX 返回非空值的最小及最大值，不自动返回对应整行。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT □□□ AS latest_order FROM orders"
+        "“最晚的日期”就是日期里最大的那个。",
+        "MIN 取最小值，MAX 取最大值，都会忽略 NULL；没有记录时结果是 NULL。",
+        "日期用规范的 YYYY-MM-DD 文本时，按字符比较的大小顺序就是时间先后。"
       ],
-      "explanation": "规范日期字符串按时间顺序排列，MAX 获取最晚日。\n执行思路：确认orders的输入记录；输出latest_order列。\n公开夹具实际返回 1 行、1 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
+      "explanation": "MAX(order_date) 返回订单日期里最大的值，也就是最晚的一天；表为空时返回 NULL。\n易错：误用 MIN 得到的是最早的订单日期。",
       "commonErrors": [
         {
           "sql": "SELECT MIN(order_date) AS latest_order FROM orders",
@@ -634,11 +634,11 @@
         }
       ],
       "hints": [
-        "先确定统计对象是行、有效观测、不同值还是累计量。",
-        "结合《MIN 与 MAX》：MIN/MAX 返回非空值的最小及最大值，不自动返回对应整行。",
-        "检查初始代码的 MAX(value) 对应的业务规则。最大值与最小值不同，聚合自动忽略NULL。"
+        "先看结果和题目要求哪里不一致：要的是最大值。",
+        "检查聚合函数是不是和要求对应：MIN 返回最小值，MAX 返回最大值。",
+        "聚合函数本来就会忽略 NULL，不需要再额外处理。"
       ],
-      "explanation": "最大值与最小值不同，聚合自动忽略NULL。\n执行思路：确认nullable_values的输入记录；输出max_value列。\n公开夹具实际返回 1 行、1 列；完整结果见 expectedOutput。\n另一种可用写法：采用另一种关系运算或查询结构计算相同结果。",
+      "explanation": "题目要的是 value 的最大值，应该使用 MAX(value)；初始代码用了 MIN，返回的是最小值。MAX 会自动忽略 NULL，所以 NULL 不会被当成最大值。\n易错：看到“NULL 不能当最大值”就去手工过滤，其实聚合函数已经处理了。",
       "commonErrors": [
         {
           "sql": "SELECT MIN(value) AS max_value FROM nullable_values",
@@ -815,11 +815,11 @@
         }
       ],
       "hints": [
-        "先确定统计对象是行、有效观测、不同值还是累计量。",
-        "结合《COUNT 的三个形式》：COUNT(*) 统计行；COUNT(col) 忽略该列 NULL；COUNT(DISTINCT col) 统计不同非空值。",
-        "按题设编写投影、筛选及分组，使用运行检查列名、NULL、重复记录和排序。"
+        "要数的是“客户编号不为空”的订单。",
+        "COUNT(列) 只数该列不是 NULL 的行，正好符合“有客户编号”。",
+        "对比 COUNT(*)：它数所有行，包括客户编号为空的订单。"
       ],
-      "explanation": "COUNT(列)仅统计非NULL值。\n执行思路：确认orders的输入记录；输出registered_orders列。\n公开夹具实际返回 1 行、1 列；完整结果见 expectedOutput。\n另一种可用写法：采用另一种关系运算或查询结构计算相同结果。",
+      "explanation": "COUNT(customer_id) 只统计 customer_id 不是 NULL 的行，也就是有客户编号的订单数。\n易错：用 COUNT(*) 会把匿名订单也数进去，结果偏多。",
       "commonErrors": [
         {
           "sql": "SELECT COUNT(*) AS registered_orders FROM orders",
@@ -1015,11 +1015,11 @@
         }
       ],
       "hints": [
-        "先确定统计对象是行、有效观测、不同值还是累计量。",
-        "结合《MIN 与 MAX》：MIN/MAX 返回非空值的最小及最大值，不自动返回对应整行。",
-        "按题设编写投影、筛选及分组，使用运行检查列名、NULL、重复记录和排序。"
+        "差额要用两个聚合值相减。",
+        "MAX 取最高价，MIN 取最低价，它们都会忽略 NULL；没有价格数据时两个值都是 NULL，相减后也是 NULL。",
+        "差额按“最大值减最小值”，顺序反了符号就反了。"
       ],
-      "explanation": "价差按最大减最小，不能颠倒。\n执行思路：确认products的输入记录；输出price_spread列。\n公开夹具实际返回 1 行、1 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
+      "explanation": "MAX(price)-MIN(price) 是最高售价减最低售价，结果不会是负数；没有价格数据时两个值都是 NULL，差额也是 NULL。\n易错：写成 MIN(price)-MAX(price) 会得到负的差额。",
       "commonErrors": [
         {
           "sql": "SELECT MIN(price)-MAX(price) AS price_spread FROM products",
@@ -1221,11 +1221,11 @@
         }
       ],
       "hints": [
-        "先确定统计对象是行、有效观测、不同值还是累计量。",
-        "结合《SUM 与 AVG》：SUM 汇总非空数值；AVG 的分母是非空数值个数，不是总行数。",
-        "回想空位所在子句的功能：SUM 与 AVG；保留周围代码，填入实现题设的表达式。"
+        "要的是不含缺失值的平均数。",
+        "AVG 只对不是 NULL 的值求平均，分母是非空值的个数，不是总行数。",
+        "不要把 NULL 换成 0 再平均，那样会把“未知”当成真实的 0。"
       ],
-      "explanation": "不能把未知观测强行当成0参与平均。\n执行思路：确认nullable_values的输入记录；输出mean_value列。\n公开夹具实际返回 1 行、1 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
+      "explanation": "AVG(value) 只对非 NULL 的值求平均，再用 ROUND 保留两位小数；没有可用数据时返回 NULL。\n易错：先把 NULL 换成 0 再平均（如 AVG(COALESCE(value,0))），分母变成了总行数，平均值被拉低。",
       "commonErrors": [
         {
           "sql": "SELECT ROUND(AVG(COALESCE(value,0)),2) AS mean_value FROM nullable_values",
@@ -1414,11 +1414,11 @@
         }
       ],
       "hints": [
-        "先确定统计对象是行、有效观测、不同值还是累计量。",
-        "结合《COUNT 的三个形式》：COUNT(*) 统计行；COUNT(col) 忽略该列 NULL；COUNT(DISTINCT col) 统计不同非空值。",
-        "回想空位所在子句的功能：COUNT 的三个形式；保留周围代码，填入实现题设的表达式。"
+        "缺失的行数 = 总行数 − 有值的行数。",
+        "COUNT(*) 数全部行，COUNT(列) 只数该列不是 NULL 的行。",
+        "空位里要写一个由两个计数相减得到的表达式。"
       ],
-      "explanation": "总行数减去已知数就是缺失行数。\n执行思路：确认nullable_values的输入记录；输出missing_count列。\n公开夹具实际返回 1 行、1 列；完整结果见 expectedOutput。\n另一种可用写法：采用另一种关系运算或查询结构计算相同结果。",
+      "explanation": "COUNT(*) 是全部行数，COUNT(value) 是 value 不为 NULL 的行数，两者相减就是 value 为 NULL 的行数。\n易错：只写 COUNT(value) 得到的是有值的行数，不是缺失的行数。",
       "commonErrors": [
         {
           "sql": "SELECT COUNT(value) AS missing_count FROM nullable_values",
@@ -1615,11 +1615,11 @@
         }
       ],
       "hints": [
-        "先确定统计对象是行、有效观测、不同值还是累计量。",
-        "结合《COUNT 的三个形式》：COUNT(*) 统计行；COUNT(col) 忽略该列 NULL；COUNT(DISTINCT col) 统计不同非空值。",
-        "检查初始代码的 DISTINCT  对应的业务规则。同一客户多次购买只计算一次。"
+        "先对比结果：同一个客户多次购买，应该只算一次。",
+        "COUNT(列) 数的是非空行数，重复的值也会各算一次。",
+        "要数“不同的客户”，需要在计数时对值去重。"
       ],
-      "explanation": "同一客户多次购买只计算一次。\n执行思路：确认orders的输入记录；仅在题设指定的范围内去重；输出unique_customers列。\n公开夹具实际返回 1 行、1 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
+      "explanation": "COUNT(DISTINCT customer_id) 先对客户编号去重，再统计不重复且不为 NULL 的客户数；同一位客户多次下单只算一次。\n易错：初始代码的 COUNT(customer_id) 统计的是有客户编号的订单数，同一客户的多笔订单会被重复计数。",
       "commonErrors": [
         {
           "sql": "SELECT COUNT(customer_id) AS unique_customers FROM orders",
@@ -2062,11 +2062,11 @@
         }
       ],
       "hints": [
-        "先确定统计对象是行、有效观测、不同值还是累计量。",
-        "结合《SUM 与 AVG》：SUM 汇总非空数值；AVG 的分母是非空数值个数，不是总行数。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT ROUND(1.0*SUM(price*stock)/□□□(SUM(stock),0),2) AS weighted_price FROM products"
+        "加权平均不是把价格直接平均，而是要考虑每件商品的数量。",
+        "加权平均 = 每项（价格 × 数量）之和 ÷ 数量之和。",
+        "总数量为 0 时不能做除法，要让结果为 NULL；乘 1.0 可以避免整数相除被截断。"
       ],
-      "explanation": "加权平均使用价格乘数量后的总额除以总数量，不能给每个商品相同权重。\n执行思路：确认products的输入记录；输出weighted_price列。\n公开夹具实际返回 1 行、1 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
+      "explanation": "SUM(price*stock) 是总价值，SUM(stock) 是总数量，两者相除就是按库存加权的平均售价；NULLIF(SUM(stock),0) 让总数量为 0 时返回 NULL，ROUND 保留两位小数。\n易错：直接用 AVG(price) 让每件商品的权重相同，没有考虑库存数量。",
       "commonErrors": [
         {
           "sql": "SELECT ROUND(AVG(price),2) AS weighted_price FROM products",

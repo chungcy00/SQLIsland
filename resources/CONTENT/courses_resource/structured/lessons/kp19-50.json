@@ -6,7 +6,7 @@
   "conceptBlocks": [
     {
       "type": "heading",
-      "text": "基本含义",
+      "text": "什么是多规则异常筛查？",
       "emphasis": []
     },
     {
@@ -41,8 +41,8 @@
       "kind": "runnable",
       "title": "核对票面与预期金额",
       "sql": "WITH f AS (\n  SELECT x.supplier_invoice_id,SUM(x.quantity_billed*x.unit_price_cents) face,\n    SUM(x.quantity_billed*p.unit_price_cents) expected\n  FROM supplier_invoice_items x JOIN purchase_order_items p ON p.po_item_id=x.po_item_id\n  GROUP BY x.supplier_invoice_id\n)\nSELECT * FROM f ORDER BY 1, 2, 3 LIMIT 3;",
-      "purpose": "核对票面与预期金额（f）的实际执行结果。",
-      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "purpose": "先按发票汇总票面金额 face，和用采购单价重算的预期金额 expected。",
+      "reason": "价格比较要用同一张发票对应的采购行重算出来的金额，而不是拿别的数字比。",
       "sourceTables": [
         {
           "name": "purchase_order_items",
@@ -259,8 +259,8 @@
       "kind": "runnable",
       "title": "准备发票记录及关联字段",
       "sql": "WITH f AS (\n  SELECT x.supplier_invoice_id,SUM(x.quantity_billed*x.unit_price_cents) face,\n    SUM(x.quantity_billed*p.unit_price_cents) expected\n  FROM supplier_invoice_items x JOIN purchase_order_items p ON p.po_item_id=x.po_item_id\n  GROUP BY x.supplier_invoice_id\n), a AS (\n  SELECT v.*,f.face,f.expected,COUNT(*) OVER(PARTITION BY supplier_id,invoice_no) copies,\n    AVG(f.face) OVER(PARTITION BY supplier_id) avg_bill\n  FROM v_invoice_balance v JOIN f ON f.supplier_invoice_id=v.supplier_invoice_id\n)\nSELECT * FROM a ORDER BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 LIMIT 3;",
-      "purpose": "准备发票记录及关联字段（a）的实际执行结果。",
-      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "purpose": "把发票的余额信息和这些金额放到一起，并算出重复份数 copies 和该供应商的平均发票金额 avg_bill。",
+      "reason": "规则判断需要的字段先放到同一张表里。",
       "sourceTables": [
         {
           "name": "purchase_order_items",
@@ -517,8 +517,8 @@
       "kind": "runnable",
       "title": "标记发票异常条件",
       "sql": "WITH f AS (\n  SELECT x.supplier_invoice_id,SUM(x.quantity_billed*x.unit_price_cents) face,\n    SUM(x.quantity_billed*p.unit_price_cents) expected\n  FROM supplier_invoice_items x JOIN purchase_order_items p ON p.po_item_id=x.po_item_id\n  GROUP BY x.supplier_invoice_id\n), a AS (\n  SELECT v.*,f.face,f.expected,COUNT(*) OVER(PARTITION BY supplier_id,invoice_no) copies,\n    AVG(f.face) OVER(PARTITION BY supplier_id) avg_bill\n  FROM v_invoice_balance v JOIN f ON f.supplier_invoice_id=v.supplier_invoice_id\n), z AS (\n  SELECT a.*,CASE WHEN copies>1 THEN 1 ELSE 0 END duplicate_flag,\n    CASE WHEN face>2*avg_bill THEN 1 ELSE 0 END large_flag,\n    CASE WHEN balance_cents<0 THEN 1 ELSE 0 END overpay_flag,\n    CASE WHEN ABS(face-expected)>100 THEN 1 ELSE 0 END mismatch_flag FROM a\n)\nSELECT * FROM z ORDER BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17 LIMIT 3;",
-      "purpose": "标记发票异常条件（z）的实际执行结果。",
-      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "purpose": "按四条规则分别打标：疑似重复、金额偏大、多付款、票面与预期不符。",
+      "reason": "四项各自独立标记，不放进同一个互斥的 CASE，一张发票可以同时命中多项。",
       "sourceTables": [
         {
           "name": "purchase_order_items",
@@ -791,8 +791,8 @@
       "kind": "runnable",
       "title": "汇总命中规则并输出异常发票",
       "sql": "WITH f AS (\n  SELECT x.supplier_invoice_id,SUM(x.quantity_billed*x.unit_price_cents) face,\n    SUM(x.quantity_billed*p.unit_price_cents) expected\n  FROM supplier_invoice_items x JOIN purchase_order_items p ON p.po_item_id=x.po_item_id\n  GROUP BY x.supplier_invoice_id\n), a AS (\n  SELECT v.*,f.face,f.expected,COUNT(*) OVER(PARTITION BY supplier_id,invoice_no) copies,\n    AVG(f.face) OVER(PARTITION BY supplier_id) avg_bill\n  FROM v_invoice_balance v JOIN f ON f.supplier_invoice_id=v.supplier_invoice_id\n), z AS (\n  SELECT a.*,CASE WHEN copies>1 THEN 1 ELSE 0 END duplicate_flag,\n    CASE WHEN face>2*avg_bill THEN 1 ELSE 0 END large_flag,\n    CASE WHEN balance_cents<0 THEN 1 ELSE 0 END overpay_flag,\n    CASE WHEN ABS(face-expected)>100 THEN 1 ELSE 0 END mismatch_flag FROM a\n)\nSELECT supplier_invoice_id,supplier_id,billed_cents,duplicate_flag,large_flag,overpay_flag,mismatch_flag,\n  duplicate_flag+large_flag+overpay_flag+mismatch_flag flags FROM z\nWHERE duplicate_flag+large_flag+overpay_flag+mismatch_flag>0 ORDER BY flags DESC,supplier_invoice_id",
-      "purpose": "在前面各步中间结果的基础上完成最终计算，输出题目要求的完整结果。",
-      "reason": "前面的步骤只是分块准备；把它们组合起来，才能得到最终的业务结果。",
+      "purpose": "汇总命中的规则数 flags，只输出至少命中一项的发票，命中最多的排在前面。",
+      "reason": "规则命中只说明值得优先复核，不等于违规。",
       "sourceTables": [
         {
           "name": "purchase_order_items",
@@ -1452,7 +1452,13 @@
         "emphasis": []
       }
     ],
-    "reason": [],
+    "reason": [
+      {
+        "type": "paragraph",
+        "text": "把四项异常写进同一个 CASE，只会返回第一个成立的标签，同时命中多项的发票看起来只命中一项；把“金额不符”解释成关联缺失，会把数据对不上和业务异常混为一谈。",
+        "emphasis": []
+      }
+    ],
     "correction": [
       {
         "type": "paragraph",

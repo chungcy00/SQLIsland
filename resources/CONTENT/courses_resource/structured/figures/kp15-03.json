@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp15-03",
-  "lessonSha256": "f56673ccfc92fb50e8e4e94ed2faec2a1db0ae53d6b73bdefdaf517438cd801d",
+  "lessonSha256": "288a6c1112acd06434dbf15bd3325715532e9661937cc89dd70c595896c39b23",
   "figures": [
     {
       "id": "kp15-03-clauses",
@@ -14,13 +14,13 @@
           "role": "select",
           "label": "取数",
           "sql": "SELECT month,sales,LAG(sales) OVER(ORDER BY month) AS previous_sales,LEAD(sales) OVER(ORDER BY month) AS next_sales",
-          "note": "输出查询需要的列与计算表达式。"
+          "note": "结果表最终显示 4 列：month、sales、previous_sales、next_sales。"
         },
         {
           "role": "from",
           "label": "来源",
           "sql": "FROM monthly",
-          "note": "从 monthly 读取输入数据。"
+          "note": "数据来自表 monthly。"
         },
         {
           "role": "order",
@@ -188,7 +188,8 @@
             null
           ]
         }
-      ]
+      ],
+      "conclusion": "LAG 取上一行、LEAD 取下一行；第一行没有上一行、最后一行没有下一行，对应位置是 NULL。"
     }
   ]
 }

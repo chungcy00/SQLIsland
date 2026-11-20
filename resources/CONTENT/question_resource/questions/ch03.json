@@ -1502,11 +1502,11 @@
         }
       ],
       "hints": [
-        "将题设条件逐项翻译为真假判断，特别注意边界值和括号。",
-        "结合《LIKE、通配符与转义》：% 匹配零个或多个字符；_ 匹配单个字符；ESCAPE 指定转义符。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT product_name FROM products WHERE product_name LIKE □□□ ORDER BY product_name"
+        "“以 er 结尾”是对文本模式的匹配，要用 LIKE。",
+        "% 表示任意长度的任意字符，放在模式的哪一侧，决定了是前缀、后缀还是包含。",
+        "后缀要求前面可以有任意内容，最后几个字符固定是 er。"
       ],
-      "explanation": "后缀条件应在前方使用任意长度匹配。\n执行思路：确认products的输入记录；按筛选条件保留符合要求的记录，并考虑空值；输出product_name列；遵循题设排序和并列规则。\n公开夹具实际返回 1 行、1 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
+      "explanation": "LIKE '%er' 中的 % 匹配前面任意多个字符，结尾必须是 er，所以只返回以 er 结尾的名称；ORDER BY 让输出顺序固定。\n易错：写成 'er%' 匹配的是以 er 开头的名称，位置反了。",
       "commonErrors": [
         {
           "sql": "SELECT product_name FROM products WHERE product_name LIKE 'er%' ORDER BY product_name",

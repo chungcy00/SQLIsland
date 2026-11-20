@@ -6,7 +6,7 @@
   "conceptBlocks": [
     {
       "type": "heading",
-      "text": "基本含义",
+      "text": "什么是发票付款状态？",
       "emphasis": []
     },
     {
@@ -46,8 +46,8 @@
       "kind": "runnable",
       "title": "核对发票的开票、已付和剩余金额",
       "sql": "SELECT supplier_invoice_id,supplier_id,billed_cents,paid_cents,balance_cents\nFROM v_invoice_balance ORDER BY 1, 2, 3, 4, 5 LIMIT 3;",
-      "purpose": "核对发票的开票、已付和剩余金额（invoice_balance）的实际执行结果。",
-      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "purpose": "先查看每张发票的开票金额、已付金额和剩余金额。",
+      "reason": "视图 v_invoice_balance 已经按截止日整理好了付款和贷项，可以直接用它核对金额。",
       "sourceTables": [
         {
           "name": "v_invoice_balance",
@@ -165,8 +165,8 @@
       "kind": "runnable",
       "title": "按余额及付款额划分付款状态",
       "sql": "SELECT supplier_invoice_id,balance_cents,\n CASE WHEN balance_cents=0 THEN 'paid' WHEN paid_cents=0 THEN 'unpaid'\n      WHEN balance_cents>0 THEN 'partial' ELSE 'overpaid' END AS payment_state\nFROM v_invoice_balance ORDER BY 1, 2, 3 LIMIT 3;",
-      "purpose": "按余额及付款额划分付款状态（payment_classification）的实际执行结果。",
-      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "purpose": "根据余额和已付金额判断付款状态：余额为 0 是已付清，已付为 0 是未付，余额大于 0 是部分付款，其余是多付。",
+      "reason": "CASE 从上往下判断，先判余额为 0，再判付款为 0，之后才看余额正负，顺序不能换。",
       "sourceTables": [
         {
           "name": "v_invoice_balance",
@@ -276,8 +276,8 @@
       "kind": "runnable",
       "title": "汇总金额并判断付款状态",
       "sql": "SELECT supplier_invoice_id,supplier_id,billed_cents,paid_cents,balance_cents,CASE WHEN balance_cents=0 THEN 'paid' WHEN paid_cents=0 THEN 'unpaid' WHEN balance_cents>0 THEN 'partial' ELSE 'overpaid' END payment_state FROM v_invoice_balance ORDER BY balance_cents DESC,supplier_invoice_id",
-      "purpose": "在前面各步中间结果的基础上完成最终计算，输出题目要求的完整结果。",
-      "reason": "前面的步骤只是分块准备；把它们组合起来，才能得到最终的业务结果。",
+      "purpose": "把金额和付款状态放在一起，按剩余金额从大到小输出。",
+      "reason": "最终结果同时包含金额与状态，便于优先处理余额最大的发票。",
       "sourceTables": [
         {
           "name": "v_invoice_balance",
@@ -761,7 +761,13 @@
         "emphasis": []
       }
     ],
-    "reason": [],
+    "reason": [
+      {
+        "type": "paragraph",
+        "text": "把付款和贷项明细直接连接后累计，一张发票有多笔付款就会重复计算；使用付款日超过截止日的记录，会把截止日之后才发生的付款算进当时的余额。",
+        "emphasis": []
+      }
+    ],
     "correction": [
       {
         "type": "paragraph",

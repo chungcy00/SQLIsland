@@ -6,7 +6,7 @@
   "conceptBlocks": [
     {
       "type": "heading",
-      "text": "基本含义",
+      "text": "什么是日期差？",
       "emphasis": []
     },
     {
@@ -163,7 +163,13 @@
         "emphasis": []
       }
     ],
-    "reason": [],
+    "reason": [
+      {
+        "type": "paragraph",
+        "text": "DATEDIFF 的参数顺序是（结束日期，开始日期），写反后天数会变成负数；用绝对值把负数改成正数，会掩盖“还没到期”这种本来有意义的情况。",
+        "emphasis": []
+      }
+    ],
     "correction": [
       {
         "type": "paragraph",

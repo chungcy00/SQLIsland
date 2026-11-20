@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp12-02",
-  "lessonSha256": "0f054cede13a75dd80ddac68aabf298be78db52dca1548f01dc94cf45a1f6a17",
+  "lessonSha256": "c1a45c75d285eb0dde5620d9d2f934dea8a9b44baa85915e618639463978c80a",
   "figures": [
     {
       "id": "kp12-02-clauses",
@@ -14,13 +14,13 @@
           "role": "select",
           "label": "取数",
           "sql": "SELECT id, strftime('%Y-%m',order_date) AS month, CAST(strftime('%Y',order_date) AS INTEGER) AS year_no, CAST(strftime('%m',order_date) AS INTEGER) AS month_no",
-          "note": "输出查询需要的列与计算表达式。"
+          "note": "结果表最终显示 4 列：id、month、year_no、month_no。"
         },
         {
           "role": "from",
           "label": "来源",
           "sql": "FROM orders",
-          "note": "从 orders 读取输入数据。"
+          "note": "数据来自表 orders。"
         },
         {
           "role": "order",
@@ -176,6 +176,77 @@
           ]
         }
       ]
+    },
+    {
+      "id": "kp12-02-fn",
+      "slot": "concept",
+      "kind": "function-map",
+      "title": "日期拆成月份键与年月数值",
+      "form": "scalar",
+      "table": "orders",
+      "inputColumns": [
+        "id",
+        "order_date"
+      ],
+      "orderBy": "id",
+      "inputRows": [
+        [
+          1,
+          "2026-01-03"
+        ],
+        [
+          2,
+          "2026-01-10"
+        ],
+        [
+          3,
+          "2026-02-02"
+        ],
+        [
+          4,
+          "2026-02-15"
+        ],
+        [
+          5,
+          "2026-02-20"
+        ]
+      ],
+      "outputs": [
+        {
+          "label": "month",
+          "sql": "strftime('%Y-%m',order_date)",
+          "values": [
+            "2026-01",
+            "2026-01",
+            "2026-02",
+            "2026-02",
+            "2026-02"
+          ]
+        },
+        {
+          "label": "year_no",
+          "sql": "CAST(strftime('%Y',order_date) AS INTEGER)",
+          "values": [
+            2026,
+            2026,
+            2026,
+            2026,
+            2026
+          ]
+        },
+        {
+          "label": "month_no",
+          "sql": "CAST(strftime('%m',order_date) AS INTEGER)",
+          "values": [
+            1,
+            1,
+            2,
+            2,
+            2
+          ]
+        }
+      ],
+      "conclusion": "一个日期可以拆成月份键、年份和月份三个值；月份键保留了年份，跨年也不会混淆。"
     }
   ]
 }

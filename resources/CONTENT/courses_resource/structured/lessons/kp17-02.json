@@ -6,7 +6,7 @@
   "conceptBlocks": [
     {
       "type": "heading",
-      "text": "基本含义",
+      "text": "什么是数据修改与事务？",
       "emphasis": []
     },
     {
@@ -18,22 +18,6 @@
       "type": "list",
       "items": [
         "事务将多条数据修改作为一个逻辑单位；提交使本次事务结果生效，回滚撤销尚未提交的事务修改。"
-      ]
-    },
-    {
-      "type": "heading",
-      "text": "使用要点",
-      "emphasis": []
-    },
-    {
-      "type": "paragraph",
-      "text": "原子性意味着同一逻辑任务全部成功或全部撤销，但必须使用支持事务的存储引擎并正确处理错误。",
-      "emphasis": []
-    },
-    {
-      "type": "list",
-      "items": [
-        "回滚不是备份，也不能撤销已提交的修改。"
       ]
     },
     {
@@ -66,6 +50,22 @@
       ],
       "title": "数据修改与事务操作",
       "caption": "回滚不是备份，也不能撤销已提交的修改。"
+    },
+    {
+      "type": "heading",
+      "text": "使用要点",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "原子性意味着同一逻辑任务全部成功或全部撤销，但必须使用支持事务的存储引擎并正确处理错误。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "回滚不是备份，也不能撤销已提交的修改。"
+      ]
     }
   ],
   "syntax": {
@@ -95,22 +95,22 @@
       "kind": "fragment",
       "title": "指定来源",
       "sql": "FROM demo_stock",
-      "purpose": "从 demo_stock 读取输入数据。",
-      "reason": "后面的子句都基于这里得到的行。"
+      "purpose": "读取示例表 demo_stock，查看修改之后的数据。",
+      "reason": "INSERT、UPDATE、DELETE 修改的是表里的数据，要用 SELECT 查看修改后的结果。"
     },
     {
       "kind": "fragment",
       "title": "选择输出",
       "sql": "SELECT id,qty",
-      "purpose": "输出 id,qty。",
-      "reason": "输出列的顺序与别名决定结果表的形状。"
+      "purpose": "显示每条记录的编号和库存数量。",
+      "reason": "SELECT 只决定显示哪些列，不改变行数。"
     },
     {
       "kind": "fragment",
       "title": "排序",
       "sql": "ORDER BY qty DESC;",
-      "purpose": "按 qty DESC 排列结果。",
-      "reason": "查询结果的默认行序没有保证，需要显式排序。"
+      "purpose": "按库存数量从大到小排列。",
+      "reason": "没有 ORDER BY 时数据库不保证行的顺序，写出来才能让输出顺序固定。"
     }
   ],
   "completeCode": {
@@ -301,7 +301,13 @@
         "emphasis": []
       }
     ],
-    "reason": [],
+    "reason": [
+      {
+        "type": "paragraph",
+        "text": "UPDATE 不写 WHERE 会修改表里的每一行：UPDATE demo_stock SET qty=25 会把所有记录的库存都改成 25；修改前先用同样的条件 SELECT 核对涉及哪些行。",
+        "emphasis": []
+      }
+    ],
     "correction": [
       {
         "type": "paragraph",

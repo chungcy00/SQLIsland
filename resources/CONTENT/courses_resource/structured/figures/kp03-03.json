@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp03-03",
-  "lessonSha256": "ead63ef004a9b998b065afc5d5ecbbe86e134ef4a863043207e8ea3cd00473e9",
+  "lessonSha256": "8d3479f25d1e3ff309c63e4f08ad622b5f93ffe5a85714e2fe3e234238b1edc0",
   "figures": [
     {
       "id": "kp03-03-clauses",
@@ -14,19 +14,19 @@
           "role": "select",
           "label": "取数",
           "sql": "SELECT product_id, price",
-          "note": "输出 product_id, price。"
+          "note": "结果表最终显示 2 列：product_id、price。"
         },
         {
           "role": "from",
           "label": "来源",
           "sql": "FROM products",
-          "note": "从 products 读取输入数据。"
+          "note": "数据来自表 products。"
         },
         {
           "role": "where",
           "label": "筛选",
           "sql": "WHERE category IN ('护肤品','化妆品') AND price BETWEEN 35 AND 65",
-          "note": "仅保留满足 category IN ('护肤品','化妆品') AND price BETWEEN 35 AND 65 的行。"
+          "note": "只保留满足这个条件的行：category IN ('护肤品','化妆品') AND price BETWEEN 35 AND 65。"
         },
         {
           "role": "order",

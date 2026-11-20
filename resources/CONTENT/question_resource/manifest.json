@@ -36,19 +36,19 @@
       "id": "ch02",
       "path": "questions/ch02.json",
       "count": 8,
-      "sha256": "3acc0f02df58225d9b4e2ee36374b5e22022dffc915e70d4af4f41ea41cca741"
+      "sha256": "570373a074d27346a2d6c7cccc22179f86a3701edcfc57f67600c0bbae51a89a"
     },
     {
       "id": "ch03",
       "path": "questions/ch03.json",
       "count": 14,
-      "sha256": "2ad104c686c6f84e383aecd7048d5500cc86dcbcb806496707e609bee9d17845"
+      "sha256": "1b239433e5c7292714d6394dfd31c056ef1bc8e78609cef7b3c6545dde429eb5"
     },
     {
       "id": "ch04",
       "path": "questions/ch04.json",
       "count": 6,
-      "sha256": "d66c58c98e8f4caaeeb4b5c97578a702b4206bc52347f7314c467842ac405f41"
+      "sha256": "f7a7698f5636045252276418235cc29e8a1de526871229ead71407a8e37ddd84"
     },
     {
       "id": "ch05",
@@ -60,25 +60,25 @@
       "id": "ch06",
       "path": "questions/ch06.json",
       "count": 12,
-      "sha256": "c8e62baecc6dbeea7f0514c3ca68225cc8e7ad7b22bb4c38e5eb87a8b677fffa"
+      "sha256": "25c4d72cf87f4fc519aaf23d08807af4208dcdfa756177b0a44db97c2b2276d5"
     },
     {
       "id": "ch07",
       "path": "questions/ch07.json",
       "count": 14,
-      "sha256": "a47b91953fa624eeef1879980b0539471a8c2fc23435df47c65c68a241b254d4"
+      "sha256": "6d2e99aebfad3914ecc08d63ba6621c256f6571c710c7a6b7b0f55d66f0579d9"
     },
     {
       "id": "ch08",
       "path": "questions/ch08.json",
       "count": 21,
-      "sha256": "7dac69d89e666b545cb7b0dab89d6be6877feb61aa7b57bdbb6bff6f9808f7af"
+      "sha256": "3b1991f5153be29ada3ed91825e7df659ff9645f5b83e5ab53e69eecdd763287"
     },
     {
       "id": "ch09",
       "path": "questions/ch09.json",
       "count": 10,
-      "sha256": "8415da31c5d01e239ce8cd3d887711d65ca82f012d055c1d487f8e32fbd00107"
+      "sha256": "ae00bafe5c1cbccf75bf6d035e369287fa60739350dbd88564e9f6c3fa96c4b6"
     },
     {
       "id": "ch10",
@@ -96,31 +96,31 @@
       "id": "ch12",
       "path": "questions/ch12.json",
       "count": 10,
-      "sha256": "566d2fbb9682cafb41dcce9045d4734b121001365de2bbe795d1e9006ef4e6d0"
+      "sha256": "9e45b959a847807663c72939289c5ce072368baf53b7f8caa52f5adc0849be49"
     },
     {
       "id": "ch13",
       "path": "questions/ch13.json",
       "count": 6,
-      "sha256": "62675ffaa342d10991db218e838296e3b50af7cd14aeeb31f104c0f4cc6fe55a"
+      "sha256": "1e1a126947cde8f98e54c4004df5551b35557cb73971ac5193030c08b13e93fe"
     },
     {
       "id": "ch14",
       "path": "questions/ch14.json",
       "count": 6,
-      "sha256": "ebe12e74c2a7381de5022889354b9cc113356a932cbaaa41e029a89bf7c9e2eb"
+      "sha256": "00a5fd00c6f9b138a9aadaaac71c1f7507eb3d802f0b357f1c5f4d2328f9f608"
     },
     {
       "id": "ch15",
       "path": "questions/ch15.json",
       "count": 19,
-      "sha256": "654f8673acf27d6d3fee63d14ed6a88d5806507aaf24ae7b88d49533779cc328"
+      "sha256": "a5fab569b06006e261eb29520b9fc7853ed7ceeaf5af24e7e8ab310a145f5baf"
     },
     {
       "id": "ch16",
       "path": "questions/ch16.json",
       "count": 8,
-      "sha256": "f66bd7a7c88bb8000942aaea77db6ec87360a9e797f7049559701407fc97b1a4"
+      "sha256": "254f84ecd646691e62775141bb201943f8c41dab4c4f0ccc2783022f7d4e978b"
     },
     {
       "id": "ch17",

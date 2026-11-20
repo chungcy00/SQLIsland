@@ -6,7 +6,7 @@
   "conceptBlocks": [
     {
       "type": "heading",
-      "text": "基本含义",
+      "text": "什么是公用表表达式 CTE？",
       "emphasis": []
     },
     {
@@ -18,22 +18,6 @@
       "type": "list",
       "items": [
         "可以在后续表达式中引用前面已经定义的关系，将复杂分析拆解为可核查的逻辑步骤。"
-      ]
-    },
-    {
-      "type": "heading",
-      "text": "使用要点",
-      "emphasis": []
-    },
-    {
-      "type": "paragraph",
-      "text": "每个表达式应明确一行代表什么，以及指标计算口径。",
-      "emphasis": []
-    },
-    {
-      "type": "list",
-      "items": [
-        "递归形式另有起始项、递归项和终止条件，可处理层级结构；本面试精简版只需了解其用途，不展开递归语法教学。"
       ]
     },
     {
@@ -64,6 +48,22 @@
       "caption": "CTE 只在当前语句内有效，不是持久表。",
       "codeColumns": [
         0
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "使用要点",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "每个表达式应明确一行代表什么，以及指标计算口径。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "递归形式另有起始项、递归项和终止条件，可处理层级结构；本面试精简版只需了解其用途，不展开递归语法教学。"
       ]
     }
   ],
@@ -96,8 +96,8 @@
       "kind": "runnable",
       "title": "类别销售汇总",
       "sql": "WITH totals AS (SELECT category,SUM(sales) AS total FROM orders GROUP BY category) SELECT * FROM totals ORDER BY total DESC;",
-      "purpose": "类别销售汇总（totals）的实际执行结果。",
-      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "purpose": "先算出每个类别的销售合计，放进临时结果 totals。",
+      "reason": "把“汇总”单独成一步，后面的筛选只需要对汇总后的结果操作，每一步都可以单独检查。",
       "sourceTables": [
         {
           "name": "orders",
@@ -208,8 +208,8 @@
       "kind": "runnable",
       "title": "保留符合阈值的类别",
       "sql": "WITH totals AS (SELECT category,SUM(sales) AS total FROM orders GROUP BY category), qualified AS (SELECT category,total FROM totals WHERE total>1000) SELECT * FROM qualified ORDER BY total DESC;",
-      "purpose": "保留符合阈值的类别（qualified）的实际执行结果。",
-      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "purpose": "再在 totals 的基础上保留合计大于 1000 的类别，放进 qualified，最后按合计从高到低显示。",
+      "reason": "同一个 WITH 里用逗号分隔多个临时结果，后面的可以直接使用前面的；每个临时结果只在这一条语句里有效。",
       "sourceTables": [
         {
           "name": "orders",
@@ -386,7 +386,13 @@
         "emphasis": []
       }
     ],
-    "reason": [],
+    "reason": [
+      {
+        "type": "paragraph",
+        "text": "一条语句里只能有一个 WITH，多个临时结果用逗号分隔；连续写两个 WITH，或者在下一条独立的语句里引用上一条语句的临时结果，都会因为找不到名字而报错。",
+        "emphasis": []
+      }
+    ],
     "correction": [
       {
         "type": "paragraph",

@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "kp12-01",
+  "lessonSha256": "a86ac6bccdb101ca96b4c37b6f338bd6b528e952feee044ffb0ee2b3f1fb18c8",
+  "figures": [
+    {
+      "id": "kp12-01-clauses",
+      "slot": "syntax",
+      "kind": "clause-map",
+      "title": "示例查询的几个部分",
+      "sql": "SELECT ROUND(12.346,2) AS rounded, ABS(-25) AS magnitude;",
+      "parts": [
+        {
+          "role": "select",
+          "label": "取数",
+          "sql": "SELECT ROUND(12.346,2) AS rounded,",
+          "note": "结果表最终显示 1 列：rounded。"
+        },
+        {
+          "role": "select",
+          "label": "取数",
+          "sql": "ABS(-25) AS magnitude;",
+          "note": "结果表最终显示 1 列：magnitude。"
+        }
+      ]
+    }
+  ]
+}

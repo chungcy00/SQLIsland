@@ -6,7 +6,7 @@
   "conceptBlocks": [
     {
       "type": "heading",
-      "text": "基本含义",
+      "text": "什么是供应商履约率？",
       "emphasis": []
     },
     {
@@ -61,8 +61,8 @@
       "kind": "runnable",
       "title": "为到期采购行标记准时及到齐",
       "sql": "SELECT po_item_id,supplier_id,quantity_ordered,received,accepted,\n CASE WHEN on_time>=quantity_ordered THEN 1 ELSE 0 END AS ontime_flag,\n CASE WHEN accepted>=quantity_ordered THEN 1 ELSE 0 END AS complete_flag\nFROM v_po_lines WHERE promised_date BETWEEN '2025-01-01' AND '2025-12-31' ORDER BY 1, 2, 3, 4, 5, 6, 7 LIMIT 3;",
-      "purpose": "为到期采购行标记准时及到齐（due_line_flags）的实际执行结果。",
-      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "purpose": "先给 2025 年到期的采购行逐行标记是否按时交足 ontime_flag、是否最终收齐 complete_flag。",
+      "reason": "这里是逐行判断，每一行要么是 1 要么是 0。",
       "sourceTables": [
         {
           "name": "v_po_lines",
@@ -230,8 +230,8 @@
       "kind": "runnable",
       "title": "按供应商累计行数、收货及接收数量",
       "sql": "SELECT supplier_id,COUNT(*) AS due_lines,\n SUM(CASE WHEN on_time>=quantity_ordered THEN 1 ELSE 0 END) AS ontime_lines,\n SUM(CASE WHEN accepted>=quantity_ordered THEN 1 ELSE 0 END) AS complete_lines,\n SUM(accepted) AS accepted_units,SUM(received) AS received_units\nFROM v_po_lines WHERE promised_date BETWEEN '2025-01-01' AND '2025-12-31'\nGROUP BY supplier_id ORDER BY 1, 2, 3, 4, 5, 6 LIMIT 3;",
-      "purpose": "按供应商累计行数、收货及接收数量（supplier_totals）的实际执行结果。",
-      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "purpose": "按供应商累计到期行数、按时行数、收齐行数，以及合格件数和收货件数。",
+      "reason": "比率的分子分母都要先在供应商层面累计，再相除。",
       "sourceTables": [
         {
           "name": "v_po_lines",
@@ -395,8 +395,8 @@
       "kind": "runnable",
       "title": "计算准时率、齐套率与质量合格率",
       "sql": "SELECT supplier_id,COUNT(*) due_lines,ROUND(100.0*SUM(CASE WHEN on_time>=quantity_ordered THEN 1 ELSE 0 END)/COUNT(*),2) ontime_pct,ROUND(100.0*SUM(CASE WHEN accepted>=quantity_ordered THEN 1 ELSE 0 END)/COUNT(*),2) complete_pct,ROUND(100.0*SUM(accepted)/NULLIF(SUM(received),0),2) quality_pct FROM v_po_lines WHERE promised_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY supplier_id ORDER BY due_lines DESC, ontime_pct DESC, complete_pct DESC, quality_pct DESC",
-      "purpose": "在前面各步中间结果的基础上完成最终计算，输出题目要求的完整结果。",
-      "reason": "前面的步骤只是分块准备；把它们组合起来，才能得到最终的业务结果。",
+      "purpose": "计算准时率、齐套率和质量合格率。",
+      "reason": "准时率与齐套率按采购行计数，质量率按件数加权；尚未到期的行不进入分母。",
       "sourceTables": [
         {
           "name": "v_po_lines",
@@ -1538,7 +1538,13 @@
         "emphasis": []
       }
     ],
-    "reason": [],
+    "reason": [
+      {
+        "type": "paragraph",
+        "text": "只统计有收货的采购行，会把“一直没到货”的行从分母里去掉，准时率被虚高；把首次收货日期当作到齐日期，分批到货的行会被误判为准时。",
+        "emphasis": []
+      }
+    ],
     "correction": [
       {
         "type": "paragraph",

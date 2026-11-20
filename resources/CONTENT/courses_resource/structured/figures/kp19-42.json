@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp19-42",
-  "lessonSha256": "b05ec31afbc3da8e7cb83734947835d27ba5cb5e4b453a0a9357f021eb72dcdb",
+  "lessonSha256": "83f69f9796a646248dec2c8f920bf82d7fdb63e1b0f3a0a561aa90ce16ce2a62",
   "figures": [
     {
       "id": "kp19-42-clauses",
@@ -14,25 +14,25 @@
           "role": "cte",
           "label": "中间结果",
           "sql": "WITH a AS (SELECT customer_id,MAX(order_date) last_day,COUNT(*) freq,SUM(net_cents) money FROM v_order_net WHERE channel='online' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY customer_id),",
-          "note": "先把名为 a 的中间结果算出来，供后面的查询引用。"
+          "note": "先单独算出一张临时结果 a，下面的查询可以把它当作普通表来用。"
         },
         {
           "role": "cte",
           "label": "中间结果",
           "sql": "b AS (SELECT *,6-NTILE(5) OVER(ORDER BY last_day DESC,customer_id) r_score,6-NTILE(5) OVER(ORDER BY freq DESC,customer_id) f_score,6-NTILE(5) OVER(ORDER BY money DESC,customer_id) m_score FROM a)",
-          "note": "先把名为 b 的中间结果算出来，供后面的查询引用。"
+          "note": "先单独算出一张临时结果 b，下面的查询可以把它当作普通表来用。"
         },
         {
           "role": "select",
           "label": "取数",
           "sql": "SELECT b.customer_id,1095-d.day_index recency_days,freq,money net_cents,r_score,f_score,m_score,CASE WHEN r_score+f_score+m_score>=13 THEN 'high_value' WHEN r_score+f_score+m_score<=6 THEN 'low_activity' ELSE 'regular' END segment",
-          "note": "输出查询需要的列与计算表达式。"
+          "note": "结果表最终显示 8 列：customer_id、recency_days、freq、net_cents、r_score、f_score…。"
         },
         {
           "role": "from",
           "label": "来源",
           "sql": "FROM b JOIN calendar_days d ON d.day=b.last_day",
-          "note": "从 b JOIN calendar_days d ON d.day=b.last_day 读取输入数据。"
+          "note": "数据来自 中间结果 b、表 calendar_days，并用 ON 后面的条件把它们的行配起来。"
         },
         {
           "role": "order",

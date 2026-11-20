@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp16-03",
-  "lessonSha256": "f1ff60decc56740fa7061a9042d1f9ccb9c0e9987d851d2a3c976aacd57b68d9",
+  "lessonSha256": "9133b201037c83b4338683f310013326f4b324ec5e0518fefe5d8dc687dabc38",
   "figures": [
     {
       "id": "kp16-03-clauses",
@@ -14,13 +14,13 @@
           "role": "select",
           "label": "取数",
           "sql": "SELECT id,CAST(amount AS DECIMAL(12,2)) AS numeric_amount,CASE WHEN LOWER(TRIM(category))='skin' THEN '护肤品' WHEN LOWER(TRIM(category))='home' THEN '日用品' WHEN LOWER(TRIM(category))='makeup' THEN '化妆品' ELSE '待分类' END AS clean_category",
-          "note": "输出查询需要的列与计算表达式。"
+          "note": "结果表最终显示 3 列：id、numeric_amount、clean_category。"
         },
         {
           "role": "from",
           "label": "来源",
           "sql": "FROM raw_data",
-          "note": "从 raw_data 读取输入数据。"
+          "note": "数据来自表 raw_data。"
         },
         {
           "role": "order",

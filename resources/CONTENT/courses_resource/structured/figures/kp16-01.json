@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp16-01",
-  "lessonSha256": "f91dc19b59fc2348a4e1c7f7d5a6154a6188634bb8130f03326119f6288500f5",
+  "lessonSha256": "e3292e924e795f54bac21ad9b8428e5129ec58714b47a9eece2b3582c58b8e27",
   "figures": [
     {
       "id": "kp16-01-clauses",
@@ -14,13 +14,13 @@
           "role": "select",
           "label": "取数",
           "sql": "SELECT TRIM(name) AS clean_name,amount,LOWER(category) AS clean_category,COUNT(*) AS duplicate_count",
-          "note": "输出查询需要的列与计算表达式。"
+          "note": "结果表最终显示 4 列：clean_name、amount、clean_category、duplicate_count。"
         },
         {
           "role": "from",
           "label": "来源",
           "sql": "FROM raw_data",
-          "note": "从 raw_data 读取输入数据。"
+          "note": "数据来自表 raw_data。"
         },
         {
           "role": "group",

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp13-02",
-  "lessonSha256": "e4d821bf5faec8e29ece8df7b9c036646268a1c93186f5f65e457c500b300016",
+  "lessonSha256": "9114f105b774632b8dd81ca3cbdf5b0702a8ce005b26090f7fac8bd8dc42962a",
   "figures": [
     {
       "id": "kp13-02-clauses",
@@ -14,7 +14,7 @@
           "role": "select",
           "label": "取数",
           "sql": "SELECT customer_id, customer_name FROM old_customers",
-          "note": "输出 customer_id, customer_name FROM old_customers。"
+          "note": "结果表最终显示 2 列：customer_id、old_customers。"
         },
         {
           "role": "setop",
@@ -26,7 +26,7 @@
           "role": "select",
           "label": "取数",
           "sql": "SELECT customer_id, customer_name FROM new_customers",
-          "note": "输出 customer_id, customer_name FROM new_customers。"
+          "note": "结果表最终显示 2 列：customer_id、new_customers。"
         },
         {
           "role": "order",

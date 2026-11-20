@@ -6,7 +6,7 @@
   "conceptBlocks": [
     {
       "type": "heading",
-      "text": "基本含义",
+      "text": "什么是条件聚合？",
       "emphasis": []
     },
     {
@@ -19,23 +19,6 @@
       "items": [
         "SUM(CASE WHEN 条件 THEN 1 ELSE 0 END) 对命中条件的行累加1；COUNT(CASE WHEN 条件 THEN 1 END) 则利用 COUNT 忽略 NULL 特性。",
         "不能用 COUNT(CASE WHEN 条件 THEN 1 ELSE 0 END)，因为0也是非空值。"
-      ]
-    },
-    {
-      "type": "heading",
-      "text": "使用要点",
-      "emphasis": []
-    },
-    {
-      "type": "paragraph",
-      "text": "MySQL IF(条件,真值,假值) 适用于二选一，未知条件也进入假值分支，不应随意将其称为零。",
-      "emphasis": []
-    },
-    {
-      "type": "list",
-      "items": [
-        "CASE 更便于表达多分类及跨库兼容。",
-        "若使用非互斥条件，多个指标可能同时计入同一行，合计不一定等于记录总数；空输入时 SUM 返回 NULL，而 COUNT 返回0。"
       ]
     },
     {
@@ -67,6 +50,23 @@
       "codeColumns": [
         0
       ]
+    },
+    {
+      "type": "heading",
+      "text": "使用要点",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "MySQL IF(条件,真值,假值) 适用于二选一，未知条件也进入假值分支，不应随意将其称为零。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "CASE 更便于表达多分类及跨库兼容。",
+        "若使用非互斥条件，多个指标可能同时计入同一行，合计不一定等于记录总数；空输入时 SUM 返回 NULL，而 COUNT 返回0。"
+      ]
     }
   ],
   "syntax": {
@@ -93,15 +93,15 @@
       "kind": "fragment",
       "title": "指定来源",
       "sql": "FROM products;",
-      "purpose": "从 products 读取输入数据。",
-      "reason": "后面的子句都基于这里得到的行。"
+      "purpose": "读取 products 表的 6 件商品。",
+      "reason": "条件计数是先对每一行判断条件，再把结果汇总。"
     },
     {
       "kind": "fragment",
       "title": "选择输出",
       "sql": "SELECT SUM(CASE WHEN stock<50 THEN 1 ELSE 0 END) AS low_count, SUM(CASE WHEN stock>=50 THEN 1 ELSE 0 END) AS normal_count",
-      "purpose": "输出查询需要的列与计算表达式。",
-      "reason": "输出列的顺序与别名决定结果表的形状。"
+      "purpose": "统计库存低于 50 的商品数和不低于 50 的商品数（本例是 2 和 4）。",
+      "reason": "CASE 把每一行变成 1 或 0，SUM 把这些 1 加起来就是满足条件的行数；两个 SUM 分别统计两种情况，一条查询就得到两个数。"
     }
   ],
   "completeCode": {
@@ -289,7 +289,13 @@
         "emphasis": []
       }
     ],
-    "reason": [],
+    "reason": [
+      {
+        "type": "paragraph",
+        "text": "COUNT 只忽略 NULL，不会忽略 0：COUNT(CASE WHEN … THEN 1 ELSE 0 END) 里每一行都有值（1 或 0），会把所有行都数进去，得到的是总行数而不是满足条件的行数。",
+        "emphasis": []
+      }
+    ],
     "correction": [
       {
         "type": "paragraph",

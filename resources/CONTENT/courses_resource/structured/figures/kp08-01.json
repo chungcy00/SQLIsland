@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp08-01",
-  "lessonSha256": "6941b667435b2a0b84b5dd193a4dade44942cf2019e66b9f685f3616d3438b24",
+  "lessonSha256": "1c08291dfcbe28b554e7dc53c526918a7ce28cab166539d1312096baf7d6d571",
   "figures": [
     {
       "id": "kp08-01-clauses",
@@ -14,13 +14,13 @@
           "role": "select",
           "label": "取数",
           "sql": "SELECT o.id, c.customer_name",
-          "note": "输出 o.id, c.customer_name。"
+          "note": "结果表最终显示 2 列：id、customer_name。"
         },
         {
           "role": "from",
           "label": "来源",
           "sql": "FROM orders o INNER JOIN customers c ON o.customer_id=c.customer_id",
-          "note": "读取查询需要的输入数据。"
+          "note": "数据来自 表 orders、表 customers，并用 ON 后面的条件把它们的行配起来。"
         },
         {
           "role": "order",
@@ -180,7 +180,9 @@
           ],
           "kept": false
         }
-      ]
+      ],
+      "caption": "内连接不保留无对应客户的匿名订单，也不保留没有订单的客户。",
+      "conclusion": "只有两边都配上的行进入结果：没有对应客户的订单和没有订单的客户，内连接都不保留。"
     }
   ]
 }

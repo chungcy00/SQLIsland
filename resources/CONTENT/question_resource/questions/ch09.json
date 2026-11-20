@@ -1190,11 +1190,11 @@
         }
       ],
       "hints": [
-        "把业务规则按互斥条件顺序排列，并检查未满足条件的处理。",
-        "结合《IF 与条件聚合》：MySQL IF(condition,a,b) 可用于简单二选一；CASE 更通用。SUM(CASE...) 可在同一查询统计不同子集。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT ROUND(100.0*COUNT(CASE WHEN customer_id □□□ THEN 1 END)/NULLIF(COUNT(*),0),2) AS registered_pct FROM orders"
+        "比例 = 满足条件的行数 ÷ 全部行数 × 100。",
+        "条件计数可以用 COUNT(CASE WHEN 条件 THEN 1 END)，条件不成立时 CASE 返回 NULL，不会被计数。",
+        "全部行数为 0 时不能做除法，用 NULLIF 让结果为 NULL。"
       ],
-      "explanation": "分子只统计有客户身份的订单，分母为全部订单。\n执行思路：确认orders的输入记录；输出registered_pct列。\n公开夹具实际返回 1 行、1 列；完整结果见 expectedOutput。\n另一种可用写法：常量1对每行非NULL，因此 COUNT(1) 与 COUNT(*) 同计行数。",
+      "explanation": "分子是 customer_id 不为 NULL 的订单数，分母是全部订单数，相除后乘 100 并保留两位小数；NULLIF(COUNT(*),0) 在表为空时让结果是 NULL。\n易错：把条件写成 IS NULL，统计的是匿名订单占比，而不是登记订单的占比。",
       "commonErrors": [
         {
           "sql": "SELECT ROUND(100.0*COUNT(CASE WHEN customer_id IS NULL THEN 1 END)/NULLIF(COUNT(*),0),2) AS registered_pct FROM orders",
@@ -1374,11 +1374,11 @@
         }
       ],
       "hints": [
-        "把业务规则按互斥条件顺序排列，并检查未满足条件的处理。",
-        "结合《IF 与条件聚合》：MySQL IF(condition,a,b) 可用于简单二选一；CASE 更通用。SUM(CASE...) 可在同一查询统计不同子集。",
-        "按题设编写投影、筛选及分组，使用运行检查列名、NULL、重复记录和排序。"
+        "两个计数要在同一次查询里同时得到。",
+        "COUNT(CASE WHEN 条件 THEN 1 END)：条件不成立时 CASE 返回 NULL，COUNT 不会计入。",
+        "不要在 CASE 里写 ELSE 0：0 不是 NULL，COUNT 会把它也计入。"
       ],
-      "explanation": "COUNT 会计入所有非NULL值，ELSE 0 会错误计数。\n执行思路：确认products的输入记录；输出high_count、low_count列。\n公开夹具实际返回 1 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：用反向比较并取 NOT 表达相同三值逻辑。",
+      "explanation": "两个 COUNT(CASE WHEN … THEN 1 END) 分别统计价格大于等于 50 和小于 50 的商品数；价格为 NULL 的商品两个条件都不成立，所以哪一类都不计入。\n易错：写了 ELSE 0，COUNT 会把每一行都数进去，得到的是总行数而不是满足条件的行数。",
       "commonErrors": [
         {
           "sql": "SELECT COUNT(CASE WHEN price>=50 THEN 1 ELSE 0 END) AS high_count,COUNT(CASE WHEN price<50 THEN 1 END) AS low_count FROM products",

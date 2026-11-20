@@ -2213,7 +2213,8 @@ textarea:not(#sql-editor) {
 .long-code > summary {color: var(--primary); font-size: .8125rem; min-height: 44px; padding: 12px 0;}
 .long-code > pre {margin-top: 0;}
 .long-code[open] + .code-excerpt {display: none;}
-.code-excerpt pre {margin-top: 0; max-height: 220px; overflow: hidden;}
+.code-excerpt {max-height: 220px; overflow-y: auto; overscroll-behavior: contain;}
+.code-excerpt pre {margin-top: 0; overflow-x: auto;}
 .example-heading {margin-top: 18px; gap: 10px;}
 .example-heading h3 {margin: 0;}
 .example-heading button {display: inline-flex; align-items: center; gap: 4px;}
@@ -2868,3 +2869,105 @@ nav .nav-svg { color: var(--primary); }
 
 /* 分步执行：数据表过多时上下滑动 */
 .step-tables { max-height: 320px; overflow-y: auto; overscroll-behavior: contain; border: 1px solid var(--line); border-radius: 12px; padding: 0 12px; margin: 8px 0; }
+
+.fig-pre { white-space: pre; }
+
+/* 函数图交互与连接小示意 */
+.fig-call { min-height: 44px; padding: 6px 10px; border-radius: 10px; border: 1px solid var(--primary); background: #fff; text-align: left; flex: 1 1 100%; }
+.fig-call[aria-pressed="true"] { box-shadow: inset 0 0 0 2px var(--primary); background: var(--lake); }
+.fig-call code { font-size: 0.75rem; overflow-wrap: anywhere; }
+.fig-hint { flex: 1 1 100%; font-size: 0.6875rem; color: var(--ink2); }
+.figure.picking .fig-mini td, .figure.picking .fig-mini th { opacity: 0.35; }
+.figure.picking .fig-mini .hl { opacity: 1; background: var(--sun-bg); color: var(--sun-ink); font-weight: 600; }
+.fig-venn { color: var(--primary); flex: none; }
+.fig-legend { align-items: center; }
+
+/* 同一节多张关系图：顶部标签切换 */
+.fig-tabs { display: flex; gap: 6px; margin-bottom: 10px; overflow-x: auto; scrollbar-width: none; }
+.fig-tabs::-webkit-scrollbar { display: none; }
+.fig-tab { flex: none; min-height: 44px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--ctl); background: #fff; color: var(--primary); font-size: 0.8125rem; font-weight: 600; }
+.fig-tab[aria-selected="true"] { background: var(--primary); border-color: var(--primary); color: #fff; }
+.fig-panel[hidden] { display: none; }
+.fig-panel-title { margin: 0 0 6px; font-size: 0.8125rem; color: var(--ink2); }
+
+/* 连接关系图：三步讲解 */
+.fig-step-h { margin: 12px 0 6px; font-size: 0.8125rem; font-weight: 600; color: var(--ink); }
+.fig-step-h b { display: inline-grid; place-items: center; width: 20px; height: 20px; margin-right: 6px; border-radius: 50%; background: var(--primary); color: #fff; font-size: 0.6875rem; }
+.fig-step-h code { font-size: 0.75rem; }
+.fig-join-src { display: grid; gap: 8px; }
+.fig-join-src small { display: block; margin-bottom: 4px; font-size: 0.75rem; color: var(--ink2); }
+.fig-mini .key { background: #DCEFEE; font-weight: 600; }
+.fig-pairs { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.fig-pairs li { padding: 8px 10px; border-radius: 10px; border-left: 4px solid var(--ok); background: var(--ok-bg); font-size: 0.8125rem; line-height: 1.5; }
+.fig-pairs li.pad { border-left-color: var(--warn); background: var(--sun-bg); }
+.fig-pairs li.drop { border-left-color: var(--err); background: var(--err-bg); }
+.fig-legend span { font-size: 0.75rem; color: var(--ink2); }
+.fig-mini .fig-group th { text-align: center; font-size: 0.75rem; font-weight: 500; color: var(--ink2); border-bottom: 1px solid var(--line); }
+.fig-scroll .fig-table.fig-wrap { min-width: 0; }
+.fig-scroll .fig-table.fig-wrap td, .fig-scroll .fig-table.fig-wrap th { white-space: normal; overflow-wrap: anywhere; padding: 6px 5px; font-size: 0.75rem; }
+.fig-flow-label { margin: 8px 0 4px; font-size: 0.75rem; font-weight: 600; color: var(--ink2); }
+.fig-table th.new, .fig-table td.new { background: var(--sun-bg); }
+.fig-no { display: inline-grid; place-items: center; width: 18px; height: 18px; margin-right: 4px; border-radius: 50%; background: var(--primary); color: #fff; font-size: 0.6875rem; }
+.fig-fn-title { flex: 1 1 100%; color: var(--ink2); }
+
+/* 连接关系图 v2：规则 / 原始数据 / 连线匹配 / 结果 */
+.fig-rule { display: flex; gap: 10px; align-items: center; margin: 4px 0 6px; }
+.fig-rule p { margin: 0; font-size: 0.8125rem; line-height: 1.5; }
+.fig-join-src { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; align-items: start; }
+.fig-join-src .fig-table th, .fig-join-src .fig-table td { padding: 5px 3px; font-size: 0.6875rem; overflow-wrap: anywhere; white-space: normal; }
+.fig-total { margin-left: 6px; padding: 1px 8px; border-radius: 999px; background: var(--lake); color: var(--primary); font-size: 0.75rem; }
+.fig-match { display: grid; grid-template-columns: minmax(0, 36fr) minmax(0, 20fr) minmax(0, 44fr); align-items: start; }
+.fig-col { display: grid; gap: 6px; }
+.fig-lines { width: 100%; display: block; }
+.fig-lines path { fill: none; stroke: var(--primary); stroke-width: 2; vector-effect: non-scaling-stroke; }
+.fig-chip { box-sizing: border-box; padding: 4px 8px; border-radius: 10px; border: 1px solid var(--line); background: #fff; display: grid; align-content: center; gap: 1px; overflow: hidden; }
+.fig-chip b { font-size: 0.75rem; line-height: 1.25; overflow-wrap: anywhere; }
+.fig-chip span { font-size: 0.6875rem; color: var(--ink2); line-height: 1.25; overflow-wrap: anywhere; }
+.fig-chip em { font-style: normal; font-size: 0.625rem; line-height: 1.2; color: var(--sun-ink); font-weight: 600; }
+.fig-chip.match { background: #DCEFEE; border-color: #B5D9D8; }
+.fig-chip.none { background: var(--sun-bg); border-color: #E3C77B; }
+.fig-mini td.pad { background: var(--sun-bg); color: var(--sun-ink); font-weight: 700; }
+.fig-mini td.pad .fig-null, .fig-mini td .fig-null { color: inherit; }
+.fig-result .fig-null { color: var(--sun-ink); font-weight: 700; font-style: normal; }
+.fig-scroll .fig-table.fig-result td, .fig-scroll .fig-table.fig-result th { overflow-wrap: normal; word-break: keep-all; font-size: 0.6875rem; padding: 6px 4px; }
+.fig-pairs .fig-truth { margin-right: 4px; }
+.fig-pairs code { font-size: 0.75rem; }
+
+/* 核心概念：讲解 → 图示卡片 → 讲解；图示下方的结论 */
+.fig-conclusion { margin: 12px 0 0; padding-top: 10px; border-top: 1px solid var(--line); font-size: 0.875rem; line-height: 1.6; color: var(--ink); }
+.fig-conclusion b { display: inline-block; margin-right: 8px; padding: 0 8px; border-radius: 999px; background: var(--lake); color: var(--primary); font-size: 0.75rem; font-weight: 600; }
+.concept-group > h3 { margin: 18px 0 6px; }
+.concept-group > h3:first-child { margin-top: 4px; }
+.concept-group > .figure { margin: 10px 0 14px; }
+
+/* 对比卡 */
+.fig-compare { display: grid; gap: 10px; }
+.fig-panel-card { padding: 10px 12px; border-radius: 12px; border: 1px solid var(--line); background: #fff; }
+.fig-panel-card.bad { background: var(--sun-bg); border-color: #E3C77B; }
+.fig-panel-card.good { background: #E4F1F0; border-color: #B5D9D8; }
+.fig-panel-card h4 { margin: 0 0 6px; font-size: 0.875rem; font-weight: 600; }
+.fig-tone { display: inline-block; margin-right: 6px; padding: 0 8px; border-radius: 999px; background: #fff; font-size: 0.6875rem; color: var(--ink2); }
+.fig-panel-note { margin: 0 0 6px; font-size: 0.75rem; color: var(--ink2); }
+.fig-big { display: flex; align-items: baseline; gap: 8px; margin-top: 8px; }
+.fig-big small { color: var(--ink2); font-size: 0.75rem; }
+.fig-big b { font-size: 1.75rem; line-height: 1.1; font-weight: 700; color: var(--ink); }
+.fig-panel-card.bad .fig-big b { color: var(--sun-ink); }
+
+/* 标题与右侧按钮统一在同一水平线上：标题不带下外边距 */
+.section-heading > h1, .section-heading > h2, .section-heading > h3 { margin: 0; }
+.section-heading { align-items: center; }
+.lesson-details .example-heading h2 { margin: 0; }
+
+/* B10：里程碑/鼓励弹窗、统计空态、品牌岛 */
+.dialog.celebrate { text-align: center; }
+.dialog.celebrate .milestone-art { max-width: 220px; margin: 0 auto 8px; }
+.dialog.celebrate .summary-illustration { margin: 0 auto 8px; }
+.update-brand { display: flex; justify-content: center; }
+.update-brand img { width: 160px; height: 107px; object-fit: contain; }
+
+/* B11：触控区不小于 44px（原先 38–42px 的控件补足高度） */
+.chip, .small-button, .lesson-nav button, .keyboard-mode, .keyboard-theme, .query-add, .query-tab-title { min-height: 44px; }
+.query-add, .keyboard-theme { min-width: 44px; }
+/* 开关外观不变，用透明的伪元素把可点击区域扩到 ≥44px 高 */
+button.switch, .switch { position: relative; }
+.switch::after { content: ""; position: absolute; inset: -8px -4px; }

@@ -6,7 +6,7 @@
   "conceptBlocks": [
     {
       "type": "heading",
-      "text": "基本含义",
+      "text": "什么是移动平均与环比？",
       "emphasis": []
     },
     {
@@ -46,8 +46,8 @@
       "kind": "runnable",
       "title": "逐月补充上期销售与移动平均",
       "sql": "WITH m AS (SELECT month,sales,LAG(sales) OVER(ORDER BY month) AS prev,AVG(sales) OVER(ORDER BY month ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) AS moving_avg FROM monthly) SELECT * FROM m ORDER BY month;",
-      "purpose": "逐月补充上期销售与移动平均（m）的实际执行结果。",
-      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "purpose": "先给每个月补上上期销售 prev 和最近三个月的移动平均 moving_avg，放进临时结果 m。",
+      "reason": "移动平均 ROWS BETWEEN 2 PRECEDING AND CURRENT ROW 取当前行和前两行，共三行；LAG 取上一行，这两个窗口都按月份排序。",
       "sourceTables": [
         {
           "name": "monthly",
@@ -124,8 +124,8 @@
       "kind": "runnable",
       "title": "计算三期平均与环比增长",
       "sql": "WITH m AS (SELECT month,sales,LAG(sales) OVER(ORDER BY month) AS prev,AVG(sales) OVER(ORDER BY month ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) AS moving_avg FROM monthly) SELECT month,ROUND(moving_avg,2) AS avg3,ROUND(100.0*(sales-prev)/NULLIF(prev,0),2) AS growth_pct FROM m ORDER BY month",
-      "purpose": "在上一步的中间结果之上完成最终计算，得到题目要求的结果。",
-      "reason": "中间结果只是过渡，最终结果还需要汇总、计算或筛选后才能回答业务问题。",
+      "purpose": "再在 m 的基础上计算三期平均 avg3 和环比增长 growth_pct，按月份排列。",
+      "reason": "环比 =（本期 − 上期）÷ 上期，用 NULLIF(prev,0) 防止除以 0；第一个月没有上期，结果保持 NULL，而不是 0。",
       "sourceTables": [
         {
           "name": "monthly",
@@ -309,7 +309,13 @@
         "emphasis": []
       }
     ],
-    "reason": [],
+    "reason": [
+      {
+        "type": "paragraph",
+        "text": "环比的分母应当是上期而不是本期；第一个月没有上期，增长率没有定义，保持 NULL，写成 0 会让人误以为销售没有变化。",
+        "emphasis": []
+      }
+    ],
     "correction": [
       {
         "type": "paragraph",

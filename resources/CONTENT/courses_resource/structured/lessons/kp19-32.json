@@ -6,7 +6,7 @@
   "conceptBlocks": [
     {
       "type": "heading",
-      "text": "基本含义",
+      "text": "什么是环比、同比与趋势？",
       "emphasis": []
     },
     {
@@ -68,8 +68,8 @@
       "kind": "runnable",
       "title": "建立连续月份轴",
       "sql": "WITH m AS (SELECT DISTINCT month_key FROM calendar_days WHERE day<='2025-12-31')\nSELECT * FROM m ORDER BY 1 LIMIT 3;",
-      "purpose": "建立连续月份轴（m）的实际执行结果。",
-      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "purpose": "先建立到 2025 年底为止的连续月份轴 m。",
+      "reason": "月份轴来自日期维度表，没有交易的月份也会出现在这里，才能分清“没有销售”和“没有这个月”。",
       "sourceTables": [
         {
           "name": "calendar_days",
@@ -285,8 +285,8 @@
       "kind": "runnable",
       "title": "汇总门店月净销售",
       "sql": "WITH m AS (SELECT DISTINCT month_key FROM calendar_days WHERE day<='2025-12-31'), a AS (SELECT store_id,SUBSTR(order_date,1,7) m,SUM(net_cents) net FROM v_sales_lines WHERE channel='store' GROUP BY store_id,SUBSTR(order_date,1,7))\nSELECT * FROM a ORDER BY 1, 2, 3 LIMIT 3;",
-      "purpose": "汇总门店月净销售（a）的实际执行结果。",
-      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "purpose": "按门店和月份汇总线下净销售 net。",
+      "reason": "这一步只包含有交易的月份，没有交易的月份此时还不存在。",
       "sourceTables": [
         {
           "name": "calendar_days",
@@ -510,8 +510,8 @@
       "kind": "runnable",
       "title": "补齐门店月份",
       "sql": "WITH m AS (SELECT DISTINCT month_key FROM calendar_days WHERE day<='2025-12-31'), a AS (SELECT store_id,SUBSTR(order_date,1,7) m,SUM(net_cents) net FROM v_sales_lines WHERE channel='store' GROUP BY store_id,SUBSTR(order_date,1,7)), b AS (SELECT s.store_id,m.month_key,COALESCE(a.net,0) net FROM stores s CROSS JOIN m LEFT JOIN a ON a.store_id=s.store_id AND a.m=m.month_key)\nSELECT * FROM b ORDER BY 1, 2, 3 LIMIT 3;",
-      "purpose": "补齐门店月份（b）的实际执行结果。",
-      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "purpose": "把门店和月份轴配成完整的组合，没有交易的月份净销售补成 0。",
+      "reason": "先补齐再做窗口计算，LAG 取到的才是真正的上个月；确认数据完整后，才允许把无交易视作 0。",
       "sourceTables": [
         {
           "name": "calendar_days",
@@ -735,8 +735,8 @@
       "kind": "runnable",
       "title": "取上月与上年同月基线",
       "sql": "WITH m AS (SELECT DISTINCT month_key FROM calendar_days WHERE day<='2025-12-31'), a AS (SELECT store_id,SUBSTR(order_date,1,7) m,SUM(net_cents) net FROM v_sales_lines WHERE channel='store' GROUP BY store_id,SUBSTR(order_date,1,7)), b AS (SELECT s.store_id,m.month_key,COALESCE(a.net,0) net FROM stores s CROSS JOIN m LEFT JOIN a ON a.store_id=s.store_id AND a.m=m.month_key), p AS (SELECT *,LAG(net) OVER(PARTITION BY store_id ORDER BY month_key) prev,LAG(net,12) OVER(PARTITION BY store_id ORDER BY month_key) prior_year FROM b)\nSELECT * FROM p ORDER BY 1, 2, 3, 4, 5 LIMIT 3;",
-      "purpose": "取上月与上年同月基线（p）的实际执行结果。",
-      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "purpose": "用窗口函数给每个门店月份取上个月 prev 和去年同月 prior_year 的净销售。",
+      "reason": "月份连续时，向前取 1 行是上个月，向前取 12 行是去年同月。",
       "sourceTables": [
         {
           "name": "calendar_days",
@@ -968,8 +968,8 @@
       "kind": "runnable",
       "title": "标记负环比",
       "sql": "WITH m AS (SELECT DISTINCT month_key FROM calendar_days WHERE day<='2025-12-31'), a AS (SELECT store_id,SUBSTR(order_date,1,7) m,SUM(net_cents) net FROM v_sales_lines WHERE channel='store' GROUP BY store_id,SUBSTR(order_date,1,7)), b AS (SELECT s.store_id,m.month_key,COALESCE(a.net,0) net FROM stores s CROSS JOIN m LEFT JOIN a ON a.store_id=s.store_id AND a.m=m.month_key), p AS (SELECT *,LAG(net) OVER(PARTITION BY store_id ORDER BY month_key) prev,LAG(net,12) OVER(PARTITION BY store_id ORDER BY month_key) prior_year FROM b), q AS (SELECT *,CASE WHEN prev>0 AND net<prev THEN 1 ELSE 0 END falling FROM p)\nSELECT * FROM q ORDER BY 1, 2, 3, 4, 5, 6 LIMIT 3;",
-      "purpose": "标记负环比（q）的实际执行结果。",
-      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "purpose": "标记本月比上个月下降的月份 falling。",
+      "reason": "下降的判断要用到上一步的 prev，所以放在后面。",
       "sourceTables": [
         {
           "name": "calendar_days",
@@ -1205,8 +1205,8 @@
       "kind": "runnable",
       "title": "滚动累计最近三月下滑次数",
       "sql": "WITH m AS (SELECT DISTINCT month_key FROM calendar_days WHERE day<='2025-12-31'), a AS (SELECT store_id,SUBSTR(order_date,1,7) m,SUM(net_cents) net FROM v_sales_lines WHERE channel='store' GROUP BY store_id,SUBSTR(order_date,1,7)), b AS (SELECT s.store_id,m.month_key,COALESCE(a.net,0) net FROM stores s CROSS JOIN m LEFT JOIN a ON a.store_id=s.store_id AND a.m=m.month_key), p AS (SELECT *,LAG(net) OVER(PARTITION BY store_id ORDER BY month_key) prev,LAG(net,12) OVER(PARTITION BY store_id ORDER BY month_key) prior_year FROM b), q AS (SELECT *,CASE WHEN prev>0 AND net<prev THEN 1 ELSE 0 END falling FROM p), z AS (SELECT *,SUM(falling) OVER(PARTITION BY store_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) fall3 FROM q)\nSELECT * FROM z ORDER BY 1, 2, 3, 4, 5, 6, 7 LIMIT 3;",
-      "purpose": "滚动累计最近三月下滑次数（z）的实际执行结果。",
-      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "purpose": "累计最近三个月（当前月和前两个月）的下降次数 fall3。",
+      "reason": "窗口范围取当前行和前两行，共三个月。",
       "sourceTables": [
         {
           "name": "calendar_days",
@@ -1446,8 +1446,8 @@
       "kind": "runnable",
       "title": "计算环比、同比与连续下滑标记",
       "sql": "WITH m AS (SELECT DISTINCT month_key FROM calendar_days WHERE day<='2025-12-31'), a AS (SELECT store_id,SUBSTR(order_date,1,7) m,SUM(net_cents) net FROM v_sales_lines WHERE channel='store' GROUP BY store_id,SUBSTR(order_date,1,7)), b AS (SELECT s.store_id,m.month_key,COALESCE(a.net,0) net FROM stores s CROSS JOIN m LEFT JOIN a ON a.store_id=s.store_id AND a.m=m.month_key), p AS (SELECT *,LAG(net) OVER(PARTITION BY store_id ORDER BY month_key) prev,LAG(net,12) OVER(PARTITION BY store_id ORDER BY month_key) prior_year FROM b), q AS (SELECT *,CASE WHEN prev>0 AND net<prev THEN 1 ELSE 0 END falling FROM p), z AS (SELECT *,SUM(falling) OVER(PARTITION BY store_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) fall3 FROM q) SELECT store_id,month_key,net net_cents,ROUND(100.0*(net-prev)/NULLIF(prev,0),2) mom_pct,ROUND(100.0*(net-prior_year)/NULLIF(prior_year,0),2) yoy_pct,CASE WHEN fall3=3 THEN 1 ELSE 0 END three_declines FROM z WHERE month_key BETWEEN '2025-01' AND '2025-12' ORDER BY net_cents DESC",
-      "purpose": "在前面各步中间结果的基础上完成最终计算，输出题目要求的完整结果。",
-      "reason": "前面的步骤只是分块准备；把它们组合起来，才能得到最终的业务结果。",
+      "purpose": "最后计算环比、同比百分比，并在连续三个月下降时标记 three_declines，只保留 2025 年各月。",
+      "reason": "必须先在包含更早历史的完整月份轴上计算窗口，最后再筛 2025 年，否则 1 月的上期和去年同月都会丢失。",
       "sourceTables": [
         {
           "name": "calendar_days",
@@ -4162,7 +4162,13 @@
         "emphasis": []
       }
     ],
-    "reason": [],
+    "reason": [
+      {
+        "type": "paragraph",
+        "text": "先筛 2025 年再开窗口时，1 月没有上个月、去年同月的数据，环比和同比会变成 NULL；删除零销售的月份会让 LAG 把更早的月份当作“上个月”，环比就错位了。",
+        "emphasis": []
+      }
+    ],
     "correction": [
       {
         "type": "paragraph",

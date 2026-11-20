@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp04-02",
-  "lessonSha256": "f453ec82e4403b307b1c51c298ed21383c8ef2cb79b0dbf64d820f57a9c08a58",
+  "lessonSha256": "c3fb68936ece80939990434b680ac840b3c0471b53569886608725da16c591f7",
   "figures": [
     {
       "id": "kp04-02-clauses",
@@ -14,13 +14,13 @@
           "role": "select",
           "label": "取数",
           "sql": "SELECT product_id, price",
-          "note": "输出 product_id, price。"
+          "note": "结果表最终显示 2 列：product_id、price。"
         },
         {
           "role": "from",
           "label": "来源",
           "sql": "FROM products",
-          "note": "从 products 读取输入数据。"
+          "note": "数据来自表 products。"
         },
         {
           "role": "order",
@@ -32,7 +32,7 @@
           "role": "limit",
           "label": "截取",
           "sql": "LIMIT 2 OFFSET 2;",
-          "note": "只返回 2 OFFSET 2 的行段。"
+          "note": "先跳过前 2 行，再最多取 2 行。"
         }
       ]
     },

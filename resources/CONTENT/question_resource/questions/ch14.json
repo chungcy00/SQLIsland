@@ -60,11 +60,11 @@
         }
       ],
       "hints": [
-        "将要求拆成可独立核对的中间集合，并为递归确定起点与终点。",
-        "结合《WITH 与多个 CTE》：公用表表达式为当前语句中的具名查询结果，可在后续查询引用；多表达式用逗号连接。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nWITH high_products AS (SELECT category,stock FROM products WHERE □□□) SELECT category,SUM(stock) AS units FROM high_products GROUP BY category ORDER BY category"
+        "先把高价商品单独筛出来，再对它们汇总。",
+        "WITH 名称 AS (查询) 定义一个临时结果，后面的查询可以像表一样使用它。",
+        "高价商品指售价大于等于 60，筛选条件要放在 WITH 的查询里。"
       ],
-      "explanation": "先在中间集合确定高价商品，再聚合库存。\n执行思路：确认products的输入记录；先明确公用表表达式的中间数据及其粒度；按筛选条件保留符合要求的记录，并考虑空值；按指定键分组后计算聚合值；输出category、units列；遵循题设排序和并列规则。\n公开夹具实际返回 2 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：用反向比较并取 NOT 表达相同三值逻辑。",
+      "explanation": "WITH high_products AS (…) 先筛出售价大于等于 60 的商品，主查询再按类别汇总库存；先筛选再汇总，汇总的只是高价商品。\n易错：把条件写成 price<60 得到的是低价商品。",
       "commonErrors": [
         {
           "sql": "WITH high_products AS (SELECT category,stock FROM products WHERE price<60) SELECT category,SUM(stock) AS units FROM high_products GROUP BY category ORDER BY category",
@@ -449,11 +449,11 @@
         }
       ],
       "hints": [
-        "将要求拆成可独立核对的中间集合，并为递归确定起点与终点。",
-        "结合《WITH 与多个 CTE》：公用表表达式为当前语句中的具名查询结果，可在后续查询引用；多表达式用逗号连接。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nWITH a AS (SELECT store_id,category,SUM(sales) AS total FROM orders GROUP BY store_id,category) SELECT store_id,ROUND(□□□,2) AS avg_category_sales FROM a GROUP BY store_id ORDER BY store_id"
+        "要做两次汇总：先按“门店 × 类别”，再按门店。",
+        "第一层 SUM 得到每个类别的总额，第二层 AVG 对这些总额求平均。",
+        "第二层平均的对象是第一层的类别总额，而不是原始订单金额。"
       ],
-      "explanation": "两层粒度不同：类别小计后求类别均值，而不是对订单均值。\n执行思路：确认orders的输入记录；先明确公用表表达式的中间数据及其粒度；按指定键分组后计算聚合值；输出store_id、avg_category_sales列；遵循题设排序和并列规则。\n公开夹具实际返回 2 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：普通 SELECT 默认保留重复记录，显式 ALL 不改变结果。",
+      "explanation": "第一层用 GROUP BY store_id, category 得到每个类别的销售总额，第二层再按门店对这些总额求 AVG，得到门店内类别总额的平均值。\n易错：第二层写成 SUM 得到的是门店总销售额，不是类别平均。",
       "commonErrors": [
         {
           "sql": "WITH a AS (SELECT store_id,category,SUM(sales) AS total FROM orders GROUP BY store_id,category) SELECT store_id,ROUND(SUM(total),2) AS avg_category_sales FROM a GROUP BY store_id ORDER BY store_id",
@@ -652,11 +652,11 @@
         }
       ],
       "hints": [
-        "将要求拆成可独立核对的中间集合，并为递归确定起点与终点。",
-        "结合《WITH 与多个 CTE》：公用表表达式为当前语句中的具名查询结果，可在后续查询引用；多表达式用逗号连接。",
-        "回想空位所在子句的功能：WITH 与多个 CTE；保留周围代码，填入实现题设的表达式。"
+        "先找出符合条件的客户，再取他们的订单。",
+        "条件“总销售额大于等于 1000”是对每个客户的汇总结果判断，不是对单笔订单判断。",
+        "对分组后的汇总结果筛选，用的是 HAVING，而不是 WHERE。"
       ],
-      "explanation": "高价值按累计销售定义，不是任一单达到门槛。\n执行思路：确认orders的输入记录；先明确公用表表达式的中间数据及其粒度；按题设连接条件匹配数据，注意连接造成的行数变化；按筛选条件保留符合要求的记录，并考虑空值；按指定键分组后计算聚合值；对分组后的计算结果筛选；输出id、customer_id、sales列；遵循题设排序和并列规则。\n公开夹具实际返回 3 行、3 列；完整结果见 expectedOutput。\n另一种可用写法：普通 SELECT 默认保留重复记录，显式 ALL 不改变结果。",
+      "explanation": "WITH 里先按客户分组，用 HAVING SUM(sales)>=1000 筛出累计销售额达标的客户，再把订单表和这些客户连接，返回他们的全部订单。\n易错：改用 MAX(sales)>=1000 判断的是“有没有任何一单达到门槛”，不是累计销售。",
       "commonErrors": [
         {
           "sql": "WITH a AS (SELECT customer_id FROM orders WHERE customer_id IS NOT NULL GROUP BY customer_id HAVING MAX(sales)>=1000) SELECT o.id,o.customer_id,o.sales FROM orders o JOIN a ON a.customer_id=o.customer_id ORDER BY o.customer_id, o.sales DESC",
@@ -1030,11 +1030,11 @@
         }
       ],
       "hints": [
-        "将要求拆成可独立核对的中间集合，并为递归确定起点与终点。",
-        "结合《WITH 与多个 CTE》：公用表表达式为当前语句中的具名查询结果，可在后续查询引用；多表达式用逗号连接。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nWITH a AS (SELECT store_id,SUM(sales) AS jan FROM orders WHERE SUBSTR(order_date,1,7)='2026-01' GROUP BY store_id),b AS (SELECT store_id,SUM(sales) AS feb FROM orders WHERE SUBSTR(order_date,1,7)='2026-02' GROUP BY store_id) SELECT s.store_id,COALESCE(b.feb,0)-COALESCE(a.jan,0) AS delta FROM stores s □□□ ON a.store_id=s.store_id LEFT JOIN b ON b.store_id=s.store_id ORDER BY delta DESC"
+        "一月和二月要分别汇总，再用门店连接。",
+        "先用两个 WITH 各汇总一个月，再以完整的门店表为基础做左连接。",
+        "某个月没有销售时是 NULL，要换成 0 再相减。"
       ],
-      "explanation": "以完整门店为骨架，两个独立月份汇总才能保留零业务门店。\n执行思路：确认orders、stores的输入记录；先明确公用表表达式的中间数据及其粒度；按题设连接条件匹配数据，注意连接造成的行数变化；按筛选条件保留符合要求的记录，并考虑空值；按指定键分组后计算聚合值；输出store_id、delta列；遵循题设排序和并列规则。\n公开夹具实际返回 3 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：省略或写出 OUTER 不改变左连接。",
+      "explanation": "两个 WITH 分别汇总一月和二月各门店的销售额，再以 stores 为基础左连接这两个汇总，用 COALESCE 把缺失的月份当作 0，二月减一月得到 delta。\n易错：不以完整门店表为基础，没有业务的门店会从结果里消失。",
       "commonErrors": [
         {
           "sql": "WITH a AS (SELECT store_id,SUM(sales) AS jan FROM orders WHERE SUBSTR(order_date,1,7)='2026-01' GROUP BY store_id),b AS (SELECT store_id,SUM(sales) AS feb FROM orders WHERE SUBSTR(order_date,1,7)='2026-02' GROUP BY store_id) SELECT s.store_id,COALESCE(b.feb,0)-COALESCE(a.jan,0) AS delta FROM stores s JOIN a ON a.store_id=s.store_id LEFT JOIN b ON b.store_id=s.store_id ORDER BY delta DESC",

@@ -6,7 +6,7 @@
   "conceptBlocks": [
     {
       "type": "heading",
-      "text": "基本含义",
+      "text": "什么是三方核对？",
       "emphasis": []
     },
     {
@@ -78,8 +78,8 @@
       "kind": "runnable",
       "title": "统一采购行的开票数量和金额",
       "sql": "WITH billed AS (\n  SELECT x.po_item_id,SUM(x.quantity_billed) billed,SUM(x.quantity_billed*x.unit_price_cents) billed_cents\n  FROM supplier_invoice_items x JOIN supplier_invoices f ON f.supplier_invoice_id=x.supplier_invoice_id\n  WHERE f.invoice_date<='2025-12-31' GROUP BY x.po_item_id\n)\nSELECT * FROM billed ORDER BY 1, 2, 3 LIMIT 3;",
-      "purpose": "统一采购行的开票数量和金额（billed）的实际执行结果。",
-      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "purpose": "先按采购行汇总截至 2025-12-31 已开票的数量和金额。",
+      "reason": "一行采购可能对应多张发票，要先按采购行汇总，才能和订购、收货各是一行对应。",
       "sourceTables": [
         {
           "name": "supplier_invoice_items",
@@ -331,8 +331,8 @@
       "kind": "runnable",
       "title": "连接订购、收货与发票",
       "sql": "WITH billed AS (\n  SELECT x.po_item_id,SUM(x.quantity_billed) billed,SUM(x.quantity_billed*x.unit_price_cents) billed_cents\n  FROM supplier_invoice_items x JOIN supplier_invoices f ON f.supplier_invoice_id=x.supplier_invoice_id\n  WHERE f.invoice_date<='2025-12-31' GROUP BY x.po_item_id\n), checked AS (\n  SELECT v.po_item_id,v.po_id,v.supplier_id,v.product_id,v.quantity_ordered,v.accepted,\n    COALESCE(b.billed,0) billed,COALESCE(b.billed_cents,0) billed_cents,v.accepted*v.unit_price_cents expected_cents\n  FROM v_po_lines v LEFT JOIN billed b ON b.po_item_id=v.po_item_id\n  WHERE v.order_date BETWEEN '2025-01-01' AND '2025-12-31'\n)\nSELECT * FROM checked ORDER BY 1, 2, 3, 4, 5, 6, 7, 8, 9 LIMIT 3;",
-      "purpose": "连接订购、收货与发票（checked）的实际执行结果。",
-      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "purpose": "把采购行、收货数量和这些开票汇总连在一起，并算出按订购单价应有的金额 expected_cents。",
+      "reason": "左连接保留没有开票的采购行，开票数量显示 NULL，才能识别“未开票”。",
       "sourceTables": [
         {
           "name": "supplier_invoice_items",
@@ -608,8 +608,8 @@
       "kind": "runnable",
       "title": "对比三方数量与金额，标记差异",
       "sql": "WITH billed AS (\n  SELECT x.po_item_id,SUM(x.quantity_billed) billed,SUM(x.quantity_billed*x.unit_price_cents) billed_cents\n  FROM supplier_invoice_items x JOIN supplier_invoices f ON f.supplier_invoice_id=x.supplier_invoice_id\n  WHERE f.invoice_date<='2025-12-31' GROUP BY x.po_item_id\n), checked AS (\n  SELECT v.po_item_id,v.po_id,v.supplier_id,v.product_id,v.quantity_ordered,v.accepted,\n    COALESCE(b.billed,0) billed,COALESCE(b.billed_cents,0) billed_cents,v.accepted*v.unit_price_cents expected_cents\n  FROM v_po_lines v LEFT JOIN billed b ON b.po_item_id=v.po_item_id\n  WHERE v.order_date BETWEEN '2025-01-01' AND '2025-12-31'\n)\nSELECT po_item_id,po_id,supplier_id,product_id,quantity_ordered,accepted,billed,billed_cents,expected_cents,\n  billed_cents-expected_cents variance_cents FROM checked\nWHERE quantity_ordered<>accepted OR accepted<>billed OR billed_cents<>expected_cents ORDER BY po_item_id",
-      "purpose": "在前面各步中间结果的基础上完成最终计算，输出题目要求的完整结果。",
-      "reason": "前面的步骤只是分块准备；把它们组合起来，才能得到最终的业务结果。",
+      "purpose": "找出订购、收货、开票数量不一致或金额不一致的采购行，并算出金额差异。",
+      "reason": "三方核对的键是采购行，数量和金额要分别检查。",
       "sourceTables": [
         {
           "name": "supplier_invoice_items",
@@ -1373,7 +1373,13 @@
         "emphasis": []
       }
     ],
-    "reason": [],
+    "reason": [
+      {
+        "type": "paragraph",
+        "text": "直接连接多笔收货与多张发票后再汇总，每笔收货会和每张发票配对，数量被成倍放大；只检查金额差会漏掉数量不对但金额恰好相同的情况。",
+        "emphasis": []
+      }
+    ],
     "correction": [
       {
         "type": "paragraph",

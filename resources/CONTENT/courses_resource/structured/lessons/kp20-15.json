@@ -6,7 +6,7 @@
   "conceptBlocks": [
     {
       "type": "heading",
-      "text": "基本含义",
+      "text": "什么是采购敞口？",
       "emphasis": []
     },
     {
@@ -67,8 +67,8 @@
       "kind": "runnable",
       "title": "按供应商汇总承诺及收货金额",
       "sql": "WITH a AS (SELECT supplier_id,SUM(ordered_cents) ordered,SUM(accepted*unit_price_cents) received FROM v_po_lines GROUP BY supplier_id)\nSELECT * FROM a ORDER BY 1, 2, 3 LIMIT 3;",
-      "purpose": "按供应商汇总承诺及收货金额（a）的实际执行结果。",
-      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "purpose": "先按供应商汇总采购承诺金额 ordered 和合格收货金额 received。",
+      "reason": "承诺和收货来自采购行，先汇总到供应商一行。",
       "sourceTables": [
         {
           "name": "suppliers",
@@ -334,8 +334,8 @@
       "kind": "runnable",
       "title": "按供应商汇总开票与付款",
       "sql": "WITH a AS (SELECT supplier_id,SUM(ordered_cents) ordered,SUM(accepted*unit_price_cents) received FROM v_po_lines GROUP BY supplier_id), b AS (SELECT supplier_id,SUM(billed_cents) billed,SUM(paid_cents) paid,SUM(balance_cents) balance FROM v_invoice_balance GROUP BY supplier_id)\nSELECT * FROM b ORDER BY 1, 2, 3, 4 LIMIT 3;",
-      "purpose": "按供应商汇总开票与付款（b）的实际执行结果。",
-      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "purpose": "再按供应商汇总开票金额、已付金额和未付余额。",
+      "reason": "开票和付款来自发票视图，同样先汇总到供应商一行。",
       "sourceTables": [
         {
           "name": "suppliers",
@@ -605,8 +605,8 @@
       "kind": "runnable",
       "title": "汇总各供应商敞口与未付余额",
       "sql": "WITH a AS (SELECT supplier_id,SUM(ordered_cents) ordered,SUM(accepted*unit_price_cents) received FROM v_po_lines GROUP BY supplier_id), b AS (SELECT supplier_id,SUM(billed_cents) billed,SUM(paid_cents) paid,SUM(balance_cents) balance FROM v_invoice_balance GROUP BY supplier_id) SELECT s.supplier_id,COALESCE(a.ordered,0) ordered_cents,COALESCE(a.received,0) received_cents,COALESCE(b.billed,0) billed_cents,COALESCE(b.paid,0) paid_cents,COALESCE(b.balance,0) balance_cents FROM suppliers s LEFT JOIN a ON a.supplier_id=s.supplier_id LEFT JOIN b ON b.supplier_id=s.supplier_id ORDER BY balance_cents DESC",
-      "purpose": "在前面各步中间结果的基础上完成最终计算，输出题目要求的完整结果。",
-      "reason": "前面的步骤只是分块准备；把它们组合起来，才能得到最终的业务结果。",
+      "purpose": "把四类金额按供应商放到一起，按未付余额从大到小输出。",
+      "reason": "供应商表左连接两个汇总，没有业务的供应商也保留，缺的金额补 0。",
       "sourceTables": [
         {
           "name": "suppliers",
@@ -2058,7 +2058,13 @@
         "emphasis": []
       }
     ],
-    "reason": [],
+    "reason": [
+      {
+        "type": "paragraph",
+        "text": "直接连接采购行和发票行，每张发票会重复使用全部合格收货量；应当分别汇总后再按供应商连接。",
+        "emphasis": []
+      }
+    ],
     "correction": [
       {
         "type": "paragraph",

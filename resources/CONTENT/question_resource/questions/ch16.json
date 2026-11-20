@@ -344,8 +344,8 @@
       "difficulty": "简单",
       "type": "独立编写",
       "title": "低于零的金额待核",
-      "context": "使用课程中的小型原始导入资料示例数据，完成“低于零的金额待核”的查询练习。示例表中的金额以元为单位，不是企业库中以分为单位的整数金额。",
-      "requirements": "raw_data 的 amount 是规范的数字文本或 NULL；转成数值后，只输出金额为负的记录：id、numeric_amount。\n输出字段名称及顺序：id, numeric_amount\n结果排序要求：不要求排序，结果行的先后顺序不影响判断。\n计算及格式要求：未指定小数位数时，保留原计算结果的精度；NULL、数字 0 和空字符串是三种不同的值。",
+      "context": "数据质检想找出金额为负、需要人工核对的记录。",
+      "requirements": "raw_data 的 amount 是规范的数字文本或 NULL。把 amount 转成数值后，只返回金额小于 0 的记录，输出 id、numeric_amount（0 和 NULL 都不算负数）。\n输出字段名称及顺序：id, numeric_amount\n结果排序要求：不要求排序，结果行的先后顺序不影响判断。",
       "datasetId": "q0223-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -374,30 +374,25 @@
           "kind": "reference",
           "mysqlSql": "SELECT id,CAST(amount AS DECIMAL(12,2)) AS numeric_amount FROM raw_data WHERE CAST(amount AS DECIMAL(12,2))<0",
           "sqliteSql": "SELECT id,CAST(amount AS DECIMAL(12,2)) AS numeric_amount FROM raw_data WHERE CAST(amount AS DECIMAL(12,2))<0"
-        },
-        {
-          "kind": "关系结构等价",
-          "mysqlSql": "SELECT id,CAST(amount AS DECIMAL(12,2)) AS numeric_amount FROM (SELECT * FROM raw_data) AS raw_data WHERE CAST(amount AS DECIMAL(12,2))<0",
-          "sqliteSql": "SELECT id,CAST(amount AS DECIMAL(12,2)) AS numeric_amount FROM (SELECT * FROM raw_data) AS raw_data WHERE CAST(amount AS DECIMAL(12,2))<0",
-          "explanation": "先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。"
         }
       ],
       "hints": [
-        "先明确原始数据异常规则和规范化标准，再决定保留哪些记录。",
-        "结合《缺失与异常检测》：先定义规则，再标记异常；空字符串、NULL、负值及零值有不同含义。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT id,CAST(amount AS DECIMAL(12,2)) AS numeric_amount FROM raw_data WHERE CAST(amount AS DECIMAL(12,2))□□□"
+        "先把文本转成数字，才能和 0 比较大小。",
+        "CAST(列 AS DECIMAL(12,2)) 把文本转成数值，筛选条件要用转换后的值来比较。",
+        "“负数”不包含 0；NULL 和 0 比较的结果是未知，不会被 WHERE 保留，不需要额外处理。"
       ],
-      "explanation": "异常规则为严格负数，0可能是有效金额。\n执行思路：确认raw_data的输入记录；按筛选条件保留符合要求的记录，并考虑空值；输出id、numeric_amount列；结果行的先后顺序不作要求。\n公开夹具实际返回 1 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
+      "explanation": "CAST(amount AS DECIMAL(12,2)) 把数字文本转成数值，WHERE 对转换后的值判断 < 0；金额为 0 不是负数，NULL 和 0 比较得到未知，WHERE 不保留，所以只剩下真正的负金额。\n易错：写成 <= 0 会把金额为 0 的记录（可能是有效金额）也当成异常。",
       "commonErrors": [
         {
           "sql": "SELECT id,CAST(amount AS DECIMAL(12,2)) AS numeric_amount FROM raw_data WHERE CAST(amount AS DECIMAL(12,2))<=0",
-          "reason": "异常规则为严格负数，0可能是有效金额。",
+          "reason": "异常规则是严格小于 0，金额为 0 的记录可能是有效金额，不应被当成负数。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
       "testFixtureIds": [
         "q0223-public",
         "q0223-boundary",
+        "q0223-multi-negative",
         "q0223-empty"
       ],
       "testFixtures": [
@@ -414,6 +409,13 @@
           "variant": "boundary",
           "path": "fixtures/q0223/q0223-boundary.json",
           "sha256": "31fb27ecae8e95baab7126f4c915312853559b94fd8f37de3ecbd09def56abb6"
+        },
+        {
+          "id": "q0223-multi-negative",
+          "visibility": "hidden",
+          "variant": "multi-negative",
+          "path": "fixtures/q0223/q0223-multi-negative.json",
+          "sha256": "64f1a874fc6a91abd673b07223cc5471b38a25cd3b9eebc7c9ac19150363ff55"
         },
         {
           "id": "q0223-empty",
@@ -487,6 +489,27 @@
             }
           },
           {
+            "fixtureId": "q0223-multi-negative",
+            "reference": {
+              "ran": true,
+              "match": true,
+              "resultHash": "3e5316021c8b8aa770f4b44a10a733611cdc4325a7b92b7cb8b3568d8ff4fe99",
+              "rowCount": 3
+            },
+            "equivalent": {
+              "ran": true,
+              "match": true,
+              "resultHash": "3e5316021c8b8aa770f4b44a10a733611cdc4325a7b92b7cb8b3568d8ff4fe99",
+              "rows": 3
+            },
+            "wrong": {
+              "ran": true,
+              "match": false,
+              "resultHash": "dce680f6b6fb102d39b110c6a8321f1b573da54175a158e120a63c48ec8509df",
+              "rows": 5
+            }
+          },
+          {
             "fixtureId": "q0223-empty",
             "reference": {
               "ran": true,
@@ -544,8 +567,8 @@
       "difficulty": "中等",
       "type": "独立编写",
       "title": "清洗类别与规范金额输出",
-      "context": "使用课程中的小型原始导入资料示例数据，完成“清洗类别与规范金额输出”的查询练习。示例表中的金额以元为单位，不是企业库中以分为单位的整数金额。",
-      "requirements": "输出 id、category_key（去掉两端空格并转成英文小写）、numeric_amount（金额转成 DECIMAL(12,2)，NULL 保持 NULL）。\n输出字段名称及顺序：id, category_key, numeric_amount\n结果排序要求：不要求排序，结果行的先后顺序不影响判断。\n计算及格式要求：未指定小数位数时，保留原计算结果的精度；NULL、数字 0 和空字符串是三种不同的值。",
+      "context": "数据整理想把类别统一成小写，并把金额文本转成数值。",
+      "requirements": "返回 id、category_key（类别去掉两端空格并转成小写）、numeric_amount（金额转成 DECIMAL(12,2)；金额为 NULL 的保持 NULL）。\n输出字段名称及顺序：id, category_key, numeric_amount\n结果排序要求：不要求排序，结果行的先后顺序不影响判断。",
       "datasetId": "q0224-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -601,24 +624,18 @@
           "kind": "reference",
           "mysqlSql": "SELECT id,LOWER(TRIM(category)) AS category_key,CAST(amount AS DECIMAL(12,2)) AS numeric_amount FROM raw_data",
           "sqliteSql": "SELECT id,LOWER(TRIM(category)) AS category_key,CAST(amount AS DECIMAL(12,2)) AS numeric_amount FROM raw_data"
-        },
-        {
-          "kind": "关系结构等价",
-          "mysqlSql": "SELECT id,LOWER(TRIM(category)) AS category_key,CAST(amount AS DECIMAL(12,2)) AS numeric_amount FROM (SELECT * FROM raw_data) AS raw_data",
-          "sqliteSql": "SELECT id,LOWER(TRIM(category)) AS category_key,CAST(amount AS DECIMAL(12,2)) AS numeric_amount FROM (SELECT * FROM raw_data) AS raw_data",
-          "explanation": "先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。"
         }
       ],
       "hints": [
-        "先明确原始数据异常规则和规范化标准，再决定保留哪些记录。",
-        "结合《CAST 与分类标准化》：CAST 显式转换类型；先清理空白和格式，再验证合法性并转换，最后统一类别。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT id,LOWER(TRIM(category)) AS category_key,□□□ AS numeric_amount FROM raw_data"
+        "这题是对每一行做清洗，不筛选行，也不合并行。",
+        "TRIM 去掉两端空格，LOWER 转小写；CAST(… AS DECIMAL(12,2)) 转成数值，NULL 转换后仍然是 NULL。",
+        "转换类型不等于填补缺失：不要把 NULL 换成 0。"
       ],
-      "explanation": "转换类型不应把缺失金额按0填充，数据清洗与填值是独立决策。\n执行思路：确认raw_data的输入记录；输出id、category_key、numeric_amount列；结果行的先后顺序不作要求。\n公开夹具实际返回 6 行、3 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
+      "explanation": "LOWER(TRIM(category)) 先去掉两端空格再转小写，让 SKIN、skin、Skin 变成同一个值；CAST 只改变类型，NULL 转换后还是 NULL。\n易错：用 COALESCE(…,0) 把缺失金额变成 0，会把“不知道金额”误当成“金额为 0”。",
       "commonErrors": [
         {
           "sql": "SELECT id,LOWER(TRIM(category)) AS category_key,COALESCE(CAST(amount AS DECIMAL(12,2)),0) AS numeric_amount FROM raw_data",
-          "reason": "转换类型不应把缺失金额按0填充，数据清洗与填值是独立决策。",
+          "reason": "把缺失金额填成 0，会把“不知道金额”误当成“金额为 0”；清洗类型和填补缺失是两件事。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -792,11 +809,11 @@
         }
       ],
       "hints": [
-        "先明确原始数据异常规则和规范化标准，再决定保留哪些记录。",
-        "结合《CAST 与分类标准化》：CAST 显式转换类型；先清理空白和格式，再验证合法性并转换，最后统一类别。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT SUM(CAST(amount AS DECIMAL(12,2))) AS total_amount FROM raw_data WHERE name IS NOT NULL AND TRIM(name)<>'' AND CAST(amount AS DECIMAL(12,2))□□□"
+        "先确定哪些记录算“有效”，再对有效记录求和。",
+        "有效记录要同时满足：名称去掉两端空格后非空、金额不为 NULL、金额不为负。",
+        "金额是文本，要先转成数值才能比较大小和求和。"
       ],
-      "explanation": "先判定有效行再数值求和，负数待核而非纳入有效总额。\n执行思路：确认raw_data的输入记录；按筛选条件保留符合要求的记录，并考虑空值；输出total_amount列。\n公开夹具实际返回 1 行、1 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
+      "explanation": "WHERE 先筛出名称有效、金额转成数值后大于等于 0 的记录，再对转换后的金额求和；金额为 NULL 的记录在比较中为未知，不会被保留，没有符合条件的记录时 SUM 返回 NULL。\n易错：把条件写成 <0 得到的是需要人工核对的负金额，而不是有效金额。",
       "commonErrors": [
         {
           "sql": "SELECT SUM(CAST(amount AS DECIMAL(12,2))) AS total_amount FROM raw_data WHERE name IS NOT NULL AND TRIM(name)<>'' AND CAST(amount AS DECIMAL(12,2))<0",
@@ -953,15 +970,15 @@
       "difficulty": "中等",
       "type": "代码填空",
       "title": "标准化后的重复名称与金额组合",
-      "context": "使用课程中的小型原始导入资料示例数据，完成“标准化后的重复名称与金额组合”的查询练习。示例表中的金额以元为单位，不是企业库中以分为单位的整数金额。",
-      "requirements": "补全代码中的一个空位，使完整SQL满足以下要求。可输入具有相同语义的片段，提交后按完整代码执行结果核对。\n按 TRIM(name) 和 amount（原始文本，不做转换）一起分组，输出 clean_name、amount、n，只保留 n 大于 1 的分组。\n输出字段名称及顺序：clean_name, amount, n\n结果排序要求：按 clean_name 升序排列；clean_name 相同时，再按 amount 升序排列。\n计算及格式要求：未指定小数位数时，保留原计算结果的精度；NULL、数字 0 和空字符串是三种不同的值。",
+      "context": "数据质检想找出名称整理后和金额都相同的疑似重复记录。",
+      "requirements": "补全代码中的一个空位，使完整SQL满足以下要求。可输入具有相同语义的片段，提交后按完整代码执行结果核对。\n把名称去掉两端空格后，与原始金额文本 amount 一起分组，输出 clean_name、amount 和每组的记录数 n，只保留 n 大于 1 的分组。\n输出字段名称及顺序：clean_name, amount, n\n结果排序要求：不要求排序，结果行的先后顺序不影响判断。",
       "datasetId": "q0227-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
       "sourceTables": [
         "raw_data"
       ],
-      "initialCode": "SELECT TRIM(name) AS clean_name,amount,COUNT(*) AS n FROM raw_data {{blank1}} HAVING COUNT(*)>1 ORDER BY clean_name,amount",
+      "initialCode": "SELECT TRIM(name) AS clean_name,amount,COUNT(*) AS n FROM raw_data {{blank1}} HAVING COUNT(*)>1",
       "options": [],
       "acceptedBlanks": [
         {
@@ -991,32 +1008,27 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT TRIM(name) AS clean_name,amount,COUNT(*) AS n FROM raw_data GROUP BY TRIM(name),amount HAVING COUNT(*)>1 ORDER BY clean_name,amount",
-          "sqliteSql": "SELECT TRIM(name) AS clean_name,amount,COUNT(*) AS n FROM raw_data GROUP BY TRIM(name),amount HAVING COUNT(*)>1 ORDER BY clean_name,amount"
-        },
-        {
-          "kind": "代数或函数等价",
-          "mysqlSql": "SELECT TRIM(name) AS clean_name,amount,COUNT(1) AS n FROM raw_data GROUP BY TRIM(name),amount HAVING COUNT(1)>1 ORDER BY clean_name,amount",
-          "sqliteSql": "SELECT TRIM(name) AS clean_name,amount,COUNT(1) AS n FROM raw_data GROUP BY TRIM(name),amount HAVING COUNT(1)>1 ORDER BY clean_name,amount",
-          "explanation": "常量1对每行非NULL，因此 COUNT(1) 与 COUNT(*) 同计行数。"
+          "mysqlSql": "SELECT TRIM(name) AS clean_name,amount,COUNT(*) AS n FROM raw_data GROUP BY TRIM(name),amount HAVING COUNT(*)>1",
+          "sqliteSql": "SELECT TRIM(name) AS clean_name,amount,COUNT(*) AS n FROM raw_data GROUP BY TRIM(name),amount HAVING COUNT(*)>1"
         }
       ],
       "hints": [
-        "先明确原始数据异常规则和规范化标准，再决定保留哪些记录。",
-        "结合《识别重复与去重规则》：重复记录由业务键决定，不是任意字段相同就删除；先报告重复，再确定保留规则。",
-        "回想空位所在子句的功能：识别重复与去重规则；保留周围代码，填入实现题设的表达式。"
+        "找重复，就是把“看起来相同”的记录分到同一组，再看每组有几条。",
+        "分组依据要用整理后的名称（去掉两端空格）和金额，否则写法略有不同的同一名称会被分开。",
+        "对分组后的结果筛选记录数，要用 HAVING，不能用 WHERE。"
       ],
-      "explanation": "联合键包含名称与原始金额，去掉名称空格才能识别重复。\n执行思路：确认raw_data的输入记录；按指定键分组后计算聚合值；对分组后的计算结果筛选；输出clean_name、amount、n列；遵循题设排序和并列规则。\n公开夹具实际返回 1 行、3 列；完整结果见 expectedOutput。\n另一种可用写法：常量1对每行非NULL，因此 COUNT(1) 与 COUNT(*) 同计行数。",
+      "explanation": "按 TRIM(name) 和 amount 分组后，写法略有不同的同名记录（例如“ Mask ”和“Mask”）会被归到同一组，COUNT(*) 统计每组条数，HAVING COUNT(*)>1 只保留重复的组。\n易错：直接按 name 分组，两端空格不同的名称会被当成不同的名称，重复就找不到了。\n提示：这些只是疑似重复，需要结合业务凭证核对后才能处理。",
       "commonErrors": [
         {
-          "sql": "SELECT TRIM(name) AS clean_name,amount,COUNT(*) AS n FROM raw_data GROUP BY name,amount HAVING COUNT(*)>1 ORDER BY clean_name,amount",
-          "reason": "联合键包含名称与原始金额，去掉名称空格才能识别重复。",
+          "sql": "SELECT TRIM(name) AS clean_name,amount,COUNT(*) AS n FROM raw_data GROUP BY name,amount HAVING COUNT(*)>1",
+          "reason": "直接按原始名称分组，两端空格不同的同名记录会被分开，找不到重复。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
       "testFixtureIds": [
         "q0227-public",
         "q0227-boundary",
+        "q0227-multi-groups",
         "q0227-empty"
       ],
       "testFixtures": [
@@ -1025,24 +1037,31 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0227/q0227-public.json",
-          "sha256": "f45daa0e60d54769e6d44d48cf9bf81dc1340d29b7e833e88370c956c51e462a"
+          "sha256": "2d68b67f9c894ad1815071dd18f934b49cdeb7f5e37305066612eaacadd24ddc"
         },
         {
           "id": "q0227-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0227/q0227-boundary.json",
-          "sha256": "7d28d87f5e64704ea054fb5a2404cb30d0d706aecd3bdefce0bef5c99ee8079b"
+          "sha256": "4b02b3e7d029ba1ab5fa742648650947c01e7f37b183698ed7ebf2f29ff4ae7a"
+        },
+        {
+          "id": "q0227-multi-groups",
+          "visibility": "hidden",
+          "variant": "multi-groups",
+          "path": "fixtures/q0227/q0227-multi-groups.json",
+          "sha256": "9c376725d82b65ae37ce9b7ef25bb397d8424a653df86219a5c9b0464540cabd"
         },
         {
           "id": "q0227-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0227/q0227-empty.json",
-          "sha256": "421532fbbc0ab3813b6bf6435493609851f51ec4007c4b03573d57d193df11e3"
+          "sha256": "1d740e03add9661825c7a7f91ab74e551425a9c2b5e3759d48781d2ceeb5dc1b"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -1102,6 +1121,27 @@
               "ran": true,
               "match": false,
               "resultHash": "4279602162aa699123d20152abd3205913c29a7642d86c47d7827b616301173f",
+              "rows": 1
+            }
+          },
+          {
+            "fixtureId": "q0227-multi-groups",
+            "reference": {
+              "ran": true,
+              "match": true,
+              "resultHash": "4cc4b0a0c8b56080748906b955dc1256a728563e1e09eff9219fc8e8ac89d459",
+              "rowCount": 3
+            },
+            "equivalent": {
+              "ran": true,
+              "match": true,
+              "resultHash": "4cc4b0a0c8b56080748906b955dc1256a728563e1e09eff9219fc8e8ac89d459",
+              "rows": 3
+            },
+            "wrong": {
+              "ran": true,
+              "match": false,
+              "resultHash": "bec9b53163120f78327a19a4126af5d77915ab93b51e216fef44f8438db1a7c1",
               "rows": 1
             }
           },
@@ -1208,11 +1248,11 @@
         }
       ],
       "hints": [
-        "先明确原始数据异常规则和规范化标准，再决定保留哪些记录。",
-        "结合《识别重复与去重规则》：重复记录由业务键决定，不是任意字段相同就删除；先报告重复，再确定保留规则。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nWITH a AS (SELECT id,TRIM(name) AS clean_name,amount,ROW_NUMBER() OVER(PARTITION BY TRIM(name) □□□ FROM raw_data WHERE name IS NOT NULL AND TRIM(name)<>'') SELECT id,clean_name,amount FROM a WHERE rn=1 ORDER BY clean_name"
+        "每组重名的记录只保留一条，规则是 id 最小。",
+        "ROW_NUMBER() OVER (PARTITION BY 分组列 ORDER BY id) 在每组内按 id 从小到大编号，第 1 条就是 id 最小的。",
+        "分组依据是整理后的名称（去掉两端空格），并且要先排除名称为空的记录。"
       ],
-      "explanation": "重复组必须用明确的确定性保留规则，取最小编号而非最大。\n执行思路：确认raw_data的输入记录；先明确公用表表达式的中间数据及其粒度；按筛选条件保留符合要求的记录，并考虑空值；根据窗口分区、顺序及框架计算每行的分析值；输出id、clean_name、amount列；遵循题设排序和并列规则。\n公开夹具实际返回 4 行、3 列；完整结果见 expectedOutput。\n另一种可用写法：用反向比较并取 NOT 表达相同三值逻辑。",
+      "explanation": "PARTITION BY TRIM(name) 把整理后名称相同的记录分到一组，ORDER BY id 让 id 最小的排第 1，外层保留 rn=1，每组就只剩一条。\n易错：ORDER BY id DESC 保留的是编号最大的一条，规则就不对了。",
       "commonErrors": [
         {
           "sql": "WITH a AS (SELECT id,TRIM(name) AS clean_name,amount,ROW_NUMBER() OVER(PARTITION BY TRIM(name) ORDER BY id DESC) AS rn FROM raw_data WHERE name IS NOT NULL AND TRIM(name)<>'') SELECT id,clean_name,amount FROM a WHERE rn=1 ORDER BY clean_name",

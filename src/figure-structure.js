@@ -1,6 +1,6 @@
 // “图示”数据契约（B9）：图示数据独立存放，不改动已转换课文；所有数值须能追溯到课程示例数据，并由执行检查核对。
 const SLOTS = ['concept', 'syntax', 'breakdown', 'problem'];
-const KINDS = ['truth-table', 'clause-map', 'row-flow', 'stage-flow', 'metric-card', 'function-map', 'join-map'];
+const KINDS = ['truth-table', 'clause-map', 'row-flow', 'stage-flow', 'metric-card', 'function-map', 'join-map', 'compare-card'];
 const TRUTH = ['true', 'false', 'unknown'];
 const ROLES = ['select', 'from', 'where', 'group', 'having', 'order', 'limit', 'cte', 'setop'];
 export function validateFigures(lesson, data) {
@@ -19,6 +19,19 @@ export function validateFigures(lesson, data) {
     text(figure.title, 'title ' + figure.id);
     const source = figure.table && lesson.sourceTables?.find(table => table.name === figure.table);
     const column = name => source?.columns.findIndex(item => item.name === name);
+    if (figure.conclusion !== undefined) text(figure.conclusion, 'conclusion ' + figure.id);
+    if (figure.kind === 'compare-card') {
+      // 对比卡：并列几块“原始数据 → 处理 → 数字”，大数字由 check.sql 实际执行核对（见 check-figures）。
+      if (figure.slot !== 'concept' || figure.merge) fail('compare-card belongs to the concept slot ' + figure.id);
+      if (!Array.isArray(figure.panels) || figure.panels.length < 2 || figure.panels.length > 3) fail('panels ' + figure.id);
+      for (const panel of figure.panels) {
+        text(panel.label, 'panel label'); if (!['bad', 'good', 'neutral'].includes(panel.tone)) fail('panel tone ' + figure.id);
+        if (!Array.isArray(panel.columns) || !Array.isArray(panel.rows) || panel.rows.some(row => row.length !== panel.columns.length)) fail('panel table ' + figure.id);
+        text(panel.big?.label, 'big label'); if (panel.big?.value === undefined) fail('big value ' + figure.id);
+        text(panel.check?.sql, 'check sql'); if (JSON.stringify(panel.check.expected) !== JSON.stringify([[panel.big.value]])) fail('check expected must equal the big number ' + figure.id);
+      }
+      continue;
+    }
     if (figure.kind === 'function-map' || figure.kind === 'join-map') {
       if (figure.slot !== 'concept' || figure.merge) fail(figure.kind + ' belongs to the concept slot ' + figure.id);
       const sqlText = [lesson.sqliteSql, lesson.mysqlSql].map(normalized);
@@ -42,19 +55,28 @@ export function validateFigures(lesson, data) {
         }
         text(figure.orderBy, 'orderBy ' + figure.id);
       } else {
-        if (!['inner', 'left'].includes(figure.joinType)) fail('joinType ' + figure.id);
+        if (!['inner', 'left', 'right', 'full'].includes(figure.joinType)) fail('joinType ' + figure.id);
         const left = tableOf(figure.left.table), right = tableOf(figure.right.table);
         const lk = cols(left, [figure.left.key])[0], rk = cols(right, [figure.right.key])[0];
         const ls = cols(left, figure.left.show), rs = cols(right, figure.right.show);
         inQuery(figure.on, 'join condition'); text(figure.sql, 'sql ' + figure.id);
         // 按样例数据重新做一遍等值连接，图中的匹配/未匹配必须与之完全一致（NULL 不匹配）。
+        // rightFilter（可选）表示写在 ON 里的右表条件：先过滤右表再匹配，其字面值必须出现在课文查询里。
+        const filter = figure.rightFilter;
+        let rightRows = right.rows;
+        if (filter) {
+          const fi = cols(right, [filter.column])[0];
+          for (const literal of [filter.gte, filter.lt]) inQuery(String(literal), 'rightFilter value');
+          rightRows = right.rows.filter(r => r[fi] >= filter.gte && r[fi] < filter.lt);
+        }
+        const keepLeft = ['left', 'full'].includes(figure.joinType), keepRight = ['right', 'full'].includes(figure.joinType);
         const expected = [];
         for (const l of left.rows) {
-          const hits = right.rows.filter(r => l[lk] !== null && r[rk] !== null && l[lk] === r[rk]);
+          const hits = rightRows.filter(r => l[lk] !== null && r[rk] !== null && l[lk] === r[rk]);
           if (hits.length) for (const r of hits) expected.push({left: ls.map(i => l[i]), right: rs.map(i => r[i]), kept: true});
-          else expected.push({left: ls.map(i => l[i]), right: null, kept: figure.joinType === 'left'});
+          else expected.push({left: ls.map(i => l[i]), right: null, kept: keepLeft});
         }
-        for (const r of right.rows) if (!left.rows.some(l => l[lk] !== null && r[rk] !== null && l[lk] === r[rk])) expected.push({left: null, right: rs.map(i => r[i]), kept: false});
+        for (const r of right.rows) if (!(rightRows.includes(r) && left.rows.some(l => l[lk] !== null && r[rk] !== null && l[lk] === r[rk]))) expected.push({left: null, right: rs.map(i => r[i]), kept: keepRight});
         const norm = list => JSON.stringify((list || []).map(pair => JSON.stringify([pair.left, pair.right, pair.kept])).sort());
         if (!Array.isArray(figure.pairs) || norm(figure.pairs) !== norm(expected)) fail('pairs differ from the sample data ' + figure.id);
       }
@@ -144,6 +166,10 @@ export function validateFigures(lesson, data) {
       if (figure.steps.length !== breakdown.length) fail('row-flow steps must match the breakdown steps ' + figure.id);
       for (const [index, step] of figure.steps.entries()) if (normalized(step.label) !== normalized(breakdown[index].sql)) fail('row-flow label differs from breakdown step ' + (index + 1));
     }
+  }
+  for (const block of lesson.presentation?.conceptBlocks || []) {
+    if (block.type !== 'figure') continue;
+    for (const id of block.ids) if (!data.figures.some(figure => figure.id === id && figure.slot === 'concept')) fail('concept block references an unknown concept figure ' + id);
   }
   return data;
 }

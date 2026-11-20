@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp10-03",
-  "lessonSha256": "db718e05bf879b5f07768d0d8d6a2a723ad2a264891e5957f2ba6de16c30f4a6",
+  "lessonSha256": "9c173f976dabab44ed31c5dd93879ce452c84e545268a8fae1d311861ef2f0ca",
   "figures": [
     {
       "id": "kp10-03-clauses",
@@ -14,19 +14,19 @@
           "role": "select",
           "label": "取数",
           "sql": "SELECT c.customer_id",
-          "note": "输出 c.customer_id。"
+          "note": "结果表最终显示 1 列：customer_id。"
         },
         {
           "role": "from",
           "label": "来源",
           "sql": "FROM customers c",
-          "note": "从 customers c 读取输入数据。"
+          "note": "数据来自表 customers。"
         },
         {
           "role": "where",
           "label": "筛选",
           "sql": "WHERE EXISTS (SELECT 1 FROM orders o WHERE o.customer_id=c.customer_id)",
-          "note": "仅保留满足条件的行。"
+          "note": "只保留满足这个条件的行：EXISTS (SELECT 1 FROM orders o WHERE o.customer_id=c.customer_id)。"
         },
         {
           "role": "order",

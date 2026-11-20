@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp16-02",
-  "lessonSha256": "793066cd6ccd22990c926a88556b5a9f50964376d9011581e5bddf3d118aba94",
+  "lessonSha256": "bd02206e76cb82dc4c6946d9d90cf4daafbe9a827c5011b2d508d38268dd3699",
   "figures": [
     {
       "id": "kp16-02-clauses",
@@ -14,13 +14,13 @@
           "role": "select",
           "label": "取数",
           "sql": "SELECT id,CASE WHEN name IS NULL OR TRIM(name)='' THEN '名称缺失' WHEN amount IS NULL THEN '金额缺失' WHEN CAST(amount AS DECIMAL(12,2))<0 THEN '负金额待核' ELSE '通过' END AS quality",
-          "note": "输出查询需要的列与计算表达式。"
+          "note": "结果表最终显示 2 列：id、quality。"
         },
         {
           "role": "from",
           "label": "来源",
           "sql": "FROM raw_data",
-          "note": "从 raw_data 读取输入数据。"
+          "note": "数据来自表 raw_data。"
         },
         {
           "role": "order",

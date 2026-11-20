@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp07-01",
-  "lessonSha256": "cdc8cc166375b9c490825832556b15b89c84010b180274e47280c319ddc38f7b",
+  "lessonSha256": "1cde5f246a727e60abb8f8fee440dbd6e632b1b00c164cf20ff22cb9389b5229",
   "figures": [
     {
       "id": "kp07-01-clauses",
@@ -14,13 +14,13 @@
           "role": "select",
           "label": "取数",
           "sql": "SELECT category, SUM(sales) AS total_sales",
-          "note": "输出 category, SUM(sales) AS total_sales。"
+          "note": "结果表最终显示 2 列：category、total_sales。"
         },
         {
           "role": "from",
           "label": "来源",
           "sql": "FROM orders",
-          "note": "从 orders 读取输入数据。"
+          "note": "数据来自表 orders。"
         },
         {
           "role": "group",

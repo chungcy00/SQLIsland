@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp08-03",
-  "lessonSha256": "0ca8ccd81be1bb55f9fd463bf0a067d34caaaef001a31be9b6ada9b303e6bdba",
+  "lessonSha256": "4e83e0dcd866e218b4970eefb09fd6866c52594302c1e338cf32b1c1be5fc5d4",
   "figures": [
     {
       "id": "kp08-03-clauses",
@@ -14,13 +14,13 @@
           "role": "select",
           "label": "取数",
           "sql": "SELECT c.customer_id, COUNT(o.id) AS feb_orders",
-          "note": "输出 c.customer_id, COUNT(o.id) AS feb_orders。"
+          "note": "结果表最终显示 2 列：customer_id、feb_orders。"
         },
         {
           "role": "from",
           "label": "来源",
           "sql": "FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id AND o.order_date >= '2026-02-01' AND o.order_date < '2026-03-01'",
-          "note": "读取查询需要的输入数据。"
+          "note": "数据来自 表 customers、表 orders，并用 ON 后面的条件把它们的行配起来。"
         },
         {
           "role": "group",
@@ -104,6 +104,107 @@
           ]
         }
       ]
+    },
+    {
+      "id": "kp08-03-join",
+      "slot": "concept",
+      "kind": "join-map",
+      "title": "日期条件写在 ON 里的左连接",
+      "joinType": "left",
+      "left": {
+        "table": "customers",
+        "key": "customer_id",
+        "show": [
+          "customer_id",
+          "customer_name"
+        ]
+      },
+      "right": {
+        "table": "orders",
+        "key": "customer_id",
+        "show": [
+          "id",
+          "customer_id",
+          "order_date"
+        ]
+      },
+      "on": "c.customer_id=o.customer_id AND o.order_date >= '2026-02-01' AND o.order_date < '2026-03-01'",
+      "sql": "SELECT c.customer_id, c.customer_name, o.id, o.customer_id, o.order_date FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id AND o.order_date >= '2026-02-01' AND o.order_date < '2026-03-01'",
+      "pairs": [
+        {
+          "left": [
+            1,
+            "林"
+          ],
+          "right": [
+            3,
+            1,
+            "2026-02-02"
+          ],
+          "kept": true
+        },
+        {
+          "left": [
+            2,
+            "陈"
+          ],
+          "right": null,
+          "kept": true
+        },
+        {
+          "left": [
+            3,
+            "王"
+          ],
+          "right": [
+            5,
+            3,
+            "2026-02-20"
+          ],
+          "kept": true
+        },
+        {
+          "left": [
+            4,
+            "李"
+          ],
+          "right": null,
+          "kept": true
+        },
+        {
+          "left": null,
+          "right": [
+            1,
+            1,
+            "2026-01-03"
+          ],
+          "kept": false
+        },
+        {
+          "left": null,
+          "right": [
+            2,
+            2,
+            "2026-01-10"
+          ],
+          "kept": false
+        },
+        {
+          "left": null,
+          "right": [
+            4,
+            null,
+            "2026-02-15"
+          ],
+          "kept": false
+        }
+      ],
+      "rightFilter": {
+        "column": "order_date",
+        "gte": "2026-02-01",
+        "lt": "2026-03-01"
+      },
+      "conclusion": "日期条件写在 ON 里，只限制哪些订单可以和客户配对；没有符合订单的客户仍然保留。"
     }
   ]
 }

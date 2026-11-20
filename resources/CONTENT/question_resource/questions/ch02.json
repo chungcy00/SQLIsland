@@ -66,11 +66,11 @@
         }
       ],
       "hints": [
-        "明确结果需要哪些输入字段，以及是否保留原始行的重复。",
-        "结合《DISTINCT 去重》：DISTINCT 对整个输出元组去重，不是仅针对紧随其后的一个字段。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT □□□price FROM products ORDER BY price"
+        "要的是“有哪些不同的价格”，而不是每件商品一行。",
+        "DISTINCT 写在 SELECT 后面，对输出的整行去重，相同的行只保留一行。",
+        "去重不会自动排序，题目要求按价格从小到大输出，需要 ORDER BY。"
       ],
-      "explanation": "相同售价的多种商品只形成一个价格档位。\n执行思路：确认products的输入记录；仅在题设指定的范围内去重；输出price列；遵循题设排序和并列规则。\n公开夹具实际返回 5 行、1 列；完整结果见 expectedOutput。\n另一种可用写法：用仅含投影字段的 GROUP BY 对结果去重。",
+      "explanation": "SELECT DISTINCT price 对输出的价格去重，相同价格的多件商品只保留一个价格；去重不保证顺序，所以仍要用 ORDER BY price 排序。\n易错：不写 DISTINCT，每件商品都会输出一行，相同价格会重复出现。",
       "commonErrors": [
         {
           "sql": "SELECT price FROM products ORDER BY price",
@@ -272,11 +272,11 @@
         }
       ],
       "hints": [
-        "明确结果需要哪些输入字段，以及是否保留原始行的重复。",
-        "结合《SELECT 与 FROM》：SELECT 指定输出表达式，FROM 指定输入关系；排序用 ORDER BY，DESC 表示降序，多个排序键用逗号分隔，前一个键相同时才看下一个。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT id,□□□ FROM orders ORDER BY □□□ DESC, □□□"
+        "先确定要输出哪三列，再决定排序。",
+        "ORDER BY 可以写多个排序键，用逗号分隔，越靠前优先级越高；DESC 只作用在它前面的那一列。",
+        "日期要从新到旧，日期相同的再按门店编号从小到大。"
       ],
-      "explanation": "门店键与客户键不同，不应混淆。\n执行思路：确认orders的输入记录；输出id、store_id、order_date列；先按order_date降序，日期相同再按store_id升序。\n公开夹具实际返回 5 行、3 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、排序；保持结果语义。",
+      "explanation": "SELECT 选出 id、store_id、order_date 三列；ORDER BY order_date DESC, store_id 先按日期从新到旧排，日期相同时再按门店编号从小到大排。\n易错：把 store_id 误写成 customer_id，两列含义不同，结果就不是门店订单摘录了。",
       "commonErrors": [
         {
           "sql": "SELECT id,customer_id,order_date FROM orders ORDER BY order_date DESC, store_id",
@@ -468,11 +468,11 @@
         }
       ],
       "hints": [
-        "明确结果需要哪些输入字段，以及是否保留原始行的重复。",
-        "结合《DISTINCT 去重》：DISTINCT 对整个输出元组去重，不是仅针对紧随其后的一个字段。",
-        "回想空位所在子句的功能：DISTINCT 去重；保留周围代码，填入实现题设的表达式。"
+        "想要“有哪些不同的类别”，而不是每件商品一行。",
+        "去重的关键字写在 SELECT 之后、列名之前，对输出的整行去重。",
+        "空位里只需要一个关键字；结果的顺序已由后面的 ORDER BY 给出。"
       ],
-      "explanation": "DISTINCT 对输出行去重，不去重会得到多行相同类别。\n执行思路：确认products的输入记录；仅在题设指定的范围内去重；输出category列；遵循题设排序和并列规则。\n公开夹具实际返回 3 行、1 列；完整结果见 expectedOutput。\n另一种可用写法：用仅含投影字段的 GROUP BY 对结果去重。",
+      "explanation": "SELECT DISTINCT category 对类别列去重，每个类别只保留一行；ORDER BY category 让输出顺序固定。\n易错：不去重会得到每件商品一行，相同类别重复出现多次。",
       "commonErrors": [
         {
           "sql": "SELECT category FROM products ORDER BY category",
@@ -793,11 +793,11 @@
         }
       ],
       "hints": [
-        "明确结果需要哪些输入字段，以及是否保留原始行的重复。",
-        "结合《DISTINCT 去重》：DISTINCT 对整个输出元组去重，不是仅针对紧随其后的一个字段。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT □□□customer_id,store_id FROM orders ORDER BY customer_id,store_id"
+        "要的是不重复的“客户 + 门店”组合，不是只对一列去重。",
+        "DISTINCT 对 SELECT 里列出的所有列整体去重，两列的值都相同才算重复。",
+        "customer_id 为 NULL 的行也要保留：去重时 NULL 与 NULL 被视为同一个值。"
       ],
-      "explanation": "DISTINCT 的单位是整行，保留每种不同的组合。\n执行思路：确认orders的输入记录；仅在题设指定的范围内去重；输出customer_id、store_id列；遵循题设排序和并列规则。\n公开夹具实际返回 4 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：用仅含投影字段的 GROUP BY 对结果去重。",
+      "explanation": "SELECT DISTINCT customer_id, store_id 把两列看成一个组合整体去重，只有两列都相同的行才会合并；customer_id 为 NULL 的行也作为一种组合保留下来。\n易错：不写 DISTINCT 会保留每一笔订单的组合，重复的组合会出现多行。",
       "commonErrors": [
         {
           "sql": "SELECT customer_id,store_id FROM orders ORDER BY customer_id,store_id",

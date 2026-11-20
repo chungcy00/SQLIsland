@@ -6,7 +6,7 @@
   "conceptBlocks": [
     {
       "type": "heading",
-      "text": "基本含义",
+      "text": "什么是离职率？",
       "emphasis": []
     },
     {
@@ -49,8 +49,8 @@
       "kind": "runnable",
       "title": "定位每月起止边界",
       "sql": "WITH m AS (SELECT month_key,MIN(day) first_day,MAX(day) last_day,MIN(day_index) first_idx FROM calendar_days WHERE month_key BETWEEN '2024-11' AND '2025-12' GROUP BY month_key)\nSELECT * FROM m ORDER BY 1, 2, 3, 4 LIMIT 3;",
-      "purpose": "定位每月起止边界（m）的实际执行结果。",
-      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "purpose": "先找出每个月的第一天和最后一天，范围包含 2024 年 11、12 月的历史。",
+      "reason": "后面按月统计在岗人数和离职人数时要用到月初月末日期；保留历史月份是为了 2025 年 1 月的滚动计算。",
       "sourceTables": [
         {
           "name": "calendar_days",
@@ -258,8 +258,8 @@
       "kind": "runnable",
       "title": "统计各部门期初、期末及离职人数",
       "sql": "WITH m AS (SELECT month_key,MIN(day) first_day,MAX(day) last_day,MIN(day_index) first_idx FROM calendar_days WHERE month_key BETWEEN '2024-11' AND '2025-12' GROUP BY month_key), a AS (SELECT d.department_id,m.month_key,SUM(CASE WHEN h.start_date< m.first_day AND (h.end_date IS NULL OR h.end_date>=m.first_day) THEN 1 ELSE 0 END) opening,SUM(CASE WHEN h.start_date<=m.last_day AND (h.end_date IS NULL OR h.end_date>m.last_day) THEN 1 ELSE 0 END) closing,SUM(CASE WHEN e.termination_date BETWEEN m.first_day AND m.last_day AND h.end_date=e.termination_date THEN 1 ELSE 0 END) exits FROM departments d CROSS JOIN m LEFT JOIN employment_history h ON h.department_id=d.department_id LEFT JOIN employees e ON e.employee_id=h.employee_id GROUP BY d.department_id,m.month_key)\nSELECT * FROM a ORDER BY 1, 2, 3, 4, 5 LIMIT 3;",
-      "purpose": "统计各部门期初、期末及离职人数（a）的实际执行结果。",
-      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "purpose": "按部门和月份统计月初在岗人数 opening、月末在岗人数 closing 和当月离职人数 exits。",
+      "reason": "离职要用员工真实的终止日期判断，调岗只改变所在部门，不算离职。",
       "sourceTables": [
         {
           "name": "calendar_days",
@@ -471,8 +471,8 @@
       "kind": "runnable",
       "title": "计算月初月末平均人数",
       "sql": "WITH m AS (SELECT month_key,MIN(day) first_day,MAX(day) last_day,MIN(day_index) first_idx FROM calendar_days WHERE month_key BETWEEN '2024-11' AND '2025-12' GROUP BY month_key), a AS (SELECT d.department_id,m.month_key,SUM(CASE WHEN h.start_date< m.first_day AND (h.end_date IS NULL OR h.end_date>=m.first_day) THEN 1 ELSE 0 END) opening,SUM(CASE WHEN h.start_date<=m.last_day AND (h.end_date IS NULL OR h.end_date>m.last_day) THEN 1 ELSE 0 END) closing,SUM(CASE WHEN e.termination_date BETWEEN m.first_day AND m.last_day AND h.end_date=e.termination_date THEN 1 ELSE 0 END) exits FROM departments d CROSS JOIN m LEFT JOIN employment_history h ON h.department_id=d.department_id LEFT JOIN employees e ON e.employee_id=h.employee_id GROUP BY d.department_id,m.month_key), b AS (SELECT *, (opening+closing)/2.0 avg_h FROM a)\nSELECT * FROM b ORDER BY 1, 2, 3, 4, 5, 6 LIMIT 3;",
-      "purpose": "计算月初月末平均人数（b）的实际执行结果。",
-      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "purpose": "计算月初与月末的平均在岗人数 avg_h。",
+      "reason": "离职率的分母用平均人数，比只用月初或月末更稳定。",
       "sourceTables": [
         {
           "name": "calendar_days",
@@ -688,8 +688,8 @@
       "kind": "runnable",
       "title": "为滚动比率准备分子和分母",
       "sql": "WITH m AS (SELECT month_key,MIN(day) first_day,MAX(day) last_day,MIN(day_index) first_idx FROM calendar_days WHERE month_key BETWEEN '2024-11' AND '2025-12' GROUP BY month_key), a AS (SELECT d.department_id,m.month_key,SUM(CASE WHEN h.start_date< m.first_day AND (h.end_date IS NULL OR h.end_date>=m.first_day) THEN 1 ELSE 0 END) opening,SUM(CASE WHEN h.start_date<=m.last_day AND (h.end_date IS NULL OR h.end_date>m.last_day) THEN 1 ELSE 0 END) closing,SUM(CASE WHEN e.termination_date BETWEEN m.first_day AND m.last_day AND h.end_date=e.termination_date THEN 1 ELSE 0 END) exits FROM departments d CROSS JOIN m LEFT JOIN employment_history h ON h.department_id=d.department_id LEFT JOIN employees e ON e.employee_id=h.employee_id GROUP BY d.department_id,m.month_key), b AS (SELECT *, (opening+closing)/2.0 avg_h FROM a), z AS (SELECT *,SUM(exits) OVER(PARTITION BY department_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) e3,SUM(avg_h) OVER(PARTITION BY department_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) h3,COUNT(*) OVER(PARTITION BY department_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) n3 FROM b)\nSELECT * FROM z ORDER BY 1, 2, 3, 4, 5, 6, 7, 8, 9 LIMIT 3;",
-      "purpose": "为滚动比率准备分子和分母（z）的实际执行结果。",
-      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "purpose": "为滚动三个月的离职率准备三个月累计的离职数 e3、人数 h3 和月数 n3。",
+      "reason": "窗口取当前月和前两个月；月数不足 3 的月份不计算滚动值。",
       "sourceTables": [
         {
           "name": "calendar_days",
@@ -917,8 +917,8 @@
       "kind": "runnable",
       "title": "计算离职率与滚动离职率",
       "sql": "WITH m AS (SELECT month_key,MIN(day) first_day,MAX(day) last_day,MIN(day_index) first_idx FROM calendar_days WHERE month_key BETWEEN '2024-11' AND '2025-12' GROUP BY month_key), a AS (SELECT d.department_id,m.month_key,SUM(CASE WHEN h.start_date< m.first_day AND (h.end_date IS NULL OR h.end_date>=m.first_day) THEN 1 ELSE 0 END) opening,SUM(CASE WHEN h.start_date<=m.last_day AND (h.end_date IS NULL OR h.end_date>m.last_day) THEN 1 ELSE 0 END) closing,SUM(CASE WHEN e.termination_date BETWEEN m.first_day AND m.last_day AND h.end_date=e.termination_date THEN 1 ELSE 0 END) exits FROM departments d CROSS JOIN m LEFT JOIN employment_history h ON h.department_id=d.department_id LEFT JOIN employees e ON e.employee_id=h.employee_id GROUP BY d.department_id,m.month_key), b AS (SELECT *, (opening+closing)/2.0 avg_h FROM a), z AS (SELECT *,SUM(exits) OVER(PARTITION BY department_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) e3,SUM(avg_h) OVER(PARTITION BY department_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) h3,COUNT(*) OVER(PARTITION BY department_id ORDER BY month_key ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) n3 FROM b) SELECT department_id,month_key,opening,closing,exits,ROUND(100.0*exits/NULLIF(avg_h,0),2) exit_pct,CASE WHEN n3=3 THEN ROUND(100.0*e3/NULLIF(h3,0),2) ELSE NULL END rolling_pct FROM z WHERE month_key BETWEEN '2025-01' AND '2025-12' ORDER BY month_key DESC, opening DESC, closing DESC",
-      "purpose": "在前面各步中间结果的基础上完成最终计算，输出题目要求的完整结果。",
-      "reason": "前面的步骤只是分块准备；把它们组合起来，才能得到最终的业务结果。",
+      "purpose": "计算月离职率和滚动三个月离职率，只输出 2025 年各月。",
+      "reason": "先在包含 2024 年历史的完整月份上算窗口，最后才筛 2025 年。",
       "sourceTables": [
         {
           "name": "calendar_days",
@@ -2872,7 +2872,13 @@
         "emphasis": []
       }
     ],
-    "reason": [],
+    "reason": [
+      {
+        "type": "paragraph",
+        "text": "先筛 2025 年再开窗口，1 月和 2 月就凑不够三个月的数据，滚动离职率会缺失；把“任职记录结束”当成离职，调岗的人会被算成离职。",
+        "emphasis": []
+      }
+    ],
     "correction": [
       {
         "type": "paragraph",

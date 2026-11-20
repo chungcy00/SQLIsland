@@ -360,8 +360,8 @@
       "difficulty": "简单",
       "type": "代码填空",
       "title": "订单贡献占总销售比率",
-      "context": "使用课程中的小型订单示例数据，完成“订单贡献占总销售比率”的查询练习。示例表中的金额以元为单位，不是企业库中以分为单位的整数金额。",
-      "requirements": "补全代码中的一个空位，使完整SQL满足以下要求。可输入具有相同语义的片段，提交后按完整代码执行结果核对。\n返回 id 和 share_pct（单笔订单销售额占全部销售额的百分比，保留两位小数；全部销售额为 0 时返回 NULL）。\n输出字段名称及顺序：id, share_pct\n结果排序要求：不要求排序，结果行的先后顺序不影响判断。\n计算及格式要求：未指定小数位数时，保留原计算结果的精度；NULL、数字 0 和空字符串是三种不同的值。",
+      "context": "运营想知道每笔订单在全部订单销售额中占多大比例。",
+      "requirements": "补全代码中的一个空位，使完整SQL满足以下要求。可输入具有相同语义的片段，提交后按完整代码执行结果核对。\n返回每笔订单的 id 和 share_pct（该订单销售额占全部订单销售额的百分比，保留两位小数；全部销售额为 0 时返回 NULL）。\n输出字段名称及顺序：id, share_pct\n结果排序要求：不要求排序，结果行的先后顺序不影响判断。",
       "datasetId": "q0199-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -416,22 +416,21 @@
           "sqliteSql": "SELECT id,ROUND(100.0*sales/NULLIF(SUM(sales) OVER(),0),2) AS share_pct FROM orders"
         },
         {
-          "kind": "关系结构等价",
-          "mysqlSql": "SELECT id,ROUND(100.0*sales/NULLIF(SUM(sales) OVER(),0),2) AS share_pct FROM (SELECT * FROM orders) AS orders",
-          "sqliteSql": "SELECT id,ROUND(100.0*sales/NULLIF(SUM(sales) OVER(),0),2) AS share_pct FROM (SELECT * FROM orders) AS orders",
-          "explanation": "先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。"
+          "kind": "独立方法等价",
+          "mysqlSql": "SELECT id,ROUND(100.0*sales/NULLIF((SELECT SUM(sales) FROM orders),0),2) AS share_pct FROM orders",
+          "sqliteSql": "SELECT id,ROUND(100.0*sales/NULLIF((SELECT SUM(sales) FROM orders),0),2) AS share_pct FROM orders"
         }
       ],
       "hints": [
-        "决定窗口内的分区、排序与范围，注意是否需要保留全部原行。",
-        "结合《OVER 与 PARTITION BY》：普通聚合压缩行数；窗口聚合为每行计算所处窗口的指标。",
-        "回想空位所在子句的功能：OVER 与 PARTITION BY；保留周围代码，填入实现题设的表达式。"
+        "要让每一行都能同时看到“全部订单的销售额合计”，但又不能把行合并掉。",
+        "把聚合函数放进窗口（OVER）里，就能在保留每一行的同时计算合计；空位决定窗口的范围。",
+        "分母要的是全体订单的销售额，而不是某个门店或类别内的合计，注意窗口不要被分组。"
       ],
-      "explanation": "分母是全体销售而非门店内合计。\n执行思路：确认orders的输入记录；根据窗口分区、顺序及框架计算每行的分析值；输出id、share_pct列；结果行的先后顺序不作要求。\n公开夹具实际返回 5 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
+      "explanation": "SUM(sales) OVER() 对全部订单求和却不合并行，所以每一行都能用自己的销售额除以同一个总额，再乘 100 并保留两位小数；NULLIF(总额,0) 在总额为 0 时得到 NULL，避免除以 0。\n易错：写成 OVER(PARTITION BY store_id) 时，分母变成该门店内的合计，占比就不再是“占全部订单”的比例。",
       "commonErrors": [
         {
           "sql": "SELECT id,ROUND(100.0*sales/NULLIF(SUM(sales) OVER(PARTITION BY store_id),0),2) AS share_pct FROM orders",
-          "reason": "分母是全体销售而非门店内合计。",
+          "reason": "窗口按门店分组后，分母变成该门店内的销售合计，不是全部订单的合计。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -453,7 +452,7 @@
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0199/q0199-boundary.json",
-          "sha256": "1d462daf0cf25aa217351f328e6f765245f089b579bc98cff0ce2212ed62800d"
+          "sha256": "a81e9498e45490b8b6b2da1cb7c6238e0fe3aebb473a6d6773d9b7ffd876eb7b"
         },
         {
           "id": "q0199-empty",
@@ -482,7 +481,7 @@
       "mysqlVerification": "未运行 MySQL 8.4",
       "validation": {
         "kind": "query",
-        "equivalentKind": "关系结构等价",
+        "equivalentKind": "独立方法等价",
         "fixtures": [
           {
             "fixtureId": "q0199-public",
@@ -510,19 +509,19 @@
             "reference": {
               "ran": true,
               "match": true,
-              "resultHash": "9671208e9e1896e757c9b6e30b0fa82ade42b6a5f6437e45a7dbb596edcbe938",
+              "resultHash": "18642f1f217309d2c1694da7b9fe94bbbf790f3fc5411b3bc3bbe7a1a6bd324c",
               "rowCount": 13
             },
             "equivalent": {
               "ran": true,
               "match": true,
-              "resultHash": "9671208e9e1896e757c9b6e30b0fa82ade42b6a5f6437e45a7dbb596edcbe938",
+              "resultHash": "18642f1f217309d2c1694da7b9fe94bbbf790f3fc5411b3bc3bbe7a1a6bd324c",
               "rows": 13
             },
             "wrong": {
               "ran": true,
               "match": false,
-              "resultHash": "c5f07e18d89d2d5fcbd3ec0edb30984badd1cbbe7d3b0cbf68dc8133be6b387e",
+              "resultHash": "3b1e5bbed84a6232a03568c1f4047f234aac9b5aec07b5ce11f4d7dd560484a2",
               "rows": 13
             }
           },
@@ -634,11 +633,11 @@
         }
       ],
       "hints": [
-        "决定窗口内的分区、排序与范围，注意是否需要保留全部原行。",
-        "结合《OVER 与 PARTITION BY》：普通聚合压缩行数；窗口聚合为每行计算所处窗口的指标。",
-        "检查初始代码的 PARTITION BY store_id 对应的业务规则。窗口分区键为门店；不改变订单行数。"
+        "先看窗口是按什么分组的：题目要的是“所在门店”的合计。",
+        "PARTITION BY 决定窗口按哪一列分组，同一组的行得到同一个合计。",
+        "初始代码的分组列和题目要求的分组不一致。"
       ],
-      "explanation": "窗口分区键为门店；不改变订单行数。\n执行思路：确认orders的输入记录；根据窗口分区、顺序及框架计算每行的分析值；输出id、store_id、store_total列；结果行的先后顺序不作要求。\n公开夹具实际返回 5 行、3 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
+      "explanation": "SUM(sales) OVER (PARTITION BY store_id) 对每个门店各自求和，并把合计附加到该门店的每一笔订单上，订单行数不变。\n易错：初始代码按 category 分区，得到的是各类别的合计，不是门店合计。",
       "commonErrors": [
         {
           "sql": "SELECT id,store_id,SUM(sales) OVER(PARTITION BY category) AS store_total FROM orders",
@@ -846,11 +845,11 @@
         }
       ],
       "hints": [
-        "决定窗口内的分区、排序与范围，注意是否需要保留全部原行。",
-        "结合《OVER 与 PARTITION BY》：普通聚合压缩行数；窗口聚合为每行计算所处窗口的指标。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT product_id,price,ROUND(price-AVG(price) OVER(□□□),2) AS gap FROM products"
+        "要用商品自己的价格减去它所在类别的平均价。",
+        "AVG(…) OVER (PARTITION BY 列) 在每个类别内求平均，并附加到类别内的每一行。",
+        "不加 PARTITION BY 的窗口是全部商品的平均，不是类别平均。"
       ],
-      "explanation": "每个类别单独建立价格基准；去除分区会变成全局均值。\n执行思路：确认products的输入记录；根据窗口分区、顺序及框架计算每行的分析值；输出product_id、price、gap列；结果行的先后顺序不作要求。\n公开夹具实际返回 6 行、3 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
+      "explanation": "AVG(price) OVER (PARTITION BY category) 给每个商品附上所在类别的平均售价，再用自己的价格减去它，ROUND 保留两位小数。\n易错：去掉 PARTITION BY 后，基准变成全体商品的平均价，不再是类别内的比较。",
       "commonErrors": [
         {
           "sql": "SELECT product_id,price,ROUND(price-AVG(price) OVER(),2) AS gap FROM products",
@@ -1051,11 +1050,11 @@
         }
       ],
       "hints": [
-        "决定窗口内的分区、排序与范围，注意是否需要保留全部原行。",
-        "结合《LAG 与 LEAD》：LAG 获取分区中前一行，LEAD 获取后一行；可指定偏移和缺失默认值。",
-        "检查初始代码的 PARTITION BY store_id  对应的业务规则。第一笔门店订单没有本店前序，不能引用其他门店的销售。"
+        "“前一订单”应当是同一家门店的前一笔。",
+        "LAG 取排序后的上一行；PARTITION BY 让它只在同一分组内找上一行。",
+        "初始代码缺少了让它按门店分开的部分。"
       ],
-      "explanation": "第一笔门店订单没有本店前序，不能引用其他门店的销售。\n执行思路：确认orders的输入记录；根据窗口分区、顺序及框架计算每行的分析值；输出id、store_id、prev_sales列；结果行的先后顺序不作要求。\n公开夹具实际返回 5 行、3 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
+      "explanation": "LAG(sales) OVER (PARTITION BY store_id ORDER BY order_date, id) 在每家门店内部按日期、id 排序，取本店上一笔订单的金额；每家门店的第一笔订单没有上一笔，结果是 NULL。\n易错：不分区时，第一笔门店订单会取到别的门店的订单金额。",
       "commonErrors": [
         {
           "sql": "SELECT id,store_id,LAG(sales) OVER(ORDER BY order_date,id) AS prev_sales FROM orders",
@@ -1195,8 +1194,8 @@
       "difficulty": "中等",
       "type": "独立编写",
       "title": "两行移动销售均值",
-      "context": "使用课程中的小型月度销售示例数据，完成“两行移动销售均值”的查询练习。示例表中的金额以元为单位，不是企业库中以分为单位的整数金额。",
-      "requirements": "输出 monthly.month 和 avg2（当前记录与前一条记录销售额的平均值，保留两位小数）；第一个月只有一行可用，就用这一行计算。\n输出字段名称及顺序：month, avg2\n结果排序要求：按 month 升序排列。\n计算及格式要求：未指定小数位数时，保留原计算结果的精度；NULL、数字 0 和空字符串是三种不同的值。",
+      "context": "运营想用最近两个月的平均值观察销售趋势。",
+      "requirements": "返回每个月的 month 和 avg2：当前月与前一个月销售额的平均值，保留两位小数；第一个月没有前一个月，只用它自己的销售额计算。\n输出字段名称及顺序：month, avg2\n结果排序要求：不要求排序，结果行的先后顺序不影响判断。",
       "datasetId": "q0203-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -1235,26 +1234,20 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT month,ROUND(AVG(sales) OVER(ORDER BY month ROWS BETWEEN 1 PRECEDING AND CURRENT ROW),2) AS avg2 FROM monthly ORDER BY month",
-          "sqliteSql": "SELECT month,ROUND(AVG(sales) OVER(ORDER BY month ROWS BETWEEN 1 PRECEDING AND CURRENT ROW),2) AS avg2 FROM monthly ORDER BY month"
-        },
-        {
-          "kind": "关系结构等价",
-          "mysqlSql": "SELECT month,ROUND(AVG(sales) OVER(ORDER BY month ROWS BETWEEN 1 PRECEDING AND CURRENT ROW),2) AS avg2 FROM (SELECT * FROM monthly) AS monthly ORDER BY month",
-          "sqliteSql": "SELECT month,ROUND(AVG(sales) OVER(ORDER BY month ROWS BETWEEN 1 PRECEDING AND CURRENT ROW),2) AS avg2 FROM (SELECT * FROM monthly) AS monthly ORDER BY month",
-          "explanation": "先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。"
+          "mysqlSql": "SELECT month,ROUND(AVG(sales) OVER(ORDER BY month ROWS BETWEEN 1 PRECEDING AND CURRENT ROW),2) AS avg2 FROM monthly",
+          "sqliteSql": "SELECT month,ROUND(AVG(sales) OVER(ORDER BY month ROWS BETWEEN 1 PRECEDING AND CURRENT ROW),2) AS avg2 FROM monthly"
         }
       ],
       "hints": [
-        "决定窗口内的分区、排序与范围，注意是否需要保留全部原行。",
-        "结合《移动平均与环比》：移动平均使用固定行数帧；环比比较当前与上期，分母为上期且不得为零。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT month,ROUND(AVG(sales) OVER(ORDER BY month ROWS BETWEEN □□□ AND CURRENT ROW),2) AS avg2 FROM monthly ORDER BY month"
+        "“当前月和前一个月”是按月份顺序相邻的两行，需要一个跟着当前行移动的计算范围。",
+        "窗口聚合 AVG(列) OVER (ORDER BY … ROWS BETWEEN … AND CURRENT ROW) 可以指定“从前面第几行到当前行”。",
+        "窗口里一共要包含 2 行：当前行和它前面的行，想想前面应该取几行；第一行前面没有行，窗口里就只有它自己。"
       ],
-      "explanation": "两行窗口只包括本行及前一行，不是三行。\n执行思路：确认monthly的输入记录；根据窗口分区、顺序及框架计算每行的分析值；输出month、avg2列；遵循题设排序和并列规则。\n公开夹具实际返回 4 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
+      "explanation": "AVG(sales) OVER (ORDER BY month ROWS BETWEEN 1 PRECEDING AND CURRENT ROW) 对每一行取“前一行和当前行”两行求平均；第一个月前面没有行，窗口里只有它自己，所以平均值就是自己的销售额。\n易错：写成 2 PRECEDING 会包含三行，得到的是三个月平均，而不是两个月平均。",
       "commonErrors": [
         {
-          "sql": "SELECT month,ROUND(AVG(sales) OVER(ORDER BY month ROWS BETWEEN 2 PRECEDING AND CURRENT ROW),2) AS avg2 FROM monthly ORDER BY month",
-          "reason": "两行窗口只包括本行及前一行，不是三行。",
+          "sql": "SELECT month,ROUND(AVG(sales) OVER(ORDER BY month ROWS BETWEEN 2 PRECEDING AND CURRENT ROW),2) AS avg2 FROM monthly",
+          "reason": "2 PRECEDING 会把前两行都算进来，窗口是三行，不是两行。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -1269,24 +1262,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0203/q0203-public.json",
-          "sha256": "2843dd941a4365455e7d6ccda4a27678bbb576451fabe057b95cb49db3514bf2"
+          "sha256": "5857d7c66fc6aea53b20934a6a6d6f65235b6ab98a002ddb24eb31934c6281c3"
         },
         {
           "id": "q0203-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0203/q0203-boundary.json",
-          "sha256": "78a8acdaf5b05987321e49ef9a6e2368c675679aa86ef1ccb862b1f196b42f79"
+          "sha256": "8529b674598d8c1d21fff75ad57de365168e7e68b6220472ddc16fb11ee30244"
         },
         {
           "id": "q0203-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0203/q0203-empty.json",
-          "sha256": "bf7cb80f761c29f1101078e384cc17cb6cb1d71e31693ba868850cb595641661"
+          "sha256": "4dd9895899db70ed7244f2d17363d21fc8a2f258d1f9854839524c2f8b121666"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -1447,11 +1440,11 @@
         }
       ],
       "hints": [
-        "决定窗口内的分区、排序与范围，注意是否需要保留全部原行。",
-        "结合《OVER 与 PARTITION BY》：普通聚合压缩行数；窗口聚合为每行计算所处窗口的指标。",
-        "按题设编写投影、筛选及分组，使用运行检查列名、NULL、重复记录和排序。"
+        "要给每一笔订单附上同一客户的订单总数，行数不能减少。",
+        "COUNT(*) OVER (PARTITION BY 列) 在每个分组内计数，并附加到组里的每一行。",
+        "分组的依据是客户，而不是门店；并且只处理已登记客户。"
       ],
-      "explanation": "计数窗口以同客户为边界，而不是同门店。\n执行思路：确认orders的输入记录；按筛选条件保留符合要求的记录，并考虑空值；根据窗口分区、顺序及框架计算每行的分析值；输出id、customer_id、customer_orders列；结果行的先后顺序不作要求。\n公开夹具实际返回 4 行、3 列；完整结果见 expectedOutput。\n另一种可用写法：常量1对每行非NULL，因此 COUNT(1) 与 COUNT(*) 同计行数。",
+      "explanation": "COUNT(*) OVER (PARTITION BY customer_id) 统计每位客户的订单数并附加到他的每一笔订单上，WHERE 先去掉没有客户编号的订单。\n易错：按 store_id 分区得到的是同一门店的订单数，不是同一客户的订单数。",
       "commonErrors": [
         {
           "sql": "SELECT id,customer_id,COUNT(*) OVER(PARTITION BY store_id) AS customer_orders FROM orders WHERE customer_id IS NOT NULL",
@@ -1809,8 +1802,8 @@
       "difficulty": "中等",
       "type": "代码填空",
       "title": "员工薪资有跳号排名",
-      "context": "使用课程中的小型员工示例数据，完成“员工薪资有跳号排名”的查询练习。示例表中的金额以元为单位，不是企业库中以分为单位的整数金额。",
-      "requirements": "补全代码中的一个空位，使完整SQL满足以下要求。可输入具有相同语义的片段，提交后按完整代码执行结果核对。\n全体员工按薪资降序 RANK，薪资相同同名次，输出 employee_id、salary、rank_no。\n输出字段名称及顺序：employee_id, salary, rank_no\n结果排序要求：不要求排序，结果行的先后顺序不影响判断。\n计算及格式要求：未指定小数位数时，保留原计算结果的精度；NULL、数字 0 和空字符串是三种不同的值。",
+      "context": "薪酬部门想给员工按薪资排名，薪资相同的员工名次相同。",
+      "requirements": "补全代码中的一个空位，使完整SQL满足以下要求。可输入具有相同语义的片段，提交后按完整代码执行结果核对。\n给薪资不为空的全体员工按薪资从高到低排名：薪资相同的员工名次相同，并且后面的名次要跳过被占用的名次（例如 1、2、2、4）；输出 employee_id、salary、rank_no。\n输出字段名称及顺序：employee_id, salary, rank_no\n结果排序要求：不要求排序，结果行的先后顺序不影响判断。",
       "datasetId": "q0207-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -1864,24 +1857,18 @@
           "kind": "reference",
           "mysqlSql": "SELECT employee_id,salary,RANK() OVER(ORDER BY salary DESC) AS rank_no FROM employees WHERE salary IS NOT NULL",
           "sqliteSql": "SELECT employee_id,salary,RANK() OVER(ORDER BY salary DESC) AS rank_no FROM employees WHERE salary IS NOT NULL"
-        },
-        {
-          "kind": "关系结构等价",
-          "mysqlSql": "SELECT employee_id,salary,RANK() OVER(ORDER BY salary DESC) AS rank_no FROM (SELECT * FROM employees) AS employees WHERE salary IS NOT NULL",
-          "sqliteSql": "SELECT employee_id,salary,RANK() OVER(ORDER BY salary DESC) AS rank_no FROM (SELECT * FROM employees) AS employees WHERE salary IS NOT NULL",
-          "explanation": "先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。"
         }
       ],
       "hints": [
-        "决定窗口内的分区、排序与范围，注意是否需要保留全部原行。",
-        "结合《ROW_NUMBER、RANK、DENSE_RANK》：ROW_NUMBER 给每行唯一序号；RANK 同值同名次并留空档；DENSE_RANK 同值同名次不留空档。",
-        "回想空位所在子句的功能：ROW_NUMBER、RANK、DENSE_RANK；保留周围代码，填入实现题设的表达式。"
+        "排名函数有好几种，区别主要在并列之后名次怎么编。",
+        "ROW_NUMBER 不允许并列，RANK 并列后跳号，DENSE_RANK 并列后不跳号，题目要的是哪一种？",
+        "对照题目里的例子 1、2、2、4，想想并列之后“下一个名次”是多少。"
       ],
-      "explanation": "RANK 对并列后的名次留空档，密集排名不留。\n执行思路：确认employees的输入记录；按筛选条件保留符合要求的记录，并考虑空值；根据窗口分区、顺序及框架计算每行的分析值；输出employee_id、salary、rank_no列；结果行的先后顺序不作要求。\n公开夹具实际返回 4 行、3 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
+      "explanation": "RANK() OVER (ORDER BY salary DESC) 给相同薪资同一个名次，并把被并列占用的名次跳过，所以两个第 2 名之后，下一名是第 4 名。\n易错：DENSE_RANK 并列后不跳号（1、2、2、3），ROW_NUMBER 则不允许并列，都不符合“跳号”的要求。",
       "commonErrors": [
         {
           "sql": "SELECT employee_id,salary,DENSE_RANK() OVER(ORDER BY salary DESC) AS rank_no FROM employees WHERE salary IS NOT NULL",
-          "reason": "RANK 对并列后的名次留空档，密集排名不留。",
+          "reason": "DENSE_RANK 并列后不跳号，得到 1、2、2、3，不符合“跳号”的名次要求。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -2093,11 +2080,11 @@
         }
       ],
       "hints": [
-        "决定窗口内的分区、排序与范围，注意是否需要保留全部原行。",
-        "结合《LAG 与 LEAD》：LAG 获取分区中前一行，LEAD 获取后一行；可指定偏移和缺失默认值。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT id,customer_id,□□□ OVER(PARTITION BY customer_id ORDER BY order_date,id) AS next_date FROM orders WHERE customer_id IS NOT NULL ORDER BY customer_id, next_date"
+        "“下一笔”要在同一客户内按时间顺序找下一行。",
+        "LEAD 取排序后的下一行，LAG 取上一行；PARTITION BY 让它只在同一客户内查找。",
+        "最后一笔订单没有下一笔，结果自然是 NULL。"
       ],
-      "explanation": "LEAD 引用未来行，客户分区避免跨客户串单。\n执行思路：确认orders的输入记录；按筛选条件保留符合要求的记录，并考虑空值；根据窗口分区、顺序及框架计算每行的分析值；输出id、customer_id、next_date列；遵循题设排序和并列规则。\n公开夹具实际返回 4 行、3 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
+      "explanation": "LEAD(order_date) OVER (PARTITION BY customer_id ORDER BY order_date, id) 在每位客户内部按日期、id 排序，取下一笔订单的日期；最后一笔没有下一笔，结果是 NULL。\n易错：误用 LAG 取到的是上一笔订单的日期，时间方向反了。",
       "commonErrors": [
         {
           "sql": "SELECT id,customer_id,LAG(order_date) OVER(PARTITION BY customer_id ORDER BY order_date,id) AS next_date FROM orders WHERE customer_id IS NOT NULL ORDER BY customer_id, next_date",
@@ -2298,11 +2285,11 @@
         }
       ],
       "hints": [
-        "决定窗口内的分区、排序与范围，注意是否需要保留全部原行。",
-        "结合《ROWS、RANGE 与累计》：ROWS 按物理窗口行数界定范围；RANGE 按排序值与同值组界定。显式指定累计帧可避免默认帧歧义。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT id,store_id,SUM(sales) OVER(□□□ORDER BY order_date,id ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS running_sales FROM orders"
+        "累计要按顺序一行一行地加。",
+        "SUM(…) OVER (PARTITION BY … ORDER BY … ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) 从分区第一行累计到当前行。",
+        "累计应当在每家门店内重新开始，要按门店分区。"
       ],
-      "explanation": "累计窗口应按门店重新开始，而不是所有订单连在一起。\n执行思路：确认orders的输入记录；根据窗口分区、顺序及框架计算每行的分析值；输出id、store_id、running_sales列；结果行的先后顺序不作要求。\n公开夹具实际返回 5 行、3 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
+      "explanation": "PARTITION BY store_id 让每家门店各自累计，ORDER BY order_date, id 决定累计顺序，ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW 表示从该门店第一笔加到当前这一笔。\n易错：不分区时所有门店的订单连在一起累计，门店之间互相影响。",
       "commonErrors": [
         {
           "sql": "SELECT id,store_id,SUM(sales) OVER(ORDER BY order_date,id ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS running_sales FROM orders",
@@ -2442,8 +2429,8 @@
       "difficulty": "中等",
       "type": "独立编写",
       "title": "并列薪资的范围累计",
-      "context": "使用课程中的小型员工示例数据，完成“并列薪资的范围累计”的查询练习。示例表中的金额以元为单位，不是企业库中以分为单位的整数金额。",
-      "requirements": "按薪资升序做 RANGE 从开头到当前值，输出 employee_id、salary、running_salary，并列薪资得到相同累计。\n输出字段名称及顺序：employee_id, salary, running_salary\n结果排序要求：不要求排序，结果行的先后顺序不影响判断。\n计算及格式要求：未指定小数位数时，保留原计算结果的精度；NULL、数字 0 和空字符串是三种不同的值。",
+      "context": "薪酬分析想看按薪资从低到高累计到当前薪资的总额。",
+      "requirements": "按薪资从低到高累计求和：累计范围是“从最小薪资一直到当前薪资的值”，薪资相同的员工得到相同的累计值；只处理薪资不为空的员工，输出 employee_id、salary、running_salary。\n输出字段名称及顺序：employee_id, salary, running_salary\n结果排序要求：不要求排序，结果行的先后顺序不影响判断。",
       "datasetId": "q0212-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -2489,24 +2476,18 @@
           "kind": "reference",
           "mysqlSql": "SELECT employee_id,salary,SUM(salary) OVER(ORDER BY salary RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS running_salary FROM employees WHERE salary IS NOT NULL",
           "sqliteSql": "SELECT employee_id,salary,SUM(salary) OVER(ORDER BY salary RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS running_salary FROM employees WHERE salary IS NOT NULL"
-        },
-        {
-          "kind": "关系结构等价",
-          "mysqlSql": "SELECT employee_id,salary,SUM(salary) OVER(ORDER BY salary RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS running_salary FROM (SELECT * FROM employees) AS employees WHERE salary IS NOT NULL",
-          "sqliteSql": "SELECT employee_id,salary,SUM(salary) OVER(ORDER BY salary RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS running_salary FROM (SELECT * FROM employees) AS employees WHERE salary IS NOT NULL",
-          "explanation": "先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。"
         }
       ],
       "hints": [
-        "决定窗口内的分区、排序与范围，注意是否需要保留全部原行。",
-        "结合《RANGE 与 ROWS 的并列效应》：排序键相同的行属于同值组；RANGE 截至当前排序值，可能同时纳入并列行；ROWS 截至具体物理行。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT employee_id,salary,SUM(salary) OVER(ORDER BY salary □□□ UNBOUNDED PRECEDING AND CURRENT ROW) AS running_salary FROM employees WHERE salary IS NOT NULL"
+        "累计求和要用带排序的窗口聚合，关键是窗口的“范围”怎么定。",
+        "窗口范围有两种计法：ROWS 按行的位置，RANGE 按排序列的值。",
+        "薪资相同的两位员工要得到相同的累计，说明窗口要把“同一个薪资值的所有行”一起算进来，想想哪种范围会这样。"
       ],
-      "explanation": "RANGE 会将同排序值的并列行纳入当前帧，ROWS逐行计算可能不同。\n执行思路：确认employees的输入记录；按筛选条件保留符合要求的记录，并考虑空值；根据窗口分区、顺序及框架计算每行的分析值；输出employee_id、salary、running_salary列；结果行的先后顺序不作要求。\n公开夹具实际返回 4 行、3 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
+      "explanation": "RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW 以排序值为界：从最小值一直累计到当前薪资，并且把和当前行薪资相同的所有行也算进来，所以并列薪资得到同样的累计值（本例两位 5000 都是 13000）。\n易错：ROWS 按物理行逐行累计，薪资相同的两行会得到不同的累计值。",
       "commonErrors": [
         {
           "sql": "SELECT employee_id,salary,SUM(salary) OVER(ORDER BY salary ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS running_salary FROM employees WHERE salary IS NOT NULL",
-          "reason": "RANGE 会将同排序值的并列行纳入当前帧，ROWS逐行计算可能不同。",
+          "reason": "ROWS 逐行累计，薪资相同的两行会得到不同的累计值；RANGE 才会把并列行一起算进当前累计。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -2646,8 +2627,8 @@
       "difficulty": "困难",
       "type": "独立编写",
       "title": "相邻记录销售环比",
-      "context": "使用课程中的小型月度销售示例数据，完成“相邻记录销售环比”的查询练习。示例表中的金额以元为单位，不是企业库中以分为单位的整数金额。",
-      "requirements": "编写 SQL，完成以下查询要求。\n对 monthly 的每一行返回 month 和 growth_pct（相对上一条记录的变化百分比，保留两位小数）；第一条记录或上一条记录的值为 0 时返回 NULL。\n输出字段名称及顺序：month, growth_pct\n结果排序要求：按 month 升序排列。\n计算及格式要求：未指定小数位数时，保留原计算结果的精度；NULL、数字 0 和空字符串是三种不同的值。",
+      "context": "运营想看每个月销售额相对上个月的变化百分比。",
+      "requirements": "对 monthly 的每个月返回 month 和 growth_pct（相对上一个月销售额的变化百分比，保留两位小数）；第一个月没有上一个月，或上一个月销售额为 0 时返回 NULL。\n输出字段名称及顺序：month, growth_pct\n结果排序要求：不要求排序，结果行的先后顺序不影响判断。",
       "datasetId": "q0214-lesson",
       "schemaVersion": 3,
       "contentVersion": "4.2.2",
@@ -2686,26 +2667,20 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "WITH a AS (SELECT month,sales,LAG(sales) OVER(ORDER BY month) AS prev FROM monthly) SELECT month,ROUND(100.0*(sales-prev)/NULLIF(prev,0),2) AS growth_pct FROM a ORDER BY month",
-          "sqliteSql": "WITH a AS (SELECT month,sales,LAG(sales) OVER(ORDER BY month) AS prev FROM monthly) SELECT month,ROUND(100.0*(sales-prev)/NULLIF(prev,0),2) AS growth_pct FROM a ORDER BY month"
-        },
-        {
-          "kind": "语法等价",
-          "mysqlSql": "WITH a AS (SELECT ALL month,sales,LAG(sales) OVER(ORDER BY month) AS prev FROM monthly) SELECT month,ROUND(100.0*(sales-prev)/NULLIF(prev,0),2) AS growth_pct FROM a ORDER BY month",
-          "sqliteSql": "WITH a AS (SELECT ALL month,sales,LAG(sales) OVER(ORDER BY month) AS prev FROM monthly) SELECT month,ROUND(100.0*(sales-prev)/NULLIF(prev,0),2) AS growth_pct FROM a ORDER BY month",
-          "explanation": "普通 SELECT 默认保留重复记录，显式 ALL 不改变结果。"
+          "mysqlSql": "WITH a AS (SELECT month,sales,LAG(sales) OVER(ORDER BY month) AS prev FROM monthly) SELECT month,ROUND(100.0*(sales-prev)/NULLIF(prev,0),2) AS growth_pct FROM a",
+          "sqliteSql": "WITH a AS (SELECT month,sales,LAG(sales) OVER(ORDER BY month) AS prev FROM monthly) SELECT month,ROUND(100.0*(sales-prev)/NULLIF(prev,0),2) AS growth_pct FROM a"
         }
       ],
       "hints": [
-        "决定窗口内的分区、排序与范围，注意是否需要保留全部原行。",
-        "结合《移动平均与环比》：移动平均使用固定行数帧；环比比较当前与上期，分母为上期且不得为零。",
-        "按题设编写投影、筛选及分组，使用运行检查列名、NULL、重复记录和排序。"
+        "“上一个月”的值要放进当前行才能相减，先想怎么取到上一行。",
+        "LAG(列) OVER (ORDER BY …) 取按顺序的上一行的值；第一行没有上一行时是 NULL。",
+        "变化百分比 =（本期 − 上期）÷ 上期；上期为 0 时要避免除以 0，可以用 NULLIF。"
       ],
-      "explanation": "增长率分子为本期减上期，分母为上期，必须处理零分母。\n执行思路：确认monthly的输入记录；先明确公用表表达式的中间数据及其粒度；根据窗口分区、顺序及框架计算每行的分析值；输出month、growth_pct列；遵循题设排序和并列规则。\n公开夹具实际返回 4 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：普通 SELECT 默认保留重复记录，显式 ALL 不改变结果。",
+      "explanation": "先用 LAG(sales) 把上一个月的销售额放进同一行，再按（本期 − 上期）÷ 上期 × 100 计算；NULLIF(prev,0) 让上期为 0 时结果是 NULL 而不是报错，第一个月没有上期，结果同样是 NULL。\n易错：分子写成（上期 − 本期）会得到符号相反的百分比。",
       "commonErrors": [
         {
-          "sql": "WITH a AS (SELECT month,sales,LAG(sales) OVER(ORDER BY month) AS prev FROM monthly) SELECT month,ROUND(100.0*(prev-sales)/NULLIF(prev,0),2) AS growth_pct FROM a ORDER BY month",
-          "reason": "增长率分子为本期减上期，分母为上期，必须处理零分母。",
+          "sql": "WITH a AS (SELECT month,sales,LAG(sales) OVER(ORDER BY month) AS prev FROM monthly) SELECT month,ROUND(100.0*(prev-sales)/NULLIF(prev,0),2) AS growth_pct FROM a",
+          "reason": "分子应为本期减上期，写反后百分比的符号相反。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -2720,24 +2695,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0214/q0214-public.json",
-          "sha256": "a8def689d4bde251b443a828dbddc533df3501fafc8e496608f142fb4892b1c4"
+          "sha256": "e81b6c3e3be3e635bbda7afdf65426cd2a1d20fee75d56765e31656845cbe1a7"
         },
         {
           "id": "q0214-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0214/q0214-boundary.json",
-          "sha256": "9b561c26f597d206aad2a92e6caf713ca8a30b79c3c0184ef832e9cfde7fb63a"
+          "sha256": "4d7d7c8cbbcf1a2ce798b808222f1b9d160403406ffdca9ce1c1e05ee2db4a50"
         },
         {
           "id": "q0214-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0214/q0214-empty.json",
-          "sha256": "237fd576593107857307bf017c4dad712bc7f665b528be06b67ba5b9e1211823"
+          "sha256": "601e63511e1f3bf4c4803da6db0731bd4759553798dd807878e16b5010c2d6f9"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -3043,8 +3018,8 @@
       "difficulty": "困难",
       "type": "独立编写",
       "title": "每类别价格最高的商品含并列",
-      "context": "使用课程中的小型商品示例数据，完成“每类别价格最高的商品含并列”的查询练习。示例表中的金额以元为单位，不是企业库中以分为单位的整数金额。",
-      "requirements": "类别内按价格降序排名，返回排名1的全部已知售价商品，输出 category、product_id、price。\n输出字段名称及顺序：category, product_id, price\n结果排序要求：不要求排序，结果行的先后顺序不影响判断。\n计算及格式要求：未指定小数位数时，保留原计算结果的精度；NULL、数字 0 和空字符串是三种不同的值。",
+      "context": "商品运营想找出每个类别里价格最高的商品，价格并列时都要列出。",
+      "requirements": "在每个类别内按价格从高到低排名，价格相同的并列同一名次；返回每个类别排名第 1 的全部商品（忽略价格为空的商品），输出 category、product_id、price。\n输出字段名称及顺序：category, product_id, price\n结果排序要求：不要求排序，结果行的先后顺序不影响判断。",
       "datasetId": "q0217-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -3085,24 +3060,18 @@
           "kind": "reference",
           "mysqlSql": "WITH a AS (SELECT category,product_id,price,RANK() OVER(PARTITION BY category ORDER BY price DESC) AS r FROM products WHERE price IS NOT NULL) SELECT category,product_id,price FROM a WHERE r=1",
           "sqliteSql": "WITH a AS (SELECT category,product_id,price,RANK() OVER(PARTITION BY category ORDER BY price DESC) AS r FROM products WHERE price IS NOT NULL) SELECT category,product_id,price FROM a WHERE r=1"
-        },
-        {
-          "kind": "代数或函数等价",
-          "mysqlSql": "WITH a AS (SELECT category,product_id,price,RANK() OVER(PARTITION BY category ORDER BY price DESC) AS r FROM products WHERE price IS NOT NULL) SELECT category,product_id,price FROM a WHERE NOT (r<>1)",
-          "sqliteSql": "WITH a AS (SELECT category,product_id,price,RANK() OVER(PARTITION BY category ORDER BY price DESC) AS r FROM products WHERE price IS NOT NULL) SELECT category,product_id,price FROM a WHERE NOT (r<>1)",
-          "explanation": "用反向比较并取 NOT 表达相同三值逻辑。"
         }
       ],
       "hints": [
-        "决定窗口内的分区、排序与范围，注意是否需要保留全部原行。",
-        "结合《ROW_NUMBER、RANK、DENSE_RANK》：ROW_NUMBER 给每行唯一序号；RANK 同值同名次并留空档；DENSE_RANK 同值同名次不留空档。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nWITH a AS (SELECT category,product_id,price,□□□ OVER(PARTITION BY category ORDER BY price DESC) AS r FROM products WHERE price IS NOT NULL) SELECT category,product_id,price FROM a WHERE r=1"
+        "“每个类别内部”各排各的名次，需要把数据按类别分组再排名。",
+        "窗口函数里 PARTITION BY 决定在哪个范围内排名；不同的排名函数对并列的处理不同。",
+        "价格并列第一的商品都要保留，所以要用并列时名次相同的那一种排名函数，而不是给每一行不同编号的那种。"
       ],
-      "explanation": "RANK 保留并列第一，ROW_NUMBER 会任意舍弃同价者。\n执行思路：确认products的输入记录；先明确公用表表达式的中间数据及其粒度；按筛选条件保留符合要求的记录，并考虑空值；根据窗口分区、顺序及框架计算每行的分析值；输出category、product_id、price列；结果行的先后顺序不作要求。\n公开夹具实际返回 3 行、3 列；完整结果见 expectedOutput。\n另一种可用写法：用反向比较并取 NOT 表达相同三值逻辑。",
+      "explanation": "RANK() OVER (PARTITION BY category ORDER BY price DESC) 在每个类别内给价格相同的商品同一个名次，外层保留名次为 1 的行，价格并列第一的商品都会保留。\n易错：ROW_NUMBER 给每一行不同的编号，价格相同的商品里只有一件能得到 1，其余会被丢掉。",
       "commonErrors": [
         {
           "sql": "WITH a AS (SELECT category,product_id,price,ROW_NUMBER() OVER(PARTITION BY category ORDER BY price DESC) AS r FROM products WHERE price IS NOT NULL) SELECT category,product_id,price FROM a WHERE r=1",
-          "reason": "RANK 保留并列第一，ROW_NUMBER 会任意舍弃同价者。",
+          "reason": "ROW_NUMBER 给并列的商品不同的编号，只会保留其中一件，并列第一的其他商品被丢掉。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -3238,8 +3207,8 @@
       "difficulty": "困难",
       "type": "独立编写",
       "title": "每种类别的价格第二档",
-      "context": "使用课程中的小型商品示例数据，完成“每种类别的价格第二档”的查询练习。示例表中的金额以元为单位，不是企业库中以分为单位的整数金额。",
-      "requirements": "使用密集排名取得每类别降序第二个不同售价的全部商品，输出 category、product_id、price。\n输出字段名称及顺序：category, product_id, price\n结果排序要求：不要求排序，结果行的先后顺序不影响判断。\n计算及格式要求：未指定小数位数时，保留原计算结果的精度；NULL、数字 0 和空字符串是三种不同的值。",
+      "context": "商品运营想找出每个类别里价格排在第二档的商品。",
+      "requirements": "在每个类别内按价格从高到低对“不同的价格”编档（价格相同属于同一档，档号连续不跳号），返回每个类别第 2 档的全部商品（忽略价格为空的商品），输出 category、product_id、price。\n输出字段名称及顺序：category, product_id, price\n结果排序要求：不要求排序，结果行的先后顺序不影响判断。",
       "datasetId": "q0218-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -3275,24 +3244,18 @@
           "kind": "reference",
           "mysqlSql": "WITH a AS (SELECT category,product_id,price,DENSE_RANK() OVER(PARTITION BY category ORDER BY price DESC) AS r FROM products WHERE price IS NOT NULL) SELECT category,product_id,price FROM a WHERE r=2",
           "sqliteSql": "WITH a AS (SELECT category,product_id,price,DENSE_RANK() OVER(PARTITION BY category ORDER BY price DESC) AS r FROM products WHERE price IS NOT NULL) SELECT category,product_id,price FROM a WHERE r=2"
-        },
-        {
-          "kind": "代数或函数等价",
-          "mysqlSql": "WITH a AS (SELECT category,product_id,price,DENSE_RANK() OVER(PARTITION BY category ORDER BY price DESC) AS r FROM products WHERE price IS NOT NULL) SELECT category,product_id,price FROM a WHERE NOT (r<>2)",
-          "sqliteSql": "WITH a AS (SELECT category,product_id,price,DENSE_RANK() OVER(PARTITION BY category ORDER BY price DESC) AS r FROM products WHERE price IS NOT NULL) SELECT category,product_id,price FROM a WHERE NOT (r<>2)",
-          "explanation": "用反向比较并取 NOT 表达相同三值逻辑。"
         }
       ],
       "hints": [
-        "决定窗口内的分区、排序与范围，注意是否需要保留全部原行。",
-        "结合《ROW_NUMBER、RANK、DENSE_RANK》：ROW_NUMBER 给每行唯一序号；RANK 同值同名次并留空档；DENSE_RANK 同值同名次不留空档。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nWITH a AS (SELECT category,product_id,price,□□□ OVER(PARTITION BY category ORDER BY price DESC) AS r FROM products WHERE price IS NOT NULL) SELECT category,product_id,price FROM a WHERE r=2"
+        "“第二档”指的是第二个不同的价格，价格相同的商品属于同一档。",
+        "有一种排名函数在并列之后档号不跳号，适合表示“第几个不同的值”。",
+        "排名要在每个类别内部进行；别忘了先去掉价格为空的行。"
       ],
-      "explanation": "第二个不同价格不是第二行，价格相同属于同档。\n执行思路：确认products的输入记录；先明确公用表表达式的中间数据及其粒度；按筛选条件保留符合要求的记录，并考虑空值；根据窗口分区、顺序及框架计算每行的分析值；输出category、product_id、price列；结果行的先后顺序不作要求。\n公开夹具实际返回 2 行、3 列；完整结果见 expectedOutput。\n另一种可用写法：用反向比较并取 NOT 表达相同三值逻辑。",
+      "explanation": "DENSE_RANK() OVER (PARTITION BY category ORDER BY price DESC) 在类别内给相同价格同一档，并且档号连续，所以档号为 2 的就是第二个不同的价格；这一档里价格相同的商品都会返回。\n易错：用 ROW_NUMBER 取第 2 行，得到的只是排在第二位的那一行，它的价格可能和第一名相同，并不是第二个不同的价格。",
       "commonErrors": [
         {
           "sql": "WITH a AS (SELECT category,product_id,price,ROW_NUMBER() OVER(PARTITION BY category ORDER BY price DESC) AS r FROM products WHERE price IS NOT NULL) SELECT category,product_id,price FROM a WHERE r=2",
-          "reason": "第二个不同价格不是第二行，价格相同属于同档。",
+          "reason": "ROW_NUMBER 取的是第 2 行，不是第二个不同的价格，价格相同的商品属于同一档。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -3434,8 +3397,8 @@
       "difficulty": "困难",
       "type": "独立编写",
       "title": "每客户最新订单",
-      "context": "使用课程中的小型订单示例数据，完成“每客户最新订单”的查询练习。示例表中的金额以元为单位，不是企业库中以分为单位的整数金额。",
-      "requirements": "对已登记客户，按订单日期降序、id 降序给每位客户的订单编唯一行号，返回每位客户最新的一笔订单：id、customer_id、order_date。\n输出字段名称及顺序：id, customer_id, order_date\n结果排序要求：按 customer_id 升序排列。\n计算及格式要求：未指定小数位数时，保留原计算结果的精度；NULL、数字 0 和空字符串是三种不同的值。",
+      "context": "客户运营想知道每位客户最近一次下的订单。",
+      "requirements": "对已登记的客户（customer_id 不为空），按订单日期从新到旧、日期相同再按 id 从大到小，给每位客户的订单编唯一的行号，返回每位客户最新的一笔订单的 id、customer_id、order_date。\n输出字段名称及顺序：id, customer_id, order_date\n结果排序要求：不要求排序，结果行的先后顺序不影响判断。",
       "datasetId": "q0219-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
@@ -3474,26 +3437,20 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "WITH a AS (SELECT id,customer_id,order_date,ROW_NUMBER() OVER(PARTITION BY customer_id ORDER BY order_date DESC,id DESC) AS rn FROM orders WHERE customer_id IS NOT NULL) SELECT id,customer_id,order_date FROM a WHERE rn=1 ORDER BY customer_id",
-          "sqliteSql": "WITH a AS (SELECT id,customer_id,order_date,ROW_NUMBER() OVER(PARTITION BY customer_id ORDER BY order_date DESC,id DESC) AS rn FROM orders WHERE customer_id IS NOT NULL) SELECT id,customer_id,order_date FROM a WHERE rn=1 ORDER BY customer_id"
-        },
-        {
-          "kind": "代数或函数等价",
-          "mysqlSql": "WITH a AS (SELECT id,customer_id,order_date,ROW_NUMBER() OVER(PARTITION BY customer_id ORDER BY order_date DESC,id DESC) AS rn FROM orders WHERE customer_id IS NOT NULL) SELECT id,customer_id,order_date FROM a WHERE NOT (rn<>1) ORDER BY customer_id",
-          "sqliteSql": "WITH a AS (SELECT id,customer_id,order_date,ROW_NUMBER() OVER(PARTITION BY customer_id ORDER BY order_date DESC,id DESC) AS rn FROM orders WHERE customer_id IS NOT NULL) SELECT id,customer_id,order_date FROM a WHERE NOT (rn<>1) ORDER BY customer_id",
-          "explanation": "用反向比较并取 NOT 表达相同三值逻辑。"
+          "mysqlSql": "WITH a AS (SELECT id,customer_id,order_date,ROW_NUMBER() OVER(PARTITION BY customer_id ORDER BY order_date DESC,id DESC) AS rn FROM orders WHERE customer_id IS NOT NULL) SELECT id,customer_id,order_date FROM a WHERE rn=1",
+          "sqliteSql": "WITH a AS (SELECT id,customer_id,order_date,ROW_NUMBER() OVER(PARTITION BY customer_id ORDER BY order_date DESC,id DESC) AS rn FROM orders WHERE customer_id IS NOT NULL) SELECT id,customer_id,order_date FROM a WHERE rn=1"
         }
       ],
       "hints": [
-        "决定窗口内的分区、排序与范围，注意是否需要保留全部原行。",
-        "结合《ROW_NUMBER、RANK、DENSE_RANK》：ROW_NUMBER 给每行唯一序号；RANK 同值同名次并留空档；DENSE_RANK 同值同名次不留空档。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nWITH a AS (SELECT id,customer_id,order_date,ROW_NUMBER() OVER(PARTITION BY customer_id ORDER BY □□□,id DESC) AS rn FROM orders WHERE customer_id IS NOT NULL) SELECT id,customer_id,order_date FROM a WHERE rn=1 ORDER BY customer_id"
+        "“每位客户各取一条”，要在每位客户内部单独排序和编号。",
+        "ROW_NUMBER() OVER (PARTITION BY 分组列 ORDER BY …) 在每个分组内从 1 开始编唯一的号。",
+        "最新的一笔要排在第 1，所以排序要从新到旧；日期相同时还需要第二个排序条件，这样每位客户只有一个第 1 名。"
       ],
-      "explanation": "最新订单应倒序选第一；编号决胜同日订单。\n执行思路：确认orders的输入记录；先明确公用表表达式的中间数据及其粒度；按筛选条件保留符合要求的记录，并考虑空值；根据窗口分区、顺序及框架计算每行的分析值；输出id、customer_id、order_date列；遵循题设排序和并列规则。\n公开夹具实际返回 3 行、3 列；完整结果见 expectedOutput。\n另一种可用写法：用反向比较并取 NOT 表达相同三值逻辑。",
+      "explanation": "PARTITION BY customer_id 让每位客户各自编号，ORDER BY order_date DESC, id DESC 把最新的订单排在第 1，日期相同时用 id 决定先后，外层保留 rn=1。\n易错：日期写成升序，取到的就是每位客户最早的订单。",
       "commonErrors": [
         {
-          "sql": "WITH a AS (SELECT id,customer_id,order_date,ROW_NUMBER() OVER(PARTITION BY customer_id ORDER BY order_date ASC,id DESC) AS rn FROM orders WHERE customer_id IS NOT NULL) SELECT id,customer_id,order_date FROM a WHERE rn=1 ORDER BY customer_id",
-          "reason": "最新订单应倒序选第一；编号决胜同日订单。",
+          "sql": "WITH a AS (SELECT id,customer_id,order_date,ROW_NUMBER() OVER(PARTITION BY customer_id ORDER BY order_date ASC,id DESC) AS rn FROM orders WHERE customer_id IS NOT NULL) SELECT id,customer_id,order_date FROM a WHERE rn=1",
+          "reason": "日期升序排第 1 的是最早的订单；要最新的一笔，日期必须从新到旧排序。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -3508,24 +3465,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0219/q0219-public.json",
-          "sha256": "c5613bf4b1163af6b2ebed1fc3c8c261999cf705c189edf962c941b609ebf5d3"
+          "sha256": "5b7979fcfb0cb6bc865209f5c526410fb80a2c22f339ce21548a3cffd73c23c6"
         },
         {
           "id": "q0219-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0219/q0219-boundary.json",
-          "sha256": "867635dfd89caae2c93c31f7eb132564bb01054d6face774dea5d2c93ddef421"
+          "sha256": "0aa42d3ff9c4fc805f2a087abd4a1d881c5773594c76556378313a8591a62f1f"
         },
         {
           "id": "q0219-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0219/q0219-empty.json",
-          "sha256": "726b1b47d2ab4116db84e1a952f9242776429bf189f41c82afc2e297196dc1cd"
+          "sha256": "c3f0368b6e59419c1a416008c9d122e4b32e0ff24a31cdaf8117c47245abe9b4"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,
@@ -3629,15 +3586,15 @@
       "difficulty": "困难",
       "type": "代码填空",
       "title": "仅完整的三行移动平均",
-      "context": "使用课程中的小型月度销售示例数据，完成“仅完整的三行移动平均”的查询练习。示例表中的金额以元为单位，不是企业库中以分为单位的整数金额。",
-      "requirements": "补全代码中的一个空位，使完整SQL满足以下要求。可输入具有相同语义的片段，提交后按完整代码执行结果核对。\n仅当当前行及此前两行的销售额都已知时，才输出 avg3（三行平均值，保留两位小数），否则返回 NULL；输出 month、avg3。\n输出字段名称及顺序：month, avg3\n结果排序要求：按 month 升序排列。\n计算及格式要求：未指定小数位数时，保留原计算结果的精度；NULL、数字 0 和空字符串是三种不同的值。",
+      "context": "运营想计算三个月移动平均，但数据不足三个月时不给出结果。",
+      "requirements": "补全代码中的一个空位，使完整SQL满足以下要求。可输入具有相同语义的片段，提交后按完整代码执行结果核对。\n仅当当前月及其前两个月的销售额都已知（共 3 个非空值）时，才返回三个月平均值 avg3（保留两位小数），否则返回 NULL；输出 month、avg3。\n输出字段名称及顺序：month, avg3\n结果排序要求：不要求排序，结果行的先后顺序不影响判断。",
       "datasetId": "q0220-lesson",
       "schemaVersion": 3,
       "contentVersion": "3.0.0",
       "sourceTables": [
         "monthly"
       ],
-      "initialCode": "SELECT month,CASE WHEN {{blank1}} OVER(ORDER BY month ROWS BETWEEN 2 PRECEDING AND CURRENT ROW)=3 THEN ROUND(AVG(sales) OVER(ORDER BY month ROWS BETWEEN 2 PRECEDING AND CURRENT ROW),2) END AS avg3 FROM monthly ORDER BY month",
+      "initialCode": "SELECT month,CASE WHEN {{blank1}} OVER(ORDER BY month ROWS BETWEEN 2 PRECEDING AND CURRENT ROW)=3 THEN ROUND(AVG(sales) OVER(ORDER BY month ROWS BETWEEN 2 PRECEDING AND CURRENT ROW),2) END AS avg3 FROM monthly",
       "options": [],
       "acceptedBlanks": [
         {
@@ -3677,26 +3634,20 @@
       "referenceSolutions": [
         {
           "kind": "reference",
-          "mysqlSql": "SELECT month,CASE WHEN COUNT(sales) OVER(ORDER BY month ROWS BETWEEN 2 PRECEDING AND CURRENT ROW)=3 THEN ROUND(AVG(sales) OVER(ORDER BY month ROWS BETWEEN 2 PRECEDING AND CURRENT ROW),2) END AS avg3 FROM monthly ORDER BY month",
-          "sqliteSql": "SELECT month,CASE WHEN COUNT(sales) OVER(ORDER BY month ROWS BETWEEN 2 PRECEDING AND CURRENT ROW)=3 THEN ROUND(AVG(sales) OVER(ORDER BY month ROWS BETWEEN 2 PRECEDING AND CURRENT ROW),2) END AS avg3 FROM monthly ORDER BY month"
-        },
-        {
-          "kind": "关系结构等价",
-          "mysqlSql": "SELECT month,CASE WHEN COUNT(sales) OVER(ORDER BY month ROWS BETWEEN 2 PRECEDING AND CURRENT ROW)=3 THEN ROUND(AVG(sales) OVER(ORDER BY month ROWS BETWEEN 2 PRECEDING AND CURRENT ROW),2) END AS avg3 FROM (SELECT * FROM monthly) AS monthly ORDER BY month",
-          "sqliteSql": "SELECT month,CASE WHEN COUNT(sales) OVER(ORDER BY month ROWS BETWEEN 2 PRECEDING AND CURRENT ROW)=3 THEN ROUND(AVG(sales) OVER(ORDER BY month ROWS BETWEEN 2 PRECEDING AND CURRENT ROW),2) END AS avg3 FROM (SELECT * FROM monthly) AS monthly ORDER BY month",
-          "explanation": "先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。"
+          "mysqlSql": "SELECT month,CASE WHEN COUNT(sales) OVER(ORDER BY month ROWS BETWEEN 2 PRECEDING AND CURRENT ROW)=3 THEN ROUND(AVG(sales) OVER(ORDER BY month ROWS BETWEEN 2 PRECEDING AND CURRENT ROW),2) END AS avg3 FROM monthly",
+          "sqliteSql": "SELECT month,CASE WHEN COUNT(sales) OVER(ORDER BY month ROWS BETWEEN 2 PRECEDING AND CURRENT ROW)=3 THEN ROUND(AVG(sales) OVER(ORDER BY month ROWS BETWEEN 2 PRECEDING AND CURRENT ROW),2) END AS avg3 FROM monthly"
         }
       ],
       "hints": [
-        "决定窗口内的分区、排序与范围，注意是否需要保留全部原行。",
-        "结合《移动平均与环比》：移动平均使用固定行数帧；环比比较当前与上期，分母为上期且不得为零。",
-        "回想空位所在子句的功能：移动平均与环比；保留周围代码，填入实现题设的表达式。"
+        "要判断窗口里是不是凑够了 3 个已知的销售额，而不只是有 3 行。",
+        "COUNT(*) 数行，COUNT(列) 只数该列不是 NULL 的行，在窗口里它们回答的问题不同。",
+        "空位里要放的是对销售额计数的窗口函数，注意它统计的是“已知值的个数”。"
       ],
-      "explanation": "完整已知样本必须计数非NULL销售，不仅计行。\n执行思路：确认monthly的输入记录；根据窗口分区、顺序及框架计算每行的分析值；输出month、avg3列；遵循题设排序和并列规则。\n公开夹具实际返回 4 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
+      "explanation": "窗口 ROWS BETWEEN 2 PRECEDING AND CURRENT ROW 取当前行和前两行；COUNT(sales) 只统计其中销售额不是 NULL 的行数，等于 3 才说明三个月数据齐全，再输出平均值，否则 CASE 返回 NULL。\n易错：COUNT(*) 数的是行数，销售额为 NULL 的行也会被计入，窗口里有缺失值时就会误判为齐全。",
       "commonErrors": [
         {
-          "sql": "SELECT month,CASE WHEN COUNT(*) OVER(ORDER BY month ROWS BETWEEN 2 PRECEDING AND CURRENT ROW)=3 THEN ROUND(AVG(sales) OVER(ORDER BY month ROWS BETWEEN 2 PRECEDING AND CURRENT ROW),2) END AS avg3 FROM monthly ORDER BY month",
-          "reason": "完整已知样本必须计数非NULL销售，不仅计行。",
+          "sql": "SELECT month,CASE WHEN COUNT(*) OVER(ORDER BY month ROWS BETWEEN 2 PRECEDING AND CURRENT ROW)=3 THEN ROUND(AVG(sales) OVER(ORDER BY month ROWS BETWEEN 2 PRECEDING AND CURRENT ROW),2) END AS avg3 FROM monthly",
+          "reason": "COUNT(*) 只数行，销售额为 NULL 的行也被计入，不能保证三个月的销售额都已知。",
           "validation": "典型错误已在至少一组夹具被结果/状态比对拒绝"
         }
       ],
@@ -3711,24 +3662,24 @@
           "visibility": "public",
           "variant": "public",
           "path": "fixtures/q0220/q0220-public.json",
-          "sha256": "33b296b884682f51c9b0ce5173e1bd4ddcb804a1784e68eaa9f6fd2434ef25a7"
+          "sha256": "1edaafecb9b56625c76ea65ab67d2ff1b41e20d40bf5404453f9799a90de872c"
         },
         {
           "id": "q0220-boundary",
           "visibility": "hidden",
           "variant": "boundary",
           "path": "fixtures/q0220/q0220-boundary.json",
-          "sha256": "24e369f9b0d1e6d0d152046a875384308fc10808a44a28ca6764760819ed0ff9"
+          "sha256": "e4a89a915e19b1812b21a0f97ba437ae893d397b63544d7309a45b4bc03fe5e0"
         },
         {
           "id": "q0220-empty",
           "visibility": "hidden",
           "variant": "empty",
           "path": "fixtures/q0220/q0220-empty.json",
-          "sha256": "faea92b10e4c5fb7e8160fae3a97e00eb5f6e6002c29b35a04b41192c106ae56"
+          "sha256": "0b2727353b49fd278aaf12c03e6e8dce35eba9d3abc99653cb4151219818f394"
         }
       ],
-      "orderPolicy": "ordered",
+      "orderPolicy": "unordered_multiset",
       "columnPolicy": "exact_names_in_order",
       "numericTolerance": {
         "absolute": 1e-06,

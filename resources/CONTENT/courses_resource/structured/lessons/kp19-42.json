@@ -6,7 +6,7 @@
   "conceptBlocks": [
     {
       "type": "heading",
-      "text": "基本含义",
+      "text": "什么是 RFM 客户分层？",
       "emphasis": []
     },
     {
@@ -47,8 +47,8 @@
       "kind": "runnable",
       "title": "客户最近购买、次数及金额",
       "sql": "WITH a AS (SELECT customer_id,MAX(order_date) last_day,COUNT(*) freq,SUM(net_cents) money FROM v_order_net WHERE channel='online' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY customer_id)\nSELECT * FROM a ORDER BY 1, 2, 3, 4 LIMIT 3;",
-      "purpose": "客户最近购买、次数及金额（a）的实际执行结果。",
-      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "purpose": "先算出 2025 年每位线上客户的最近购买日期、订单数 freq 和净消费额 money。",
+      "reason": "三项指标都是客户层面的，所以先汇总到一位客户一行。",
       "sourceTables": [
         {
           "name": "calendar_days",
@@ -191,8 +191,8 @@
       "kind": "runnable",
       "title": "为三项指标分别分档",
       "sql": "WITH a AS (SELECT customer_id,MAX(order_date) last_day,COUNT(*) freq,SUM(net_cents) money FROM v_order_net WHERE channel='online' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY customer_id), b AS (SELECT *,6-NTILE(5) OVER(ORDER BY last_day DESC,customer_id) r_score,6-NTILE(5) OVER(ORDER BY freq DESC,customer_id) f_score,6-NTILE(5) OVER(ORDER BY money DESC,customer_id) m_score FROM a)\nSELECT * FROM b ORDER BY 1, 2, 3, 4, 5, 6, 7 LIMIT 3;",
-      "purpose": "为三项指标分别分档（b）的实际执行结果。",
-      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "purpose": "给三项指标分别打 5 档分：最近购买越晚、订单越多、金额越大得分越高，5 分最高。",
+      "reason": "NTILE(5) 把客户平均分成五份，不是按并列名次；“最近”要用最近购买日期降序才能得高分。",
       "sourceTables": [
         {
           "name": "calendar_days",
@@ -347,8 +347,8 @@
       "kind": "runnable",
       "title": "按分档得分划分客户层级",
       "sql": "WITH a AS (SELECT customer_id,MAX(order_date) last_day,COUNT(*) freq,SUM(net_cents) money FROM v_order_net WHERE channel='online' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY customer_id), b AS (SELECT *,6-NTILE(5) OVER(ORDER BY last_day DESC,customer_id) r_score,6-NTILE(5) OVER(ORDER BY freq DESC,customer_id) f_score,6-NTILE(5) OVER(ORDER BY money DESC,customer_id) m_score FROM a) SELECT b.customer_id,1095-d.day_index recency_days,freq,money net_cents,r_score,f_score,m_score,CASE WHEN r_score+f_score+m_score>=13 THEN 'high_value' WHEN r_score+f_score+m_score<=6 THEN 'low_activity' ELSE 'regular' END segment FROM b JOIN calendar_days d ON d.day=b.last_day ORDER BY net_cents DESC, recency_days, freq",
-      "purpose": "在前面各步中间结果的基础上完成最终计算，输出题目要求的完整结果。",
-      "reason": "前面的步骤只是分块准备；把它们组合起来，才能得到最终的业务结果。",
+      "purpose": "把三项得分相加：总分至少 13 为高价值，至多 6 为低活跃，其余为常规。",
+      "reason": "层级由总分决定；距今天数以 2025-12-31 为截止日，其他数据集不能照搬同样的日期常数。",
       "sourceTables": [
         {
           "name": "calendar_days",
@@ -36633,7 +36633,13 @@
         "emphasis": []
       }
     ],
-    "reason": [],
+    "reason": [
+      {
+        "type": "paragraph",
+        "text": "把“距上次消费的天数”按降序直接打高分，会让很久没来的客户得 5 分，方向反了；五等分会把并列的客户拆到不同档，不等于并列名次。",
+        "emphasis": []
+      }
+    ],
     "correction": [
       {
         "type": "paragraph",

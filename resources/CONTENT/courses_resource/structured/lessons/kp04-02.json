@@ -6,7 +6,7 @@
   "conceptBlocks": [
     {
       "type": "heading",
-      "text": "基本含义",
+      "text": "什么是 LIMIT 与分页？",
       "emphasis": []
     },
     {
@@ -20,23 +20,6 @@
         "分页是在确定排序后截取结果。",
         "例如每页两条，第一页跳过0条，第二页跳过2条，第三页跳过4条；一般偏移量为（页码减一）乘每页条数，页码从1开始。",
         "LIMIT 不会自动排序，也不会自动包含所有并列记录。"
-      ]
-    },
-    {
-      "type": "heading",
-      "text": "使用要点",
-      "emphasis": []
-    },
-    {
-      "type": "paragraph",
-      "text": "若业务要求保留所有并列名次，不能直接用固定行数代替排名规则。",
-      "emphasis": []
-    },
-    {
-      "type": "list",
-      "items": [
-        "分页依赖稳定排序；即使排序稳定，如果不同页查询之间数据发生变化，也可能重复或遗漏。",
-        "高页码性能问题可后续了解，不属于本节重点。"
       ]
     },
     {
@@ -65,6 +48,23 @@
       ],
       "title": "每页 2 条时的分页参数",
       "caption": "OFFSET = （页码 − 1）× 每页条数；本例就是每页 2 条的第 2 页。"
+    },
+    {
+      "type": "heading",
+      "text": "使用要点",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "若业务要求保留所有并列名次，不能直接用固定行数代替排名规则。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "分页依赖稳定排序；即使排序稳定，如果不同页查询之间数据发生变化，也可能重复或遗漏。",
+        "高页码性能问题可后续了解，不属于本节重点。"
+      ]
     }
   ],
   "syntax": {
@@ -96,29 +96,29 @@
       "kind": "fragment",
       "title": "指定来源",
       "sql": "FROM products",
-      "purpose": "从 products 读取输入数据。",
-      "reason": "后面的子句都基于这里得到的行。"
+      "purpose": "先确定数据来自 products 表，每一行是一件商品。",
+      "reason": "WHERE、SELECT、ORDER BY 都是在这张表的行上工作的，所以要先有数据来源。"
     },
     {
       "kind": "fragment",
       "title": "选择输出",
       "sql": "SELECT product_id, price",
-      "purpose": "输出 product_id, price。",
-      "reason": "输出列的顺序与别名决定结果表的形状。"
+      "purpose": "显示商品编号和价格。",
+      "reason": "SELECT 只决定显示哪些列。"
     },
     {
       "kind": "fragment",
       "title": "排序",
       "sql": "ORDER BY price DESC, product_name",
-      "purpose": "按 price DESC, product_name 排列结果。",
-      "reason": "查询结果的默认行序没有保证，需要显式排序。"
+      "purpose": "先按 price 从高到低排，价格相同的再按 product_name 排。",
+      "reason": "LIMIT 和 OFFSET 是对排好序的结果截取，所以必须先有确定的顺序。"
     },
     {
       "kind": "fragment",
       "title": "截取行数",
       "sql": "LIMIT 2 OFFSET 2;",
-      "purpose": "只返回 2 OFFSET 2 的行段。",
-      "reason": "先排序再截取，才能得到确定的行段。"
+      "purpose": "先跳过前 2 行，再取接下来的 2 行（相当于每页 2 条的第 2 页）。",
+      "reason": "先排序再截取，取到的才是确定的那一段；OFFSET 等于（页码 − 1）× 每页条数。"
     }
   ],
   "completeCode": {
@@ -244,7 +244,13 @@
         "emphasis": []
       }
     ],
-    "reason": [],
+    "reason": [
+      {
+        "type": "paragraph",
+        "text": "没有 ORDER BY 时数据库不保证行的顺序，LIMIT 2 取到的只是“碰巧排在前面的两行”，不能说成价格最高的前两名。",
+        "emphasis": []
+      }
+    ],
     "correction": [
       {
         "type": "paragraph",

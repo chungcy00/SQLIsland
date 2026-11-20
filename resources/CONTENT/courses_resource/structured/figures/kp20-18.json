@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp20-18",
-  "lessonSha256": "cefd5cf568aa4f4aa20cb5f794c3c996de2623174ea15805e80529aa779e1f76",
+  "lessonSha256": "c20c8411fd075481cd40133493c4c225ea61916928bbb206203f58a36e0dcd33",
   "figures": [
     {
       "id": "kp20-18-clauses",
@@ -14,25 +14,25 @@
           "role": "cte",
           "label": "中间结果",
           "sql": "WITH a AS (SELECT s.source_id,SUM(o.net_cents) net,SUM(o.net_cents-o.cost_cents) gross FROM v_order_net o JOIN customer_sessions s ON s.session_id=o.session_id WHERE o.channel='online' AND o.order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY s.source_id),",
-          "note": "先把名为 a 的中间结果算出来，供后面的查询引用。"
+          "note": "先单独算出一张临时结果 a，下面的查询可以把它当作普通表来用。"
         },
         {
           "role": "cte",
           "label": "中间结果",
           "sql": "b AS (SELECT source_id,SUM(spend_cents) spend FROM marketing_campaigns WHERE month_key BETWEEN '2025-01' AND '2025-12' GROUP BY source_id)",
-          "note": "先把名为 b 的中间结果算出来，供后面的查询引用。"
+          "note": "先单独算出一张临时结果 b，下面的查询可以把它当作普通表来用。"
         },
         {
           "role": "select",
           "label": "取数",
           "sql": "SELECT t.source_id,COALESCE(a.net,0) net_cents,COALESCE(a.gross,0) gross_cents,COALESCE(b.spend,0) spend_cents,COALESCE(a.gross,0)-COALESCE(b.spend,0) contribution_cents,ROUND(100.0*(COALESCE(a.gross,0)-COALESCE(b.spend,0))/NULLIF(a.net,0),2) contribution_pct",
-          "note": "输出查询需要的列与计算表达式。"
+          "note": "结果表最终显示 6 列：source_id、net_cents、gross_cents、spend_cents、contribution_cents、contribution_pct。"
         },
         {
           "role": "from",
           "label": "来源",
           "sql": "FROM traffic_sources t LEFT JOIN a ON a.source_id=t.source_id LEFT JOIN b ON b.source_id=t.source_id",
-          "note": "读取查询需要的输入数据。"
+          "note": "数据来自 表 traffic_sources、中间结果 a、中间结果 b，并用 ON 后面的条件把它们的行配起来。"
         },
         {
           "role": "order",

@@ -6,7 +6,7 @@
   "conceptBlocks": [
     {
       "type": "heading",
-      "text": "基本含义",
+      "text": "什么是月度趋势与缺失月份？",
       "emphasis": []
     },
     {
@@ -81,8 +81,8 @@
       "kind": "runnable",
       "title": "从日期维度提取自然月",
       "sql": "WITH months AS (\n SELECT DISTINCT month_key FROM calendar_days WHERE month_key BETWEEN '2025-01' AND '2025-12'\n)\nSELECT * FROM months ORDER BY 1 LIMIT 3;",
-      "purpose": "从日期维度提取自然月（months）的实际执行结果。",
-      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "purpose": "先从日期维度表取出 2025 年的 12 个自然月 months。",
+      "reason": "没有销售的月份也要出现在报表里，所以以日期维度的月份为基准。",
       "sourceTables": [
         {
           "name": "stores",
@@ -693,8 +693,8 @@
       "kind": "runnable",
       "title": "按自然月汇总有效订单",
       "sql": "WITH months AS (\n SELECT DISTINCT month_key FROM calendar_days WHERE month_key BETWEEN '2025-01' AND '2025-12'\n), sales AS (\n SELECT SUBSTR(order_date,1,7) month_key,SUM(net_cents) net_cents FROM v_order_net\n WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY SUBSTR(order_date,1,7)\n)\nSELECT * FROM sales ORDER BY 1, 2 LIMIT 3;",
-      "purpose": "按自然月汇总有效订单（sales）的实际执行结果。",
-      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "purpose": "按自然月汇总 2025 年线下有效订单的净销售 sales。",
+      "reason": "这一步只有有订单的月份。",
       "sourceTables": [
         {
           "name": "stores",
@@ -1305,8 +1305,8 @@
       "kind": "runnable",
       "title": "补全没有订单的月份",
       "sql": "WITH months AS (\n SELECT DISTINCT month_key FROM calendar_days WHERE month_key BETWEEN '2025-01' AND '2025-12'\n), sales AS (\n SELECT SUBSTR(order_date,1,7) month_key,SUM(net_cents) net_cents FROM v_order_net\n WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY SUBSTR(order_date,1,7)\n), complete AS (\n SELECT m.month_key,COALESCE(s.net_cents,0) net_cents FROM months m LEFT JOIN sales s ON m.month_key=s.month_key\n)\nSELECT * FROM complete ORDER BY 1, 2 LIMIT 3;",
-      "purpose": "补全没有订单的月份（complete）的实际执行结果。",
-      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "purpose": "把月份和销售汇总左连接，没有订单的月份净销售补成 0。",
+      "reason": "只有来源数据完整时才能把无交易解释为 0；漏传、未关账的月份不能直接补 0。",
       "sourceTables": [
         {
           "name": "stores",
@@ -1921,8 +1921,8 @@
       "kind": "runnable",
       "title": "在连续月份上计算上一月净销售",
       "sql": "WITH months AS (\n SELECT DISTINCT month_key FROM calendar_days WHERE month_key BETWEEN '2025-01' AND '2025-12'\n), sales AS (\n SELECT SUBSTR(order_date,1,7) month_key,SUM(net_cents) net_cents FROM v_order_net\n WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY SUBSTR(order_date,1,7)\n), complete AS (\n SELECT m.month_key,COALESCE(s.net_cents,0) net_cents FROM months m LEFT JOIN sales s ON m.month_key=s.month_key\n), previous AS (\n SELECT month_key,net_cents,LAG(net_cents) OVER(ORDER BY month_key) previous_net_cents FROM complete\n)\nSELECT * FROM previous ORDER BY 1, 2, 3 LIMIT 3;",
-      "purpose": "在连续月份上计算上一月净销售（previous）的实际执行结果。",
-      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "purpose": "用 LAG 取每个月的上一个月净销售 previous_net_cents。",
+      "reason": "月份已经连续，LAG 的“上一行”才是上个月。",
       "sourceTables": [
         {
           "name": "stores",
@@ -2541,8 +2541,8 @@
       "kind": "runnable",
       "title": "计算金额变化与环比百分比",
       "sql": "WITH months AS (\n SELECT DISTINCT month_key FROM calendar_days WHERE month_key BETWEEN '2025-01' AND '2025-12'\n), sales AS (\n SELECT SUBSTR(order_date,1,7) month_key,SUM(net_cents) net_cents FROM v_order_net\n WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY SUBSTR(order_date,1,7)\n), complete AS (\n SELECT m.month_key,COALESCE(s.net_cents,0) net_cents FROM months m LEFT JOIN sales s ON m.month_key=s.month_key\n), previous AS (\n SELECT month_key,net_cents,LAG(net_cents) OVER(ORDER BY month_key) previous_net_cents FROM complete\n)\nSELECT month_key,net_cents,previous_net_cents,net_cents-previous_net_cents change_cents,\n ROUND(100.0*(net_cents-previous_net_cents)/NULLIF(previous_net_cents,0),2) change_pct\nFROM previous ORDER BY month_key",
-      "purpose": "在前面各步中间结果的基础上完成最终计算，输出题目要求的完整结果。",
-      "reason": "前面的步骤只是分块准备；把它们组合起来，才能得到最终的业务结果。",
+      "purpose": "计算金额变化和环比百分比。",
+      "reason": "环比以上一个月为分母，上月为 0 时用 NULLIF 保持 NULL。",
       "sourceTables": [
         {
           "name": "stores",
@@ -3654,7 +3654,13 @@
         "emphasis": []
       }
     ],
-    "reason": [],
+    "reason": [
+      {
+        "type": "paragraph",
+        "text": "只对有销售的月份使用 LAG，缺了的月份会被跳过，“上个月”其实是更早的月份；零分母的环比补成 0%，会把“没有定义”说成“没有变化”。",
+        "emphasis": []
+      }
+    ],
     "correction": [
       {
         "type": "paragraph",

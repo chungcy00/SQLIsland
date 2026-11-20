@@ -6,7 +6,7 @@
   "conceptBlocks": [
     {
       "type": "heading",
-      "text": "类型如何影响数据",
+      "text": "数据类型如何影响数据？",
       "emphasis": []
     },
     {
@@ -24,7 +24,7 @@
     },
     {
       "type": "heading",
-      "text": "数据字典需要记录什么",
+      "text": "数据字典需要记录什么？",
       "emphasis": []
     },
     {

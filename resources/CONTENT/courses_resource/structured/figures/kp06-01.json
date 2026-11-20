@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp06-01",
-  "lessonSha256": "c7af163d3c5be0525b78936b4ce34b7153b2a50e6fae3b99c705433a8a2eff1c",
+  "lessonSha256": "52f526e3599a877cf89cbecba1e44440bbce7e0c5fc60271e2a6fc661ee5a3ad",
   "figures": [
     {
       "id": "kp06-01-clauses",
@@ -14,13 +14,13 @@
           "role": "select",
           "label": "取数",
           "sql": "SELECT COUNT(*) AS rows_count, COUNT(value) AS nonnull_count, COUNT(DISTINCT value) AS unique_count",
-          "note": "输出查询需要的列与计算表达式。"
+          "note": "结果表最终显示 3 列：rows_count、nonnull_count、unique_count。"
         },
         {
           "role": "from",
           "label": "来源",
           "sql": "FROM nullable_values;",
-          "note": "从 nullable_values 读取输入数据。"
+          "note": "数据来自表 nullable_values。"
         }
       ]
     },
@@ -126,7 +126,8 @@
           "sql": "COUNT(DISTINCT value)",
           "value": 2
         }
-      ]
+      ],
+      "conclusion": "COUNT(*) 数全部行，COUNT(value) 跳过 NULL，COUNT(DISTINCT value) 再去掉重复值——同一张表，三个数不同（4、3、2）。"
     }
   ]
 }

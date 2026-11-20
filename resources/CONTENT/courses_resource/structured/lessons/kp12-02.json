@@ -6,7 +6,7 @@
   "conceptBlocks": [
     {
       "type": "heading",
-      "text": "基本含义",
+      "text": "什么是日期拆分与格式化？",
       "emphasis": []
     },
     {
@@ -18,6 +18,12 @@
       "type": "list",
       "items": [
         "相同月份编号可能来自不同年份，故跨年报表应使用年份与月份组合；派生日期字段本身不改变记录粒度，分组才改变粒度。"
+      ]
+    },
+    {
+      "type": "figure",
+      "ids": [
+        "kp12-02-fn"
       ]
     }
   ],
@@ -45,22 +51,22 @@
       "kind": "fragment",
       "title": "指定来源",
       "sql": "FROM orders",
-      "purpose": "从 orders 读取输入数据。",
-      "reason": "后面的子句都基于这里得到的行。"
+      "purpose": "读取 orders 表，每一行是一笔订单。",
+      "reason": "后面的函数是对每一笔订单的日期进行处理。"
     },
     {
       "kind": "fragment",
       "title": "选择输出",
       "sql": "SELECT id, DATE_FORMAT(order_date,'%Y-%m') AS month, YEAR(order_date) AS year_no, MONTH(order_date) AS month_no",
-      "purpose": "输出查询需要的列与计算表达式。",
-      "reason": "输出列的顺序与别名决定结果表的形状。"
+      "purpose": "把订单日期拆成月份键（如 2026-02）、年份数字和月份数字三列。",
+      "reason": "月份键保留了年份，方便跨年分组；年份和月份数字适合做数值比较。"
     },
     {
       "kind": "fragment",
       "title": "排序",
       "sql": "ORDER BY sales DESC;",
-      "purpose": "按 sales DESC 排列结果。",
-      "reason": "查询结果的默认行序没有保证，需要显式排序。"
+      "purpose": "按销售额从高到低排列。",
+      "reason": "没有 ORDER BY 时数据库不保证行的顺序，写出来才能让输出顺序固定。"
     }
   ],
   "completeCode": {
@@ -187,7 +193,13 @@
         "emphasis": []
       }
     ],
-    "reason": [],
+    "reason": [
+      {
+        "type": "paragraph",
+        "text": "只按 MONTH(order_date) 分组时，2025 年 2 月和 2026 年 2 月的订单会被放进同一组；跨年数据必须同时区分年份和月份。",
+        "emphasis": []
+      }
+    ],
     "correction": [
       {
         "type": "paragraph",

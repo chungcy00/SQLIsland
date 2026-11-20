@@ -6,7 +6,7 @@
   "conceptBlocks": [
     {
       "type": "heading",
-      "text": "基本含义",
+      "text": "什么是复购率？",
       "emphasis": []
     },
     {
@@ -61,8 +61,8 @@
       "kind": "runnable",
       "title": "每位客户的有效购买订单数",
       "sql": "WITH purchases AS (\n  SELECT c.customer_id, COUNT(DISTINCT o.order_id) purchase_count\n  FROM customers c JOIN v_order_net o ON o.customer_id=c.customer_id\n  WHERE o.channel='online' AND o.order_date BETWEEN '2025-01-01' AND '2025-12-31'\n    AND o.net_cents>0\n  GROUP BY c.customer_id\n)\nSELECT * FROM purchases ORDER BY 1, 2 LIMIT 3;",
-      "purpose": "每位客户的有效购买订单数（purchases）的实际执行结果。",
-      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "purpose": "先算出每位客户在 2025 年线上的有效购买订单数 purchase_count。",
+      "reason": "要先在客户层面数订单，才能判断每位客户买了几次；用 COUNT(DISTINCT order_id) 避免同一订单被重复计数。",
       "sourceTables": [
         {
           "name": "stores",
@@ -673,8 +673,8 @@
       "kind": "runnable",
       "title": "统计回购客户数与占比",
       "sql": "WITH purchases AS (\n  SELECT c.customer_id, COUNT(DISTINCT o.order_id) purchase_count\n  FROM customers c JOIN v_order_net o ON o.customer_id=c.customer_id\n  WHERE o.channel='online' AND o.order_date BETWEEN '2025-01-01' AND '2025-12-31'\n    AND o.net_cents>0\n  GROUP BY c.customer_id\n)\nSELECT COUNT(*) AS purchasing_customers,\n  COALESCE(SUM(CASE WHEN purchase_count>=2 THEN 1 ELSE 0 END),0) AS repeat_customers,\n  ROUND(100.0*COALESCE(SUM(CASE WHEN purchase_count>=2 THEN 1 ELSE 0 END),0)/NULLIF(COUNT(*),0),2) AS repeat_pct\nFROM purchases",
-      "purpose": "在上一步的中间结果之上完成最终计算，得到题目要求的结果。",
-      "reason": "中间结果只是过渡，最终结果还需要汇总、计算或筛选后才能回答业务问题。",
+      "purpose": "再在客户粒度统计：有购买的客户数、购买 2 次及以上的客户数，以及后者占前者的百分比。",
+      "reason": "分母是“有购买的客户数”，不是订单数，也不是所有注册客户数；没有客户时比率为 NULL。",
       "sourceTables": [
         {
           "name": "stores",
@@ -1441,7 +1441,13 @@
         "emphasis": []
       }
     ],
-    "reason": [],
+    "reason": [
+      {
+        "type": "paragraph",
+        "text": "在订单明细层直接 COUNT(*) 会把一张订单的多行明细当成多次购买；用所有客户（包括没买过的）做分母，比率就不再是“购买客户里有多少人回购”。",
+        "emphasis": []
+      }
+    ],
     "correction": [
       {
         "type": "paragraph",

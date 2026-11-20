@@ -6,7 +6,7 @@
   "conceptBlocks": [
     {
       "type": "heading",
-      "text": "基本含义",
+      "text": "什么是字符串拼接？",
       "emphasis": []
     },
     {
@@ -21,19 +21,9 @@
       ]
     },
     {
-      "type": "heading",
-      "text": "使用要点",
-      "emphasis": []
-    },
-    {
-      "type": "paragraph",
-      "text": "MySQL 的 CONCAT 任一参数为 NULL 时结果为 NULL；SQLite 的连接运算符 || 具有同样的空值传播效果，但 SQLite 的 concat 函数空值行为不同。",
-      "emphasis": []
-    },
-    {
-      "type": "list",
-      "items": [
-        "若业务希望保留部分标签，先确定缺失文本的替代值，不应无条件把未知改成空文本。"
+      "type": "figure",
+      "ids": [
+        "kp11-01-fn"
       ]
     },
     {
@@ -61,6 +51,22 @@
       "codeColumns": [
         0
       ]
+    },
+    {
+      "type": "heading",
+      "text": "使用要点",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "MySQL 的 CONCAT 任一参数为 NULL 时结果为 NULL；SQLite 的连接运算符 || 具有同样的空值传播效果，但 SQLite 的 concat 函数空值行为不同。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "若业务希望保留部分标签，先确定缺失文本的替代值，不应无条件把未知改成空文本。"
+      ]
     }
   ],
   "syntax": {
@@ -87,22 +93,22 @@
       "kind": "fragment",
       "title": "指定来源",
       "sql": "FROM products",
-      "purpose": "从 products 读取输入数据。",
-      "reason": "后面的子句都基于这里得到的行。"
+      "purpose": "读取 products 表，每一行是一件商品。",
+      "reason": "后面的步骤都是对这些商品行进行计算。"
     },
     {
       "kind": "fragment",
       "title": "选择输出",
       "sql": "SELECT product_id, CONCAT(category, ' - ', product_name) AS label",
-      "purpose": "输出 product_id, CONCAT(category, ' - ', product_name) AS label。",
-      "reason": "输出列的顺序与别名决定结果表的形状。"
+      "purpose": "把类别和商品名称用“ - ”拼成一个显示用的标签 label。",
+      "reason": "CONCAT 按顺序把几段文本拼成一个新值；分隔符要自己写进去，否则几段会直接连在一起。"
     },
     {
       "kind": "fragment",
       "title": "排序",
       "sql": "ORDER BY label DESC;",
-      "purpose": "按 label DESC 排列结果。",
-      "reason": "查询结果的默认行序没有保证，需要显式排序。"
+      "purpose": "按标签倒序排列。",
+      "reason": "可以直接使用 SELECT 里起的别名 label 排序；没有 ORDER BY 时行的顺序没有保证。"
     }
   ],
   "completeCode": {
@@ -209,7 +215,13 @@
         "emphasis": []
       }
     ],
-    "reason": [],
+    "reason": [
+      {
+        "type": "paragraph",
+        "text": "CONCAT(category, product_name) 没有分隔符，结果会是“护肤品Mask”连在一起；SQLite 的拼接要用 ||，直接把另一种数据库的写法复制过去可能报错。",
+        "emphasis": []
+      }
+    ],
     "correction": [
       {
         "type": "paragraph",

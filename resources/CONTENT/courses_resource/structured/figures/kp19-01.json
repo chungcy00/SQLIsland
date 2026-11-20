@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp19-01",
-  "lessonSha256": "8f9dce98ff24d6aeb00e438c61a70b0baccab3234658bd248d5345de434e813e",
+  "lessonSha256": "28ffcf0c5befe1662638c9aaf24159bbfa03811cca3db4bde584a0eeba15f85f",
   "figures": [
     {
       "id": "kp19-01-clauses",
@@ -14,25 +14,25 @@
           "role": "cte",
           "label": "中间结果",
           "sql": "WITH a AS (SELECT store_id,SUM(net_cents) net,SUM(cost_cents) cost FROM v_sales_lines WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY store_id),",
-          "note": "先把名为 a 的中间结果算出来，供后面的查询引用。"
+          "note": "先单独算出一张临时结果 a，下面的查询可以把它当作普通表来用。"
         },
         {
           "role": "cte",
           "label": "中间结果",
           "sql": "b AS (SELECT store_id,SUM(target_cents) target FROM sales_targets WHERE month_key BETWEEN '2025-01' AND '2025-12' GROUP BY store_id)",
-          "note": "先把名为 b 的中间结果算出来，供后面的查询引用。"
+          "note": "先单独算出一张临时结果 b，下面的查询可以把它当作普通表来用。"
         },
         {
           "role": "select",
           "label": "取数",
           "sql": "SELECT s.store_id,COALESCE(a.net,0) net_cents,COALESCE(a.net-a.cost,0) gross_cents,ROUND(100.0*(a.net-a.cost)/NULLIF(a.net,0),2) margin_pct,b.target target_cents,ROUND(100.0*COALESCE(a.net,0)/NULLIF(b.target,0),2) achievement_pct",
-          "note": "输出查询需要的列与计算表达式。"
+          "note": "结果表最终显示 6 列：store_id、net_cents、gross_cents、margin_pct、target_cents、achievement_pct。"
         },
         {
           "role": "from",
           "label": "来源",
           "sql": "FROM stores s LEFT JOIN a ON a.store_id=s.store_id LEFT JOIN b ON b.store_id=s.store_id",
-          "note": "读取查询需要的输入数据。"
+          "note": "数据来自 表 stores、中间结果 a、中间结果 b，并用 ON 后面的条件把它们的行配起来。"
         },
         {
           "role": "order",

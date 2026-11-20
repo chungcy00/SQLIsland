@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp19-43",
-  "lessonSha256": "f0f6b3498699f6a3c473b2d2b736a868ee2fea5d6e78a210a2718438be85b8b5",
+  "lessonSha256": "06c68c6d5be5243951e6a55e414f252b589c4938272fd5d8ef5f99759510221a",
   "figures": [
     {
       "id": "kp19-43-clauses",
@@ -14,49 +14,49 @@
           "role": "cte",
           "label": "中间结果",
           "sql": "WITH a AS (SELECT customer_id,MIN(SUBSTR(order_date,1,7)) cohort FROM v_order_net WHERE channel='online' GROUP BY customer_id),",
-          "note": "先把名为 a 的中间结果算出来，供后面的查询引用。"
+          "note": "先单独算出一张临时结果 a，下面的查询可以把它当作普通表来用。"
         },
         {
           "role": "cte",
           "label": "中间结果",
           "sql": "b AS (SELECT cohort,COUNT(*) n FROM a GROUP BY cohort),",
-          "note": "先把名为 b 的中间结果算出来，供后面的查询引用。"
+          "note": "先单独算出一张临时结果 b，下面的查询可以把它当作普通表来用。"
         },
         {
           "role": "cte",
           "label": "中间结果",
           "sql": "m AS (SELECT DISTINCT month_key FROM calendar_days WHERE day<='2025-12-31'),",
-          "note": "先把名为 m 的中间结果算出来，供后面的查询引用。"
+          "note": "先单独算出一张临时结果 m，下面的查询可以把它当作普通表来用。"
         },
         {
           "role": "cte",
           "label": "中间结果",
           "sql": "x AS (SELECT b.cohort,m.month_key,b.n,(CAST(SUBSTR(m.month_key,1,4) AS INTEGER)-CAST(SUBSTR(b.cohort,1,4) AS INTEGER))*12+CAST(SUBSTR(m.month_key,6,2) AS INTEGER)-CAST(SUBSTR(b.cohort,6,2) AS INTEGER) k FROM b CROSS JOIN m WHERE m.month_key>=b.cohort),",
-          "note": "先把名为 x 的中间结果算出来，供后面的查询引用。"
+          "note": "先单独算出一张临时结果 x，下面的查询可以把它当作普通表来用。"
         },
         {
           "role": "cte",
           "label": "中间结果",
           "sql": "y AS (SELECT a.cohort,SUBSTR(o.order_date,1,7) m,COUNT(DISTINCT o.customer_id) active FROM a JOIN v_order_net o ON o.customer_id=a.customer_id AND o.channel='online' GROUP BY a.cohort,SUBSTR(o.order_date,1,7))",
-          "note": "先把名为 y 的中间结果算出来，供后面的查询引用。"
+          "note": "先单独算出一张临时结果 y，下面的查询可以把它当作普通表来用。"
         },
         {
           "role": "select",
           "label": "取数",
           "sql": "SELECT x.cohort,x.k month_offset,x.n cohort_size,COALESCE(y.active,0) active_customers,ROUND(100.0*COALESCE(y.active,0)/x.n,2) retention_pct",
-          "note": "输出查询需要的列与计算表达式。"
+          "note": "结果表最终显示 5 列：cohort、month_offset、cohort_size、active_customers、retention_pct。"
         },
         {
           "role": "from",
           "label": "来源",
           "sql": "FROM x LEFT JOIN y ON y.cohort=x.cohort AND y.m=x.month_key",
-          "note": "从 x LEFT JOIN y ON y.cohort=x.cohort AND y.m=x.month_key 读取输入数据。"
+          "note": "数据来自 中间结果 x、中间结果 y，并用 ON 后面的条件把它们的行配起来。"
         },
         {
           "role": "where",
           "label": "筛选",
           "sql": "WHERE x.k BETWEEN 0 AND 6",
-          "note": "仅保留满足 x.k BETWEEN 0 AND 6 的行。"
+          "note": "只保留满足这个条件的行：x.k BETWEEN 0 AND 6。"
         },
         {
           "role": "order",

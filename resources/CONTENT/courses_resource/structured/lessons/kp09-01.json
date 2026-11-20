@@ -6,7 +6,7 @@
   "conceptBlocks": [
     {
       "type": "heading",
-      "text": "基本含义",
+      "text": "什么是条件表达式 CASE？",
       "emphasis": []
     },
     {
@@ -19,23 +19,6 @@
       "items": [
         "搜索式 CASE 从上到下判断 WHEN，返回首个为真的分支；若没有真条件，返回 ELSE，省略 ELSE 时返回 NULL。",
         "条件可能重叠，所以应先判断更具体的规则。"
-      ]
-    },
-    {
-      "type": "heading",
-      "text": "使用要点",
-      "emphasis": []
-    },
-    {
-      "type": "paragraph",
-      "text": "例如库存为0同时满足小于50，必须先判断缺货再判断低库存。",
-      "emphasis": []
-    },
-    {
-      "type": "list",
-      "items": [
-        "NULL 与数值比较通常未知，不会命中普通分支，因此有缺失时需单独处理。",
-        "分类规则应明确边界及异常负值，不把未知数据当作正常。"
       ]
     },
     {
@@ -69,6 +52,23 @@
       ],
       "title": "CASE 从上到下判断的过程",
       "caption": "0 同时满足 stock<50，所以缺货必须写在低库存之前。"
+    },
+    {
+      "type": "heading",
+      "text": "使用要点",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "例如库存为0同时满足小于50，必须先判断缺货再判断低库存。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "NULL 与数值比较通常未知，不会命中普通分支，因此有缺失时需单独处理。",
+        "分类规则应明确边界及异常负值，不把未知数据当作正常。"
+      ]
     }
   ],
   "syntax": {
@@ -95,22 +95,22 @@
       "kind": "fragment",
       "title": "指定来源",
       "sql": "FROM products",
-      "purpose": "从 products 读取输入数据。",
-      "reason": "后面的子句都基于这里得到的行。"
+      "purpose": "读取 products 表，每一行是一件商品。",
+      "reason": "后面的步骤都是对这些商品行进行计算。"
     },
     {
       "kind": "fragment",
       "title": "选择输出",
       "sql": "SELECT product_id, CASE WHEN stock=0 THEN '缺货' WHEN stock<50 THEN '低库存' ELSE '正常' END AS stock_level",
-      "purpose": "输出查询需要的列与计算表达式。",
-      "reason": "输出列的顺序与别名决定结果表的形状。"
+      "purpose": "给每件商品算出一个库存等级：库存为 0 是“缺货”，小于 50 是“低库存”，其余是“正常”。",
+      "reason": "CASE 从上往下找第一个成立的 WHEN；库存 0 同时满足 stock<50，所以必须先写 stock=0，否则缺货商品会被归为低库存。"
     },
     {
       "kind": "fragment",
       "title": "排序",
       "sql": "ORDER BY product_name DESC;",
-      "purpose": "按 product_name DESC 排列结果。",
-      "reason": "查询结果的默认行序没有保证，需要显式排序。"
+      "purpose": "按商品名称倒序排列。",
+      "reason": "没有 ORDER BY 时数据库不保证行的顺序，写出来才能让输出顺序固定。"
     }
   ],
   "completeCode": {
@@ -257,7 +257,13 @@
         "emphasis": []
       }
     ],
-    "reason": [],
+    "reason": [
+      {
+        "type": "paragraph",
+        "text": "CASE 只返回第一个成立的分支，stock<50 写在前面时，库存 0 的商品也满足它，会被归为“低库存”而不是“缺货”；NULL 与数字比较得到未知，两个 WHEN 都不成立，会落入 ELSE 被当成“正常”。",
+        "emphasis": []
+      }
+    ],
     "correction": [
       {
         "type": "paragraph",

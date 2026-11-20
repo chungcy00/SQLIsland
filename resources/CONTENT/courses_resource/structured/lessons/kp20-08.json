@@ -6,7 +6,7 @@
   "conceptBlocks": [
     {
       "type": "heading",
-      "text": "基本含义",
+      "text": "什么是库存投资回报率？",
       "emphasis": []
     },
     {
@@ -60,8 +60,8 @@
       "kind": "runnable",
       "title": "按类别汇总销售毛利",
       "sql": "WITH a AS (SELECT p.category_id,SUM(s.net_cents-s.cost_cents) gross FROM v_sales_lines s JOIN products p ON p.product_id=s.product_id WHERE s.order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY p.category_id)\nSELECT * FROM a ORDER BY 1, 2 LIMIT 3;",
-      "purpose": "按类别汇总销售毛利（a）的实际执行结果。",
-      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "purpose": "先按商品类别汇总 2025 年所有渠道的毛利（净额减成本）。",
+      "reason": "毛利要用销售成本计算，不能用销售收入代替。",
       "sourceTables": [
         {
           "name": "categories",
@@ -381,8 +381,8 @@
       "kind": "runnable",
       "title": "按类别计算平均库存价值",
       "sql": "WITH a AS (SELECT p.category_id,SUM(s.net_cents-s.cost_cents) gross FROM v_sales_lines s JOIN products p ON p.product_id=s.product_id WHERE s.order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY p.category_id), b AS (SELECT p.category_id,CASE WHEN COUNT(i.snapshot_id)=2*COUNT(DISTINCT p.product_id)*(SELECT COUNT(*) FROM warehouses) THEN SUM(i.quantity*i.unit_cost_cents)/2.0 ELSE NULL END avg_stock FROM products p CROSS JOIN warehouses w LEFT JOIN inventory_snapshots i ON i.product_id=p.product_id AND i.warehouse_id=w.warehouse_id AND i.snapshot_date IN ('2024-12-31','2025-12-31') GROUP BY p.category_id)\nSELECT * FROM b ORDER BY 1, 2 LIMIT 3;",
-      "purpose": "按类别计算平均库存价值（b）的实际执行结果。",
-      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "purpose": "再算每个类别的平均库存成本：2024 年底与 2025 年底库存成本价值之和除以 2。",
+      "reason": "只有每个仓库每个商品在两个日期都有快照时才计算，缺档不当作 0。",
       "sourceTables": [
         {
           "name": "categories",
@@ -702,8 +702,8 @@
       "kind": "runnable",
       "title": "计算库存投资回报率",
       "sql": "WITH a AS (SELECT p.category_id,SUM(s.net_cents-s.cost_cents) gross FROM v_sales_lines s JOIN products p ON p.product_id=s.product_id WHERE s.order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY p.category_id), b AS (SELECT p.category_id,CASE WHEN COUNT(i.snapshot_id)=2*COUNT(DISTINCT p.product_id)*(SELECT COUNT(*) FROM warehouses) THEN SUM(i.quantity*i.unit_cost_cents)/2.0 ELSE NULL END avg_stock FROM products p CROSS JOIN warehouses w LEFT JOIN inventory_snapshots i ON i.product_id=p.product_id AND i.warehouse_id=w.warehouse_id AND i.snapshot_date IN ('2024-12-31','2025-12-31') GROUP BY p.category_id) SELECT c.category_id,COALESCE(a.gross,0) gross_cents,b.avg_stock avg_stock_cents,ROUND(COALESCE(a.gross,0)/NULLIF(b.avg_stock,0),4) gmroi FROM categories c LEFT JOIN a ON a.category_id=c.category_id LEFT JOIN b ON b.category_id=c.category_id ORDER BY gmroi DESC",
-      "purpose": "在前面各步中间结果的基础上完成最终计算，输出题目要求的完整结果。",
-      "reason": "前面的步骤只是分块准备；把它们组合起来，才能得到最终的业务结果。",
+      "purpose": "用毛利除以平均库存成本，得到库存投资回报率 gmroi。",
+      "reason": "这个比率回答“每 1 元库存成本创造了多少毛利”；分母为 0 时保持 NULL。",
       "sourceTables": [
         {
           "name": "categories",
@@ -1434,7 +1434,13 @@
         "emphasis": []
       }
     ],
-    "reason": [],
+    "reason": [
+      {
+        "type": "paragraph",
+        "text": "用销售收入代替毛利，比率衡量的就不再是利润；把缺少的库存快照当 0 再平均，平均库存会偏低，回报率被虚高。",
+        "emphasis": []
+      }
+    ],
     "correction": [
       {
         "type": "paragraph",

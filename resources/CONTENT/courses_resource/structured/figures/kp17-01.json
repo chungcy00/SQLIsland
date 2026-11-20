@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp17-01",
-  "lessonSha256": "9702516a31f9e003083f67f427f0cc7f33d6d6aec89d0428e2567bec946f7909",
+  "lessonSha256": "b48f08e195c3bd3b1a41d866b8f37e2d7c6a2538875b6e61fd9c454860561c2c",
   "figures": [
     {
       "id": "kp17-01-clauses",
@@ -14,13 +14,13 @@
           "role": "select",
           "label": "取数",
           "sql": "SELECT id,qty",
-          "note": "输出 id,qty。"
+          "note": "结果表最终显示 2 列：id、qty。"
         },
         {
           "role": "from",
           "label": "来源",
           "sql": "FROM demo_stock",
-          "note": "从 demo_stock 读取输入数据。"
+          "note": "数据来自表 demo_stock。"
         },
         {
           "role": "order",

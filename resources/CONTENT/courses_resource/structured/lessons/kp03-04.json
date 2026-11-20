@@ -6,7 +6,7 @@
   "conceptBlocks": [
     {
       "type": "heading",
-      "text": "基本含义",
+      "text": "什么是 LIKE 模糊匹配？",
       "emphasis": []
     },
     {
@@ -19,23 +19,6 @@
       "items": [
         "百分号 % 匹配零个或多个字符，下划线 _ 匹配恰好一个字符。",
         "模式通常要匹配整个字符串，因此前缀搜索把百分号放在末尾，后缀搜索放在开头，包含搜索则两边都放。"
-      ]
-    },
-    {
-      "type": "heading",
-      "text": "使用要点",
-      "emphasis": []
-    },
-    {
-      "type": "paragraph",
-      "text": "当业务要求找出实际包含下划线或百分号的名称时，必须把通配符转义。",
-      "emphasis": []
-    },
-    {
-      "type": "list",
-      "items": [
-        "本例通过 ESCAPE 指定感叹号为转义字符，!_ 表示普通下划线，!% 表示普通百分号，!! 表示感叹号本身。",
-        "大小写敏感性受数据库和排序规则影响，不能从一个本地例子推断全部数据库表现。"
       ]
     },
     {
@@ -77,6 +60,23 @@
       "codeColumns": [
         0
       ]
+    },
+    {
+      "type": "heading",
+      "text": "使用要点",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "当业务要求找出实际包含下划线或百分号的名称时，必须把通配符转义。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "本例通过 ESCAPE 指定感叹号为转义字符，!_ 表示普通下划线，!% 表示普通百分号，!! 表示感叹号本身。",
+        "大小写敏感性受数据库和排序规则影响，不能从一个本地例子推断全部数据库表现。"
+      ]
     }
   ],
   "syntax": {
@@ -103,29 +103,29 @@
       "kind": "fragment",
       "title": "指定来源",
       "sql": "FROM products",
-      "purpose": "从 products 读取输入数据。",
-      "reason": "后面的子句都基于这里得到的行。"
+      "purpose": "先确定数据来自 products 表，每一行是一件商品。",
+      "reason": "WHERE、SELECT、ORDER BY 都是在这张表的行上工作的，所以要先有数据来源。"
     },
     {
       "kind": "fragment",
       "title": "筛选行",
       "sql": "WHERE product_name LIKE '%!_%' ESCAPE '!'",
-      "purpose": "仅保留满足 product_name LIKE '%!_%' ESCAPE '!' 的行。",
-      "reason": "条件结果为真才保留；未知（NULL）的行会被排除。"
+      "purpose": "找出名称里含有真正下划线字符的商品。",
+      "reason": "_ 在 LIKE 里本来表示“任意一个字符”；写成 !_ 并用 ESCAPE '!' 声明感叹号是转义字符，下划线才被当作普通字符；两头的 % 表示前后可以有任意内容。"
     },
     {
       "kind": "fragment",
       "title": "选择输出",
       "sql": "SELECT product_name",
-      "purpose": "输出 product_name。",
-      "reason": "输出列的顺序与别名决定结果表的形状。"
+      "purpose": "只显示商品名称 product_name。",
+      "reason": "SELECT 只决定显示哪些列。"
     },
     {
       "kind": "fragment",
       "title": "排序",
       "sql": "ORDER BY product_name DESC;",
-      "purpose": "按 product_name DESC 排列结果。",
-      "reason": "查询结果的默认行序没有保证，需要显式排序。"
+      "purpose": "按名称倒序排列。",
+      "reason": "没有 ORDER BY 时数据库不保证行的顺序，写出来才能让输出顺序固定。"
     }
   ],
   "completeCode": {
@@ -231,7 +231,13 @@
         "emphasis": []
       }
     ],
-    "reason": [],
+    "reason": [
+      {
+        "type": "paragraph",
+        "text": "不转义时 _ 代表任意一个字符，'%_%' 实际上只要求名称至少有一个字符，几乎所有名称都会匹配，而不是只找含下划线的名称。",
+        "emphasis": []
+      }
+    ],
     "correction": [
       {
         "type": "paragraph",

@@ -95,7 +95,7 @@ try {
   assert.equal(await page.locator('[data-action=startCards]').count(), 1);
   await page.screenshot({ path: 'artifacts/refined-cards.png' });
   await page.locator('[data-action=cardMode][data-arg=章节]').click();
-  await page.locator('#card-chapter').selectOption('ch02');
+  await page.locator('[data-action=cardChapter][data-arg=ch02]').click();
   await page.locator('[data-action=startCards]').click();
   await page.locator('.flashcard').waitFor();
   assert.match(await page.locator('main').innerText(), /自由浏览/);

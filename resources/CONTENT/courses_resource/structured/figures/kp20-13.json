@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp20-13",
-  "lessonSha256": "da0dca02bd8c41a24476ca44b113f79e4ff12cec975ce58a07cc2836f8f54bfc",
+  "lessonSha256": "f1a1fa02d201f27593cff17f5215ffb1c6df7d63ac6f834a636d7834cda93686",
   "figures": [
     {
       "id": "kp20-13-clauses",
@@ -14,31 +14,31 @@
           "role": "cte",
           "label": "中间结果",
           "sql": "WITH a AS (SELECT order_id,SUM(amount_cents) paid FROM payments WHERE status='settled' AND payment_date<='2025-12-31' GROUP BY order_id),",
-          "note": "先把名为 a 的中间结果算出来，供后面的查询引用。"
+          "note": "先单独算出一张临时结果 a，下面的查询可以把它当作普通表来用。"
         },
         {
           "role": "cte",
           "label": "中间结果",
           "sql": "b AS (SELECT i.order_id,SUM(r.refund_cents) refunded FROM returns r JOIN order_items i ON i.order_item_id=r.order_item_id WHERE r.return_date<='2025-12-31' GROUP BY i.order_id)",
-          "note": "先把名为 b 的中间结果算出来，供后面的查询引用。"
+          "note": "先单独算出一张临时结果 b，下面的查询可以把它当作普通表来用。"
         },
         {
           "role": "select",
           "label": "取数",
           "sql": "SELECT o.order_id,o.net_cents,COALESCE(a.paid,0)-COALESCE(b.refunded,0) cash_net_cents,COALESCE(a.paid,0)-COALESCE(b.refunded,0)-o.net_cents difference_cents",
-          "note": "输出查询需要的列与计算表达式。"
+          "note": "结果表最终显示 4 列：order_id、net_cents、cash_net_cents、difference_cents。"
         },
         {
           "role": "from",
           "label": "来源",
           "sql": "FROM v_order_net o LEFT JOIN a ON a.order_id=o.order_id LEFT JOIN b ON b.order_id=o.order_id",
-          "note": "读取查询需要的输入数据。"
+          "note": "数据来自 表 v_order_net、中间结果 a、中间结果 b，并用 ON 后面的条件把它们的行配起来。"
         },
         {
           "role": "where",
           "label": "筛选",
           "sql": "WHERE o.order_date BETWEEN '2025-01-01' AND '2025-12-31' AND COALESCE(a.paid,0)-COALESCE(b.refunded,0)<>o.net_cents",
-          "note": "仅保留满足条件的行。"
+          "note": "只保留满足这个条件的行：o.order_date BETWEEN '2025-01-01' AND '2025-12-31' AND COALESCE(a.pa…。"
         },
         {
           "role": "order",

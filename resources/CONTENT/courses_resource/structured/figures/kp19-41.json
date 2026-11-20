@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp19-41",
-  "lessonSha256": "adb09264e12633ccbe2b75ddbbd1b3c89ebe91dd19354670284310d257515472",
+  "lessonSha256": "25e8d2b0b6d5df5da059a1b9b0fde82d1bb1c3003b238ee26d42c6f60944dfc3",
   "figures": [
     {
       "id": "kp19-41-clauses",
@@ -14,25 +14,25 @@
           "role": "cte",
           "label": "中间结果",
           "sql": "WITH a AS (SELECT *,ROW_NUMBER() OVER(PARTITION BY customer_id ORDER BY order_date,order_id) rn FROM v_order_net WHERE channel='online')",
-          "note": "先把名为 a 的中间结果算出来，供后面的查询引用。"
+          "note": "先单独算出一张临时结果 a，下面的查询可以把它当作普通表来用。"
         },
         {
           "role": "select",
           "label": "取数",
           "sql": "SELECT CASE WHEN rn=1 THEN 'new' ELSE 'returning' END segment,COUNT(DISTINCT customer_id) customers,COUNT(*) orders,SUM(net_cents) net_cents,ROUND(1.0*SUM(net_cents)/COUNT(*),2) avg_order_cents",
-          "note": "输出查询需要的列与计算表达式。"
+          "note": "结果表最终显示 5 列：segment、customers、orders、net_cents、avg_order_cents。"
         },
         {
           "role": "from",
           "label": "来源",
           "sql": "FROM a",
-          "note": "从 a 读取输入数据。"
+          "note": "数据来自中间结果 a。"
         },
         {
           "role": "where",
           "label": "筛选",
           "sql": "WHERE order_date BETWEEN '2025-01-01' AND '2025-12-31'",
-          "note": "仅保留满足 order_date BETWEEN '2025-01-01' AND '2025-12-31' 的行。"
+          "note": "只保留满足这个条件的行：order_date BETWEEN '2025-01-01' AND '2025-12-31'。"
         },
         {
           "role": "group",

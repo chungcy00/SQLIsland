@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp15-05",
-  "lessonSha256": "11456c7baa7ca880782842db1daf7fbb4f23f2e5454686dffe39c4e70838f79d",
+  "lessonSha256": "4d7c7a26c6ac39a72c424219d7a509ebc265ace311480e5568fd680d3de9d277",
   "figures": [
     {
       "id": "kp15-05-clauses",
@@ -14,19 +14,19 @@
           "role": "cte",
           "label": "中间结果",
           "sql": "WITH m AS (SELECT month,sales,LAG(sales) OVER(ORDER BY month) AS prev,AVG(sales) OVER(ORDER BY month ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) AS moving_avg FROM monthly)",
-          "note": "先把名为 m 的中间结果算出来，供后面的查询引用。"
+          "note": "先单独算出一张临时结果 m，下面的查询可以把它当作普通表来用。"
         },
         {
           "role": "select",
           "label": "取数",
           "sql": "SELECT month,ROUND(moving_avg,2) AS avg3,ROUND(100.0*(sales-prev)/NULLIF(prev,0),2) AS growth_pct",
-          "note": "输出查询需要的列与计算表达式。"
+          "note": "结果表最终显示 3 列：month、avg3、growth_pct。"
         },
         {
           "role": "from",
           "label": "来源",
           "sql": "FROM m",
-          "note": "从 m 读取输入数据。"
+          "note": "数据来自中间结果 m。"
         },
         {
           "role": "order",

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp05-02",
-  "lessonSha256": "48804010bf7d61b901b549a80c588f354b678d6f87c67e2b988454739de8f3fb",
+  "lessonSha256": "b2c2fedb364674dad0ef45dddea634e25d220a92eb5b91004dfa86c9d7f8af7b",
   "figures": [
     {
       "id": "kp05-02-clauses",
@@ -14,13 +14,13 @@
           "role": "select",
           "label": "取数",
           "sql": "SELECT id, IFNULL(value, -1) AS filled, COALESCE(note, 'missing') AS note_filled",
-          "note": "输出 id；IFNULL 把缺失的 value 换成 -1，COALESCE 把缺失的 note 换成 'missing'"
+          "note": "结果表最终显示 3 列：id、filled、note_filled。"
         },
         {
           "role": "from",
           "label": "来源",
           "sql": "FROM nullable_values",
-          "note": "读取 nullable_values 表"
+          "note": "数据来自表 nullable_values。"
         },
         {
           "role": "order",
@@ -209,7 +209,8 @@
             "ok"
           ]
         }
-      ]
+      ],
+      "conclusion": "IFNULL 和 COALESCE 只替换 NULL；0 和空文本是真实的值，原样保留。"
     }
   ]
 }

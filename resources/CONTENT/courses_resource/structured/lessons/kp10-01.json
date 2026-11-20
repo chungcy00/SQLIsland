@@ -6,7 +6,7 @@
   "conceptBlocks": [
     {
       "type": "heading",
-      "text": "基本含义",
+      "text": "什么是标量子查询？",
       "emphasis": []
     },
     {
@@ -19,22 +19,6 @@
       "items": [
         "零行得到 NULL，多行在 MySQL 中报错。",
         "分析师经常需要将明细与动态基准比较，例如价格高于整体均值；硬编码均值会在数据更新后失效。"
-      ]
-    },
-    {
-      "type": "heading",
-      "text": "使用要点",
-      "emphasis": []
-    },
-    {
-      "type": "paragraph",
-      "text": "聚合函数不带分组时可形成单行基准，但空输入的平均值为 NULL，普通比较不会保留任何行。",
-      "emphasis": []
-    },
-    {
-      "type": "list",
-      "items": [
-        "外层查询依然逐条商品判断，查询结果不改变原表。"
       ]
     },
     {
@@ -59,6 +43,22 @@
       ],
       "title": "标量子查询返回不同行数时",
       "caption": "空输入的平均值是 NULL，普通比较不会保留任何行。"
+    },
+    {
+      "type": "heading",
+      "text": "使用要点",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "聚合函数不带分组时可形成单行基准，但空输入的平均值为 NULL，普通比较不会保留任何行。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "外层查询依然逐条商品判断，查询结果不改变原表。"
+      ]
     }
   ],
   "syntax": {
@@ -85,29 +85,29 @@
       "kind": "fragment",
       "title": "指定来源",
       "sql": "FROM products",
-      "purpose": "从 products 读取输入数据。",
-      "reason": "后面的子句都基于这里得到的行。"
+      "purpose": "读取 products 表，每一行是一件商品。",
+      "reason": "外层查询逐件商品判断价格是否高于平均价。"
     },
     {
       "kind": "fragment",
       "title": "筛选行",
       "sql": "WHERE price > (SELECT AVG(price) FROM products)",
-      "purpose": "仅保留满足 price > (SELECT AVG(price) FROM products) 的行。",
-      "reason": "条件结果为真才保留；未知（NULL）的行会被排除。"
+      "purpose": "先用子查询算出所有商品的平均价格（本例是 44），再只保留价格高于它的商品。",
+      "reason": "子查询只返回一个值，可以像普通数字一样参与比较；平均价是现算的，商品数据变化后条件会自动跟着变。"
     },
     {
       "kind": "fragment",
       "title": "选择输出",
       "sql": "SELECT product_id, price",
-      "purpose": "输出 product_id, price。",
-      "reason": "输出列的顺序与别名决定结果表的形状。"
+      "purpose": "显示商品编号和价格。",
+      "reason": "SELECT 只决定显示哪些列，不改变筛选出来的行数。"
     },
     {
       "kind": "fragment",
       "title": "排序",
       "sql": "ORDER BY price;",
-      "purpose": "按 price 排列结果。",
-      "reason": "查询结果的默认行序没有保证，需要显式排序。"
+      "purpose": "按价格从低到高排列。",
+      "reason": "没有 ORDER BY 时数据库不保证行的顺序，写出来才能让输出顺序固定。"
     }
   ],
   "completeCode": {
@@ -212,7 +212,13 @@
         "emphasis": []
       }
     ],
-    "reason": [],
+    "reason": [
+      {
+        "type": "paragraph",
+        "text": "= 要求右边只有一个值，而 SELECT price FROM products 返回了多行（每件商品一个价格），MySQL 会报错说子查询返回多行；需要的是单个值（如 MAX(price)），或者改用 IN。",
+        "emphasis": []
+      }
+    ],
     "correction": [
       {
         "type": "paragraph",

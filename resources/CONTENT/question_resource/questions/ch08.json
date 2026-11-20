@@ -1368,11 +1368,11 @@
         }
       ],
       "hints": [
-        "先画出两个关系中使用的键与一对多方向，判断哪一侧必须保留。",
-        "结合《RIGHT JOIN 与 CROSS JOIN 实操》：右连接保留右侧全部记录；交叉连接产生所有组合。应先判断希望保留哪侧以及目标结果粒度。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT s.store_id,o.id AS order_id FROM orders o □□□ stores s ON o.store_id=s.store_id"
+        "要保留没有订单的门店，说明门店表是需要完整保留的一侧。",
+        "RIGHT JOIN 保留右表的所有行；左表配不上的列显示 NULL。",
+        "orders 是左表、stores 是右表，所以 stores 的每一行都会保留。"
       ],
-      "explanation": "右连接保留右侧维度表全部记录。\n执行思路：确认orders、stores的输入记录；按题设连接条件匹配数据，注意连接造成的行数变化；输出store_id、order_id列；结果行的先后顺序不作要求。\n公开夹具实际返回 6 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：采用另一种关系运算或查询结构计算相同结果。",
+      "explanation": "orders RIGHT JOIN stores 保留右表 stores 的每一行；没有订单的门店，订单列（id）显示 NULL。\n易错：用普通 JOIN（内连接）只保留两边都配上的行，没有订单的门店会消失。",
       "commonErrors": [
         {
           "sql": "SELECT s.store_id,o.id AS order_id FROM orders o JOIN stores s ON o.store_id=s.store_id",
@@ -1582,11 +1582,11 @@
         }
       ],
       "hints": [
-        "先画出两个关系中使用的键与一对多方向，判断哪一侧必须保留。",
-        "结合《笛卡尔积与完整维度》：CROSS JOIN 可构建所有维度组合，例如每个月份与每家门店；再左连接真实销售数据可补齐无交易组合。",
-        "检查初始代码的 DISTINCT  对应的业务规则。先去重类别，再展成完整组合，否则重复类别会膨胀行数。"
+        "先比较结果的行数：每家门店和每个类别只应该组合一次。",
+        "CROSS JOIN 会把两边每一行两两组合，所以右边如果有重复的类别，组合就会重复。",
+        "想想右边那个子查询返回的是“每个类别一行”还是“每件商品一行”。"
       ],
-      "explanation": "先去重类别，再展成完整组合，否则重复类别会膨胀行数。\n执行思路：确认products、stores的输入记录；按题设连接条件匹配数据，注意连接造成的行数变化；仅在题设指定的范围内去重；输出store_id、category列；结果行的先后顺序不作要求。\n公开夹具实际返回 9 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：普通 SELECT 默认保留重复记录，显式 ALL 不改变结果。",
+      "explanation": "先用 SELECT DISTINCT category 得到每个类别一行，再和门店 CROSS JOIN，得到“门店 × 类别”的完整组合，每个组合只出现一次。\n易错：不去重时，类别按商品数出现多次，CROSS JOIN 会让行数成倍增加。",
       "commonErrors": [
         {
           "sql": "SELECT s.store_id,p.category FROM stores s CROSS JOIN (SELECT category FROM products) p",
@@ -2561,11 +2561,11 @@
         }
       ],
       "hints": [
-        "先画出两个关系中使用的键与一对多方向，判断哪一侧必须保留。",
-        "结合《CROSS JOIN 与自连接》：交叉连接形成两表笛卡尔积；自连接使用同一表的不同别名表示不同角色。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT m.employee_name AS manager_name,e.employee_name AS report_name FROM employees m JOIN employees e ON □□□ ORDER BY report_name"
+        "主管和下属都在同一张 employees 表里，要把它连接到自己。",
+        "给表起两个别名，一个当主管，一个当下属；下属的 manager_id 对应主管的 employee_id。",
+        "只保留实际存在的主管，所以用内连接，没有下属的主管自然不出现。"
       ],
-      "explanation": "关系有方向，主管主键连下属的主管外键。\n执行思路：确认employees的输入记录；按题设连接条件匹配数据，注意连接造成的行数变化；输出manager_name、report_name列；遵循题设排序和并列规则。\n公开夹具实际返回 3 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：普通 SELECT 默认保留重复记录，显式 ALL 不改变结果。",
+      "explanation": "employees m JOIN employees e ON m.employee_id=e.manager_id：m 是主管，e 是下属，下属的 manager_id 等于主管的 employee_id；内连接只保留有下属的主管。\n易错：把连接条件写反（m.manager_id=e.employee_id）会变成“员工和他的主管”，方向反了。",
       "commonErrors": [
         {
           "sql": "SELECT m.employee_name AS manager_name,e.employee_name AS report_name FROM employees m JOIN employees e ON m.manager_id=e.employee_id ORDER BY report_name",

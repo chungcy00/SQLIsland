@@ -6,7 +6,7 @@
   "conceptBlocks": [
     {
       "type": "heading",
-      "text": "基本含义",
+      "text": "什么是舍入与绝对值？",
       "emphasis": []
     },
     {
@@ -18,22 +18,6 @@
       "type": "list",
       "items": [
         "计算比率时分子和分母决定业务意义；整数商用于完整单位数量，余数表示剩余量。"
-      ]
-    },
-    {
-      "type": "heading",
-      "text": "使用要点",
-      "emphasis": []
-    },
-    {
-      "type": "paragraph",
-      "text": "MySQL 的 / 可保留小数，DIV 截去小数部分；SQLite 两个整数相除可能截断。",
-      "emphasis": []
-    },
-    {
-      "type": "list",
-      "items": [
-        "金额通常使用精确十进制或整数分，先计算再按业务要求舍入。"
       ]
     },
     {
@@ -60,6 +44,22 @@
       "caption": "金额通常用精确十进制或整数分，先计算再按业务要求舍入。",
       "codeColumns": [
         0
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "使用要点",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "MySQL 的 / 可保留小数，DIV 截去小数部分；SQLite 两个整数相除可能截断。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "金额通常使用精确十进制或整数分，先计算再按业务要求舍入。"
       ]
     }
   ],
@@ -188,7 +188,13 @@
         "emphasis": []
       }
     ],
-    "reason": [],
+    "reason": [
+      {
+        "type": "paragraph",
+        "text": "两个整数相除，SQLite 会把结果截断成整数，显示两位小数也不代表数据库里存的就是精确金额；金额应当先计算再舍入，并使用精确的数据类型。",
+        "emphasis": []
+      }
+    ],
     "correction": [
       {
         "type": "paragraph",

@@ -72,11 +72,11 @@
         }
       ],
       "hints": [
-        "确认计算单位；确定日期或数值的边界，对零分母另作判断。",
-        "结合《日期格式、年份和月份》：DATE_FORMAT 用指定格式展示日期；YEAR 和 MONTH 提取数值年份与月份。",
-        "按题设编写投影、筛选及分组，使用运行检查列名、NULL、重复记录和排序。"
+        "要从日期里取出“几月”这个数字。",
+        "有专门的函数从日期中取月份，返回 1 到 12 的整数。",
+        "不要混淆提取月份和提取年份的函数。"
       ],
-      "explanation": "月份数字不等于四位年份。\n执行思路：确认orders的输入记录；输出id、month_no列；结果行的先后顺序不作要求。\n公开夹具实际返回 5 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
+      "explanation": "MONTH(order_date) 返回订单日期所在的月份，是 1 到 12 的整数。\n易错：误用 YEAR 会得到四位年份，而不是月份。",
       "commonErrors": [
         {
           "sql": "SELECT id,YEAR(order_date) AS month_no FROM orders",
@@ -787,11 +787,11 @@
         }
       ],
       "hints": [
-        "确认计算单位；确定日期或数值的边界，对零分母另作判断。",
-        "结合《DATEDIFF 与 TIMESTAMPDIFF》：DATEDIFF(a,b) 计算日期部分之差；TIMESTAMPDIFF(unit,start,end) 按指定单位计算完整差值。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT invoice_id,□□□ AS days_allowed FROM invoices"
+        "信用期限 = 到期日期 − 开票日期，单位是天。",
+        "DATEDIFF(日期1, 日期2) 返回日期1 减日期2 相差的天数。",
+        "参数的顺序决定结果的正负：较晚的日期放在前面。"
       ],
-      "explanation": "日期差函数参数顺序决定正负，信用期限从开票到到期。\n执行思路：确认invoices的输入记录；输出invoice_id、days_allowed列；结果行的先后顺序不作要求。\n公开夹具实际返回 2 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
+      "explanation": "DATEDIFF(due_date, invoice_date) 是到期日期减开票日期，得到信用期限的天数，正常情况下是正数。\n易错：把两个参数写反，结果会变成负数，方向就错了。",
       "commonErrors": [
         {
           "sql": "SELECT invoice_id,DATEDIFF(invoice_date,due_date) AS days_allowed FROM invoices",
@@ -983,11 +983,11 @@
         }
       ],
       "hints": [
-        "确认计算单位；确定日期或数值的边界，对零分母另作判断。",
-        "结合《DATEDIFF 与 TIMESTAMPDIFF》：DATEDIFF(a,b) 计算日期部分之差；TIMESTAMPDIFF(unit,start,end) 按指定单位计算完整差值。",
-        "回想空位所在子句的功能：DATEDIFF 与 TIMESTAMPDIFF；保留周围代码，填入实现题设的表达式。"
+        "账龄是从开票那天算起，到报告日经过了多少天。",
+        "DATEDIFF(结束日期, 开始日期) 返回两个日期相差的天数。",
+        "空位里要填的是“开始日期”所在的列。"
       ],
-      "explanation": "账龄按开票日计算，不是按到期日计算。\n执行思路：确认invoices的输入记录；输出invoice_id、age_days列；遵循题设排序和并列规则。\n公开夹具实际返回 2 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
+      "explanation": "DATEDIFF('2026-02-15', invoice_date) 是报告日减开票日期，得到自开票起经过的天数。\n易错：用到期日期（due_date）去算，得到的是距离到期日的天数，而不是账龄。",
       "commonErrors": [
         {
           "sql": "SELECT invoice_id,DATEDIFF('2026-02-15',due_date) AS age_days FROM invoices ORDER BY age_days DESC",
@@ -1187,11 +1187,11 @@
         }
       ],
       "hints": [
-        "确认计算单位；确定日期或数值的边界，对零分母另作判断。",
-        "结合《日期格式、年份和月份》：DATE_FORMAT 用指定格式展示日期；YEAR 和 MONTH 提取数值年份与月份。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT transaction_id,DATE_FORMAT(transaction_date,□□□) AS month_key FROM transactions"
+        "月份键要同时包含年份和月份。",
+        "DATE_FORMAT(日期, 格式) 按格式把日期变成文本，%Y 是四位年份，%m 是两位月份。",
+        "格式里需要同时有年份和月份，中间用 - 连接。"
       ],
-      "explanation": "格式必须包括两位月份，才能区分同年不同月份。\n执行思路：确认transactions的输入记录；输出transaction_id、month_key列；结果行的先后顺序不作要求。\n公开夹具实际返回 5 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：先构造派生输入关系，再执行相同投影、聚合和筛选；保持结果语义。",
+      "explanation": "DATE_FORMAT(transaction_date,'%Y-%m') 把日期格式化成 2026-02 这样的月份键，既区分月份也区分年份。\n易错：只写 '%Y' 只有年份，同一年的不同月份无法区分。",
       "commonErrors": [
         {
           "sql": "SELECT transaction_id,DATE_FORMAT(transaction_date,'%Y') AS month_key FROM transactions",
@@ -1368,11 +1368,11 @@
         }
       ],
       "hints": [
-        "确认计算单位；确定日期或数值的边界，对零分母另作判断。",
-        "结合《日期区间与月边界》：半开区间包含开始日期但不包含下一个月首日，适用于日期与时间戳。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT COALESCE(SUM(amount),0) AS total_paid FROM payments WHERE payment_date>='□□□' AND payment_date<'2026-03-01'"
+        "“二月”是一个日期范围，起点包含、终点不包含。",
+        "用“大于等于 2 月 1 日、小于 3 月 1 日”描述整个二月，不用关心二月有几天。",
+        "没有记录时 SUM 返回 NULL，题目要求返回 0，需要替换。"
       ],
-      "explanation": "区间起点应排除一月的付款。\n执行思路：确认payments的输入记录；按筛选条件保留符合要求的记录，并考虑空值；输出total_paid列。\n公开夹具实际返回 1 行、1 列；完整结果见 expectedOutput。\n另一种可用写法：用反向比较并取 NOT 表达相同三值逻辑。",
+      "explanation": "payment_date>='2026-02-01' AND payment_date<'2026-03-01' 精确描述整个二月；SUM 在没有记录时是 NULL，COALESCE 把它换成 0。\n易错：起点写成 1 月 1 日会把一月的付款也算进来。",
       "commonErrors": [
         {
           "sql": "SELECT COALESCE(SUM(amount),0) AS total_paid FROM payments WHERE payment_date>='2026-01-01' AND payment_date<'2026-03-01'",
@@ -1743,11 +1743,11 @@
         }
       ],
       "hints": [
-        "确认计算单位；确定日期或数值的边界，对零分母另作判断。",
-        "结合《DATEDIFF 与 TIMESTAMPDIFF》：DATEDIFF(a,b) 计算日期部分之差；TIMESTAMPDIFF(unit,start,end) 按指定单位计算完整差值。",
-        "检查初始代码的 p.promised_date) AS delay_days 对应的业务规则。延迟需要对照承诺日，不是下单日。"
+        "延迟要拿收货日期和“承诺日期”比，先看初始代码比的是哪个日期。",
+        "承诺日期在采购订单表里，下单日期不是承诺日期。",
+        "DATEDIFF(收货日期, 承诺日期) 提前时是负数，延后时是正数。"
       ],
-      "explanation": "延迟需要对照承诺日，不是下单日。\n执行思路：确认purchase_items、purchase_orders、receipts的输入记录；按题设连接条件匹配数据，注意连接造成的行数变化；输出receipt_id、delay_days列；结果行的先后顺序不作要求。\n公开夹具实际返回 2 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：普通 SELECT 默认保留重复记录，显式 ALL 不改变结果。",
+      "explanation": "应当用 DATEDIFF(r.receipt_date, p.promised_date)：收货日期减承诺日期，提前为负、延迟为正；初始代码用了下单日期 order_date，比较的对象不对。\n易错：把下单日期当成承诺日期，算出来的是下单到收货的间隔，不是延迟。",
       "commonErrors": [
         {
           "sql": "SELECT r.receipt_id,DATEDIFF(r.receipt_date,p.order_date) AS delay_days FROM receipts r JOIN purchase_items i ON r.po_item_id=i.po_item_id JOIN purchase_orders p ON p.po_id=i.po_id",

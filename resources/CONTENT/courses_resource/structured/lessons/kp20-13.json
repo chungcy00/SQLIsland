@@ -6,7 +6,7 @@
   "conceptBlocks": [
     {
       "type": "heading",
-      "text": "基本含义",
+      "text": "什么是订单与收款核对？",
       "emphasis": []
     },
     {
@@ -53,8 +53,8 @@
       "kind": "runnable",
       "title": "按订单汇集成功收款",
       "sql": "WITH a AS (SELECT order_id,SUM(amount_cents) paid FROM payments WHERE status='settled' AND payment_date<='2025-12-31' GROUP BY order_id) SELECT * FROM a ORDER BY 1, 2 LIMIT 3;",
-      "purpose": "按订单汇集成功收款（a）的实际执行结果。",
-      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "purpose": "先按订单汇总截至 2025-12-31 状态为成功的收款 paid。",
+      "reason": "失败或未结算的收款不算，截止日也要统一。",
       "sourceTables": [
         {
           "name": "order_items",
@@ -324,8 +324,8 @@
       "kind": "runnable",
       "title": "按订单汇集退款金额",
       "sql": "WITH a AS (SELECT order_id,SUM(amount_cents) paid FROM payments WHERE status='settled' AND payment_date<='2025-12-31' GROUP BY order_id), b AS (SELECT i.order_id,SUM(r.refund_cents) refunded FROM returns r JOIN order_items i ON i.order_item_id=r.order_item_id WHERE r.return_date<='2025-12-31' GROUP BY i.order_id) SELECT * FROM b ORDER BY 1, 2 LIMIT 3;",
-      "purpose": "按订单汇集退款金额（b）的实际执行结果。",
-      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "purpose": "再按订单汇总截至 2025-12-31 的实际退款 refunded。",
+      "reason": "退款记录挂在订单明细上，要先汇总到订单，再和收款对应。",
       "sourceTables": [
         {
           "name": "order_items",
@@ -595,8 +595,8 @@
       "kind": "runnable",
       "title": "对比净销售与现金净额，列出差异订单",
       "sql": "WITH a AS (SELECT order_id,SUM(amount_cents) paid FROM payments WHERE status='settled' AND payment_date<='2025-12-31' GROUP BY order_id), b AS (SELECT i.order_id,SUM(r.refund_cents) refunded FROM returns r JOIN order_items i ON i.order_item_id=r.order_item_id WHERE r.return_date<='2025-12-31' GROUP BY i.order_id) SELECT o.order_id,o.net_cents,COALESCE(a.paid,0)-COALESCE(b.refunded,0) cash_net_cents,COALESCE(a.paid,0)-COALESCE(b.refunded,0)-o.net_cents difference_cents FROM v_order_net o LEFT JOIN a ON a.order_id=o.order_id LEFT JOIN b ON b.order_id=o.order_id WHERE o.order_date BETWEEN '2025-01-01' AND '2025-12-31' AND COALESCE(a.paid,0)-COALESCE(b.refunded,0)<>o.net_cents ORDER BY difference_cents DESC",
-      "purpose": "在前面各步中间结果的基础上完成最终计算，输出题目要求的完整结果。",
-      "reason": "前面的步骤只是分块准备；把它们组合起来，才能得到最终的业务结果。",
+      "purpose": "对比订单净销售与现金净额（收款减退款），只列差额不为 0 的订单。",
+      "reason": "收款和退款分别汇总到订单后再连接，一个订单只有一行。",
       "sourceTables": [
         {
           "name": "order_items",
@@ -1078,7 +1078,13 @@
         "emphasis": []
       }
     ],
-    "reason": [],
+    "reason": [
+      {
+        "type": "paragraph",
+        "text": "直接连接付款与退款明细，一笔订单有多笔付款和多笔退款时会两两配对，金额被放大；把失败的付款也算进去，现金净额就偏高。",
+        "emphasis": []
+      }
+    ],
     "correction": [
       {
         "type": "paragraph",

@@ -6,7 +6,7 @@
   "conceptBlocks": [
     {
       "type": "heading",
-      "text": "基本含义",
+      "text": "什么是缺失与异常检测？",
       "emphasis": []
     },
     {
@@ -63,22 +63,22 @@
       "kind": "fragment",
       "title": "指定来源",
       "sql": "FROM raw_data",
-      "purpose": "从 raw_data 读取输入数据。",
-      "reason": "后面的子句都基于这里得到的行。"
+      "purpose": "读取 raw_data 表。",
+      "reason": "质量检查是对每一行逐行打标签。"
     },
     {
       "kind": "fragment",
       "title": "选择输出",
       "sql": "SELECT id,CASE WHEN name IS NULL OR TRIM(name)='' THEN '名称缺失' WHEN amount IS NULL THEN '金额缺失' WHEN CAST(amount AS DECIMAL(12,2))<0 THEN '负金额待核' ELSE '通过' END AS quality",
-      "purpose": "输出查询需要的列与计算表达式。",
-      "reason": "输出列的顺序与别名决定结果表的形状。"
+      "purpose": "给每一行打一个质量标签：名称缺失、金额缺失、负金额待核，都不是就是“通过”。",
+      "reason": "CASE 只返回第一个成立的标签，所以把更基础的问题放在前面；负金额不自动改正，只是标出来待核实。"
     },
     {
       "kind": "fragment",
       "title": "排序",
       "sql": "ORDER BY name DESC;",
-      "purpose": "按 name DESC 排列结果。",
-      "reason": "查询结果的默认行序没有保证，需要显式排序。"
+      "purpose": "按名称倒序排列。",
+      "reason": "没有 ORDER BY 时数据库不保证行的顺序，写出来才能让输出顺序固定。"
     }
   ],
   "completeCode": {
@@ -223,7 +223,13 @@
         "emphasis": []
       }
     ],
-    "reason": [],
+    "reason": [
+      {
+        "type": "paragraph",
+        "text": "负金额可能是退款，把它直接改成 0 会抹掉真实记录；CAST 对非法文本不会报错，而是悄悄得到 0 或 NULL，不能用它来判断一个文本是不是合法数字。",
+        "emphasis": []
+      }
+    ],
     "correction": [
       {
         "type": "paragraph",

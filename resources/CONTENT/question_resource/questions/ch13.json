@@ -193,11 +193,11 @@
         }
       ],
       "hints": [
-        "判断需求是保留重复、去重合并、求共同成员还是求差。",
-        "结合《INTERSECT 与 EXCEPT》：MySQL 8.4 支持 INTERSECT 求交集，EXCEPT 求前一集合减后一集合，默认去重。",
-        "回想空位所在子句的功能：INTERSECT 与 EXCEPT；保留周围代码，填入实现题设的表达式。"
+        "要找出“两边都有”的商品，是集合的交集关系。",
+        "集合运算符把上下两个查询的结果合并：UNION 并集，INTERSECT 交集，EXCEPT 差集。",
+        "空位里是连接两个查询的集合运算符；最后的 ORDER BY 对合并后的结果排序。"
       ],
-      "explanation": "共同集合与差集方向不同；这是明细集合匹配练习，不表示同一业务期间的真实采购销售关系。\n执行思路：确认order_items、purchase_items的输入记录；输出product_id列；遵循题设排序和并列规则。\n公开夹具实际返回 2 行、1 列；完整结果见 expectedOutput。\n另一种可用写法：普通 SELECT 默认保留重复记录，显式 ALL 不改变结果。",
+      "explanation": "INTERSECT 只保留两个查询结果里都出现的商品编号，并自动去重；ORDER BY 对合并后的结果排序。\n易错：用 EXCEPT 得到的是第一个查询里有、第二个查询里没有的商品，方向和含义都不同。",
       "commonErrors": [
         {
           "sql": "SELECT product_id FROM order_items EXCEPT SELECT product_id FROM purchase_items ORDER BY product_id",
@@ -589,11 +589,11 @@
         }
       ],
       "hints": [
-        "判断需求是保留重复、去重合并、求共同成员还是求差。",
-        "结合《UNION 与 UNION ALL》：UNION 合并并去重，UNION ALL 保留所有行及重复项；两侧必须具有相同列数。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT customer_id FROM old_customers □□□ SELECT customer_id FROM new_customers ORDER BY customer_id"
+        "题目要求保留重复，所以不能去重。",
+        "UNION 会去重，UNION ALL 把所有行叠在一起。",
+        "两个查询的列数和对应列的含义要一致。"
       ],
-      "explanation": "UNION ALL 不去重，可保留重复导入的原始数据。\n执行思路：确认new_customers、old_customers的输入记录；输出customer_id列；遵循题设排序和并列规则。\n公开夹具实际返回 7 行、1 列；完整结果见 expectedOutput。\n另一种可用写法：普通 SELECT 默认保留重复记录，显式 ALL 不改变结果。",
+      "explanation": "UNION ALL 把两个名单的行全部叠在一起，重复的客户编号也保留；ORDER BY 对合并后的结果排序。\n易错：用 UNION 会自动去重，重复导入的记录就被合并掉了。",
       "commonErrors": [
         {
           "sql": "SELECT customer_id FROM old_customers UNION SELECT customer_id FROM new_customers ORDER BY customer_id",
@@ -773,11 +773,11 @@
         }
       ],
       "hints": [
-        "判断需求是保留重复、去重合并、求共同成员还是求差。",
-        "结合《UNION 去重与合并结果》：默认 UNION 对全部输出列去重，保留同一客户在两批数据中的唯一编号。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT □□□(customer_id) AS n FROM (SELECT customer_id FROM old_customers UNION SELECT customer_id FROM new_customers) AS u"
+        "先把两个名单合并并去重，再数有多少个客户。",
+        "UNION 合并并去重，COUNT(列) 只数不为 NULL 的值。",
+        "合并写在子查询里，外层再 COUNT。"
       ],
-      "explanation": "先求集合并集再计数，重复客户只计一次；COUNT 忽略NULL。\n执行思路：确认new_customers、old_customers的输入记录；输出n列。\n公开夹具实际返回 1 行、1 列；完整结果见 expectedOutput。\n另一种可用写法：普通 SELECT 默认保留重复记录，显式 ALL 不改变结果。",
+      "explanation": "UNION 先合并两个名单并去掉重复，COUNT(customer_id) 再统计其中不为 NULL 的客户数，每位客户只算一次。\n易错：用 UNION ALL 合并，在两个名单里都出现的客户会被数两次。",
       "commonErrors": [
         {
           "sql": "SELECT COUNT(customer_id) AS n FROM (SELECT customer_id FROM old_customers UNION ALL SELECT customer_id FROM new_customers) AS u",
@@ -995,11 +995,11 @@
         }
       ],
       "hints": [
-        "判断需求是保留重复、去重合并、求共同成员还是求差。",
-        "结合《UNION 与 UNION ALL》：UNION 合并并去重，UNION ALL 保留所有行及重复项；两侧必须具有相同列数。",
-        "关注这个局部结构（空缺部分仍需自行完成）：\nSELECT customer_id,'old' AS source FROM old_customers □□□ SELECT customer_id,'new' AS source FROM new_customers ORDER BY customer_id,source"
+        "要在合并时给每一行标上来源。",
+        "在每个查询里加一列常量（如 'old'），合并后就能区分来源。",
+        "要保留各表内部的重复记录，合并方式要选不去重的那种。"
       ],
-      "explanation": "来源列不阻止同一个来源内的重复记录被UNION去除。\n执行思路：确认new_customers、old_customers的输入记录；输出customer_id、source列；遵循题设排序和并列规则。\n公开夹具实际返回 7 行、2 列；完整结果见 expectedOutput。\n另一种可用写法：普通 SELECT 默认保留重复记录，显式 ALL 不改变结果。",
+      "explanation": "两个查询各加一列常量来源 'old' 和 'new'，再用 UNION ALL 叠加，保留各自内部的重复记录；ORDER BY 让顺序固定。\n易错：用 UNION 会把完全相同的行去掉，同一个来源里的重复记录就丢失了。",
       "commonErrors": [
         {
           "sql": "SELECT customer_id,'old' AS source FROM old_customers UNION SELECT customer_id,'new' AS source FROM new_customers ORDER BY customer_id,source",

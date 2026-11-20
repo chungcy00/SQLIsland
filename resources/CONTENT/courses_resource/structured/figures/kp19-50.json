@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp19-50",
-  "lessonSha256": "3fc1164cd935b8dfbb34b0997e31e5051579c6ba94b6e2bc3f450e4a02008628",
+  "lessonSha256": "30600779cc63d01f90bf428cefa317a1bc8508de93b925313f963b4ab790508a",
   "figures": [
     {
       "id": "kp19-50-clauses",
@@ -14,37 +14,37 @@
           "role": "cte",
           "label": "中间结果",
           "sql": "WITH f AS (\n  SELECT x.supplier_invoice_id,SUM(x.quantity_billed*x.unit_price_cents) face,\n    SUM(x.quantity_billed*p.unit_price_cents) expected\n  FROM supplier_invoice_items x JOIN purchase_order_items p ON p.po_item_id=x.po_item_id\n  GROUP BY x.supplier_invoice_id\n),",
-          "note": "先把名为 f 的中间结果算出来，供后面的查询引用。"
+          "note": "先单独算出一张临时结果 f，下面的查询可以把它当作普通表来用。"
         },
         {
           "role": "cte",
           "label": "中间结果",
           "sql": "a AS (\n  SELECT v.*,f.face,f.expected,COUNT(*) OVER(PARTITION BY supplier_id,invoice_no) copies,\n    AVG(f.face) OVER(PARTITION BY supplier_id) avg_bill\n  FROM v_invoice_balance v JOIN f ON f.supplier_invoice_id=v.supplier_invoice_id\n),",
-          "note": "先把名为 a 的中间结果算出来，供后面的查询引用。"
+          "note": "先单独算出一张临时结果 a，下面的查询可以把它当作普通表来用。"
         },
         {
           "role": "cte",
           "label": "中间结果",
           "sql": "z AS (\n  SELECT a.*,CASE WHEN copies>1 THEN 1 ELSE 0 END duplicate_flag,\n    CASE WHEN face>2*avg_bill THEN 1 ELSE 0 END large_flag,\n    CASE WHEN balance_cents<0 THEN 1 ELSE 0 END overpay_flag,\n    CASE WHEN ABS(face-expected)>100 THEN 1 ELSE 0 END mismatch_flag FROM a\n)",
-          "note": "先把名为 z 的中间结果算出来，供后面的查询引用。"
+          "note": "先单独算出一张临时结果 z，下面的查询可以把它当作普通表来用。"
         },
         {
           "role": "select",
           "label": "取数",
           "sql": "SELECT supplier_invoice_id,supplier_id,billed_cents,duplicate_flag,large_flag,overpay_flag,mismatch_flag,\n  duplicate_flag+large_flag+overpay_flag+mismatch_flag flags",
-          "note": "输出查询需要的列与计算表达式。"
+          "note": "结果表最终显示 8 列：supplier_invoice_id、supplier_id、billed_cents、duplicate_flag、large_flag、overpay_flag…。"
         },
         {
           "role": "from",
           "label": "来源",
           "sql": "FROM z",
-          "note": "从 z 读取输入数据。"
+          "note": "数据来自中间结果 z。"
         },
         {
           "role": "where",
           "label": "筛选",
           "sql": "WHERE duplicate_flag+large_flag+overpay_flag+mismatch_flag>0",
-          "note": "仅保留满足 duplicate_flag+large_flag+overpay_flag+mismatch_flag>0 的行。"
+          "note": "只保留满足这个条件的行：duplicate_flag+large_flag+overpay_flag+mismatch_flag>0。"
         },
         {
           "role": "order",

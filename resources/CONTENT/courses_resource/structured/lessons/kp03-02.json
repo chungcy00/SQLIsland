@@ -6,7 +6,7 @@
   "conceptBlocks": [
     {
       "type": "heading",
-      "text": "基本含义",
+      "text": "什么是逻辑运算 AND、OR、NOT？",
       "emphasis": []
     },
     {
@@ -20,23 +20,6 @@
         "AND 要求两个条件都为真；OR 要求至少一个条件为真（也允许两个都为真）；NOT 对条件取反。",
         "在本项目的常规语法设置中，NOT 的逻辑优先级高于 AND，AND 高于 OR；但最好主动用括号写出业务含义。",
         "实际需求常有两层：任一候选规则成立，但必须满足共同的限制。"
-      ]
-    },
-    {
-      "type": "heading",
-      "text": "使用要点",
-      "emphasis": []
-    },
-    {
-      "type": "paragraph",
-      "text": "例如低价或高库存的商品可参加促销，但零库存必须排除。",
-      "emphasis": []
-    },
-    {
-      "type": "list",
-      "items": [
-        "若把共同限制只写在 OR 的一侧，另一侧通过的商品可能绕过限制。",
-        "涉及 NULL 时，未知条件的取反仍可能是未知，并不是所有记录都能分为真与假两类。"
       ]
     },
     {
@@ -67,6 +50,23 @@
       "caption": "优先级从高到低是 NOT、AND、OR；用括号写明业务含义最稳妥。",
       "codeColumns": [
         0
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "使用要点",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "例如低价或高库存的商品可参加促销，但零库存必须排除。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "若把共同限制只写在 OR 的一侧，另一侧通过的商品可能绕过限制。",
+        "涉及 NULL 时，未知条件的取反仍可能是未知，并不是所有记录都能分为真与假两类。"
       ]
     }
   ],
@@ -99,29 +99,29 @@
       "kind": "fragment",
       "title": "指定来源",
       "sql": "FROM products",
-      "purpose": "从 products 读取输入数据。",
-      "reason": "后面的子句都基于这里得到的行。"
+      "purpose": "先确定数据来自 products 表，每一行是一件商品。",
+      "reason": "WHERE、SELECT、ORDER BY 都是在这张表的行上工作的，所以要先有数据来源。"
     },
     {
       "kind": "fragment",
       "title": "筛选行",
       "sql": "WHERE (price < 40 OR stock > 100) AND NOT stock = 0",
-      "purpose": "仅保留满足 (price < 40 OR stock > 100) AND NOT stock = 0 的行。",
-      "reason": "条件结果为真才保留；未知（NULL）的行会被排除。"
+      "purpose": "先在括号里判断“价格低于 40 或库存超过 100”，再要求库存不能为 0。",
+      "reason": "括号让 OR 先算，AND 再把“库存不为 0”这个共同限制套在两种情况上；没有括号时 AND 会先算，意思就变了。"
     },
     {
       "kind": "fragment",
       "title": "选择输出",
       "sql": "SELECT product_id",
-      "purpose": "输出 product_id。",
-      "reason": "输出列的顺序与别名决定结果表的形状。"
+      "purpose": "只显示符合条件的商品编号 product_id。",
+      "reason": "SELECT 只决定显示哪些列，不改变筛选出来的行数。"
     },
     {
       "kind": "fragment",
       "title": "排序",
       "sql": "ORDER BY product_name DESC;",
-      "purpose": "按 product_name DESC 排列结果。",
-      "reason": "查询结果的默认行序没有保证，需要显式排序。"
+      "purpose": "按商品名称 product_name 倒序排列。",
+      "reason": "文本也可以排序；DESC 表示从后往前，写出来才能让输出顺序固定。"
     }
   ],
   "completeCode": {
@@ -240,7 +240,13 @@
         "emphasis": []
       }
     ],
-    "reason": [],
+    "reason": [
+      {
+        "type": "paragraph",
+        "text": "AND 比 OR 先计算，所以 price < 40 OR stock > 100 AND stock > 0 实际是“价格低于 40，或者（库存超过 100 且库存大于 0）”，价格低但库存为 0 的商品没有被排除。",
+        "emphasis": []
+      }
+    ],
     "correction": [
       {
         "type": "paragraph",

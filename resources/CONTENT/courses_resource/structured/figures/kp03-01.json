@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp03-01",
-  "lessonSha256": "2c06844850dfdb99a0b88f22c328dc7eec1372d08dbd51c43de44edcbf87d297",
+  "lessonSha256": "2f99b989c97211713d4152afca9729d5e106a5b91c05c2eaee12597f431423f7",
   "figures": [
     {
       "id": "kp03-01-clauses",
@@ -14,19 +14,19 @@
           "role": "select",
           "label": "取数",
           "sql": "SELECT product_id, price",
-          "note": "输出 product_id, price。"
+          "note": "结果表最终显示 2 列：product_id、price。"
         },
         {
           "role": "from",
           "label": "来源",
           "sql": "FROM products",
-          "note": "从 products 读取输入数据。"
+          "note": "数据来自表 products。"
         },
         {
           "role": "where",
           "label": "筛选",
           "sql": "WHERE price >= 35 AND price <= 65",
-          "note": "仅保留满足 price >= 35 AND price <= 65 的行。"
+          "note": "只保留满足这个条件的行：price >= 35 AND price <= 65。"
         },
         {
           "role": "order",

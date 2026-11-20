@@ -6,7 +6,7 @@
   "conceptBlocks": [
     {
       "type": "heading",
-      "text": "基本含义",
+      "text": "什么是 NOT EXISTS 反向匹配？",
       "emphasis": []
     },
     {
@@ -19,22 +19,6 @@
       "items": [
         "NOT EXISTS 在没有满足相关条件的行时为真。",
         "NOT IN 在候选集合出现 NULL 时，未匹配值的比较可能为未知；WHERE 不保留未知，因此结果可能少于预期。"
-      ]
-    },
-    {
-      "type": "heading",
-      "text": "使用要点",
-      "emphasis": []
-    },
-    {
-      "type": "paragraph",
-      "text": "对非空客户主键，本例用 NOT EXISTS 最直接。",
-      "emphasis": []
-    },
-    {
-      "type": "list",
-      "items": [
-        "若外层键也允许空值，需要另外定义缺失键的业务处理规则。"
       ]
     },
     {
@@ -60,6 +44,22 @@
       "caption": "外层键允许为空时，需要另外定义缺失键的处理规则。",
       "codeColumns": [
         0
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "使用要点",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "对非空客户主键，本例用 NOT EXISTS 最直接。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "若外层键也允许空值，需要另外定义缺失键的业务处理规则。"
       ]
     }
   ],
@@ -88,29 +88,29 @@
       "kind": "fragment",
       "title": "指定来源",
       "sql": "FROM customers c",
-      "purpose": "从 customers c 读取输入数据。",
-      "reason": "后面的子句都基于这里得到的行。"
+      "purpose": "读取 customers 表（别名 c），每一行是一位客户。",
+      "reason": "NOT EXISTS 子查询要引用外层这一位客户，所以外层表要起别名。"
     },
     {
       "kind": "fragment",
       "title": "筛选行",
       "sql": "WHERE NOT EXISTS (SELECT 1 FROM orders o WHERE o.customer_id=c.customer_id)",
-      "purpose": "仅保留满足条件的行。",
-      "reason": "条件结果为真才保留；未知（NULL）的行会被排除。"
+      "purpose": "对每位客户检查 orders 里有没有属于他的订单，一笔都没有才保留（本例是客户 4）。",
+      "reason": "NOT EXISTS 在内层找不到任何行时为真，正好用来找“没有交易的对象”。"
     },
     {
       "kind": "fragment",
       "title": "选择输出",
       "sql": "SELECT c.customer_id",
-      "purpose": "输出 c.customer_id。",
-      "reason": "输出列的顺序与别名决定结果表的形状。"
+      "purpose": "显示客户编号。",
+      "reason": "SELECT 只决定显示哪些列。"
     },
     {
       "kind": "fragment",
       "title": "排序",
       "sql": "ORDER BY customer_name DESC;",
-      "purpose": "按 customer_name DESC 排列结果。",
-      "reason": "查询结果的默认行序没有保证，需要显式排序。"
+      "purpose": "按客户姓名倒序排列。",
+      "reason": "没有 ORDER BY 时数据库不保证行的顺序，写出来才能让输出顺序固定。"
     }
   ],
   "completeCode": {
@@ -191,7 +191,13 @@
         "emphasis": []
       }
     ],
-    "reason": [],
+    "reason": [
+      {
+        "type": "paragraph",
+        "text": "NOT IN 遇到子查询结果里含有 NULL 时，每个“不在集合里”的判断都会变成未知，WHERE 只保留真，结果可能一行都没有；orders 里的 customer_id 允许为空，所以这样写不安全。",
+        "emphasis": []
+      }
+    ],
     "correction": [
       {
         "type": "paragraph",

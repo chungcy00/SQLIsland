@@ -6,7 +6,7 @@
   "conceptBlocks": [
     {
       "type": "heading",
-      "text": "基本含义",
+      "text": "什么是应付账龄？",
       "emphasis": []
     },
     {
@@ -46,8 +46,8 @@
       "kind": "runnable",
       "title": "为发票筛选截止日余额及到期区间",
       "sql": "WITH a AS (SELECT v.*,CASE WHEN due_date>='2025-12-31' THEN 'current' WHEN due_date>='2025-12-01' THEN '01-30' WHEN due_date>='2025-11-01' THEN '31-60' WHEN due_date>='2025-10-02' THEN '61-90' ELSE '90+' END bucket FROM v_invoice_balance v WHERE balance_cents>0)\nSELECT * FROM a ORDER BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 LIMIT 3;",
-      "purpose": "为发票筛选截止日余额及到期区间（a）的实际执行结果。",
-      "reason": "在示例数据上运行该步骤，核对中间结果后再进入下一步。",
+      "purpose": "先筛出截止日（2025-12-31）仍有余额的发票，并按到期日划分账龄区间 bucket。",
+      "reason": "到期当日不算逾期；1–30、31–60、61–90、90 天以上各有明确的端点，不能重叠。",
       "sourceTables": [
         {
           "name": "v_invoice_balance",
@@ -185,8 +185,8 @@
       "kind": "runnable",
       "title": "按供应商与账龄区间汇总欠款",
       "sql": "WITH a AS (SELECT v.*,CASE WHEN due_date>='2025-12-31' THEN 'current' WHEN due_date>='2025-12-01' THEN '01-30' WHEN due_date>='2025-11-01' THEN '31-60' WHEN due_date>='2025-10-02' THEN '61-90' ELSE '90+' END bucket FROM v_invoice_balance v WHERE balance_cents>0) SELECT supplier_id,bucket,COUNT(*) invoices,SUM(balance_cents) outstanding_cents FROM a GROUP BY supplier_id,bucket ORDER BY outstanding_cents DESC",
-      "purpose": "在上一步的中间结果之上完成最终计算，得到题目要求的结果。",
-      "reason": "中间结果只是过渡，最终结果还需要汇总、计算或筛选后才能回答业务问题。",
+      "purpose": "按供应商和账龄区间汇总发票张数和未付余额。",
+      "reason": "金额用截止日前的净余额（扣除批准的贷项和付款），不是发票面额。",
       "sourceTables": [
         {
           "name": "v_invoice_balance",
@@ -2353,7 +2353,13 @@
         "emphasis": []
       }
     ],
-    "reason": [],
+    "reason": [
+      {
+        "type": "paragraph",
+        "text": "用发票面额代替余额，会把已经付过的钱也算成欠款；用当前日期代替固定的 2025-12-31，同一份报表每天跑出来的账龄都会变；区间端点写重了，第 90 天会同时落进两个区间。",
+        "emphasis": []
+      }
+    ],
     "correction": [
       {
         "type": "paragraph",

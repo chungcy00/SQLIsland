@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp03-04",
-  "lessonSha256": "c6a037ad5259525ab0f8f84c9ddec657b11bd59e0b7bdd721b6a43e44da1d969",
+  "lessonSha256": "b4d8ebb7182a7fa0d5e1867b0e38e8cedbb5e798e323b7ccbc7b5f97a27085b6",
   "figures": [
     {
       "id": "kp03-04-clauses",
@@ -14,19 +14,19 @@
           "role": "select",
           "label": "取数",
           "sql": "SELECT product_name",
-          "note": "输出 product_name。"
+          "note": "结果表最终显示 1 列：product_name。"
         },
         {
           "role": "from",
           "label": "来源",
           "sql": "FROM products",
-          "note": "从 products 读取输入数据。"
+          "note": "数据来自表 products。"
         },
         {
           "role": "where",
           "label": "筛选",
           "sql": "WHERE product_name LIKE '%!_%' ESCAPE '!'",
-          "note": "仅保留满足 product_name LIKE '%!_%' ESCAPE '!' 的行。"
+          "note": "只保留满足这个条件的行：product_name LIKE '%!_%' ESCAPE '!'。"
         },
         {
           "role": "order",

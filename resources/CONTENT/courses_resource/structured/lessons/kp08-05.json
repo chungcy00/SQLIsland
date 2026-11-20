@@ -6,7 +6,7 @@
   "conceptBlocks": [
     {
       "type": "heading",
-      "text": "基本含义",
+      "text": "什么是连接膨胀？",
       "emphasis": []
     },
     {
@@ -17,8 +17,30 @@
     {
       "type": "list",
       "items": [
-        "若客户有2笔订单及3次联系记录，两类明细直接按客户编号连接会得到6对记录，每笔订单重复3次；直接对销售额求和会放大金额。",
+        "若客户有2笔订单及3次联系记录，两类明细直接按客户编号连接会得到6对记录，每笔订单重复3次；直接对销售额求和会放大金额。"
+      ]
+    },
+    {
+      "type": "figure",
+      "ids": [
+        "kp08-05-fanout"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "什么是预聚合？",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
         "预聚合是先在各自事实表中按共同键独立计算指标，使每张汇总表在目标键上至多一行，再连接主档或其他汇总表。"
+      ]
+    },
+    {
+      "type": "figure",
+      "ids": [
+        "kp08-05-preagg"
       ]
     },
     {
@@ -36,28 +58,6 @@
       "items": [
         "应先确定目标粒度、检查键的唯一性、核对连接前后总额，再决定是否需要预聚合。"
       ]
-    },
-    {
-      "type": "table",
-      "columns": [
-        "做法",
-        "客户有 2 笔订单、3 次联系记录",
-        "对销售额求和"
-      ],
-      "rows": [
-        [
-          "直接连接两类明细",
-          "得到 6 对记录，每笔订单重复 3 次",
-          "金额被放大"
-        ],
-        [
-          "先在各自表里汇总再连接",
-          "每个客户在汇总表里至多一行",
-          "金额不重复"
-        ]
-      ],
-      "title": "直接连接与先汇总再连接",
-      "caption": "先确定目标粒度，再核对连接前后的总额。"
     }
   ],
   "syntax": {
@@ -90,29 +90,29 @@
       "kind": "fragment",
       "title": "计算 totals",
       "sql": "WITH totals AS (SELECT customer_id,SUM(sales) AS total FROM orders WHERE customer_id IS NOT NULL GROUP BY customer_id)",
-      "purpose": "先把名为 totals 的中间结果算出来，供后面的查询引用。",
-      "reason": "公用表表达式只在当前语句内有效，便于把复杂查询分层表达。"
+      "purpose": "先在订单表里按客户汇总销售额，得到每位客户一行的临时结果 totals（客户编号为空的订单不计入）。",
+      "reason": "先汇总再连接，totals 里每位客户最多一行，连接就不会把金额重复放大。"
     },
     {
       "kind": "fragment",
       "title": "指定来源",
       "sql": "FROM customers c LEFT JOIN totals t ON c.customer_id=t.customer_id",
-      "purpose": "读取查询需要的输入数据。",
-      "reason": "后面的子句都基于这里得到的行。"
+      "purpose": "把客户表和 totals 左连接：每位客户配上自己的合计，没有订单的客户保留。",
+      "reason": "totals 每个客户只有一行，一位客户最多配上一行；LEFT JOIN 让没有订单的客户也留在结果里。"
     },
     {
       "kind": "fragment",
       "title": "选择输出",
       "sql": "SELECT c.customer_id,COALESCE(t.total,0) AS total",
-      "purpose": "输出 c.customer_id,COALESCE(t.total,0) AS total。",
-      "reason": "输出列的顺序与别名决定结果表的形状。"
+      "purpose": "显示客户编号和合计，没有订单的客户用 COALESCE 把 NULL 换成 0。",
+      "reason": "COALESCE 返回第一个不是 NULL 的值，这样无订单的客户显示 0 而不是空。"
     },
     {
       "kind": "fragment",
       "title": "排序",
       "sql": "ORDER BY total DESC;",
-      "purpose": "按 total DESC 排列结果。",
-      "reason": "查询结果的默认行序没有保证，需要显式排序。"
+      "purpose": "按合计从高到低排列。",
+      "reason": "要保证展示顺序必须显式写 ORDER BY。"
     }
   ],
   "completeCode": {
@@ -255,7 +255,13 @@
         "emphasis": []
       }
     ],
-    "reason": [],
+    "reason": [
+      {
+        "type": "paragraph",
+        "text": "连接出现重复行后，SUM(DISTINCT sales) 只是把相同的金额合并：两笔不同订单恰好金额相同时会被当成一笔，反而少算，并没有解决重复；根本办法是先按共同键汇总再连接。",
+        "emphasis": []
+      }
+    ],
     "correction": [
       {
         "type": "paragraph",

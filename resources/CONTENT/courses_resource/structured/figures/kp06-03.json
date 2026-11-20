@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kp06-03",
-  "lessonSha256": "a85a9d1c58b828101cebeac2aeec9fab56a429e52f4b89ea5352d3724569c266",
+  "lessonSha256": "cc01fe2f9ee9e34971de9113937c16153853c586d835dbac34f2457be29c7963",
   "figures": [
     {
       "id": "kp06-03-clauses",
@@ -14,13 +14,13 @@
           "role": "select",
           "label": "取数",
           "sql": "SELECT MIN(price) AS min_price, MAX(price) AS max_price",
-          "note": "输出 MIN(price) AS min_price, MAX(price) AS max_price。"
+          "note": "结果表最终显示 2 列：min_price、max_price。"
         },
         {
           "role": "from",
           "label": "来源",
           "sql": "FROM products;",
-          "note": "从 products 读取输入数据。"
+          "note": "数据来自表 products。"
         }
       ]
     },
@@ -151,7 +151,8 @@
           "sql": "MAX(price)",
           "value": 89
         }
-      ]
+      ],
+      "conclusion": "MIN 和 MAX 各只返回一个值，不会告诉你是哪件商品；多件商品价格相同时也只有一个值。"
     }
   ]
 }
