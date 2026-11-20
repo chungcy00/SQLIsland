@@ -22,36 +22,6 @@
       "sha256": "36f9df74d1242f7c2874312d8604f3cc9aacc9347b4a6d35d80838c2e8f12b06"
     },
     {
-      "path": "BUSINESS_REVIEW.md",
-      "bytes": 1704,
-      "sha256": "864886f6a95d4b3c8cc50f555321c17e6a6557197f028eb993b1ea40a92d5b95"
-    },
-    {
-      "path": "DEVELOPMENT_AUDIT.md",
-      "bytes": 1533,
-      "sha256": "96ff97fc93e1253d9002f8ed31e5299a195144b9bb068d150bc70e6e34b2a190"
-    },
-    {
-      "path": "ERD_REPORT.md",
-      "bytes": 4832,
-      "sha256": "7bfb217f24f44dbeaadac15896e73ef009bf016b76269672413a228d98fdb384"
-    },
-    {
-      "path": "README.md",
-      "bytes": 2399,
-      "sha256": "b69f7fbed3e119c8faa5d81c047d299c48d989390ea4bb047cd3501f41cd5e1e"
-    },
-    {
-      "path": "REFERENCES.md",
-      "bytes": 464,
-      "sha256": "4536e88f6f4697d6442611a429d47eed98244201c26901c4bde489adb561c00e"
-    },
-    {
-      "path": "TASK_REAUDIT.md",
-      "bytes": 612,
-      "sha256": "3acaedca67a2ceb1b46c117ac0cd3a128dbaca82d197251ecd69ef69e5524dab"
-    },
-    {
       "path": "audit_results.json",
       "bytes": 2092,
       "sha256": "a49324a16dc1cad0af25faa8f3871b4e5914f3e3500977c9c9b0255e5fce01d4"
@@ -62,6 +32,11 @@
       "sha256": "4041339d343090456745718116564fe7315470e598611b997e9a9ecdc2f63eaa"
     },
     {
+      "path": "BUSINESS_REVIEW.md",
+      "bytes": 1704,
+      "sha256": "864886f6a95d4b3c8cc50f555321c17e6a6557197f028eb993b1ea40a92d5b95"
+    },
+    {
       "path": "changes.json",
       "bytes": 185104,
       "sha256": "799f831a8ed6656afcc29b158935b60b30262a95b05c78113c2c7b31b3268816"
@@ -70,11 +45,6 @@
       "path": "comparator_regression.json",
       "bytes": 615,
       "sha256": "82caa3be5370621529acb6aa33bfd08e472331376372b807c9ef5d646931445a"
-    },
-    {
-      "path": "courses_resource/README.md",
-      "bytes": 3414,
-      "sha256": "544bfc2fb066c552f8eb6534e9cab5274ff7725a4e30e733cc0dd9283246ff7a"
     },
     {
       "path": "courses_resource/courses/ch01.json",
@@ -562,6 +532,11 @@
       "sha256": "2ae5c82d1f166f4c2f28089e45dc2981d216e2c9e16818585e132b052ac0fcba"
     },
     {
+      "path": "courses_resource/README.md",
+      "bytes": 3414,
+      "sha256": "544bfc2fb066c552f8eb6534e9cab5274ff7725a4e30e733cc0dd9283246ff7a"
+    },
+    {
       "path": "courses_resource/reference/CURRICULUM.md",
       "bytes": 8178,
       "sha256": "0b7133bc97a6a3eaca99cb55bf81449735b3ef58029f307e77b677ff299f7b06"
@@ -642,9 +617,9 @@
       "sha256": "e0ef57985af4d9b65527a90d0d3d519b83e937f6fb63377e476d5ddf19c4c4cc"
     },
     {
-      "path": "courses_resource/structured/README.md",
-      "bytes": 4789,
-      "sha256": "f004b3db79f03fa643aeea792e0b7773e36055c13213df100200f775d0347c3e"
+      "path": "courses_resource/structured/figures/kp05-01.json",
+      "bytes": 2922,
+      "sha256": "6b219d6308c7ff00107a985cd1da07929f5598d95e92006a9264ced9c2ed238e"
     },
     {
       "path": "courses_resource/structured/lessons/kp01-01.json",
@@ -683,18 +658,13 @@
     },
     {
       "path": "courses_resource/structured/manifest.json",
-      "bytes": 2268,
-      "sha256": "fd0dcd344afe6a12575cd33dcd79c0a18fdd405abd32151e8266f69d407dadcb"
+      "bytes": 2444,
+      "sha256": "5b679de93885840fec32535ed06b481916d64d5f8b4e34fe2ad1bceed6753980"
     },
     {
-      "path": "courses_resource/validation/REPORT.md",
-      "bytes": 990,
-      "sha256": "bdf446eac2fb3618660694c019b63b854ec8548c1e1c39edaab7151442e64648"
-    },
-    {
-      "path": "courses_resource/validation/UPGRADE.md",
-      "bytes": 348,
-      "sha256": "6fff3bbbaae31e5ae0cb3e0d6ba8196af058d3c57464102d5a6010aa20c61f3a"
+      "path": "courses_resource/structured/README.md",
+      "bytes": 4789,
+      "sha256": "f004b3db79f03fa643aeea792e0b7773e36055c13213df100200f775d0347c3e"
     },
     {
       "path": "courses_resource/validation/batch1-import.json",
@@ -1227,6 +1197,11 @@
       "sha256": "3ef5f181f62712fc2ffa2791e062b4acae46d434fd162c164db60b841ce0e1d5"
     },
     {
+      "path": "courses_resource/validation/REPORT.md",
+      "bytes": 990,
+      "sha256": "bdf446eac2fb3618660694c019b63b854ec8548c1e1c39edaab7151442e64648"
+    },
+    {
       "path": "courses_resource/validation/structured-courses.json",
       "bytes": 8585,
       "sha256": "89735b73693574a295f7679dba0938a3e9b3f2a5b60ac61d1786674fadaaf248"
@@ -1237,9 +1212,14 @@
       "sha256": "3e3239ef49b867d13d128e56d470332dd96491936076dc3dc17af6cc363b8ca1"
     },
     {
-      "path": "enterprise_reference/MECHANICAL_REVIEW.md",
-      "bytes": 8265,
-      "sha256": "f1546ef1a0cf01e584e6611814789e262916b6f1475714ad417029c01d0b4e61"
+      "path": "courses_resource/validation/UPGRADE.md",
+      "bytes": 348,
+      "sha256": "6fff3bbbaae31e5ae0cb3e0d6ba8196af058d3c57464102d5a6010aa20c61f3a"
+    },
+    {
+      "path": "DEVELOPMENT_AUDIT.md",
+      "bytes": 1533,
+      "sha256": "96ff97fc93e1253d9002f8ed31e5299a195144b9bb068d150bc70e6e34b2a190"
     },
     {
       "path": "enterprise_reference/business_tasks/BP01.json",
@@ -2307,6 +2287,11 @@
       "sha256": "1af467ca932b064dc658d5887db87308a2cc697f36d9fac04332d8f96f486423"
     },
     {
+      "path": "enterprise_reference/MECHANICAL_REVIEW.md",
+      "bytes": 8265,
+      "sha256": "f1546ef1a0cf01e584e6611814789e262916b6f1475714ad417029c01d0b4e61"
+    },
+    {
       "path": "enterprise_reference/structured_data/accounts.csv",
       "bytes": 149,
       "sha256": "b1f206a90d4daafe188681146303b557e5019ae19185488f93ccb7a17978a171"
@@ -2537,11 +2522,6 @@
       "sha256": "93747a03b0835f84b54d851d61556f36a41b90c3c7a1653952febf5abdbd5034"
     },
     {
-      "path": "enterprise_reference/validation/REPORT.md",
-      "bytes": 4155,
-      "sha256": "01932badfbfe832b0752397281087f84da07c58161c47c98f74ab29184a4742e"
-    },
-    {
       "path": "enterprise_reference/validation/anomalies.json",
       "bytes": 3638,
       "sha256": "da95d49962b3421632337bd0a4c77eda78ecd0b8186ee13eed477f0d57fd0d2c"
@@ -2567,14 +2547,19 @@
       "sha256": "5b24aa84c7fe3269fe6328241989f5e55fb7e6f449552953a47955c987fc20bf"
     },
     {
+      "path": "enterprise_reference/validation/REPORT.md",
+      "bytes": 4155,
+      "sha256": "01932badfbfe832b0752397281087f84da07c58161c47c98f74ab29184a4742e"
+    },
+    {
       "path": "enterprise_reference/validation/task_definitions.py",
       "bytes": 514,
       "sha256": "420868a3100ff0ff1ced29ed93a137aeb8c08deb851c5a8221b218d78322ea05"
     },
     {
-      "path": "flashcard_resource/README.md",
-      "bytes": 3622,
-      "sha256": "b6492ff93948e6b42e71a2f3ef3dff00689fbff9c1875166c7b7fc96d484c6a5"
+      "path": "ERD_REPORT.md",
+      "bytes": 4832,
+      "sha256": "7bfb217f24f44dbeaadac15896e73ef009bf016b76269672413a228d98fdb384"
     },
     {
       "path": "flashcard_resource/course_links/ch01.json",
@@ -3517,6 +3502,11 @@
       "sha256": "36ee524df96ff7a48d5c7f0b0eb2b0e2ce8f55f2b72149d000943b02761410ed"
     },
     {
+      "path": "flashcard_resource/README.md",
+      "bytes": 3622,
+      "sha256": "b6492ff93948e6b42e71a2f3ef3dff00689fbff9c1875166c7b7fc96d484c6a5"
+    },
+    {
       "path": "flashcard_resource/reference/CURRICULUM.md",
       "bytes": 8178,
       "sha256": "0b7133bc97a6a3eaca99cb55bf81449735b3ef58029f307e77b677ff299f7b06"
@@ -3532,19 +3522,14 @@
       "sha256": "93223bf79c75bce6eead64527d28f6f123afdc9930924ab94d7d8de96b38dc7d"
     },
     {
-      "path": "flashcard_resource/reference/QUESTION_BANK.md",
-      "bytes": 4772,
-      "sha256": "156baffef1646e4327f3a413077f528ac53eac685ec506a82a3e5692ad4a2d14"
-    },
-    {
-      "path": "flashcard_resource/reference/TECHNICAL.md",
-      "bytes": 8582,
-      "sha256": "d226416ca26c272d58875b3ba0c2438eeab31cb8e025cbaae376419894c96aa4"
-    },
-    {
       "path": "flashcard_resource/reference/manifest_correction.json",
       "bytes": 549,
       "sha256": "0da91fdeedbf086828d25f5ac6241fc237d6d1df297d1f080dd0466ef99f6ca2"
+    },
+    {
+      "path": "flashcard_resource/reference/QUESTION_BANK.md",
+      "bytes": 4772,
+      "sha256": "156baffef1646e4327f3a413077f528ac53eac685ec506a82a3e5692ad4a2d14"
     },
     {
       "path": "flashcard_resource/reference/source_index.json",
@@ -3552,14 +3537,14 @@
       "sha256": "bff124557c17d5199aeb80ec65f8ead6000f704e7012b10337c9e1b2552b30a9"
     },
     {
+      "path": "flashcard_resource/reference/TECHNICAL.md",
+      "bytes": 8582,
+      "sha256": "d226416ca26c272d58875b3ba0c2438eeab31cb8e025cbaae376419894c96aa4"
+    },
+    {
       "path": "flashcard_resource/review_policy.json",
       "bytes": 2365,
       "sha256": "7f45303ed380caab2ab4cf30141d91647f333e991c0972a16ee1c5baa7f0c026"
-    },
-    {
-      "path": "flashcard_resource/validation/REPORT.md",
-      "bytes": 3261,
-      "sha256": "eddc557a839730e685624f594d400f7d856082789645be7d4bc920b039cd8416"
     },
     {
       "path": "flashcard_resource/validation/build_flashcards.py",
@@ -4207,6 +4192,11 @@
       "sha256": "b451fc735d3d5b5668b0e0803df3e8c1ebf6c9d3f5c8ceb4ef3a602aba629e68"
     },
     {
+      "path": "flashcard_resource/validation/REPORT.md",
+      "bytes": 3261,
+      "sha256": "eddc557a839730e685624f594d400f7d856082789645be7d4bc920b039cd8416"
+    },
+    {
       "path": "flashcard_resource/validation/verify_flashcards.py",
       "bytes": 6691,
       "sha256": "963227e390a2d50e92cc5b6851eb423b0607d916bed161de2392595ae07cf53c"
@@ -4215,11 +4205,6 @@
       "path": "integrated_verification.log",
       "bytes": 827,
       "sha256": "1e3eb658fafac196c16fa9b787e416820d55a0de8a22e0e67f63e91bdee34b5a"
-    },
-    {
-      "path": "question_resource/README.md",
-      "bytes": 4602,
-      "sha256": "6806a1eec7275e9b95e97dacd3b3e29132a7071e69e2c4654c2e2b0ba6f545a1"
     },
     {
       "path": "question_resource/course_links/ch01.json",
@@ -4332,11 +4317,6 @@
       "sha256": "ef6e36667ca3f882d6d76f93e09c1ef911f9bad78cd42fe788216dfe2301e89b"
     },
     {
-      "path": "question_resource/databases/ecommerce/README.md",
-      "bytes": 243,
-      "sha256": "fd8b1b21d7ac3a938bfcfb86d02030b86ff76b04c57191ad139507b06303c815"
-    },
-    {
       "path": "question_resource/databases/ecommerce/ecommerce.sqlite",
       "bytes": 13312000,
       "sha256": "31b1767d0e2b774e5cb7395ed186be7c92d534a96e90fc8576780875a69c8ff3"
@@ -4345,6 +4325,11 @@
       "path": "question_resource/databases/ecommerce/mysql_import.sql",
       "bytes": 8465917,
       "sha256": "c4a93f4d98e61fd365ffd29887130eb771b47c4ba236701edd843799910e553e"
+    },
+    {
+      "path": "question_resource/databases/ecommerce/README.md",
+      "bytes": 243,
+      "sha256": "fd8b1b21d7ac3a938bfcfb86d02030b86ff76b04c57191ad139507b06303c815"
     },
     {
       "path": "question_resource/databases/ecommerce/schema.json",
@@ -4357,11 +4342,6 @@
       "sha256": "bcd8f3f9aeadbb547aa327017f8b30bca11ce2763cd9277600f17dfb2e0d4641"
     },
     {
-      "path": "question_resource/databases/enterprise/README.md",
-      "bytes": 245,
-      "sha256": "0e4d290308dda286ef19fb76bb7a8e81ac1cffdfdaff3e39d5a743b47fed3d88"
-    },
-    {
       "path": "question_resource/databases/enterprise/enterprise.sqlite",
       "bytes": 43110400,
       "sha256": "d47285cfecd67f2dfd37a0d41a2c8a2714a6ecbc8e1170c3e9c0052204106924"
@@ -4370,6 +4350,11 @@
       "path": "question_resource/databases/enterprise/mysql_import.sql",
       "bytes": 25408243,
       "sha256": "6817665df585761888ff0323ba218e9b47c119486725afbf7ac00c0f0e1ccb0d"
+    },
+    {
+      "path": "question_resource/databases/enterprise/README.md",
+      "bytes": 245,
+      "sha256": "0e4d290308dda286ef19fb76bb7a8e81ac1cffdfdaff3e39d5a743b47fed3d88"
     },
     {
       "path": "question_resource/databases/enterprise/schema.json",
@@ -4382,11 +4367,6 @@
       "sha256": "0e9f164e6042d190f2dbe2c69727cfb7fbbb6dab7f0de2a25290483a3228805b"
     },
     {
-      "path": "question_resource/databases/finance/README.md",
-      "bytes": 239,
-      "sha256": "361dec1adb237b4d03bbbdc0c8508c524825b93b5e2f6f1606f4752cde6a0b70"
-    },
-    {
       "path": "question_resource/databases/finance/finance.sqlite",
       "bytes": 8028160,
       "sha256": "8ae00caa3958ac0db837a871916324d03061adfa81bbfa0ad3f2d127da1106ec"
@@ -4395,6 +4375,11 @@
       "path": "question_resource/databases/finance/mysql_import.sql",
       "bytes": 5052224,
       "sha256": "9bf7e8e08c94cbb74b24774ae7a82478f758a9b2f7fb2d4db3a9ff6629997571"
+    },
+    {
+      "path": "question_resource/databases/finance/README.md",
+      "bytes": 239,
+      "sha256": "361dec1adb237b4d03bbbdc0c8508c524825b93b5e2f6f1606f4752cde6a0b70"
     },
     {
       "path": "question_resource/databases/finance/schema.json",
@@ -4407,11 +4392,6 @@
       "sha256": "73d8f176b2948c367497af092c2d106c8a789c202cf552aa21e752dfa662a941"
     },
     {
-      "path": "question_resource/databases/hr/README.md",
-      "bytes": 229,
-      "sha256": "6f53b11ae053d7301a328ef620f3e8fe2979f74898c1b239905ae8964deadff7"
-    },
-    {
       "path": "question_resource/databases/hr/hr.sqlite",
       "bytes": 8069120,
       "sha256": "5806902531cf0f938bd5fea7cb2c92c8d77314e84bf55ef37bd14e8b3601a033"
@@ -4420,6 +4400,11 @@
       "path": "question_resource/databases/hr/mysql_import.sql",
       "bytes": 3963588,
       "sha256": "8916924b8289694c760a18490540910fc3a30686166864dd249681a27d0cb81a"
+    },
+    {
+      "path": "question_resource/databases/hr/README.md",
+      "bytes": 229,
+      "sha256": "6f53b11ae053d7301a328ef620f3e8fe2979f74898c1b239905ae8964deadff7"
     },
     {
       "path": "question_resource/databases/hr/schema.json",
@@ -4432,11 +4417,6 @@
       "sha256": "2c993a7630b47426b9a2d8fdc53cece65a9f1ba3a7be3d6b5a9cdc11e70ccec8"
     },
     {
-      "path": "question_resource/databases/inventory/README.md",
-      "bytes": 243,
-      "sha256": "30c8d70f35965139876f28996f7f7d1f0028bad803c4bc4cd474055d2d54e6ec"
-    },
-    {
       "path": "question_resource/databases/inventory/inventory.sqlite",
       "bytes": 28377088,
       "sha256": "8ffd03557cec269f31946f250002439e5c5722722962be17a86d7a86775c7eda"
@@ -4445,6 +4425,11 @@
       "path": "question_resource/databases/inventory/mysql_import.sql",
       "bytes": 16827916,
       "sha256": "7a09f4e88f3e5d0b4650a74cf41291090424787765413b80bd0d81acdcec4677"
+    },
+    {
+      "path": "question_resource/databases/inventory/README.md",
+      "bytes": 243,
+      "sha256": "30c8d70f35965139876f28996f7f7d1f0028bad803c4bc4cd474055d2d54e6ec"
     },
     {
       "path": "question_resource/databases/inventory/schema.json",
@@ -4462,11 +4447,6 @@
       "sha256": "d4a576377467d697b1819d61144f28c00e0610afd36b2b0adbf8d2c3371168d5"
     },
     {
-      "path": "question_resource/databases/procurement/README.md",
-      "bytes": 247,
-      "sha256": "0d47db6da3bc2c0825a9091c7ee6682c4b8be2005abd4fd16728b7a1c0f4e89b"
-    },
-    {
       "path": "question_resource/databases/procurement/mysql_import.sql",
       "bytes": 1663632,
       "sha256": "da8061b19d32a737409c76a43207020e8927c9faef35b9c0923bdc31301405bc"
@@ -4475,6 +4455,11 @@
       "path": "question_resource/databases/procurement/procurement.sqlite",
       "bytes": 3108864,
       "sha256": "32291e67b8888bba581f4e52fc4eeac482cc785ed9c75e5c89267998283637b7"
+    },
+    {
+      "path": "question_resource/databases/procurement/README.md",
+      "bytes": 247,
+      "sha256": "0d47db6da3bc2c0825a9091c7ee6682c4b8be2005abd4fd16728b7a1c0f4e89b"
     },
     {
       "path": "question_resource/databases/procurement/schema.json",
@@ -4487,14 +4472,14 @@
       "sha256": "72c9bdb792076693a379c1ad01895e3f611c25e917330ccf118730d2a6ebbc68"
     },
     {
-      "path": "question_resource/databases/retail/README.md",
-      "bytes": 237,
-      "sha256": "63be23f43cc1afea2cf858c1fea23b8c8547dcc40e4f21b83f9b9c08f986d617"
-    },
-    {
       "path": "question_resource/databases/retail/mysql_import.sql",
       "bytes": 8568615,
       "sha256": "6dd5763a037431ebbac87398dc698203b1347a7e00183d1bc7f91ba2a4c31a60"
+    },
+    {
+      "path": "question_resource/databases/retail/README.md",
+      "bytes": 237,
+      "sha256": "63be23f43cc1afea2cf858c1fea23b8c8547dcc40e4f21b83f9b9c08f986d617"
     },
     {
       "path": "question_resource/databases/retail/retail.sqlite",
@@ -9382,6 +9367,11 @@
       "sha256": "0cf6a5baabbeb010ab313aa3826eb70e4959e41e04b88ecc0873c9f3addade7d"
     },
     {
+      "path": "question_resource/README.md",
+      "bytes": 4602,
+      "sha256": "6806a1eec7275e9b95e97dacd3b3e29132a7071e69e2c4654c2e2b0ba6f545a1"
+    },
+    {
       "path": "question_resource/reference/CURRICULUM.md",
       "bytes": 8178,
       "sha256": "0b7133bc97a6a3eaca99cb55bf81449735b3ef58029f307e77b677ff299f7b06"
@@ -9400,11 +9390,6 @@
       "path": "question_resource/reference/TECHNICAL.md",
       "bytes": 8582,
       "sha256": "d226416ca26c272d58875b3ba0c2438eeab31cb8e025cbaae376419894c96aa4"
-    },
-    {
-      "path": "question_resource/validation/REPORT.md",
-      "bytes": 5223,
-      "sha256": "a7df01c265d580de044e4eb6cd39d0a753fa2f0fa39f801aece71dcf8fa7e250"
     },
     {
       "path": "question_resource/validation/build_bank.py",
@@ -12932,9 +12917,29 @@
       "sha256": "2cc5632865d65929c768444513d8e04ccce8b679bea9780d21100c2b4a9f9acb"
     },
     {
+      "path": "question_resource/validation/REPORT.md",
+      "bytes": 5223,
+      "sha256": "a7df01c265d580de044e4eb6cd39d0a753fa2f0fa39f801aece71dcf8fa7e250"
+    },
+    {
       "path": "question_resource/validation/verify_bank.py",
       "bytes": 8635,
       "sha256": "07d8f970b6605a780626b2962a6afb960d920d45332308a73e08191c52c16792"
+    },
+    {
+      "path": "README.md",
+      "bytes": 2399,
+      "sha256": "b69f7fbed3e119c8faa5d81c047d299c48d989390ea4bb047cd3501f41cd5e1e"
+    },
+    {
+      "path": "REFERENCES.md",
+      "bytes": 464,
+      "sha256": "4536e88f6f4697d6442611a429d47eed98244201c26901c4bde489adb561c00e"
+    },
+    {
+      "path": "similarity_scan.py",
+      "bytes": 1835,
+      "sha256": "a8babfbf6870c8146926eb8b406a7518057426b341dc6aa0a5a9f6fdaf0fa518"
     },
     {
       "path": "similarity.json",
@@ -12942,9 +12947,9 @@
       "sha256": "b34ab842656adafb047e4922b992506a256a19bcd5bfa6082fd697b80d3cebc0"
     },
     {
-      "path": "similarity_scan.py",
-      "bytes": 1835,
-      "sha256": "a8babfbf6870c8146926eb8b406a7518057426b341dc6aa0a5a9f6fdaf0fa518"
+      "path": "TASK_REAUDIT.md",
+      "bytes": 612,
+      "sha256": "3acaedca67a2ceb1b46c117ac0cd3a128dbaca82d197251ecd69ef69e5524dab"
     },
     {
       "path": "verify_integrated.py",

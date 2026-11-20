@@ -2,6 +2,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import {createHash} from 'node:crypto';
 import {validateStructuredLesson} from '../src/lesson-structure.js';
+import {validateFigures} from '../src/figure-structure.js';
 export const root = path.resolve('resources/CONTENT/courses_resource');
 export const hash = bytes => createHash('sha256').update(bytes).digest('hex');
 export const readJson = async file => JSON.parse(await fs.readFile(file, 'utf8'));
@@ -29,6 +30,17 @@ export async function loadCourseStructures(chapters) {
     validateStructuredLesson(lesson, presentation);
     lesson.presentation = presentation;
     converted.add(entry.id);
+  }
+  for (const entry of manifest.figures || []) {
+    const lesson = lessons.get(entry.id);
+    const record = manifest.lessons.find(item => item.id === entry.id);
+    if (!lesson || !converted.has(entry.id)) throw Error('Figures require a converted lesson: ' + entry.id);
+    const bytes = await fs.readFile(path.join(root, 'structured', entry.path));
+    if (hash(bytes) !== entry.sha256) throw Error('Figure checksum changed: ' + entry.id);
+    const data = JSON.parse(bytes);
+    if (data.lessonSha256 !== record.sha256) throw Error('Figure data is bound to a different lesson version: ' + entry.id);
+    validateFigures(lesson, data);
+    lesson.figures = data.figures;
   }
   return {resourceVersion: manifest.resourceVersion, converted: [...converted], pending: [...lessons.keys()].filter(id => !converted.has(id))};
 }

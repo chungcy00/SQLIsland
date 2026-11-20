@@ -1,0 +1,120 @@
+{
+  "schemaVersion": 1,
+  "id": "kp05-01",
+  "lessonSha256": "5cae9b4b952dcb12cc412d54a7da5844075c5f849d50280cbf7488605b80502d",
+  "figures": [
+    {
+      "id": "kp05-01-truth",
+      "slot": "concept",
+      "kind": "truth-table",
+      "title": "同一个条件，三种结果",
+      "caption": "WHERE 只保留结果为“真”的行；“假”和“未知”都会被排除。",
+      "table": "nullable_values",
+      "predicate": "value <> 10",
+      "keyColumn": "id",
+      "valueColumn": "value",
+      "rows": [
+        {
+          "key": 1,
+          "value": null,
+          "truth": "unknown"
+        },
+        {
+          "key": 2,
+          "value": 0,
+          "truth": "true"
+        },
+        {
+          "key": 3,
+          "value": 10,
+          "truth": "false"
+        },
+        {
+          "key": 4,
+          "value": 10,
+          "truth": "false"
+        }
+      ],
+      "replacesTable": true
+    },
+    {
+      "id": "kp05-01-clauses",
+      "slot": "syntax",
+      "kind": "clause-map",
+      "title": "示例查询的四个部分",
+      "sql": "SELECT id, value FROM nullable_values WHERE value <> 10 ORDER BY id;",
+      "parts": [
+        {
+          "role": "select",
+          "label": "取数",
+          "sql": "SELECT id, value",
+          "note": "输出记录编号和数值"
+        },
+        {
+          "role": "from",
+          "label": "来源",
+          "sql": "FROM nullable_values",
+          "note": "读取待检查的记录"
+        },
+        {
+          "role": "where",
+          "label": "筛选",
+          "sql": "WHERE value <> 10",
+          "note": "只保留条件为真的行"
+        },
+        {
+          "role": "order",
+          "label": "排序",
+          "sql": "ORDER BY id;",
+          "note": "按记录编号排列"
+        }
+      ]
+    },
+    {
+      "id": "kp05-01-flow",
+      "slot": "breakdown",
+      "kind": "row-flow",
+      "title": "每一步剩下多少行",
+      "table": "nullable_values",
+      "keyColumn": "id",
+      "columns": [
+        "id",
+        "value"
+      ],
+      "steps": [
+        {
+          "label": "FROM nullable_values",
+          "sql": "SELECT id, value FROM nullable_values",
+          "keptKeys": [
+            1,
+            2,
+            3,
+            4
+          ]
+        },
+        {
+          "label": "WHERE value <> 10",
+          "sql": "SELECT id, value FROM nullable_values WHERE value <> 10",
+          "keptKeys": [
+            2
+          ]
+        },
+        {
+          "label": "SELECT id, value",
+          "sql": "SELECT id, value FROM nullable_values WHERE value <> 10",
+          "keptKeys": [
+            2
+          ]
+        },
+        {
+          "label": "ORDER BY id;",
+          "sql": "SELECT id, value FROM nullable_values WHERE value <> 10 ORDER BY id;",
+          "keptKeys": [
+            2
+          ]
+        }
+      ],
+      "merge": "breakdown"
+    }
+  ]
+}

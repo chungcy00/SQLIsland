@@ -17,7 +17,7 @@ test('archived source, saved blocks and original course fields agree for the imp
     assert.equal(k.presentation.cuts,undefined);
     assert.equal(k.presentation.heads,undefined);
     const source=await readJson(path.join(root,k.presentation.sourcePath));
-    const {presentation,...fields}=k;
+    const {presentation,figures,...fields}=k;
     assert.deepEqual(fields,source);
   }
   const patch=await readJson(path.join(root,'source/batch1/课程字段补丁.json'));

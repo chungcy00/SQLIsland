@@ -69,5 +69,12 @@
       "path": "lessons/kp05-02.json",
       "sha256": "c8261c49414d6ff582ec7d29da2838104bd7801052ba08d6ec30d6cd47fecd53"
     }
+  ],
+  "figures": [
+    {
+      "id": "kp05-01",
+      "path": "figures/kp05-01.json",
+      "sha256": "6b219d6308c7ff00107a985cd1da07929f5598d95e92006a9264ced9c2ed238e"
+    }
   ]
 }

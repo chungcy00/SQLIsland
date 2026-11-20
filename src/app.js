@@ -2,6 +2,7 @@ import { lessonComplete, lessonNote, lessonNoteKey, migrateLessonBookmarks } fro
 import { isCurrentQuestionAttempt, questionDraft } from "./question-progress.js";
 import { actionIconPaths } from "./action-icons.js";
 import { hasIcon, iconSvg } from "./icons-v2.js";
+import { renderFigures, rowFlowStep } from "./figures.js";
 import { islandSvg, islandLitCount } from "./island.js";
 import islandSource from "../resources/ASSETS/v2/illustrations/milestone/milestone.svg";
 import { contourSvg, tideSvg } from "./decor.js";
@@ -702,7 +703,15 @@ function renderTeachingBlocks(blocks = []) {
   }).join("");
 }
 function conceptContent(k) {
-  return `<div class="concept-group">${k.presentation ? renderTeachingBlocks(k.presentation.conceptBlocks) : `<p>${e(k.concept)}</p>${(k.teaching?.mergedConcepts || []).map(item => `<p>${e(item.explanation)}</p>`).join("")}`}</div>`;
+  const figures = (k.figures || []).filter((figure) => figure.slot === "concept");
+  const replacing = figures.find((figure) => figure.replacesTable);
+  const blocks = (list) => {
+    let placed = false;
+    const body = list.map((block) => block.type === "table" && replacing && !placed ? (placed = true, renderFigures({ ...k, figures: [replacing] }, "concept")) : renderTeachingBlocks([block])).join("");
+    const rest = renderFigures({ ...k, figures: figures.filter((figure) => figure !== replacing) }, "concept");
+    return body + rest;
+  };
+  return `<div class="concept-group">${k.presentation ? blocks(k.presentation.conceptBlocks) : `<p>${e(k.concept)}</p>${(k.teaching?.mergedConcepts || []).map(item => `<p>${e(item.explanation)}</p>`).join("")}`}</div>`;
 }
 function lessonTeaching(k) {
   if (!k.teaching) return "";
@@ -713,8 +722,8 @@ function lessonTeaching(k) {
 function lessonBreakdown(k) {
   const steps = k.presentation?.breakdown || [];
   const summary = (sql) => e(String(sql || "").replace(/\s+/g, " ").trim());
-  const row = (step, i) => `<div class="code-explanation-part step-item" data-step="${i}"><button class="step-row" data-action="lessonStep" data-arg="${i}" aria-expanded="false" aria-controls="step-body-${i}"><span class="step-no">${i + 1}</span><span class="step-main"><strong>${e(step.title)}</strong><small class="step-summary">${summary(step.sql)}</small></span>${icon("down", "step-chevron")}</button><div class="step-body" id="step-body-${i}" hidden>${step.kind === "fragment"
-    ? `<small class="fragment-tag">片段 · 不能单独运行</small>${code(step.sql)}<p><strong>作用：</strong>${e(step.purpose)}</p><p><strong>原因：</strong>${e(step.reason)}</p>`
+  const row = (step, i) => `<div class="code-explanation-part step-item" data-step="${i}"><button class="step-row" data-action="lessonStep" data-arg="${i}" aria-expanded="false" aria-controls="step-body-${i}"><span class="step-no">${i + 1}</span><span class="step-main"><strong>${e(step.title)}</strong><small class="step-summary">${summary(step.sql)}</small></span>${rowFlowStep(k, i) ? `<span class="fig-count">${rowFlowStep(k, i).badge}</span>` : ""}${icon("down", "step-chevron")}</button><div class="step-body" id="step-body-${i}" hidden>${step.kind === "fragment"
+    ? `${code(step.sql)}<p><strong>作用：</strong>${e(step.purpose)}</p><p><strong>原因：</strong>${e(step.reason)}</p>${rowFlowStep(k, i) ? `<h3>数据变化</h3>${rowFlowStep(k, i).html}` : ""}`
     : `${renderTables(step.sourceTables)}${code(step.sql)}<p>${e(step.purpose)}</p><p>${e(step.reason)}</p><h3>中间结果</h3>${table(step.result.columns, step.result.rows)}`}</div></div>`;
   const legacy = k.presentation ? "" : (k.teaching?.checkpoints || []).map(step =>
     `<details class="lesson-checkpoint"><summary>${e(step.label)} · <code>${e(step.name)}</code></summary>${lessonCode(step.sql)}${table(step.result.columns, step.result.rows)}</details>`
@@ -773,7 +782,7 @@ function lessonPage(id) {
     <header class="lesson-intro">${contourSvg("lesson-contour")}<div class="lesson-chapter"><span class="chapter-badge">${String(chapter.number).padStart(2, "0")}</span><span>第 ${chapter.number} 章 · ${e(chapter.title)}</span></div><h1 class="lesson-title">${e(k.title)}</h1>${goal ? `<section class="lesson-purpose" data-lesson-section="purpose"><p>能够运用本节知识完成：${e(goal)}</p></section>` : ""}<div class="question-meta">${tag(k.compatibility?.status || "MySQL 教学")}<small>${position} / ${chapter.knowledgePoints.length}</small></div></header>
     <div class="lesson-nav" role="navigation" aria-label="章节内导航">${[["concept", "概念"], ...(!sharedExample ? [["syntax", "语法"]] : []), ["example", "示例"], ["cautions", "易错"]].map(([key, label], i) => `<button data-action="lessonJump" data-arg="${key}" ${i === 0 ? 'aria-current="true"' : ""}>${label}</button>`).join("")}</div>
     <div class="lesson-foundation"><section class="lesson-section" data-lesson-section="concept"><h2>核心概念</h2><div class="lesson-concept">${conceptContent(k)}</div>${sharedExample ? parameters : ""}</section>
-    ${!sharedExample ? `<section class="lesson-section" data-lesson-section="syntax"><h2>语法</h2>${k.presentation?.syntax.purpose ? `<p class="syntax-purpose">${teachingText(k.presentation.syntax.purpose)}</p>` : ""}${lessonCode(k.syntax)}${parameters}</section>` : ""}</div>
+    ${!sharedExample ? `<section class="lesson-section" data-lesson-section="syntax"><h2>语法</h2>${k.presentation?.syntax.purpose ? `<p class="syntax-purpose">${teachingText(k.presentation.syntax.purpose)}</p>` : ""}${lessonCode(k.syntax)}${parameters}${renderFigures(k, "syntax")}</section>` : ""}</div>
     ${(k.executionSteps || []).length ? `<section class="lesson-section" data-lesson-section="steps"><h2>执行思路</h2><ol class="steps">${k.executionSteps.map((step, i) => `<li class="step"><b>${i + 1}</b><span>${e(step)}</span></li>`).join("")}</ol></section>` : ""}
     <section class="lesson-section" data-lesson-section="data"><h2>示例数据</h2>${renderTables(k.sourceTables, true, k.presentation?.dataDescriptions)}</section>
     <section class="lesson-section" data-lesson-section="example"><div class="section-heading example-heading"><h2>SQL 示例</h2>${button(icon("code") + " 去实验室", "lessonLab", id, "small-button")}</div>${lessonTeaching(k)}${lessonBreakdown(k)}${lessonCompleteCode(k)}<div id="lesson-result" aria-live="polite">${lessonExampleResult?.id === id ? lessonResult(k, lessonExampleResult.result) : ""}</div>${lessonExtensions(k)}</section>

@@ -67,6 +67,7 @@ function inner(name) {
   cache.set(name, result);
   return result;
 }
-export const hasIcon = (name) => !!inner(name);
+// down 用作展开箭头（章节、分步执行），沿用原来的 V 形箭头。
+export const hasIcon = (name) => name !== "down" && !!inner(name);
 export const iconSvg = (name, cls = "") =>
   `<svg class="icon v2 ${cls}" viewBox="0 0 24 24" aria-hidden="true">${inner(name)}</svg>`;

@@ -1,0 +1,48 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import path from 'node:path';
+import {root, readJson, loadCourseStructures} from '../scripts/course-structure-resources.mjs';
+import {validateFigures} from '../src/figure-structure.js';
+import {renderFigures, rowFlowStep} from '../src/figures.js';
+const chapters = await Promise.all(Array.from({length:20},(_,i)=>readJson(path.join(root,'courses',`ch${String(i+1).padStart(2,'0')}.json`))));
+await loadCourseStructures(chapters);
+const lessons = chapters.flatMap(c=>c.knowledgePoints);
+const pilot = lessons.find(k=>k.id==='kp05-01');
+const data = await readJson(path.join(root,'structured/figures/kp05-01.json'));
+const fresh = () => structuredClone(data);
+test('pilot figures load only for converted lessons and match the sample data', () => {
+  assert.equal(pilot.figures.length, 3);
+  assert.deepEqual(lessons.filter(k=>k.figures).map(k=>k.id), ['kp05-01']);
+  validateFigures(pilot, fresh());
+});
+test('figure validation rejects numbers that differ from the lesson data', () => {
+  let bad = fresh(); bad.figures[0].rows[1].value = 1;
+  assert.throws(()=>validateFigures(pilot, bad), /differs from sample data|does not cover concept table row/);
+  bad = fresh(); bad.figures[0].rows.pop();
+  assert.throws(()=>validateFigures(pilot, bad), /rows count/);
+  bad = fresh(); bad.figures[1].parts[2].sql = 'WHERE value = 10';
+  assert.throws(()=>validateFigures(pilot, bad), /rebuild the query/);
+  bad = fresh(); bad.figures[2].steps[1].keptKeys = [2, 9];
+  assert.throws(()=>validateFigures(pilot, bad), /subset/);
+  bad = fresh(); bad.figures[2].steps.pop();
+  assert.throws(()=>validateFigures(pilot, bad), /last step|match the breakdown/);
+  bad = fresh(); bad.figures[2].steps[2].label = 'SELECT *';
+  assert.throws(()=>validateFigures(pilot, bad), /label differs/);
+  bad = fresh(); bad.figures[2].steps[3].sql = 'SELECT 1';
+  assert.throws(()=>validateFigures(pilot, bad), /full query/);
+  bad = fresh(); bad.figures[0].rows[1].truth = 'false';
+  assert.throws(()=>validateFigures(pilot, bad), /does not cover concept table row/);
+  bad = fresh(); bad.figures[0].rows[0].truth = 'maybe';
+  assert.throws(()=>validateFigures(pilot, bad), /truth/);
+});
+test('figures render real text labels and escape content', () => {
+  const html = ['concept','syntax','breakdown'].map(slot=>renderFigures(pilot, slot)).join('');
+  for (const text of ['未知','真','假','取数','筛选','排序']) assert.ok(html.includes(text), text);
+  assert.deepEqual([0,1,2,3].map(i=>rowFlowStep(pilot,i).badge), ['4 行','4 → 1 行','1 → 1 行','1 → 1 行']);
+  assert.ok(rowFlowStep(pilot,1).html.includes('排除'));
+  assert.equal(rowFlowStep(pilot,4), null);
+  assert.equal(renderFigures(pilot,'breakdown'), '');
+  assert.ok(html.includes('value &lt;&gt; 10'));
+  assert.ok(!html.includes('<svg'));
+  assert.equal(renderFigures({figures: [], sourceTables: []}, 'concept'), '');
+});

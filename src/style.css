@@ -2722,3 +2722,43 @@ td.cell-bad { background: var(--err-bg); color: var(--err); font-weight: 600; }
 nav .nav-icon .nav-svg { width: 24px; height: 24px; }
 .list-icon > .icon { width: 28px; height: 28px; }
 nav .nav-svg { color: var(--primary); }
+
+/* ===== B9 教学图解 ===== */
+.figure { margin: 12px 0; padding: 12px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; }
+.figure > figcaption { font-size: 0.9375rem; font-weight: 600; margin-bottom: 8px; }
+.fig-table { width: 100%; border-collapse: collapse; font-size: 0.8125rem; }
+.fig-table th { text-align: left; background: var(--lake); font-weight: 600; padding: 6px 8px; }
+.fig-table th:first-child { border-radius: 8px 0 0 8px; }
+.fig-table th:last-child { border-radius: 0 8px 8px 0; }
+.fig-table td { padding: 8px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+.fig-table tr:last-child td { border-bottom: 0; }
+.fig-table code { font-size: 0.75rem; }
+.fig-null { color: var(--ink2); font-style: italic; }
+.fig-key { display: block; color: var(--ink2); font-size: 0.6875rem; }
+.fig-truth { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 999px; font-weight: 600; font-size: 0.75rem; }
+.fig-truth b { font-weight: 700; }
+.fig-truth.true { background: var(--ok-bg); color: var(--ok); }
+.fig-truth.false { background: var(--err-bg); color: var(--err); }
+.fig-truth.unknown { background: var(--warn-bg); color: var(--warn); }
+.fig-row.dropped td:not(:last-child) { color: var(--ink2); }
+.fig-flow .fig-row.dropped td:not(:last-child) { opacity: 0.6; }
+.fig-caption { margin: 8px 0 0; font-size: 0.8125rem; color: var(--ink2); }
+.fig-clauses { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.fig-clause { display: grid; grid-template-columns: 52px minmax(0, 1fr); gap: 2px 8px; align-items: center; padding: 8px 10px; border-radius: 10px; background: var(--bg); border-left: 4px solid var(--clause, var(--primary)); }
+.fig-clause code { font-size: 0.8125rem; overflow-wrap: anywhere; }
+.fig-clause small { grid-column: 2; color: var(--ink2); font-size: 0.75rem; }
+.fig-clause-tag { font-size: 0.75rem; font-weight: 600; color: var(--clause, var(--primary)); }
+.fig-clause.select, .fig-clause.from { --clause: #38607f; }
+.fig-clause.where { --clause: #2a7478; }
+.fig-clause.group { --clause: #4a7c45; }
+.fig-clause.order { --clause: #7f6a1f; }
+.fig-flow { display: grid; gap: 10px; }
+.fig-step { border: 1px solid var(--line); border-radius: 10px; padding: 8px; }
+.fig-step header { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.fig-step header code { flex: 1; min-width: 0; font-size: 0.75rem; overflow-wrap: anywhere; }
+.fig-step-no { width: 22px; height: 22px; border-radius: 50%; background: var(--primary); color: #fff; font-size: 0.75rem; font-weight: 600; display: grid; place-items: center; flex: none; }
+.fig-count { flex: none; font-size: 0.75rem; font-weight: 600; padding: 2px 8px; border-radius: 999px; background: var(--lake); color: var(--primary); }
+.fig-out { font-size: 0.6875rem; font-weight: 600; color: var(--err); background: var(--err-bg); padding: 1px 6px; border-radius: 999px; }
+.fig-flow .fig-table { table-layout: fixed; } .fig-flow .fig-table th:last-child, .fig-flow .fig-table td:last-child { width: 64px; }
+.step-row .fig-count { flex: none; margin-right: 4px; }
+.step-body h3 { margin: 10px 0 6px; font-size: 0.875rem; }
