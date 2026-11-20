@@ -3083,6 +3083,12 @@ async function handleAction(action, arg, element) {
 app.addEventListener("click", (event) => {
   const element = event.target.closest("[data-action]");
   if (!element) return;
+  // 整张闪卡点击翻面，但卡片里本来就能点的东西（展开/收起、链接、按钮、输入框）和选中文字时的点击不能触发翻面。
+  if (element.classList.contains("fc-tap")) {
+    const inner = event.target.closest("summary, details, a, button, input, textarea, select, label");
+    if (inner && inner !== element && element.contains(inner)) return;
+    if (window.getSelection?.().toString()) return;
+  }
   handleAction(element.dataset.action, element.dataset.arg, element).catch(
     (error) => {
       busy = false;

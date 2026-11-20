@@ -38,8 +38,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 2399,
-      "sha256": "b69f7fbed3e119c8faa5d81c047d299c48d989390ea4bb047cd3501f41cd5e1e"
+      "bytes": 2494,
+      "sha256": "caf1115b54d1600795f8e305eac1a52f189bda1b52da466e25ae20963f62c014"
     },
     {
       "path": "REFERENCES.md",
@@ -4487,109 +4487,9 @@
       "sha256": "53af1beaf38373df06065de12f26ed64bdae9f0da927818e192d051b5faede6d"
     },
     {
-      "path": "flashcard_resource/flashcards/ch01.json",
-      "bytes": 17716,
-      "sha256": "173d737c3cfcc8155d82048416062832d65a6433c4b62cf7a8e7eab471dd45af"
-    },
-    {
-      "path": "flashcard_resource/flashcards/ch02.json",
-      "bytes": 20615,
-      "sha256": "d79d672b0222bcf9958552b53965324e7a0811837e374f80833b577dcfd18346"
-    },
-    {
-      "path": "flashcard_resource/flashcards/ch03.json",
-      "bytes": 36685,
-      "sha256": "3c38e0f7e5f034b438ad9eba9015ebf267d5b14b8547e909f962ac9019e5ec31"
-    },
-    {
-      "path": "flashcard_resource/flashcards/ch04.json",
-      "bytes": 19529,
-      "sha256": "d9cf143d069da5544b23e812285b355f57e0bfa6615c9dbade1ed90f2f70b313"
-    },
-    {
-      "path": "flashcard_resource/flashcards/ch05.json",
-      "bytes": 18043,
-      "sha256": "f9174e6259679088b368a5d64183afdc1caa0bafc04fe16cd80937ad0acddedc"
-    },
-    {
-      "path": "flashcard_resource/flashcards/ch06.json",
-      "bytes": 26422,
-      "sha256": "f16a2d69d87368340151f64df8e2fda6be8da595dc21e0b0b0565374afd7c1c2"
-    },
-    {
-      "path": "flashcard_resource/flashcards/ch07.json",
-      "bytes": 24794,
-      "sha256": "8cf342703fae4823031b4e0e84275ec83f35fd95cbeb193823dee5f48ec43e19"
-    },
-    {
-      "path": "flashcard_resource/flashcards/ch08.json",
-      "bytes": 41072,
-      "sha256": "5d7ffc765d38ffb9b973a11b1b192582e4cdb4392a44def486485b0338034627"
-    },
-    {
-      "path": "flashcard_resource/flashcards/ch09.json",
-      "bytes": 26981,
-      "sha256": "5de7d17b895943c0730660c89f178becb255bab5008980e390b8329de2a40c5f"
-    },
-    {
-      "path": "flashcard_resource/flashcards/ch10.json",
-      "bytes": 32608,
-      "sha256": "1ee5a1b1dcc7630789385a74b3a4fad50c6b94da2259a8af2b6da2c3059c76e2"
-    },
-    {
-      "path": "flashcard_resource/flashcards/ch11.json",
-      "bytes": 20080,
-      "sha256": "1474434bfbd2491dd03e48a7ba046e62038ea3a2a0f691769d324f1ee6229ec1"
-    },
-    {
-      "path": "flashcard_resource/flashcards/ch12.json",
-      "bytes": 27609,
-      "sha256": "6ad636e1abd18cadf73b6fb7356d1a83f1436fe1a21f1e4e3983d71609abfaec"
-    },
-    {
-      "path": "flashcard_resource/flashcards/ch13.json",
-      "bytes": 19248,
-      "sha256": "28acfbb45b8e0e2b71b3c5b0bf321226d69b17309b1ee604ceb3f15f92554c08"
-    },
-    {
-      "path": "flashcard_resource/flashcards/ch14.json",
-      "bytes": 20809,
-      "sha256": "462aafe1e54fba33264c1b0ab2bbf8ed065334754b69e7a25644932b08b07b83"
-    },
-    {
-      "path": "flashcard_resource/flashcards/ch15.json",
-      "bytes": 36523,
-      "sha256": "bf91103c2b38a8559dce7b568bfef1fa85df4a5bdfe8caf333a463704d93b955"
-    },
-    {
-      "path": "flashcard_resource/flashcards/ch16.json",
-      "bytes": 21821,
-      "sha256": "dd542d88baf5f329fa66e03bb3c5072a12381d5b6558a0ab3cdacfedb0afeb0b"
-    },
-    {
-      "path": "flashcard_resource/flashcards/ch17.json",
-      "bytes": 20560,
-      "sha256": "6df765486182e4b64a246217aa0a3fb207ae08930d8cfad0c7735e08ca917cd7"
-    },
-    {
-      "path": "flashcard_resource/flashcards/ch18.json",
-      "bytes": 13593,
-      "sha256": "f24b548f9b813676d1de0c3d16c31e94e560abef5f5424e1e9d015e74b4b54ea"
-    },
-    {
-      "path": "flashcard_resource/flashcards/ch19.json",
-      "bytes": 133772,
-      "sha256": "ac47a4055c515e2daab0283b328547d0504500ac3b0f1eac16c7e4a3dab33a51"
-    },
-    {
-      "path": "flashcard_resource/flashcards/ch20.json",
-      "bytes": 79752,
-      "sha256": "a53f12f15116983fc43659f3c363029b3790e68fdf06af82c632558274b0b0cf"
-    },
-    {
       "path": "flashcard_resource/manifest.json",
-      "bytes": 56197,
-      "sha256": "c8eee5e340a339996cf108dcd09897b1e6cf6af302fdbe5d0f4ef77084813e01"
+      "bytes": 49759,
+      "sha256": "e12685d9d5fcfe51342d142353485bfc27d7cef5cf072b690b916e77d7765654"
     },
     {
       "path": "flashcard_resource/reading/ch01.md",

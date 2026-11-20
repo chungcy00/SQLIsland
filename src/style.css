@@ -3174,3 +3174,64 @@ nav .nav-svg { color: var(--primary); }
 .fig-flow-table.dense td { overflow-wrap: anywhere; }
 .fig-table.fig-flow-table { min-width: 0; }
 .fig-table.fig-flow-table th, .fig-table.fig-flow-table td { white-space: normal; }
+
+/* 闪卡教学图示：代码对比 */
+.fc-diff-side { border-radius: var(--r-code); padding: 8px 10px; margin-bottom: 8px; border-left: 3px solid var(--ctl); background: var(--lake); }
+.fc-diff-side.bad { border-left-color: var(--err); background: var(--err-bg); }
+.fc-diff-side.good { border-left-color: var(--ok); background: var(--ok-bg); }
+.fc-diff-side small { display: block; font-weight: 600; margin-bottom: 4px; color: var(--ink2); }
+.fc-diff-side pre { margin: 0; padding: 0; background: none; border: 0; white-space: pre-wrap; word-break: break-word; font-size: 0.8125rem; line-height: 1.6; }
+.fc-diff-side mark { background: transparent; font-weight: 700; border-radius: 3px; padding: 0 2px; }
+.fc-diff-side.bad mark { background: #f3c9c2; color: var(--err); }
+.fc-diff-side.good mark { background: #bfe3cf; color: #1f5c40; }
+
+/* 闪卡教学图示：函数 输入 → 输出 */
+.fc-call { border: 1px solid var(--line); border-radius: var(--r-ctl); margin-bottom: 8px; overflow: hidden; background: var(--card); }
+.fc-call-in { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 6px 10px; background: var(--lake); }
+.fc-fn { font-weight: 700; color: var(--primary); background: var(--card); border-radius: var(--r-pill); padding: 2px 10px; font-family: var(--font-mono); font-size: 0.8125rem; }
+.fc-args { display: flex; flex-direction: column; min-width: 0; }
+.fc-args small, .fc-call-out small { font-size: 0.6875rem; color: var(--ink2); }
+.fc-args code { background: none; padding: 0; font-size: 0.8125rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+.fc-call-out { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 6px 10px; background: var(--sun-bg); }
+.fc-call-out span { display: flex; align-items: baseline; gap: 8px; color: var(--sun-ink); font-weight: 600; font-size: 0.8125rem; white-space: nowrap; }
+.fc-call-out b { font-family: var(--font-mono); font-size: 1rem; color: var(--ink); overflow-wrap: anywhere; text-align: right; }
+
+/* 闪卡教学图示：语法分块 */
+.fc-chunk { border-left: 4px solid var(--primary); background: var(--lake); border-radius: 0 var(--r-code) var(--r-code) 0; padding: 6px 10px; margin-bottom: 6px; }
+.fc-chunk-role { display: block; font-size: 0.6875rem; font-weight: 600; color: var(--ink2); margin-bottom: 2px; }
+.fc-chunk code { display: block; background: none; padding: 0; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 0.8125rem; }
+.fc-chunk.k-select { border-left-color: var(--primary); }
+.fc-chunk.k-from { border-left-color: var(--teal); }
+.fc-chunk.k-where, .fc-chunk.k-having { border-left-color: var(--sun); background: var(--sun-bg); }
+.fc-chunk.k-group { border-left-color: #5b6fa6; }
+.fc-chunk.k-order, .fc-chunk.k-limit { border-left-color: var(--ok); background: var(--ok-bg); }
+.fc-chunk.k-join { border-left-color: #3f7f9e; }
+.fc-chunk.k-with, .fc-chunk.k-case { border-left-color: #8a6a1c; }
+.fc-chunk.k-insert, .fc-chunk.k-update, .fc-chunk.k-delete, .fc-chunk.k-create { border-left-color: var(--err); background: var(--err-bg); }
+
+/* 闪卡教学图示：并排结果对比 */
+.fc-cmp-t { margin-bottom: 8px; }
+.fc-cmp-t h4 { margin: 0 0 4px; font-size: var(--fs-aux); color: var(--ink2); }
+.fc-cmp table { width: 100%; }
+.fc-cmp tr.only td { background: var(--sun-bg); font-weight: 600; }
+.fc-only { font-size: 0.6875rem; font-weight: 600; color: var(--sun-ink); background: var(--card); border: 1px solid var(--sun); border-radius: 999px; padding: 1px 6px; white-space: nowrap; }
+
+/* 闪卡教学图示：示例数据 */
+.fc-data .fc-h small { margin-left: 8px; font-weight: 400; font-size: 0.75rem; color: var(--ink2); }
+.fc-data-t { margin-bottom: 8px; }
+.fc-data-t h4 { margin: 0 0 4px; font-size: var(--fs-aux); color: var(--ink2); }
+.fc-data-t h4 small { margin-left: 6px; font-weight: 400; }
+.fc-data-set { margin-bottom: 8px; border: 1px solid var(--line); border-radius: var(--r-ctl); padding: 0 10px; background: var(--card); }
+.fc-data-set summary { cursor: pointer; padding: 8px 0; font-size: var(--fs-aux); font-weight: 600; color: var(--ink2); }
+
+/* 闪卡教学图示：业务指标代入数字 */
+.fc-subst .fc-h small { display: block; margin-left: 12px; font-weight: 400; font-size: 0.75rem; color: var(--ink2); }
+.fc-sub-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 12px; border-radius: var(--r-ctl); background: var(--lake); }
+.fc-sub-row.res { background: var(--sun-bg); }
+.fc-sub-k { font-weight: 700; display: flex; flex-direction: column; min-width: 0; }
+.fc-sub-k small { font-weight: 400; color: var(--ink2); font-size: 0.75rem; }
+.fc-sub-v { display: flex; flex-direction: column; align-items: flex-end; }
+.fc-sub-v small { font-size: 0.6875rem; color: var(--ink2); font-family: var(--font-mono); }
+.fc-sub-v b { font-family: var(--font-mono); font-size: 1.0625rem; overflow-wrap: anywhere; }
+.fc-sub-op { text-align: center; font-weight: 700; color: var(--ink2); padding: 2px 0; }
+.fc-chunk.k-pred { border-left-color: var(--sun); background: var(--sun-bg); }

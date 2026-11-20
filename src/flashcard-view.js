@@ -1,7 +1,7 @@
 // 332 张闪卡的手机端双面展示。只读渲染：按 section.type 分派，未知类型原样兜底，不改卡片数据。
 // 由 app.js 注入 e / table / code / tag，避免与 app.js 循环依赖。
 import { TYPE_LABELS } from "./flashcard-model.mjs";
-import { mergeTimeline, groupRuns, runTitle, isAlt, parseFormula, formulaLines, scopeItems } from "./flashcard-blocks.mjs";
+import { mergeTimeline, groupRuns, runTitle, isAlt, parseFormula, formulaLines, scopeItems, errorPair, callPairs, showValue, syntaxChunks, compareResults, metricSubstitution } from "./flashcard-blocks.mjs";
 
 // 八类模板差异：正面是否带代码、背面图示的呈现方式、待确认标记。
 export const CARD_TEMPLATES = {
@@ -152,7 +152,79 @@ export function createCardView({ e, table, code, tag }) {
       else if (x.type === "code" && isAlt(x.title)) parts.push(altBlock(x, card));
       else parts.push(section(x, template));
     }
+    const sub = metricSubstitution(card);
+    if (sub) {
+      let at = -1;
+      parts.forEach((x, i) => { if (/fc-(scope|formula-card)/.test(x.slice(0, 80))) at = i; });
+      parts.splice(at + 1, 0, substFigure(sub));
+    }
+    const data = dataFigure(card);
+    if (data) {
+      const first = parts.findIndex((x) => /^<section class="fc-sec (fc-group|fc-codeblock)/.test(x));
+      parts.splice(first >= 0 ? first : parts.length, 0, data);
+    }
     return parts.join("");
+  }
+
+
+  // ---- 闪卡教学图示（只用卡片自己的数据计算，放在背面答案/解析之后）----
+  const diffSide = (segments) => segments.map((x) => (x.changed ? `<mark>${e(x.t)}</mark>` : e(x.t))).join("");
+  function codeDiffFigure(diff) {
+    return `<section class="fc-sec fc-fig fc-diff"><h3 class="fc-h"><i></i>错在哪里：两种写法的差别</h3><div class="fc-diff-side bad"><small>错误写法（正面）</small><pre><code>${diffSide(diff.wrong)}</code></pre></div><div class="fc-diff-side good"><small>正确写法</small><pre><code>${diffSide(diff.right)}</code></pre></div><p class="fc-hint">高亮的是两种写法不一样的地方${diff.changedWrong ? "" : "：错误写法里的每个词在正确写法里都有，差别在于正确写法多出来的部分"}。</p></section>`;
+  }
+  function callFigure(found) {
+    const rows = found.pairs.map((p) => `<div class="fc-call"><div class="fc-call-in">${p.call ? `<span class="fc-fn">${e(p.call.name)}</span><span class="fc-args"><small>输入</small><code>${e(p.call.args || "（无参数）")}</code></span>` : `<span class="fc-args"><small>表达式</small><code>${e(p.expr)}</code></span>`}</div><div class="fc-call-out"><span>↓ 输出${p.alias ? `<small>${e(p.alias)}</small>` : ""}</span><b>${e(showValue(p.value))}</b></div></div>`).join("");
+    return `<section class="fc-sec fc-fig fc-calls"><h3 class="fc-h"><i></i>输入 → 函数 → 输出${found.example.label ? `：${e(found.example.label)}` : ""}</h3>${rows}${found.total > found.pairs.length ? `<p class="fc-hint">这个示例共有 ${found.total} 列，这里只列出前 ${found.pairs.length} 个。</p>` : ""}</section>`;
+  }
+  function chunkFigure(chunks) {
+    return `<section class="fc-sec fc-fig fc-chunks"><h3 class="fc-h"><i></i>语法分块：每一部分管什么</h3>${chunks.map((c) => `<div class="fc-chunk k-${c.family}"><span class="fc-chunk-role">${e(c.role)}</span><code>${e(c.text)}</code></div>`).join("")}</section>`;
+  }
+  function compareFigure(cmp) {
+    const cell = (v) => (v === null ? '<span class="muted">NULL</span>' : e(v));
+    return `<section class="fc-sec fc-fig fc-cmp"><h3 class="fc-h"><i></i>同样的数据，不同写法的结果</h3>${cmp.tables.map((t) => `<div class="fc-cmp-t"><h4>${e(t.title)}</h4><div class="table-wrap"><table><thead><tr>${t.columns.map((c) => `<th>${e(c)}</th>`).join("")}<th></th></tr></thead><tbody>${t.rows.map((r) => `<tr class="${r.only ? "only" : ""}">${r.row.map((v) => `<td>${cell(v)}</td>`).join("")}<td>${r.only ? '<span class="fc-only">只在这里</span>' : ""}</td></tr>`).join("")}</tbody></table></div></div>`).join("")}<p class="fc-hint">黄色的行，只在这一种写法的结果里出现。</p></section>`;
+  }
+  // ---- 示例数据：卡片没有“数据示例”表时，把示例 setupSql 建出的表放在代码之前（构建时由应用引擎实际执行得到）----
+  function dataFigure(card) {
+    const sets = card.dataSets;
+    if (!sets?.length) return "";
+    const tables = (set) => set.tables.map((t) => `<div class="fc-data-t"><h4>${e(t.name)}<small>${t.rowCount} 行</small></h4>${table(t.columns, t.rows, 30)}</div>`).join("");
+    const body = sets.length === 1
+      ? tables(sets[0])
+      : sets.map((set, i) => `<details class="fc-data-set"${i === 0 ? " open" : ""}><summary>${set.labels.length ? "用于：" + e(set.labels.join("、")) : "示例数据 " + (i + 1)}</summary>${tables(set)}</details>`).join("");
+    return `<section class="fc-sec fc-fig fc-data"><h3 class="fc-h"><i></i>示例数据<small>下面的代码在这些数据上运行</small></h3>${body}</section>`;
+  }
+  function substFigure(sub) {
+    const fmt = (v) => String(v);
+    const row = (kind, text, col, val) => `<div class="fc-sub-row ${kind}"><span class="fc-sub-k">${e(kind === "top" ? "分子" : "分母")}${text ? `<small>${e(text)}</small>` : ""}</span><span class="fc-sub-v"><small>${e(col)}</small><b>${e(fmt(val))}</b></span></div>`;
+    return `<section class="fc-sec fc-fig fc-subst"><h3 class="fc-h"><i></i>代入示例数字<small>${e(sub.label)} · 结果的第一行有效数据</small></h3>${row("top", sub.formula?.top, sub.top.column, sub.top.value)}<div class="fc-sub-op">÷</div>${row("bottom", sub.formula?.bottom, sub.bottom.column, sub.bottom.value)}${sub.factor !== 1 ? `<div class="fc-sub-op">× ${e(sub.factor)}${sub.factor === 100 ? "（换成百分数）" : ""}</div>` : ""}<div class="fc-sub-row res"><span class="fc-sub-k">结果</span><span class="fc-sub-v"><small>${e(sub.target.column)}</small><b>${e(fmt(sub.target.value))}</b></span></div></section>`;
+  }
+  function decorate(card) {
+    const sections = (card.back?.sections || []).map((x) => ({ section: x }));
+    const pair = errorPair(card);
+    // 对比图的右侧就是完整的“正确代码”（含高亮），所以用它取代单独的代码块，避免同一段代码连续出现两次。
+    if (pair) sections.splice(pair.at, 1, { html: codeDiffFigure(pair.diff) });
+    if (card.type === "syntax") {
+      const index = sections.findIndex((x) => x.section?.type === "syntax");
+      const chunks = index >= 0 ? syntaxChunks(sections[index].section.content) : null;
+      if (chunks) sections.splice(index + 1, 0, { html: chunkFigure(chunks) });
+    }
+    if (card.type === "comparison") {
+      const cmp = compareResults(card);
+      if (cmp) sections.splice(cmp.at + 1, 0, { html: compareFigure(cmp) });
+    }
+    const calls = callPairs(card);
+    if (calls) {
+      const firstCode = sections.findIndex((x) => x.section?.type === "code");
+      const afterTable = firstCode >= 0 ? sections.findIndex((x, i) => i > firstCode && x.section?.type === "table") : -1;
+      const at = afterTable >= 0 ? afterTable + 1 : Math.max(1, sections.findIndex((x) => x.section?.type === "syntax") + 1);
+      sections.splice(at, 0, { html: callFigure(calls) });
+    }
+    const data = dataFigure(card);
+    if (data) {
+      const first = sections.findIndex((x) => x.section?.type === "code" || (x.html && /fc-(diff|calls)/.test(x.html)));
+      sections.splice(first >= 0 ? first : sections.length, 0, { html: data });
+    }
+    return sections;
   }
 
   const art = (card) => (card.illustrationKey ? `<img class="fc-art" src="assets/flashcards/${card.illustrationKey}.png" alt="">` : "");
@@ -170,7 +242,7 @@ export function createCardView({ e, table, code, tag }) {
 
   function back(card, extra = "") {
     const template = CARD_TEMPLATES[card.type] || CARD_TEMPLATES.concept;
-    return `<article class="fc fc-${card.type} back" aria-label="背面"><h2 class="fc-title">${e(card.front?.prompt ?? "")}</h2><div class="fc-answer">${paragraphs(card.back?.answer)}</div>${template.compose ? composeBack(card, template) : (card.back?.sections || []).map((s) => section(s, template)).join("")}${extra}</article>`;
+    return `<article class="fc fc-${card.type} back" aria-label="背面"><h2 class="fc-title">${e(card.front?.prompt ?? "")}</h2><div class="fc-answer">${paragraphs(card.back?.answer)}</div>${template.compose ? composeBack(card, template) : decorate(card).map((x) => x.html ?? section(x.section, template)).join("")}${extra}</article>`;
   }
 
   return { front, back, meta };
