@@ -2808,3 +2808,9 @@ nav .nav-svg { color: var(--primary); }
 .quiz-split.expanded .quiz-bottom { overflow: visible; margin-top: 16px; }
 .quiz-split.expanded .editor-body { max-height: none; }
 .quiz-split.expanded .quiz-bottom .question-execution { position: static; }
+
+.fig-concept td:first-child { font-weight: 600; }
+.fig-concept td { overflow-wrap: anywhere; }
+.fig-concept code { font-size: 0.75rem; }
+.fig-scroll .fig-concept td, .fig-scroll .fig-concept th { white-space: normal; }
+.fig-scroll .fig-concept { min-width: 0; }

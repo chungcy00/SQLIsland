@@ -38,6 +38,36 @@
         "需要可复现的排行榜或分页时，应加上稳定且唯一的决胜字段。",
         "空值的默认排序位置及文本排序规则可能因数据库而异。"
       ]
+    },
+    {
+      "type": "table",
+      "columns": [
+        "写法",
+        "排序方式",
+        "说明"
+      ],
+      "rows": [
+        [
+          "ORDER BY price",
+          "按 price 升序",
+          "省略方向时默认升序，从小到大"
+        ],
+        [
+          "ORDER BY price DESC",
+          "按 price 降序",
+          "从大到小"
+        ],
+        [
+          "ORDER BY price DESC, product_name",
+          "先按 price 降序，price 相同再按 product_name 升序",
+          "第二列只在第一列相同时才起作用"
+        ]
+      ],
+      "title": "几种 ORDER BY 写法的排序方式",
+      "caption": "没有 ORDER BY 时，数据库不保证输出顺序。",
+      "codeColumns": [
+        0
+      ]
     }
   ],
   "syntax": {

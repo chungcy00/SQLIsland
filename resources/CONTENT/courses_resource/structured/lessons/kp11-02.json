@@ -37,6 +37,41 @@
         "在 UTF-8 中古晋是两个字符、六个字节。",
         "字符数也不必然等于视觉字形数量。"
       ]
+    },
+    {
+      "type": "table",
+      "columns": [
+        "函数",
+        "统计单位",
+        "“古晋”的结果"
+      ],
+      "rows": [
+        [
+          "MySQL CHAR_LENGTH",
+          "字符",
+          "2"
+        ],
+        [
+          "MySQL LENGTH",
+          "字节",
+          "6"
+        ],
+        [
+          "SQLite length（文本）",
+          "字符",
+          "2"
+        ],
+        [
+          "SQLite length（BLOB）",
+          "字节",
+          "不适用"
+        ]
+      ],
+      "title": "字符长度与字节长度",
+      "caption": "“古晋”在 UTF-8 中是两个字符、六个字节。",
+      "codeColumns": [
+        0
+      ]
     }
   ],
   "syntax": {

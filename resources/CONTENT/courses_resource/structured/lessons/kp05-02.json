@@ -67,6 +67,11 @@
           "COALESCE(note, 'missing')",
           "空字符串"
         ]
+      ],
+      "title": "同一个值，不同处理方式的结果",
+      "caption": "IFNULL 与 COALESCE 只替换 NULL；0 和空字符串不会被替换。",
+      "codeColumns": [
+        1
       ]
     }
   ],

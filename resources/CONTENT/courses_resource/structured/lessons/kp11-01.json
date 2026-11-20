@@ -35,6 +35,32 @@
       "items": [
         "若业务希望保留部分标签，先确定缺失文本的替代值，不应无条件把未知改成空文本。"
       ]
+    },
+    {
+      "type": "table",
+      "columns": [
+        "写法",
+        "任一部分为 NULL 时"
+      ],
+      "rows": [
+        [
+          "MySQL CONCAT",
+          "结果为 NULL"
+        ],
+        [
+          "SQLite 的 ||",
+          "结果为 NULL"
+        ],
+        [
+          "SQLite 的 concat 函数",
+          "空值行为不同"
+        ]
+      ],
+      "title": "拼接遇到 NULL 时",
+      "caption": "想保留部分标签，先确定缺失文本的替代值。",
+      "codeColumns": [
+        0
+      ]
     }
   ],
   "syntax": {

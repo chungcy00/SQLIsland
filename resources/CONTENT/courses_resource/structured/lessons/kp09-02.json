@@ -37,6 +37,36 @@
         "CASE 更便于表达多分类及跨库兼容。",
         "若使用非互斥条件，多个指标可能同时计入同一行，合计不一定等于记录总数；空输入时 SUM 返回 NULL，而 COUNT 返回0。"
       ]
+    },
+    {
+      "type": "table",
+      "columns": [
+        "写法",
+        "条件不成立时的值",
+        "结果"
+      ],
+      "rows": [
+        [
+          "SUM(CASE WHEN 条件 THEN 1 ELSE 0 END)",
+          "0",
+          "正确，命中的行各加 1"
+        ],
+        [
+          "COUNT(CASE WHEN 条件 THEN 1 END)",
+          "NULL，被 COUNT 忽略",
+          "正确"
+        ],
+        [
+          "COUNT(CASE WHEN 条件 THEN 1 ELSE 0 END)",
+          "0，不是空值，会被计数",
+          "错误，统计的是全部行"
+        ]
+      ],
+      "title": "条件计数的三种写法",
+      "caption": "COUNT 只忽略 NULL，不会忽略 0。",
+      "codeColumns": [
+        0
+      ]
     }
   ],
   "syntax": {

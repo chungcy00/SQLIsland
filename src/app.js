@@ -702,7 +702,11 @@ function renderTeachingBlocks(blocks = []) {
       case "heading": return `<h3>${text(block.text, block.emphasis)}</h3>`;
       case "paragraph": return `<p>${text(block.text, block.emphasis)}</p>`;
       case "list": return `<ul>${block.items.map(item => `<li>${typeof item === "string" ? e(item) : text(item.text, item.emphasis)}</li>`).join("")}</ul>`;
-      case "table": return `<div class="concept-comparison">${table(block.columns, block.rows)}</div>`;
+      case "table": {
+        const cells = (row) => row.map((v, c) => `<td>${(block.codeColumns || []).includes(c) ? `<code>${e(v)}</code>` : e(v)}</td>`).join("");
+        const grid = `<div class="fig-scroll"><table class="fig-table fig-concept"><thead><tr>${block.columns.map(c => `<th>${e(c)}</th>`).join("")}</tr></thead><tbody>${block.rows.map(row => `<tr class="fig-row kept">${cells(row)}</tr>`).join("")}</tbody></table></div>`;
+        return block.title ? `<figure class="figure figure-table"><figcaption>${e(block.title)}</figcaption>${grid}${block.caption ? `<div class="fig-caption">${e(block.caption)}</div>` : ""}</figure>` : `<div class="concept-comparison">${table(block.columns, block.rows)}</div>`;
+      }
       case "code": return code(block.sql);
       default: return "";
     }

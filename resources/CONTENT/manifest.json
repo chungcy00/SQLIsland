@@ -1024,17 +1024,17 @@
     {
       "path": "courses_resource/structured/figures/kp01-01.json",
       "bytes": 3599,
-      "sha256": "21e800ba939050dbdba96ca43c8577b70d6de4525b60a94e10870b4dfbbd916d"
+      "sha256": "e29d8f61684b9613aafd33b55cff7e51a04fd98df6f141cb2a9f0c351fa4f079"
     },
     {
       "path": "courses_resource/structured/figures/kp01-02.json",
       "bytes": 3707,
-      "sha256": "4520bc90610368a2759727235ab649036732bb7d30ff82dd49ccb5ac51c26707"
+      "sha256": "8f87611b5adbaebddacbdbe4986cc6a5a04f98a0ef3a5604614f3af0a527d76a"
     },
     {
       "path": "courses_resource/structured/figures/kp01-03.json",
       "bytes": 3733,
-      "sha256": "6fe672fcd5b19bfbf417816b339adc9e1a0fc78c33372de7fd0f978322238780"
+      "sha256": "9184d4173343c4abfb763e499801ec90c17e231e85ba8d8bc1266304ec34747d"
     },
     {
       "path": "courses_resource/structured/figures/kp02-01.json",
@@ -1044,152 +1044,152 @@
     {
       "path": "courses_resource/structured/figures/kp02-02.json",
       "bytes": 3138,
-      "sha256": "f9b76d6f268cff9d2a4dd7e18fcdd16a2ad1554ca4b3391928d1f6d2aaa657cc"
+      "sha256": "3b7ff1f530e18d9843a9eeb7b4d9af1498a560bb36164ff378c6cef49abf92a5"
     },
     {
       "path": "courses_resource/structured/figures/kp03-01.json",
       "bytes": 4092,
-      "sha256": "dba8b8dab28085af892b134fd4b21a50c6977837ab29e3bfd84c2da79e2b1d3f"
+      "sha256": "7b59b2b19104eb2d7d537a841062ab890b1f6270e2a7bc0ccc7c0cea1057163f"
     },
     {
       "path": "courses_resource/structured/figures/kp03-02.json",
       "bytes": 4057,
-      "sha256": "7b5bf8e6a9dbb23bb247a41a670c99526e098c4b11112bfc7a41b7c11b0e63f5"
+      "sha256": "148aa6b2923dbf506b84c1c491e7a497e2dc5e42fcdf81ec110a63f23e3a8766"
     },
     {
       "path": "courses_resource/structured/figures/kp03-03.json",
       "bytes": 4358,
-      "sha256": "03d3aae6b49e86be59914cded43546549a8d9b83c64f2209bdf21b8fd5ac5763"
+      "sha256": "ef03ba11bd146a452fe05ab95f60ce34ac4f028af5b7ca3da029893e56278025"
     },
     {
       "path": "courses_resource/structured/figures/kp03-04.json",
       "bytes": 3570,
-      "sha256": "e168e21caf1738d28671ddfb95eafb4590d9dff549d18affea1cd4b518ac47fc"
+      "sha256": "4387827b01e07d9b3da68325178822d532bbda11a86516d7bf275fa535a480e3"
     },
     {
       "path": "courses_resource/structured/figures/kp04-01.json",
       "bytes": 3491,
-      "sha256": "b94497c8cc3adf6b4f93b0fcf95a7fcd2312839150812e7a3136d94d1f7954e3"
+      "sha256": "60fc21a6db31e85c6f77b675876c8a632588aa2af2f52630da03a74c0a0678aa"
     },
     {
       "path": "courses_resource/structured/figures/kp04-02.json",
       "bytes": 4085,
-      "sha256": "ce326c774a2396305567c97f17e4e1c93115e7ad3c849d67a2af27b4b4bc277f"
+      "sha256": "45b34ae0ce35cbc36b43b206a43b7dae589ccf9157c54222fe030028225efb0e"
     },
     {
       "path": "courses_resource/structured/figures/kp05-01.json",
       "bytes": 2934,
-      "sha256": "e3f4197b0697d0d48585235f1d315d3abfe941442fd38743b01b6d73938129c1"
+      "sha256": "3d4a6172df26ae266d8a6d9c96b93d07a050da24cefad62e894d35dabb904460"
     },
     {
       "path": "courses_resource/structured/figures/kp05-02.json",
       "bytes": 3561,
-      "sha256": "3cc2c6384463e5ef43016f1af0f2dca2f279fb88c26e605c91378e9f2a5e8223"
+      "sha256": "871b67de5be1532c38cef5d20006af0f2f045b25c565fd770719d31bb3226d64"
     },
     {
       "path": "courses_resource/structured/figures/kp06-01.json",
       "bytes": 2173,
-      "sha256": "3a81b4cb21f7f38a645a2dbbaf0dc6d39e85c810058e38a0bad7cf8ba257af9b"
+      "sha256": "30403588e4a13ebd0d6c816c4f6ada0662ed012aad8fe196ee35b3b65507e667"
     },
     {
       "path": "courses_resource/structured/figures/kp06-02.json",
       "bytes": 1923,
-      "sha256": "3c949efe502b2dfb19809b65bc3bfa4ab21b185d432509526ea46555bfe46e27"
+      "sha256": "639c81bf5974a32ce42b66dd62169cb7eb7d7051164229500e0697ca12583590"
     },
     {
       "path": "courses_resource/structured/figures/kp06-03.json",
       "bytes": 2445,
-      "sha256": "e4e4a1e5c28cfa8e83862316edb21462ad4074a5e727f9e1f4ddd442cd9b54bc"
+      "sha256": "7b1d65580c09d0f735e74ceb38c1679fff190cb7ae2a0000f985f9b0ccec8fe5"
     },
     {
       "path": "courses_resource/structured/figures/kp07-01.json",
       "bytes": 3553,
-      "sha256": "f13daa359e8fe5828c860f81f2b2838e37eceff722b2b10b3e327da56f61a833"
+      "sha256": "c4fb2e5d9779921e32de3edfd3e88d6f854ae4556ce8b26f9b63f761d4ceb189"
     },
     {
       "path": "courses_resource/structured/figures/kp07-02.json",
       "bytes": 4181,
-      "sha256": "d50cefa57ff55273ba4f184eb8a12524f511bff172b7ad73b7a6cccaff2c1e02"
+      "sha256": "9dbcba54dee33e586f34c7e6954373445b61003847012e036b4dd494e0c36fbc"
     },
     {
       "path": "courses_resource/structured/figures/kp07-03.json",
       "bytes": 3745,
-      "sha256": "ae442ed7d64763d4fe64d2acabb4c451ecf062977df3e1e57263cd23f886cf2a"
+      "sha256": "a78b9c04e6099fcc656efbc8d50cb46e94f3a8c619084c62ed2688fef8bf439a"
     },
     {
       "path": "courses_resource/structured/figures/kp08-01.json",
       "bytes": 2488,
-      "sha256": "25bb3d1f3efc8a4cc443bd2df9152a2ff159600317863f7b39ffdea7cf72ff03"
+      "sha256": "d9920bf0dfaa74d8f4b1a12323306fee2ad0579f38b8b7f6882b172c75da5e46"
     },
     {
       "path": "courses_resource/structured/figures/kp08-02.json",
       "bytes": 2949,
-      "sha256": "b295e30ea224bb2af3aeae2291be251847dbba6c6efb786177203115e6f97dd6"
+      "sha256": "7a54231dc7111552da89e43d32ba94317ec7f77333664a8972b88a29f0c53c75"
     },
     {
       "path": "courses_resource/structured/figures/kp08-03.json",
       "bytes": 3366,
-      "sha256": "6da6aa1759ffafaa458e6e1d8ae3d8e24b2f50a385cd2f7dd1934a50f54af8a4"
+      "sha256": "11670faa8a01c3d805adfd0d1bff8c7693b1b692e897dd379b0c704bc33347ed"
     },
     {
       "path": "courses_resource/structured/figures/kp08-04.json",
       "bytes": 2712,
-      "sha256": "875b2ad5cfa4067d6ae8b93f78ea270d72dfce53decf4ffc4b0d4aa9816a200e"
+      "sha256": "8ff4cbff92f5d4dbff2d076f33c219f62315b5662b92b3f27164aadad2ac3c11"
     },
     {
       "path": "courses_resource/structured/figures/kp08-05.json",
       "bytes": 1513,
-      "sha256": "93584fa4b4787b6155e1b5fb9d7ff17fa36e262d82cab605d69dee9a2961518d"
+      "sha256": "92c2907149c2122c8f2d0e6102a5cd9ced24c7c652d07b5d0621a45b31d9fcb4"
     },
     {
       "path": "courses_resource/structured/figures/kp09-01.json",
       "bytes": 4014,
-      "sha256": "05147cac6bc07ae4f89ff7ceca637f3e94fad6fd693527c67a1dbcebd9fb1ad2"
+      "sha256": "5913b4e226e730a55abbe84b343cc7d9060b4b0fd1194c108b647a93362692d2"
     },
     {
       "path": "courses_resource/structured/figures/kp09-02.json",
       "bytes": 2697,
-      "sha256": "d7c7f35ff275b6516a34379fe3fb9b01b933e0d137ae90d6647012840a244d03"
+      "sha256": "bf66b2e3c7a681ff1e66129512b55c90b731248c65ab3d97e62e9c1ea4d85001"
     },
     {
       "path": "courses_resource/structured/figures/kp09-03.json",
       "bytes": 3671,
-      "sha256": "6d656cb6743351253a14c64ef8b4aa8bee89c31ddeaff181bda5ebaee62e9ef4"
+      "sha256": "be8b479d6b81e324f0c323cd6ca0e5918cce6f82f50b0f56abe2645c32ca76ac"
     },
     {
       "path": "courses_resource/structured/figures/kp10-01.json",
       "bytes": 4161,
-      "sha256": "c69261f74d36ef377365fafa1293dd37a09e91970784cb31651b4780bdbfe1e5"
+      "sha256": "cf02e399918999df548cb1e2307c808cd7ff68c0c90e1a8205e6ca367c6989f8"
     },
     {
       "path": "courses_resource/structured/figures/kp10-02.json",
       "bytes": 3380,
-      "sha256": "92a169cd0bd17acd77e1b820653f76b3e2fb9234c085525d998f903bbff1a36a"
+      "sha256": "ff4851327cb5a07073626512dc782cd672ff6c1ba14b48dc5fa23de1ef8e90f2"
     },
     {
       "path": "courses_resource/structured/figures/kp10-03.json",
       "bytes": 3326,
-      "sha256": "f94cfc763aac7c2378c99598fbebc42a8cc442639b5b51f0532b17e2203e8946"
+      "sha256": "2c2b6215e9d1d40aedc524c000447efe837446d4b70d5b6c07945e77a434fcdf"
     },
     {
       "path": "courses_resource/structured/figures/kp10-04.json",
       "bytes": 3038,
-      "sha256": "19c837ee69b5226f430ad1f4b4005df7e9cf07e7000e20195071251d8758f23d"
+      "sha256": "c17fb7ecf05bfacc5a387bdb5f908bacfc9dd61f2e66983ec6910c4f528a07cc"
     },
     {
       "path": "courses_resource/structured/figures/kp11-01.json",
       "bytes": 3865,
-      "sha256": "c7e99d1ec9c11b96458b1ae4869f99de0ce09579165d0657cb54f7341162be7a"
+      "sha256": "2e8ce80f40b0904086aa1c2ecc9ffa9dbbdc525f3efb4ddf48a77d928095609e"
     },
     {
       "path": "courses_resource/structured/figures/kp11-02.json",
       "bytes": 3656,
-      "sha256": "90e68a12d6a15c7e68611ffb18f419733ca7c7d1d3e770c648eda028576f0814"
+      "sha256": "8fe44e9c4168dbd51c6033faa66adaf28d6109cb55dcfb5428732013ae24cc53"
     },
     {
       "path": "courses_resource/structured/figures/kp11-03.json",
       "bytes": 4340,
-      "sha256": "f6e0b2c043cd22fd7c42995ce10376fb04617338d8ccdad584f3bdd8bcb7e7c2"
+      "sha256": "4022ac9f677ad62addf6304dcec827c13922ec844a94c33e707d74fe98b4c0c9"
     },
     {
       "path": "courses_resource/structured/figures/kp12-02.json",
@@ -1199,42 +1199,42 @@
     {
       "path": "courses_resource/structured/figures/kp12-04.json",
       "bytes": 3529,
-      "sha256": "216c1a41ff2d70e219e079c7dd7b980bbe1d1af59d07baf99cb34d31e6e0363a"
+      "sha256": "bace9b8e3fb2a6aab8dd3a4442e72195ea94edd0d73685a27ffa45445bd4db89"
     },
     {
       "path": "courses_resource/structured/figures/kp13-01.json",
       "bytes": 1278,
-      "sha256": "bbc5eb4f5bdc760638502389ba57621ef55914059aa788c06488f8fedcc55b87"
+      "sha256": "9f9ac17b2929fc4b8bafaa98abf344216ed24351ef7e24f0b8f9b379eebd0bad"
     },
     {
       "path": "courses_resource/structured/figures/kp13-02.json",
       "bytes": 1278,
-      "sha256": "536f7260a514eb959612eae7b124abd391c620bbd35950f691cb41560de3b854"
+      "sha256": "461c8005e0d9e60f8ae65f516c1e0a61c87b5395ba9ef3c27a8d66d17c403a74"
     },
     {
       "path": "courses_resource/structured/figures/kp14-01.json",
       "bytes": 1546,
-      "sha256": "0d4c5a46a215c5c8bd04d2bf7aa4c7533f5abe30c6ac9984fb2cdb20b4aaf3cd"
+      "sha256": "9a35e11bca643cb237bffd4376362b50fb575e963a7c03468c15d721c821c907"
     },
     {
       "path": "courses_resource/structured/figures/kp15-01.json",
       "bytes": 4148,
-      "sha256": "ada966db3285ce4a07addba4e9424911559c58e2dc2206a606acaf0d7489e6fc"
+      "sha256": "39cc4369a0e84c8068f919c3c56203593b2cd5c51d50d24f7409a642943ee334"
     },
     {
       "path": "courses_resource/structured/figures/kp15-02.json",
       "bytes": 4067,
-      "sha256": "a6d58a005adb7e753174561c37a0e254a74b444f657900cb0f8bb9c236ea00c0"
+      "sha256": "d7d659415b83902f9c5a0a117fcfb6dd69c424e750c19d4f567f3a83f34a42ab"
     },
     {
       "path": "courses_resource/structured/figures/kp15-03.json",
       "bytes": 3526,
-      "sha256": "39b5b5e626e8dcc1a503d111f65d33198a47605d322de0f783d26e0dc7cec387"
+      "sha256": "650a67f2bfbaab7bfb61630f895f8d2dc1469ee67190e0070a57575ad28129d8"
     },
     {
       "path": "courses_resource/structured/figures/kp15-04.json",
       "bytes": 3298,
-      "sha256": "7cf6de6f5ae47a2d25fb0f8de7f287b7e747c63a177d8dc1c6e7a2ac48448ce1"
+      "sha256": "45f5ad8ce36119fabdeb9b745c520411e86ad0fa4acf83cb2db652dff21426ec"
     },
     {
       "path": "courses_resource/structured/figures/kp15-05.json",
@@ -1249,27 +1249,27 @@
     {
       "path": "courses_resource/structured/figures/kp16-02.json",
       "bytes": 4231,
-      "sha256": "af936b51b9a7b78f6cda22962facf1baef42461dc1c8bcdb1462c6883b86916e"
+      "sha256": "8adee3483d20919314ec54489143e14ab3b6f5c7937ed5a742123dd581776057"
     },
     {
       "path": "courses_resource/structured/figures/kp16-03.json",
       "bytes": 4807,
-      "sha256": "c01f5181a480b0d7fcd73c128d6ad9a64d7b1cdc3fc84f8b81d9963c00353f40"
+      "sha256": "732e97f49153d7fadf6e9715270f1586ba216ccfa8c542ffe20b6f629ecd7303"
     },
     {
       "path": "courses_resource/structured/figures/kp17-01.json",
       "bytes": 2083,
-      "sha256": "87c4f224ff67b2e317f5f4b787115a4ef53921c77d04e7e1c39fd4e72e95aef6"
+      "sha256": "ef6243cc8da20b58270fd9df1edbd7b293c3f15eb905faafcac66fd95a9fbd5c"
     },
     {
       "path": "courses_resource/structured/figures/kp17-02.json",
       "bytes": 2083,
-      "sha256": "47d6a64db5cd9c7a4f2cb3b89dcb6a1f955d02b8cae92d5666c66cbcaf960e93"
+      "sha256": "c1c6257fb38f57c5cdb0d18d3157cf511da070142652fe78cda8b75c1066fa95"
     },
     {
       "path": "courses_resource/structured/figures/kp18-01.json",
       "bytes": 3465,
-      "sha256": "a00287c67fb08c87f486f7e1eaac7258202891c0140e5a6c9fb66f0a3fde4766"
+      "sha256": "95dfa04b543ea2436ac13453140b6d86c63efa7cd3e0d89787852aad062ca9ed"
     },
     {
       "path": "courses_resource/structured/figures/kp19-01.json",
@@ -1413,18 +1413,18 @@
     },
     {
       "path": "courses_resource/structured/lessons/kp01-01.json",
-      "bytes": 6094,
-      "sha256": "5241b6e56a33d94391f89158a4f1d794411c208a499ffe1f9e6f1e2725cd4105"
+      "bytes": 6233,
+      "sha256": "6f7d2617c396667063a48aee85ee11631c73d9977768bb45ca5fe1103ce8ecea"
     },
     {
       "path": "courses_resource/structured/lessons/kp01-02.json",
-      "bytes": 5541,
-      "sha256": "4c5a307bec570c7953145de65ed4cba06e3eb96ef70618b0675957ec5fbe0eb3"
+      "bytes": 5695,
+      "sha256": "303e6414171621ff6955f361b04dbc15683a4245663e37225a8a3864a815e854"
     },
     {
       "path": "courses_resource/structured/lessons/kp01-03.json",
-      "bytes": 7233,
-      "sha256": "d76d1b160cef8dbafa23ed2bc1c34d32ba22e26e03689c15e145b31d32f40d21"
+      "bytes": 7375,
+      "sha256": "609d61ec67bdd39563ae8bccfb25bcd6a32a8bff5b281f7b87b42dc0f75683f5"
     },
     {
       "path": "courses_resource/structured/lessons/kp02-01.json",
@@ -1433,158 +1433,158 @@
     },
     {
       "path": "courses_resource/structured/lessons/kp02-02.json",
-      "bytes": 5644,
-      "sha256": "8abc1a82324f9ec4c20b413e741d7cdbaedf0a70c4075b6a058da70c0719f786"
+      "bytes": 5813,
+      "sha256": "715b93b3626a85afc1129de621ebe1d998c083595948178d371051a8b4ae3a01"
     },
     {
       "path": "courses_resource/structured/lessons/kp03-01.json",
-      "bytes": 6772,
-      "sha256": "d91df030386df4cd72f60ee728abdfe562e863504e159cd3e3d6ba8bf5e559c9"
+      "bytes": 7582,
+      "sha256": "2c06844850dfdb99a0b88f22c328dc7eec1372d08dbd51c43de44edcbf87d297"
     },
     {
       "path": "courses_resource/structured/lessons/kp03-02.json",
-      "bytes": 6690,
-      "sha256": "c21a6cee88946c970600232344e8e5298d8b13df324da2ddbe4ca62d3f3d7c18"
+      "bytes": 7448,
+      "sha256": "320a9da6fe6f5d81fda109aefd81c3e041ca7598498a5cb4a1ed3622bca37f39"
     },
     {
       "path": "courses_resource/structured/lessons/kp03-03.json",
-      "bytes": 6946,
-      "sha256": "aa9b08ef1134d33e0faf672da349d6456f829291638d0e9afc1f29e77a619c85"
+      "bytes": 7587,
+      "sha256": "ead63ef004a9b998b065afc5d5ecbbe86e134ef4a863043207e8ea3cd00473e9"
     },
     {
       "path": "courses_resource/structured/lessons/kp03-04.json",
-      "bytes": 6248,
-      "sha256": "8cdbcd979aaa9d8f9573987efba3605f8311e9fa8005fe6f8a5466cdaa3dd83e"
+      "bytes": 7112,
+      "sha256": "c6a037ad5259525ab0f8f84c9ddec657b11bd59e0b7bdd721b6a43e44da1d969"
     },
     {
       "path": "courses_resource/structured/lessons/kp04-01.json",
-      "bytes": 5548,
-      "sha256": "376fb2470c9744af3f7dbd846d4d2403de0e33b3c1a12e301b02f1279b889fae"
+      "bytes": 6311,
+      "sha256": "4b518699d77892773f28f926b4b32f212e30dce4f166dc17f74afd741b44ea3d"
     },
     {
       "path": "courses_resource/structured/lessons/kp04-02.json",
-      "bytes": 6811,
-      "sha256": "643ec97e548940e586da1cee63b8cb4e8c838b991e2ae6f3f75e956326b47fce"
+      "bytes": 7323,
+      "sha256": "f453ec82e4403b307b1c51c298ed21383c8ef2cb79b0dbf64d820f57a9c08a58"
     },
     {
       "path": "courses_resource/structured/lessons/kp05-01.json",
-      "bytes": 9114,
-      "sha256": "419242737500667ed6bdc866de6ce00873e01059cd8f0e3befd6e9e5a7237654"
+      "bytes": 9224,
+      "sha256": "3f5e4e536cb5c175430382f65c3bc36afded65f1854db65d2095d98282c1515e"
     },
     {
       "path": "courses_resource/structured/lessons/kp05-02.json",
-      "bytes": 6730,
-      "sha256": "6e632cb9f65368b129c4a3c193f9165e4c30b2243ef516b0641114518b0468fe"
+      "bytes": 6926,
+      "sha256": "48804010bf7d61b901b549a80c588f354b678d6f87c67e2b988454739de8f3fb"
     },
     {
       "path": "courses_resource/structured/lessons/kp06-01.json",
-      "bytes": 6029,
-      "sha256": "500e7e24091398ce03b904bd1317728c50c2eb8c080b6640278a785bdcd54b8a"
+      "bytes": 6800,
+      "sha256": "c7af163d3c5be0525b78936b4ce34b7153b2a50e6fae3b99c705433a8a2eff1c"
     },
     {
       "path": "courses_resource/structured/lessons/kp06-02.json",
-      "bytes": 5556,
-      "sha256": "f0d6de72f7154dbecbce09cb697a2bce046f275c87806d35559d610f0de28b48"
+      "bytes": 6141,
+      "sha256": "3facae399a5a848e158f85f5968051086b86d7877ab0acae3f9089919190d182"
     },
     {
       "path": "courses_resource/structured/lessons/kp06-03.json",
-      "bytes": 5697,
-      "sha256": "2ab42eecd92f535c03661dd8cc682bf0df50478d9f7d0029d1aaf646754bd51c"
+      "bytes": 6353,
+      "sha256": "a85a9d1c58b828101cebeac2aeec9fab56a429e52f4b89ea5352d3724569c266"
     },
     {
       "path": "courses_resource/structured/lessons/kp07-01.json",
-      "bytes": 6427,
-      "sha256": "46f6ea2cedbe47ed264c4f4e79e01236c66cc22b001e12e0a3495c4f3ddef53f"
+      "bytes": 7142,
+      "sha256": "cdc8cc166375b9c490825832556b15b89c84010b180274e47280c319ddc38f7b"
     },
     {
       "path": "courses_resource/structured/lessons/kp07-02.json",
-      "bytes": 6710,
-      "sha256": "99157b2a56b68d530eac866ce0e40bb3e186f577266a27156f8e0ab9702f1326"
+      "bytes": 7429,
+      "sha256": "6281275c906bca3e4942f988ed5d0f8e0ba4b96c3e8249d529053082dcb16316"
     },
     {
       "path": "courses_resource/structured/lessons/kp07-03.json",
-      "bytes": 7169,
-      "sha256": "677d931bbc2c70b046717d733c40d70ad5693916633617c56eab2a1609f85084"
+      "bytes": 7874,
+      "sha256": "7551c77ec2e58e8256bed7eefa920b8381d501af26691ccba0066b7abd7bb304"
     },
     {
       "path": "courses_resource/structured/lessons/kp08-01.json",
-      "bytes": 6622,
-      "sha256": "ee326d3acc16e370f96a4aa51e227b15a14512f07cfb4226f2afbb445944330d"
+      "bytes": 7233,
+      "sha256": "6941b667435b2a0b84b5dd193a4dade44942cf2019e66b9f685f3616d3438b24"
     },
     {
       "path": "courses_resource/structured/lessons/kp08-02.json",
-      "bytes": 7660,
-      "sha256": "1c5559876afd5cc6522730697ccd3473967fe2e56fdefe1fa6012ed523c48749"
+      "bytes": 8356,
+      "sha256": "c35265384c90c36b078629cb7e4d1b161d6dbc3928dcc840b719f55cb1064996"
     },
     {
       "path": "courses_resource/structured/lessons/kp08-03.json",
-      "bytes": 7204,
-      "sha256": "604fa7de981f9c11d8a3b78a4eaabfaeb3494854cba0647f4188187bc6ed84af"
+      "bytes": 7857,
+      "sha256": "0ca8ccd81be1bb55f9fd463bf0a067d34caaaef001a31be9b6ada9b303e6bdba"
     },
     {
       "path": "courses_resource/structured/lessons/kp08-04.json",
-      "bytes": 7732,
-      "sha256": "bba451df66256103ec0da82c7cf7144486be26a36340d68dbb015d08214b4d15"
+      "bytes": 8402,
+      "sha256": "df030fc94624e0e1a9670c567495c2c09851542bb50198e242bdc639dff89cdd"
     },
     {
       "path": "courses_resource/structured/lessons/kp08-05.json",
-      "bytes": 8484,
-      "sha256": "88d4ac1944e20b0a1bfcf898e4c1aa3345db1de3d36fbe960d206a46b13f4850"
+      "bytes": 9096,
+      "sha256": "f1c2549dfda649c564a434545f4a2eb41c269313ee9221485f37289ae9828dbf"
     },
     {
       "path": "courses_resource/structured/lessons/kp09-01.json",
-      "bytes": 6934,
-      "sha256": "046d79ca4d3c2773f757e65d720413e19413baba0b5043824b478148dbeee212"
+      "bytes": 7655,
+      "sha256": "13403fa662fe5238c975f3813e88490d1dc99343cc1c26f7c3831c66409f42de"
     },
     {
       "path": "courses_resource/structured/lessons/kp09-02.json",
-      "bytes": 8254,
-      "sha256": "f82420f8d0329106f6ca5611020c753ab3c57afe8c8ecd484d94303ae3911f67"
+      "bytes": 8981,
+      "sha256": "37b34d41c6c0d8ff1100ba2d504e1f02b07338b4524ae2fda40a3260d038c784"
     },
     {
       "path": "courses_resource/structured/lessons/kp09-03.json",
-      "bytes": 6742,
-      "sha256": "3ad2224565d9d83b51582d34b625efc95a7600ad4ef2410d81421f2298f1d65e"
+      "bytes": 7263,
+      "sha256": "f0633cff5f87897e219c8656ec529247b17dcee75bd24eb29e1b5ee6766474ef"
     },
     {
       "path": "courses_resource/structured/lessons/kp10-01.json",
-      "bytes": 5902,
-      "sha256": "02862d6e664903eeb828a1394d041f7aa2abee2a0d9709c07b1d2a31098fdbf7"
+      "bytes": 6401,
+      "sha256": "99a045d008e4e9e2e292b3d2ca2de7a60cc9fcf9226d30a2448e83521508dd1b"
     },
     {
       "path": "courses_resource/structured/lessons/kp10-02.json",
-      "bytes": 5998,
-      "sha256": "14fadd037e1db046aba96ec6aaa216ed58157646821bb81af2bef6f1b7f3eda3"
+      "bytes": 6645,
+      "sha256": "2d9238ff373b74eeaa50d02694f72d20df8ee16d7adf09c39a4776078d452804"
     },
     {
       "path": "courses_resource/structured/lessons/kp10-03.json",
-      "bytes": 6057,
-      "sha256": "bb4288dee72e1f6ea1a5fc46a788ace7981dc5f67a1e38d9cd1fbb155716d943"
+      "bytes": 6665,
+      "sha256": "db718e05bf879b5f07768d0d8d6a2a723ad2a264891e5957f2ba6de16c30f4a6"
     },
     {
       "path": "courses_resource/structured/lessons/kp10-04.json",
-      "bytes": 5815,
-      "sha256": "20c5f9b660b6023adf3f327189f6a7c67e29a6a2df1638e62bf92a6e913d6fce"
+      "bytes": 6467,
+      "sha256": "f82bc909f015adc3bf0ef9dcab7308936ae37fc370eb1f61453c80478e269750"
     },
     {
       "path": "courses_resource/structured/lessons/kp11-01.json",
-      "bytes": 5674,
-      "sha256": "567aa2b1ab0254b82748c34b5d1ad99264f7860624cf935e0525c08d40713946"
+      "bytes": 6216,
+      "sha256": "b3c92f2395975ea5c94cacfd6422ddb1c45bee39b3df7df1183a5979ba9e3e59"
     },
     {
       "path": "courses_resource/structured/lessons/kp11-02.json",
-      "bytes": 6073,
-      "sha256": "d8fae809ca31c31b8e0e124f96080120bb21c66c121af5d5849b8ecbc98c3aac"
+      "bytes": 6762,
+      "sha256": "76e883a6a9b4f489647fe718d1951e92713708253ce6aee54521c90cf5e6412c"
     },
     {
       "path": "courses_resource/structured/lessons/kp11-03.json",
-      "bytes": 6473,
-      "sha256": "b9bee29519a55d6bb3e444d0c669ed3675c65c971ab3262a69c45acee673a52c"
+      "bytes": 7208,
+      "sha256": "e3333e1669def82d75af3a741310856f7026410953b41c145a6e89b16f72d1e4"
     },
     {
       "path": "courses_resource/structured/lessons/kp12-01.json",
-      "bytes": 5027,
-      "sha256": "b15b61128d44e763f879d3f0387e2238b00717fac4b97163caa0e36be27ac85d"
+      "bytes": 5589,
+      "sha256": "8a29ea0f97c3da9047314719187ede8dab4fbcee1873b5e39b59c642a22309e3"
     },
     {
       "path": "courses_resource/structured/lessons/kp12-02.json",
@@ -1593,48 +1593,48 @@
     },
     {
       "path": "courses_resource/structured/lessons/kp12-03.json",
-      "bytes": 4736,
-      "sha256": "337c0a5b3dad2b07f654873dcdd0cf168355af68ab80615e9bbcc1ec7063f2f1"
+      "bytes": 5349,
+      "sha256": "a298ebf02c4aef36a960745fe0b934c73544201f9dc5b3ba2670da2f581fee0e"
     },
     {
       "path": "courses_resource/structured/lessons/kp12-04.json",
-      "bytes": 5161,
-      "sha256": "030cab7e53b86f7db033b4a3d0f3943479b7b40b1b23ca74be107687fd592eb9"
+      "bytes": 5837,
+      "sha256": "f9b7dd5709cd7d84b14ae8b86c9d12196f89b756a323f61a4426ccffc305a49f"
     },
     {
       "path": "courses_resource/structured/lessons/kp13-01.json",
-      "bytes": 7707,
-      "sha256": "7cd4d909b7c1483ca48b6f162961e6b895c13e3558434aefd612b460ad5409ef"
+      "bytes": 8276,
+      "sha256": "0307f01128654fac03b8e8b71d224d91b355db81d5fa57f4e1766cec6581300d"
     },
     {
       "path": "courses_resource/structured/lessons/kp13-02.json",
-      "bytes": 5897,
-      "sha256": "9f2ed27b4d1d689b1c4744e27c84616c82a7a9378b8e9797a360d97efee7cf14"
+      "bytes": 6417,
+      "sha256": "e4d821bf5faec8e29ece8df7b9c036646268a1c93186f5f65e457c500b300016"
     },
     {
       "path": "courses_resource/structured/lessons/kp14-01.json",
-      "bytes": 10260,
-      "sha256": "b9c29510663e8ac962783669dcd73313fb362baa6df13547752ba44a726d399a"
+      "bytes": 10932,
+      "sha256": "2ffbf955a18c75cb0003571bcd4e19d14f74596f66e5b29cbf3654a2740bc64c"
     },
     {
       "path": "courses_resource/structured/lessons/kp15-01.json",
-      "bytes": 5714,
-      "sha256": "b60589b94a1bc606c21e7cfbbf9a39d4bf229bcfafcc7f8e08688eb6b1123966"
+      "bytes": 6237,
+      "sha256": "bd433955fa11203c1f93711e2a31b1d2f1897bd030e5539ed926817acac0a2d8"
     },
     {
       "path": "courses_resource/structured/lessons/kp15-02.json",
-      "bytes": 5606,
-      "sha256": "a854c8c1100934a6ca08b9e879f1e0b3f7b30f12afde18ebe37eab8a417239cc"
+      "bytes": 6337,
+      "sha256": "54b1885b508deb0be526531620ec92f59e2722d36e975f33f5553c1e4d085d92"
     },
     {
       "path": "courses_resource/structured/lessons/kp15-03.json",
-      "bytes": 5339,
-      "sha256": "ced4708e76f097359fd9307e3cfaec6364f8ad0b87f0d31b19280334a9b79091"
+      "bytes": 5904,
+      "sha256": "f56673ccfc92fb50e8e4e94ed2faec2a1db0ae53d6b73bdefdaf517438cd801d"
     },
     {
       "path": "courses_resource/structured/lessons/kp15-04.json",
-      "bytes": 6172,
-      "sha256": "5983bcd71a8dfbf511e48b9903e7d678b9b6ea38708613fb7dfc0c82f1f56768"
+      "bytes": 6807,
+      "sha256": "d5eb13221b8c56abaa8be983de9d223ad087f71c14c6400fb55907709b248107"
     },
     {
       "path": "courses_resource/structured/lessons/kp15-05.json",
@@ -1648,28 +1648,28 @@
     },
     {
       "path": "courses_resource/structured/lessons/kp16-02.json",
-      "bytes": 6254,
-      "sha256": "52ca69eb5fd75e76fa110e081d80e07634b5db6810a94b4be6d0284357e9fdf3"
+      "bytes": 6782,
+      "sha256": "793066cd6ccd22990c926a88556b5a9f50964376d9011581e5bddf3d118aba94"
     },
     {
       "path": "courses_resource/structured/lessons/kp16-03.json",
-      "bytes": 6444,
-      "sha256": "b0a0578fae31d0ab227d8482b7e43f3ad0a95c1b50a03c6104177cebfd72c279"
+      "bytes": 7041,
+      "sha256": "f1ff60decc56740fa7061a9042d1f9ccb9c0e9987d851d2a3c976aacd57b68d9"
     },
     {
       "path": "courses_resource/structured/lessons/kp17-01.json",
-      "bytes": 7504,
-      "sha256": "0dd4d59d7a31f722c4399f10685eb715fc341923c3002bfea7c70c4f782f8891"
+      "bytes": 8197,
+      "sha256": "9702516a31f9e003083f67f427f0cc7f33d6d6aec89d0428e2567bec946f7909"
     },
     {
       "path": "courses_resource/structured/lessons/kp17-02.json",
-      "bytes": 8696,
-      "sha256": "02a7e1ccb1dae45ca2f89d3644c042aee39531cace0662244d1d8554ac0dd7de"
+      "bytes": 9332,
+      "sha256": "caeae8bfe48ee36620206ab47adcf6da68ed72e975013cd981baaaf40ea35aa6"
     },
     {
       "path": "courses_resource/structured/lessons/kp18-01.json",
-      "bytes": 9963,
-      "sha256": "8d3810e8abf27c6573819a3eb0dd1f508173e02b536904bc1cf467229bb3d4ff"
+      "bytes": 10689,
+      "sha256": "af4c6491f7b897d4551995883ac52eb068a74c9f4a4148765366bb53ae09878d"
     },
     {
       "path": "courses_resource/structured/lessons/kp19-01.json",
@@ -1814,7 +1814,7 @@
     {
       "path": "courses_resource/structured/manifest.json",
       "bytes": 27433,
-      "sha256": "63d99f15ca459922a563dad377fd4f8e5ca48d04280b180a9130923366a61e5b"
+      "sha256": "5f7f28dbd8f6848e24b89969cc7378d4d2128d871697677074de85e611dda054"
     },
     {
       "path": "courses_resource/structured/README.md",
