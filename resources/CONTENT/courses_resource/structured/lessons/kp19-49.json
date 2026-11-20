@@ -458,6 +458,230 @@
           ]
         ]
       }
+    },
+    {
+      "kind": "runnable",
+      "title": "对比账簿与银行金额，标记差异",
+      "sql": "WITH a AS (\n  SELECT 0 unreferenced, reference_no ref, SUM(expense_cents) ledger\n  FROM v_expenses WHERE entry_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY reference_no\n), b AS (\n  SELECT CASE WHEN reference_no IS NULL THEN 1 ELSE 0 END unreferenced,\n    COALESCE(reference_no,CAST(bank_id AS CHAR)) ref, SUM(-amount_cents) bank\n  FROM bank_transactions WHERE transaction_date BETWEEN '2025-01-01' AND '2025-12-31'\n  GROUP BY CASE WHEN reference_no IS NULL THEN 1 ELSE 0 END,COALESCE(reference_no,CAST(bank_id AS CHAR))\n), k AS (\n  SELECT unreferenced,ref FROM a UNION SELECT unreferenced,ref FROM b\n)\nSELECT CASE WHEN k.unreferenced=1 THEN CONCAT('BANK-',k.ref) ELSE k.ref END ref,\n  a.ledger ledger_cents,b.bank bank_cents,COALESCE(b.bank,0)-COALESCE(a.ledger,0) difference_cents,\n  CASE WHEN a.ref IS NULL THEN 'bank_only' WHEN b.ref IS NULL THEN 'ledger_only' ELSE 'difference' END issue,\n  CASE WHEN k.unreferenced=1 THEN 'unreferenced_bank' ELSE 'reference' END reference_kind\nFROM k LEFT JOIN a ON a.ref=k.ref AND a.unreferenced=k.unreferenced\nLEFT JOIN b ON b.ref=k.ref AND b.unreferenced=k.unreferenced\nWHERE a.ref IS NULL OR b.ref IS NULL OR a.ledger<>b.bank ORDER BY ref,reference_kind",
+      "purpose": "在前面各步中间结果的基础上完成最终计算，输出题目要求的完整结果。",
+      "reason": "前面的步骤只是分块准备；把它们组合起来，才能得到最终的业务结果。",
+      "sourceTables": [
+        {
+          "name": "bank_transactions",
+          "columns": [
+            {
+              "name": "bank_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "transaction_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "reference_no",
+              "type": "TEXT"
+            },
+            {
+              "name": "amount_cents",
+              "type": "INTEGER"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              "2025-06-12",
+              "J000001",
+              -13842
+            ],
+            [
+              2,
+              "2025-12-06",
+              "J000002",
+              -64705
+            ],
+            [
+              3,
+              "2025-12-16",
+              "J000004",
+              -228009
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 17931
+        },
+        {
+          "name": "v_expenses",
+          "columns": [
+            {
+              "name": "entry_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "entry_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "department_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "store_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "reference_no",
+              "type": "TEXT"
+            },
+            {
+              "name": "account_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "expense_cents",
+              "type": "派生"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              "2025-06-02",
+              4,
+              null,
+              "J000001",
+              4,
+              13842
+            ],
+            [
+              2,
+              "2025-12-04",
+              1,
+              null,
+              "J000002",
+              4,
+              65928
+            ],
+            [
+              3,
+              "2023-04-04",
+              1,
+              null,
+              "J000003",
+              4,
+              21203
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 18000
+        }
+      ],
+      "result": {
+        "columns": [
+          "ref",
+          "ledger_cents",
+          "bank_cents",
+          "difference_cents",
+          "issue",
+          "reference_kind"
+        ],
+        "rows": [
+          [
+            "BANK-086E2C1C",
+            null,
+            2809,
+            2809,
+            "bank_only",
+            "reference"
+          ],
+          [
+            "BANK-1051D348",
+            null,
+            2129,
+            2129,
+            "bank_only",
+            "reference"
+          ],
+          [
+            "BANK-137B5891",
+            null,
+            1805,
+            1805,
+            "bank_only",
+            "reference"
+          ],
+          [
+            "BANK-17888",
+            null,
+            723,
+            723,
+            "bank_only",
+            "unreferenced_bank"
+          ],
+          [
+            "BANK-17889",
+            null,
+            879,
+            879,
+            "bank_only",
+            "unreferenced_bank"
+          ],
+          [
+            "BANK-17891",
+            null,
+            929,
+            929,
+            "bank_only",
+            "unreferenced_bank"
+          ],
+          [
+            "BANK-17892",
+            null,
+            1212,
+            1212,
+            "bank_only",
+            "unreferenced_bank"
+          ],
+          [
+            "BANK-17896",
+            null,
+            788,
+            788,
+            "bank_only",
+            "unreferenced_bank"
+          ],
+          [
+            "BANK-17901",
+            null,
+            395,
+            395,
+            "bank_only",
+            "unreferenced_bank"
+          ],
+          [
+            "BANK-17902",
+            null,
+            494,
+            494,
+            "bank_only",
+            "unreferenced_bank"
+          ],
+          [
+            "BANK-17904",
+            null,
+            308,
+            308,
+            "bank_only",
+            "unreferenced_bank"
+          ],
+          [
+            "BANK-17906",
+            null,
+            1169,
+            1169,
+            "bank_only",
+            "unreferenced_bank"
+          ]
+        ]
+      }
     }
   ],
   "completeCode": {

@@ -697,6 +697,407 @@
           ]
         ]
       }
+    },
+    {
+      "kind": "runnable",
+      "title": "计算库存投资回报率",
+      "sql": "WITH a AS (SELECT p.category_id,SUM(s.net_cents-s.cost_cents) gross FROM v_sales_lines s JOIN products p ON p.product_id=s.product_id WHERE s.order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY p.category_id), b AS (SELECT p.category_id,CASE WHEN COUNT(i.snapshot_id)=2*COUNT(DISTINCT p.product_id)*(SELECT COUNT(*) FROM warehouses) THEN SUM(i.quantity*i.unit_cost_cents)/2.0 ELSE NULL END avg_stock FROM products p CROSS JOIN warehouses w LEFT JOIN inventory_snapshots i ON i.product_id=p.product_id AND i.warehouse_id=w.warehouse_id AND i.snapshot_date IN ('2024-12-31','2025-12-31') GROUP BY p.category_id) SELECT c.category_id,COALESCE(a.gross,0) gross_cents,b.avg_stock avg_stock_cents,ROUND(COALESCE(a.gross,0)/NULLIF(b.avg_stock,0),4) gmroi FROM categories c LEFT JOIN a ON a.category_id=c.category_id LEFT JOIN b ON b.category_id=c.category_id ORDER BY gmroi DESC",
+      "purpose": "在前面各步中间结果的基础上完成最终计算，输出题目要求的完整结果。",
+      "reason": "前面的步骤只是分块准备；把它们组合起来，才能得到最终的业务结果。",
+      "sourceTables": [
+        {
+          "name": "categories",
+          "columns": [
+            {
+              "name": "category_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "category_name",
+              "type": "TEXT"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              "护肤"
+            ],
+            [
+              2,
+              "清洁"
+            ],
+            [
+              3,
+              "家居"
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 15
+        },
+        {
+          "name": "inventory_snapshots",
+          "columns": [
+            {
+              "name": "snapshot_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "warehouse_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "product_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "snapshot_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "quantity",
+              "type": "INTEGER"
+            },
+            {
+              "name": "unit_cost_cents",
+              "type": "INTEGER"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              1,
+              "2023-01-31",
+              2,
+              3341
+            ],
+            [
+              2,
+              1,
+              2,
+              "2023-01-31",
+              3,
+              647
+            ],
+            [
+              3,
+              1,
+              3,
+              "2023-01-31",
+              11,
+              514
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 54000
+        },
+        {
+          "name": "products",
+          "columns": [
+            {
+              "name": "product_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "category_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "product_name",
+              "type": "TEXT"
+            },
+            {
+              "name": "list_price_cents",
+              "type": "INTEGER"
+            },
+            {
+              "name": "reorder_level",
+              "type": "INTEGER"
+            },
+            {
+              "name": "active",
+              "type": "INTEGER"
+            },
+            {
+              "name": "discontinued_date",
+              "type": "TEXT"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              7,
+              "Nusa 休闲长裤 XL",
+              4450,
+              2,
+              1,
+              null
+            ],
+            [
+              2,
+              11,
+              "Bumi 成猫粮 中号",
+              970,
+              4,
+              1,
+              null
+            ],
+            [
+              3,
+              4,
+              "青禾 香米 500g",
+              1060,
+              2,
+              1,
+              null
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 500
+        },
+        {
+          "name": "v_sales_lines",
+          "columns": [
+            {
+              "name": "order_item_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "order_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "store_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "customer_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "session_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "channel",
+              "type": "TEXT"
+            },
+            {
+              "name": "order_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "product_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "promotion_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "net_qty",
+              "type": "派生"
+            },
+            {
+              "name": "net_cents",
+              "type": "派生"
+            },
+            {
+              "name": "cost_cents",
+              "type": "派生"
+            },
+            {
+              "name": "discount_cents",
+              "type": "INTEGER"
+            },
+            {
+              "name": "refund_cents",
+              "type": "派生"
+            }
+          ],
+          "rows": [
+            [
+              53709,
+              2,
+              4,
+              null,
+              null,
+              "store",
+              "2025-10-02",
+              287,
+              null,
+              1,
+              300,
+              268,
+              0,
+              0
+            ],
+            [
+              55177,
+              2,
+              4,
+              null,
+              null,
+              "store",
+              "2025-10-02",
+              158,
+              null,
+              0,
+              0,
+              0,
+              0,
+              1810
+            ],
+            [
+              29478,
+              3,
+              4,
+              2256,
+              null,
+              "store",
+              "2025-06-09",
+              59,
+              null,
+              1,
+              1310,
+              618,
+              0,
+              0
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 64627
+        },
+        {
+          "name": "warehouses",
+          "columns": [
+            {
+              "name": "warehouse_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "warehouse_name",
+              "type": "TEXT"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              "古晋区域配送中心"
+            ],
+            [
+              2,
+              "美里区域配送仓"
+            ],
+            [
+              3,
+              "吉隆坡电商与门店仓"
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 3
+        }
+      ],
+      "result": {
+        "columns": [
+          "category_id",
+          "gross_cents",
+          "avg_stock_cents",
+          "gmroi"
+        ],
+        "rows": [
+          [
+            4,
+            6286528,
+            13877168.5,
+            0.453
+          ],
+          [
+            6,
+            987252,
+            2378039.5,
+            0.4152
+          ],
+          [
+            8,
+            2700270,
+            6992836.0,
+            0.3861
+          ],
+          [
+            5,
+            1582364,
+            4165128.0,
+            0.3799
+          ],
+          [
+            15,
+            5453302,
+            14424479.5,
+            0.3781
+          ],
+          [
+            2,
+            2190229,
+            6004347.5,
+            0.3648
+          ],
+          [
+            11,
+            2150355,
+            7748739.5,
+            0.2775
+          ],
+          [
+            1,
+            2669940,
+            10598879.0,
+            0.2519
+          ],
+          [
+            9,
+            791590,
+            3839210.0,
+            0.2062
+          ],
+          [
+            7,
+            5902748,
+            30452426.5,
+            0.1938
+          ],
+          [
+            14,
+            1738669,
+            9634192.5,
+            0.1805
+          ],
+          [
+            3,
+            5781330,
+            32097845.5,
+            0.1801
+          ],
+          [
+            12,
+            1473216,
+            10433142.0,
+            0.1412
+          ],
+          [
+            10,
+            2150523,
+            16507808.5,
+            0.1303
+          ],
+          [
+            13,
+            703693,
+            12393473.5,
+            0.0568
+          ]
+        ]
+      }
     }
   ],
   "completeCode": {

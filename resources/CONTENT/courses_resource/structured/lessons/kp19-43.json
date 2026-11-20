@@ -745,6 +745,217 @@
           ]
         ]
       }
+    },
+    {
+      "kind": "runnable",
+      "title": "计算同期群留存率",
+      "sql": "WITH a AS (SELECT customer_id,MIN(SUBSTR(order_date,1,7)) cohort FROM v_order_net WHERE channel='online' GROUP BY customer_id), b AS (SELECT cohort,COUNT(*) n FROM a GROUP BY cohort), m AS (SELECT DISTINCT month_key FROM calendar_days WHERE day<='2025-12-31'), x AS (SELECT b.cohort,m.month_key,b.n,(CAST(SUBSTR(m.month_key,1,4) AS INTEGER)-CAST(SUBSTR(b.cohort,1,4) AS INTEGER))*12+CAST(SUBSTR(m.month_key,6,2) AS INTEGER)-CAST(SUBSTR(b.cohort,6,2) AS INTEGER) k FROM b CROSS JOIN m WHERE m.month_key>=b.cohort), y AS (SELECT a.cohort,SUBSTR(o.order_date,1,7) m,COUNT(DISTINCT o.customer_id) active FROM a JOIN v_order_net o ON o.customer_id=a.customer_id AND o.channel='online' GROUP BY a.cohort,SUBSTR(o.order_date,1,7)) SELECT x.cohort,x.k month_offset,x.n cohort_size,COALESCE(y.active,0) active_customers,ROUND(100.0*COALESCE(y.active,0)/x.n,2) retention_pct FROM x LEFT JOIN y ON y.cohort=x.cohort AND y.m=x.month_key WHERE x.k BETWEEN 0 AND 6 ORDER BY x.cohort,x.k",
+      "purpose": "在前面各步中间结果的基础上完成最终计算，输出题目要求的完整结果。",
+      "reason": "前面的步骤只是分块准备；把它们组合起来，才能得到最终的业务结果。",
+      "sourceTables": [
+        {
+          "name": "calendar_days",
+          "columns": [
+            {
+              "name": "day",
+              "type": "TEXT"
+            },
+            {
+              "name": "month_key",
+              "type": "TEXT"
+            },
+            {
+              "name": "day_index",
+              "type": "INTEGER"
+            }
+          ],
+          "rows": [
+            [
+              "2023-01-01",
+              "2023-01",
+              0
+            ],
+            [
+              "2023-01-02",
+              "2023-01",
+              1
+            ],
+            [
+              "2023-01-03",
+              "2023-01",
+              2
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 1096
+        },
+        {
+          "name": "v_order_net",
+          "columns": [
+            {
+              "name": "order_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "store_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "customer_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "session_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "channel",
+              "type": "TEXT"
+            },
+            {
+              "name": "order_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "net_cents",
+              "type": "派生"
+            },
+            {
+              "name": "cost_cents",
+              "type": "派生"
+            }
+          ],
+          "rows": [
+            [
+              2,
+              4,
+              null,
+              null,
+              "store",
+              "2025-10-02",
+              300,
+              268
+            ],
+            [
+              3,
+              4,
+              2256,
+              null,
+              "store",
+              "2025-06-09",
+              1310,
+              618
+            ],
+            [
+              5,
+              4,
+              4644,
+              null,
+              "store",
+              "2024-07-24",
+              16670,
+              8477
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 23325
+        }
+      ],
+      "result": {
+        "columns": [
+          "cohort",
+          "month_offset",
+          "cohort_size",
+          "active_customers",
+          "retention_pct"
+        ],
+        "rows": [
+          [
+            "2023-01",
+            0,
+            7,
+            7,
+            100.0
+          ],
+          [
+            "2023-01",
+            1,
+            7,
+            4,
+            57.14
+          ],
+          [
+            "2023-01",
+            2,
+            7,
+            2,
+            28.57
+          ],
+          [
+            "2023-01",
+            3,
+            7,
+            3,
+            42.86
+          ],
+          [
+            "2023-01",
+            4,
+            7,
+            3,
+            42.86
+          ],
+          [
+            "2023-01",
+            5,
+            7,
+            2,
+            28.57
+          ],
+          [
+            "2023-01",
+            6,
+            7,
+            2,
+            28.57
+          ],
+          [
+            "2023-02",
+            0,
+            23,
+            23,
+            100.0
+          ],
+          [
+            "2023-02",
+            1,
+            23,
+            3,
+            13.04
+          ],
+          [
+            "2023-02",
+            2,
+            23,
+            2,
+            8.7
+          ],
+          [
+            "2023-02",
+            3,
+            23,
+            3,
+            13.04
+          ],
+          [
+            "2023-02",
+            4,
+            23,
+            4,
+            17.39
+          ]
+        ]
+      }
     }
   ],
   "completeCode": {

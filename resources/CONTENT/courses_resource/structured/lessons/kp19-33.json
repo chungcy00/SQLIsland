@@ -353,6 +353,300 @@
           ]
         ]
       }
+    },
+    {
+      "kind": "runnable",
+      "title": "筛选高销售低毛利商品",
+      "sql": "WITH a AS (SELECT product_id,SUM(net_cents) net,SUM(cost_cents) cost,SUM(discount_cents) discount,SUM(refund_cents) refund FROM v_sales_lines WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY product_id), b AS (SELECT *,NTILE(4) OVER(ORDER BY net DESC,product_id) bucket FROM a) SELECT product_id,net net_cents,ROUND(100.0*(net-cost)/NULLIF(net,0),2) margin_pct,discount discount_cents,refund refund_cents FROM b WHERE bucket=1 AND 100.0*(net-cost)/NULLIF(net,0)<30 ORDER BY net DESC",
+      "purpose": "在前面各步中间结果的基础上完成最终计算，输出题目要求的完整结果。",
+      "reason": "前面的步骤只是分块准备；把它们组合起来，才能得到最终的业务结果。",
+      "sourceTables": [
+        {
+          "name": "v_sales_lines",
+          "columns": [
+            {
+              "name": "order_item_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "order_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "store_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "customer_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "session_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "channel",
+              "type": "TEXT"
+            },
+            {
+              "name": "order_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "product_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "promotion_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "net_qty",
+              "type": "派生"
+            },
+            {
+              "name": "net_cents",
+              "type": "派生"
+            },
+            {
+              "name": "cost_cents",
+              "type": "派生"
+            },
+            {
+              "name": "discount_cents",
+              "type": "INTEGER"
+            },
+            {
+              "name": "refund_cents",
+              "type": "派生"
+            }
+          ],
+          "rows": [
+            [
+              53709,
+              2,
+              4,
+              null,
+              null,
+              "store",
+              "2025-10-02",
+              287,
+              null,
+              1,
+              300,
+              268,
+              0,
+              0
+            ],
+            [
+              55177,
+              2,
+              4,
+              null,
+              null,
+              "store",
+              "2025-10-02",
+              158,
+              null,
+              0,
+              0,
+              0,
+              0,
+              1810
+            ],
+            [
+              29478,
+              3,
+              4,
+              2256,
+              null,
+              "store",
+              "2025-06-09",
+              59,
+              null,
+              1,
+              1310,
+              618,
+              0,
+              0
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 64627
+        }
+      ],
+      "result": {
+        "columns": [
+          "product_id",
+          "net_cents",
+          "margin_pct",
+          "discount_cents",
+          "refund_cents"
+        ],
+        "rows": [
+          [
+            169,
+            1160554,
+            17.73,
+            26953,
+            50733
+          ],
+          [
+            264,
+            422666,
+            19.4,
+            634,
+            30600
+          ],
+          [
+            157,
+            364172,
+            25.3,
+            2401,
+            24737
+          ],
+          [
+            127,
+            359836,
+            25.94,
+            4884,
+            38800
+          ],
+          [
+            399,
+            304741,
+            26.73,
+            759,
+            0
+          ],
+          [
+            367,
+            269142,
+            12.68,
+            7068,
+            13640
+          ],
+          [
+            130,
+            225866,
+            15.99,
+            914,
+            0
+          ],
+          [
+            374,
+            215268,
+            26.51,
+            2869,
+            10123
+          ],
+          [
+            483,
+            213362,
+            15.73,
+            838,
+            14280
+          ],
+          [
+            229,
+            156607,
+            24.8,
+            533,
+            20370
+          ],
+          [
+            22,
+            151511,
+            28.39,
+            3019,
+            17170
+          ],
+          [
+            246,
+            135101,
+            22.39,
+            1659,
+            0
+          ],
+          [
+            193,
+            129663,
+            27.68,
+            1754,
+            9623
+          ],
+          [
+            331,
+            123750,
+            21.41,
+            0,
+            13750
+          ],
+          [
+            231,
+            123483,
+            12.83,
+            2097,
+            9660
+          ],
+          [
+            443,
+            122290,
+            29.07,
+            1080,
+            10140
+          ],
+          [
+            95,
+            120421,
+            22.39,
+            449,
+            0
+          ],
+          [
+            191,
+            116130,
+            21.29,
+            0,
+            5530
+          ],
+          [
+            290,
+            115879,
+            18.7,
+            371,
+            1550
+          ],
+          [
+            460,
+            108609,
+            27.72,
+            982,
+            5249
+          ],
+          [
+            409,
+            108356,
+            20.92,
+            284,
+            970
+          ],
+          [
+            487,
+            107800,
+            25.78,
+            0,
+            43120
+          ],
+          [
+            410,
+            96200,
+            23.09,
+            2600,
+            0
+          ]
+        ]
+      }
     }
   ],
   "completeCode": {

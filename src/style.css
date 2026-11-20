@@ -2487,7 +2487,7 @@ details[open]::details-content { block-size: auto; }
 .step-item.open .step-no { background: var(--primary); color: var(--on-primary); }
 .step-main { display: block; flex: 1; min-width: 0; }
 .step-main strong { display: block; font-size: var(--fs-sub); font-weight: 600; }
-.step-summary { display: block; font-family: var(--font-mono); font-size: var(--fs-micro); color: var(--ink2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.step-summary { display: block; font-family: var(--font-mono); font-size: var(--fs-micro); color: var(--ink2); white-space: normal; overflow-wrap: anywhere; line-height: 1.5; }
 .step-chevron { flex: none; transition: transform 0.2s ease-in-out; color: var(--primary); }
 .step-item.open .step-chevron { transform: rotate(180deg); }
 .step-body { padding: 8px 12px 12px; }

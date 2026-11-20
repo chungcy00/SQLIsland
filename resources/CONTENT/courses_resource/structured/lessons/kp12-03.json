@@ -42,10 +42,17 @@
   "breakdown": [
     {
       "kind": "fragment",
-      "title": "选择输出",
-      "sql": "SELECT DATEDIFF('2026-02-03','2026-01-31') AS days, TIMESTAMPDIFF(DAY,'2026-01-31','2026-02-03') AS elapsed;",
-      "purpose": "输出查询需要的列与计算表达式。",
-      "reason": "输出列的顺序与别名决定结果表的形状。"
+      "title": "按天计算日期差",
+      "sql": "DATEDIFF('2026-02-03','2026-01-31') AS days",
+      "purpose": "直接计算两个日期相差的天数。",
+      "reason": "DATEDIFF 只关心日期部分，结果是整数天。"
+    },
+    {
+      "kind": "fragment",
+      "title": "按指定单位计算差值",
+      "sql": "TIMESTAMPDIFF(DAY,'2026-01-31','2026-02-03') AS elapsed",
+      "purpose": "用 TIMESTAMPDIFF 指定以天为单位计算间隔。",
+      "reason": "TIMESTAMPDIFF 可换成其他单位，这里与 DATEDIFF 结果一致。"
     }
   ],
   "completeCode": {

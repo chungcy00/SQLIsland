@@ -287,6 +287,334 @@
           ]
         ]
       }
+    },
+    {
+      "kind": "runnable",
+      "title": "计算合同价差与价格环比",
+      "sql": "WITH a AS (SELECT i.po_item_id,p.supplier_id,i.product_id,p.order_date,i.unit_price_cents,c.unit_price_cents contract_cents,LAG(i.unit_price_cents) OVER(PARTITION BY p.supplier_id,i.product_id ORDER BY p.order_date,i.po_item_id) previous_cents FROM purchase_order_items i JOIN purchase_orders p ON p.po_id=i.po_id JOIN supplier_contracts c ON c.contract_id=i.contract_id WHERE p.status<>'cancelled') SELECT po_item_id,supplier_id,product_id,unit_price_cents,contract_cents,unit_price_cents-contract_cents contract_variance_cents,previous_cents,ROUND(100.0*(unit_price_cents-previous_cents)/NULLIF(previous_cents,0),2) change_pct FROM a WHERE order_date BETWEEN '2025-01-01' AND '2025-12-31' ORDER BY po_item_id",
+      "purpose": "在上一步的中间结果之上完成最终计算，得到题目要求的结果。",
+      "reason": "中间结果只是过渡，最终结果还需要汇总、计算或筛选后才能回答业务问题。",
+      "sourceTables": [
+        {
+          "name": "purchase_order_items",
+          "columns": [
+            {
+              "name": "po_item_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "po_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "product_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "contract_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "quantity_ordered",
+              "type": "INTEGER"
+            },
+            {
+              "name": "unit_price_cents",
+              "type": "INTEGER"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              2114,
+              254,
+              2214,
+              29,
+              1165
+            ],
+            [
+              2,
+              2369,
+              357,
+              3123,
+              24,
+              5065
+            ],
+            [
+              3,
+              432,
+              389,
+              3410,
+              13,
+              366
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 9993
+        },
+        {
+          "name": "purchase_orders",
+          "columns": [
+            {
+              "name": "po_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "supplier_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "warehouse_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "order_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "promised_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "status",
+              "type": "TEXT"
+            },
+            {
+              "name": "order_priority",
+              "type": "TEXT"
+            },
+            {
+              "name": "cancellation_date",
+              "type": "TEXT"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              51,
+              3,
+              "2025-02-13",
+              "2025-03-03",
+              "placed",
+              "normal",
+              null
+            ],
+            [
+              2,
+              28,
+              3,
+              "2025-02-20",
+              "2025-03-11",
+              "placed",
+              "normal",
+              null
+            ],
+            [
+              3,
+              15,
+              3,
+              "2024-01-08",
+              "2024-01-13",
+              "placed",
+              "normal",
+              null
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 5000
+        },
+        {
+          "name": "supplier_contracts",
+          "columns": [
+            {
+              "name": "contract_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "supplier_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "product_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "start_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "end_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "unit_price_cents",
+              "type": "INTEGER"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              50,
+              1,
+              "2023-01-01",
+              "2023-10-16",
+              3057
+            ],
+            [
+              2,
+              50,
+              1,
+              "2023-10-17",
+              "2024-03-25",
+              3114
+            ],
+            [
+              3,
+              50,
+              1,
+              "2024-03-26",
+              "2024-11-29",
+              3316
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 4405
+        }
+      ],
+      "result": {
+        "columns": [
+          "po_item_id",
+          "supplier_id",
+          "product_id",
+          "unit_price_cents",
+          "contract_cents",
+          "contract_variance_cents",
+          "previous_cents",
+          "change_pct"
+        ],
+        "rows": [
+          [
+            2,
+            48,
+            357,
+            5065,
+            5065,
+            0,
+            4755,
+            6.52
+          ],
+          [
+            3,
+            49,
+            389,
+            366,
+            366,
+            0,
+            366,
+            0.0
+          ],
+          [
+            4,
+            47,
+            16,
+            1120,
+            1120,
+            0,
+            null,
+            null
+          ],
+          [
+            12,
+            57,
+            290,
+            1218,
+            1224,
+            -6,
+            1208,
+            0.83
+          ],
+          [
+            16,
+            49,
+            12,
+            398,
+            398,
+            0,
+            398,
+            0.0
+          ],
+          [
+            22,
+            35,
+            202,
+            5618,
+            5692,
+            -74,
+            5373,
+            4.56
+          ],
+          [
+            23,
+            32,
+            370,
+            2814,
+            2761,
+            53,
+            2657,
+            5.91
+          ],
+          [
+            26,
+            2,
+            90,
+            3830,
+            3830,
+            0,
+            3796,
+            0.9
+          ],
+          [
+            27,
+            2,
+            415,
+            4128,
+            4128,
+            0,
+            4128,
+            0.0
+          ],
+          [
+            28,
+            30,
+            153,
+            8690,
+            8690,
+            0,
+            8594,
+            1.12
+          ],
+          [
+            30,
+            5,
+            416,
+            2915,
+            2915,
+            0,
+            3069,
+            -5.02
+          ],
+          [
+            33,
+            30,
+            169,
+            1517,
+            1517,
+            0,
+            1448,
+            4.77
+          ]
+        ]
+      }
     }
   ],
   "completeCode": {

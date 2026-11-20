@@ -271,6 +271,201 @@
           ]
         ]
       }
+    },
+    {
+      "kind": "runnable",
+      "title": "汇总金额并判断付款状态",
+      "sql": "SELECT supplier_invoice_id,supplier_id,billed_cents,paid_cents,balance_cents,CASE WHEN balance_cents=0 THEN 'paid' WHEN paid_cents=0 THEN 'unpaid' WHEN balance_cents>0 THEN 'partial' ELSE 'overpaid' END payment_state FROM v_invoice_balance ORDER BY balance_cents DESC,supplier_invoice_id",
+      "purpose": "在前面各步中间结果的基础上完成最终计算，输出题目要求的完整结果。",
+      "reason": "前面的步骤只是分块准备；把它们组合起来，才能得到最终的业务结果。",
+      "sourceTables": [
+        {
+          "name": "v_invoice_balance",
+          "columns": [
+            {
+              "name": "supplier_invoice_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "po_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "supplier_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "invoice_no",
+              "type": "TEXT"
+            },
+            {
+              "name": "invoice_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "due_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "billed_cents",
+              "type": "派生"
+            },
+            {
+              "name": "paid_cents",
+              "type": "派生"
+            },
+            {
+              "name": "balance_cents",
+              "type": "派生"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              51,
+              "INV-E287130F3A",
+              "2025-03-13",
+              "2025-05-12",
+              1681982,
+              1681982,
+              0
+            ],
+            [
+              2,
+              2,
+              28,
+              "INV-E9FE93C319",
+              "2025-03-26",
+              "2025-05-25",
+              157276,
+              157276,
+              0
+            ],
+            [
+              3,
+              3,
+              15,
+              "INV-B4BFEAA92E",
+              "2024-02-10",
+              "2024-04-10",
+              345254,
+              190828,
+              154426
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 4739
+        }
+      ],
+      "result": {
+        "columns": [
+          "supplier_invoice_id",
+          "supplier_id",
+          "billed_cents",
+          "paid_cents",
+          "balance_cents",
+          "payment_state"
+        ],
+        "rows": [
+          [
+            252,
+            29,
+            1095304,
+            0,
+            1095304,
+            "unpaid"
+          ],
+          [
+            4075,
+            9,
+            1089303,
+            0,
+            1089303,
+            "unpaid"
+          ],
+          [
+            388,
+            25,
+            1102826,
+            331411,
+            771415,
+            "partial"
+          ],
+          [
+            2082,
+            23,
+            711442,
+            0,
+            711442,
+            "unpaid"
+          ],
+          [
+            525,
+            20,
+            698634,
+            0,
+            698634,
+            "unpaid"
+          ],
+          [
+            2482,
+            30,
+            1024827,
+            330576,
+            694251,
+            "partial"
+          ],
+          [
+            1297,
+            9,
+            645066,
+            0,
+            645066,
+            "unpaid"
+          ],
+          [
+            4004,
+            48,
+            640982,
+            0,
+            640982,
+            "unpaid"
+          ],
+          [
+            3914,
+            47,
+            624128,
+            0,
+            624128,
+            "unpaid"
+          ],
+          [
+            869,
+            43,
+            615186,
+            0,
+            615186,
+            "unpaid"
+          ],
+          [
+            3268,
+            1,
+            613291,
+            0,
+            613291,
+            "unpaid"
+          ],
+          [
+            2737,
+            9,
+            608988,
+            0,
+            608988,
+            "unpaid"
+          ]
+        ]
+      }
     }
   ],
   "completeCode": {

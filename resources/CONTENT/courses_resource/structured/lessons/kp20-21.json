@@ -601,6 +601,364 @@
           ]
         ]
       }
+    },
+    {
+      "kind": "runnable",
+      "title": "计算每小时销售额与人工占比",
+      "sql": "WITH a AS (SELECT store_id,SUM(net_cents) net FROM v_sales_lines WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY store_id), b AS (SELECT store_id,SUM(labor_cents) labor,SUM(worked_minutes+overtime_minutes) minutes_worked FROM v_staff_month WHERE month_key BETWEEN '2025-01' AND '2025-12' AND store_id IS NOT NULL GROUP BY store_id) SELECT s.store_id,COALESCE(a.net,0) net_cents,COALESCE(b.labor,0) labor_cents,ROUND(1.0*COALESCE(b.minutes_worked,0)/60,2) worked_hours,ROUND(60.0*COALESCE(a.net,0)/NULLIF(b.minutes_worked,0),2) sales_per_hour_cents,ROUND(100.0*COALESCE(b.labor,0)/NULLIF(a.net,0),2) labor_pct FROM stores s LEFT JOIN a ON a.store_id=s.store_id LEFT JOIN b ON b.store_id=s.store_id ORDER BY net_cents DESC",
+      "purpose": "在前面各步中间结果的基础上完成最终计算，输出题目要求的完整结果。",
+      "reason": "前面的步骤只是分块准备；把它们组合起来，才能得到最终的业务结果。",
+      "sourceTables": [
+        {
+          "name": "stores",
+          "columns": [
+            {
+              "name": "store_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "store_name",
+              "type": "TEXT"
+            },
+            {
+              "name": "city",
+              "type": "TEXT"
+            },
+            {
+              "name": "fulfillment_warehouse_id",
+              "type": "INTEGER"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              "河滨生活馆",
+              "古晋",
+              1
+            ],
+            [
+              2,
+              "埔奕家居馆",
+              "美里",
+              2
+            ],
+            [
+              3,
+              "蕉赖家庭店",
+              "吉隆坡",
+              3
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 12
+        },
+        {
+          "name": "v_sales_lines",
+          "columns": [
+            {
+              "name": "order_item_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "order_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "store_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "customer_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "session_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "channel",
+              "type": "TEXT"
+            },
+            {
+              "name": "order_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "product_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "promotion_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "net_qty",
+              "type": "派生"
+            },
+            {
+              "name": "net_cents",
+              "type": "派生"
+            },
+            {
+              "name": "cost_cents",
+              "type": "派生"
+            },
+            {
+              "name": "discount_cents",
+              "type": "INTEGER"
+            },
+            {
+              "name": "refund_cents",
+              "type": "派生"
+            }
+          ],
+          "rows": [
+            [
+              53709,
+              2,
+              4,
+              null,
+              null,
+              "store",
+              "2025-10-02",
+              287,
+              null,
+              1,
+              300,
+              268,
+              0,
+              0
+            ],
+            [
+              55177,
+              2,
+              4,
+              null,
+              null,
+              "store",
+              "2025-10-02",
+              158,
+              null,
+              0,
+              0,
+              0,
+              0,
+              1810
+            ],
+            [
+              29478,
+              3,
+              4,
+              2256,
+              null,
+              "store",
+              "2025-06-09",
+              59,
+              null,
+              1,
+              1310,
+              618,
+              0,
+              0
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 64627
+        },
+        {
+          "name": "v_staff_month",
+          "columns": [
+            {
+              "name": "employee_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "month_key",
+              "type": "TEXT"
+            },
+            {
+              "name": "department_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "position_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "store_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "base_cents",
+              "type": "INTEGER"
+            },
+            {
+              "name": "bonus_cents",
+              "type": "INTEGER"
+            },
+            {
+              "name": "overtime_minutes",
+              "type": "派生"
+            },
+            {
+              "name": "worked_minutes",
+              "type": "派生"
+            },
+            {
+              "name": "labor_cents",
+              "type": "派生"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              "2024-12",
+              1,
+              2,
+              3,
+              117077,
+              0,
+              375,
+              4320,
+              123313.0
+            ],
+            [
+              1,
+              "2025-01",
+              1,
+              2,
+              3,
+              350005,
+              0,
+              255,
+              10560,
+              362683.0
+            ],
+            [
+              1,
+              "2025-02",
+              1,
+              2,
+              3,
+              350005,
+              0,
+              660,
+              10560,
+              382818.0
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 3892
+        }
+      ],
+      "result": {
+        "columns": [
+          "store_id",
+          "net_cents",
+          "labor_cents",
+          "worked_hours",
+          "sales_per_hour_cents",
+          "labor_pct"
+        ],
+        "rows": [
+          [
+            6,
+            6969441,
+            74045903.0,
+            40516.25,
+            172.02,
+            1062.44
+          ],
+          [
+            7,
+            5693507,
+            18326233.0,
+            13035.75,
+            436.76,
+            321.88
+          ],
+          [
+            5,
+            5373344,
+            33699996.0,
+            18788.0,
+            286.0,
+            627.17
+          ],
+          [
+            2,
+            4244313,
+            13069124.0,
+            7489.0,
+            566.74,
+            307.92
+          ],
+          [
+            1,
+            3909544,
+            20412334.0,
+            12661.0,
+            308.79,
+            522.12
+          ],
+          [
+            12,
+            3718711,
+            21883972.0,
+            12920.25,
+            287.82,
+            588.48
+          ],
+          [
+            11,
+            3591126,
+            17819766.0,
+            10957.0,
+            327.75,
+            496.22
+          ],
+          [
+            10,
+            3167056,
+            11969477.0,
+            7631.0,
+            415.03,
+            377.94
+          ],
+          [
+            9,
+            2598900,
+            4762259.0,
+            2685.5,
+            967.75,
+            183.24
+          ],
+          [
+            4,
+            2496443,
+            20029940.0,
+            13334.25,
+            187.22,
+            802.34
+          ],
+          [
+            3,
+            2422875,
+            15944353.0,
+            8467.25,
+            286.15,
+            658.08
+          ],
+          [
+            8,
+            2231300,
+            20639043.0,
+            13414.0,
+            166.34,
+            924.98
+          ]
+        ]
+      }
     }
   ],
   "completeCode": {

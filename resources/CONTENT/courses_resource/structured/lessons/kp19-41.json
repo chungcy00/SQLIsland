@@ -292,6 +292,232 @@
           ]
         ]
       }
+    },
+    {
+      "kind": "runnable",
+      "title": "区分新客与回头客并汇总",
+      "sql": "WITH a AS (SELECT *,ROW_NUMBER() OVER(PARTITION BY customer_id ORDER BY order_date,order_id) rn FROM v_order_net WHERE channel='online') SELECT CASE WHEN rn=1 THEN 'new' ELSE 'returning' END segment,COUNT(DISTINCT customer_id) customers,COUNT(*) orders,SUM(net_cents) net_cents,ROUND(1.0*SUM(net_cents)/COUNT(*),2) avg_order_cents FROM a WHERE order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY CASE WHEN rn=1 THEN 'new' ELSE 'returning' END ORDER BY segment",
+      "purpose": "在上一步的中间结果之上完成最终计算，得到题目要求的结果。",
+      "reason": "中间结果只是过渡，最终结果还需要汇总、计算或筛选后才能回答业务问题。",
+      "sourceTables": [
+        {
+          "name": "customers",
+          "columns": [
+            {
+              "name": "customer_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "customer_name",
+              "type": "TEXT"
+            },
+            {
+              "name": "signup_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "region",
+              "type": "TEXT"
+            },
+            {
+              "name": "member_since_date",
+              "type": "TEXT"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              "张诗敏",
+              "2024-09-10",
+              "西马",
+              null
+            ],
+            [
+              2,
+              "Hana Yusof",
+              "2024-02-27",
+              null,
+              null
+            ],
+            [
+              3,
+              "Muhammad Ismail",
+              "2024-05-26",
+              "砂拉越",
+              null
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 5000
+        },
+        {
+          "name": "orders",
+          "columns": [
+            {
+              "name": "order_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "store_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "customer_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "session_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "order_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "channel",
+              "type": "TEXT"
+            },
+            {
+              "name": "status",
+              "type": "TEXT"
+            },
+            {
+              "name": "cancellation_reason",
+              "type": "TEXT"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              4,
+              null,
+              null,
+              "2024-03-29",
+              "store",
+              "cancelled",
+              "库存不足或待付款超时关闭"
+            ],
+            [
+              2,
+              4,
+              null,
+              null,
+              "2025-10-02",
+              "store",
+              "completed",
+              null
+            ],
+            [
+              3,
+              4,
+              2256,
+              null,
+              "2025-06-09",
+              "store",
+              "completed",
+              null
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 30000
+        },
+        {
+          "name": "v_order_net",
+          "columns": [
+            {
+              "name": "order_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "store_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "customer_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "session_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "channel",
+              "type": "TEXT"
+            },
+            {
+              "name": "order_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "net_cents",
+              "type": "派生"
+            },
+            {
+              "name": "cost_cents",
+              "type": "派生"
+            }
+          ],
+          "rows": [
+            [
+              2,
+              4,
+              null,
+              null,
+              "store",
+              "2025-10-02",
+              300,
+              268
+            ],
+            [
+              3,
+              4,
+              2256,
+              null,
+              "store",
+              "2025-06-09",
+              1310,
+              618
+            ],
+            [
+              5,
+              4,
+              4644,
+              null,
+              "store",
+              "2024-07-24",
+              16670,
+              8477
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 23325
+        }
+      ],
+      "result": {
+        "columns": [
+          "segment",
+          "customers",
+          "orders",
+          "net_cents",
+          "avg_order_cents"
+        ],
+        "rows": [
+          [
+            "new",
+            1272,
+            1272,
+            11963679,
+            9405.41
+          ],
+          [
+            "returning",
+            1180,
+            5610,
+            51354413,
+            9154.08
+          ]
+        ]
+      }
     }
   ],
   "completeCode": {

@@ -786,6 +786,334 @@
           ]
         ]
       }
+    },
+    {
+      "kind": "runnable",
+      "title": "汇总命中规则并输出异常发票",
+      "sql": "WITH f AS (\n  SELECT x.supplier_invoice_id,SUM(x.quantity_billed*x.unit_price_cents) face,\n    SUM(x.quantity_billed*p.unit_price_cents) expected\n  FROM supplier_invoice_items x JOIN purchase_order_items p ON p.po_item_id=x.po_item_id\n  GROUP BY x.supplier_invoice_id\n), a AS (\n  SELECT v.*,f.face,f.expected,COUNT(*) OVER(PARTITION BY supplier_id,invoice_no) copies,\n    AVG(f.face) OVER(PARTITION BY supplier_id) avg_bill\n  FROM v_invoice_balance v JOIN f ON f.supplier_invoice_id=v.supplier_invoice_id\n), z AS (\n  SELECT a.*,CASE WHEN copies>1 THEN 1 ELSE 0 END duplicate_flag,\n    CASE WHEN face>2*avg_bill THEN 1 ELSE 0 END large_flag,\n    CASE WHEN balance_cents<0 THEN 1 ELSE 0 END overpay_flag,\n    CASE WHEN ABS(face-expected)>100 THEN 1 ELSE 0 END mismatch_flag FROM a\n)\nSELECT supplier_invoice_id,supplier_id,billed_cents,duplicate_flag,large_flag,overpay_flag,mismatch_flag,\n  duplicate_flag+large_flag+overpay_flag+mismatch_flag flags FROM z\nWHERE duplicate_flag+large_flag+overpay_flag+mismatch_flag>0 ORDER BY flags DESC,supplier_invoice_id",
+      "purpose": "在前面各步中间结果的基础上完成最终计算，输出题目要求的完整结果。",
+      "reason": "前面的步骤只是分块准备；把它们组合起来，才能得到最终的业务结果。",
+      "sourceTables": [
+        {
+          "name": "purchase_order_items",
+          "columns": [
+            {
+              "name": "po_item_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "po_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "product_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "contract_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "quantity_ordered",
+              "type": "INTEGER"
+            },
+            {
+              "name": "unit_price_cents",
+              "type": "INTEGER"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              2114,
+              254,
+              2214,
+              29,
+              1165
+            ],
+            [
+              2,
+              2369,
+              357,
+              3123,
+              24,
+              5065
+            ],
+            [
+              3,
+              432,
+              389,
+              3410,
+              13,
+              366
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 9993
+        },
+        {
+          "name": "supplier_invoice_items",
+          "columns": [
+            {
+              "name": "supplier_invoice_item_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "supplier_invoice_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "po_item_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "quantity_billed",
+              "type": "INTEGER"
+            },
+            {
+              "name": "unit_price_cents",
+              "type": "INTEGER"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              619,
+              216,
+              4961
+            ],
+            [
+              2,
+              1,
+              2386,
+              36,
+              1477
+            ],
+            [
+              3,
+              1,
+              5546,
+              172,
+              2740
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 9459
+        },
+        {
+          "name": "v_invoice_balance",
+          "columns": [
+            {
+              "name": "supplier_invoice_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "po_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "supplier_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "invoice_no",
+              "type": "TEXT"
+            },
+            {
+              "name": "invoice_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "due_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "billed_cents",
+              "type": "派生"
+            },
+            {
+              "name": "paid_cents",
+              "type": "派生"
+            },
+            {
+              "name": "balance_cents",
+              "type": "派生"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              51,
+              "INV-E287130F3A",
+              "2025-03-13",
+              "2025-05-12",
+              1681982,
+              1681982,
+              0
+            ],
+            [
+              2,
+              2,
+              28,
+              "INV-E9FE93C319",
+              "2025-03-26",
+              "2025-05-25",
+              157276,
+              157276,
+              0
+            ],
+            [
+              3,
+              3,
+              15,
+              "INV-B4BFEAA92E",
+              "2024-02-10",
+              "2024-04-10",
+              345254,
+              190828,
+              154426
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 4739
+        }
+      ],
+      "result": {
+        "columns": [
+          "supplier_invoice_id",
+          "supplier_id",
+          "billed_cents",
+          "duplicate_flag",
+          "large_flag",
+          "overpay_flag",
+          "mismatch_flag",
+          "flags"
+        ],
+        "rows": [
+          [
+            2971,
+            33,
+            277567,
+            0,
+            1,
+            1,
+            1,
+            3
+          ],
+          [
+            3336,
+            49,
+            69434,
+            0,
+            1,
+            1,
+            1,
+            3
+          ],
+          [
+            3,
+            15,
+            345254,
+            0,
+            1,
+            0,
+            1,
+            2
+          ],
+          [
+            66,
+            49,
+            58520,
+            0,
+            1,
+            0,
+            1,
+            2
+          ],
+          [
+            174,
+            34,
+            29822,
+            0,
+            1,
+            0,
+            1,
+            2
+          ],
+          [
+            215,
+            57,
+            136370,
+            0,
+            1,
+            0,
+            1,
+            2
+          ],
+          [
+            252,
+            29,
+            1095304,
+            0,
+            1,
+            0,
+            1,
+            2
+          ],
+          [
+            255,
+            54,
+            698678,
+            0,
+            1,
+            0,
+            1,
+            2
+          ],
+          [
+            326,
+            29,
+            362898,
+            0,
+            1,
+            0,
+            1,
+            2
+          ],
+          [
+            350,
+            59,
+            281881,
+            0,
+            1,
+            0,
+            1,
+            2
+          ],
+          [
+            415,
+            49,
+            37644,
+            0,
+            1,
+            1,
+            0,
+            2
+          ],
+          [
+            419,
+            8,
+            217612,
+            0,
+            1,
+            1,
+            0,
+            2
+          ]
+        ]
+      }
     }
   ],
   "completeCode": {

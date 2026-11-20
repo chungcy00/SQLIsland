@@ -492,6 +492,253 @@
           ]
         ]
       }
+    },
+    {
+      "kind": "runnable",
+      "title": "计算广告后的贡献利润与占比",
+      "sql": "WITH a AS (SELECT s.source_id,SUM(o.net_cents) net,SUM(o.net_cents-o.cost_cents) gross FROM v_order_net o JOIN customer_sessions s ON s.session_id=o.session_id WHERE o.channel='online' AND o.order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY s.source_id), b AS (SELECT source_id,SUM(spend_cents) spend FROM marketing_campaigns WHERE month_key BETWEEN '2025-01' AND '2025-12' GROUP BY source_id) SELECT t.source_id,COALESCE(a.net,0) net_cents,COALESCE(a.gross,0) gross_cents,COALESCE(b.spend,0) spend_cents,COALESCE(a.gross,0)-COALESCE(b.spend,0) contribution_cents,ROUND(100.0*(COALESCE(a.gross,0)-COALESCE(b.spend,0))/NULLIF(a.net,0),2) contribution_pct FROM traffic_sources t LEFT JOIN a ON a.source_id=t.source_id LEFT JOIN b ON b.source_id=t.source_id ORDER BY contribution_cents DESC",
+      "purpose": "在前面各步中间结果的基础上完成最终计算，输出题目要求的完整结果。",
+      "reason": "前面的步骤只是分块准备；把它们组合起来，才能得到最终的业务结果。",
+      "sourceTables": [
+        {
+          "name": "customer_sessions",
+          "columns": [
+            {
+              "name": "session_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "customer_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "source_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "session_date",
+              "type": "TEXT"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              1901,
+              1,
+              "2024-08-24"
+            ],
+            [
+              2,
+              3000,
+              1,
+              "2025-11-09"
+            ],
+            [
+              3,
+              3682,
+              4,
+              "2024-07-29"
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 50000
+        },
+        {
+          "name": "marketing_campaigns",
+          "columns": [
+            {
+              "name": "campaign_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "source_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "month_key",
+              "type": "TEXT"
+            },
+            {
+              "name": "spend_cents",
+              "type": "INTEGER"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              "2023-01",
+              0
+            ],
+            [
+              2,
+              2,
+              "2023-01",
+              349637
+            ],
+            [
+              3,
+              3,
+              "2023-01",
+              173632
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 180
+        },
+        {
+          "name": "traffic_sources",
+          "columns": [
+            {
+              "name": "source_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "source_name",
+              "type": "TEXT"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              "自然访问"
+            ],
+            [
+              2,
+              "搜索广告"
+            ],
+            [
+              3,
+              "社交媒体"
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 5
+        },
+        {
+          "name": "v_order_net",
+          "columns": [
+            {
+              "name": "order_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "store_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "customer_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "session_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "channel",
+              "type": "TEXT"
+            },
+            {
+              "name": "order_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "net_cents",
+              "type": "派生"
+            },
+            {
+              "name": "cost_cents",
+              "type": "派生"
+            }
+          ],
+          "rows": [
+            [
+              2,
+              4,
+              null,
+              null,
+              "store",
+              "2025-10-02",
+              300,
+              268
+            ],
+            [
+              3,
+              4,
+              2256,
+              null,
+              "store",
+              "2025-06-09",
+              1310,
+              618
+            ],
+            [
+              5,
+              4,
+              4644,
+              null,
+              "store",
+              "2024-07-24",
+              16670,
+              8477
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 23325
+        }
+      ],
+      "result": {
+        "columns": [
+          "source_id",
+          "net_cents",
+          "gross_cents",
+          "spend_cents",
+          "contribution_cents",
+          "contribution_pct"
+        ],
+        "rows": [
+          [
+            1,
+            27221835,
+            10543653,
+            0,
+            10543653,
+            38.73
+          ],
+          [
+            4,
+            9277495,
+            3535735,
+            435753,
+            3099982,
+            33.41
+          ],
+          [
+            2,
+            14170254,
+            5427044,
+            2877981,
+            2549063,
+            17.99
+          ],
+          [
+            3,
+            9027392,
+            3475284,
+            2608823,
+            866461,
+            9.6
+          ],
+          [
+            5,
+            3621116,
+            1396494,
+            1247280,
+            149214,
+            4.12
+          ]
+        ]
+      }
     }
   ],
   "completeCode": {

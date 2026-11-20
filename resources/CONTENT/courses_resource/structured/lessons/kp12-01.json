@@ -57,10 +57,17 @@
   "breakdown": [
     {
       "kind": "fragment",
-      "title": "选择输出",
-      "sql": "SELECT ROUND(12.346,2) AS rounded, ABS(-25) AS magnitude;",
-      "purpose": "输出 ROUND(12.346,2) AS rounded, ABS(-25) AS magnitude。",
-      "reason": "输出列的顺序与别名决定结果表的形状。"
+      "title": "四舍五入列",
+      "sql": "ROUND(12.346,2) AS rounded",
+      "purpose": "把 12.346 保留 2 位小数。",
+      "reason": "ROUND 的第二个参数决定保留的小数位数。"
+    },
+    {
+      "kind": "fragment",
+      "title": "绝对值列",
+      "sql": "ABS(-25) AS magnitude",
+      "purpose": "取 -25 的绝对值。",
+      "reason": "ABS 去掉符号，只保留数值大小。"
     }
   ],
   "completeCode": {

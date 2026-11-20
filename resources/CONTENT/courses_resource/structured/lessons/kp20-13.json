@@ -590,6 +590,266 @@
           ]
         ]
       }
+    },
+    {
+      "kind": "runnable",
+      "title": "对比净销售与现金净额，列出差异订单",
+      "sql": "WITH a AS (SELECT order_id,SUM(amount_cents) paid FROM payments WHERE status='settled' AND payment_date<='2025-12-31' GROUP BY order_id), b AS (SELECT i.order_id,SUM(r.refund_cents) refunded FROM returns r JOIN order_items i ON i.order_item_id=r.order_item_id WHERE r.return_date<='2025-12-31' GROUP BY i.order_id) SELECT o.order_id,o.net_cents,COALESCE(a.paid,0)-COALESCE(b.refunded,0) cash_net_cents,COALESCE(a.paid,0)-COALESCE(b.refunded,0)-o.net_cents difference_cents FROM v_order_net o LEFT JOIN a ON a.order_id=o.order_id LEFT JOIN b ON b.order_id=o.order_id WHERE o.order_date BETWEEN '2025-01-01' AND '2025-12-31' AND COALESCE(a.paid,0)-COALESCE(b.refunded,0)<>o.net_cents ORDER BY difference_cents DESC",
+      "purpose": "在前面各步中间结果的基础上完成最终计算，输出题目要求的完整结果。",
+      "reason": "前面的步骤只是分块准备；把它们组合起来，才能得到最终的业务结果。",
+      "sourceTables": [
+        {
+          "name": "order_items",
+          "columns": [
+            {
+              "name": "order_item_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "order_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "product_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "promotion_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "quantity",
+              "type": "INTEGER"
+            },
+            {
+              "name": "unit_price_cents",
+              "type": "INTEGER"
+            },
+            {
+              "name": "discount_cents",
+              "type": "INTEGER"
+            },
+            {
+              "name": "unit_cost_cents",
+              "type": "INTEGER"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              10962,
+              64,
+              null,
+              1,
+              790,
+              0,
+              368
+            ],
+            [
+              2,
+              8118,
+              413,
+              null,
+              3,
+              2440,
+              0,
+              1414
+            ],
+            [
+              3,
+              26242,
+              494,
+              null,
+              1,
+              750,
+              0,
+              318
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 90074
+        },
+        {
+          "name": "payments",
+          "columns": [
+            {
+              "name": "payment_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "order_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "payment_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "amount_cents",
+              "type": "INTEGER"
+            },
+            {
+              "name": "status",
+              "type": "TEXT"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              3442,
+              "2023-01-01",
+              22200,
+              "settled"
+            ],
+            [
+              2,
+              5930,
+              "2023-01-01",
+              18444,
+              "failed"
+            ],
+            [
+              3,
+              5930,
+              "2023-01-01",
+              18444,
+              "settled"
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 28816
+        },
+        {
+          "name": "returns",
+          "columns": [
+            {
+              "name": "return_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "order_item_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "return_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "quantity",
+              "type": "INTEGER"
+            },
+            {
+              "name": "refund_cents",
+              "type": "INTEGER"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              4682,
+              "2023-01-19",
+              1,
+              5940
+            ],
+            [
+              2,
+              79414,
+              "2023-01-26",
+              1,
+              3880
+            ],
+            [
+              3,
+              24744,
+              "2023-01-15",
+              1,
+              2180
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 5063
+        },
+        {
+          "name": "v_order_net",
+          "columns": [
+            {
+              "name": "order_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "store_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "customer_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "session_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "channel",
+              "type": "TEXT"
+            },
+            {
+              "name": "order_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "net_cents",
+              "type": "派生"
+            },
+            {
+              "name": "cost_cents",
+              "type": "派生"
+            }
+          ],
+          "rows": [
+            [
+              2,
+              4,
+              null,
+              null,
+              "store",
+              "2025-10-02",
+              300,
+              268
+            ],
+            [
+              3,
+              4,
+              2256,
+              null,
+              "store",
+              "2025-06-09",
+              1310,
+              618
+            ],
+            [
+              5,
+              4,
+              4644,
+              null,
+              "store",
+              "2024-07-24",
+              16670,
+              8477
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 23325
+        }
+      ],
+      "result": {
+        "columns": [
+          "order_id",
+          "net_cents",
+          "cash_net_cents",
+          "difference_cents"
+        ],
+        "rows": []
+      }
     }
   ],
   "completeCode": {

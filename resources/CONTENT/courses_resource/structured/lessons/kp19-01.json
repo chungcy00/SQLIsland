@@ -503,6 +503,322 @@
           ]
         ]
       }
+    },
+    {
+      "kind": "runnable",
+      "title": "汇总净销售、利润率与目标达成率",
+      "sql": "WITH a AS (SELECT store_id,SUM(net_cents) net,SUM(cost_cents) cost FROM v_sales_lines WHERE channel='store' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY store_id), b AS (SELECT store_id,SUM(target_cents) target FROM sales_targets WHERE month_key BETWEEN '2025-01' AND '2025-12' GROUP BY store_id) SELECT s.store_id,COALESCE(a.net,0) net_cents,COALESCE(a.net-a.cost,0) gross_cents,ROUND(100.0*(a.net-a.cost)/NULLIF(a.net,0),2) margin_pct,b.target target_cents,ROUND(100.0*COALESCE(a.net,0)/NULLIF(b.target,0),2) achievement_pct FROM stores s LEFT JOIN a ON a.store_id=s.store_id LEFT JOIN b ON b.store_id=s.store_id ORDER BY net_cents DESC",
+      "purpose": "在前面各步中间结果的基础上完成最终计算，输出题目要求的完整结果。",
+      "reason": "前面的步骤只是分块准备；把它们组合起来，才能得到最终的业务结果。",
+      "sourceTables": [
+        {
+          "name": "sales_targets",
+          "columns": [
+            {
+              "name": "target_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "store_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "month_key",
+              "type": "TEXT"
+            },
+            {
+              "name": "target_cents",
+              "type": "INTEGER"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              "2023-01",
+              2181521
+            ],
+            [
+              2,
+              1,
+              "2023-02",
+              2287646
+            ],
+            [
+              3,
+              1,
+              "2023-03",
+              1961490
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 432
+        },
+        {
+          "name": "stores",
+          "columns": [
+            {
+              "name": "store_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "store_name",
+              "type": "TEXT"
+            },
+            {
+              "name": "city",
+              "type": "TEXT"
+            },
+            {
+              "name": "fulfillment_warehouse_id",
+              "type": "INTEGER"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              "河滨生活馆",
+              "古晋",
+              1
+            ],
+            [
+              2,
+              "埔奕家居馆",
+              "美里",
+              2
+            ],
+            [
+              3,
+              "蕉赖家庭店",
+              "吉隆坡",
+              3
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 12
+        },
+        {
+          "name": "v_sales_lines",
+          "columns": [
+            {
+              "name": "order_item_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "order_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "store_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "customer_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "session_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "channel",
+              "type": "TEXT"
+            },
+            {
+              "name": "order_date",
+              "type": "TEXT"
+            },
+            {
+              "name": "product_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "promotion_id",
+              "type": "INTEGER"
+            },
+            {
+              "name": "net_qty",
+              "type": "派生"
+            },
+            {
+              "name": "net_cents",
+              "type": "派生"
+            },
+            {
+              "name": "cost_cents",
+              "type": "派生"
+            },
+            {
+              "name": "discount_cents",
+              "type": "INTEGER"
+            },
+            {
+              "name": "refund_cents",
+              "type": "派生"
+            }
+          ],
+          "rows": [
+            [
+              53709,
+              2,
+              4,
+              null,
+              null,
+              "store",
+              "2025-10-02",
+              287,
+              null,
+              1,
+              300,
+              268,
+              0,
+              0
+            ],
+            [
+              55177,
+              2,
+              4,
+              null,
+              null,
+              "store",
+              "2025-10-02",
+              158,
+              null,
+              0,
+              0,
+              0,
+              0,
+              1810
+            ],
+            [
+              29478,
+              3,
+              4,
+              2256,
+              null,
+              "store",
+              "2025-06-09",
+              59,
+              null,
+              1,
+              1310,
+              618,
+              0,
+              0
+            ]
+          ],
+          "previewOnly": true,
+          "rowCount": 64627
+        }
+      ],
+      "result": {
+        "columns": [
+          "store_id",
+          "net_cents",
+          "gross_cents",
+          "margin_pct",
+          "target_cents",
+          "achievement_pct"
+        ],
+        "rows": [
+          [
+            6,
+            6969441,
+            2741661,
+            39.34,
+            69312500,
+            10.06
+          ],
+          [
+            7,
+            5693507,
+            2205227,
+            38.73,
+            62193957,
+            9.15
+          ],
+          [
+            5,
+            5373344,
+            2121391,
+            39.48,
+            65368327,
+            8.22
+          ],
+          [
+            2,
+            4244313,
+            1648352,
+            38.84,
+            41668727,
+            10.19
+          ],
+          [
+            1,
+            3909544,
+            1559185,
+            39.88,
+            40293000,
+            9.7
+          ],
+          [
+            12,
+            3718711,
+            1442294,
+            38.78,
+            42565796,
+            8.74
+          ],
+          [
+            11,
+            3591126,
+            1411633,
+            39.31,
+            26005035,
+            13.81
+          ],
+          [
+            10,
+            3167056,
+            1216199,
+            38.4,
+            32419295,
+            9.77
+          ],
+          [
+            9,
+            2598900,
+            1013522,
+            39.0,
+            35417426,
+            7.34
+          ],
+          [
+            4,
+            2496443,
+            985357,
+            39.47,
+            18416544,
+            13.56
+          ],
+          [
+            3,
+            2422875,
+            965035,
+            39.83,
+            16716511,
+            14.49
+          ],
+          [
+            8,
+            2231300,
+            873943,
+            39.17,
+            20027456,
+            11.14
+          ]
+        ]
+      }
     }
   ],
   "completeCode": {

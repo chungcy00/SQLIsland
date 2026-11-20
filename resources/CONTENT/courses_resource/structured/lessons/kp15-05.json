@@ -119,6 +119,79 @@
           ]
         ]
       }
+    },
+    {
+      "kind": "runnable",
+      "title": "计算三期平均与环比增长",
+      "sql": "WITH m AS (SELECT month,sales,LAG(sales) OVER(ORDER BY month) AS prev,AVG(sales) OVER(ORDER BY month ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) AS moving_avg FROM monthly) SELECT month,ROUND(moving_avg,2) AS avg3,ROUND(100.0*(sales-prev)/NULLIF(prev,0),2) AS growth_pct FROM m ORDER BY month",
+      "purpose": "在上一步的中间结果之上完成最终计算，得到题目要求的结果。",
+      "reason": "中间结果只是过渡，最终结果还需要汇总、计算或筛选后才能回答业务问题。",
+      "sourceTables": [
+        {
+          "name": "monthly",
+          "columns": [
+            {
+              "name": "month",
+              "type": "TEXT",
+              "mysqlType": "VARCHAR(160) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_bin",
+              "sqliteType": "TEXT"
+            },
+            {
+              "name": "sales",
+              "type": "INTEGER",
+              "mysqlType": "INT",
+              "sqliteType": "INTEGER"
+            }
+          ],
+          "rows": [
+            [
+              "2026-01",
+              1000
+            ],
+            [
+              "2026-02",
+              1500
+            ],
+            [
+              "2026-03",
+              1500
+            ],
+            [
+              "2026-04",
+              900
+            ]
+          ]
+        }
+      ],
+      "result": {
+        "columns": [
+          "month",
+          "avg3",
+          "growth_pct"
+        ],
+        "rows": [
+          [
+            "2026-01",
+            1000.0,
+            null
+          ],
+          [
+            "2026-02",
+            1250.0,
+            50.0
+          ],
+          [
+            "2026-03",
+            1333.33,
+            0.0
+          ],
+          [
+            "2026-04",
+            1300.0,
+            -40.0
+          ]
+        ]
+      }
     }
   ],
   "completeCode": {
