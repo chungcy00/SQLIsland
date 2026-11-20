@@ -79,6 +79,8 @@ const image = (path, cls = "", alt = "") =>
 const button = (label, action, arg = "", cls = "") =>
   `<button class="${cls}" data-action="${action}" data-arg="${e(arg)}">${label}</button>`;
 const goButton = (label, route, cls = "") => button(label, "go", route, cls);
+// 纯图标按钮：补 aria-label（屏幕阅读器朗读名称），图标本身 aria-hidden。
+const labelled = (html, name) => html.replace("<button ", `<button aria-label="${e(name)}" `);
 const code = (sql) => `<pre><code>${e(formatSqlForDisplay(sql))}</code></pre>`;
 // 分步执行：高亮“这一步新增的代码”。有上一步（同为可运行步骤）时，按词比较，只高亮相对上一步新增的词；没有可比较的上一步（首步、片段）则整段都是这一步引入的。
 // 数据表较多（超过 2 张）时，表区域限高并改为上下滑动，避免每一步都把页面撑得很长。
@@ -254,12 +256,10 @@ const getQuestion = (id) => content.questions.find((q) => q.id === id);
 const allCards = () => [...content.cards, ...state.userCards];
 const favorite = (id) => state.favorites.includes(id);
 const favButton = (id) =>
-  button(
-    icon("star"),
-    "favorite",
-    id,
-    "icon-button favorite " + (favorite(id) ? "selected" : ""),
-  );
+  labelled(
+    button(icon("star"), "favorite", id, "icon-button favorite " + (favorite(id) ? "selected" : "")),
+    favorite(id) ? "取消收藏" : "收藏",
+  ).replace("<button ", `<button aria-pressed="${favorite(id)}" `);
 const currentAttempt = (attempt) => isCurrentQuestionAttempt(attempt, getQuestion(attempt.questionId));
 const attempted = (id) => state.attempts.filter((a) => a.questionId === id && currentAttempt(a));
 const draftForQuestion = (id) => questionDraft(state.drafts[id], getQuestion(id));
@@ -528,7 +528,7 @@ function shell(title, body, tab = "home", detail = false, extra = "") {
     ["flashcards", "闪卡", "/cards"],
     ["mine", "我的", "/mine"],
   ];
-  app.innerHTML = `<header class="appbar ${detail ? "detail" : ""}">${detail ? button(icon("back"), "back", "", "icon-button") : image("brand/logo_d", "logo")}<h1>${e(title)}</h1>${extra || (!detail ? goButton(icon("settings"), "/settings", "icon-button") : '<span class="appbar-spacer"></span>')}</header><main class="page ${detail ? "detail" : ""}">${body}</main>${detail ? "" : `<nav aria-label="主导航">${navigation.map(([key, label, path]) => goButton(`<span class="nav-icon">${iconSvg(`${key}_${tab === key ? "active" : "inactive"}`, "nav-svg")}</span>${label}`, path, tab === key ? "active" : "")).join("")}</nav>`}`;
+  app.innerHTML = `<header class="appbar ${detail ? "detail" : ""}">${detail ? labelled(button(icon("back"), "back", "", "icon-button"), "返回") : image("brand/logo_d", "logo")}<h1>${e(title)}</h1>${extra || (!detail ? labelled(goButton(icon("settings"), "/settings", "icon-button"), "设置") : '<span class="appbar-spacer"></span>')}</header><main class="page ${detail ? "detail" : ""}">${body}</main>${detail ? "" : `<nav aria-label="主导航">${navigation.map(([key, label, path]) => goButton(`<span class="nav-icon">${iconSvg(`${key}_${tab === key ? "active" : "inactive"}`, "nav-svg")}</span>${label}`, path, tab === key ? "active" : "")).join("")}</nav>`}`;
 }
 function completedChapter(c) {
   return c.knowledgePoints.every((k) => completedLesson(k.id));
@@ -1244,13 +1244,13 @@ function cardsPage() {
     ${button(icon("flip") + `<span>进入「${modeText}」3D 翻卡学习</span>`, "startCards", newMode, "primary full start-flip")}${state.flashSession ? button("继续上次复习", "resumeCards", "", "tonal full") : ""}</section>
     ${spot ? `<div class="section-heading"><h2>随手翻一张</h2>${button(icon("skip") + " 换一张", "spotNext", "", "text-button")}</div>
     ${spotBack
-      ? `<div class="card-flip big back" role="button" tabindex="0" data-action="spotFlip" aria-label="点击翻回正面"><div class="row"><span class="aux">${e(spot.id.toUpperCase())} · 答案 · 解析</span><span class="tools">${button(icon("copy"), "copyCard", spot.id, "icon-button")}</span></div>${cardBackBody(spot)}</div>`
+      ? `<div class="card-flip big back" role="button" tabindex="0" data-action="spotFlip" aria-label="点击翻回正面"><div class="row"><span class="aux">${e(spot.id.toUpperCase())} · 答案 · 解析</span><span class="tools">${labelled(button(icon("copy"), "copyCard", spot.id, "icon-button"), "复制为个人卡片")}</span></div>${cardBackBody(spot)}</div>`
       : `<button class="card-flip big" data-action="spotFlip" aria-label="点击翻面"><div class="t">${tag(spot.id.toUpperCase())}<span class="ic">${icon("flip")}</span><span class="aux">正面 · 点击翻面</span></div><div class="q">${e(spot.front.question || "")}</div>${cardCode(spot)}<div class="hint">先默想答案，再点击卡片翻面核对</div></button>`}` : ""}
     <div class="section-heading"><small class="card-match-count">匹配到 ${matching.length} 张 · 点击卡片直接翻面</small>${cardFlipped.size ? button(icon("reset") + " 全部正面", "allFront", "", "text-button") : ""}</div>
     <div class="search">${icon("search")}<input id="card-search" value="${e(cardSearch)}" placeholder="搜索闪卡问题、答案、卡号或标签…" aria-label="搜索闪卡"></div>
     <div class="chips">${button("全部章", "browseChapter", "", "chip " + (!cardBrowseChapter ? "selected" : ""))}${chapterChips(cardBrowseChapter, "browseChapter")}</div>
     ${matching.slice(0, cardBrowseLimit).map((c) => cardFlipped.has(c.id)
-      ? `<div class="card-flip mini back" role="button" tabindex="0" data-action="miniFlip" data-arg="${c.id}" aria-label="点击翻回正面"><div class="row"><span class="aux">${e(c.id.toUpperCase())} · 答案 · 解析</span><span class="tools">${button(icon("copy"), "copyCard", c.id, "icon-button")}</span></div>${cardBackBody(c)}</div>`
+      ? `<div class="card-flip mini back" role="button" tabindex="0" data-action="miniFlip" data-arg="${c.id}" aria-label="点击翻回正面"><div class="row"><span class="aux">${e(c.id.toUpperCase())} · 答案 · 解析</span><span class="tools">${labelled(button(icon("copy"), "copyCard", c.id, "icon-button"), "复制为个人卡片")}</span></div>${cardBackBody(c)}</div>`
       : `<button class="card-flip mini" data-action="miniFlip" data-arg="${c.id}"><div class="t"><span class="ic">${icon("flip")}</span><span class="q">${e(c.front.question)}</span></div>${cardCode(c)}<div class="row">${cardStatus(c)}<span class="tap">${icon("reset")}轻触翻面看答案</span></div></button>`).join("")}
     ${matching.length > cardBrowseLimit ? button("加载更多闪卡", "moreCards", "", "outline full") : ""}${matching.length ? "" : empty("暂无匹配闪卡", "", button("清除搜索", "resetCardSearch", "", "outline"), "09_empty_magnifier")}`,
     "flashcards",
@@ -1526,7 +1526,7 @@ async function labPage(id) {
     body,
     "home",
     true,
-    goButton(icon("database"), "/datasets", "icon-button"),
+    labelled(goButton(icon("database"), "/datasets", "icon-button"), "数据集管理"),
   );
   if (erdSchema) {
     document.querySelector("#lab-erd").dataset.dataset = expectedDataset;

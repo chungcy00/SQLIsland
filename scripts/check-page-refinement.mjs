@@ -93,23 +93,21 @@ try {
   await page.screenshot({ path: 'artifacts/refined-practice.png' });
   await route('/cards');
   assert.equal(await page.locator('[data-action=startCards]').count(), 1);
+  assert.equal(await page.locator('[data-action=cardMode]').count(), 7);
   await page.screenshot({ path: 'artifacts/refined-cards.png' });
+  // 章节模式：选章节后开始，进入复习页（整卡点击翻面，正面不出现评级按钮）
   await page.locator('[data-action=cardMode][data-arg=章节]').click();
   await page.locator('[data-action=cardChapter][data-arg=ch02]').click();
   await page.locator('[data-action=startCards]').click();
-  await page.locator('.flashcard').waitFor();
-  assert.match(await page.locator('main').innerText(), /自由浏览/);
+  await page.locator('.flashcard.front').waitFor();
   assert.equal(await page.locator('[data-action=rate]').count(), 0);
+  // 卡片库：搜索卡号、整卡点击翻面看答案、复制为自定义卡
   await route('/cards');
-  const firstCard = page.locator('.card-browser-row').first();
-  const cardId = (await firstCard.locator('small').first().innerText()).split(' · ')[0];
-  await page.locator('#card-search').fill(cardId);
-  await page.waitForFunction(() => document.querySelectorAll('.card-browser-row').length === 1);
-  assert.equal(await page.locator('.card-browser-row').count(), 1);
-  await page.locator('.card-browser-row summary').click();
-  await page.locator('.card-browser-answer').first().waitFor({ state: 'visible' }); // B2：展开有 200ms 高度动画
-  assert.equal(await page.locator('.card-browser-answer:visible').count(), 1);
-  await page.locator('[data-action=copyCard]').click();
+  await page.locator('#card-search').fill('fc0005');
+  await page.waitForFunction(() => document.querySelectorAll('.card-flip.mini').length === 1);
+  await page.locator('.card-flip.mini').click();
+  await page.locator('.card-flip.mini.back').waitFor();
+  await page.locator('.card-flip.mini.back [data-action=copyCard]').click();
   await page.waitForURL('**/#/card-edit/user-*');
   assert.ok((await page.locator('#card-front').inputValue()).length);
   await route('/mine');
@@ -124,7 +122,7 @@ try {
   await route('/mine');
   assert.match(await page.locator('main').innerText(), /已发起导出/);
   await route('/lesson/kp01-01');
-  assert.match(await page.locator('pre').nth(1).innerText(), /SELECT id, category, sales\nFROM orders\nORDER BY id;/);
+  assert.ok((await page.locator('pre').allInnerTexts()).some((text) => /SELECT id, category, sales\s*\nFROM orders\s*\nORDER BY sales DESC;/.test(text)), '课文完整代码按子句换行显示');
   const note = page.locator('#note');
   const initialHeight = await note.evaluate((n) => n.clientHeight);
   await note.fill('自适应笔记\n'.repeat(25));

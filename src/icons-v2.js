@@ -1,4 +1,4 @@
-// 新版图标（B8）：ChatGPT 绘制的 49 个线性图标，构建时内联。
+// 新版图标（B8）：ChatGPT 绘制的 49 个线性图标 + 补充 6 个（fit、minus、send、save、hint、answer），构建时内联。
 import back from "../resources/ASSETS/v2/icons/back.svg";
 import backup from "../resources/ASSETS/v2/icons/backup.svg";
 import book from "../resources/ASSETS/v2/icons/book.svg";
@@ -48,7 +48,13 @@ import stats from "../resources/ASSETS/v2/icons/stats.svg";
 import undo from "../resources/ASSETS/v2/icons/undo.svg";
 import wrap from "../resources/ASSETS/v2/icons/wrap.svg";
 import wrongbook from "../resources/ASSETS/v2/icons/wrongbook.svg";
-const raw = { back, backup, book, card, chart, check, clock, close, cloud, code, code_lab, copy, database, dataset, down, download, edit, expand, favorites, filter, flashcards_active, flashcards_inactive, flip, home_active, home_inactive, keyboard, learn_active, learn_inactive, mine_active, mine_inactive, offline, phone, play, plus, practice_active, practice_inactive, project, redo, reset, right, search, settings, shrink, skip, star, stats, undo, wrap, wrongbook };
+import answer from "../resources/ASSETS/v2/icons/answer.svg";
+import fit from "../resources/ASSETS/v2/icons/fit.svg";
+import hint from "../resources/ASSETS/v2/icons/hint.svg";
+import minus from "../resources/ASSETS/v2/icons/minus.svg";
+import save from "../resources/ASSETS/v2/icons/save.svg";
+import send from "../resources/ASSETS/v2/icons/send.svg";
+const raw = { answer, fit, hint, minus, save, send, back, backup, book, card, chart, check, clock, close, cloud, code, code_lab, copy, database, dataset, down, download, edit, expand, favorites, filter, flashcards_active, flashcards_inactive, flip, home_active, home_inactive, keyboard, learn_active, learn_inactive, mine_active, mine_inactive, offline, phone, play, plus, practice_active, practice_inactive, project, redo, reset, right, search, settings, shrink, skip, star, stats, undo, wrap, wrongbook };
 const aliases = { wrong: "wrongbook", cards: "card" };
 const cache = new Map();
 function inner(name) {
