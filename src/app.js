@@ -117,6 +117,8 @@ const listPositions = new Map();
 let learningSearchView = null, practiceFilterView = null;
 let questionSequence = null;
 let questionKeyboard = false;
+let quizScroll = {};
+let quizExpanded = false;
 let lessonExampleResult = null;
 const questionTableCache = new Map();
 const projectSchemas = new Map();
@@ -344,27 +346,31 @@ window.addEventListener("keydown", (event) => { if (event.key === "Escape" && cl
 window.addEventListener("hashchange", () => closeTopLayer());
 // ===== B5：长题干折叠 / 滑动切题 =====
 function syncStems() {
+  const box = document.querySelector(".quiz-split");
+  if (box) {
+    // 作答页：题目区默认可完整滚动；内容超出时出现“展开全文”，展开后整页一起滚动，并提供“收回”
+    const pane = box.querySelector('.quiz-pane[data-pane="题目"]');
+    const toggle = pane?.querySelector(".stem-toggle");
+    if (!toggle) return;
+    const expanded = box.classList.contains("expanded");
+    toggle.textContent = expanded ? "收回" : "展开全文";
+    toggle.hidden = expanded ? false : pane.hidden || pane.scrollHeight <= pane.clientHeight + 4;
+    return;
+  }
   document.querySelectorAll(".stem").forEach((stem) => {
     const text = stem.querySelector(".stem-text");
     const button = stem.querySelector(".stem-toggle");
+    if (!button) return;
     const wasOpen = stem.classList.contains("open");
     stem.classList.remove("open", "mini");
     const lineHeight = parseFloat(getComputedStyle(text.querySelector("p") || text).lineHeight) || 24;
     const clamped = text.scrollHeight > lineHeight * 8; // 内容明显超过 6 行（含小标题与间距）才折叠，短题干完整显示
     stem.classList.toggle("clamped", clamped);
     button.hidden = !clamped;
-    button.textContent = "展开全文";
-    if (wasOpen && clamped) { stem.classList.add("open"); button.textContent = "收起"; }
+    // 展开后不再放“收起”按钮：向下阅读后滚回题目区顶部，题干自动折叠（见 mountQuizSplit）
+    if (wasOpen && clamped) { stem.classList.add("open"); button.hidden = true; }
   });
 }
-app.addEventListener("focusin", (event) => {
-  if (event.target.id !== "sql-editor" || !route().startsWith("/question/")) return;
-  const stem = document.querySelector(".stem.clamped");
-  if (!stem) return;
-  stem.classList.remove("open");
-  stem.classList.add("mini");
-  stem.querySelector(".stem-toggle").textContent = "展开全文";
-});
 let swipe = null;
 app.addEventListener("touchstart", (event) => {
   swipe = null;
@@ -1050,6 +1056,8 @@ async function questionPage(id, renderVersion = revision) {
   if (loadedQuestionId !== id) {
     loadedQuestionId = id;
     openFolds.clear();
+    quizScroll = {};
+    quizExpanded = false;
     quizTab = "题目";
     questionKeyboard = false;
     feedback = null;
@@ -1064,25 +1072,18 @@ async function questionPage(id, renderVersion = revision) {
   const position = sequence.findIndex((item) => item.id === id);
   const submitted = attempted(id).length > 0;
   if (q.type !== "选择") editorFields = await questionFields(q);
-  let body = `<div class="quiz-details"><div class="question-meta">${tag(q.type)}${tag(q.difficulty)}<small>${q.id.toUpperCase()}</small></div><h1 class="quiz-title">${e(q.title.split(" · ")[0])}</h1><p class="question-location">第 ${chapter.number} 章 · ${e(chapter.title)}<span>${chapterQuestions.findIndex((item) => item.id === id) + 1} / ${chapterQuestions.length}</span></p>`;
+  const head = `<div class="question-meta">${tag(q.type)}${tag(q.difficulty)}<small>${q.id.toUpperCase()}</small></div><h1 class="quiz-title">${e(q.title.split(" · ")[0])}</h1><p class="question-location">第 ${chapter.number} 章 · ${e(chapter.title)}<span>${chapterQuestions.findIndex((item) => item.id === id) + 1} / ${chapterQuestions.length}</span></p>`;
+  const split = q.type !== "选择";
+  let body = split ? `<div class="quiz-details quiz-split">` : `<div class="quiz-details">${head}`;
   if (q.type === "选择") {
     body += `<p class="choice-requirements">${e(q.requirements)}</p><div class="choice-options" role="radiogroup" aria-label="答案选项">${q.options.map((o) => `<div class="choice-item">${`<button class="option ${selectedOption === o.id ? "selected" : ""}" data-action="option" data-arg="${e(o.id)}" role="radio" aria-checked="${selectedOption === o.id}"><b>${e(o.id)}</b><span>${e(o.text)}</span>${selectedOption === o.id ? icon("check") : ""}</button>`}${submitted && o.explanation ? `<p class="option-explanation ${o.id === q.correctOptionId ? "correct" : ""}">${o.id === q.correctOptionId ? icon("check") : ""}${e(o.explanation)}</p>` : ""}</div>`).join("")}</div>`;
   } else {
-    body += `<div class="tabs">${["题目", "数据表"].map((t) => button(t, "quizTab", t, quizTab === t ? "selected" : "")).join("")}</div>`;
-    if (quizTab === "数据表") {
-      try {
-        const tables = await questionTables(q);
-        body += tables.length ? renderTables(tables, false) : empty("暂无公开数据表");
-      } catch (error) {
-        body += `<div class="notice error">${e(error.message)}</div>${button("重新加载数据表", "quizTab", "数据表", "outline")}`;
-      }
-    } else {
-      body += `${q.context ? `<p class="question-context">${e(q.context)}</p>` : ""}${questionRequirements(q)}`;
-        body += `<section class="question-code"><h2>${q.type === "代码纠错" ? "修正代码" : q.type === "代码填空" ? "补全代码" : "编写 SQL"}</h2>${q.type === "代码填空" ? `<p class="input-guidance">补全 ${e([...new Set((q.initialCode || "").match(/\{\{[^}]+\}\}/g) || [])].join("、") || "代码中的空位")}，可编辑完整 SQL。</p>` : ""}${editor(q.id, draftForQuestion(id).code ?? formatSqlForDisplay(q.initialCode ?? ""), questionKeyboard && state.settings.customKeyboard)}</section>`;
-    }
+    const cachedTables = questionTableCache.get(q.id);
+    const tablesInner = cachedTables ? (cachedTables.length ? renderTables(cachedTables, false) : empty("暂无公开数据表")) : `<p class="muted quiz-tables-pending" data-qid="${e(q.id)}">正在加载本题的数据表…</p>`;
+    body += `<div class="quiz-top"><div class="tabs">${["题目", "数据表"].map((t) => button(t, "quizTab", t, quizTab === t ? "selected" : "")).join("")}</div><div class="quiz-pane" data-pane="题目" ${quizTab === "题目" ? "" : "hidden"}>${head}${q.context ? `<p class="question-context">${e(q.context)}</p>` : ""}${questionRequirements(q)}</div><div class="quiz-pane" data-pane="数据表" ${quizTab === "数据表" ? "" : "hidden"}>${tablesInner}</div></div><div class="quiz-splitter" role="separator" aria-orientation="horizontal" tabindex="0" aria-label="调整题目区与代码区高度"></div><div class="quiz-bottom">`;
+    body += `<section class="question-code"><h2>${q.type === "代码纠错" ? "修正代码" : q.type === "代码填空" ? "补全代码" : "编写 SQL"}</h2>${q.type === "代码填空" ? `<p class="input-guidance">补全 ${e([...new Set((q.initialCode || "").match(/\{\{[^}]+\}\}/g) || [])].join("、") || "代码中的空位")}，可编辑完整 SQL。</p>` : ""}${editor(q.id, draftForQuestion(id).code ?? formatSqlForDisplay(q.initialCode ?? ""), questionKeyboard && state.settings.customKeyboard)}</section>`;
   }
-  const onTables = q.type !== "选择" && quizTab === "数据表"; // 数据表页只看数据，不显示运行/提交/提示/参考答案
-  if (!onTables) body += `<section class="question-execution"><div class="actions">${q.type !== "选择" ? button(actionIcon(busy ? "stop" : "play") + (busy ? " 停止" : " 运行"), busy ? "stop" : "runQuestion", q.id, "outline") : ""}<button class="primary" data-action="submitQuestion" data-arg="${id}" ${busy ? "disabled" : ""}>${actionIcon("send")}${busy ? "执行中…" : "提交答案"}</button></div></section>`;
+  body += `<section class="question-execution"><div class="actions">${q.type !== "选择" ? button(actionIcon(busy ? "stop" : "play") + (busy ? " 停止" : " 运行"), busy ? "stop" : "runQuestion", q.id, "outline") : ""}<button class="primary" data-action="submitQuestion" data-arg="${id}" ${busy ? "disabled" : ""}>${actionIcon("send")}${busy ? "执行中…" : "提交答案"}</button></div></section>`;
   if (lastResult) body += `<section class="query-output"><div class="row between table-heading"><h2>运行结果</h2><small>${lastResult.rowCount} 行${lastResult.elapsedMs ? " · " + lastResult.elapsedMs + " ms" : ""}</small></div>${table(lastResult.columns, lastResult.rows)}</section>`;
   if (feedback) {
     const diff = feedback.publicComparison ? diffComparison(feedback.publicComparison, q) : null;
@@ -1091,9 +1092,10 @@ async function questionPage(id, renderVersion = revision) {
   const hintMax = Math.min(q.hints.length, 3), hintOpen = openFolds.has(id + ":hints"), refOpen = openFolds.has(id + ":ref");
   const hintLabel = hints === 0 ? "提示 0/" + hintMax : !hintOpen ? "展开提示 " + Math.min(hints, 3) + "/" + hintMax : hints >= hintMax ? "收起提示 " + hintMax + "/" + hintMax : "提示 " + hints + "/" + hintMax;
   const refLabel = !answerShown ? "查看参考答案" : refOpen ? "收起参考答案" : "展开参考答案";
-  if (!onTables) body += `<section class="answer-support"><div class="actions"><button class="outline" data-action="hint" data-arg="${id}" aria-expanded="${hintOpen}">${actionIcon("hint")}${hintLabel}</button><button class="outline" data-action="showAnswer" data-arg="${id}" aria-expanded="${refOpen}">${actionIcon("answer")}${refLabel}</button></div>${hints && hintOpen ? `<ol class="hint-list">${q.hints.slice(0, hints).map((hint, index) => `<li><small>提示 ${index + 1}</small><p>${e(hint)}</p></li>`).join("")}</ol>` : ""}${answerShown && refOpen ? `<div class="reference-answer"><h3>参考答案</h3>${q.type === "选择" ? `<p>正确选项 ${e(q.correctOptionId)}</p>` : code(q.referenceSolutions[0]?.mysqlSql || q.initialCode)}<p>${e(q.type === "选择" ? choiceExplanation(q) : q.explanation)}</p></div>` : ""}</section>`;
-  body += `${sequenceButtons(sequence[position - 1], sequence[position + 1], "question")}</div>`;
+  body += `<section class="answer-support"><div class="actions"><button class="outline" data-action="hint" data-arg="${id}" aria-expanded="${hintOpen}">${actionIcon("hint")}${hintLabel}</button><button class="outline" data-action="showAnswer" data-arg="${id}" aria-expanded="${refOpen}">${actionIcon("answer")}${refLabel}</button></div>${hints && hintOpen ? `<ol class="hint-list">${q.hints.slice(0, hints).map((hint, index) => `<li><small>提示 ${index + 1}</small><p>${e(hint)}</p></li>`).join("")}</ol>` : ""}${answerShown && refOpen ? `<div class="reference-answer"><h3>参考答案</h3>${q.type === "选择" ? `<p>正确选项 ${e(q.correctOptionId)}</p>` : code(q.referenceSolutions[0]?.mysqlSql || q.initialCode)}<p>${e(q.type === "选择" ? choiceExplanation(q) : q.explanation)}</p></div>` : ""}</section>`;
+  body += `${sequenceButtons(sequence[position - 1], sequence[position + 1], "question")}${split ? "</div></div>" : "</div>"}`;
   if (route() !== "/question/" + id || renderVersion !== revision) return;
+  captureQuizScroll();
   shell(q.type === "选择" ? "选择练习" : "SQL 练习", body, "practice", true, favButton(id));
   requestAnimationFrame(syncStems);
 }
@@ -1726,6 +1728,7 @@ async function render() {
     mountEditor(app, saveEditorDraft);
     resizeTextFields();
     mountKeyboardResize();
+    mountQuizSplit();
     document.body.classList.toggle(
       "has-sql-keyboard",
       !!document.querySelector(".editor-workspace .keyboard-wrap:not(.hidden)"),
@@ -2140,11 +2143,22 @@ async function handleAction(action, arg, element) {
       break;
     }
     case "stemToggle": {
+      const box = element.closest(".quiz-split");
+      if (box) {
+        const expanding = !box.classList.contains("expanded");
+        if (!expanding) captureQuizScroll();
+        quizExpanded = expanding;
+        box.classList.toggle("expanded", expanding);
+        box.closest(".page")?.classList.toggle("quiz-expanded", expanding);
+        layoutQuiz();
+        if (expanding) element.scrollIntoView({ block: "nearest" });
+        else { window.scrollTo(0, 0); restoreQuizScroll(); }
+        break;
+      }
       const stem = element.closest(".stem");
-      const open = stem.classList.contains("mini") ? true : !stem.classList.contains("open");
       stem.classList.remove("mini");
-      stem.classList.toggle("open", open);
-      element.textContent = open ? "收起" : "展开全文";
+      stem.classList.add("open");
+      element.hidden = true;
       break;
     }
     case "lessonJump": {
@@ -2231,11 +2245,18 @@ async function handleAction(action, arg, element) {
       await persist();
       await render();
       break;
-    case "quizTab":
-      quizTab = arg === "数据表" ? "数据表" : "题目";
-      questionKeyboard = false;
-      await render();
+    case "quizTab": {
+      const next = arg === "数据表" ? "数据表" : "题目";
+      if (!document.querySelector(".quiz-split")) { quizTab = next; questionKeyboard = false; await render(); break; }
+      captureQuizScroll(); // 隐藏面板（display:none）会丢失滚动位置，所以切换前先记下，切换后恢复
+      quizTab = next;
+      document.querySelectorAll(".quiz-top .tabs button").forEach((tab) => tab.classList.toggle("selected", tab.dataset.arg === next));
+      document.querySelectorAll(".quiz-pane").forEach((pane) => { pane.hidden = pane.dataset.pane !== next; });
+      restoreQuizScroll();
+      requestAnimationFrame(() => { restoreQuizScroll(); syncStems(); });
+      if (next === "数据表") await loadQuizTables(element?.dataset.retry === "1");
       break;
+    }
     case "hint": {
       const max = Math.min(getQuestion(arg).hints.length, 3);
       const key = arg + ":hints";
@@ -3217,3 +3238,94 @@ function mountKeyboardResize() {
     await persist();
   });
 }
+
+// ===== 练习题作答页：题目区独立滚动 + 可拖动分隔条 =====
+const QUIZ_SPLITTER = 24, QUIZ_MIN_TOP = 72, QUIZ_MIN_BOTTOM = 170;
+function captureQuizScroll() {
+  document.querySelectorAll(".quiz-pane").forEach((pane) => { if (!pane.hidden) quizScroll[pane.dataset.pane] = pane.scrollTop; });
+}
+function restoreQuizScroll() {
+  document.querySelectorAll(".quiz-pane").forEach((pane) => { pane.scrollTop = quizScroll[pane.dataset.pane] || 0; });
+}
+async function loadQuizTables(retry = false) {
+  const pane = document.querySelector('.quiz-pane[data-pane="数据表"]');
+  if (!pane) return;
+  const pending = pane.querySelector(".quiz-tables-pending") || (retry || pane.querySelector(".notice.error") ? pane : null);
+  if (!pending) return;
+  const q = getQuestion(route().split("/")[2]);
+  if (!q) return;
+  pane.innerHTML = '<p class="muted quiz-tables-pending">正在加载本题的数据表…</p>';
+  try {
+    const tables = await questionTables(q);
+    pane.innerHTML = tables.length ? renderTables(tables, false) : empty("暂无公开数据表");
+  } catch (error) {
+    pane.innerHTML = `<div class="notice error">${e(error.message)}</div><button class="outline" data-action="quizTab" data-arg="数据表" data-retry="1">重新加载数据表</button>`;
+  }
+  pane.scrollTop = quizScroll["数据表"] || 0;
+}
+function quizRatio() {
+  return Math.max(0.15, Math.min(0.75, Number(state?.settings.quizSplit) || 0.4));
+}
+function layoutQuiz() {
+  const box = document.querySelector(".quiz-split");
+  if (!box) return;
+  if (box.classList.contains("expanded")) { box.style.height = ""; syncStems(); return; } // 展开全文：整页一起滚动
+  const viewport = window.visualViewport;
+  const height = viewport ? viewport.height : window.innerHeight;
+  const top = box.getBoundingClientRect().top + window.scrollY;
+  const keyboard = document.body.classList.contains("has-sql-keyboard") ? applyKeyboardHeight() : 0;
+  const total = Math.max(QUIZ_MIN_TOP + QUIZ_MIN_BOTTOM + QUIZ_SPLITTER, Math.floor(height - top - keyboard - 8));
+  box.style.height = total + "px";
+  const room = total - QUIZ_SPLITTER;
+  // 键盘弹出时可视高度变小：题目区按比例缩小，但至少留出 72px 回看题目、170px 编辑代码
+  // 可视高度很小（小屏手机或键盘弹出）：题目区上限 30%，编辑区至少 230px，保证输入位置不被遮挡
+  const compact = height < 620;
+  const minBottom = compact ? 230 : QUIZ_MIN_BOTTOM;
+  const wanted = Math.round(room * (compact ? Math.min(quizRatio(), 0.3) : quizRatio()));
+  const topHeight = Math.max(QUIZ_MIN_TOP, Math.min(room - minBottom, wanted));
+  box.style.setProperty("--quiz-top", topHeight + "px");
+  box.style.setProperty("--quiz-bottom", room - topHeight + "px");
+  const handle = box.querySelector(".quiz-splitter");
+  handle?.setAttribute("aria-valuenow", String(Math.round(quizRatio() * 100)));
+  syncStems();
+}
+function mountQuizSplit() {
+  const box = document.querySelector(".quiz-split");
+  if (!box) return;
+  box.closest(".page")?.classList.add("quiz-page");
+  if (quizExpanded) { box.classList.add("expanded"); box.closest(".page")?.classList.add("quiz-expanded"); } // 重绘（运行、提交等）后保持展开状态
+  restoreQuizScroll();
+  layoutQuiz();
+  if (quizTab === "数据表") loadQuizTables();
+  const handle = box.querySelector(".quiz-splitter");
+  let drag = null;
+  const setRatio = (value) => {
+    state.settings.quizSplit = Math.round(Math.max(0.15, Math.min(0.75, value)) * 1000) / 1000;
+    layoutQuiz();
+  };
+  handle.addEventListener("pointerdown", (event) => {
+    drag = { y: event.clientY, top: box.querySelector(".quiz-top").getBoundingClientRect().height, room: box.getBoundingClientRect().height - QUIZ_SPLITTER };
+    handle.setPointerCapture(event.pointerId);
+    event.preventDefault();
+  });
+  handle.addEventListener("pointermove", (event) => {
+    if (drag) setRatio((drag.top + event.clientY - drag.y) / drag.room);
+  });
+  const finish = async () => {
+    if (!drag) return;
+    drag = null;
+    await persist();
+  };
+  handle.addEventListener("pointerup", finish);
+  handle.addEventListener("pointercancel", finish);
+  handle.addEventListener("lostpointercapture", finish);
+  handle.addEventListener("keydown", async (event) => {
+    if (!["ArrowUp", "ArrowDown", "Home", "End"].includes(event.key)) return;
+    event.preventDefault();
+    setRatio(event.key === "Home" ? 0.15 : event.key === "End" ? 0.75 : quizRatio() + (event.key === "ArrowDown" ? 0.05 : -0.05));
+    await persist();
+  });
+}
+window.addEventListener("resize", () => requestAnimationFrame(layoutQuiz));
+window.visualViewport?.addEventListener("resize", () => requestAnimationFrame(layoutQuiz));
+new MutationObserver(() => requestAnimationFrame(layoutQuiz)).observe(document.body, { attributes: true, attributeFilter: ["class"] });

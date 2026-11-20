@@ -73,7 +73,7 @@ try {
     const firstButton = await footer.locator('button').first().boundingBox();
     const question = await page.locator('.quiz-details').boundingBox();
     assert.ok(Math.abs(firstButton.x - question.x) <= 1);
-    await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+    await page.evaluate(() => { window.scrollTo(0, document.documentElement.scrollHeight); document.querySelector('.quiz-bottom')?.scrollTo(0, 1e6); }); // 作答页的上一题/下一题位于下方独立滚动区的末尾
     const atBottom = await footer.boundingBox();
     assert.ok(atBottom.y + atBottom.height <= 844 - 8 + 1, 'footer ends with spacing above the viewport bottom');
     await page.locator('[data-action=quizTab][data-arg=数据表]').click();

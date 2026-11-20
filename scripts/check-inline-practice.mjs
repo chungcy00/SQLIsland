@@ -29,7 +29,7 @@ try{
   assert.equal(await button.locator('.material-icon').count(),1);
   assert.equal(await button.evaluate(n=>getComputedStyle(n).borderRadius),'999px');
  }
- assert.equal(await page.locator('.quiz-details > :last-child').getAttribute('class'),'actions sequence-actions');
+ assert.equal(await page.locator('.quiz-details .quiz-bottom > :last-child').getAttribute('class'),'actions sequence-actions');
  await page.locator('.tabs [data-arg=数据表]').click();
  await page.waitForFunction(()=>document.querySelectorAll('.source-table-name').length===3);
  assert.deepEqual(await page.locator('.source-table-name').allTextContents(),content.questions.find(q=>q.id==='q0251').sourceTables);

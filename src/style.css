@@ -2774,3 +2774,37 @@ nav .nav-svg { color: var(--primary); }
 .fig-clause.limit { --clause: #7f6a1f; }
 .fig-clause.cte { --clause: #38607f; }
 .fig-clause.setop { --clause: #9c5f1e; }
+
+/* ===== 练习题作答页：题目区独立滚动 + 可拖动分隔条 ===== */
+.page.detail.quiz-page, .page.detail:has(.quiz-split) { overflow: hidden; min-height: 0; padding-bottom: 8px; }
+.has-sql-keyboard .page.detail.quiz-page, .has-sql-keyboard .page.detail:has(.quiz-split) { padding-bottom: 8px; }
+.quiz-details.quiz-split { display: flex; flex-direction: column; min-height: 0; height: calc(100dvh - 72px); overflow: hidden; }
+.quiz-split .quiz-top { flex: 0 0 var(--quiz-top, 40%); min-height: 0; display: flex; flex-direction: column; }
+.quiz-split .quiz-top .tabs { flex: none; margin: 0 0 4px; }
+.quiz-split .quiz-pane { flex: 1 1 0; min-height: 0; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; padding: 4px 0 8px; }
+.quiz-split .quiz-pane[hidden] { display: none; }
+.quiz-split .quiz-pane .quiz-title { margin-top: 8px; }
+.quiz-splitter { flex: 0 0 24px; display: flex; align-items: center; justify-content: center; touch-action: none; cursor: row-resize; }
+.quiz-splitter::before { content: ""; width: 44px; height: 5px; border-radius: 3px; background: var(--ctl); }
+.quiz-splitter:focus-visible { outline: 2px solid var(--primary); outline-offset: -2px; border-radius: 8px; }
+.quiz-split .quiz-bottom { flex: 1 1 0; min-height: 0; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+.quiz-split .quiz-bottom .question-code { margin-top: 0; }
+.quiz-split .quiz-bottom .sql-editor { margin-top: 6px; }
+.quiz-split .editor-body { max-height: max(120px, calc(var(--quiz-bottom, 300px) - 160px)); }
+.quiz-split .quiz-bottom .question-execution { position: sticky; bottom: 0; z-index: 2; background: var(--bg); padding: 8px 0; margin: 0; }
+.quiz-split .quiz-bottom > .sequence-actions { margin-top: 12px; padding-top: 12px; }
+
+.quiz-split .stem.clamped:not(.open) .stem-text, .quiz-split .stem .stem-text { max-height: none; -webkit-mask-image: none; mask-image: none; overflow: visible; }
+.quiz-split .stem-toggle { display: block; }
+.quiz-split .stem-toggle[hidden] { display: none; }
+
+/* 展开全文：整页一起滚动 */
+.page.detail.quiz-page.quiz-expanded { overflow: visible; min-height: calc(100dvh - 64px); padding-bottom: 35px; }
+.has-sql-keyboard .page.detail.quiz-page.quiz-expanded { padding-bottom: calc(var(--sql-keyboard-height, 240px) + 30px); }
+.quiz-details.quiz-split.expanded { display: block; height: auto; overflow: visible; }
+.quiz-split.expanded .quiz-top { display: block; flex: none; }
+.quiz-split.expanded .quiz-pane { overflow: visible; }
+.quiz-split.expanded .quiz-splitter { display: none; }
+.quiz-split.expanded .quiz-bottom { overflow: visible; margin-top: 16px; }
+.quiz-split.expanded .editor-body { max-height: none; }
+.quiz-split.expanded .quiz-bottom .question-execution { position: static; }

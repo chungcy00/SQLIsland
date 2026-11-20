@@ -12,6 +12,7 @@ export const defaults = () => ({
   history: [],
   settings: {
     keyboardHeight: 240,
+    quizSplit: 0.4,
     dailyGoal: 5,
     newCards: 10,
     reviewLimit: 100,
