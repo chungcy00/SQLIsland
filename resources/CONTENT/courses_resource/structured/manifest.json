@@ -38,7 +38,7 @@
       "files": [
         {
           "path": "source/unified73/73节课程字段补丁.json",
-          "sha256": "df49e3f05cdee2c8d16a137af22a2d61ca04594eadda08ccde9eaab5964135c1"
+          "sha256": "7a6b980e67b90d92fa3bcb4348585bc25648836be5ea794ee73f1d2a0951cea1"
         },
         {
           "path": "source/unified73/统一导入说明.md",
@@ -46,7 +46,7 @@
         },
         {
           "path": "source/unified73/执行记录汇总.json",
-          "sha256": "606aa3a0e92537badd1af2c367f2e84c0abc88f7e69619d0a9fedcd236913915"
+          "sha256": "fe2db35f82a342a924308968c205f46168d631a2a00b3cd5195711fc4b7b0c84"
         },
         {
           "path": "source/unified73/复验报告.json",
@@ -345,7 +345,7 @@
     {
       "id": "kp19-03",
       "path": "lessons/kp19-03.json",
-      "sha256": "90f756c06f35633a7bbd64a08dbc3b2b21fa4df534c34efc0b95e7cbdc419d33"
+      "sha256": "17124e0494ed1d97791bc74827520a12b555d241195de5bca5631085fbe47474"
     },
     {
       "id": "kp19-32",
@@ -365,12 +365,12 @@
     {
       "id": "kp19-41",
       "path": "lessons/kp19-41.json",
-      "sha256": "799ec36a4575e744db091f6f55e5e0b5cb7c807b317c6c3ff12f3b1465c3a33a"
+      "sha256": "d20363b78711eb3e1ca4dadeeeeee69b8a27c6b668aa6de5f442a8fd80e95255"
     },
     {
       "id": "kp19-42",
       "path": "lessons/kp19-42.json",
-      "sha256": "df24dfa563ba7fc3daf91e3c518431891acb0b219327f258ad87a4fb31f7b9d3"
+      "sha256": "35da857f41f6f74f105cf85c9f78d7edbb6a9ee921952e6466f551553d8d029c"
     },
     {
       "id": "kp19-43",
@@ -425,12 +425,12 @@
     {
       "id": "kp20-01",
       "path": "lessons/kp20-01.json",
-      "sha256": "b19bc021ae2982508334c2a8aacadb2ccea741129d459073519b5f23f273291a"
+      "sha256": "ef3dbb2805daa9957a73732de3a6d62a417dcd8f89a076c097d239f2e9e3d339"
     },
     {
       "id": "kp20-02",
       "path": "lessons/kp20-02.json",
-      "sha256": "71ff33cc4bf61e5cf4e44d1e1095018855f87197199acd8de3fcaefb7ba3b42b"
+      "sha256": "3b811b6e85a3f9176c1a479ebbd10750e9776b438affc776c39d6968bf5fd4d5"
     },
     {
       "id": "kp20-03",
@@ -445,7 +445,7 @@
     {
       "id": "kp20-08",
       "path": "lessons/kp20-08.json",
-      "sha256": "11ec96ba8ec3c20c6f7fd86fc6ec51a44462c409d9c8eeca1933b1fad020baf5"
+      "sha256": "15ae4c22f00958f32f7f4ae740544bb62b1ba5fad59156362c5ee877f71a1511"
     },
     {
       "id": "kp20-13",
@@ -465,12 +465,12 @@
     {
       "id": "kp20-21",
       "path": "lessons/kp20-21.json",
-      "sha256": "be59a8b1caf776143b4d39e981f6c4e3568c46d6643d53975bf654b1e1a7b9ee"
+      "sha256": "9025a203b6d084fa55d7f44abf36aeb7f8ddc6fbb6a0749d1885244649d44419"
     },
     {
       "id": "kp20-23",
       "path": "lessons/kp20-23.json",
-      "sha256": "f14318ce8356c0355085cf531bec96dd32a1f5004b47dd55ee33b997822e739e"
+      "sha256": "c69f4fb0d4760b45eefb7a587caa445b6c9840e760ee5b391ac83ae86cf550c1"
     }
   ],
   "figures": [
@@ -737,7 +737,7 @@
     {
       "id": "kp19-03",
       "path": "figures/kp19-03.json",
-      "sha256": "21d7a3baf761b7ef86c518025950bb7b1f2896721842bdb775fbef1a7cc23598"
+      "sha256": "6bf74cf7353cadc7f529d5f534038534e47928ef4a34eabaaf80592f906c33a6"
     },
     {
       "id": "kp19-32",
@@ -757,12 +757,12 @@
     {
       "id": "kp19-41",
       "path": "figures/kp19-41.json",
-      "sha256": "9537f5b6a45db409dc29656a7f8f9b9732e304f0991608161fe2e1ad0389c4a9"
+      "sha256": "60500979578c019588bdf8745cba9b2d5cf08840bdf7cffc8a6940fcfe6744c1"
     },
     {
       "id": "kp19-42",
       "path": "figures/kp19-42.json",
-      "sha256": "e383cbd3f1bf9846003f66090764ff4cfec78270685af10296200800b6245131"
+      "sha256": "c5df01b75c6725e942c5e86af0bbf9e9b2d05a9536a269a425636bd145e627e5"
     },
     {
       "id": "kp19-43",
@@ -817,12 +817,12 @@
     {
       "id": "kp20-01",
       "path": "figures/kp20-01.json",
-      "sha256": "79b648f67af7a0a8a40ef2493b7ec02adb7c01ee504a4ba1a4dae7e41ec1c1e4"
+      "sha256": "61e84a19e377dc2536eb1dd1b5ec014132ab88d297160ced2800a1d1a024d241"
     },
     {
       "id": "kp20-02",
       "path": "figures/kp20-02.json",
-      "sha256": "24ca34ff8b1cf2dad06d6efb23f3a054ea7ea5360b092d6db24984e5220664e5"
+      "sha256": "4899b26f45d98f4e42d9d34fdbad87c88d251311ab6c9c7e4bb79c03a0a5ffe5"
     },
     {
       "id": "kp20-03",
@@ -837,7 +837,7 @@
     {
       "id": "kp20-08",
       "path": "figures/kp20-08.json",
-      "sha256": "317c6c1141a40ad86c455a5d6cff91abc8c88ce1f5763f7c2a6543a475208a79"
+      "sha256": "cf50c18a412b57e8e41479c697dbed8d47f6685068f3e439f1b7d6d2099434ae"
     },
     {
       "id": "kp20-13",
@@ -857,12 +857,12 @@
     {
       "id": "kp20-21",
       "path": "figures/kp20-21.json",
-      "sha256": "525b448952407aec04a460c60564b8bc592da49c458e2110d325e726febcf583"
+      "sha256": "9eb1b9c05f9304476caea2c8fba67f8603ac7a461165ea5c04ef318b824e37f1"
     },
     {
       "id": "kp20-23",
       "path": "figures/kp20-23.json",
-      "sha256": "fd987b831205d95615bec7d2e1a0416a9ce812442d96881e77c0a846280a3407"
+      "sha256": "9f014ff3cda988b0f101c764efaa0fb753113334f1a547d8b1a19f72dad4d59b"
     },
     {
       "id": "kp12-01",

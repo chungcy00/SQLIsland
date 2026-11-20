@@ -48,13 +48,19 @@ test("两种合并字段都能读取", () => {
   assert.ok(![...sources].some((id) => cards.some((c) => c.id === id)));
 });
 
-test("插画：映射 null 不补图，函数卡使用代码插画", () => {
+test("插画：原数据没有的卡从四张现有插画里按卡号稳定取一张，函数卡使用代码插画", () => {
   const cards = normalizeCards(source, map);
+  const pool = new Set(["lighthouse", "island", "error", "logic"]);
   for (const c of cards) {
     if (c.type === "function") assert.equal(c.illustrationKey, "code");
-    else if (map[c.id] === null && !c.front.illustration) assert.equal(c.illustrationKey, null, c.id);
+    else if (map[c.id] === null && !c.front.illustration) assert.ok(pool.has(c.illustrationKey), c.id);
+    assert.ok(c.illustrationKey, c.id);
   }
-  assert.equal(cards.filter((c) => c.illustrationKey).length, 219 + 53);
+  assert.equal(cards.filter((c) => c.illustrationKey).length, 332);
+  const again = normalizeCards(source, map);
+  assert.deepEqual(cards.map((c) => c.illustrationKey), again.map((c) => c.illustrationKey));
+  const used = new Set(cards.filter((c) => c.type === "concept" || c.type === "syntax").map((c) => c.illustrationKey));
+  assert.ok(used.size >= 3);
 });
 
 test("打包副本去掉 actual，其余示例字段保留", () => {

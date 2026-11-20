@@ -24,6 +24,11 @@ export const ILLUSTRATION_KEYS = {
 // 函数用法卡原对象无显式插画引用；用户已确认使用「代码插画」（2026-11-20）。
 const FUNCTION_DEFAULT_ILLUSTRATION = "code";
 
+// 原数据里没有插画的卡（核心概念 24 张、语法结构 36 张）：用户确认从这四张现有插画里任取一张（2026-11-21）。
+// 按卡号稳定轮换，同一张卡每次打开都是同一张图。
+export const FALLBACK_ILLUSTRATIONS = ["lighthouse", "island", "error", "logic"];
+const fallbackKey = (id) => FALLBACK_ILLUSTRATIONS[(Number(String(id).replace(/\D/g, "")) || 0) % FALLBACK_ILLUSTRATIONS.length];
+
 const keyOf = (fileName) => ILLUSTRATION_KEYS[String(fileName || "").split("/").pop()] || null;
 
 // 兼容两种合并字段：interviewMergedFrom（数组，219 张）与 interviewRevision.mergedFrom（113 张）。
@@ -53,7 +58,8 @@ export function normalizeCard(raw, illustrationMap = {}, { slim = false } = {}) 
   const illustration =
     keyOf(raw.front?.illustration) ||
     keyOf(mapped) ||
-    (raw.type === "function" ? FUNCTION_DEFAULT_ILLUSTRATION : null);
+    (raw.type === "function" ? FUNCTION_DEFAULT_ILLUSTRATION : null) ||
+    fallbackKey(raw.id);
   const chapterIds = Array.isArray(raw.chapterIds) ? raw.chapterIds : [];
   const card = {
     ...raw,

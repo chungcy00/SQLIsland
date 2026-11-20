@@ -58,7 +58,7 @@
   "methodBlocks": [
     {
       "type": "paragraph",
-      "text": "原查询的 months 通过 DISTINCT 将日历日期归并成唯一月份；sales 根据日期前三段中的年月（前7个字符）聚合净额，渠道及年度过滤仅作用于交易。",
+      "text": "原查询的 months 通过 DISTINCT 将日历日期归并成唯一月份；sales 根据日期的前 7 个字符（年-月）聚合净额，渠道及年度过滤仅作用于交易。",
       "emphasis": []
     },
     {
@@ -3339,7 +3339,7 @@
   "resultBlocks": [
     {
       "type": "paragraph",
-      "text": "原课程前3个月净额依次400、0、130分。本次独立内联例子复现该结果，且明确4月至12月为无交易月份。2月由400降至0，金额差−400、环比−100%；",
+      "text": "主查询前3个月净额依次400、0、130分。独立内联例子复现该结果，且明确4月至12月为无交易月份。2月由400降至0，金额差−400、环比−100%；",
       "emphasis": []
     },
     {
@@ -3683,5 +3683,5 @@
     ]
   },
   "sourcePath": "source/unified73/kp20-02.json",
-  "sourceSha256": "c8e34ed274f882e71ff619218a872f657fbd128651a1d50ff860fa4e827e2fce"
+  "sourceSha256": "3828e10af9ab536476132cc4658836c8a80c9eeb26ac1ba0857fba06c0d781bd"
 }

@@ -354,7 +354,7 @@
       "title": "按分档得分划分客户层级",
       "sql": "WITH a AS (SELECT customer_id,MAX(order_date) last_day,COUNT(*) freq,SUM(net_cents) money FROM v_order_net WHERE channel='online' AND order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY customer_id), b AS (SELECT *,6-NTILE(5) OVER(ORDER BY last_day DESC,customer_id) r_score,6-NTILE(5) OVER(ORDER BY freq DESC,customer_id) f_score,6-NTILE(5) OVER(ORDER BY money DESC,customer_id) m_score FROM a) SELECT b.customer_id,1095-d.day_index recency_days,freq,money net_cents,r_score,f_score,m_score,CASE WHEN r_score+f_score+m_score>=13 THEN 'high_value' WHEN r_score+f_score+m_score<=6 THEN 'low_activity' ELSE 'regular' END segment FROM b JOIN calendar_days d ON d.day=b.last_day ORDER BY net_cents DESC, recency_days, freq",
       "purpose": "把三项得分相加：总分至少 13 为高价值，至多 6 为低活跃，其余为常规。",
-      "reason": "层级由总分决定；距今天数以 2025-12-31 为截止日，其他数据集不能照搬同样的日期常数。",
+      "reason": "层级由总分决定；天数以 2025-12-31 为截止日来算，其他数据集不能照搬同样的日期常数。",
       "sourceTables": [
         {
           "name": "calendar_days",
@@ -36649,7 +36649,7 @@
     "correction": [
       {
         "type": "paragraph",
-        "text": "最近日期降序或距今天数升序；按业务要求选择五等分或并列排名。",
+        "text": "最近日期降序或距截止日天数升序；按业务要求选择五等分或并列排名。",
         "emphasis": []
       }
     ],
@@ -36667,5 +36667,5 @@
     ]
   },
   "sourcePath": "source/unified73/kp19-42.json",
-  "sourceSha256": "05fbca01a00bda80364a714bf79050988b8f6a5ed225bb9db5a9aa557bc7006a"
+  "sourceSha256": "5ce757acbb5695f7ddbc6e698cf66509035415f12f16944f3346c3d40300510d"
 }

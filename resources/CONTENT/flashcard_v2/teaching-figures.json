@@ -1,0 +1,7117 @@
+{
+ "version": 1,
+ "note": "闪卡教学图解数据，按卡号索引，只补充图示，不改 cards.json。图中数字必须来自该卡自身内容，或登记在 derived 中；计算块在测试里逐步重算。",
+ "figures": {
+  "fc2-0340": {
+   "title": "净销售额怎么一步步算出来（单位：分）",
+   "blocks": [
+    {
+     "type": "calc",
+     "lines": [
+      {
+       "label": "原始销售额",
+       "note": "数量 × 单价",
+       "value": 10000,
+       "unit": "分"
+      },
+      {
+       "op": "−",
+       "label": "折扣",
+       "value": 1000,
+       "unit": "分"
+      },
+      {
+       "op": "−",
+       "label": "累计退款",
+       "value": 2000,
+       "unit": "分"
+      },
+      {
+       "op": "=",
+       "label": "净销售额",
+       "value": 7000,
+       "unit": "分"
+      }
+     ]
+    },
+    {
+     "type": "note",
+     "text": "付款额不是销售额，不参与这个计算。"
+    }
+   ]
+  },
+  "fc2-0341": {
+   "title": "净销售成本：先算原成本，再减退货冲回",
+   "derived": [
+    "400",
+    "200"
+   ],
+   "blocks": [
+    {
+     "type": "calc",
+     "title": "① 原销售成本",
+     "lines": [
+      {
+       "label": "原销售数量",
+       "value": 4,
+       "unit": "件"
+      },
+      {
+       "op": "×",
+       "label": "每件历史成本",
+       "value": 100,
+       "unit": "分/件"
+      },
+      {
+       "op": "=",
+       "label": "原成本",
+       "value": 400,
+       "unit": "分"
+      }
+     ]
+    },
+    {
+     "type": "calc",
+     "title": "② 退货冲回的原成本",
+     "lines": [
+      {
+       "label": "有效退货数量",
+       "value": 2,
+       "unit": "件"
+      },
+      {
+       "op": "×",
+       "label": "对应的原销售单位成本",
+       "value": 100,
+       "unit": "分/件"
+      },
+      {
+       "op": "=",
+       "label": "退货冲回成本",
+       "value": 200,
+       "unit": "分"
+      }
+     ]
+    },
+    {
+     "type": "calc",
+     "title": "③ 净销售成本",
+     "lines": [
+      {
+       "label": "原成本",
+       "value": 400,
+       "unit": "分"
+      },
+      {
+       "op": "−",
+       "label": "退货冲回成本",
+       "value": 200,
+       "unit": "分"
+      },
+      {
+       "op": "=",
+       "label": "净销售成本",
+       "value": 200,
+       "unit": "分"
+      }
+     ]
+    },
+    {
+     "type": "note",
+     "text": "成本用的是交易时记录的历史标准成本，不用当前采购价。"
+    }
+   ]
+  },
+  "fc2-0342": {
+   "title": "毛利与门店贡献利润：逐层扣减（单位：分）",
+   "blocks": [
+    {
+     "type": "calc",
+     "title": "① 毛利",
+     "lines": [
+      {
+       "label": "净销售额",
+       "value": 10000,
+       "unit": "分"
+      },
+      {
+       "op": "−",
+       "label": "净销售成本",
+       "value": 6000,
+       "unit": "分"
+      },
+      {
+       "op": "=",
+       "label": "毛利",
+       "value": 4000,
+       "unit": "分"
+      }
+     ]
+    },
+    {
+     "type": "calc",
+     "title": "② 门店贡献利润",
+     "lines": [
+      {
+       "label": "毛利",
+       "value": 4000,
+       "unit": "分"
+      },
+      {
+       "op": "−",
+       "label": "可归属门店费用",
+       "value": 1000,
+       "unit": "分"
+      },
+      {
+       "op": "=",
+       "label": "门店贡献利润",
+       "value": 3000,
+       "unit": "分"
+      }
+     ]
+    },
+    {
+     "type": "note",
+     "text": "贡献利润还不是企业净利润：其他费用和税没有扣。"
+    }
+   ]
+  },
+  "fc2-0350": {
+   "title": "环比：（本月 − 上月）÷ 上月 × 100%",
+   "derived": [
+    "0.2",
+    "120",
+    "1",
+    "20"
+   ],
+   "blocks": [
+    {
+     "type": "calc",
+     "title": "1月（上月是上一年12月）",
+     "lines": [
+      {
+       "label": "本月净销售",
+       "value": 120,
+       "unit": "分"
+      },
+      {
+       "op": "−",
+       "label": "上月净销售",
+       "value": 100,
+       "unit": "分"
+      },
+      {
+       "op": "=",
+       "label": "增减额",
+       "value": 20,
+       "unit": "分"
+      },
+      {
+       "op": "÷",
+       "label": "上月净销售",
+       "value": 100,
+       "unit": "分"
+      },
+      {
+       "op": "=",
+       "label": "增长比例",
+       "value": 0.2
+      },
+      {
+       "op": "×",
+       "label": "换成百分数",
+       "value": 100
+      },
+      {
+       "op": "=",
+       "label": "环比",
+       "value": 20,
+       "unit": "%"
+      }
+     ]
+    },
+    {
+     "type": "calc",
+     "title": "2月",
+     "lines": [
+      {
+       "label": "本月净销售",
+       "value": 0,
+       "unit": "分"
+      },
+      {
+       "op": "−",
+       "label": "上月净销售",
+       "value": 120,
+       "unit": "分"
+      },
+      {
+       "op": "=",
+       "label": "增减额",
+       "value": -120,
+       "unit": "分"
+      },
+      {
+       "op": "÷",
+       "label": "上月净销售",
+       "value": 120,
+       "unit": "分"
+      },
+      {
+       "op": "=",
+       "label": "增长比例",
+       "value": -1
+      },
+      {
+       "op": "×",
+       "label": "换成百分数",
+       "value": 100
+      },
+      {
+       "op": "=",
+       "label": "环比",
+       "value": -100,
+       "unit": "%"
+      }
+     ]
+    },
+    {
+     "type": "calc",
+     "title": "3月（上月为 0）",
+     "lines": [
+      {
+       "label": "本月净销售",
+       "value": 50,
+       "unit": "分"
+      },
+      {
+       "op": "÷",
+       "label": "上月净销售（作除数）",
+       "value": 0,
+       "unit": "分"
+      },
+      {
+       "op": "=",
+       "label": "环比",
+       "text": "不可计算：除数不能是 0"
+      }
+     ]
+    },
+    {
+     "type": "note",
+     "text": "缺失上一自然月时，也不能拿更早的月份跨月比较。"
+    }
+   ]
+  },
+  "fc2-0351": {
+   "title": "同比与环比：比较的对象不同",
+   "derived": [
+    "40",
+    "0.5",
+    "20",
+    "0.2"
+   ],
+   "blocks": [
+    {
+     "type": "calc",
+     "title": "同比：对齐上一年同一自然月（2024年1月）",
+     "lines": [
+      {
+       "label": "2025年1月",
+       "value": 120,
+       "unit": "分"
+      },
+      {
+       "op": "−",
+       "label": "2024年1月",
+       "value": 80,
+       "unit": "分"
+      },
+      {
+       "op": "=",
+       "label": "增减额",
+       "value": 40,
+       "unit": "分"
+      },
+      {
+       "op": "÷",
+       "label": "2024年1月",
+       "value": 80,
+       "unit": "分"
+      },
+      {
+       "op": "=",
+       "label": "增长比例",
+       "value": 0.5
+      },
+      {
+       "op": "×",
+       "label": "换成百分数",
+       "value": 100
+      },
+      {
+       "op": "=",
+       "label": "同比",
+       "value": 50,
+       "unit": "%"
+      }
+     ]
+    },
+    {
+     "type": "calc",
+     "title": "环比：对齐上一个自然月（2024年12月）",
+     "lines": [
+      {
+       "label": "2025年1月",
+       "value": 120,
+       "unit": "分"
+      },
+      {
+       "op": "−",
+       "label": "2024年12月",
+       "value": 100,
+       "unit": "分"
+      },
+      {
+       "op": "=",
+       "label": "增减额",
+       "value": 20,
+       "unit": "分"
+      },
+      {
+       "op": "÷",
+       "label": "2024年12月",
+       "value": 100,
+       "unit": "分"
+      },
+      {
+       "op": "=",
+       "label": "增长比例",
+       "value": 0.2
+      },
+      {
+       "op": "×",
+       "label": "换成百分数",
+       "value": 100
+      },
+      {
+       "op": "=",
+       "label": "环比",
+       "value": 20,
+       "unit": "%"
+      }
+     ]
+    },
+    {
+     "type": "note",
+     "text": "稀疏的月度记录里，“往前数 12 行”不一定正好是一年前，要按自然月对齐。"
+    }
+   ]
+  },
+  "fc2-0353": {
+   "title": "促销期与非促销期：看日均，不看总额",
+   "derived": [
+    "0.5",
+    "20"
+   ],
+   "blocks": [
+    {
+     "type": "calc",
+     "title": "① 促销期日均",
+     "lines": [
+      {
+       "label": "促销期净销售",
+       "value": 120
+      },
+      {
+       "op": "÷",
+       "label": "促销天数",
+       "value": 2,
+       "unit": "天"
+      },
+      {
+       "op": "=",
+       "label": "促销日均",
+       "value": 60
+      }
+     ]
+    },
+    {
+     "type": "calc",
+     "title": "② 非促销期日均",
+     "lines": [
+      {
+       "label": "非促销期净销售",
+       "value": 120
+      },
+      {
+       "op": "÷",
+       "label": "非促销天数",
+       "value": 3,
+       "unit": "天"
+      },
+      {
+       "op": "=",
+       "label": "非促销日均",
+       "value": 40
+      }
+     ]
+    },
+    {
+     "type": "calc",
+     "title": "③ 变化率",
+     "lines": [
+      {
+       "label": "促销日均",
+       "value": 60
+      },
+      {
+       "op": "−",
+       "label": "非促销日均",
+       "value": 40
+      },
+      {
+       "op": "=",
+       "label": "日均差",
+       "value": 20
+      },
+      {
+       "op": "÷",
+       "label": "非促销日均",
+       "value": 40
+      },
+      {
+       "op": "=",
+       "label": "变化比例",
+       "value": 0.5
+      },
+      {
+       "op": "×",
+       "label": "换成百分数",
+       "value": 100
+      },
+      {
+       "op": "=",
+       "label": "变化率",
+       "value": 50,
+       "unit": "%"
+      }
+     ]
+    },
+    {
+     "type": "note",
+     "text": "两段总额同为 120，但天数不同，日均就不同。"
+    }
+   ]
+  },
+  "fc2-0367": {
+   "title": "库存金额 = 库存数量 × 当时的标准成本",
+   "blocks": [
+    {
+     "type": "calc",
+     "lines": [
+      {
+       "label": "期末库存数量",
+       "value": 8,
+       "unit": "件"
+      },
+      {
+       "op": "×",
+       "label": "当日历史标准成本",
+       "value": 150,
+       "unit": "分/件"
+      },
+      {
+       "op": "=",
+       "label": "库存金额",
+       "value": 1200,
+       "unit": "分"
+      }
+     ]
+    },
+    {
+     "type": "note",
+     "text": "不是“当前售价 × 数量”。库存按成本计价，成本取该时点的标准成本。"
+    }
+   ]
+  },
+  "fc2-0368": {
+   "title": "平均库存金额：两端快照的平均",
+   "derived": [
+    "3200"
+   ],
+   "blocks": [
+    {
+     "type": "calc",
+     "lines": [
+      {
+       "label": "期初库存金额",
+       "value": 2000,
+       "unit": "分"
+      },
+      {
+       "op": "+",
+       "label": "期末库存金额",
+       "value": 1200,
+       "unit": "分"
+      },
+      {
+       "op": "=",
+       "label": "两端合计",
+       "value": 3200,
+       "unit": "分"
+      },
+      {
+       "op": "÷",
+       "label": "两个时点",
+       "value": 2
+      },
+      {
+       "op": "=",
+       "label": "平均库存金额",
+       "value": 1600,
+       "unit": "分"
+      }
+     ]
+    },
+    {
+     "type": "note",
+     "text": "两端快照缺任何一个，整组返回空值，不补零。"
+    }
+   ]
+  },
+  "fc2-0369": {
+   "title": "库存周转率：三步算出",
+   "blocks": [
+    {
+     "type": "calc",
+     "title": "① 净销售出库成本",
+     "lines": [
+      {
+       "label": "销售出库成本",
+       "value": 6000,
+       "unit": "分"
+      },
+      {
+       "op": "−",
+       "label": "退货冲回",
+       "value": 1000,
+       "unit": "分"
+      },
+      {
+       "op": "=",
+       "label": "净销售出库成本",
+       "value": 5000,
+       "unit": "分"
+      }
+     ]
+    },
+    {
+     "type": "calc",
+     "title": "② 平均库存成本",
+     "derived": [
+      "5000"
+     ],
+     "lines": [
+      {
+       "label": "期初库存成本",
+       "value": 2000,
+       "unit": "分"
+      },
+      {
+       "op": "+",
+       "label": "期末库存成本",
+       "value": 3000,
+       "unit": "分"
+      },
+      {
+       "op": "=",
+       "label": "两端合计",
+       "value": 5000,
+       "unit": "分"
+      },
+      {
+       "op": "÷",
+       "label": "两个时点",
+       "value": 2
+      },
+      {
+       "op": "=",
+       "label": "平均库存成本",
+       "value": 2500,
+       "unit": "分"
+      }
+     ]
+    },
+    {
+     "type": "calc",
+     "title": "③ 周转率",
+     "lines": [
+      {
+       "label": "净销售出库成本",
+       "value": 5000,
+       "unit": "分"
+      },
+      {
+       "op": "÷",
+       "label": "平均库存成本",
+       "value": 2500,
+       "unit": "分"
+      },
+      {
+       "op": "=",
+       "label": "库存周转率",
+       "value": 2,
+       "unit": "次"
+      }
+     ]
+    },
+    {
+     "type": "note",
+     "text": "调拨不属于销售出库成本，不参与计算。"
+    }
+   ]
+  },
+  "fc2-0372": {
+   "title": "库存覆盖天数：先求日均出库，再看库存够卖几天",
+   "blocks": [
+    {
+     "type": "calc",
+     "title": "① 日均出库",
+     "lines": [
+      {
+       "label": "30天内销售出库",
+       "value": 30,
+       "unit": "件"
+      },
+      {
+       "op": "÷",
+       "label": "完整观察天数",
+       "value": 30,
+       "unit": "天"
+      },
+      {
+       "op": "=",
+       "label": "日均出库",
+       "value": 1,
+       "unit": "件/天"
+      }
+     ]
+    },
+    {
+     "type": "calc",
+     "title": "② 覆盖天数",
+     "lines": [
+      {
+       "label": "期末库存",
+       "value": 60,
+       "unit": "件"
+      },
+      {
+       "op": "÷",
+       "label": "日均出库",
+       "value": 1,
+       "unit": "件/天"
+      },
+      {
+       "op": "=",
+       "label": "库存覆盖",
+       "value": 60,
+       "unit": "天"
+      }
+     ]
+    },
+    {
+     "type": "note",
+     "text": "销售出库只是“需求”的替代指标，缺货时会低估真实需求。"
+    }
+   ]
+  },
+  "fc2-0375": {
+   "title": "库存满足率：未满足的需求也要留在分母里",
+   "derived": [
+    "12",
+    "0.7"
+   ],
+   "blocks": [
+    {
+     "type": "bars",
+     "title": "全部需求 40 件",
+     "unit": "件",
+     "items": [
+      {
+       "label": "已满足",
+       "value": 28,
+       "tone": "good"
+      },
+      {
+       "label": "未满足",
+       "value": 12,
+       "tone": "bad"
+      }
+     ]
+    },
+    {
+     "type": "calc",
+     "lines": [
+      {
+       "label": "实际满足",
+       "value": 28,
+       "unit": "件"
+      },
+      {
+       "op": "÷",
+       "label": "全部需求（含未满足）",
+       "value": 40,
+       "unit": "件"
+      },
+      {
+       "op": "=",
+       "label": "满足比例",
+       "value": 0.7
+      },
+      {
+       "op": "×",
+       "label": "换成百分数",
+       "value": 100
+      },
+      {
+       "op": "=",
+       "label": "库存满足率",
+       "value": 70,
+       "unit": "%"
+      }
+     ]
+    }
+   ]
+  },
+  "fc2-0378": {
+   "title": "老龄库存价值：先判断库龄，再乘成本",
+   "blocks": [
+    {
+     "type": "steps",
+     "items": [
+      {
+       "title": "库龄 = 观察日 − 本仓入库日",
+       "detail": "本例剩余的 4 件，库龄是 180 日。"
+      },
+      {
+       "title": "只统计库龄 ≥ 180 日的剩余批次",
+       "detail": "180 日正好在边界上，计入。"
+      },
+      {
+       "title": "价值 = 剩余数量 × 期末标准单位成本"
+      }
+     ]
+    },
+    {
+     "type": "calc",
+     "lines": [
+      {
+       "label": "剩余数量",
+       "value": 4,
+       "unit": "件"
+      },
+      {
+       "op": "×",
+       "label": "期末标准单位成本",
+       "value": 10
+      },
+      {
+       "op": "=",
+       "label": "180日及以上库存价值",
+       "value": 40
+      }
+     ]
+    },
+    {
+     "type": "note",
+     "text": "按先进先出：销售、调出、损耗先消耗最早进入本仓的批次，所以剩下的是较新的批次。"
+    }
+   ]
+  },
+  "fc2-0391": {
+   "title": "谁算“购买活跃客户”？",
+   "blocks": [
+    {
+     "type": "table",
+     "columns": [
+      "客户",
+      "2025年内的订单",
+      "是否计入"
+     ],
+     "hl": [
+      0,
+      1
+     ],
+     "dim": [
+      2,
+      3
+     ],
+     "rows": [
+      [
+       "客户1",
+       "2笔有效订单",
+       {
+        "t": "计入",
+        "tone": "good"
+       }
+      ],
+      [
+       "客户2",
+       "1笔有效订单",
+       {
+        "t": "计入",
+        "tone": "good"
+       }
+      ],
+      [
+       "客户3",
+       "只有取消订单",
+       {
+        "t": "不计入",
+        "tone": "bad"
+       }
+      ],
+      [
+       "客户4",
+       "仅上年购买",
+       {
+        "t": "不计入",
+        "tone": "bad"
+       }
+      ]
+     ],
+     "foot": [
+      "合计",
+      "",
+      "2 位"
+     ]
+    },
+    {
+     "type": "note",
+     "text": "活跃客户数 = 观察期内至少有一笔有效购买的去重已知客户，不是 4 位注册客户。"
+    }
+   ]
+  },
+  "fc2-0393": {
+   "title": "购买频率数订单，不数明细行",
+   "blocks": [
+    {
+     "type": "table",
+     "columns": [
+      "有效订单",
+      "明细条数",
+      "算作购买次数"
+     ],
+     "rows": [
+      [
+       "第一笔订单",
+       "2",
+       "1 次"
+      ],
+      [
+       "第二笔订单",
+       "1",
+       "1 次"
+      ]
+     ],
+     "foot": [
+      "合计",
+      "3",
+      {
+       "t": "2 次",
+       "tone": "good"
+      }
+     ]
+    },
+    {
+     "type": "note",
+     "text": "明细有 3 条，但购买频率是去重后的有效订单数：2 次，不是 3 次。"
+    }
+   ],
+   "derived": [
+    "3"
+   ]
+  },
+  "fc2-0394": {
+   "title": "最近消费间隔：用固定的分析截止日，不用今天",
+   "blocks": [
+    {
+     "type": "table",
+     "columns": [
+      "项目",
+      "日期"
+     ],
+     "rows": [
+      [
+       "分析截止日",
+       "2025-12-31"
+      ],
+      [
+       "最近一次有效购买",
+       "2025-12-31"
+      ]
+     ],
+     "foot": [
+      "间隔（截止日 − 最近购买日）",
+      {
+       "t": "0 个自然日",
+       "tone": "good"
+      }
+     ]
+    },
+    {
+     "type": "note",
+     "text": "不能用实际运行日期去减，否则同样的数据每天算出不同的结果。"
+    }
+   ]
+  },
+  "fc2-0395": {
+   "title": "客户净消费 = 订单折后金额 − 截止日前的有效退款",
+   "blocks": [
+    {
+     "type": "calc",
+     "lines": [
+      {
+       "label": "有效订单折后金额合计",
+       "value": 1500,
+       "unit": "分"
+      },
+      {
+       "op": "−",
+       "label": "截止日前有效退款",
+       "value": 150,
+       "unit": "分"
+      },
+      {
+       "op": "=",
+       "label": "净消费",
+       "value": 1350,
+       "unit": "分"
+      }
+     ]
+    },
+    {
+     "type": "note",
+     "text": "退款追溯到原订单明细，不按退款发生的月份另算。"
+    }
+   ]
+  },
+  "fc2-0403": {
+   "title": "会话转化率：数会话，不数订单",
+   "derived": [
+    "0",
+    "0.3333",
+    "2"
+   ],
+   "blocks": [
+    {
+     "type": "table",
+     "columns": [
+      "会话",
+      "有效线上订单",
+      "算作转化会话"
+     ],
+     "hl": [
+      0
+     ],
+     "rows": [
+      [
+       "会话1",
+       "2 张",
+       {
+        "t": "1 个",
+        "tone": "good"
+       }
+      ],
+      [
+       "会话2",
+       "0 张",
+       "0 个"
+      ],
+      [
+       "会话3",
+       "0 张",
+       "0 个"
+      ]
+     ],
+     "foot": [
+      "合计",
+      "2 张",
+      "1 个"
+     ]
+    },
+    {
+     "type": "calc",
+     "lines": [
+      {
+       "label": "转化会话数",
+       "value": 1
+      },
+      {
+       "op": "÷",
+       "label": "全部会话数",
+       "value": 3
+      },
+      {
+       "op": "=",
+       "label": "比例（约）",
+       "value": 0.3333,
+       "approx": true
+      },
+      {
+       "op": "×",
+       "label": "换成百分数",
+       "value": 100
+      },
+      {
+       "op": "=",
+       "label": "会话购买转化率",
+       "value": 33.33,
+       "unit": "%",
+       "approx": true
+      }
+     ]
+    }
+   ]
+  },
+  "fc2-0420": {
+   "title": "发票未付余额：面额 − 贷项 − 付款（单位：分）",
+   "derived": [
+    "9000"
+   ],
+   "blocks": [
+    {
+     "type": "calc",
+     "lines": [
+      {
+       "label": "发票面额",
+       "value": 10000,
+       "unit": "分"
+      },
+      {
+       "op": "−",
+       "label": "截止日前有效贷项",
+       "value": 1000,
+       "unit": "分"
+      },
+      {
+       "op": "=",
+       "label": "贷项调整后的应付",
+       "value": 9000,
+       "unit": "分"
+      },
+      {
+       "op": "−",
+       "label": "截止日前有效付款",
+       "value": 5000,
+       "unit": "分"
+      },
+      {
+       "op": "=",
+       "label": "未付余额",
+       "value": 4000,
+       "unit": "分"
+      }
+     ]
+    },
+    {
+     "type": "note",
+     "text": "余额为负，表示超付或有其他需要核对的情形，不要直接丢掉。"
+    }
+   ]
+  },
+  "fc2-0421": {
+   "title": "账龄：逾期天数决定落在哪个档",
+   "derived": [
+    "30"
+   ],
+   "blocks": [
+    {
+     "type": "table",
+     "columns": [
+      "项目",
+      "日期"
+     ],
+     "rows": [
+      [
+       "到期日",
+       "2025-12-01"
+      ],
+      [
+       "截止日",
+       "2025-12-31"
+      ]
+     ],
+     "foot": [
+      "逾期天数（截止日 − 到期日）",
+      {
+       "t": "30 天",
+       "tone": "warn"
+      }
+     ]
+    },
+    {
+     "type": "table",
+     "title": "账龄档位",
+     "columns": [
+      "档位",
+      "说明"
+     ],
+     "hl": [
+      1
+     ],
+     "rows": [
+      [
+       "未逾期",
+       "到期日不早于截止日（到期当天也算未逾期）"
+      ],
+      [
+       "1–30 日",
+       "← 本张发票落在这里"
+      ],
+      [
+       "31–60 日",
+       ""
+      ],
+      [
+       "61–90 日",
+       ""
+      ],
+      [
+       ">90 日",
+       ""
+      ]
+     ]
+    },
+    {
+     "type": "note",
+     "text": "只有余额大于 0 的发票才进入账龄；这里欠款 600 分。"
+    }
+   ]
+  },
+  "fc2-0441": {
+   "title": "期末在职人数 = 期初 + 新增 − 退出",
+   "blocks": [
+    {
+     "type": "calc",
+     "lines": [
+      {
+       "label": "1月1日在职",
+       "value": 2,
+       "unit": "人"
+      },
+      {
+       "op": "+",
+       "label": "之后入职",
+       "value": 2,
+       "unit": "人"
+      },
+      {
+       "op": "−",
+       "label": "之后离职",
+       "value": 1,
+       "unit": "人"
+      },
+      {
+       "op": "=",
+       "label": "1月31日在职",
+       "value": 3,
+       "unit": "人"
+      }
+     ]
+    },
+    {
+     "type": "note",
+     "text": "按任职区间计数（左闭右开），不是数工资记录的条数。"
+    }
+   ]
+  },
+  "fc2-0472": {
+   "title": "加权采购周期：按合格收货数量加权",
+   "derived": [
+    "20",
+    "60",
+    "80",
+    "7.5"
+   ],
+   "blocks": [
+    {
+     "type": "table",
+     "columns": [
+      "批次",
+      "收货日（距订单日）",
+      "合格收货",
+      "天数 × 数量"
+     ],
+     "rows": [
+      [
+       "第一批",
+       "5 天",
+       "4 件",
+       "20"
+      ],
+      [
+       "第二批",
+       "10 天",
+       "6 件",
+       "60"
+      ]
+     ],
+     "foot": [
+      "合计",
+      "",
+      "10 件",
+      "80"
+     ]
+    },
+    {
+     "type": "calc",
+     "lines": [
+      {
+       "label": "Σ（天数 × 数量）",
+       "value": 80
+      },
+      {
+       "op": "÷",
+       "label": "Σ 合格收货数量",
+       "value": 10,
+       "unit": "件"
+      },
+      {
+       "op": "=",
+       "label": "采购周期",
+       "value": 8,
+       "unit": "天"
+      }
+     ]
+    },
+    {
+     "type": "note",
+     "text": "如果把两批天数简单平均，会得到 7.5 天，忽略了两批数量不同。"
+    }
+   ]
+  },
+  "fc2-0477": {
+   "title": "尚未交付 = 订购量 − 合格收货量",
+   "blocks": [
+    {
+     "type": "calc",
+     "title": "① 合格收货",
+     "lines": [
+      {
+       "label": "实收",
+       "value": 10,
+       "unit": "件"
+      },
+      {
+       "op": "−",
+       "label": "拒收",
+       "value": 2,
+       "unit": "件"
+      },
+      {
+       "op": "=",
+       "label": "合格收货",
+       "value": 8,
+       "unit": "件"
+      }
+     ],
+     "derived": [
+      "8"
+     ]
+    },
+    {
+     "type": "calc",
+     "title": "② 尚未交付",
+     "lines": [
+      {
+       "label": "订购量",
+       "value": 10,
+       "unit": "件"
+      },
+      {
+       "op": "−",
+       "label": "合格收货",
+       "value": 8,
+       "unit": "件"
+      },
+      {
+       "op": "=",
+       "label": "尚未交付",
+       "value": 2,
+       "unit": "件"
+      }
+     ]
+    },
+    {
+     "type": "note",
+     "text": "拒收的货不算履约，所以尚未交付要用“合格收货”来减。"
+    }
+   ],
+   "derived": [
+    "8"
+   ]
+  },
+  "fc2-0478": {
+   "title": "逾期未交付：只算承诺日已过的缺口",
+   "blocks": [
+    {
+     "type": "table",
+     "columns": [
+      "采购行",
+      "承诺日",
+      "未交付",
+      "是否计入逾期"
+     ],
+     "hl": [
+      0,
+      1
+     ],
+     "dim": [
+      2
+     ],
+     "rows": [
+      [
+       "第一行",
+       "已过",
+       "2 件",
+       {
+        "t": "计入",
+        "tone": "good"
+       }
+      ],
+      [
+       "第二行",
+       "已过",
+       "10 件",
+       {
+        "t": "计入",
+        "tone": "good"
+       }
+      ],
+      [
+       "第三行",
+       "在未来",
+       "10 件",
+       {
+        "t": "不计入",
+        "tone": "bad"
+       }
+      ]
+     ]
+    },
+    {
+     "type": "calc",
+     "lines": [
+      {
+       "label": "第一行逾期未交付",
+       "value": 2,
+       "unit": "件"
+      },
+      {
+       "op": "+",
+       "label": "第二行逾期未交付",
+       "value": 10,
+       "unit": "件"
+      },
+      {
+       "op": "=",
+       "label": "逾期未交付",
+       "value": 12,
+       "unit": "件"
+      }
+     ]
+    },
+    {
+     "type": "note",
+     "text": "承诺日当天不算逾期；未来到期的 10 件不属于逾期缺口。"
+    }
+   ]
+  },
+  "fc2-0485": {
+   "title": "供应商集中度：份额、前两家、份额平方和",
+   "derived": [
+    "100",
+    "3600",
+    "900",
+    "90"
+   ],
+   "blocks": [
+    {
+     "type": "bars",
+     "title": "采购金额与占比（共 100）",
+     "items": [
+      {
+       "label": "供应商1",
+       "value": 60
+      },
+      {
+       "label": "供应商2",
+       "value": 30
+      },
+      {
+       "label": "供应商3",
+       "value": 10
+      }
+     ]
+    },
+    {
+     "type": "calc",
+     "title": "前两家集中度",
+     "lines": [
+      {
+       "label": "最大供应商份额",
+       "value": 60,
+       "unit": "%"
+      },
+      {
+       "op": "+",
+       "label": "第二大份额",
+       "value": 30,
+       "unit": "%"
+      },
+      {
+       "op": "=",
+       "label": "前两家集中度",
+       "value": 90,
+       "unit": "%"
+      }
+     ]
+    },
+    {
+     "type": "calc",
+     "title": "份额平方和（HHI，0–10000 尺度）",
+     "lines": [
+      {
+       "label": "60² ",
+       "value": 3600
+      },
+      {
+       "op": "+",
+       "label": "30²",
+       "value": 900
+      },
+      {
+       "op": "+",
+       "label": "10²",
+       "value": 100
+      },
+      {
+       "op": "=",
+       "label": "HHI",
+       "value": 4600
+      }
+     ]
+    }
+   ]
+  },
+  "fc2-0033": {
+   "title": "语法拆解：括号划范围，AND / OR / NOT 管逻辑",
+   "blocks": [
+    {
+     "type": "chunks",
+     "items": [
+      {
+       "role": "WHERE：开始写筛选条件",
+       "text": "WHERE",
+       "family": "where"
+      },
+      {
+       "role": "括号：把两个条件合成一组；AND 要求两个同时成立",
+       "text": "(condition1 AND condition2)",
+       "family": "pred"
+      },
+      {
+       "role": "OR：左边这一组，或右边这一组，至少一边成立",
+       "text": "OR",
+       "family": "where"
+      },
+      {
+       "role": "NOT 放在要取反的条件前；括号说明取反的范围",
+       "text": "NOT (condition3)",
+       "family": "pred"
+      }
+     ]
+    }
+   ]
+  },
+  "fc2-0041": {
+   "title": "语法拆解：两种写法，同一个意思",
+   "blocks": [
+    {
+     "type": "chunks",
+     "items": [
+      {
+       "role": "写法一：运算符形式",
+       "text": "WHERE column REGEXP pattern",
+       "family": "where"
+      },
+      {
+       "role": "写法二：函数形式（MySQL）",
+       "text": "WHERE REGEXP_LIKE(column, pattern)",
+       "family": "where"
+      },
+      {
+       "role": "column：要检查的列",
+       "text": "column",
+       "family": "from"
+      },
+      {
+       "role": "pattern：正则模式，描述“固定编码格式”长什么样",
+       "text": "pattern",
+       "family": "pred"
+      }
+     ]
+    },
+    {
+     "type": "note",
+     "text": "本应用的本地环境不能直接执行这两种写法（卡片已说明）；简单前缀判断可以先用 LIKE。"
+    }
+   ]
+  },
+  "fc2-0046": {
+   "title": "语法拆解：先按谁排，并列时再按谁排",
+   "blocks": [
+    {
+     "type": "chunks",
+     "items": [
+      {
+       "role": "ORDER BY：开始写排序",
+       "text": "ORDER BY",
+       "family": "order"
+      },
+      {
+       "role": "主排序：ASC 升序（可省略），DESC 降序",
+       "text": "expression [ASC 或 DESC]",
+       "family": "order"
+      },
+      {
+       "role": "次排序：主排序并列时才起作用",
+       "text": ", expression2 [ASC 或 DESC]",
+       "family": "order"
+      }
+     ]
+    },
+    {
+     "type": "steps",
+     "title": "例：ORDER BY sales DESC, id ASC",
+     "items": [
+      {
+       "title": "先按金额 sales 降序"
+      },
+      {
+       "title": "金额并列时，按编号 id 升序"
+      }
+     ]
+    }
+   ]
+  },
+  "fc2-0064": {
+   "title": "语法拆解：<=> 让两个 NULL 也能“相等”",
+   "blocks": [
+    {
+     "type": "chunks",
+     "items": [
+      {
+       "role": "左边的表达式",
+       "text": "expression1",
+       "family": "select"
+      },
+      {
+       "role": "空值安全等于：返回 0 或 1，不会返回未知",
+       "text": "<=>",
+       "family": "pred"
+      },
+      {
+       "role": "右边的表达式",
+       "text": "expression2",
+       "family": "select"
+      }
+     ]
+    },
+    {
+     "type": "table",
+     "columns": [
+      "左右两边",
+      "<=> 的结果"
+     ],
+     "rows": [
+      [
+       "两个都是 NULL",
+       {
+        "t": "1",
+        "tone": "good"
+       }
+      ],
+      [
+       "只有一个是 NULL",
+       {
+        "t": "0",
+        "tone": "bad"
+       }
+      ]
+     ]
+    },
+    {
+     "type": "note",
+     "text": "当前应用不会自动转换 <=>，需要显式写成 IS NOT DISTINCT FROM。"
+    }
+   ]
+  },
+  "fc2-0103": {
+   "title": "语法拆解：用 AND 把两个键都对上",
+   "blocks": [
+    {
+     "type": "chunks",
+     "items": [
+      {
+       "role": "ON：开始写连接条件",
+       "text": "ON",
+       "family": "join"
+      },
+      {
+       "role": "第一对键相等",
+       "text": "a.key1 = b.key1",
+       "family": "join"
+      },
+      {
+       "role": "AND：两对键必须同时相等",
+       "text": "AND",
+       "family": "where"
+      },
+      {
+       "role": "第二对键相等",
+       "text": "a.key2 = b.key2",
+       "family": "join"
+      }
+     ]
+    },
+    {
+     "type": "note",
+     "text": "比如要同时匹配“仓库”和“商品”：只匹配其中一个，就可能把别的仓库的记录也连进来，造成重复。"
+    }
+   ]
+  },
+  "fc2-0131": {
+   "title": "语法拆解：括号里的子查询先算出一个值",
+   "blocks": [
+    {
+     "type": "chunks",
+     "items": [
+      {
+       "role": "外层：拿这一列去和子查询的结果比较",
+       "text": "WHERE column >",
+       "family": "where"
+      },
+      {
+       "role": "子查询：用聚合函数得到一个值（单列、至多一行）",
+       "text": "(SELECT aggregate_function(column) FROM table_name)",
+       "family": "select"
+      }
+     ]
+    },
+    {
+     "type": "steps",
+     "items": [
+      {
+       "title": "先算括号里的子查询",
+       "detail": "得到一个值，例如平均金额。"
+      },
+      {
+       "title": "外层用这个值逐行比较",
+       "detail": "子查询零行时返回 NULL。"
+      }
+     ]
+    }
+   ]
+  },
+  "fc2-0136": {
+   "title": "语法拆解：EXISTS 只问“有没有匹配的行”",
+   "blocks": [
+    {
+     "type": "chunks",
+     "items": [
+      {
+       "role": "EXISTS：子查询至少返回一行，条件就成立",
+       "text": "WHERE EXISTS (",
+       "family": "where"
+      },
+      {
+       "role": "子查询：到另一张表里找",
+       "text": "SELECT 1 FROM table_b b",
+       "family": "from"
+      },
+      {
+       "role": "关联条件：把内层的行和外层这一行对应起来",
+       "text": "WHERE b.key = a.key )",
+       "family": "join"
+      }
+     ]
+    },
+    {
+     "type": "steps",
+     "items": [
+      {
+       "title": "取外层一个客户"
+      },
+      {
+       "title": "到订单表里找关联的订单",
+       "detail": "SELECT 1 只是表达“只关心有没有”，不关心取什么列。"
+      },
+      {
+       "title": "找到至少一行 → 保留这个客户"
+      }
+     ]
+    }
+   ]
+  },
+  "fc2-0137": {
+   "title": "语法拆解：NOT EXISTS 把结果反过来",
+   "blocks": [
+    {
+     "type": "chunks",
+     "items": [
+      {
+       "role": "NOT EXISTS：子查询一行都没有，条件才成立",
+       "text": "WHERE NOT EXISTS (",
+       "family": "where"
+      },
+      {
+       "role": "子查询",
+       "text": "SELECT 1 FROM table_b b",
+       "family": "from"
+      },
+      {
+       "role": "关联条件在子查询内部",
+       "text": "WHERE b.key = a.key )",
+       "family": "join"
+      }
+     ]
+    },
+    {
+     "type": "compare",
+     "heads": [
+      "内层查询",
+      "EXISTS",
+      "NOT EXISTS"
+     ],
+     "rows": [
+      [
+       "找到匹配行",
+       {
+        "t": "保留",
+        "tone": "good"
+       },
+       {
+        "t": "不保留",
+        "tone": "bad"
+       }
+      ],
+      [
+       "没有匹配行",
+       {
+        "t": "不保留",
+        "tone": "bad"
+       },
+       {
+        "t": "保留",
+        "tone": "good"
+       }
+      ]
+     ]
+    }
+   ]
+  },
+  "fc2-0236": {
+   "title": "语法拆解：OVER 里的三个可选部分",
+   "blocks": [
+    {
+     "type": "chunks",
+     "items": [
+      {
+       "role": "窗口函数：可以没有参数，如 ROW_NUMBER()；也可以有，如 SUM(sales)",
+       "text": "window_function([arguments])",
+       "family": "select"
+      },
+      {
+       "role": "OVER：把后面的规范交给这个函数",
+       "text": "OVER (",
+       "family": "with"
+      },
+      {
+       "role": "分区（可选）：每个分区单独计算",
+       "text": "[PARTITION BY column]",
+       "family": "group"
+      },
+      {
+       "role": "排序（可选）：决定分区内的计算顺序",
+       "text": "[ORDER BY column]",
+       "family": "order"
+      },
+      {
+       "role": "范围（可选）：用哪几行参与计算",
+       "text": "[frame_clause] )",
+       "family": "limit"
+      }
+     ]
+    },
+    {
+     "type": "note",
+     "text": "方括号表示可选；并非所有窗口函数都使用窗口范围。窗口内的排序也不保证最终输出的顺序。"
+    }
+   ]
+  },
+  "fc2-0257": {
+   "title": "语法拆解：用起点和终点划出窗口范围",
+   "blocks": [
+    {
+     "type": "chunks",
+     "items": [
+      {
+       "role": "ROWS：按“行的位置”定边界",
+       "text": "ROWS",
+       "family": "limit"
+      },
+      {
+       "role": "起点",
+       "text": "BETWEEN frame_start",
+       "family": "limit"
+      },
+      {
+       "role": "终点",
+       "text": "AND frame_end",
+       "family": "limit"
+      }
+     ]
+    },
+    {
+     "type": "compare",
+     "heads": [
+      "写法",
+      "边界按什么定"
+     ],
+     "rows": [
+      [
+       "ROWS",
+       "行的位置"
+      ],
+      [
+       "RANGE",
+       "排序值"
+      ]
+     ]
+    },
+    {
+     "type": "note",
+     "text": "例：计算最近两条订单金额之和，就是从“前一行”到“当前行”。"
+    }
+   ]
+  },
+  "fc2-0297": {
+   "title": "语法拆解：建表 = 表名 + 每个字段的类型与约束",
+   "blocks": [
+    {
+     "type": "chunks",
+     "items": [
+      {
+       "role": "CREATE TABLE：建一张新表；[IF NOT EXISTS] 是可选部分",
+       "text": "CREATE TABLE [IF NOT EXISTS] table_name (",
+       "family": "create"
+      },
+      {
+       "role": "字段 1：名称、数据类型，并设为主键",
+       "text": "column1 data_type PRIMARY KEY,",
+       "family": "create"
+      },
+      {
+       "role": "字段 2：名称、数据类型，并且不能为空",
+       "text": "column2 data_type NOT NULL )",
+       "family": "create"
+      }
+     ]
+    },
+    {
+     "type": "note",
+     "text": "NOT NULL 禁止空值；DEFAULT 只在省略该列时生效，不能代替 NOT NULL。"
+    }
+   ]
+  },
+  "fc2-0006": {
+   "title": "三种键：同一份数据里看区别",
+   "blocks": [
+    {
+     "type": "table",
+     "columns": [
+      "约束",
+      "示例数据",
+      "结果"
+     ],
+     "rows": [
+      [
+       "唯一键（父表 code）",
+       "A、NULL、NULL",
+       "3 行里只有 1 个非空，允许多个 NULL"
+      ],
+      [
+       "外键（子表 pid）",
+       "1、1、NULL",
+       "值 1 出现 2 次：可重复；还有 1 行为空"
+      ]
+     ],
+     "title": "示例里的表现"
+    }
+   ]
+  },
+  "fc2-0013": {
+   "title": "定点小数 vs 浮点数：同一个加法的结果",
+   "derived": [
+    "0.3"
+   ],
+   "blocks": [
+    {
+     "type": "table",
+     "columns": [
+      "做法",
+      "判断",
+      "结果"
+     ],
+     "rows": [
+      [
+       "整数分累计：10 分 + 20 分",
+       "合计是否精确",
+       "30"
+      ],
+      [
+       "浮点：0.1 + 0.2 = 0.3 吗",
+       "直接比较是否相等",
+       {
+        "t": "0（不相等）",
+        "tone": "bad"
+       }
+      ],
+      [
+       "浮点：|和 − 0.3| < 0.000001",
+       "用误差容限比较",
+       {
+        "t": "1（视为相等）",
+        "tone": "good"
+       }
+      ]
+     ],
+     "title": "用卡里的例子对比"
+    },
+    {
+     "type": "note",
+     "text": "金额用整数“分”或 DECIMAL 存，比较浮点数时用误差容限，不要直接用等号。"
+    }
+   ]
+  },
+  "fc2-0014": {
+   "title": "三种日期时间类型：存什么、会不会随时区变",
+   "blocks": [
+    {
+     "type": "table",
+     "columns": [
+      "类型",
+      "读出结果"
+     ],
+     "rows": [
+      [
+       "DATETIME",
+       "2025-01-31 16:30:00（钟表时间，不转换）"
+      ],
+      [
+       "TIMESTAMP",
+       "2025-02-01 00:30:00（转成会话时区，日期跨天）"
+      ]
+     ],
+     "title": "同一时刻 UTC 2025-01-31 16:30:00，在 UTC+8 会话里读出来"
+    },
+    {
+     "type": "note",
+     "text": "这是说明 MySQL 时区语义的示意，不是本地时区的实测结果。"
+    }
+   ]
+  },
+  "fc2-0019": {
+   "title": "记录缺失 vs 字段空值：在连接结果里看得出来",
+   "blocks": [
+    {
+     "type": "table",
+     "columns": [
+      "客户",
+      "匹配订单数",
+      "金额非空的订单数",
+      "判断"
+     ],
+     "rows": [
+      [
+       "客户1",
+       "2",
+       "2",
+       {
+        "t": "有金额",
+        "tone": "good"
+       }
+      ],
+      [
+       "客户2",
+       "1",
+       "0",
+       {
+        "t": "记录在，金额缺失（字段空值）",
+        "tone": "warn"
+       }
+      ],
+      [
+       "客户3",
+       "0",
+       "0",
+       {
+        "t": "没有订单（记录缺失）",
+        "tone": "bad"
+       }
+      ]
+     ],
+     "title": "客户与订单左连接后"
+    }
+   ]
+  },
+  "fc2-0088": {
+   "title": "DISTINCT 只去重；GROUP BY 还能汇总",
+   "blocks": [
+    {
+     "type": "flow",
+     "items": [
+      {
+       "title": "原始数据 t",
+       "table": {
+        "columns": [
+         "id",
+         "g",
+         "x"
+        ],
+        "rows": [
+         [
+          1,
+          "A",
+          10
+         ],
+         [
+          2,
+          "A",
+          20
+         ],
+         [
+          3,
+          "B",
+          5
+         ],
+         [
+          4,
+          "B",
+          null
+         ]
+        ]
+       }
+      },
+      {
+       "title": "DISTINCT g：只看有哪些组",
+       "detail": "输出所选字段的不同组合，没有汇总。",
+       "badge": "去重",
+       "table": {
+        "columns": [
+         "g"
+        ],
+        "rows": [
+         [
+          "A"
+         ],
+         [
+          "B"
+         ]
+        ]
+       }
+      },
+      {
+       "title": "GROUP BY g：每组一行，可带聚合",
+       "detail": "SUM(x) 忽略 NULL，COUNT(*) 数的是行数。",
+       "badge": "分组汇总",
+       "table": {
+        "columns": [
+         "g",
+         "total",
+         "n"
+        ],
+        "rows": [
+         [
+          "A",
+          30,
+          2
+         ],
+         [
+          "B",
+          5,
+          2
+         ]
+        ]
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "fc2-0110": {
+   "title": "JOIN 横向加字段，UNION 纵向加记录",
+   "derived": [
+    "4"
+   ],
+   "blocks": [
+    {
+     "type": "table",
+     "columns": [
+      "cid",
+      "amount"
+     ],
+     "rows": [
+      [
+       1,
+       100
+      ],
+      [
+       1,
+       20
+      ],
+      [
+       2,
+       null
+      ]
+     ],
+     "title": "JOIN：客户与订单匹配，多出 amount 列"
+    },
+    {
+     "type": "table",
+     "columns": [
+      "key_id"
+     ],
+     "rows": [
+      [
+       1
+      ],
+      [
+       2
+      ],
+      [
+       3
+      ],
+      [
+       10
+      ],
+      [
+       11
+      ],
+      [
+       12
+      ],
+      [
+       13
+      ]
+     ],
+     "title": "UNION ALL：客户编号接在订单编号上面，行变多（3 + 4 = 7）"
+    },
+    {
+     "type": "note",
+     "text": "要补充字段 → JOIN；要追加记录 → UNION / UNION ALL。"
+    }
+   ]
+  },
+  "fc2-0138": {
+   "title": "IN、EXISTS、JOIN：同样找“有订单的客户”",
+   "derived": [
+    "3"
+   ],
+   "blocks": [
+    {
+     "type": "table",
+     "columns": [
+      "写法",
+      "输出的客户",
+      "行数"
+     ],
+     "rows": [
+      [
+       "IN",
+       "1、2",
+       "2 行"
+      ],
+      [
+       "EXISTS",
+       "1、2",
+       "2 行"
+      ],
+      [
+       "JOIN",
+       {
+        "t": "1、1、2",
+        "tone": "warn"
+       },
+       {
+        "t": "3 行（客户1 重复）",
+        "tone": "warn"
+       }
+      ]
+     ],
+     "title": "客户 1、2、3；订单的客户编号是 1、1、2、NULL",
+     "hl": [
+      2
+     ]
+    }
+   ]
+  },
+  "fc2-0139": {
+   "title": "为什么 NOT IN 找不到客户 3",
+   "blocks": [
+    {
+     "type": "steps",
+     "items": [
+      {
+       "title": "订单里的客户编号集合是 1、2、NULL"
+      },
+      {
+       "title": "客户 3 NOT IN 这个集合",
+       "detail": "3≠1 为真，3≠2 为真，3≠NULL 是“未知”；真 AND 未知 = 未知。"
+      },
+      {
+       "title": "WHERE 只保留“真”，未知被筛掉",
+       "detail": "所以一行也没有。"
+      }
+     ]
+    },
+    {
+     "type": "table",
+     "columns": [
+      "写法",
+      "结果"
+     ],
+     "rows": [
+      [
+       "NOT IN（集合含 NULL）",
+       {
+        "t": "空：一行也没有",
+        "tone": "bad"
+       }
+      ],
+      [
+       "NOT IN（先排除子查询里的 NULL）",
+       {
+        "t": "客户 3",
+        "tone": "good"
+       }
+      ],
+      [
+       "NOT EXISTS",
+       {
+        "t": "客户 3",
+        "tone": "good"
+       }
+      ]
+     ],
+     "title": "同一份数据，三种写法"
+    }
+   ]
+  },
+  "fc2-0159": {
+   "title": "字符数 vs 字节数（UTF-8）",
+   "blocks": [
+    {
+     "type": "table",
+     "columns": [
+      "文字",
+      "字符数",
+      "字节数"
+     ],
+     "rows": [
+      [
+       "AB",
+       "2",
+       "2"
+      ],
+      [
+       "中文",
+       "2",
+       "6"
+      ],
+      [
+       "表情符号",
+       "1",
+       "4"
+      ],
+      [
+       "空字符串",
+       "0",
+       "0"
+      ],
+      [
+       "NULL",
+       null,
+       null
+      ]
+     ],
+     "title": "同一段文字，两种长度",
+     "hl": [
+      1,
+      2
+     ]
+    },
+    {
+     "type": "note",
+     "text": "多字节字符里，字符数和字节数不一定相等。空字符串长度是 0，NULL 不是空字符串。"
+    }
+   ]
+  },
+  "fc2-0178": {
+   "title": "CEIL、FLOOR 与朝零截断：看数轴方向",
+   "derived": [
+    "3",
+    "2.9"
+   ],
+   "blocks": [
+    {
+     "type": "table",
+     "columns": [
+      "输入",
+      "CEIL（朝正无穷）",
+      "FLOOR（朝负无穷）"
+     ],
+     "rows": [
+      [
+       "2.3",
+       "3",
+       "2"
+      ],
+      [
+       "-2.3",
+       "-2",
+       "-3"
+      ],
+      [
+       "-2（整数）",
+       "-2",
+       "-2"
+      ]
+     ],
+     "title": "正数、负数、整数"
+    },
+    {
+     "type": "table",
+     "columns": [
+      "输入",
+      "FLOOR",
+      "朝零截断"
+     ],
+     "rows": [
+      [
+       "-2.9",
+       {
+        "t": "-3",
+        "tone": "bad"
+       },
+       {
+        "t": "-2",
+        "tone": "good"
+       }
+      ]
+     ],
+     "title": "朝零截断：负数时与 FLOOR 不同"
+    },
+    {
+     "type": "note",
+     "text": "负数向上取整趋近零，向下取整远离零；朝零截断是直接丢掉小数部分。"
+    }
+   ]
+  },
+  "fc2-0189": {
+   "title": "CURDATE() 与 NOW()：一个只有日期，一个带时间",
+   "blocks": [
+    {
+     "type": "table",
+     "columns": [
+      "时区",
+      "日期时间",
+      "日期"
+     ],
+     "rows": [
+      [
+       "UTC",
+       "2025-12-31 18:30:00",
+       "2025-12-31"
+      ],
+      [
+       "UTC+8",
+       "2026-01-01 02:30:00",
+       {
+        "t": "2026-01-01",
+        "tone": "warn"
+       }
+      ]
+     ],
+     "title": "同一个 UTC 时刻，日期可能随时区跨天"
+    },
+    {
+     "type": "note",
+     "text": "图里的时间只是示意，不是当前时间。"
+    }
+   ]
+  },
+  "fc2-0217": {
+   "title": "UNION 去重，UNION ALL 全部保留",
+   "blocks": [
+    {
+     "type": "flow",
+     "items": [
+      {
+       "title": "输入 a（3 行）",
+       "table": {
+        "columns": [
+         "id",
+         "amount"
+        ],
+        "rows": [
+         [
+          1,
+          10
+         ],
+         [
+          1,
+          10
+         ],
+         [
+          2,
+          null
+         ]
+        ]
+       }
+      },
+      {
+       "title": "输入 b（3 行；字段名不同但顺序相同）",
+       "detail": "按列的位置匹配，不按名称。",
+       "table": {
+        "columns": [
+         "key_id",
+         "value"
+        ],
+        "rows": [
+         [
+          1,
+          10
+         ],
+         [
+          2,
+          null
+         ],
+         [
+          3,
+          10
+         ]
+        ]
+       }
+      },
+      {
+       "title": "UNION：整行去重",
+       "badge": "3 行",
+       "table": {
+        "columns": [
+         "id",
+         "amount"
+        ],
+        "rows": [
+         [
+          1,
+          10
+         ],
+         [
+          2,
+          null
+         ],
+         [
+          3,
+          10
+         ]
+        ]
+       }
+      },
+      {
+       "title": "UNION ALL：全部保留",
+       "badge": "6 行",
+       "table": {
+        "columns": [
+         "id",
+         "amount"
+        ],
+        "rows": [
+         [
+          1,
+          10
+         ],
+         [
+          1,
+          10
+         ],
+         [
+          1,
+          10
+         ],
+         [
+          2,
+          null
+         ],
+         [
+          2,
+          null
+         ],
+         [
+          3,
+          10
+         ]
+        ]
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "fc2-0227": {
+   "title": "公用表表达式与子查询：写法不同，这里结果一样",
+   "blocks": [
+    {
+     "type": "table",
+     "columns": [
+      "g",
+      "total"
+     ],
+     "rows": [
+      [
+       "A",
+       30
+      ]
+     ],
+     "title": "两种写法筛出“总额大于 10 的组”：结果相同"
+    },
+    {
+     "type": "note",
+     "text": "两者都不会创建跨语句的临时表或持久视图。"
+    }
+   ]
+  },
+  "fc2-0238": {
+   "title": "GROUP BY 压缩行，PARTITION BY 保留行",
+   "blocks": [
+    {
+     "type": "flow",
+     "items": [
+      {
+       "title": "原始数据 t（4 行）",
+       "table": {
+        "columns": [
+         "id",
+         "g",
+         "x"
+        ],
+        "rows": [
+         [
+          1,
+          "A",
+          10
+         ],
+         [
+          2,
+          "A",
+          20
+         ],
+         [
+          3,
+          "B",
+          5
+         ],
+         [
+          4,
+          "B",
+          null
+         ]
+        ]
+       }
+      },
+      {
+       "title": "GROUP BY g：每组压成一行",
+       "badge": "2 行",
+       "table": {
+        "columns": [
+         "g",
+         "total"
+        ],
+        "rows": [
+         [
+          "A",
+          30
+         ],
+         [
+          "B",
+          5
+         ]
+        ]
+       }
+      },
+      {
+       "title": "SUM(x) OVER (PARTITION BY g)：每行都保留，并附上组总额",
+       "badge": "4 行",
+       "table": {
+        "columns": [
+         "id",
+         "g",
+         "x",
+         "total"
+        ],
+        "rows": [
+         [
+          1,
+          "A",
+          10,
+          30
+         ],
+         [
+          2,
+          "A",
+          20,
+          30
+         ],
+         [
+          3,
+          "B",
+          5,
+          5
+         ],
+         [
+          4,
+          "B",
+          null,
+          5
+         ]
+        ]
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "fc2-0239": {
+   "title": "展示顺序变了，排名不变",
+   "blocks": [
+    {
+     "type": "table",
+     "columns": [
+      "id",
+      "rn"
+     ],
+     "rows": [
+      [
+       1,
+       2
+      ],
+      [
+       2,
+       1
+      ],
+      [
+       3,
+       2
+      ],
+      [
+       4,
+       1
+      ]
+     ],
+     "title": "窗口内按门店分区、金额降序算出 rn；最外层 ORDER BY id"
+    },
+    {
+     "type": "table",
+     "columns": [
+      "id",
+      "rn"
+     ],
+     "rows": [
+      [
+       2,
+       1
+      ],
+      [
+       4,
+       1
+      ],
+      [
+       1,
+       2
+      ],
+      [
+       3,
+       2
+      ]
+     ],
+     "title": "同一个 rn，最外层改成 ORDER BY rn, id"
+    },
+    {
+     "type": "note",
+     "text": "每个 id 的 rn 前后完全一样：外层排序只改变行出现的先后。"
+    }
+   ]
+  },
+  "fc2-0274": {
+   "title": "缺失值与异常值：先分类，不要先删除",
+   "blocks": [
+    {
+     "type": "table",
+     "columns": [
+      "数量",
+      "分类",
+      "怎么处理"
+     ],
+     "rows": [
+      [
+       "NULL",
+       {
+        "t": "缺失",
+        "tone": "warn"
+       },
+       "追溯、保留或合理填补"
+      ],
+      [
+       "小于 0 或大于 100（如 −3、150）",
+       {
+        "t": "异常",
+        "tone": "bad"
+       },
+       "核查原因，不能自动删除"
+      ],
+      [
+       "0 至 100（包括 0）",
+       {
+        "t": "正常",
+        "tone": "good"
+       },
+       "零可能是真实值"
+      ]
+     ],
+     "title": "卡里的分类规则（单次发货数量允许 0 至 100）"
+    },
+    {
+     "type": "bars",
+     "title": "示例数据的计数",
+     "unit": "条",
+     "items": [
+      {
+       "label": "缺失",
+       "value": 1,
+       "tone": "warn"
+      },
+      {
+       "label": "异常",
+       "value": 2,
+       "tone": "bad"
+      }
+     ],
+     "share": false
+    }
+   ]
+  },
+  "fc2-0288": {
+   "title": "大额交易：候选异常 ≠ 错误 ≠ 舞弊",
+   "blocks": [
+    {
+     "type": "table",
+     "columns": [
+      "交易",
+      "金额",
+      "审核状态",
+      "怎么处理"
+     ],
+     "rows": [
+      [
+       "3",
+       "10000",
+       {
+        "t": "已核实真实",
+        "tone": "good"
+       },
+       "按分析目的保留"
+      ],
+      [
+       "4",
+       "99999",
+       {
+        "t": "已核实错误",
+        "tone": "bad"
+       },
+       "修正或排除"
+      ],
+      [
+       "5",
+       "8000",
+       {
+        "t": "待核实",
+        "tone": "warn"
+       },
+       "继续查凭证"
+      ]
+     ],
+     "title": "教学阈值：金额大于 1000 的候选"
+    },
+    {
+     "type": "note",
+     "text": "筛选只是风险候选识别，不是错误或舞弊结论。"
+    }
+   ]
+  },
+  "fc2-0365": {
+   "title": "库存流水 vs 库存快照：从期初推到期末",
+   "derived": [
+    "95",
+    "60",
+    "78"
+   ],
+   "blocks": [
+    {
+     "type": "calc",
+     "lines": [
+      {
+       "label": "期初",
+       "value": 100
+      },
+      {
+       "label": "收入",
+       "op": "+",
+       "value": 30
+      },
+      {
+       "label": "销售",
+       "op": "−",
+       "value": 20
+      },
+      {
+       "label": "转出",
+       "op": "−",
+       "value": 10
+      },
+      {
+       "label": "损耗",
+       "op": "−",
+       "value": 5
+      },
+      {
+       "label": "期末余额",
+       "op": "=",
+       "value": 95
+      }
+     ],
+     "title": "仓库1：期初 + 期间净变动 = 期末"
+    },
+    {
+     "type": "calc",
+     "lines": [
+      {
+       "label": "期初",
+       "value": 50
+      },
+      {
+       "label": "转入",
+       "op": "+",
+       "value": 10
+      },
+      {
+       "label": "期末余额",
+       "op": "=",
+       "value": 60
+      }
+     ],
+     "title": "仓库2"
+    },
+    {
+     "type": "calc",
+     "lines": [
+      {
+       "label": "期末库存",
+       "value": 95
+      },
+      {
+       "label": "预留",
+       "op": "−",
+       "value": 10
+      },
+      {
+       "label": "质检",
+       "op": "−",
+       "value": 5
+      },
+      {
+       "label": "其他不可售",
+       "op": "−",
+       "value": 2
+      },
+      {
+       "label": "可售库存",
+       "op": "=",
+       "value": 78
+      }
+     ],
+     "title": "可售库存（仓库1，三类不可售互不重叠）"
+    }
+   ]
+  },
+  "fc2-0373": {
+   "title": "周转天数 15 天、覆盖 60 天：两个问题，不矛盾",
+   "derived": [
+    "75000",
+    "5000",
+    "2500",
+    "1"
+   ],
+   "blocks": [
+    {
+     "type": "calc",
+     "title": "周转天数（30 日期间）",
+     "lines": [
+      {
+       "label": "期初库存成本",
+       "value": 2000,
+       "unit": "分"
+      },
+      {
+       "label": "期末库存成本",
+       "value": 3000,
+       "op": "+"
+      },
+      {
+       "label": "两端合计",
+       "value": 5000,
+       "op": "="
+      },
+      {
+       "label": "两个时点",
+       "value": 2,
+       "op": "÷"
+      },
+      {
+       "label": "平均库存成本",
+       "value": 2500,
+       "op": "="
+      },
+      {
+       "label": "期间天数",
+       "value": 30,
+       "op": "×",
+       "unit": "天"
+      },
+      {
+       "label": "",
+       "value": 75000,
+       "op": "="
+      },
+      {
+       "label": "净出库成本",
+       "value": 5000,
+       "op": "÷"
+      },
+      {
+       "label": "周转天数",
+       "value": 15,
+       "op": "=",
+       "unit": "天"
+      }
+     ]
+    },
+    {
+     "type": "calc",
+     "title": "库存覆盖天数：① 日均出库",
+     "lines": [
+      {
+       "label": "近 30 日出库",
+       "value": 30,
+       "unit": "件"
+      },
+      {
+       "label": "观察天数",
+       "value": 30,
+       "op": "÷",
+       "unit": "天"
+      },
+      {
+       "label": "日均出库",
+       "value": 1,
+       "op": "=",
+       "unit": "件/天"
+      }
+     ]
+    },
+    {
+     "type": "calc",
+     "title": "② 覆盖天数",
+     "lines": [
+      {
+       "label": "现存库存",
+       "value": 60,
+       "unit": "件"
+      },
+      {
+       "label": "日均出库",
+       "value": 1,
+       "op": "÷",
+       "unit": "件/天"
+      },
+      {
+       "label": "库存覆盖",
+       "value": 60,
+       "op": "=",
+       "unit": "天"
+      }
+     ]
+    }
+   ]
+  },
+  "fc2-0383": {
+   "title": "现有库存、在途、未完成采购：不要直接相加",
+   "blocks": [
+    {
+     "type": "calc",
+     "lines": [
+      {
+       "label": "已发出",
+       "value": 30,
+       "unit": "件",
+       "note": "发出 20 件已到货 + 10 件未到"
+      },
+      {
+       "label": "已到货",
+       "op": "−",
+       "value": 20,
+       "unit": "件"
+      },
+      {
+       "label": "在途",
+       "op": "=",
+       "value": 10,
+       "unit": "件"
+      }
+     ],
+     "title": "调拨：截止 1 月 6 日"
+    },
+    {
+     "type": "note",
+     "text": "另有 5 件尚未发出，不计入在途；未完成采购是预期供应，不能直接加进现有库存。"
+    }
+   ]
+  },
+  "fc2-0400": {
+   "title": "留存率与复购率：分母是两群不同的客户",
+   "derived": [
+    "0.5"
+   ],
+   "blocks": [
+    {
+     "type": "table",
+     "columns": [
+      "",
+      "分母",
+      "分子",
+      "结果"
+     ],
+     "rows": [
+      [
+       "同期群留存率（一月首购群）",
+       "客户1、客户2（固定）",
+       "客户1（二月回访）",
+       {
+        "t": "1 ÷ 2 = 50%",
+        "tone": "good"
+       }
+      ],
+      [
+       "二月期间复购率",
+       "客户1、客户3（二月购买者）",
+       "客户3（买了两次）",
+       {
+        "t": "1 ÷ 2 = 50%",
+        "tone": "good"
+       }
+      ]
+     ],
+     "title": "一月首购客户 1、2；二月购买的是客户 1（一次）和客户 3（两次）"
+    },
+    {
+     "type": "note",
+     "text": "两个都是 50%，只是巧合：客户集合不同，含义也不同，不能互换。"
+    }
+   ]
+  },
+  "fc2-0417": {
+   "title": "费用、采购承诺、付款：同一笔业务的三个口径（一月）",
+   "blocks": [
+    {
+     "type": "table",
+     "columns": [
+      "口径",
+      "一月",
+      "二月"
+     ],
+     "rows": [
+      [
+       "费用（销售成本）",
+       {
+        "t": "60",
+        "tone": "good"
+       },
+       "0"
+      ],
+      [
+       "采购承诺（有效采购订单）",
+       "100",
+       "—"
+      ],
+      [
+       "付款（现金流出）",
+       "40",
+       "60"
+      ]
+     ],
+     "title": "一月订购并收货 100，其中 60 转为销售成本，实际支付 40；二月再付 60"
+    },
+    {
+     "type": "note",
+     "text": "本期费用是确认条件决定的 60，不是订单的 100，也不是付款的 40。"
+    }
+   ]
+  },
+  "fc2-0496": {
+   "title": "百分点 vs 相对增长：20% → 25%",
+   "derived": [
+    "0.25"
+   ],
+   "blocks": [
+    {
+     "type": "calc",
+     "lines": [
+      {
+       "label": "新比例",
+       "value": 25,
+       "unit": "%"
+      },
+      {
+       "label": "旧比例",
+       "op": "−",
+       "value": 20,
+       "unit": "%"
+      },
+      {
+       "label": "变化",
+       "op": "=",
+       "value": 5,
+       "unit": "个百分点"
+      }
+     ],
+     "title": "百分点：直接相减"
+    },
+    {
+     "type": "calc",
+     "lines": [
+      {
+       "label": "新比例 − 旧比例",
+       "value": 5
+      },
+      {
+       "label": "÷ 旧比例",
+       "op": "÷",
+       "value": 20
+      },
+      {
+       "label": "",
+       "op": "=",
+       "value": 0.25
+      },
+      {
+       "label": "× 100%",
+       "op": "×",
+       "value": 100
+      },
+      {
+       "label": "相对增长",
+       "op": "=",
+       "value": 25,
+       "unit": "%"
+      }
+     ],
+     "title": "相对增长：再除以旧比例"
+    },
+    {
+     "type": "table",
+     "columns": [
+      "",
+      "百分点",
+      "相对增长"
+     ],
+     "rows": [
+      [
+       "25% 至 20%",
+       "-5 个百分点",
+       "-20%"
+      ]
+     ],
+     "title": "反过来 25% → 20%"
+    }
+   ]
+  },
+  "fc2-0497": {
+   "title": "哪些指标能直接加？",
+   "derived": [
+    "35",
+    "170",
+    "0.2059"
+   ],
+   "blocks": [
+    {
+     "type": "table",
+     "columns": [
+      "指标",
+      "数据",
+      "能直接加吗",
+      "结果"
+     ],
+     "rows": [
+      [
+       "销售额（可加总）",
+       "100 + 50 + 200",
+       {
+        "t": "能（不重叠、同币种）",
+        "tone": "good"
+       },
+       "350"
+      ],
+      [
+       "期末库存（半可加）",
+       "2 月底 150；3 月底 155",
+       {
+        "t": "不能跨日期累加",
+        "tone": "bad"
+       },
+       "累加得 305（错）；取 3 月底：155"
+      ],
+      [
+       "转化率（不可加）",
+       "购买 20、10、5；访问 100、20、50",
+       {
+        "t": "不能直接平均",
+        "tone": "bad"
+       },
+       ""
+      ]
+     ],
+     "title": "卡里的三种指标"
+    },
+    {
+     "type": "calc",
+     "lines": [
+      {
+       "label": "购买次数合计（20 + 10 + 5）",
+       "value": 35
+      },
+      {
+       "label": "访问量合计（100 + 20 + 50）",
+       "value": 170,
+       "op": "÷"
+      },
+      {
+       "label": "比例（约）",
+       "value": 0.2059,
+       "op": "=",
+       "approx": true
+      },
+      {
+       "label": "换成百分数",
+       "value": 100,
+       "op": "×"
+      },
+      {
+       "label": "整体转化率",
+       "value": 20.5882,
+       "op": "=",
+       "unit": "%",
+       "approx": true
+      }
+     ],
+     "title": "转化率：先汇总分子分母，再相除"
+    },
+    {
+     "type": "note",
+     "text": "把三行各自的转化率直接平均，会得到 26.6667%，偏差很大。"
+    }
+   ]
+  },
+  "fc2-0500": {
+   "title": "整体正相关，每个季节内却是负的",
+   "blocks": [
+    {
+     "type": "table",
+     "columns": [
+      "季节",
+      "广告",
+      "销量"
+     ],
+     "rows": [
+      [
+       "淡季",
+       "1",
+       "12"
+      ],
+      [
+       "淡季",
+       "2",
+       "10"
+      ],
+      [
+       "旺季",
+       "3",
+       "32"
+      ],
+      [
+       "旺季",
+       "4",
+       "30"
+      ]
+     ],
+     "title": "教学数据"
+    },
+    {
+     "type": "table",
+     "columns": [
+      "范围",
+      "协方差",
+      "方向"
+     ],
+     "rows": [
+      [
+       "整体（四条一起）",
+       "9.5",
+       {
+        "t": "正",
+        "tone": "good"
+       }
+      ],
+      [
+       "淡季内",
+       "-0.5",
+       {
+        "t": "负",
+        "tone": "bad"
+       }
+      ],
+      [
+       "旺季内",
+       "-0.5",
+       {
+        "t": "负",
+        "tone": "bad"
+       }
+      ]
+     ],
+     "title": "协方差（符号表示同向或反向变化）"
+    },
+    {
+     "type": "note",
+     "text": "旺季同时抬高了广告和销量，整体才显得正相关：相关不等于广告增加销量。"
+    }
+   ]
+  },
+  "fc2-0502": {
+   "title": "透视再反透视：聚合掉的明细回不来",
+   "blocks": [
+    {
+     "type": "flow",
+     "items": [
+      {
+       "title": "长表：A 店一月有两笔",
+       "table": {
+        "columns": [
+         "store",
+         "month",
+         "amount"
+        ],
+        "rows": [
+         [
+          "A",
+          "Jan",
+          10
+         ],
+         [
+          "A",
+          "Jan",
+          20
+         ],
+         [
+          "A",
+          "Feb",
+          40
+         ],
+         [
+          "B",
+          "Jan",
+          5
+         ]
+        ]
+       }
+      },
+      {
+       "title": "透视（条件聚合）：类别变成列",
+       "detail": "A 店一月的 10 和 20 合成了 30。",
+       "badge": "聚合",
+       "table": {
+        "columns": [
+         "store",
+         "jan",
+         "feb"
+        ],
+        "rows": [
+         [
+          "A",
+          30,
+          40
+         ],
+         [
+          "B",
+          5,
+          null
+         ]
+        ]
+       }
+      },
+      {
+       "title": "反透视（UNION ALL）：多列变回多行",
+       "detail": "一月只剩 30，原来的两笔 10、20 无法恢复；B 店二月的缺失保留为 NULL。",
+       "badge": "不能还原",
+       "table": {
+        "columns": [
+         "store",
+         "month",
+         "amount"
+        ],
+        "rows": [
+         [
+          "A",
+          "Feb",
+          40
+         ],
+         [
+          "A",
+          "Jan",
+          30
+         ],
+         [
+          "B",
+          "Feb",
+          null
+         ],
+         [
+          "B",
+          "Jan",
+          5
+         ]
+        ]
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "fc2-0003": {
+   "title": "依次写入订单编号，主键逐个检查",
+   "blocks": [
+    {
+     "type": "pairs",
+     "items": [
+      {
+       "left": "101",
+       "right": "有效",
+       "note": "第一次出现",
+       "tone": "good"
+      },
+      {
+       "left": "102",
+       "right": "有效",
+       "tone": "good"
+      },
+      {
+       "left": "101",
+       "right": "重复，拒绝",
+       "note": "101 已经存在",
+       "tone": "bad"
+      },
+      {
+       "left": "NULL",
+       "right": "MySQL 拒绝",
+       "note": "主键不允许为空",
+       "tone": "bad"
+      }
+     ]
+    },
+    {
+     "type": "note",
+     "text": "每张表最多一个主键约束；主键也可以由多个字段组成。"
+    }
+   ]
+  },
+  "fc2-0005": {
+   "title": "复合主键：看整个组合，不看单个字段",
+   "blocks": [
+    {
+     "type": "pairs",
+     "items": [
+      {
+       "left": "仓库 1 · 商品 10",
+       "right": "有效",
+       "tone": "good"
+      },
+      {
+       "left": "仓库 1 · 商品 11",
+       "right": "有效",
+       "tone": "good"
+      },
+      {
+       "left": "仓库 2 · 商品 10",
+       "right": "有效",
+       "note": "商品 10 又出现了，但组合不同",
+       "tone": "good"
+      },
+      {
+       "left": "仓库 1 · 商品 10",
+       "right": "组合重复，拒绝",
+       "note": "与第一行的组合完全相同",
+       "tone": "bad"
+      }
+     ]
+    },
+    {
+     "type": "note",
+     "text": "组成主键的每个字段在 MySQL 里都不能为空。"
+    }
+   ]
+  },
+  "fc2-0011": {
+   "title": "按业务含义选类型",
+   "blocks": [
+    {
+     "type": "pairs",
+     "items": [
+      {
+       "left": "25",
+       "right": "INT",
+       "note": "数量用整数"
+      },
+      {
+       "left": "19.90",
+       "right": "DECIMAL(10,2)",
+       "note": "精确金额"
+      },
+      {
+       "left": "00123",
+       "right": "VARCHAR(20)",
+       "note": "编码用文本，保留前导零"
+      },
+      {
+       "left": "2025-01-01",
+       "right": "DATE",
+       "note": "自然日期"
+      }
+     ]
+    },
+    {
+     "type": "note",
+     "text": "电话号码可能有前导零，不要因为只含数字就定义成数值。"
+    }
+   ]
+  },
+  "fc2-0016": {
+   "title": "数据字典里，一个字段要说明什么",
+   "blocks": [
+    {
+     "type": "chunks",
+     "title": "以 net_cents 为例",
+     "items": [
+      {
+       "role": "字段名",
+       "text": "net_cents",
+       "family": "select"
+      },
+      {
+       "role": "含义",
+       "text": "净销售额",
+       "family": "from"
+      },
+      {
+       "role": "单位",
+       "text": "马币分（金额字段以整数分保存）",
+       "family": "where"
+      },
+      {
+       "role": "还应记录",
+       "text": "类型 · 可空性 · 约束 · 主外键 · 视图的计算口径",
+       "family": "join"
+      }
+     ]
+    },
+    {
+     "type": "note",
+     "text": "只有字段名清单，看不出 net_cents 是“分”不是“元”，也看不出统计口径。"
+    }
+   ]
+  },
+  "fc2-0020": {
+   "title": "三种“键”各自是什么",
+   "blocks": [
+    {
+     "type": "pairs",
+     "items": [
+      {
+       "left": "候选键",
+       "right": "能唯一识别记录，且没有多余的组成字段",
+       "note": "主键从候选键里选定"
+      },
+      {
+       "left": "业务唯一键",
+       "right": "来自业务规则",
+       "note": "例：供应商＋发票号"
+      },
+      {
+       "left": "代理键",
+       "right": "人为生成的内部编号",
+       "note": "例：supplier_invoice_id；不保证业务事实不重复"
+      }
+     ]
+    },
+    {
+     "type": "note",
+     "text": "“供应商＋发票号”目前只是重复检查键，不保证唯一；规则和数据都验证唯一、非空且最小后，才能称为候选键。"
+    }
+   ]
+  },
+  "fc2-0044": {
+   "title": "字符集与排序规则：各管一件事",
+   "blocks": [
+    {
+     "type": "pairs",
+     "items": [
+      {
+       "left": "字符集",
+       "right": "决定值怎么表示"
+      },
+      {
+       "left": "排序规则",
+       "right": "决定比较和排序时，怎样对待大小写、重音等差异"
+      }
+     ]
+    },
+    {
+     "type": "steps",
+     "items": [
+      {
+       "title": "核对客户编码之前，先确认列的排序规则"
+      },
+      {
+       "title": "再判断“A”和“a”算不算同一个编码"
+      },
+      {
+       "title": "否则可能把不同的编码误合并"
+      }
+     ]
+    },
+    {
+     "type": "note",
+     "text": "SQLite 的 BINARY、NOCASE 不等同于 MySQL 的 Unicode 排序规则。"
+    }
+   ]
+  },
+  "fc2-0056": {
+   "title": "NULL、0、空字符串：三种不同的状态",
+   "blocks": [
+    {
+     "type": "table",
+     "columns": [
+      "值",
+      "含义",
+      "参与比较时"
+     ],
+     "rows": [
+      [
+       "NULL",
+       "没有已知或适用的值",
+       {
+        "t": "得到“未知”，WHERE 不保留",
+        "tone": "warn"
+       }
+      ],
+      [
+       "0",
+       "已确认数量为零",
+       "正常得到真或假"
+      ],
+      [
+       "空字符串",
+       "已存入一段空文本",
+       "正常得到真或假"
+      ]
+     ]
+    },
+    {
+     "type": "note",
+     "text": "不要不经业务判断，就把所有空值替换成零。"
+    }
+   ]
+  },
+  "fc2-0235": {
+   "title": "同一份输入：普通聚合压成一行，窗口函数保留每行",
+   "blocks": [
+    {
+     "type": "flow",
+     "items": [
+      {
+       "title": "输入：2 行",
+       "table": {
+        "columns": [
+         "商品",
+         "销量"
+        ],
+        "rows": [
+         [
+          "A",
+          10
+         ],
+         [
+          "B",
+          20
+         ]
+        ]
+       }
+      },
+      {
+       "title": "普通分组聚合：压成一行",
+       "badge": "1 行",
+       "table": {
+        "columns": [
+         "总销量"
+        ],
+        "rows": [
+         [
+          30
+         ]
+        ]
+       }
+      },
+      {
+       "title": "窗口函数：每行保留，并附上组内总销量",
+       "badge": "2 行",
+       "table": {
+        "columns": [
+         "商品",
+         "销量",
+         "组内总销量"
+        ],
+        "rows": [
+         [
+          "A",
+          10,
+          30
+         ],
+         [
+          "B",
+          20,
+          30
+         ]
+        ]
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "fc2-0273": {
+   "title": "每个质量维度，问一个问题",
+   "blocks": [
+    {
+     "type": "pairs",
+     "items": [
+      {
+       "left": "完整性",
+       "right": "该有的数据都在吗？",
+       "note": "例：订单金额缺失"
+      },
+      {
+       "left": "准确性",
+       "right": "数据和事实一致吗？",
+       "note": "例：金额与凭证不符"
+      },
+      {
+       "left": "一致性",
+       "right": "同一件事的记录一致吗？",
+       "note": "例：同一编码对应多个类别"
+      },
+      {
+       "left": "及时性",
+       "right": "数据是否按时到位？",
+       "note": "例：昨日订单未入库"
+      }
+     ]
+    },
+    {
+     "type": "note",
+     "text": "约束通过不等于业务正确；缺失不一定是零，要区分未知、不适用和实际为零。"
+    }
+   ]
+  },
+  "fc2-0319": {
+   "title": "索引为什么能加快查找（示意）",
+   "blocks": [
+    {
+     "type": "steps",
+     "items": [
+      {
+       "title": "没有索引",
+       "detail": "只能从头到尾逐行检查，每一行都要比一遍。"
+      },
+      {
+       "title": "有索引",
+       "detail": "数据库维护一份有序的键值结构，先在里面缩小范围，再取对应的记录。"
+      },
+      {
+       "title": "代价",
+       "detail": "索引要占存储、要维护，是否使用取决于选择性、数据量和优化器成本，不保证提速。"
+      }
+     ]
+    },
+    {
+     "type": "note",
+     "text": "复合索引 (a, b) 通常能利用前导字段 a；只用 b 不一定能高效查找。"
+    }
+   ]
+  },
+  "fc2-0327": {
+   "title": "哪些写法更容易用上普通有序索引",
+   "blocks": [
+    {
+     "type": "table",
+     "columns": [
+      "条件写法",
+      "能否定位索引"
+     ],
+     "rows": [
+      [
+       "date >= '2025-01-01' AND date < '2026-01-01'",
+       {
+        "t": "通常可以：直接日期范围",
+        "tone": "good"
+       }
+      ],
+      [
+       "YEAR(date) = 2025",
+       {
+        "t": "可能妨碍：对列调用了函数",
+        "tone": "bad"
+       }
+      ],
+      [
+       "LIKE 'abc%'",
+       {
+        "t": "有机会使用前导范围",
+        "tone": "good"
+       }
+      ],
+      [
+       "LIKE '%abc'",
+       {
+        "t": "可能妨碍：前面有通配符",
+        "tone": "bad"
+       }
+      ],
+      [
+       "列被隐式类型转换",
+       {
+        "t": "可能妨碍",
+        "tone": "bad"
+       }
+      ]
+     ]
+    },
+    {
+     "type": "note",
+     "text": "日期语义一致时，把 YEAR(date)=2025 改写成日期范围，再用执行计划核实。"
+    }
+   ]
+  },
+  "fc2-0331": {
+   "title": "EXPLAIN：看数据库打算怎么执行",
+   "blocks": [
+    {
+     "type": "steps",
+     "items": [
+      {
+       "title": "你写的查询（描述想要什么结果）"
+      },
+      {
+       "title": "优化器决定物理计划：怎么访问、连接和处理数据"
+      },
+      {
+       "title": "EXPLAIN 把这个计划展示出来"
+      }
+     ]
+    },
+    {
+     "type": "table",
+     "columns": [
+      "字段",
+      "含义"
+     ],
+     "rows": [
+      [
+       "type",
+       "访问方式"
+      ],
+      [
+       "possible_keys",
+       "候选索引"
+      ],
+      [
+       "key",
+       "实际选用的索引"
+      ],
+      [
+       "rows、filtered",
+       "估算值，不是实测"
+      ]
+     ],
+     "title": "MySQL EXPLAIN 的主要字段"
+    },
+    {
+     "type": "note",
+     "text": "普通 EXPLAIN 不是实测耗时；EXPLAIN ANALYZE 会真的执行查询，要谨慎使用。"
+    }
+   ]
+  },
+  "fc2-0390": {
+   "title": "同一个客户的订单：谁是首购订单",
+   "blocks": [
+    {
+     "type": "table",
+     "columns": [
+      "订单",
+      "日期",
+      "订单分类",
+      "为什么"
+     ],
+     "rows": [
+      [
+       "101",
+       "2025-01-05",
+       {
+        "t": "首购",
+        "tone": "good"
+       },
+       "该客户的第一笔有效订单"
+      ],
+      [
+       "102",
+       "2025-01-05",
+       "非首购",
+       "同一天再下单；客户仍可属于新客群，但这单不是首购订单"
+      ],
+      [
+       "103",
+       "2025-02-03",
+       "非首购",
+       "后续订单"
+      ]
+     ],
+     "hl": [
+      0
+     ]
+    },
+    {
+     "type": "note",
+     "text": "新老客户看“首次有效购买的时间”；首购订单是“第一笔订单”。要先明确有效状态、渠道和历史起点。"
+    }
+   ]
+  },
+  "fc2-0396": {
+   "title": "RFM：三个字母，三个维度",
+   "blocks": [
+    {
+     "type": "pairs",
+     "items": [
+      {
+       "left": "R · 最近消费",
+       "right": "距截止日 10 天",
+       "note": "越近越好"
+      },
+      {
+       "left": "F · 消费频率",
+       "right": "期间 5 笔订单",
+       "note": "通常越高越好"
+      },
+      {
+       "left": "M · 消费金额",
+       "right": "期间净消费 800 马币",
+       "note": "通常越高越好"
+      }
+     ]
+    },
+    {
+     "type": "note",
+     "text": "分桶方式和阈值是本题的设定，不是通用行业标准；历史价值不等于预测价值。"
+    }
+   ]
+  },
+  "fc2-0398": {
+   "title": "同期群：成员固定，追踪的是同一批人",
+   "blocks": [
+    {
+     "type": "flow",
+     "items": [
+      {
+       "title": "确定同期群：1 月首次购买的客户",
+       "detail": "之后成员不再变动。",
+       "table": {
+        "columns": [
+         "客户",
+         "首购月"
+        ],
+        "rows": [
+         [
+          "甲",
+          "1月"
+         ],
+         [
+          "乙",
+          "1月"
+         ],
+         [
+          "丙",
+          "1月"
+         ]
+        ]
+       }
+      },
+      {
+       "title": "观察次月：仍然是这三个人",
+       "detail": "已观察但没有购买，记为零；还没到的月份不输出。",
+       "table": {
+        "columns": [
+         "客户",
+         "次月有购买"
+        ],
+        "rows": [
+         [
+          "甲",
+          "是"
+         ],
+         [
+          "乙",
+          "否"
+         ],
+         [
+          "丙",
+          "是"
+         ]
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "type": "note",
+     "text": "如果每个月重新挑客户，分母就变了，前后不可比。"
+    }
+   ]
+  },
+  "fc2-0418": {
+   "title": "赊销形成应收账款（单位：元）",
+   "blocks": [
+    {
+     "type": "calc",
+     "lines": [
+      {
+       "label": "确认的应收",
+       "value": 1000
+      },
+      {
+       "label": "已收",
+       "op": "−",
+       "value": 600
+      },
+      {
+       "label": "剩余应收",
+       "op": "=",
+       "value": 400
+      }
+     ]
+    },
+    {
+     "type": "note",
+     "text": "只有赊销才形成应收；订单收入不必然是应收。"
+    }
+   ]
+  },
+  "fc2-0431": {
+   "title": "贷项通知单减少应付，不是现金退款（单位：元）",
+   "derived": [
+    "900"
+   ],
+   "blocks": [
+    {
+     "type": "calc",
+     "lines": [
+      {
+       "label": "发票面额",
+       "value": 1000
+      },
+      {
+       "label": "批准的贷项",
+       "op": "−",
+       "value": 100
+      },
+      {
+       "label": "净应付",
+       "op": "=",
+       "value": 900
+      },
+      {
+       "label": "已付",
+       "op": "−",
+       "value": 400
+      },
+      {
+       "label": "未结",
+       "op": "=",
+       "value": 500
+      }
+     ]
+    },
+    {
+     "type": "note",
+     "text": "贷项让净应付变少；这个例子里没有任何现金退回。"
+    }
+   ]
+  },
+  "fc2-0456": {
+   "title": "历史部门要按“当时”的任职区间判断",
+   "blocks": [
+    {
+     "type": "table",
+     "columns": [
+      "观察日",
+      "哪个区间包含它",
+      "当时的部门"
+     ],
+     "rows": [
+      [
+       "6月末",
+       "2025-01-01 ≤ 观察日 < 2025-07-01",
+       {
+        "t": "A",
+        "tone": "good"
+       }
+      ],
+      [
+       "7月1日",
+       "2025-07-01 ≤ 观察日（结束日为空，仍有效）",
+       {
+        "t": "B",
+        "tone": "good"
+       }
+      ]
+     ],
+     "title": "7 月 1 日从 A 部门调往 B 部门"
+    },
+    {
+     "type": "note",
+     "text": "如果直接用员工“当前部门”B，6 月末的人数会被错记到 B。"
+    }
+   ]
+  },
+  "fc2-0034": {
+   "title": "同一批行：不加括号与加括号，各留下谁",
+   "blocks": [
+    {
+     "type": "table",
+     "columns": [
+      "id",
+      "region",
+      "paid",
+      "不加括号",
+      "加括号"
+     ],
+     "rows": [
+      [
+       1,
+       "A",
+       0,
+       {
+        "t": "保留（多选了）",
+        "tone": "bad"
+       },
+       "不保留"
+      ],
+      [
+       2,
+       "A",
+       1,
+       "保留",
+       "保留"
+      ],
+      [
+       3,
+       "B",
+       0,
+       "不保留",
+       "不保留"
+      ],
+      [
+       4,
+       "B",
+       1,
+       "保留",
+       "保留"
+      ],
+      [
+       5,
+       "C",
+       1,
+       "不保留",
+       "不保留"
+      ]
+     ],
+     "title": "不加括号时，AND 先于 OR：region='A' OR (region='B' AND paid=1)",
+     "hl": [
+      0
+     ]
+    },
+    {
+     "type": "note",
+     "text": "不加括号时，只要地区是 A 就保留，没有检查是否已付款，所以 id 1 被多选。"
+    }
+   ]
+  },
+  "fc2-0059": {
+   "title": "空值怎样传播",
+   "blocks": [
+    {
+     "type": "table",
+     "columns": [
+      "表达式",
+      "结果"
+     ],
+     "rows": [
+      [
+       "NULL AND 1",
+       "未知（NULL）"
+      ],
+      [
+       "NULL AND 0",
+       "假（0）"
+      ],
+      [
+       "NULL OR 1",
+       "真（1）"
+      ],
+      [
+       "NULL OR 0",
+       "未知（NULL）"
+      ]
+     ],
+     "title": "未知与真假的组合"
+    },
+    {
+     "type": "table",
+     "columns": [
+      "id",
+      "x",
+      "x > 0",
+      "NOT (x > 0)",
+      "x + 10"
+     ],
+     "rows": [
+      [
+       1,
+       5,
+       1,
+       0,
+       15
+      ],
+      [
+       2,
+       0,
+       0,
+       1,
+       10
+      ],
+      [
+       3,
+       null,
+       null,
+       null,
+       null
+      ]
+     ],
+     "title": "逐行看：比较、取反与算术",
+     "hl": [
+      2
+     ]
+    },
+    {
+     "type": "note",
+     "text": "WHERE 只保留结果为“真”的行：NOT (x > 0) 只留下 id 2，id 3 是未知，被筛掉。"
+    }
+   ]
+  },
+  "fc2-0073": {
+   "title": "聚合函数遇到零行、全空值、部分空值",
+   "blocks": [
+    {
+     "type": "table",
+     "columns": [
+      "输入",
+      "COUNT(*)",
+      "COUNT(字段)",
+      "SUM",
+      "AVG"
+     ],
+     "rows": [
+      [
+       "零行（不分组）",
+       "0",
+       "0",
+       null,
+       null
+      ],
+      [
+       "全空的组 B",
+       "1",
+       "0",
+       null,
+       null
+      ],
+      [
+       "部分为空的组 A",
+       "3",
+       "2",
+       "40",
+       "20"
+      ]
+     ],
+     "hl": [
+      0,
+      1
+     ]
+    },
+    {
+     "type": "note",
+     "text": "SUM、AVG 只计非空值；有 GROUP BY 时，零行通常没有分组结果。"
+    }
+   ]
+  },
+  "fc2-0082": {
+   "title": "一行代表一个“门店 + 商品”的组合",
+   "blocks": [
+    {
+     "type": "flow",
+     "items": [
+      {
+       "title": "原始交易：6 行",
+       "table": {
+        "columns": [
+         "store",
+         "sku",
+         "amount"
+        ],
+        "rows": [
+         [
+          "A",
+          "X",
+          40
+         ],
+         [
+          "A",
+          "X",
+          60
+         ],
+         [
+          "A",
+          "Y",
+          30
+         ],
+         [
+          "B",
+          "X",
+          50
+         ],
+         [
+          "B",
+          null,
+          10
+         ],
+         [
+          "B",
+          null,
+          20
+         ]
+        ]
+       }
+      },
+      {
+       "title": "按（门店，商品）分组：4 组",
+       "detail": "商品为空的两条记录归到同一组。",
+       "badge": "4 组",
+       "table": {
+        "columns": [
+         "store",
+         "sku",
+         "n",
+         "total"
+        ],
+        "rows": [
+         [
+          "A",
+          "X",
+          2,
+          100
+         ],
+         [
+          "A",
+          "Y",
+          1,
+          30
+         ],
+         [
+          "B",
+          null,
+          2,
+          30
+         ],
+         [
+          "B",
+          "X",
+          1,
+          50
+         ]
+        ]
+       }
+      },
+      {
+       "title": "只按门店分组：2 组",
+       "badge": "2 组",
+       "table": {
+        "columns": [
+         "store",
+         "n",
+         "total"
+        ],
+        "rows": [
+         [
+          "A",
+          3,
+          130
+         ],
+         [
+          "B",
+          3,
+          80
+         ]
+        ]
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "fc2-0085": {
+   "title": "逻辑顺序：每一步剩下什么",
+   "blocks": [
+    {
+     "type": "flow",
+     "items": [
+      {
+       "title": "来源：6 行订单",
+       "badge": "6 行",
+       "table": {
+        "columns": [
+         "id",
+         "store",
+         "amount",
+         "status"
+        ],
+        "rows": [
+         [
+          1,
+          "A",
+          100,
+          "paid"
+         ],
+         [
+          2,
+          "A",
+          50,
+          "paid"
+         ],
+         [
+          3,
+          "A",
+          900,
+          "cancelled"
+         ],
+         [
+          4,
+          "B",
+          80,
+          "paid"
+         ],
+         [
+          5,
+          "C",
+          200,
+          "paid"
+         ],
+         [
+          6,
+          "C",
+          20,
+          "paid"
+         ]
+        ],
+        "dim": [
+         2
+        ]
+       }
+      },
+      {
+       "title": "行筛选 WHERE status = paid：剩 5 行，再分组聚合",
+       "badge": "3 组",
+       "table": {
+        "columns": [
+         "store",
+         "total"
+        ],
+        "rows": [
+         [
+          "A",
+          150
+         ],
+         [
+          "B",
+          80
+         ],
+         [
+          "C",
+          220
+         ]
+        ]
+       }
+      },
+      {
+       "title": "组筛选 HAVING ≥ 100",
+       "detail": "B 组只有 80，被筛掉。",
+       "badge": "2 组",
+       "table": {
+        "columns": [
+         "store",
+         "total"
+        ],
+        "rows": [
+         [
+          "A",
+          150
+         ],
+         [
+          "B",
+          80
+         ],
+         [
+          "C",
+          220
+         ]
+        ],
+        "dim": [
+         1
+        ]
+       }
+      },
+      {
+       "title": "窗口计算、选择输出、去重、排序、限行",
+       "table": {
+        "columns": [
+         "store",
+         "total",
+         "rn"
+        ],
+        "rows": [
+         [
+          "C",
+          220,
+          1
+         ],
+         [
+          "A",
+          150,
+          2
+         ]
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "type": "note",
+     "text": "这是语义上的顺序，不等于优化器实际的物理执行计划。"
+    }
+   ]
+  },
+  "fc2-0095": {
+   "title": "内连接：只有匹配的行才留下",
+   "blocks": [
+    {
+     "type": "flow",
+     "items": [
+      {
+       "title": "客户 3 行",
+       "table": {
+        "columns": [
+         "id",
+         "name"
+        ],
+        "rows": [
+         [
+          1,
+          "A"
+         ],
+         [
+          2,
+          "B"
+         ],
+         [
+          3,
+          "C"
+         ]
+        ]
+       }
+      },
+      {
+       "title": "订单 5 行：14、15 找不到对应客户",
+       "table": {
+        "columns": [
+         "id",
+         "customer_id",
+         "amount",
+         "status"
+        ],
+        "rows": [
+         [
+          11,
+          1,
+          100,
+          "paid"
+         ],
+         [
+          12,
+          1,
+          50,
+          "pending"
+         ],
+         [
+          13,
+          2,
+          80,
+          "paid"
+         ],
+         [
+          14,
+          9,
+          40,
+          "paid"
+         ],
+         [
+          15,
+          null,
+          20,
+          "paid"
+         ]
+        ],
+        "dim": [
+         3,
+         4
+        ]
+       }
+      },
+      {
+       "title": "内连接：匹配行 3 行（客户 3 没有订单，也不输出）",
+       "badge": "3 行",
+       "table": {
+        "columns": [
+         "customer_id",
+         "order_id",
+         "amount"
+        ],
+        "rows": [
+         [
+          1,
+          11,
+          100
+         ],
+         [
+          1,
+          12,
+          50
+         ],
+         [
+          2,
+          13,
+          80
+         ]
+        ]
+       }
+      },
+      {
+       "title": "再筛选已付款：只剩符合条件的匹配行",
+       "badge": "2 行",
+       "table": {
+        "columns": [
+         "customer_id",
+         "order_id",
+         "amount"
+        ],
+        "rows": [
+         [
+          1,
+          11,
+          100
+         ],
+         [
+          2,
+          13,
+          80
+         ]
+        ]
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "fc2-0096": {
+   "title": "左连接：右表条件放在 ON，还是 WHERE",
+   "blocks": [
+    {
+     "type": "flow",
+     "items": [
+      {
+       "title": "左连接：保留所有客户，未匹配的右表列补 NULL",
+       "badge": "4 行",
+       "table": {
+        "columns": [
+         "customer_id",
+         "order_id",
+         "amount"
+        ],
+        "rows": [
+         [
+          1,
+          11,
+          100
+         ],
+         [
+          1,
+          12,
+          50
+         ],
+         [
+          2,
+          13,
+          80
+         ],
+         [
+          3,
+          null,
+          null
+         ]
+        ],
+        "hl": [
+         3
+        ]
+       }
+      },
+      {
+       "title": "条件放在 ON（status = paid）：只限制“匹配哪些订单”",
+       "detail": "客户 3 仍然保留。",
+       "badge": "3 行",
+       "table": {
+        "columns": [
+         "customer_id",
+         "order_id",
+         "amount"
+        ],
+        "rows": [
+         [
+          1,
+          11,
+          100
+         ],
+         [
+          2,
+          13,
+          80
+         ],
+         [
+          3,
+          null,
+          null
+         ]
+        ]
+       }
+      },
+      {
+       "title": "条件放在 WHERE：对连接结果筛选，NULL 被拒绝",
+       "detail": "客户 3 被排除。",
+       "badge": "2 行",
+       "table": {
+        "columns": [
+         "customer_id",
+         "order_id",
+         "amount"
+        ],
+        "rows": [
+         [
+          1,
+          11,
+          100
+         ],
+         [
+          2,
+          13,
+          80
+         ]
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "type": "table",
+     "columns": [
+      "id",
+      "COUNT(*)",
+      "COUNT(o.id)"
+     ],
+     "rows": [
+      [
+       1,
+       2,
+       2
+      ],
+      [
+       2,
+       1,
+       1
+      ],
+      [
+       3,
+       {
+        "t": "1",
+        "tone": "warn"
+       },
+       {
+        "t": "0",
+        "tone": "good"
+       }
+      ]
+     ],
+     "title": "统计订单数：用非空的右表主键",
+     "hl": [
+      2
+     ]
+    }
+   ]
+  },
+  "fc2-0098": {
+   "title": "全外连接：左连接 + 反向未匹配行",
+   "blocks": [
+    {
+     "type": "flow",
+     "items": [
+      {
+       "title": "左连接：保留左表全部行",
+       "detail": "a、b 的键都有重复，所以匹配组合会展开。",
+       "badge": "6 行",
+       "table": {
+        "columns": [
+         "aid",
+         "bid"
+        ],
+        "rows": [
+         [
+          1,
+          null
+         ],
+         [
+          2,
+          11
+         ],
+         [
+          2,
+          12
+         ],
+         [
+          3,
+          11
+         ],
+         [
+          3,
+          12
+         ],
+         [
+          4,
+          null
+         ]
+        ]
+       }
+      },
+      {
+       "title": "反向左连接：只取右表里没有匹配的行",
+       "detail": "用保证非空的左表 id 是否为空来判断。",
+       "badge": "2 行",
+       "table": {
+        "columns": [
+         "aid",
+         "bid"
+        ],
+        "rows": [
+         [
+          null,
+          13
+         ],
+         [
+          null,
+          14
+         ]
+        ]
+       }
+      },
+      {
+       "title": "UNION ALL：保留两个分支的全部行",
+       "badge": "8 行",
+       "table": {
+        "columns": [
+         "aid",
+         "bid"
+        ],
+        "rows": [
+         [
+          null,
+          13
+         ],
+         [
+          null,
+          14
+         ],
+         [
+          1,
+          null
+         ],
+         [
+          2,
+          11
+         ],
+         [
+          2,
+          12
+         ],
+         [
+          3,
+          11
+         ],
+         [
+          3,
+          12
+         ],
+         [
+          4,
+          null
+         ]
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "type": "note",
+     "text": "不能用 UNION 去重来代替；普通等值也不会把两个 NULL 配对。"
+    }
+   ]
+  },
+  "fc2-0099": {
+   "title": "交叉连接：2 × 3 = 6 个组合，再补上销售",
+   "blocks": [
+    {
+     "type": "flow",
+     "items": [
+      {
+       "title": "门店 2 家 × 月份 3 个 = 6 个组合",
+       "badge": "6 行",
+       "table": {
+        "columns": [
+         "s",
+         "m"
+        ],
+        "rows": [
+         [
+          "A",
+          1
+         ],
+         [
+          "A",
+          2
+         ],
+         [
+          "A",
+          3
+         ],
+         [
+          "B",
+          1
+         ],
+         [
+          "B",
+          2
+         ],
+         [
+          "B",
+          3
+         ]
+        ]
+       }
+      },
+      {
+       "title": "销售事实按（门店，月份）先汇总",
+       "table": {
+        "columns": [
+         "s",
+         "m",
+         "amt"
+        ],
+        "rows": [
+         [
+          "A",
+          1,
+          30
+         ],
+         [
+          "B",
+          2,
+          5
+         ]
+        ]
+       }
+      },
+      {
+       "title": "把汇总结果左连接到 6 个组合上",
+       "detail": "没有交易的组合保留为 NULL；是否补零，要看观测是否完整。",
+       "table": {
+        "columns": [
+         "s",
+         "m",
+         "amt"
+        ],
+        "rows": [
+         [
+          "A",
+          1,
+          30
+         ],
+         [
+          "A",
+          2,
+          null
+         ],
+         [
+          "A",
+          3,
+          null
+         ],
+         [
+          "B",
+          1,
+          null
+         ],
+         [
+          "B",
+          2,
+          5
+         ],
+         [
+          "B",
+          3,
+          null
+         ]
+        ],
+        "hl": [
+         0,
+         4
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "type": "note",
+     "text": "任何一个输入表为空，交叉连接的结果就是空的。"
+    }
+   ]
+  },
+  "fc2-0106": {
+   "title": "一对多连接：行数变多，订单金额被重复加",
+   "blocks": [
+    {
+     "type": "flow",
+     "items": [
+      {
+       "title": "订单 3 行 × 明细 3 条，左连接后 4 行",
+       "detail": "订单 1 匹配两条明细，订单金额 100 出现了两次。",
+       "badge": "4 行",
+       "table": {
+        "columns": [
+         "order_id",
+         "item_id",
+         "amount"
+        ],
+        "rows": [
+         [
+          1,
+          11,
+          100
+         ],
+         [
+          1,
+          12,
+          100
+         ],
+         [
+          2,
+          13,
+          50
+         ],
+         [
+          3,
+          null,
+          40
+         ]
+        ],
+        "hl": [
+         0,
+         1
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "type": "calc",
+     "lines": [
+      {
+       "label": "订单 1（第一次）",
+       "value": 100
+      },
+      {
+       "label": "订单 1（重复）",
+       "op": "+",
+       "value": 100
+      },
+      {
+       "label": "订单 2",
+       "op": "+",
+       "value": 50
+      },
+      {
+       "label": "订单 3",
+       "op": "+",
+       "value": 40
+      },
+      {
+       "label": "合计（偏大）",
+       "op": "=",
+       "value": 290
+      }
+     ],
+     "title": "直接累加订单金额"
+    },
+    {
+     "type": "calc",
+     "lines": [
+      {
+       "label": "订单 1",
+       "value": 100
+      },
+      {
+       "label": "订单 2",
+       "op": "+",
+       "value": 50
+      },
+      {
+       "label": "订单 3",
+       "op": "+",
+       "value": 40
+      },
+      {
+       "label": "订单金额",
+       "op": "=",
+       "value": 190
+      }
+     ],
+     "title": "先把明细按订单聚合再连接"
+    }
+   ]
+  },
+  "fc2-0109": {
+   "title": "NULL 能不能连上 NULL",
+   "blocks": [
+    {
+     "type": "flow",
+     "items": [
+      {
+       "title": "普通等值连接：NULL = NULL 是“未知”，不匹配",
+       "detail": "只有 10 = 10 匹配。",
+       "badge": "1 行",
+       "table": {
+        "columns": [
+         "a_id",
+         "b_id"
+        ],
+        "rows": [
+         [
+          1,
+          11
+         ]
+        ]
+       }
+      },
+      {
+       "title": "左连接：保留 a 里没有匹配的行",
+       "badge": "3 行",
+       "table": {
+        "columns": [
+         "a_id",
+         "b_id"
+        ],
+        "rows": [
+         [
+          1,
+          11
+         ],
+         [
+          2,
+          null
+         ],
+         [
+          3,
+          null
+         ]
+        ]
+       }
+      },
+      {
+       "title": "业务明确允许时，显式写“两边都为空”",
+       "detail": "b 里有两个空键，所以 a 的一个空键匹配了两行。",
+       "badge": "3 行",
+       "table": {
+        "columns": [
+         "a_id",
+         "b_id"
+        ],
+        "rows": [
+         [
+          1,
+          11
+         ],
+         [
+          2,
+          12
+         ],
+         [
+          2,
+          13
+         ]
+        ],
+        "hl": [
+         1,
+         2
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "type": "note",
+     "text": "空值不天然代表同一个实体，不能随意补同一个哨兵值。"
+    }
+   ]
+  },
+  "fc2-0120": {
+   "title": "CASE 逐行判断：命中第一个为真的 WHEN",
+   "blocks": [
+    {
+     "type": "table",
+     "columns": [
+      "amount",
+      "先判断 ≥ 100（正确顺序）",
+      "先判断 ≥ 50（宽条件在前）",
+      "省略 ELSE"
+     ],
+     "rows": [
+      [
+       150,
+       "高",
+       {
+        "t": "中",
+        "tone": "bad"
+       },
+       "高"
+      ],
+      [
+       100,
+       "高",
+       {
+        "t": "中",
+        "tone": "bad"
+       },
+       "高"
+      ],
+      [
+       50,
+       "中",
+       "中",
+       {
+        "t": "NULL",
+        "tone": "warn"
+       }
+      ],
+      [
+       49,
+       "其他",
+       "其他",
+       {
+        "t": "NULL",
+        "tone": "warn"
+       }
+      ],
+      [
+       null,
+       "其他",
+       "其他",
+       {
+        "t": "NULL",
+        "tone": "warn"
+       }
+      ]
+     ],
+     "title": "同一批金额，三种写法",
+     "hl": [
+      0,
+      1
+     ]
+    },
+    {
+     "type": "note",
+     "text": "宽条件放在前面，会把更具体的条件盖住；没有命中又省略 ELSE，返回 NULL。"
+    }
+   ]
+  },
+  "fc2-0134": {
+   "title": "相关子查询：每一行用自己所属门店的平均值",
+   "blocks": [
+    {
+     "type": "pairs",
+     "items": [
+      {
+       "left": "门店 A",
+       "right": "平均值 20",
+       "note": "金额 10、30"
+      },
+      {
+       "left": "门店 B",
+       "right": "平均值 150",
+       "note": "金额 100、200；空值不计"
+      },
+      {
+       "left": "门店 C",
+       "right": "平均值 NULL",
+       "note": "金额全为空"
+      }
+     ],
+     "title": "内层随当前行的门店变化"
+    },
+    {
+     "type": "table",
+     "columns": [
+      "写法",
+      "比较的基准",
+      "留下的订单"
+     ],
+     "rows": [
+      [
+       "相关子查询",
+       "所属门店的平均值",
+       "2、4"
+      ],
+      [
+       "非相关子查询",
+       "全体平均值 85",
+       "3、4"
+      ]
+     ],
+     "title": "两种比较"
+    },
+    {
+     "type": "note",
+     "text": "相关性是语义上的依赖；物理执行时，优化器可以改写查询。"
+    }
+   ]
+  },
+  "fc2-0221": {
+   "title": "分支内排序与最后的 ORDER BY：各管一段",
+   "blocks": [
+    {
+     "type": "flow",
+     "items": [
+      {
+       "title": "分支 a 取前两名（分支内排序 + LIMIT 2）",
+       "detail": "a 原有 10、30、20 三行。",
+       "table": {
+        "columns": [
+         "id",
+         "amt"
+        ],
+        "rows": [
+         [
+          2,
+          30
+         ],
+         [
+          3,
+          20
+         ]
+        ]
+       }
+      },
+      {
+       "title": "分支 b 取前两名",
+       "detail": "b 原有 40、5、30 三行。",
+       "table": {
+        "columns": [
+         "id",
+         "amt"
+        ],
+        "rows": [
+         [
+          4,
+          40
+         ],
+         [
+          6,
+          30
+         ]
+        ]
+       }
+      },
+      {
+       "title": "UNION ALL 合并：4 行",
+       "badge": "4 行",
+       "table": {
+        "columns": [
+         "id",
+         "amt"
+        ],
+        "rows": [
+         [
+          2,
+          30
+         ],
+         [
+          3,
+          20
+         ],
+         [
+          4,
+          40
+         ],
+         [
+          6,
+          30
+         ]
+        ]
+       }
+      },
+      {
+       "title": "最后的 ORDER BY：决定整个结果的顺序",
+       "table": {
+        "columns": [
+         "id",
+         "amt"
+        ],
+        "rows": [
+         [
+          4,
+          40
+         ],
+         [
+          2,
+          30
+         ],
+         [
+          6,
+          30
+         ],
+         [
+          3,
+          20
+         ]
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "type": "note",
+     "text": "分支内排序主要配合 LIMIT 选记录，不保证最终展示顺序；最终排序要写明列名和并列时的次级键。"
+    }
+   ]
+  },
+  "fc2-0237": {
+   "title": "分区窗口：不减少行，每行附上所在分区的合计",
+   "blocks": [
+    {
+     "type": "flow",
+     "items": [
+      {
+       "title": "6 条交易，按门店分成两个分区",
+       "table": {
+        "columns": [
+         "id",
+         "store",
+         "day",
+         "amount"
+        ],
+        "rows": [
+         [
+          1,
+          "A",
+          1,
+          10
+         ],
+         [
+          2,
+          "A",
+          2,
+          20
+         ],
+         [
+          3,
+          "A",
+          2,
+          30
+         ],
+         [
+          4,
+          "A",
+          4,
+          null
+         ],
+         [
+          5,
+          "B",
+          1,
+          100
+         ],
+         [
+          6,
+          "B",
+          2,
+          200
+         ]
+        ]
+       }
+      },
+      {
+       "title": "分别求和：A 分区 10 + 20 + 30 = 60（NULL 忽略），B 分区 100 + 200 = 300"
+      },
+      {
+       "title": "合计写回每一行：仍然是 6 行",
+       "badge": "6 行",
+       "table": {
+        "columns": [
+         "id",
+         "store",
+         "total"
+        ],
+        "rows": [
+         [
+          1,
+          "A",
+          60
+         ],
+         [
+          2,
+          "A",
+          60
+         ],
+         [
+          3,
+          "A",
+          60
+         ],
+         [
+          4,
+          "A",
+          60
+         ],
+         [
+          5,
+          "B",
+          300
+         ],
+         [
+          6,
+          "B",
+          300
+         ]
+        ]
+       }
+      },
+      {
+       "title": "对比 GROUP BY：每组压成一行",
+       "badge": "2 行",
+       "table": {
+        "columns": [
+         "store",
+         "total"
+        ],
+        "rows": [
+         [
+          "A",
+          60
+         ],
+         [
+          "B",
+          300
+         ]
+        ]
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "fc2-0253": {
+   "title": "同一天两笔交易：ROWS 逐笔累计，RANGE 一起跳升",
+   "blocks": [
+    {
+     "type": "table",
+     "columns": [
+      "id",
+      "store",
+      "day",
+      "amount",
+      "ROWS 逐行累计",
+      "RANGE（按日期并列）"
+     ],
+     "rows": [
+      [
+       1,
+       "A",
+       1,
+       10,
+       10,
+       10
+      ],
+      [
+       2,
+       "A",
+       2,
+       20,
+       30,
+       {
+        "t": "60",
+        "tone": "warn"
+       }
+      ],
+      [
+       3,
+       "A",
+       2,
+       30,
+       60,
+       "60"
+      ],
+      [
+       4,
+       "A",
+       4,
+       null,
+       60,
+       60
+      ],
+      [
+       5,
+       "B",
+       1,
+       100,
+       100,
+       100
+      ],
+      [
+       6,
+       "B",
+       2,
+       200,
+       300,
+       300
+      ]
+     ],
+     "title": "A 店 id 2、3 的日期相同（第 2 天）",
+     "hl": [
+      1,
+      2
+     ]
+    },
+    {
+     "type": "note",
+     "text": "ROWS 按物理行位置累计，排序时加唯一编号才稳定；RANGE 会把排序值相同的并列行一起算进来。切换门店时累计重置。"
+    }
+   ]
+  },
+  "fc2-0254": {
+   "title": "最近三条记录，不等于最近三个自然日",
+   "blocks": [
+    {
+     "type": "table",
+     "columns": [
+      "id",
+      "store",
+      "day",
+      "amount",
+      "最近三条平均",
+      "有效值个数"
+     ],
+     "rows": [
+      [
+       1,
+       "A",
+       1,
+       10,
+       10,
+       1
+      ],
+      [
+       2,
+       "A",
+       2,
+       20,
+       15,
+       2
+      ],
+      [
+       3,
+       "A",
+       2,
+       30,
+       20,
+       3
+      ],
+      [
+       4,
+       "A",
+       4,
+       null,
+       25,
+       2
+      ],
+      [
+       5,
+       "B",
+       1,
+       100,
+       100,
+       1
+      ],
+      [
+       6,
+       "B",
+       2,
+       200,
+       150,
+       2
+      ]
+     ],
+     "title": "ROWS BETWEEN 2 PRECEDING AND CURRENT ROW",
+     "hl": [
+      3
+     ]
+    },
+    {
+     "type": "note",
+     "text": "A 店的日期是第 1、2、2、4 天，缺第 3 天；“最近三条”并不是连续三个自然日。要三个自然日，先聚合到每日，再建立连续日历，区分缺失和确认的零。"
+    }
+   ]
+  },
+  "fc2-0428": {
+   "title": "发票余额：先各自汇总，再连接（截止 1 月 31 日）",
+   "blocks": [
+    {
+     "type": "flow",
+     "items": [
+      {
+       "title": "付款：2 月的一笔排除",
+       "detail": "按发票汇总：发票 1 付 5000，发票 2 付 6000。",
+       "table": {
+        "columns": [
+         "id",
+         "dt",
+         "amt"
+        ],
+        "rows": [
+         [
+          1,
+          "2025-01-04",
+          2000
+         ],
+         [
+          1,
+          "2025-01-10",
+          3000
+         ],
+         [
+          1,
+          "2025-02-02",
+          4000
+         ],
+         [
+          2,
+          "2025-01-10",
+          6000
+         ]
+        ],
+        "dim": [
+         2
+        ]
+       }
+      },
+      {
+       "title": "贷项：2 月的一笔排除",
+       "detail": "按发票汇总：发票 1 贷项 1000。",
+       "table": {
+        "columns": [
+         "id",
+         "dt",
+         "amt"
+        ],
+        "rows": [
+         [
+          1,
+          "2025-01-05",
+          400
+         ],
+         [
+          1,
+          "2025-01-12",
+          600
+         ],
+         [
+          1,
+          "2025-02-03",
+          500
+         ]
+        ],
+        "dim": [
+         2
+        ]
+       }
+      },
+      {
+       "title": "连接到一行一张发票的基础表",
+       "detail": "发票 2 余额为负：超付，保留并标识。",
+       "table": {
+        "columns": [
+         "id",
+         "billed",
+         "paid",
+         "balance"
+        ],
+        "rows": [
+         [
+          1,
+          9000,
+          5000,
+          4000
+         ],
+         [
+          2,
+          5000,
+          6000,
+          -1000
+         ],
+         [
+          3,
+          3000,
+          0,
+          3000
+         ]
+        ],
+        "hl": [
+         1
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "type": "calc",
+     "lines": [
+      {
+       "label": "面额",
+       "value": 10000,
+       "unit": "分"
+      },
+      {
+       "label": "贷项",
+       "op": "−",
+       "value": 1000,
+       "unit": "分"
+      },
+      {
+       "label": "净应付",
+       "op": "=",
+       "value": 9000,
+       "unit": "分"
+      },
+      {
+       "label": "付款",
+       "op": "−",
+       "value": 5000,
+       "unit": "分"
+      },
+      {
+       "label": "未付余额",
+       "op": "=",
+       "value": 4000,
+       "unit": "分"
+      }
+     ],
+     "title": "发票 1"
+    },
+    {
+     "type": "note",
+     "text": "如果把付款和贷项直接连到发票上，一张发票会被乘出 4 行，付款和贷项被重复累加。"
+    }
+   ]
+  },
+  "fc2-0435": {
+   "title": "净额：先看科目性质和符号约定（单位：分）",
+   "derived": [
+    "11000"
+   ],
+   "blocks": [
+    {
+     "type": "calc",
+     "lines": [
+      {
+       "label": "借方",
+       "value": 10000
+      },
+      {
+       "label": "贷方（冲回）",
+       "op": "−",
+       "value": 2000
+      },
+      {
+       "label": "费用净额",
+       "op": "=",
+       "value": 8000
+      }
+     ],
+     "title": "费用科目：借方 − 贷方"
+    },
+    {
+     "type": "calc",
+     "lines": [
+      {
+       "label": "贷方",
+       "value": 15000
+      },
+      {
+       "label": "借方（冲回）",
+       "op": "−",
+       "value": 1000
+      },
+      {
+       "label": "收入净额",
+       "op": "=",
+       "value": 14000
+      }
+     ],
+     "title": "收入科目：贷方 − 借方"
+    },
+    {
+     "type": "calc",
+     "lines": [
+      {
+       "label": "流出",
+       "value": -10000
+      },
+      {
+       "label": "退款流入",
+       "op": "+",
+       "value": 2000
+      },
+      {
+       "label": "流出",
+       "op": "+",
+       "value": -3000
+      },
+      {
+       "label": "金额合计",
+       "op": "=",
+       "value": -11000
+      },
+      {
+       "label": "取反",
+       "op": "×",
+       "value": -1
+      },
+      {
+       "label": "净支出",
+       "op": "=",
+       "value": 11000
+      }
+     ],
+     "title": "银行净支出：流入为正、流出为负，合计后取反"
+    },
+    {
+     "type": "note",
+     "text": "如果逐笔取绝对值再加（10000 + 2000 + 3000），会得到 15000，把退款也当成了支出。"
+    }
+   ]
+  },
+  "fc2-0466": {
+   "title": "采购行 1：计划、收货、开票、付款四个环节",
+   "blocks": [
+    {
+     "type": "flow",
+     "items": [
+      {
+       "title": "采购订单：计划订购 10 件",
+       "detail": "订购量 10，单价 100。",
+       "badge": "订购 10"
+      },
+      {
+       "title": "收货：多批实际到货",
+       "detail": "实际到货 6 + 4 = 10；拒收 1；合格 = 10 − 1 = 9。",
+       "badge": "合格 9",
+       "table": {
+        "columns": [
+         "receipt_id",
+         "po_item_id",
+         "received",
+         "rejected"
+        ],
+        "rows": [
+         [
+          1,
+          1,
+          6,
+          1
+         ],
+         [
+          2,
+          1,
+          4,
+          0
+         ]
+        ]
+       }
+      },
+      {
+       "title": "开票：两张发票",
+       "detail": "开票数量 6 + 3 = 9。",
+       "badge": "开票 9",
+       "table": {
+        "columns": [
+         "supplier_invoice_id",
+         "po_item_id",
+         "quantity_billed"
+        ],
+        "rows": [
+         [
+          11,
+          1,
+          6
+         ],
+         [
+          12,
+          1,
+          3
+         ]
+        ]
+       }
+      },
+      {
+       "title": "付款：按发票核对，不分摊到采购行",
+       "table": {
+        "columns": [
+         "supplier_invoice_id",
+         "billed",
+         "paid",
+         "balance"
+        ],
+        "rows": [
+         [
+          11,
+          600,
+          400,
+          200
+         ],
+         [
+          12,
+          300,
+          0,
+          300
+         ]
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "type": "calc",
+     "lines": [
+      {
+       "label": "实际到货",
+       "value": 10,
+       "unit": "件"
+      },
+      {
+       "label": "拒收",
+       "op": "−",
+       "value": 1,
+       "unit": "件"
+      },
+      {
+       "label": "合格收货",
+       "op": "=",
+       "value": 9,
+       "unit": "件"
+      }
+     ],
+     "title": "合格收货",
+     "derived": []
+    }
+   ]
+  },
+  "fc2-0479": {
+   "title": "分两批收货、分两次开票：截止 1 月 31 日核对",
+   "blocks": [
+    {
+     "type": "flow",
+     "items": [
+      {
+       "title": "收货：2 月的一批排除；取消的采购行不算",
+       "detail": "到货 6 + 4 = 10，拒收 1。",
+       "table": {
+        "columns": [
+         "id",
+         "po_item_id",
+         "dt",
+         "received",
+         "rejected"
+        ],
+        "rows": [
+         [
+          11,
+          1,
+          "2025-01-03",
+          6,
+          1
+         ],
+         [
+          12,
+          1,
+          "2025-01-10",
+          4,
+          0
+         ],
+         [
+          13,
+          1,
+          "2025-02-02",
+          2,
+          0
+         ],
+         [
+          14,
+          3,
+          "2025-01-09",
+          8,
+          0
+         ]
+        ],
+        "dim": [
+         2,
+         3
+        ]
+       }
+      },
+      {
+       "title": "开票：2 月的一张排除",
+       "detail": "开票 5 + 4 = 9。",
+       "table": {
+        "columns": [
+         "id",
+         "po_item_id",
+         "dt",
+         "qty"
+        ],
+        "rows": [
+         [
+          21,
+          1,
+          "2025-01-05",
+          5
+         ],
+         [
+          22,
+          1,
+          "2025-01-12",
+          4
+         ],
+         [
+          23,
+          1,
+          "2025-02-03",
+          2
+         ]
+        ],
+        "dim": [
+         2
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "type": "calc",
+     "lines": [
+      {
+       "label": "实际到货",
+       "value": 10
+      },
+      {
+       "label": "拒收",
+       "op": "−",
+       "value": 1
+      },
+      {
+       "label": "合格收货",
+       "op": "=",
+       "value": 9
+      }
+     ],
+     "title": "合格收货"
+    },
+    {
+     "type": "calc",
+     "lines": [
+      {
+       "label": "订购量",
+       "value": 12
+      },
+      {
+       "label": "合格收货",
+       "op": "−",
+       "value": 9
+      },
+      {
+       "label": "待合格收货",
+       "op": "=",
+       "value": 3
+      }
+     ],
+     "title": "待合格收货量"
+    },
+    {
+     "type": "note",
+     "text": "采购行与收货、开票都是一对多：先各自汇总再连接；直接连会得到 4 行，到货被算成 20、开票被算成 18。"
+    }
+   ]
+  },
+  "fc2-0494": {
+   "title": "找“当时有效”的记录，而不是当前记录",
+   "blocks": [
+    {
+     "type": "flow",
+     "items": [
+      {
+       "title": "任职历史：左闭右开，空结束日表示仍有效",
+       "table": {
+        "columns": [
+         "employee_id",
+         "dept",
+         "start_date",
+         "end_date"
+        ],
+        "rows": [
+         [
+          1,
+          "A",
+          "2025-01-01",
+          "2025-02-01"
+         ],
+         [
+          1,
+          "B",
+          "2025-02-01",
+          null
+         ]
+        ]
+       }
+      },
+      {
+       "title": "事件日期落在哪个区间",
+       "detail": "调动日 2025-02-01 只算新部门 B。",
+       "table": {
+        "columns": [
+         "事件",
+         "员工",
+         "日期",
+         "当时的部门"
+        ],
+        "rows": [
+         [
+          1,
+          1,
+          "2025-01-31",
+          {
+           "t": "A",
+           "tone": "good"
+          }
+         ],
+         [
+          2,
+          1,
+          "2025-02-01",
+          {
+           "t": "B",
+           "tone": "good"
+          }
+         ],
+         [
+          3,
+          2,
+          "2025-02-01",
+          {
+           "t": "没有记录（NULL）",
+           "tone": "warn"
+          }
+         ]
+        ]
+       }
+      },
+      {
+       "title": "历史成本：取“不晚于交易日”的最近生效记录",
+       "detail": "不允许未来的成本进入历史。",
+       "table": {
+        "columns": [
+         "sale",
+         "交易日",
+         "当时的成本"
+        ],
+        "rows": [
+         [
+          1,
+          "2024-12-31",
+          {
+           "t": "没有记录（NULL）",
+           "tone": "warn"
+          }
+         ],
+         [
+          2,
+          "2025-01-15",
+          100
+         ],
+         [
+          3,
+          "2025-02-01",
+          120
+         ]
+        ]
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "fc2-0240": {
+   "title": "ROW_NUMBER：并列也给不同编号，换分组重新从 1 开始",
+   "blocks": [
+    {
+     "type": "table",
+     "columns": [
+      "id",
+      "分组 g",
+      "x",
+      "ROW_NUMBER"
+     ],
+     "rows": [
+      [
+       1,
+       "A",
+       100,
+       {
+        "t": "1",
+        "tone": "good"
+       }
+      ],
+      [
+       2,
+       "A",
+       100,
+       {
+        "t": "2",
+        "tone": "good"
+       }
+      ],
+      [
+       3,
+       "A",
+       80,
+       "3"
+      ],
+      [
+       4,
+       "B",
+       90,
+       {
+        "t": "1",
+        "tone": "good"
+       }
+      ],
+      [
+       5,
+       "B",
+       null,
+       "2"
+      ]
+     ],
+     "title": "PARTITION BY g ORDER BY x DESC, id",
+     "hl": [
+      0,
+      1
+     ]
+    },
+    {
+     "type": "note",
+     "text": "id 1 和 id 2 的 x 都是 100（并列），仍然得到 1 和 2：靠 ORDER BY 里追加的唯一编号 id 决定先后。B 组重新从 1 开始。"
+    }
+   ]
+  },
+  "fc2-0241": {
+   "title": "RANK：并列同名次，之后跳过被占用的名次",
+   "blocks": [
+    {
+     "type": "table",
+     "columns": [
+      "id",
+      "分组 g",
+      "x",
+      "RANK"
+     ],
+     "rows": [
+      [
+       1,
+       "A",
+       100,
+       {
+        "t": "1",
+        "tone": "good"
+       }
+      ],
+      [
+       2,
+       "A",
+       100,
+       {
+        "t": "1",
+        "tone": "good"
+       }
+      ],
+      [
+       3,
+       "A",
+       80,
+       {
+        "t": "3",
+        "tone": "warn"
+       }
+      ],
+      [
+       4,
+       "B",
+       90,
+       "1"
+      ],
+      [
+       5,
+       "B",
+       null,
+       "2"
+      ]
+     ],
+     "title": "PARTITION BY g ORDER BY x DESC",
+     "hl": [
+      0,
+      1,
+      2
+     ]
+    },
+    {
+     "type": "note",
+     "text": "A 组有两个第 1 名，所以下一个名次是 3，名次 2 被占用而跳过。不要把唯一编号放进窗口的 ORDER BY，否则会打破并列。"
+    }
+   ]
+  },
+  "fc2-0242": {
+   "title": "DENSE_RANK：并列同名次，之后的名次连续",
+   "blocks": [
+    {
+     "type": "table",
+     "columns": [
+      "id",
+      "分组 g",
+      "x",
+      "DENSE_RANK"
+     ],
+     "rows": [
+      [
+       1,
+       "A",
+       100,
+       {
+        "t": "1",
+        "tone": "good"
+       }
+      ],
+      [
+       2,
+       "A",
+       100,
+       {
+        "t": "1",
+        "tone": "good"
+       }
+      ],
+      [
+       3,
+       "A",
+       80,
+       {
+        "t": "2",
+        "tone": "warn"
+       }
+      ],
+      [
+       4,
+       "B",
+       90,
+       "1"
+      ],
+      [
+       5,
+       "B",
+       null,
+       "2"
+      ]
+     ],
+     "title": "PARTITION BY g ORDER BY x DESC",
+     "hl": [
+      0,
+      1,
+      2
+     ]
+    },
+    {
+     "type": "table",
+     "columns": [
+      "id",
+      "x",
+      "ROW_NUMBER",
+      "RANK",
+      "DENSE_RANK"
+     ],
+     "rows": [
+      [
+       1,
+       100,
+       "1",
+       "1",
+       "1"
+      ],
+      [
+       2,
+       100,
+       "2",
+       "1",
+       "1"
+      ],
+      [
+       3,
+       80,
+       "3",
+       "3",
+       "2"
+      ]
+     ],
+     "title": "A 组：三种编号对照",
+     "hl": [
+      2
+     ]
+    },
+    {
+     "type": "note",
+     "text": "并列之后：ROW_NUMBER 继续往下数，RANK 跳号，DENSE_RANK 连续。"
+    }
+   ]
+  },
+  "fc2-0244": {
+   "title": "LAG 读前一行，LEAD 读后一行（按 id 排序，同组内）",
+   "blocks": [
+    {
+     "type": "table",
+     "columns": [
+      "id",
+      "分组 g",
+      "x",
+      "LAG(x) 前一行",
+      "LEAD(x) 后一行"
+     ],
+     "rows": [
+      [
+       1,
+       "A",
+       100,
+       null,
+       "100"
+      ],
+      [
+       2,
+       "A",
+       100,
+       "100",
+       "80"
+      ],
+      [
+       3,
+       "A",
+       80,
+       "100",
+       null
+      ],
+      [
+       4,
+       "B",
+       90,
+       null,
+       null
+      ],
+      [
+       5,
+       "B",
+       null,
+       "90",
+       null
+      ]
+     ],
+     "title": "LAG(x) 与 LEAD(x) OVER (PARTITION BY g ORDER BY id)"
+    },
+    {
+     "type": "table",
+     "columns": [
+      "id",
+      "x",
+      "LAG(x,1,0)",
+      "原因"
+     ],
+     "rows": [
+      [
+       5,
+       null,
+       {
+        "t": "0",
+        "tone": "good"
+       },
+       "没有前一行：用默认值 0"
+      ],
+      [
+       4,
+       90,
+       {
+        "t": "NULL",
+        "tone": "warn"
+       },
+       "前一行（id 5）存在，它的 x 本身就是 NULL"
+      ],
+      [
+       3,
+       80,
+       "90",
+       "前一行是 id 4"
+      ],
+      [
+       2,
+       100,
+       "80",
+       "前一行是 id 3"
+      ],
+      [
+       1,
+       100,
+       "100",
+       "前一行是 id 2"
+      ]
+     ],
+     "title": "LAG(x, 1, 0)：默认值只填“没有前一行”，不替换真实的 NULL（按 id 倒序读）",
+     "hl": [
+      0,
+      1
+     ]
+    },
+    {
+     "type": "note",
+     "text": "LAG 只按排序后的行位置回看，不会自动去找“上一个自然月”。"
+    }
+   ]
+  },
+  "fc2-0245": {
+   "title": "LEAD：读同一门店的下一条记录",
+   "blocks": [
+    {
+     "type": "table",
+     "columns": [
+      "门店",
+      "seq",
+      "amount",
+      "LEAD(amount)",
+      "LEAD(amount,1,-1)"
+     ],
+     "rows": [
+      [
+       "A",
+       1,
+       100,
+       {
+        "t": "NULL",
+        "tone": "warn"
+       },
+       {
+        "t": "NULL",
+        "tone": "warn"
+       }
+      ],
+      [
+       "A",
+       2,
+       null,
+       "130",
+       "130"
+      ],
+      [
+       "A",
+       3,
+       130,
+       {
+        "t": "NULL",
+        "tone": "bad"
+       },
+       {
+        "t": "-1",
+        "tone": "good"
+       }
+      ],
+      [
+       "B",
+       1,
+       50,
+       "80",
+       "80"
+      ],
+      [
+       "B",
+       2,
+       80,
+       {
+        "t": "NULL",
+        "tone": "bad"
+       },
+       {
+        "t": "-1",
+        "tone": "good"
+       }
+      ]
+     ],
+     "title": "LEAD(amount) 与 LEAD(amount, 1, -1)",
+     "hl": [
+      0
+     ]
+    },
+    {
+     "type": "note",
+     "text": "第一行（A，seq 1）：下一行存在，但它的金额本身是 NULL，所以仍返回 NULL，默认值不会替换它。红色的两行是“没有下一行”，才使用默认值。LEAD 指后续记录，不保证是下一个自然日或月。"
+    }
+   ]
+  },
+  "fc2-0247": {
+   "title": "FIRST_VALUE / LAST_VALUE：取决于窗口框架",
+   "blocks": [
+    {
+     "type": "table",
+     "columns": [
+      "g",
+      "id",
+      "k",
+      "x"
+     ],
+     "rows": [
+      [
+       "A",
+       1,
+       1,
+       10
+      ],
+      [
+       "A",
+       2,
+       2,
+       20
+      ],
+      [
+       "A",
+       3,
+       2,
+       null
+      ],
+      [
+       "A",
+       4,
+       3,
+       40
+      ],
+      [
+       "B",
+       5,
+       1,
+       null
+      ],
+      [
+       "B",
+       6,
+       2,
+       5
+      ]
+     ],
+     "title": "教学数据（A 组 id 2、3 的 k 相同）"
+    },
+    {
+     "type": "table",
+     "columns": [
+      "id",
+      "整个分区",
+      "第一行到当前行",
+      "前一行到当前行"
+     ],
+     "rows": [
+      [
+       1,
+       "10 / 40",
+       "10 / 10",
+       "10 / 10"
+      ],
+      [
+       2,
+       "10 / 40",
+       "10 / 20",
+       "10 / 20"
+      ],
+      [
+       3,
+       "10 / 40",
+       {
+        "t": "10 / NULL",
+        "tone": "warn"
+       },
+       "20 / NULL"
+      ],
+      [
+       4,
+       "10 / 40",
+       "10 / 40",
+       "NULL / 40"
+      ],
+      [
+       5,
+       "NULL / 5",
+       "NULL / NULL",
+       "NULL / NULL"
+      ],
+      [
+       6,
+       "NULL / 5",
+       "NULL / 5",
+       "NULL / 5"
+      ]
+     ],
+     "title": "三种框架下的（首值 / 末值）"
+    },
+    {
+     "type": "note",
+     "text": "LAST_VALUE 读的是“框架里的最后一行”，不是整组最后一行。要整分区的末值，要显式写 UNBOUNDED FOLLOWING 并保证排序稳定；首末行是 NULL 时，结果就是 NULL，不会自动跳过。"
+    }
+   ]
+  },
+  "fc2-0250": {
+   "title": "NTILE(3)：按记录数分桶，较大的桶在前",
+   "blocks": [
+    {
+     "type": "table",
+     "columns": [
+      "id",
+      "score",
+      "分组 g",
+      "桶号"
+     ],
+     "rows": [
+      [
+       1,
+       100,
+       "A",
+       {
+        "t": "1",
+        "tone": "good"
+       }
+      ],
+      [
+       2,
+       90,
+       "A",
+       {
+        "t": "1",
+        "tone": "good"
+       }
+      ],
+      [
+       3,
+       90,
+       "A",
+       {
+        "t": "2",
+        "tone": "warn"
+       }
+      ],
+      [
+       4,
+       90,
+       "A",
+       {
+        "t": "2",
+        "tone": "warn"
+       }
+      ],
+      [
+       5,
+       50,
+       "A",
+       "3"
+      ],
+      [
+       6,
+       20,
+       "B",
+       "1"
+      ],
+      [
+       7,
+       10,
+       "B",
+       "2"
+      ]
+     ],
+     "title": "PARTITION BY g ORDER BY score DESC, id",
+     "hl": [
+      1,
+      2,
+      3
+     ]
+    },
+    {
+     "type": "note",
+     "text": "A 组 5 行分 3 桶：2、2、1，较大的桶排在前面。id 2、3、4 的分数同为 90，却分在不同的桶：按记录数分，不按分数范围分，所以同分要加唯一键保证稳定。桶数多于行数时，只出现有记录的前几个桶。"
+    }
+   ]
+  },
+  "fc2-0174": {
+   "title": "CEILING：朝正无穷取整（输入 → 输出）",
+   "blocks": [
+    {
+     "type": "pairs",
+     "items": [
+      {
+       "left": "CEILING(2.3)",
+       "right": "3"
+      },
+      {
+       "left": "CEILING(-2.3)",
+       "right": "-2",
+       "note": "−3 < −2.3 < −2：不小于 −2.3 的最小整数是 −2",
+       "tone": "warn"
+      },
+      {
+       "left": "CEILING(2)",
+       "right": "2",
+       "note": "整数不变"
+      },
+      {
+       "left": "CEILING(NULL)",
+       "right": "NULL",
+       "note": "空值仍是空值"
+      },
+      {
+       "left": "CEILING(25.0 / 10)",
+       "right": "3",
+       "note": "按整箱算要 3 箱"
+      }
+     ]
+    },
+    {
+     "type": "note",
+     "text": "负数向上取整是靠近零，不是增大绝对值。"
+    }
+   ]
+  }
+ }
+}

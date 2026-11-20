@@ -45,7 +45,7 @@
     },
     {
       "type": "paragraph",
-      "text": "COUNT(DISTINCT customer_id) 数组内客户，COUNT(*) 数订单（前提是订单视图每订单一行），SUM 汇总净额，1.0 保留小数运算。",
+      "text": "COUNT(DISTINCT customer_id) 数分组内的客户，COUNT(*) 数订单（前提是订单视图每订单一行），SUM 汇总净额，1.0 保留小数运算。",
       "emphasis": []
     }
   ],
@@ -763,5 +763,5 @@
     ]
   },
   "sourcePath": "source/unified73/kp19-41.json",
-  "sourceSha256": "7452fdbc396638ac5614239743f3a04e6c58f6556efd6368ae3ff8629285e246"
+  "sourceSha256": "9aeab99bbfb1a23af8f2fe828bad5aad09665bfe40651965461bdb318a6f5a3e"
 }

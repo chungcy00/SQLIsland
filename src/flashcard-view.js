@@ -198,6 +198,41 @@ export function createCardView({ e, table, code, tag }) {
     const row = (kind, text, col, val) => `<div class="fc-sub-row ${kind}"><span class="fc-sub-k">${e(kind === "top" ? "分子" : "分母")}${text ? `<small>${e(text)}</small>` : ""}</span><span class="fc-sub-v"><small>${e(col)}</small><b>${e(fmt(val))}</b></span></div>`;
     return `<section class="fc-sec fc-fig fc-subst"><h3 class="fc-h"><i></i>代入示例数字<small>${e(sub.label)} · 结果的第一行有效数据</small></h3>${row("top", sub.formula?.top, sub.top.column, sub.top.value)}<div class="fc-sub-op">÷</div>${row("bottom", sub.formula?.bottom, sub.bottom.column, sub.bottom.value)}${sub.factor !== 1 ? `<div class="fc-sub-op">× ${e(sub.factor)}${sub.factor === 100 ? "（换成百分数）" : ""}</div>` : ""}<div class="fc-sub-row res"><span class="fc-sub-k">结果</span><span class="fc-sub-v"><small>${e(sub.target.column)}</small><b>${e(fmt(sub.target.value))}</b></span></div></section>`;
   }
+  // ---- 教学图解（teaching-figures.json，按卡号挂在 card.teach 上；图里的数字已在构建/测试里与卡片原文核对）----
+  const fmtNum = (v) => {
+    const n = Number(v);
+    const body = Math.abs(n) >= 1000 && Number.isInteger(n) ? Math.abs(n).toLocaleString("en-US") : String(Math.abs(n));
+    return (n < 0 ? "−" : "") + body;
+  };
+  const cellHtml = (v) => {
+    if (v === null || v === undefined) return '<span class="muted">NULL</span>';
+    if (typeof v === "object") return `<span class="fc-tf-cell ${v.tone ? "t-" + e(v.tone) : ""}">${e(v.t)}</span>`;
+    return e(v);
+  };
+  const tfTitle = (b) => (b.title ? `<h4 class="fc-tf-sub">${e(b.title)}</h4>` : "");
+  const tfBlocks = {
+    calc: (b) => `<div class="fc-tf-calc">${tfTitle(b)}${b.lines.map((l, i) => {
+      const last = l.op === "=" && i === b.lines.length - 1;
+      const val = typeof l.value === "number" ? `<b>${l.approx ? "≈ " : ""}${e(fmtNum(l.value))}${l.unit ? `<small>${e(l.unit)}</small>` : ""}</b>` : `<b class="txt">${e(l.text || "")}</b>`;
+      return `<div class="fc-tf-line${l.op === "=" ? " eq" : ""}${last ? " res" : ""}"><span class="op">${e(l.op || "")}</span><span class="lb">${e(l.label)}${l.note ? `<small>${e(l.note)}</small>` : ""}</span>${val}</div>`;
+    }).join("")}</div>`,
+    table: (b) => `<div class="fc-tf-table">${tfTitle(b)}<div class="table-wrap"><table><thead><tr>${b.columns.map((c) => `<th>${e(c)}</th>`).join("")}</tr></thead><tbody>${b.rows.map((r, i) => `<tr class="${(b.hl || []).includes(i) ? "hl" : ""}${(b.dim || []).includes(i) ? " dim" : ""}">${r.map((v) => `<td>${cellHtml(v)}</td>`).join("")}</tr>`).join("")}${b.foot ? `<tr class="foot">${b.foot.map((v) => `<td>${cellHtml(v)}</td>`).join("")}</tr>` : ""}</tbody></table></div></div>`,
+    compare: (b) => `<div class="fc-tf-cmp${b.vs ? " vs" : ""}">${tfTitle(b)}<div class="table-wrap"><table><thead><tr>${b.heads.map((h, i) => `<th class="h${i}">${e(h)}</th>`).join("")}</tr></thead><tbody>${b.rows.map((r) => `<tr>${r.map((v, i) => `<${i ? "td" : "th scope=\"row\""}>${cellHtml(v)}</${i ? "td" : "th"}>`).join("")}</tr>`).join("")}</tbody></table></div></div>`,
+    chunks: (b) => `<div class="fc-tf-chunks">${tfTitle(b)}${b.items.map((c) => `<div class="fc-chunk k-${e(c.family || "select")}"><span class="fc-chunk-role">${e(c.role)}</span><code>${e(c.text)}</code></div>`).join("")}</div>`,
+    steps: (b) => `<ol class="fc-tf-steps">${b.items.map((it, i) => `<li><b>${i + 1}</b><div><strong>${e(it.title)}</strong>${it.detail ? `<p>${e(it.detail)}</p>` : ""}</div></li>`).join("")}</ol>`,
+    bars: (b) => {
+      const total = b.items.reduce((sum, i) => sum + i.value, 0);
+      return `<div class="fc-tf-bars">${tfTitle(b)}${b.items.map((i) => `<div class="fc-tf-bar"><span class="lb">${e(i.label)}</span><span class="track"><i class="${i.tone ? "t-" + e(i.tone) : ""}" style="width:${Math.max(2, Math.round((i.value / total) * 100))}%"></i></span><b>${e(fmtNum(i.value))}${b.unit ? `<small>${e(b.unit)}</small>` : ""}</b>${b.share !== false ? `<em>${Math.round((i.value / total) * 1000) / 10}%</em>` : ""}</div>`).join("")}</div>`;
+    },
+    note: (b) => `<p class="fc-tf-note">${e(b.text)}</p>`,
+    flow: (b) => `<div class="fc-tf-flow">${tfTitle(b)}${b.items.map((it, i) => `${i ? '<div class="fc-tf-down">↓</div>' : ""}<div class="fc-tf-stage"><div class="head"><b>${i + 1}</b><strong>${e(it.title)}</strong>${it.badge ? `<span class="badge">${e(it.badge)}</span>` : ""}</div>${it.detail ? `<p>${e(it.detail)}</p>` : ""}${it.table ? `<div class="table-wrap"><table><thead><tr>${it.table.columns.map((c) => `<th>${e(c)}</th>`).join("")}</tr></thead><tbody>${it.table.rows.map((r, ri) => `<tr class="${(it.table.hl || []).includes(ri) ? "hl" : ""}${(it.table.dim || []).includes(ri) ? " dim" : ""}">${r.map((v) => `<td>${cellHtml(v)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>` : ""}</div>`).join("")}</div>`,
+    pairs: (b) => `<div class="fc-tf-pairs">${tfTitle(b)}${b.items.map((p) => `<div class="fc-tf-pair ${p.tone ? "t-" + e(p.tone) : ""}"><span class="l">${e(p.left)}</span><span class="ar">→</span><span class="r">${e(p.right)}</span>${p.note ? `<small>${e(p.note)}</small>` : ""}</div>`).join("")}</div>`,
+  };
+  tfBlocks.matrix = tfBlocks.compare;
+  function teachFigure(spec) {
+    return `<section class="fc-sec fc-fig fc-tf"><h3 class="fc-h"><i></i>${e(spec.title)}</h3>${spec.caption ? `<p class="fc-hint">${e(spec.caption)}</p>` : ""}${spec.blocks.map((b) => (tfBlocks[b.type] ? tfBlocks[b.type](b) : "")).join("")}${spec.footer || spec.blocks.some((b) => b.type === "calc" || b.type === "bars") ? `<p class="fc-tf-foot">${e(spec.footer || "图中数字来自本卡内容，计算过程已逐步核对。")}</p>` : ""}</section>`;
+  }
+
   function decorate(card) {
     const sections = (card.back?.sections || []).map((x) => ({ section: x }));
     const pair = errorPair(card);
@@ -242,7 +277,7 @@ export function createCardView({ e, table, code, tag }) {
 
   function back(card, extra = "") {
     const template = CARD_TEMPLATES[card.type] || CARD_TEMPLATES.concept;
-    return `<article class="fc fc-${card.type} back" aria-label="背面"><h2 class="fc-title">${e(card.front?.prompt ?? "")}</h2><div class="fc-answer">${paragraphs(card.back?.answer)}</div>${template.compose ? composeBack(card, template) : decorate(card).map((x) => x.html ?? section(x.section, template)).join("")}${extra}</article>`;
+    return `<article class="fc fc-${card.type} back" aria-label="背面"><h2 class="fc-title">${e(card.front?.prompt ?? "")}</h2><div class="fc-answer">${paragraphs(card.back?.answer)}</div>${card.teach ? teachFigure(card.teach) : ""}${template.compose ? composeBack(card, template) : decorate(card).map((x) => x.html ?? section(x.section, template)).join("")}${extra}</article>`;
   }
 
   return { front, back, meta };

@@ -138,7 +138,7 @@
   "comparison": "固定消费阈值利于跨期比较；相对五等分利于本期相对比较。样本少于五人时未必出现全部档位。",
   "commonError": {
     "example": "按距上次消费天数降序直接赋高分，或将并列五等分当作同名次。",
-    "correction": "最近日期降序或距今天数升序；按业务要求选择五等分或并列排名。"
+    "correction": "最近日期降序或距截止日天数升序；按业务要求选择五等分或并列排名。"
   },
   "notes": "完整输出见 ../enterprise_reference/business_tasks/results/BP12.json；公开预览展示前12行。独立边界及场景仅在提交判题时使用。",
   "compatibility": {

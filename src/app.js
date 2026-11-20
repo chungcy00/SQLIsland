@@ -420,43 +420,6 @@ function cheerStreak(firstToday) {
   const streak = studyStreak();
   if ([7, 30, 100].includes(streak)) cheer({ art: finalArt("13_encourage", "summary-illustration"), title: `连续学习 ${streak} 天`, message: "每天坚持一点点，数据岛正在一块一块亮起来。", actionLabel: "继续学习", route: "/learn" });
 }
-// 选择类底部面板：options = [{value, label}]；resolve(选中值 | null)
-function openSheet({ title, options, value }) {
-  return new Promise((resolve) => {
-    const sheet = document.createElement("div");
-    sheet.className = "sheet";
-    sheet.setAttribute("role", "dialog");
-    sheet.setAttribute("aria-modal", "true");
-    sheet.setAttribute("aria-label", title);
-    sheet.innerHTML = `<div class="sheet-grab"><i></i></div><div class="sheet-head"><h2>${e(title)}</h2><button class="icon-button" data-sheet="close" aria-label="关闭">${icon("close")}</button></div><div class="sheet-list" role="radiogroup">${options.map((o) => `<button class="sheet-option" role="radio" aria-checked="${o.value === value}" data-sheet-value="${e(o.value)}">${e(o.label)}${icon("check")}</button>`).join("")}</div>`;
-    const scrim = document.createElement("div");
-    scrim.className = "scrim";
-    let result = null;
-    const layer = showLayer(sheet, scrim, () => resolve(result));
-    scrim.addEventListener("click", () => layer.dismiss());
-    sheet.addEventListener("click", (event) => {
-      if (event.target.closest('[data-sheet="close"]')) return layer.dismiss();
-      const option = event.target.closest("[data-sheet-value]");
-      if (!option) return;
-      result = options.find((o) => String(o.value) === option.dataset.sheetValue)?.value ?? null;
-      layer.dismiss();
-    });
-    const grab = sheet.querySelector(".sheet-grab");
-    let startY = null;
-    grab.addEventListener("pointerdown", (event) => { startY = event.clientY; sheet.classList.add("drag"); grab.setPointerCapture(event.pointerId); });
-    grab.addEventListener("pointermove", (event) => { if (startY !== null) sheet.style.transform = `translateY(${Math.max(0, event.clientY - startY)}px)`; });
-    const finish = (event) => {
-      if (startY === null) return;
-      const distance = event.clientY - startY;
-      startY = null;
-      sheet.classList.remove("drag");
-      sheet.style.transform = "";
-      if (distance > 80) layer.dismiss();
-    };
-    grab.addEventListener("pointerup", finish);
-    grab.addEventListener("pointercancel", finish);
-  });
-}
 window.addEventListener("keydown", (event) => { if (event.key === "Escape" && closeTopLayer()) event.preventDefault(); });
 window.addEventListener("hashchange", () => closeTopLayer());
 // ===== B5：长题干折叠 / 滑动切题 =====
@@ -646,7 +609,7 @@ function home() {
     "数屿SQL",
     `<section class="panel continue learning-hero">${contourSvg("hero-contour")}${islandSvg(islandLitCount(completedKnowledgePoints(), knowledgePoints().length), islandSource, "learning-hero-art")}<div class="hero-text"><div class="study-badge">连续学习 ${studyStreak()} 天 · 累计 ${minutes} 分钟</div><h2>${e(title)}</h2><p class="hero-summary">${summary}</p></div><div class="hero-progress"><div class="progress" role="progressbar" aria-label="已学知识点" aria-valuemin="0" aria-valuemax="${knowledgePoints().length}" aria-valuenow="${completedKnowledgePoints()}"><span style="width:${knowledgePoints().length ? (completedKnowledgePoints() / knowledgePoints().length) * 100 : 0}%"></span></div><small>已学 ${completedKnowledgePoints()}/${knowledgePoints().length}</small></div><div class="hero-actions">${goButton(icon("play") + " " + (state.lastLesson ? "继续学习" : "开始学习"), "/lesson/" + next.id, "primary")}${goButton("待复习 " + dueCards().length + " 卡", "/cards", "hero-review")}</div></section>
     <div class="section-heading"><h2>快捷入口</h2></div><div class="home-shortcuts">${shortcuts.map(([label, route, asset, count]) => goButton(`<span class="list-icon">${icon(asset)}</span><span class="grow"><strong>${label}</strong>${count ? `<small>${count}</small>` : ""}</span>`, route, "shortcut-tile")).join("")}</div>
-    ${tideSvg("tide")}<div class="section-heading"><h2>学习路线</h2>${goButton("查看统计", "/stats")}</div><div class="stats home-progress"><div class="stat"><strong>${completedKnowledgePoints()}<small> / ${knowledgePoints().length}</small></strong><small>学完知识点</small></div><div class="stat"><strong>${stats.done}<small> / ${content.questions.length}</small></strong><small>独立完成题目</small></div><div class="stat"><strong>${studiedCards()}<small> / 200</small></strong><small>已学闪卡</small></div></div>
+    ${tideSvg("tide")}<div class="section-heading"><h2>学习路线</h2>${goButton("查看统计", "/stats")}</div><div class="stats home-progress"><div class="stat"><strong>${completedKnowledgePoints()}<small> / ${knowledgePoints().length}</small></strong><small>学完知识点</small></div><div class="stat"><strong>${stats.done}<small> / ${content.questions.length}</small></strong><small>独立完成题目</small></div><div class="stat"><strong>${studiedCards()}<small> / ${content.cards.length}</small></strong><small>已学闪卡</small></div></div>
     <div class="panel home-stages">${stages.map((stage) => {
       const chapters = content.chapters.filter((c) => c.stage === stage);
       const points = chapters.flatMap((c) => c.knowledgePoints);

@@ -133,14 +133,14 @@
       "path": "courses/ch19.json",
       "title": "业务数据分析",
       "knowledgePointCount": 18,
-      "sha256": "01ee4ca752275b2145ff0834ab7bcb60bd1406167f368b49278226200c606474"
+      "sha256": "067aa50009a2bd73a4fc369d63e8c0e22a5a8168e16a2c66673dd2c3ea97fbba"
     },
     {
       "id": "ch20",
       "path": "courses/ch20.json",
       "title": "综合挑战",
       "knowledgePointCount": 10,
-      "sha256": "8932a419229d5fe29ab0f333941d87a3b9d91c648f63e5dea02440e2323af281"
+      "sha256": "d500515574726c3acc93a61ed075e9d82a55d920a29ab6cfe5a9834c788fc511"
     }
   ],
   "knowledgePointCount": 80,
@@ -242,13 +242,13 @@
     },
     {
       "path": "courses/ch19.json",
-      "bytes": 783667,
-      "sha256": "01ee4ca752275b2145ff0834ab7bcb60bd1406167f368b49278226200c606474"
+      "bytes": 783679,
+      "sha256": "067aa50009a2bd73a4fc369d63e8c0e22a5a8168e16a2c66673dd2c3ea97fbba"
     },
     {
       "path": "courses/ch20.json",
-      "bytes": 372374,
-      "sha256": "8932a419229d5fe29ab0f333941d87a3b9d91c648f63e5dea02440e2323af281"
+      "bytes": 372378,
+      "sha256": "d500515574726c3acc93a61ed075e9d82a55d920a29ab6cfe5a9834c788fc511"
     },
     {
       "path": "fixtures/lesson-accounts.json",

@@ -71,6 +71,11 @@ cards.push(
     ),
   ),
 );
+// 教学图解：独立文件，按卡号挂到 card.teach；不改原始卡片 JSON。
+{
+  const teaching = JSON.parse(await readFile(`${contentSource}/flashcard_v2/teaching-figures.json`));
+  for (const card of cards) if (teaching.figures?.[card.id]) card.teach = teaching.figures[card.id];
+}
 const courseStructureStatus = await loadCourseStructures(chapters);
 const integerPolicies = JSON.parse(await readFile("src/integer-column-policy.json"));
 for (const question of questions) {

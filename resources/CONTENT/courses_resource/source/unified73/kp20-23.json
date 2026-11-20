@@ -709,7 +709,7 @@
   ],
   "teaching": {
     "problem": "管理层需要2025年每月全渠道经营概览，将净销售、毛利、费用、人工、广告和采购承诺汇总到同一报表，并在异常月份下钻门店，区分利润、费用压力与采购资金承诺。",
-    "codeExplanation": "m 从日历去重取得12个月；s 按订单日期提取月份，汇总净销售与净销售减净成本的毛利；f 按费用入账月份汇总费用；h 按员工月汇总人工估算成本；p 按采购订单月份汇总承诺金额，而非实际付款或销售成本；a 按活动月份汇总广告支出。每个子查询先归并为一月一行，随后从 m 左连接五组结果，避免销售和费用明细多对多相乘。主查询中 s、f、p 只设起始日期，最终与2025月份轴连接限制输出；真实部署可为各模块增加截止边界以减少扫描，但此补丁不修改主查询。COALESCE 用于已确认无业务的情况，来源缺失需另作完整性核验。最后毛利减费用和人工，广告可能已入费用，不重复扣减；人工同样需确认费用中是否已包含，采购承诺不是当期损益。门店下钻时，毛利率用总毛利除总净额，目标达成率仅使用目标为正门店的实际及目标；退款率以折后扣退款前金额为分母。示例以总体加权基准比较低毛利、低达成及高退款，未知比率需另核查。门店贡献用毛利减直接归属费用；总部及未归属人工仍在口径外。滚动费用率按门店采用三个月费用合计除销售合计，在连续月份轴上用 ROWS 窗口，期初需保留报告前两个月，行数不足或分母为零留空；不得平均月比率。",
+    "codeExplanation": "m 从日历去重取得12个月；s 按订单日期提取月份，汇总净销售与净销售减净成本的毛利；f 按费用入账月份汇总费用；h 按员工月汇总人工估算成本；p 按采购订单月份汇总承诺金额，而非实际付款或销售成本；a 按活动月份汇总广告支出。每个子查询先归并为一月一行，随后从 m 左连接五组结果，避免销售和费用明细多对多相乘。主查询中 s、f、p 只设起始日期，最终与2025月份轴连接限制输出；真实部署可为各模块增加截止边界以减少扫描，但本课的主查询保持原样。COALESCE 用于已确认无业务的情况，来源缺失需另作完整性核验。最后毛利减费用和人工，广告可能已入费用，不重复扣减；人工同样需确认费用中是否已包含，采购承诺不是当期损益。门店下钻时，毛利率用总毛利除总净额，目标达成率仅使用目标为正门店的实际及目标；退款率以折后扣退款前金额为分母。示例以总体加权基准比较低毛利、低达成及高退款，未知比率需另核查。门店贡献用毛利减直接归属费用；总部及未归属人工仍在口径外。滚动费用率按门店采用三个月费用合计除销售合计，在连续月份轴上用 ROWS 窗口，期初需保留报告前两个月，行数不足或分母为零留空；不得平均月比率。",
     "resultExplanation": "独立案例1月毛利400，费用150，人工100，经营贡献150；广告50及采购承诺500单列。2月无销售但费用80、人工100，贡献为负180，不能删除该月份。3月毛利300减人工150为150。4月至12月完全无记录，示例已知无业务，全部显示0；实际数据未送达不能视为0。门店示例整体毛利率580÷1700=34.12%，正目标门店达成率1500÷1700=88.24%；门店1达成偏低且退款偏高，门店2毛利率低且直接贡献为负60，门店3目标为0不可算达成率，门店4无销售仍有费用。滚动例1月费用120÷销售1000=12%，不同于各月费率的简单平均；4月窗口净销售为0，结果为空。原企业2025年1月公布贡献2944637−65219277−51797482=−114072122分，不是完整净利润；须核验费用归属及是否重复计入人工，不据此直接认定企业亏损。",
     "checkpoints": [
       {
@@ -1091,7 +1091,7 @@
       },
       {
         "label": "门店经营异常看板",
-        "explanation": "独立门店月数据；仅正目标门店参与整体达成率；空值不等于正常，需单独复核。以整体加权指标作为示例比较基准，非原课固定阈值。",
+        "explanation": "独立门店月数据；仅正目标门店参与整体达成率；空值不等于正常，需单独复核。以整体加权指标作为示例比较基准，不是固定的业务阈值。",
         "sql": "WITH store_month(store_id,net,gross,target,refund,pre_refund,direct_expense) AS (SELECT 1,1000,400,1200,100,1100,150 UNION ALL SELECT 2,500,100,400,0,500,160 UNION ALL SELECT 3,200,80,0,0,200,20 UNION ALL SELECT 4,0,0,100,0,0,30),\nbenchmark AS (SELECT 100.0*SUM(gross)/NULLIF(SUM(net),0) overall_margin,100.0*SUM(CASE WHEN target>0 THEN net ELSE 0 END)/NULLIF(SUM(CASE WHEN target>0 THEN target ELSE 0 END),0) overall_attainment,100.0*SUM(refund)/NULLIF(SUM(pre_refund),0) overall_refund FROM store_month),\nmetrics AS (SELECT *,100.0*gross/NULLIF(net,0) margin,100.0*net/NULLIF(CASE WHEN target>0 THEN target END,0) attainment,100.0*refund/NULLIF(pre_refund,0) refund_pct FROM store_month)\nSELECT store_id,ROUND(margin,2) margin_pct,ROUND(attainment,2) attainment_pct,ROUND(refund_pct,2) refund_pct,ROUND(overall_margin,2) overall_margin,ROUND(overall_attainment,2) overall_attainment,CASE WHEN margin<overall_margin THEN 1 ELSE 0 END low_margin,CASE WHEN attainment<overall_attainment THEN 1 ELSE 0 END low_attainment,CASE WHEN refund_pct>overall_refund THEN 1 ELSE 0 END high_refund FROM metrics CROSS JOIN benchmark ORDER BY attainment_pct DESC",
         "result": {
           "columns": [
