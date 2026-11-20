@@ -5,13 +5,25 @@
   "teachingKind": "advanced",
   "conceptBlocks": [
     {
-      "type": "paragraph",
-      "text": "序号为每行分配唯一位置，普通排名让并列共享名次且跳过被占用位置，连续排名按不同排序值连续编号。窗口排序决定名次，外层排序决定展示顺序。排名范围由分区决定。",
+      "type": "heading",
+      "text": "基本含义",
       "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "序号为每行分配唯一位置，普通排名让并列共享名次且跳过被占用位置，连续排名按不同排序值连续编号。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "窗口排序决定名次，外层排序决定展示顺序。",
+        "排名范围由分区决定。"
+      ]
     }
   ],
   "syntax": {
-    "purpose": "v 排名指标；id 唯一决胜键，仅用于需要确定行序时。"
+    "purpose": "序号、排名与连续排名的语法模板如下，各部分含义见下方说明。"
   },
   "dataDescriptions": {
     "employees": "共 4 行；字段：employee_id、employee_name、manager_id、salary。"

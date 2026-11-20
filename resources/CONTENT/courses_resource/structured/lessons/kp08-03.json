@@ -5,13 +5,25 @@
   "teachingKind": "syntax",
   "conceptBlocks": [
     {
-      "type": "paragraph",
-      "text": "ON 定义哪些行可以匹配；WHERE 对连接产生的结果进行筛选。对于内连接，某些条件放在两处效果相同；外连接不能机械互换。",
+      "type": "heading",
+      "text": "基本含义",
       "emphasis": []
     },
     {
       "type": "paragraph",
-      "text": "当右侧日期条件放进 ON 时，只允许该期间订单参与匹配，左侧无符合条件的客户仍返回补齐行。",
+      "text": "ON 定义哪些行可以匹配；WHERE 对连接产生的结果进行筛选。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "对于内连接，某些条件放在两处效果相同；外连接不能机械互换。",
+        "当右侧日期条件放进 ON 时，只允许该期间订单参与匹配，左侧无符合条件的客户仍返回补齐行。"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "使用要点",
       "emphasis": []
     },
     {
@@ -20,13 +32,15 @@
       "emphasis": []
     },
     {
-      "type": "paragraph",
-      "text": "更隐蔽的是：只有其他月份订单的客户在连接时已有匹配，WHERE 删除这些订单后也不会重新补齐。仅追加 OR 右键 IS NULL 不能补救这种情况。",
-      "emphasis": []
+      "type": "list",
+      "items": [
+        "更隐蔽的是：只有其他月份订单的客户在连接时已有匹配，WHERE 删除这些订单后也不会重新补齐。",
+        "仅追加 OR 右键 IS NULL 不能补救这种情况。"
+      ]
     }
   ],
   "syntax": {
-    "purpose": "ON 定义键与期间匹配条件；WHERE 连接结果筛选；COUNT(b.id) 仅统计实际匹配记录。"
+    "purpose": "外连接的 ON 与 WHERE的语法模板如下，各部分含义见下方说明。"
   },
   "dataDescriptions": {
     "customers": "共 4 行；字段：customer_id、customer_name。",

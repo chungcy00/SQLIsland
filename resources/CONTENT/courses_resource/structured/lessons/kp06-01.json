@@ -5,28 +5,44 @@
   "teachingKind": "syntax",
   "conceptBlocks": [
     {
-      "type": "paragraph",
-      "text": "计数前先确认希望统计什么。一张订单表有五行，不代表五位客户；一列有四行，也不代表四个有效填报值。COUNT(*) 计算输入关系中的全部行，不检查任何指定字段是否缺失。",
+      "type": "heading",
+      "text": "基本含义",
       "emphasis": []
     },
     {
       "type": "paragraph",
-      "text": "COUNT(value) 只统计该字段非 NULL 的行，因此数值零仍然计入。COUNT(DISTINCT value) 在非空值中去重再计数，重复的10只算一次。",
+      "text": "计数前先确认希望统计什么。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "一张订单表有五行，不代表五位客户；一列有四行，也不代表四个有效填报值。",
+        "COUNT(*) 计算输入关系中的全部行，不检查任何指定字段是否缺失。",
+        "COUNT(value) 只统计该字段非 NULL 的行，因此数值零仍然计入。"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "使用要点",
       "emphasis": []
     },
     {
       "type": "paragraph",
-      "text": "三种写法都可以将多行压缩成一行统计结果；加上分组后则每组产生一个计数。若输入为空，三种计数均返回0。计数的对象与数据粒度必须一致：订单号用于数订单，客户号用于数客户；",
+      "text": "COUNT(DISTINCT value) 在非空值中去重再计数，重复的10只算一次。",
       "emphasis": []
     },
     {
-      "type": "paragraph",
-      "text": "若一笔订单有多行明细，直接数行会高估订单量。",
-      "emphasis": []
+      "type": "list",
+      "items": [
+        "三种写法都可以将多行压缩成一行统计结果；加上分组后则每组产生一个计数。",
+        "若输入为空，三种计数均返回0。",
+        "计数的对象与数据粒度必须一致：订单号用于数订单，客户号用于数客户；若一笔订单有多行明细，直接数行会高估订单量。"
+      ]
     }
   ],
   "syntax": {
-    "purpose": "COUNT(*) 输入行数；COUNT(column_name) 指定列非空的行数；DISTINCT 对指定表达式的非空取值去重。"
+    "purpose": "COUNT 的三个形式的语法模板如下，各部分含义见下方说明。"
   },
   "dataDescriptions": {
     "nullable_values": "共 4 行；字段：id、value、note。"

@@ -5,18 +5,40 @@
   "teachingKind": "business",
   "conceptBlocks": [
     {
-      "type": "paragraph",
-      "text": "每月一行。销售按订单日期、费用按分录日期、人工按员工月份、采购按订单日期、广告按活动月份独立聚合。经营贡献=毛利−费用−人工；广告与采购承诺单列，不重复扣减。",
+      "type": "heading",
+      "text": "基本含义",
       "emphasis": []
     },
     {
       "type": "paragraph",
-      "text": "无业务月份保留，确认数据完整后才补零。",
+      "text": "每月一行。",
       "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "销售按订单日期、费用按分录日期、人工按员工月份、采购按订单日期、广告按活动月份独立聚合。"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "使用要点",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "经营贡献=毛利−费用−人工；广告与采购承诺单列，不重复扣减。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "无业务月份保留，确认数据完整后才补零。"
+      ]
     }
   ],
   "syntax": {
-    "purpose": "统计截止日 2025-12-31；金额 马币分；输出粒度 月。"
+    "purpose": "月度经营汇总表的语法模板如下，各部分含义见下方说明。"
   },
   "dataDescriptions": {
     "calendar_days": "共 3 行；字段：day、month_key、day_index。",

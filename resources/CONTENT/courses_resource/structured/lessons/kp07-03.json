@@ -5,28 +5,42 @@
   "teachingKind": "syntax",
   "conceptBlocks": [
     {
-      "type": "paragraph",
-      "text": "当一份报表需要同时区分多个业务维度时，分组键必须包含这些维度。例如每家门店内各类别的销售额，结果的一行代表门店与类别的组合，而不是单独一个门店或类别。",
+      "type": "heading",
+      "text": "基本含义",
       "emphasis": []
     },
     {
       "type": "paragraph",
-      "text": "GROUP BY store_id, category 按联合键分组，只有两个字段都相同的记录才归入同一组。",
+      "text": "当一份报表需要同时区分多个业务维度时，分组键必须包含这些维度。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "例如每家门店内各类别的销售额，结果的一行代表门店与类别的组合，而不是单独一个门店或类别。",
+        "GROUP BY store_id, category 按联合键分组，只有两个字段都相同的记录才归入同一组。"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "使用要点",
       "emphasis": []
     },
     {
       "type": "paragraph",
-      "text": "增加分组键通常使统计粒度更细，删除键通常合并原有组，但实际组数取决于数据。严格分组要求输出的非聚合表达式属于分组键，或能够由分组键唯一决定，或符合数据库允许的单值限制。",
+      "text": "增加分组键通常使统计粒度更细，删除键通常合并原有组，但实际组数取决于数据。",
       "emphasis": []
     },
     {
-      "type": "paragraph",
-      "text": "MySQL 默认严格分组模式会拒绝多数来源不确定的裸列，SQLite 可能接受并返回某个输入行的值；能运行不代表结果有明确业务含义。",
-      "emphasis": []
+      "type": "list",
+      "items": [
+        "严格分组要求输出的非聚合表达式属于分组键，或能够由分组键唯一决定，或符合数据库允许的单值限制。",
+        "MySQL 默认严格分组模式会拒绝多数来源不确定的裸列，SQLite 可能接受并返回某个输入行的值；能运行不代表结果有明确业务含义。"
+      ]
     }
   ],
   "syntax": {
-    "purpose": "key_a, key_b 共同决定结果粒度的维度；SUM(metric) 对联合组内数值求和。"
+    "purpose": "多字段分组与严格分组的语法模板如下，各部分含义见下方说明。"
   },
   "dataDescriptions": {
     "orders": "共 5 行；字段：id、category、sales、store_id、order_date、customer_id。"

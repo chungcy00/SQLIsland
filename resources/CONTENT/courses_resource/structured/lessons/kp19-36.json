@@ -5,18 +5,25 @@
   "teachingKind": "business",
   "conceptBlocks": [
     {
-      "type": "paragraph",
-      "text": "积压表示资金占用相对需求偏高；滞销表示观察期内无销售或销售极慢；缺货风险表示库存不足以覆盖预计需求。库存覆盖天数=期末数量÷期间日均销售出库量。",
+      "type": "heading",
+      "text": "基本含义",
       "emphasis": []
     },
     {
       "type": "paragraph",
-      "text": "该指标描述按历史速度能卖多久，不等于实际售罄日期。",
+      "text": "积压表示资金占用相对需求偏高；滞销表示观察期内无销售或销售极慢；缺货风险表示库存不足以覆盖预计需求。",
       "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "库存覆盖天数=期末数量÷期间日均销售出库量。",
+        "该指标描述按历史速度能卖多久，不等于实际售罄日期。"
+      ]
     }
   ],
   "syntax": {
-    "purpose": "统计截止日 2025-12-31；金额 整数马币分；比率按题设；输出粒度 仓库×商品。"
+    "purpose": "库存积压、滞销与缺货预警的语法模板如下，各部分含义见下方说明。"
   },
   "dataDescriptions": {
     "inventory_snapshots": "共 3 行；字段：snapshot_id、warehouse_id、product_id、snapshot_date、quantity、unit_cost_cents。",

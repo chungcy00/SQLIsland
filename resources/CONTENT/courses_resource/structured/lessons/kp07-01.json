@@ -5,23 +5,43 @@
   "teachingKind": "syntax",
   "conceptBlocks": [
     {
-      "type": "paragraph",
-      "text": "分组是把具有相同分组键的记录归入同一组，再对每组分别计算统计指标。例如订单表中每行是一笔订单，主管想知道每类商品总销售额时，输出应改成每类商品一行。",
+      "type": "heading",
+      "text": "基本含义",
       "emphasis": []
     },
     {
       "type": "paragraph",
-      "text": "GROUP BY category 将相同类别的记录放进同一组，SUM(sales) 分别计算各组销售额。分组键决定结果粒度，聚合函数决定指标。",
+      "text": "分组是把具有相同分组键的记录归入同一组，再对每组分别计算统计指标。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "例如订单表中每行是一笔订单，主管想知道每类商品总销售额时，输出应改成每类商品一行。",
+        "GROUP BY category 将相同类别的记录放进同一组，SUM(sales) 分别计算各组销售额。",
+        "分组键决定结果粒度，聚合函数决定指标。"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "使用要点",
       "emphasis": []
     },
     {
       "type": "paragraph",
-      "text": "没有分组的聚合通常得到一个整体统计值，有分组就得到每个存在的组的统计值。NULL 分组键会形成一个组；原表不存在的类别不会凭空生成零销售组。分组本身不保证结果顺序，需要显式排序。",
+      "text": "没有分组的聚合通常得到一个整体统计值，有分组就得到每个存在的组的统计值。",
       "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "NULL 分组键会形成一个组；原表不存在的类别不会凭空生成零销售组。",
+        "分组本身不保证结果顺序，需要显式排序。"
+      ]
     }
   ],
   "syntax": {
-    "purpose": "group_key 决定统计粒度的维度；metric 需要汇总的数值；GROUP BY 按键划分记录。"
+    "purpose": "GROUP BY 分组的语法模板如下，各部分含义见下方说明。"
   },
   "dataDescriptions": {
     "orders": "共 5 行；字段：id、category、sales、store_id、order_date、customer_id。"

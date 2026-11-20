@@ -5,18 +5,25 @@
   "teachingKind": "business",
   "conceptBlocks": [
     {
-      "type": "paragraph",
-      "text": "采购行是履约计数单位，收货件数是质量计量单位。准时足量率=承诺日及之前累计合格数量达到订购量的采购行数÷到期采购行数；",
+      "type": "heading",
+      "text": "基本含义",
       "emphasis": []
     },
     {
       "type": "paragraph",
-      "text": "完整交付率=截至年底累计合格数量达到订购量的采购行数÷到期采购行数；质量合格率=合格件数÷实际收货件数。分批收货不能按收货单数计履约；零实收时质量率留空。",
+      "text": "采购行是履约计数单位，收货件数是质量计量单位。",
       "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "准时足量率=承诺日及之前累计合格数量达到订购量的采购行数÷到期采购行数；完整交付率=截至年底累计合格数量达到订购量的采购行数÷到期采购行数；质量合格率=合格件数÷实际收货件数。",
+        "分批收货不能按收货单数计履约；零实收时质量率留空。"
+      ]
     }
   ],
   "syntax": {
-    "purpose": "统计截止日 2025-12-31；金额 整数马币分；比率按题设；输出粒度 供应商。"
+    "purpose": "供应商履约率与交付表现的语法模板如下，各部分含义见下方说明。"
   },
   "dataDescriptions": {
     "v_po_lines": "共 3 行；字段：po_item_id、po_id、supplier_id、warehouse_id、order_date、promised_date、product_id、quantity_ordered、unit_price_cents、ordered_cents、received、accepted、on_time、billed、billed_cents。"

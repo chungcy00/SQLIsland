@@ -5,18 +5,40 @@
   "teachingKind": "function",
   "conceptBlocks": [
     {
-      "type": "paragraph",
-      "text": "舍入改变输出精度，绝对值去掉方向但保留幅度，两者都不是数据类型转换。计算比率时分子和分母决定业务意义；整数商用于完整单位数量，余数表示剩余量。",
+      "type": "heading",
+      "text": "基本含义",
       "emphasis": []
     },
     {
       "type": "paragraph",
-      "text": "MySQL 的 / 可保留小数，DIV 截去小数部分；SQLite 两个整数相除可能截断。金额通常使用精确十进制或整数分，先计算再按业务要求舍入。",
+      "text": "舍入改变输出精度，绝对值去掉方向但保留幅度，两者都不是数据类型转换。",
       "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "计算比率时分子和分母决定业务意义；整数商用于完整单位数量，余数表示剩余量。"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "使用要点",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "MySQL 的 / 可保留小数，DIV 截去小数部分；SQLite 两个整数相除可能截断。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "金额通常使用精确十进制或整数分，先计算再按业务要求舍入。"
+      ]
     }
   ],
   "syntax": {
-    "purpose": "x 待处理数值；d 舍入位数；a,b 被除数、除数。"
+    "purpose": "数值计算、除法与精度处理的语法模板如下，各部分含义见下方说明。"
   },
   "dataDescriptions": {},
   "problem": "财务报表将12.346显示为两位小数，偏差-25另需显示幅度；包装业务有7件商品，每箱2件，区分平均箱数与完整箱数。",

@@ -5,18 +5,40 @@
   "teachingKind": "function",
   "conceptBlocks": [
     {
-      "type": "paragraph",
-      "text": "半开区间含起点、不含终点。月报终点用下一月第一天，而不是当月最后一天午夜，可覆盖最后一天任意时刻。相邻区间无重叠，也无需猜测数据精度。",
+      "type": "heading",
+      "text": "基本含义",
       "emphasis": []
     },
     {
       "type": "paragraph",
-      "text": "保持日期字段裸列比较通常有利于索引范围检索，但实际性能由执行计划决定。",
+      "text": "半开区间含起点、不含终点。",
       "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "月报终点用下一月第一天，而不是当月最后一天午夜，可覆盖最后一天任意时刻。"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "使用要点",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "相邻区间无重叠，也无需猜测数据精度。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "保持日期字段裸列比较通常有利于索引范围检索，但实际性能由执行计划决定。"
+      ]
     }
   ],
   "syntax": {
-    "purpose": "start 包含的开始边界；next_start 排除的结束边界。"
+    "purpose": "日期区间与月边界的语法模板如下，各部分含义见下方说明。"
   },
   "dataDescriptions": {
     "orders": "共 5 行；字段：id、category、sales、store_id、order_date、customer_id。"

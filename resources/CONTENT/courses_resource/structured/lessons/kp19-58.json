@@ -5,18 +5,40 @@
   "teachingKind": "business",
   "conceptBlocks": [
     {
-      "type": "paragraph",
-      "text": "三方核对比较订购数量、合格收货数量、原始开票数量及金额。应核金额=合格收货量×采购单价；金额差=原始开票金额−应核金额。数量不等或金额差非零均需复核，金额单位为分。",
+      "type": "heading",
+      "text": "基本含义",
       "emphasis": []
     },
     {
       "type": "paragraph",
-      "text": "后续贷项不在本题冲减。",
+      "text": "三方核对比较订购数量、合格收货数量、原始开票数量及金额。",
       "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "应核金额=合格收货量×采购单价；金额差=原始开票金额−应核金额。"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "使用要点",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "数量不等或金额差非零均需复核，金额单位为分。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "后续贷项不在本题冲减。"
+      ]
     }
   ],
   "syntax": {
-    "purpose": "统计截止日 2025-12-31；金额 整数马币分；比率按题设；输出粒度 采购行。"
+    "purpose": "采购、收货与发票三方核对的语法模板如下，各部分含义见下方说明。"
   },
   "dataDescriptions": {
     "supplier_invoice_items": "共 3 行；字段：supplier_invoice_item_id、supplier_invoice_id、po_item_id、quantity_billed、unit_price_cents。",

@@ -5,13 +5,25 @@
   "teachingKind": "business",
   "conceptBlocks": [
     {
-      "type": "paragraph",
-      "text": "账龄按合同到期日而非发票开立日计算；截至报告日尚未到期的项目归入未逾期。只统计正余额；部分付款只统计剩余金额。各账龄区间必须互斥且覆盖所有有效到期日。",
+      "type": "heading",
+      "text": "基本含义",
       "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "账龄按合同到期日而非发票开立日计算；截至报告日尚未到期的项目归入未逾期。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "只统计正余额；部分付款只统计剩余金额。",
+        "各账龄区间必须互斥且覆盖所有有效到期日。"
+      ]
     }
   ],
   "syntax": {
-    "purpose": "统计截止日 2025-12-31；金额 整数马币分；比率按题设；输出粒度 供应商×账龄。"
+    "purpose": "应付账款账龄的语法模板如下，各部分含义见下方说明。"
   },
   "dataDescriptions": {
     "v_invoice_balance": "共 3 行；字段：supplier_invoice_id、po_id、supplier_id、invoice_no、invoice_date、due_date、billed_cents、paid_cents、balance_cents。"

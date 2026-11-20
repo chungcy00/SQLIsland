@@ -5,23 +5,40 @@
   "teachingKind": "function",
   "conceptBlocks": [
     {
-      "type": "paragraph",
-      "text": "导入数据中同一名称可能出现首尾空格、类别大小写不一致、分隔符不统一。TRIM 默认去除两端普通空格，不会清除所有类型空白；REPLACE 替换指定子串的全部匹配；",
+      "type": "heading",
+      "text": "基本含义",
       "emphasis": []
     },
     {
       "type": "paragraph",
-      "text": "LOWER 与 UPPER 调整大小写，在比较和分组前可用来统一约定。清洗规则取决于字段含义：内部空格可能是姓名或名称的一部分，不能一律删除。",
+      "text": "导入数据中同一名称可能出现首尾空格、类别大小写不一致、分隔符不统一。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "TRIM 默认去除两端普通空格，不会清除所有类型空白；REPLACE 替换指定子串的全部匹配；LOWER 与 UPPER 调整大小写，在比较和分组前可用来统一约定。"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "使用要点",
       "emphasis": []
     },
     {
       "type": "paragraph",
-      "text": "清洗不会自动去重，也不会自动修复金额或缺失值。",
+      "text": "清洗规则取决于字段含义：内部空格可能是姓名或名称的一部分，不能一律删除。",
       "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "清洗不会自动去重，也不会自动修复金额或缺失值。"
+      ]
     }
   ],
   "syntax": {
-    "purpose": "str 待处理文本；old 匹配的子串；new 替换文本。"
+    "purpose": "文本清洗与格式统一的语法模板如下，各部分含义见下方说明。"
   },
   "dataDescriptions": {
     "raw_data": "共 6 行；字段：id、name、amount、category。"

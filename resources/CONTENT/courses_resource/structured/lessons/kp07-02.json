@@ -5,28 +5,42 @@
   "teachingKind": "syntax",
   "conceptBlocks": [
     {
-      "type": "paragraph",
-      "text": "WHERE 和 HAVING 都能排除数据，但处理对象不同。WHERE 在逻辑上先筛选输入行，决定哪些交易参与后续统计；HAVING 在分组聚合之后筛选统计结果。",
+      "type": "heading",
+      "text": "基本含义",
       "emphasis": []
     },
     {
       "type": "paragraph",
-      "text": "比如只统计二月订单，应先按日期筛行；如果要求类别销售合计超过1000，则必须等组内金额计算完成再判断。两个条件可以同时存在。",
+      "text": "WHERE 和 HAVING 都能排除数据，但处理对象不同。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "WHERE 在逻辑上先筛选输入行，决定哪些交易参与后续统计；HAVING 在分组聚合之后筛选统计结果。",
+        "比如只统计二月订单，应先按日期筛行；如果要求类别销售合计超过1000，则必须等组内金额计算完成再判断。"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "使用要点",
       "emphasis": []
     },
     {
       "type": "paragraph",
-      "text": "将合计阈值误写为单笔金额阈值会改变分子和样本范围，得到完全不同的报告。",
+      "text": "两个条件可以同时存在。",
       "emphasis": []
     },
     {
-      "type": "paragraph",
-      "text": "聚合查询没有 GROUP BY 时也可以使用 HAVING 判断整体聚合结果，并非所有 HAVING 都必须配合显式分组。",
-      "emphasis": []
+      "type": "list",
+      "items": [
+        "将合计阈值误写为单笔金额阈值会改变分子和样本范围，得到完全不同的报告。",
+        "聚合查询没有 GROUP BY 时也可以使用 HAVING 判断整体聚合结果，并非所有 HAVING 都必须配合显式分组。"
+      ]
     }
   ],
   "syntax": {
-    "purpose": "WHERE 筛选参与汇总的行；GROUP BY 划分统计组；HAVING 筛选汇总后的组；threshold 组级指标阈值。"
+    "purpose": "HAVING 与 WHERE的语法模板如下，各部分含义见下方说明。"
   },
   "dataDescriptions": {
     "orders": "共 5 行；字段：id、category、sales、store_id、order_date、customer_id。"

@@ -5,13 +5,24 @@
   "teachingKind": "function",
   "conceptBlocks": [
     {
-      "type": "paragraph",
-      "text": "日期格式化产生用于展示或分组的文本键，年份与月份提取产生数值字段。相同月份编号可能来自不同年份，故跨年报表应使用年份与月份组合；派生日期字段本身不改变记录粒度，分组才改变粒度。",
+      "type": "heading",
+      "text": "基本含义",
       "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "日期格式化产生用于展示或分组的文本键，年份与月份提取产生数值字段。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "相同月份编号可能来自不同年份，故跨年报表应使用年份与月份组合；派生日期字段本身不改变记录粒度，分组才改变粒度。"
+      ]
     }
   ],
   "syntax": {
-    "purpose": "day 有效日期；%Y-%m 四位年份、两位月份。"
+    "purpose": "日期格式、年份和月份的语法模板如下，各部分含义见下方说明。"
   },
   "dataDescriptions": {
     "orders": "共 5 行；字段：id、category、sales、store_id、order_date、customer_id。"

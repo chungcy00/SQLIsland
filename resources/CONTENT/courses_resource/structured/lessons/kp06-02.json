@@ -5,8 +5,25 @@
   "teachingKind": "syntax",
   "conceptBlocks": [
     {
+      "type": "heading",
+      "text": "基本含义",
+      "emphasis": []
+    },
+    {
       "type": "paragraph",
-      "text": "SUM 将非空数值相加，AVG 计算非空数值的算术平均。平均值不是将总和机械地除以表的行数：如果记录缺失，默认分母只包括已知数值。零本身是真实数值，既参与求和也进入平均值分母。",
+      "text": "SUM 将非空数值相加，AVG 计算非空数值的算术平均。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "平均值不是将总和机械地除以表的行数：如果记录缺失，默认分母只包括已知数值。",
+        "零本身是真实数值，既参与求和也进入平均值分母。"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "使用要点",
       "emphasis": []
     },
     {
@@ -15,18 +32,15 @@
       "emphasis": []
     },
     {
-      "type": "paragraph",
-      "text": "业务上必须明确平均的是订单金额、门店营收还是商品价格，统计对象改变时，平均值含义也改变。多个组的平均值不能直接再平均，除非组大小相同或符合另行规定的等权口径；",
-      "emphasis": []
-    },
-    {
-      "type": "paragraph",
-      "text": "总体平均应合并总和及有效计数。",
-      "emphasis": []
+      "type": "list",
+      "items": [
+        "业务上必须明确平均的是订单金额、门店营收还是商品价格，统计对象改变时，平均值含义也改变。",
+        "多个组的平均值不能直接再平均，除非组大小相同或符合另行规定的等权口径；总体平均应合并总和及有效计数。"
+      ]
     }
   ],
   "syntax": {
-    "purpose": "SUM 非空数值合计；AVG 非空数值的算术平均；column_name 数值表达式或字段。"
+    "purpose": "SUM 与 AVG的语法模板如下，各部分含义见下方说明。"
   },
   "dataDescriptions": {
     "nullable_values": "共 4 行；字段：id、value、note。"

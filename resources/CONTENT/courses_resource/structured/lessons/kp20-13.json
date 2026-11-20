@@ -5,13 +5,24 @@
   "teachingKind": "business",
   "conceptBlocks": [
     {
-      "type": "paragraph",
-      "text": "订单净销售属于业务收入指标，成功收款扣实际退款是资金事件净额；二者按订单及一致截止口径核对。差额为净现金减净销售。",
+      "type": "heading",
+      "text": "基本含义",
       "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "订单净销售属于业务收入指标，成功收款扣实际退款是资金事件净额；二者按订单及一致截止口径核对。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "差额为净现金减净销售。"
+      ]
     }
   ],
   "syntax": {
-    "purpose": "统计期间 2025年；截止日 2025-12-31；金额 马币分；输出粒度 订单。"
+    "purpose": "订单结算与收入核对的语法模板如下，各部分含义见下方说明。"
   },
   "dataDescriptions": {
     "order_items": "共 3 行；字段：order_item_id、order_id、product_id、promotion_id、quantity、unit_price_cents、discount_cents、unit_cost_cents。",

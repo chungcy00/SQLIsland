@@ -5,18 +5,40 @@
   "teachingKind": "business",
   "conceptBlocks": [
     {
-      "type": "paragraph",
-      "text": "时间序列分析先确定时间粒度及连续时间轴，再把实际业务金额汇总至相同粒度。环比=(本期金额−上一期金额)÷上一期金额×100%。上一期为零或缺失时百分比留空；",
+      "type": "heading",
+      "text": "基本含义",
       "emphasis": []
     },
     {
       "type": "paragraph",
-      "text": "上一期为零但本期有金额时，金额差仍可计算。窗口函数取的是排序后的上一行，不会自动识别缺失自然月。",
+      "text": "时间序列分析先确定时间粒度及连续时间轴，再把实际业务金额汇总至相同粒度。",
       "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "环比=(本期金额−上一期金额)÷上一期金额×100%。"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "使用要点",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "上一期为零或缺失时百分比留空；上一期为零但本期有金额时，金额差仍可计算。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "窗口函数取的是排序后的上一行，不会自动识别缺失自然月。"
+      ]
     }
   ],
   "syntax": {
-    "purpose": "统计期间 2025年；渠道 线下门店；输出粒度 自然月；金额 马币分。"
+    "purpose": "时间序列与缺失月份的语法模板如下，各部分含义见下方说明。"
   },
   "dataDescriptions": {
     "stores": "共 3 行；字段：store_id、store_name、city、fulfillment_warehouse_id。",

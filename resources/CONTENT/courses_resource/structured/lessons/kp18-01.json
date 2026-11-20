@@ -5,23 +5,43 @@
   "teachingKind": "syntax",
   "conceptBlocks": [
     {
-      "type": "paragraph",
-      "text": "索引是辅助定位数据的结构，而不是额外的业务筛选条件。常见树形索引按键组织数据，可缩小需要检查的候选范围。",
+      "type": "heading",
+      "text": "基本含义",
       "emphasis": []
     },
     {
       "type": "paragraph",
-      "text": "选择性较高的条件通常匹配较少记录，但是否采用索引取决于统计信息、表大小、成本及优化器。复合索引按列顺序组织，门店等值加日期范围通常适合门店在前、日期在后。",
+      "text": "索引是辅助定位数据的结构，而不是额外的业务筛选条件。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "常见树形索引按键组织数据，可缩小需要检查的候选范围。",
+        "选择性较高的条件通常匹配较少记录，但是否采用索引取决于统计信息、表大小、成本及优化器。",
+        "复合索引按列顺序组织，门店等值加日期范围通常适合门店在前、日期在后。"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "使用要点",
       "emphasis": []
     },
     {
       "type": "paragraph",
-      "text": "普通索引列上直接比较常比套函数更容易形成搜索范围。索引增加空间及写入维护成本。执行计划用于观察访问方式，不能仅凭出现索引断言已经提速。",
+      "text": "普通索引列上直接比较常比套函数更容易形成搜索范围。",
       "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "索引增加空间及写入维护成本。",
+        "执行计划用于观察访问方式，不能仅凭出现索引断言已经提速。"
+      ]
     }
   ],
   "syntax": {
-    "purpose": "idx_price 价格索引名称；store_id 复合索引前导列；order_date 日期范围列；EXPLAIN 查看计划；EXPLAIN ANALYZE 实际执行并测量。"
+    "purpose": "索引与查询优化基础的语法模板如下，各部分含义见下方说明。"
   },
   "dataDescriptions": {
     "products": "共 6 行；字段：product_id、product_name、category、price、stock。"

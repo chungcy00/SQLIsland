@@ -5,13 +5,25 @@
   "teachingKind": "business",
   "conceptBlocks": [
     {
-      "type": "paragraph",
-      "text": "净应付=原始面额−截至截止日已批准贷项；余额=净应付−已付金额。已结清不等于一定付现，贷项可能抵销全部面额。发票与付款通常一对多，贷项也是独立明细，直接连接会形成乘积。",
+      "type": "heading",
+      "text": "基本含义",
       "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "净应付=原始面额−截至截止日已批准贷项；余额=净应付−已付金额。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "已结清不等于一定付现，贷项可能抵销全部面额。",
+        "发票与付款通常一对多，贷项也是独立明细，直接连接会形成乘积。"
+      ]
     }
   ],
   "syntax": {
-    "purpose": "统计截止日 2025-12-31；金额 整数马币分；比率按题设；输出粒度 发票。"
+    "purpose": "供应商发票与付款核对的语法模板如下，各部分含义见下方说明。"
   },
   "dataDescriptions": {
     "v_invoice_balance": "共 3 行；字段：supplier_invoice_id、po_id、supplier_id、invoice_no、invoice_date、due_date、billed_cents、paid_cents、balance_cents。"

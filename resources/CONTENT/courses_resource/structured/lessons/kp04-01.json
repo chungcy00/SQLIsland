@@ -5,23 +5,43 @@
   "teachingKind": "syntax",
   "conceptBlocks": [
     {
-      "type": "paragraph",
-      "text": "排序只改变返回记录的排列顺序，不会自动减少行数、修改数据或计算名次。没有 ORDER BY 时，数据库不保证查询输出的顺序。",
+      "type": "heading",
+      "text": "基本含义",
       "emphasis": []
     },
     {
       "type": "paragraph",
-      "text": "ASC 表示升序，DESC 表示降序，省略方向通常为升序。多列排序按从左到右的优先级比较：先按第一列排序，只有第一列相同才比较第二列。",
+      "text": "排序只改变返回记录的排列顺序，不会自动减少行数、修改数据或计算名次。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "没有 ORDER BY 时，数据库不保证查询输出的顺序。",
+        "ASC 表示升序，DESC 表示降序，省略方向通常为升序。",
+        "多列排序按从左到右的优先级比较：先按第一列排序，只有第一列相同才比较第二列。"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "使用要点",
       "emphasis": []
     },
     {
       "type": "paragraph",
-      "text": "若全部排序字段仍相同，则这些记录的相对顺序没有保证。需要可复现的排行榜或分页时，应加上稳定且唯一的决胜字段。空值的默认排序位置及文本排序规则可能因数据库而异。",
+      "text": "若全部排序字段仍相同，则这些记录的相对顺序没有保证。",
       "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "需要可复现的排行榜或分页时，应加上稳定且唯一的决胜字段。",
+        "空值的默认排序位置及文本排序规则可能因数据库而异。"
+      ]
     }
   ],
   "syntax": {
-    "purpose": "ORDER BY 定义输出排序；key1 主要排序字段；key2 主字段相同后的次级排序字段；DESC 降序；ASC 升序。"
+    "purpose": "ORDER BY 多列排序的语法模板如下，各部分含义见下方说明。"
   },
   "dataDescriptions": {
     "products": "共 6 行；字段：product_id、product_name、category、price、stock。"

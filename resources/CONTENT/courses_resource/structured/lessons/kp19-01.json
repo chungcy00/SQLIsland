@@ -5,13 +5,25 @@
   "teachingKind": "business",
   "conceptBlocks": [
     {
-      "type": "paragraph",
-      "text": "净销售是扣除折扣、退款后的有效销售额；毛利为净销售减退货冲减后成本，不是扣除租金等费用的净利润。金额使用整数分。目标和订单明细不是同一粒度，须先预聚合。",
+      "type": "heading",
+      "text": "基本含义",
       "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "净销售是扣除折扣、退款后的有效销售额；毛利为净销售减退货冲减后成本，不是扣除租金等费用的净利润。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "金额使用整数分。",
+        "目标和订单明细不是同一粒度，须先预聚合。"
+      ]
     }
   ],
   "syntax": {
-    "purpose": "统计截止日 2025-12-31；金额 整数马币分；比率按题设；输出粒度 门店。"
+    "purpose": "门店净销售、利润与目标达成的语法模板如下，各部分含义见下方说明。"
   },
   "dataDescriptions": {
     "sales_targets": "共 3 行；字段：target_id、store_id、month_key、target_cents。",

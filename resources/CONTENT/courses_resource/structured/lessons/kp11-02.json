@@ -5,23 +5,42 @@
   "teachingKind": "function",
   "conceptBlocks": [
     {
-      "type": "paragraph",
-      "text": "截取函数从指定字符位置提取一段文本，常规正向位置从1开始。固定长度前缀适合编码规则明确的字段；若分隔符位置变化，应先定位分隔符。",
+      "type": "heading",
+      "text": "基本含义",
       "emphasis": []
     },
     {
       "type": "paragraph",
-      "text": "字符长度用于限制名称字符数，字节长度用于存储或接口传输预算。MySQL CHAR_LENGTH 统计字符，LENGTH 统计字节；",
+      "text": "截取函数从指定字符位置提取一段文本，常规正向位置从1开始。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "固定长度前缀适合编码规则明确的字段；若分隔符位置变化，应先定位分隔符。",
+        "字符长度用于限制名称字符数，字节长度用于存储或接口传输预算。"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "使用要点",
       "emphasis": []
     },
     {
       "type": "paragraph",
-      "text": "SQLite length 对文本统计字符，对 BLOB 统计字节。在 UTF-8 中古晋是两个字符、六个字节。字符数也不必然等于视觉字形数量。",
+      "text": "MySQL CHAR_LENGTH 统计字符，LENGTH 统计字节；SQLite length 对文本统计字符，对 BLOB 统计字节。",
       "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "在 UTF-8 中古晋是两个字符、六个字节。",
+        "字符数也不必然等于视觉字形数量。"
+      ]
     }
   ],
   "syntax": {
-    "purpose": "str 待处理文本；pos 从1起的正向字符位置；len 截取字符数。"
+    "purpose": "文本截取、字符数与字节数的语法模板如下，各部分含义见下方说明。"
   },
   "dataDescriptions": {
     "products": "共 6 行；字段：product_id、product_name、category、price、stock。"

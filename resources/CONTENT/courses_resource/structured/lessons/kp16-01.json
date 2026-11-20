@@ -5,13 +5,25 @@
   "teachingKind": "advanced",
   "conceptBlocks": [
     {
-      "type": "paragraph",
-      "text": "技术重复与业务重复不同。同样金额或商品可能属于合法的多次交易；名称经清洗后相同也不证明是同一笔。应先确定业务键、规范化规则和保留优先级，再定位待核实记录。",
+      "type": "heading",
+      "text": "基本含义",
       "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "技术重复与业务重复不同。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "同样金额或商品可能属于合法的多次交易；名称经清洗后相同也不证明是同一笔。",
+        "应先确定业务键、规范化规则和保留优先级，再定位待核实记录。"
+      ]
     }
   ],
   "syntax": {
-    "purpose": "business_key 业务识别字段组合。"
+    "purpose": "识别重复与去重规则的语法模板如下，各部分含义见下方说明。"
   },
   "dataDescriptions": {
     "raw_data": "共 6 行；字段：id、name、amount、category。"

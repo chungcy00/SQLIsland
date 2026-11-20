@@ -5,13 +5,40 @@
   "teachingKind": "business",
   "conceptBlocks": [
     {
-      "type": "paragraph",
-      "text": "预算是计划值，实际费用是已入账费用净额。冲销应保留负号。差额=实际−预算；偏差率=差额÷预算×100%。先统一期间、科目与部门粒度，否则明细连接会成倍放大金额。",
+      "type": "heading",
+      "text": "基本含义",
       "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "预算是计划值，实际费用是已入账费用净额。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "冲销应保留负号。"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "使用要点",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "差额=实际−预算；偏差率=差额÷预算×100%。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "先统一期间、科目与部门粒度，否则明细连接会成倍放大金额。"
+      ]
     }
   ],
   "syntax": {
-    "purpose": "统计截止日 2025-12-31；金额 整数马币分；比率按题设；输出粒度 部门×科目。"
+    "purpose": "预算与实际费用差异的语法模板如下，各部分含义见下方说明。"
   },
   "dataDescriptions": {
     "budgets": "共 3 行；字段：budget_id、department_id、account_id、month_key、budget_cents。",

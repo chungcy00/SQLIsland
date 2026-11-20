@@ -5,13 +5,24 @@
   "teachingKind": "business",
   "conceptBlocks": [
     {
-      "type": "paragraph",
-      "text": "按2025年线上订单会话来源汇总净销售及毛利，并与同年广告支出对齐；广告后贡献为毛利减广告，贡献率以净销售为分母。保留全部渠道。",
+      "type": "heading",
+      "text": "基本含义",
       "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "按2025年线上订单会话来源汇总净销售及毛利，并与同年广告支出对齐；广告后贡献为毛利减广告，贡献率以净销售为分母。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "保留全部渠道。"
+      ]
     }
   ],
   "syntax": {
-    "purpose": "统计截止日 2025-12-31；金额 整数马币分；输出粒度 渠道。"
+    "purpose": "渠道广告后的贡献利润的语法模板如下，各部分含义见下方说明。"
   },
   "dataDescriptions": {
     "customer_sessions": "共 3 行；字段：session_id、customer_id、source_id、session_date。",

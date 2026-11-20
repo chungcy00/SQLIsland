@@ -5,18 +5,41 @@
   "teachingKind": "business",
   "conceptBlocks": [
     {
-      "type": "paragraph",
-      "text": "库存金额是某一时点的数量乘单位成本；销售成本是期间流量。平均库存取期初与期末库存金额的平均。周转率=净销售出库成本÷平均库存；周转天数=365×平均库存÷净销售出库成本。",
+      "type": "heading",
+      "text": "基本含义",
       "emphasis": []
     },
     {
       "type": "paragraph",
-      "text": "周转率以次为单位，不能和百分比混淆。两端均值是近似值，不能代替高频日均库存。",
+      "text": "库存金额是某一时点的数量乘单位成本；销售成本是期间流量。",
       "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "平均库存取期初与期末库存金额的平均。",
+        "周转率=净销售出库成本÷平均库存；周转天数=365×平均库存÷净销售出库成本。"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "使用要点",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "周转率以次为单位，不能和百分比混淆。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "两端均值是近似值，不能代替高频日均库存。"
+      ]
     }
   ],
   "syntax": {
-    "purpose": "统计截止日 2025-12-31；金额 整数马币分；比率按题设；输出粒度 仓库×类别。"
+    "purpose": "库存周转率、周转天数与库存金额的语法模板如下，各部分含义见下方说明。"
   },
   "dataDescriptions": {
     "categories": "共 3 行；字段：category_id、category_name。",

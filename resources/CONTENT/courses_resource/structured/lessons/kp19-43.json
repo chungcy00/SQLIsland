@@ -5,18 +5,40 @@
   "teachingKind": "business",
   "conceptBlocks": [
     {
-      "type": "paragraph",
-      "text": "同期群是按共同起点划分的一组客户，本题起点为历史首购月份。第0月为首购月；第1月为下一自然月，不是首购后30天。每期留存率=该同期群当月购买的去重客户数÷首购群原始人数。",
+      "type": "heading",
+      "text": "基本含义",
       "emphasis": []
     },
     {
       "type": "paragraph",
-      "text": "各月分别计算，因此不要求连续活跃，客户中途不买后再次购买仍可计入当月留存。",
+      "text": "同期群是按共同起点划分的一组客户，本题起点为历史首购月份。",
       "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "第0月为首购月；第1月为下一自然月，不是首购后30天。"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "使用要点",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "每期留存率=该同期群当月购买的去重客户数÷首购群原始人数。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "各月分别计算，因此不要求连续活跃，客户中途不买后再次购买仍可计入当月留存。"
+      ]
     }
   ],
   "syntax": {
-    "purpose": "统计截止日 2025-12-31；金额 整数马币分；比率按题设；输出粒度 首购月×月偏移。"
+    "purpose": "客户留存与同期群分析的语法模板如下，各部分含义见下方说明。"
   },
   "dataDescriptions": {
     "calendar_days": "共 3 行；字段：day、month_key、day_index。",

@@ -5,23 +5,43 @@
   "teachingKind": "syntax",
   "conceptBlocks": [
     {
-      "type": "paragraph",
-      "text": "外连接在返回匹配行对之外，还保留指定一侧没有匹配的行。LEFT JOIN 保留左表，RIGHT JOIN 保留右表；另一侧的输出字段用 NULL 补齐。",
+      "type": "heading",
+      "text": "基本含义",
       "emphasis": []
     },
     {
       "type": "paragraph",
-      "text": "保留侧有多条匹配时依然会生成多行，并非保证行数不变。若业务需要所有客户（含未购买者），客户必须是保留侧。判断是否匹配应使用匹配侧原本非空的主键，而不是可能缺失的备注或金额。",
+      "text": "外连接在返回匹配行对之外，还保留指定一侧没有匹配的行。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "LEFT JOIN 保留左表，RIGHT JOIN 保留右表；另一侧的输出字段用 NULL 补齐。",
+        "保留侧有多条匹配时依然会生成多行，并非保证行数不变。",
+        "若业务需要所有客户（含未购买者），客户必须是保留侧。"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "使用要点",
       "emphasis": []
     },
     {
       "type": "paragraph",
-      "text": "统计匹配数量时，COUNT(订单主键) 忽略补出的空值；COUNT(*) 会把补齐行也统计在内。右连接交换表的位置即可改写为左连接，不能直接只替换关键字而不检查保留侧。",
+      "text": "判断是否匹配应使用匹配侧原本非空的主键，而不是可能缺失的备注或金额。",
       "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "统计匹配数量时，COUNT(订单主键) 忽略补出的空值；COUNT(*) 会把补齐行也统计在内。",
+        "右连接交换表的位置即可改写为左连接，不能直接只替换关键字而不检查保留侧。"
+      ]
     }
   ],
   "syntax": {
-    "purpose": "a 需要完整保留的表；b 用来匹配的表；ON 连接条件。"
+    "purpose": "LEFT JOIN 与 RIGHT JOIN的语法模板如下，各部分含义见下方说明。"
   },
   "dataDescriptions": {
     "customers": "共 4 行；字段：customer_id、customer_name。",

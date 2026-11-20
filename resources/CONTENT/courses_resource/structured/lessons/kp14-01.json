@@ -5,18 +5,40 @@
   "teachingKind": "advanced",
   "conceptBlocks": [
     {
-      "type": "paragraph",
-      "text": "公用表表达式是当前语句内命名的查询结果，不是持久表，也不保证物理物化。可以在后续表达式中引用前面已经定义的关系，将复杂分析拆解为可核查的逻辑步骤。",
+      "type": "heading",
+      "text": "基本含义",
       "emphasis": []
     },
     {
       "type": "paragraph",
-      "text": "每个表达式应明确一行代表什么，以及指标计算口径。递归形式另有起始项、递归项和终止条件，可处理层级结构；本面试精简版只需了解其用途，不展开递归语法教学。",
+      "text": "公用表表达式是当前语句内命名的查询结果，不是持久表，也不保证物理物化。",
       "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "可以在后续表达式中引用前面已经定义的关系，将复杂分析拆解为可核查的逻辑步骤。"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "使用要点",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "每个表达式应明确一行代表什么，以及指标计算口径。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "递归形式另有起始项、递归项和终止条件，可处理层级结构；本面试精简版只需了解其用途，不展开递归语法教学。"
+      ]
     }
   ],
   "syntax": {
-    "purpose": "a,b 当前语句内的表达式名称；AS 定义表达式查询。"
+    "purpose": "公用表表达式与多步骤查询的语法模板如下，各部分含义见下方说明。"
   },
   "dataDescriptions": {
     "orders": "共 5 行；字段：id、category、sales、store_id、order_date、customer_id。"

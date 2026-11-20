@@ -9,7 +9,7 @@
       "projectId": "retail",
       "title": "门店净销售、利润与目标达成",
       "context": "区域经理需要2025年门店经营表。",
-      "requirements": "每门店一行；有效线下订单，按原订单日期归属截至年底退货；毛利=净销售-退货冲减后成本；毛利率和目标达成率使用百分比，分母为0返回NULL；金额单位分。保留无销售门店。\n输出字段名称及顺序：store_id, net_cents, gross_cents, margin_pct, target_cents, achievement_pct。输出顺序：net_cents DESC。金额单位为马币分；派生金额及比率按题设保留小数，零分母为NULL。",
+      "requirements": "1. 每家门店一行，保留没有销售的门店。\n2. 只统计有效的线下订单；退货按原订单日期归属，统计截至年底的退货。\n3. 毛利 = 净销售额 − 退货冲减后的成本。\n4. 毛利率和目标达成率用百分比表示；分母为 0 时，返回 NULL。\n输出字段名称及顺序：store_id, net_cents, gross_cents, margin_pct, target_cents, achievement_pct\n结果排序要求：按 net_cents 降序排列。\n计算及格式要求：金额单位为马币分；计算得到的金额和比率按题目要求保留指定的小数位；分母为 0 时，返回 NULL。",
       "grain": "门店",
       "commonError": "直接连接月目标与订单明细会重复累计目标。",
       "executionSteps": [
@@ -349,7 +349,7 @@
       "projectId": "retail",
       "title": "门店月度环比同比与持续下滑",
       "context": "经营主管希望识别连续三个月环比负增长的门店。",
-      "requirements": "构造2023—2025完整门店月份轴；2025年逐月返回净销售、环比、同比及连续三月负增长标志；上期零或缺失时比率NULL。\n输出字段名称及顺序：store_id, month_key, net_cents, mom_pct, yoy_pct, three_declines。输出顺序不作要求。金额单位为马币分；派生金额及比率按题设保留小数，零分母为NULL。",
+      "requirements": "1. 构造 2023 至 2025 年完整的“门店 × 月份”时间轴。\n2. 返回 2025 年每个月的净销售额、环比、同比，以及“连续三个月负增长”标志。\n3. 上期为 0 或缺失时，比率返回 NULL。\n输出字段名称及顺序：store_id, month_key, net_cents, mom_pct, yoy_pct, three_declines\n结果排序要求：不要求排序，结果行的先后顺序不影响判断。\n计算及格式要求：金额单位为马币分；计算得到的金额和比率按题目要求保留指定的小数位；分母为 0 时，返回 NULL。",
       "grain": "门店×月",
       "commonError": "先筛2025再计算窗口会丢失去年和上月。",
       "executionSteps": [
@@ -1750,7 +1750,7 @@
       "projectId": "retail",
       "title": "高销售低毛利商品诊断",
       "context": "商品经理不希望销售额掩盖利润问题。",
-      "requirements": "2025年线下商品净销售额位于前四分之一且毛利率低于30%；返回销售、毛利率、折扣额、退款额；按净销售降序、商品编号升序。四分位使用NTILE(4)，并列按编号。\n输出字段名称及顺序：product_id, net_cents, margin_pct, discount_cents, refund_cents。输出顺序（含决胜键）：net DESC,product_id) bucket FROM a) SELECT product_id,net net_cents,ROUND(100.0*(net-cost)/NULLIF(net,0),2) margin_pct,discount discount_cents,refund refund_cents FROM b WHERE bucket=1 AND 100.0*(net-cost)/NULLIF(net,0)<30 ORDER BY net DESC,product_id。金额单位为马币分；派生金额及比率按题设保留小数，零分母为NULL。",
+      "requirements": "1. 统计 2025 年线下商品：净销售额位于前四分之一（使用 NTILE(4) 分组，净销售额相同时再按商品编号区分），并且毛利率低于 30%。\n2. 返回销售额、毛利率、折扣额和退款额。\n输出字段名称及顺序：product_id, net_cents, margin_pct, discount_cents, refund_cents\n结果排序要求：按 net 降序排列；net 相同时，再按 product_id 升序排列。\n计算及格式要求：金额单位为马币分；计算得到的金额和比率按题目要求保留指定的小数位；分母为 0 时，返回 NULL。",
       "grain": "商品",
       "commonError": "先按毛利筛选再计算销售四分位改变总体。",
       "executionSteps": [
@@ -2155,7 +2155,7 @@
       "projectId": "inventory",
       "title": "低销量高库存诊断",
       "context": "仓储经理希望优先处理积压货品。",
-      "requirements": "统计2025-10-03至12-31共90日仓库销售出库量；期末为12-31；有效商品、库存价值超过500000分且销量低于20件；无销售记0，库存覆盖天数无销售返回NULL。\n输出字段名称及顺序：warehouse_id, product_id, quantity, sold_units, stock_value_cents, cover_days。输出顺序：stock_value_cents DESC, i.warehouse_id。金额单位为马币分；派生金额及比率按题设保留小数，零分母为NULL。",
+      "requirements": "1. 统计 2025-10-03 至 2025-12-31 共 90 天的仓库销售出库量；期末库存取 2025-12-31 的数据。\n2. 只看有效商品，且库存价值超过 500000 分、销量低于 20 件。\n3. 没有销售记录的按 0 计；没有销售时，库存覆盖天数返回 NULL。\n输出字段名称及顺序：warehouse_id, product_id, quantity, sold_units, stock_value_cents, cover_days\n结果排序要求：按 stock_value_cents 降序排列；stock_value_cents 相同时，再按 warehouse_id 升序排列。\n计算及格式要求：金额单位为马币分；计算得到的金额和比率按题目要求保留指定的小数位；分母为 0 时，返回 NULL。",
       "grain": "仓库×商品",
       "commonError": "用内连接会漏掉零销售的积压商品。",
       "executionSteps": [
@@ -2825,7 +2825,7 @@
       "projectId": "inventory",
       "title": "类别库存周转率及周转天数",
       "context": "仓储部门比较不同仓库与品类的资金效率。",
-      "requirements": "2025年：净销售出库成本含退货冲回；年初价值以2024-12-31快照、年末以2025-12-31快照；平均库存=两端均值；周转天数365/周转率，销售成本非正时天数NULL。 缺失任一商品的期初或期末快照时，该仓库类别的平均库存及周转指标返回NULL，不将缺失当作零。\n输出字段名称及顺序：warehouse_id, category_id, cogs_cents, avg_stock_cents, turnover, turnover_days。输出顺序：avg_stock_cents DESC。金额单位为马币分；派生金额及比率按题设保留小数，零分母为NULL。",
+      "requirements": "1. 统计 2025 年：净销售出库成本包含退货冲回；期初库存价值取 2024-12-31 的快照，期末库存价值取 2025-12-31 的快照；平均库存 = 期初与期末的平均值。\n2. 周转天数 = 365 ÷ 周转率；销售成本不为正时，周转天数返回 NULL。\n3. 缺少某个商品的期初或期末快照时，该仓库类别的平均库存及周转指标返回 NULL，不能把缺失当作 0。\n输出字段名称及顺序：warehouse_id, category_id, cogs_cents, avg_stock_cents, turnover, turnover_days\n结果排序要求：按 avg_stock_cents 降序排列。\n计算及格式要求：金额单位为马币分；计算得到的金额和比率按题目要求保留指定的小数位；分母为 0 时，返回 NULL。",
       "grain": "仓库×类别",
       "commonError": "销售额不是出库成本；逐商品周转率的简单平均也不是类别周转率。",
       "executionSteps": [
@@ -3438,7 +3438,7 @@
       "projectId": "ecommerce",
       "title": "新老客户净收入及客单价",
       "context": "营销部门比较首购客户与已有购买历史的客户。",
-      "requirements": "仅线上有效订单。客户首次有效订单以日期、订单编号决胜；2025年按订单是否首购分组，输出客户数、订单数、净收入和平均订单净额（分）。\n输出字段名称及顺序：segment, customers, orders, net_cents, avg_order_cents。输出顺序（含决胜键）：order_date,order_id) rn FROM v_order_net WHERE channel='online') SELECT CASE WHEN rn=1 THEN 'new' ELSE 'returning' END segment,COUNT(DISTINCT customer_id) customers,COUNT(*) orders,SUM(net_cents) net_cents,ROUND(1.0*SUM(net_cents)/COUNT(*),2) avg_order_cents FROM a WHERE order_date BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY CASE WHEN rn=1 THEN 'new' ELSE 'returning' END ORDER BY segment。金额单位为马币分；派生金额及比率按题设保留小数，零分母为NULL。",
+      "requirements": "1. 只统计线上有效订单；客户的首次有效订单先比较日期，日期相同时再比较订单编号来确定。\n2. 统计 2025 年的订单，按订单是否为客户首购分组。\n3. 输出客户数、订单数、净收入和平均订单净额（单位：分）。\n输出字段名称及顺序：segment, customers, orders, net_cents, avg_order_cents\n结果排序要求：按 segment 升序排列。\n计算及格式要求：金额单位为马币分；计算得到的金额和比率按题目要求保留指定的小数位；分母为 0 时，返回 NULL。",
       "grain": "订单所属客户阶段",
       "commonError": "先筛2025会把已有购买客户误标为新客；客户可在两个组出现。",
       "executionSteps": [
@@ -3695,7 +3695,7 @@
       "projectId": "ecommerce",
       "title": "最近消费、频率、金额客户分层",
       "context": "客户运营团队需要可执行的分层名单。",
-      "requirements": "2025年有线上有效购买的客户；截止12-31距最近购买天数；年度订单数和净消费金额；分别按最近日期近到远、频率高到低、金额高到低分五组（并列客户编号）；三个分数5为最好；总分≥13为高价值、≤6为低活跃。\n输出字段名称及顺序：customer_id, recency_days, freq, net_cents, r_score, f_score, m_score, segment。输出顺序（含决胜键）：last_day DESC,customer_id) r_score,6-NTILE(5) OVER(ORDER BY freq DESC,customer_id) f_score,6-NTILE(5) OVER(ORDER BY money DESC,customer_id) m_score FROM a) SELECT b.customer_id,1095-d.day_index recency_days,freq,money net_cents,r_score,f_score,m_score,CASE WHEN r_score+f_score+m_score>=13 THEN 'high_value' WHEN r_score+f_score+m_score<=6 THEN 'low_activity' ELSE 'regular' END segment FROM b JOIN calendar_days d ON d.day=b.last_day ORDER BY b.customer_id。金额单位为马币分；派生金额及比率按题设保留小数，零分母为NULL。",
+      "requirements": "1. 统计 2025 年有线上有效购买的客户，计算：截至 12-31 距最近一次购买的天数、年度订单数、净消费金额。\n2. 三个指标各自分成五组：最近购买日期由近到远、订单数由高到低、净消费金额由高到低；指标相同时按客户编号区分。得分 5 为最好。\n3. 三项得分之和大于等于 13 为“高价值”，小于等于 6 为“低活跃”。\n输出字段名称及顺序：customer_id, recency_days, freq, net_cents, r_score, f_score, m_score, segment\n结果排序要求：按 customer_id 升序排列。\n计算及格式要求：金额单位为马币分；计算得到的金额和比率按题目要求保留指定的小数位；分母为 0 时，返回 NULL。",
       "grain": "客户",
       "commonError": "每行订单做NTILE会将同一客户拆入多组。",
       "executionSteps": [
@@ -21886,7 +21886,7 @@
       "projectId": "ecommerce",
       "title": "首购月份留存矩阵",
       "context": "业务经理希望观察首购后的月度复购留存。",
-      "requirements": "线上有效订单；首次购买月为同期群，观察第0至第6月；按首购月与月偏移输出同期群规模、活跃客户与留存率；没有活跃但已观察的月份为0，未来月份不输出。\n输出字段名称及顺序：cohort, month_offset, cohort_size, active_customers, retention_pct。输出顺序（含决胜键）：x.cohort,x.k。金额单位为马币分；派生金额及比率按题设保留小数，零分母为NULL。",
+      "requirements": "1. 统计线上有效订单；客户首次购买所在的月份为同期群，观察第 0 至第 6 个月。\n2. 按首购月和月份偏移，输出同期群规模、活跃客户数和留存率。\n3. 已观察到但没有活跃客户的月份记为 0；尚未到来的月份不输出。\n输出字段名称及顺序：cohort, month_offset, cohort_size, active_customers, retention_pct\n结果排序要求：按 cohort 升序排列；cohort 相同时，再按 k 升序排列。\n计算及格式要求：金额单位为马币分；计算得到的金额和比率按题目要求保留指定的小数位；分母为 0 时，返回 NULL。",
       "grain": "首购月×月偏移",
       "commonError": "直接COUNT订单会把同一客户的多次复购重复计数。",
       "executionSteps": [
@@ -23747,7 +23747,7 @@
       "projectId": "ecommerce",
       "title": "客户复购率",
       "context": "电商运营需要评估2025年发生有效购买的客户是否再次购买。",
-      "requirements": "统计2025-01-01至2025-12-31的线上有效购买。有效订单须为completed，按订单日期归属，并扣除截至2025-12-31确认的退款后净销售额大于0。只统计customers中存在且customer_id非空的客户。每个客户按不同order_id计购买次数，同一订单的多条明细只算一次。输出一行，purchasing_customers为至少购买一次的去重客户数，repeat_customers为至少购买两次的去重客户数，repeat_pct=100.0*repeat_customers/purchasing_customers，四舍五入2位小数，零分母返回NULL。\n输出字段名称及顺序：purchasing_customers, repeat_customers, repeat_pct。",
+      "requirements": "1. 统计 2025-01-01 至 2025-12-31 的线上有效购买：订单状态须为 completed，按订单日期归属，并且扣除截至 2025-12-31 确认的退款后净销售额大于 0。\n2. 只统计 customers 表中存在且 customer_id 不为空的客户。\n3. 每位客户按不同的 order_id 计购买次数，同一订单的多条明细只算一次。\n4. 只输出一行：purchasing_customers 为至少购买一次的不重复客户数，repeat_customers 为至少购买两次的不重复客户数，repeat_pct = 100.0 × repeat_customers ÷ purchasing_customers，四舍五入保留 2 位小数；分母为 0 时，返回 NULL。\n输出字段名称及顺序：purchasing_customers, repeat_customers, repeat_pct",
       "grain": "分析期间全部有效购买客户汇总为一行",
       "commonError": {
         "example": "忽略客户去重、完整月份或汇总粒度会改变业务指标。",
@@ -23993,7 +23993,7 @@
       "projectId": "finance",
       "title": "预算与实际费用差异",
       "context": "财务负责人检查部门年度超支。",
-      "requirements": "2025年部门×费用科目，预算与费用分录各自汇总，偏差=实际-预算；超过预算10%标记；保留有预算但没有发生额的项目；分母为零返回NULL。\n输出字段名称及顺序：department_id, account_id, budget_cents, actual_cents, variance_cents, variance_pct, over_budget。输出顺序（含决胜键）：b.department_id,b.account_id。金额单位为马币分；派生金额及比率按题设保留小数，零分母为NULL。",
+      "requirements": "1. 统计 2025 年“部门 × 费用科目”：预算和费用分录分别汇总，偏差 = 实际 − 预算。\n2. 实际超过预算 10% 的项目要加上标记。\n3. 有预算但没有发生额的项目也要保留；分母为 0 时，返回 NULL。\n输出字段名称及顺序：department_id, account_id, budget_cents, actual_cents, variance_cents, variance_pct, over_budget\n结果排序要求：按 department_id 升序排列；department_id 相同时，再按 account_id 升序排列。\n计算及格式要求：金额单位为马币分；计算得到的金额和比率按题目要求保留指定的小数位；分母为 0 时，返回 NULL。",
       "grain": "部门×科目",
       "commonError": "预算按月存在，连接分录后再求和会放大预算。",
       "executionSteps": [
@@ -24533,7 +24533,7 @@
       "projectId": "finance",
       "title": "供应商发票与付款核对",
       "context": "财务人员需要年底未付及异常付款清单。",
-      "requirements": "所有截至12-31的供应商发票，汇总付款；输出发票金额、实付金额、余额和未付/部分/足额/超额状态。按余额倒序。 paid表示已结清，包含已批准贷项全额抵销而无需付现的情况。 本库v_invoice_balance的billed_cents为发票面额减截至截止日已批准贷项后的净应付，paid_cents仅计截止日前付款；原始发票面额保留在supplier_invoice_items。\n输出字段名称及顺序：supplier_invoice_id, supplier_id, billed_cents, paid_cents, balance_cents, payment_state。输出顺序（含决胜键）：balance_cents DESC,supplier_invoice_id。金额单位为马币分；派生金额及比率按题设保留小数，零分母为NULL。",
+      "requirements": "1. 统计截至 12-31 的全部供应商发票，汇总每张发票的付款。\n2. 输出发票金额、实付金额、余额，以及状态（未付、部分、足额、超额）。\n3. 状态“足额”表示已结清，包括已批准的贷项全额抵销、无需付款的情况。\n4. 本库中 v_invoice_balance 的 billed_cents 是发票面额扣除截至截止日已批准贷项后的净应付，paid_cents 只计截止日前的付款；原始发票面额保存在 supplier_invoice_items。\n输出字段名称及顺序：supplier_invoice_id, supplier_id, billed_cents, paid_cents, balance_cents, payment_state\n结果排序要求：按 balance_cents 降序排列；balance_cents 相同时，再按 supplier_invoice_id 升序排列。\n计算及格式要求：金额单位为马币分；计算得到的金额和比率按题目要求保留指定的小数位；分母为 0 时，返回 NULL。",
       "grain": "发票",
       "commonError": "不能直接将多笔付款与多行发票明细同时连接后求和。",
       "executionSteps": [
@@ -62681,7 +62681,7 @@
       "projectId": "finance",
       "title": "应付账款账龄",
       "context": "财务负责人评估逾期支付压力。",
-      "requirements": "截至2025-12-31，余额>0；按到期日分为未逾期（到期日≥截止日）、1—30、31—60、61—90、90日以上；按供应商与账龄汇总发票数及应付余额。日期差用日历索引；到期日可能超出年底，先判未逾期。 本库v_invoice_balance的billed_cents为发票面额减截至截止日已批准贷项后的净应付，paid_cents仅计截止日前付款；原始发票面额保留在supplier_invoice_items。\n输出字段名称及顺序：supplier_id, bucket, invoices, outstanding_cents。输出顺序（含决胜键）：supplier_id,bucket。金额单位为马币分；派生金额及比率按题设保留小数，零分母为NULL。",
+      "requirements": "1. 统计截至 2025-12-31、余额大于 0 的应付发票。\n2. 按到期日分为：未逾期（到期日大于等于截止日）、1—30 天、31—60 天、61—90 天、90 天以上；到期日可能晚于年底，应先判断为未逾期。\n3. 按供应商和账龄分组，汇总发票数和应付余额。\n4. 日期差通过日历索引计算。\n5. 本库中 v_invoice_balance 的 billed_cents 是发票面额扣除截至截止日已批准贷项后的净应付，paid_cents 只计截止日前的付款；原始发票面额保存在 supplier_invoice_items。\n输出字段名称及顺序：supplier_id, bucket, invoices, outstanding_cents\n结果排序要求：按 supplier_id 升序排列；supplier_id 相同时，再按 bucket 升序排列。\n计算及格式要求：金额单位为马币分；计算得到的金额和比率按题目要求保留指定的小数位；分母为 0 时，返回 NULL。",
       "grain": "供应商×账龄",
       "commonError": "账龄基于到期日，不是发票日期；未到期不能算逾期。",
       "executionSteps": [
@@ -63812,7 +63812,7 @@
       "projectId": "finance",
       "title": "银行流水与凭证全量对账",
       "context": "审计人员需要同时寻找银行端和账簿端的未匹配。",
-      "requirements": "2025年费用凭证按真实reference_no汇总费用净额；银行按真实reference_no汇总净支出，净支出=-SUM(amount_cents)，正向冲回或收入作为负支出，不能逐行取ABS。采用两端全量键集合，每条NULL银行参考号单独对账，并用reference_kind区分reference与unreferenced_bank，防止合成显示名BANK-编号与真实参考号碰撞。返回有缺失或金额差异的记录，差额=银行净支出-账簿费用；缺失端输出NULL。显示ref为真实参考号或BANK-银行编号。按ref升序、reference_kind升序。\n输出字段名称及顺序：ref, ledger_cents, bank_cents, difference_cents, issue, reference_kind。输出顺序（含决胜键）：ref,reference_kind。金额单位为马币分；派生金额及比率按题设保留小数，零分母为NULL。",
+      "requirements": "1. 2025 年的费用凭证按真实的 reference_no 汇总费用净额；银行流水按真实的 reference_no 汇总净支出，净支出 = −SUM(amount_cents)。正向冲回或收入按负支出处理，不能逐行取 ABS。\n2. 两侧的键取全集；银行参考号为 NULL 的每一条流水单独对账，并用 reference_kind 区分 reference 和 unreferenced_bank，避免合成的显示名 BANK-编号 与真实参考号冲突。\n3. 只返回有缺失或金额有差异的记录；差额 = 银行净支出 − 账簿费用，缺失的一端输出 NULL。\n4. ref 显示为真实参考号，没有参考号时显示为 BANK-银行流水编号。\n输出字段名称及顺序：ref, ledger_cents, bank_cents, difference_cents, issue, reference_kind\n结果排序要求：按 ref 升序排列；ref 相同时，再按 reference_kind 升序排列。\n计算及格式要求：金额单位为马币分；计算得到的金额和比率按题目要求保留指定的小数位；分母为 0 时，返回 NULL。",
       "grain": "对账参考号",
       "commonError": "逐行ABS会掩盖银行冲回；只用BANK-编号作为键可能与真实参考号合并。",
       "executionSteps": [
@@ -73512,7 +73512,7 @@
       "projectId": "finance",
       "title": "多规则异常交易筛查",
       "context": "审计部门需要异常线索，不用于认定违规。",
-      "requirements": "截至2025-12-31的每张发票计算四个复核标记：同供应商同invoice_no存在多张发票；原始发票面额超过该供应商全部期间内发票面额均值的2倍；净应付减实付余额为负；原始发票面额与本张发票已开票数量按对应采购行单价重算金额相差超过100分。面额及采购重算金额均在本张发票行内汇总，不能使用整张采购单总收货金额，不冲减贷项；超额付款标记使用截止日已批准贷项后的净应付。数量是否超收或超开票由三方核对题检查，本题第四项专门识别开票价格差异。输出净应付billed_cents和四个标记，至少一个标记才返回，按标记数降序、发票编号升序。大额及价格标记使用未舍入值，标记只代表复核候选。\n输出字段名称及顺序：supplier_invoice_id, supplier_id, billed_cents, duplicate_flag, large_flag, overpay_flag, mismatch_flag, flags。输出顺序（含决胜键）：flags DESC,supplier_invoice_id。金额单位为马币分；派生金额及比率按题设保留小数，零分母为NULL。",
+      "requirements": "1. 对截至 2025-12-31 的每张发票计算四个复核标记：\n   ① 同一供应商、同一 invoice_no 存在多张发票；\n   ② 原始发票面额超过该供应商全部期间发票面额平均值的 2 倍；\n   ③ 净应付减实付余额为负；\n   ④ 原始发票面额与按本张发票已开票数量和对应采购行单价重算的金额相差超过 100 分。\n2. 面额和采购重算金额都在本张发票的行内汇总，不能使用整张采购单的总收货金额，也不冲减贷项；超额付款标记使用截止日已批准贷项之后的净应付。\n3. 数量是否超收或超开票由三方核对题检查，本题第四个标记专门识别开票价格差异。\n4. 输出净应付 billed_cents 和四个标记，至少有一个标记才返回；大额标记和价格标记使用未舍入的值，标记只代表需要复核的候选。\n输出字段名称及顺序：supplier_invoice_id, supplier_id, billed_cents, duplicate_flag, large_flag, overpay_flag, mismatch_flag, flags\n结果排序要求：按 flags 降序排列；flags 相同时，再按 supplier_invoice_id 升序排列。\n计算及格式要求：金额单位为马币分；计算得到的金额和比率按题目要求保留指定的小数位；分母为 0 时，返回 NULL。",
       "grain": "发票",
       "commonError": "分批发票不能与整单收货金额比较；已批准贷项不应自动变成发票单价错误。",
       "executionSteps": [
@@ -83601,7 +83601,7 @@
       "projectId": "hr",
       "title": "月度离职率与趋势",
       "context": "人资经理比较各部门真实离职率。",
-      "requirements": "2025年每部门每月真实离职人数（终止日期落月内，取终止前岗位）/期初期末平均在职数；期初以当月首日之前一天在职为准；滚动三月率用离职总数/三个月平均人数之和，非简单平均。 三个月滚动指标包含2024年11—12月历史后再筛选2025年输出，不在年度边界重新开始累计；确实不足三个月时返回NULL。\n输出字段名称及顺序：department_id, month_key, opening, closing, exits, exit_pct, rolling_pct。输出顺序不作要求。金额单位为马币分；派生金额及比率按题设保留小数，零分母为NULL。",
+      "requirements": "1. 统计 2025 年每个部门每个月的真实离职人数：终止日期落在当月内，岗位取终止前的岗位。\n2. 离职率 = 离职人数 ÷ 期初期末平均在职人数；期初以当月首日前一天的在职人数为准。\n3. 滚动三个月离职率 = 三个月离职总数 ÷ 三个月平均人数之和（不是简单平均）；计算时包含 2024 年 11—12 月的历史数据，再筛选 2025 年输出，不在年度边界重新开始累计；确实不足三个月时返回 NULL。\n输出字段名称及顺序：department_id, month_key, opening, closing, exits, exit_pct, rolling_pct\n结果排序要求：不要求排序，结果行的先后顺序不影响判断。\n计算及格式要求：金额单位为马币分；计算得到的金额和比率按题目要求保留指定的小数位；分母为 0 时，返回 NULL。",
       "grain": "部门×月",
       "commonError": "把部门调动当离职会夸大离职率。",
       "executionSteps": [
@@ -84582,7 +84582,7 @@
       "projectId": "procurement",
       "title": "采购价格与合同、历史价格比较",
       "context": "采购人员检查实际采购价是否偏离合同。",
-      "requirements": "2025年非取消采购行；比较合同单价、成交价及同供应商同商品上一采购行的实际单价；上一行按订单日期、行编号；输出合同差价及较上一单变动率。\n输出字段名称及顺序：po_item_id, supplier_id, product_id, unit_price_cents, contract_cents, contract_variance_cents, previous_cents, change_pct。输出顺序（含决胜键）：p.order_date,i.po_item_id) previous_cents FROM purchase_order_items i JOIN purchase_orders p ON p.po_id=i.po_id JOIN supplier_contracts c ON c.contract_id=i.contract_id WHERE p.status<>'cancelled') SELECT po_item_id,supplier_id,product_id,unit_price_cents,contract_cents,unit_price_cents-contract_cents contract_variance_cents,previous_cents,ROUND(100.0*(unit_price_cents-previous_cents)/NULLIF(previous_cents,0),2) change_pct FROM a WHERE order_date BETWEEN '2025-01-01' AND '2025-12-31' ORDER BY po_item_id。金额单位为马币分；派生金额及比率按题设保留小数，零分母为NULL。",
+      "requirements": "1. 统计 2025 年未取消的采购行。\n2. 比较合同单价、成交价，以及同一供应商同一商品的上一采购行的实际单价；上一行按订单日期、行编号确定。\n3. 输出合同差价和较上一单的变动率。\n输出字段名称及顺序：po_item_id, supplier_id, product_id, unit_price_cents, contract_cents, contract_variance_cents, previous_cents, change_pct\n结果排序要求：按 po_item_id 升序排列。\n计算及格式要求：金额单位为马币分；计算得到的金额和比率按题目要求保留指定的小数位；分母为 0 时，返回 NULL。",
       "grain": "采购行",
       "commonError": "简单比较未经加权的供应商总价可能混入不同商品。",
       "executionSteps": [
@@ -119500,7 +119500,7 @@
       "projectId": "procurement",
       "title": "供应商准时、完整交付与质量",
       "context": "采购经理比较供应商2025年到期采购行表现。",
-      "requirements": "按2025年承诺到期日且非取消采购行；准时足量=截止承诺日接受数量≥订购量；完整=截至年底接受数量≥订购量；质量合格率=接受件数/实际收货件数；输出供应商及分母。 仅输出至少有一条期间到期采购行的供应商。\n输出字段名称及顺序：supplier_id, due_lines, ontime_pct, complete_pct, quality_pct。输出顺序（含决胜键）：supplier_id。金额单位为马币分；派生金额及比率按题设保留小数，零分母为NULL。",
+      "requirements": "1. 按承诺到期日在 2025 年内、且未取消的采购行统计。\n2. 准时足量：截止承诺日的接受数量大于等于订购量；完整：截至年底的接受数量大于等于订购量；质量合格率 = 接受件数 ÷ 实际收货件数。\n3. 输出供应商及各比率的分母；只输出期间内至少有一条到期采购行的供应商。\n输出字段名称及顺序：supplier_id, due_lines, ontime_pct, complete_pct, quality_pct\n结果排序要求：按 supplier_id 升序排列。\n计算及格式要求：金额单位为马币分；计算得到的金额和比率按题目要求保留指定的小数位；分母为 0 时，返回 NULL。",
       "grain": "供应商",
       "commonError": "有任意一批准时到货并不等于整行准时足量。",
       "executionSteps": [
@@ -120106,7 +120106,7 @@
       "projectId": "procurement",
       "title": "采购、收货、发票三方核对",
       "context": "采购控制人员识别数量、价格与金额差异。",
-      "requirements": "2025年非取消采购行（截止年底）；输出订购、合格收货、开票数量，开票金额与合格收货按采购单价的金额差；仅数量不等或金额差不为0；未开票也需要呈现。 本题核对原始开票行，不冲减后续贷项；净应付与贷项的核对见财务题。\n输出字段名称及顺序：po_item_id, po_id, supplier_id, product_id, quantity_ordered, accepted, billed, billed_cents, expected_cents, variance_cents。输出顺序（含决胜键）：po_item_id。金额单位为马币分；派生金额及比率按题设保留小数，零分母为NULL。",
+      "requirements": "1. 统计 2025 年未取消的采购行（截至年底）。\n2. 输出订购数量、合格收货数量、开票数量，以及开票金额与按采购单价计算的合格收货金额之间的差额；未开票的也要列出。\n3. 只保留数量不相等或金额差不为 0 的记录。\n4. 本题核对原始开票行，不冲减后续贷项；净应付与贷项的核对见财务题。\n输出字段名称及顺序：po_item_id, po_id, supplier_id, product_id, quantity_ordered, accepted, billed, billed_cents, expected_cents, variance_cents\n结果排序要求：按 po_item_id 升序排列。\n计算及格式要求：金额单位为马币分；计算得到的金额和比率按题目要求保留指定的小数位；分母为 0 时，返回 NULL。",
       "grain": "采购行",
       "commonError": "v_po_lines的开票汇总不含发票日期过滤；截至年底核对需重新汇总日期合格的发票行。",
       "executionSteps": [

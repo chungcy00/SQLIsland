@@ -5,18 +5,41 @@
   "teachingKind": "syntax",
   "conceptBlocks": [
     {
-      "type": "paragraph",
-      "text": "交集返回两个结果中共同存在的行；差集返回左侧存在且右侧不存在的行。默认均去重。差集不可交换左右侧；交集的成员不取决于方向。集合运算比较对应的整行，不等于普通等号处理空值的逻辑。",
+      "type": "heading",
+      "text": "基本含义",
       "emphasis": []
     },
     {
       "type": "paragraph",
-      "text": "原生 MySQL 8.4 支持两类运算，SQLite 不支持其 ALL 形式；组合运算宜用具名表达式明确范围。",
+      "text": "交集返回两个结果中共同存在的行；差集返回左侧存在且右侧不存在的行。",
       "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "默认均去重。",
+        "差集不可交换左右侧；交集的成员不取决于方向。"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "使用要点",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "集合运算比较对应的整行，不等于普通等号处理空值的逻辑。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "原生 MySQL 8.4 支持两类运算，SQLite 不支持其 ALL 形式；组合运算宜用具名表达式明确范围。"
+      ]
     }
   ],
   "syntax": {
-    "purpose": "INTERSECT 共同成员；EXCEPT 左侧独有成员。"
+    "purpose": "交集与差集的语法模板如下，各部分含义见下方说明。"
   },
   "dataDescriptions": {
     "old_customers": "共 4 行；字段：customer_id、customer_name。",

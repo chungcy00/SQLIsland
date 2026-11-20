@@ -5,18 +5,25 @@
   "teachingKind": "business",
   "conceptBlocks": [
     {
-      "type": "paragraph",
-      "text": "复购率是期间有至少两笔有效购买的客户人数÷有至少一笔有效购买的客户人数×100%。不是复购订单占比，也不是所有注册客户中复购客户的占比。",
+      "type": "heading",
+      "text": "基本含义",
       "emphasis": []
     },
     {
       "type": "paragraph",
-      "text": "一个订单可能有多条商品明细，必须按订单编号计数；同一客户的有效订单次数再用于分类。",
+      "text": "复购率是期间有至少两笔有效购买的客户人数÷有至少一笔有效购买的客户人数×100%。",
       "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "不是复购订单占比，也不是所有注册客户中复购客户的占比。",
+        "一个订单可能有多条商品明细，必须按订单编号计数；同一客户的有效订单次数再用于分类。"
+      ]
     }
   ],
   "syntax": {
-    "purpose": "本节语法：WITH purchases AS (\n  SELECT c.customer_id, COUNT(DISTINCT o.order_id) purchase_count\n  FROM customers c JOIN v_order_net o ON o.customer_id=c.customer_id\n  WHERE o.channel='online' AND o.order_date BETWEEN '2025-01-01' AND '2025-12-31'\n    AND o.net_cents>0\n  GROUP BY c.customer_id\n)\nSELECT COUNT(*) AS purchasing_customers,\n  COALESCE(SUM(CASE WHEN purchase_count>=2 THEN 1 ELSE 0 END),0) AS repeat_customers,\n  ROUND(100.0*COALESCE(SUM(CASE WHEN purchase_count>=2 THEN 1 ELSE 0 END),0)/NULLIF(COUNT(*),0),2) AS repeat_pct\nFROM purchases"
+    "purpose": "客户复购率与统计粒度的语法模板如下。"
   },
   "dataDescriptions": {
     "stores": "共 3 行；字段：store_id、store_name、city、fulfillment_warehouse_id。",

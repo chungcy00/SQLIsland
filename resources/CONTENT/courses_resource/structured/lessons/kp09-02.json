@@ -5,33 +5,42 @@
   "teachingKind": "syntax",
   "conceptBlocks": [
     {
-      "type": "paragraph",
-      "text": "条件聚合将业务条件转换为每行的数值，再使用聚合函数统计指定子集。SUM(CASE WHEN 条件 THEN 1 ELSE 0 END) 对命中条件的行累加1；",
+      "type": "heading",
+      "text": "基本含义",
       "emphasis": []
     },
     {
       "type": "paragraph",
-      "text": "COUNT(CASE WHEN 条件 THEN 1 END) 则利用 COUNT 忽略 NULL 特性。",
+      "text": "条件聚合将业务条件转换为每行的数值，再使用聚合函数统计指定子集。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "SUM(CASE WHEN 条件 THEN 1 ELSE 0 END) 对命中条件的行累加1；COUNT(CASE WHEN 条件 THEN 1 END) 则利用 COUNT 忽略 NULL 特性。",
+        "不能用 COUNT(CASE WHEN 条件 THEN 1 ELSE 0 END)，因为0也是非空值。"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "使用要点",
       "emphasis": []
     },
     {
       "type": "paragraph",
-      "text": "不能用 COUNT(CASE WHEN 条件 THEN 1 ELSE 0 END)，因为0也是非空值。",
+      "text": "MySQL IF(条件,真值,假值) 适用于二选一，未知条件也进入假值分支，不应随意将其称为零。",
       "emphasis": []
     },
     {
-      "type": "paragraph",
-      "text": "MySQL IF(条件,真值,假值) 适用于二选一，未知条件也进入假值分支，不应随意将其称为零。CASE 更便于表达多分类及跨库兼容。",
-      "emphasis": []
-    },
-    {
-      "type": "paragraph",
-      "text": "若使用非互斥条件，多个指标可能同时计入同一行，合计不一定等于记录总数；空输入时 SUM 返回 NULL，而 COUNT 返回0。",
-      "emphasis": []
+      "type": "list",
+      "items": [
+        "CASE 更便于表达多分类及跨库兼容。",
+        "若使用非互斥条件，多个指标可能同时计入同一行，合计不一定等于记录总数；空输入时 SUM 返回 NULL，而 COUNT 返回0。"
+      ]
     }
   ],
   "syntax": {
-    "purpose": "p 需要统计的业务条件；a、b 条件真或非真时的返回值；SUM 累计各行的命中标记。"
+    "purpose": "IF 与条件聚合的语法模板如下，各部分含义见下方说明。"
   },
   "dataDescriptions": {
     "products": "共 6 行；字段：product_id、product_name、category、price、stock。"

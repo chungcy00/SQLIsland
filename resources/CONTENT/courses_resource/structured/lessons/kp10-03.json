@@ -5,18 +5,40 @@
   "teachingKind": "syntax",
   "conceptBlocks": [
     {
-      "type": "paragraph",
-      "text": "相关子查询引用外层表中的字段，逻辑上针对当前外层记录判断；物理执行可能被优化器改写，并不保证逐行运行。EXISTS 关注内层是否有至少一行，而不关注 SELECT 返回什么值。",
+      "type": "heading",
+      "text": "基本含义",
       "emphasis": []
     },
     {
       "type": "paragraph",
-      "text": "它不汇总购买次数，也不搬运订单明细。通过相关条件将每位客户与自己的订单匹配，即使有多笔订单，外层客户也只保留原有的一行。",
+      "text": "相关子查询引用外层表中的字段，逻辑上针对当前外层记录判断；物理执行可能被优化器改写，并不保证逐行运行。",
       "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "EXISTS 关注内层是否有至少一行，而不关注 SELECT 返回什么值。"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "使用要点",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "它不汇总购买次数，也不搬运订单明细。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "通过相关条件将每位客户与自己的订单匹配，即使有多笔订单，外层客户也只保留原有的一行。"
+      ]
     }
   ],
   "syntax": {
-    "purpose": "EXISTS 内层有行时为真；a.key 当前外层记录的键；SELECT 1 表达仅关注存在性。"
+    "purpose": "相关子查询与 EXISTS的语法模板如下，各部分含义见下方说明。"
   },
   "dataDescriptions": {
     "customers": "共 4 行；字段：customer_id、customer_name。",

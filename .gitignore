@@ -80,3 +80,6 @@ scripts/revise-order-by-*.py
 scripts/revise-question-order.py
 scripts/convert-lessons.py
 scripts/convert_lessons_lib.py
+scripts/revise-question-text.py
+scripts/question_text_edits.py
+.qtext-old.json

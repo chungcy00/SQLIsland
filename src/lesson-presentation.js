@@ -1,6 +1,6 @@
 // Split display blocks without changing or summarizing the original teaching text.
 export function requirementSections(text = "") {
-  const labels = ["输出字段名称及顺序", "输出列名称及顺序", "输出顺序（含决胜键）", "输出顺序", "参考排序键"];
+  const labels = ["输出字段名称及顺序", "输出列名称及顺序", "结果排序要求", "计算及格式要求", "输出顺序（含决胜键）", "输出顺序", "参考排序键"];
   const pattern = new RegExp(`(${labels.join("|")})[：:]`, "g");
   const sections = [];
   let start = 0;

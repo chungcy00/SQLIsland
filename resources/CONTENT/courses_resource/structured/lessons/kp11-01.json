@@ -5,28 +5,40 @@
   "teachingKind": "function",
   "conceptBlocks": [
     {
-      "type": "paragraph",
-      "text": "字符串拼接按指定顺序将多个文本组合为一个新值，可以插入空格、连字符等分隔符。它常用于显示标签而不是代替独立字段。",
+      "type": "heading",
+      "text": "基本含义",
       "emphasis": []
     },
     {
       "type": "paragraph",
-      "text": "MySQL 的 CONCAT 任一参数为 NULL 时结果为 NULL；",
+      "text": "字符串拼接按指定顺序将多个文本组合为一个新值，可以插入空格、连字符等分隔符。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "它常用于显示标签而不是代替独立字段。"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "使用要点",
       "emphasis": []
     },
     {
       "type": "paragraph",
-      "text": "SQLite 的连接运算符 || 具有同样的空值传播效果，但 SQLite 的 concat 函数空值行为不同。",
+      "text": "MySQL 的 CONCAT 任一参数为 NULL 时结果为 NULL；SQLite 的连接运算符 || 具有同样的空值传播效果，但 SQLite 的 concat 函数空值行为不同。",
       "emphasis": []
     },
     {
-      "type": "paragraph",
-      "text": "若业务希望保留部分标签，先确定缺失文本的替代值，不应无条件把未知改成空文本。",
-      "emphasis": []
+      "type": "list",
+      "items": [
+        "若业务希望保留部分标签，先确定缺失文本的替代值，不应无条件把未知改成空文本。"
+      ]
     }
   ],
   "syntax": {
-    "purpose": "str1,str2 按顺序参与拼接的表达式；分隔符 显式写入的文本常量。"
+    "purpose": "CONCAT 字符串拼接的语法模板如下，各部分含义见下方说明。"
   },
   "dataDescriptions": {
     "products": "共 6 行；字段：product_id、product_name、category、price、stock。"

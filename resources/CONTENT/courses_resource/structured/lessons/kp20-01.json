@@ -5,18 +5,40 @@
   "teachingKind": "business",
   "conceptBlocks": [
     {
-      "type": "paragraph",
-      "text": "贡献率=分组净销售额÷全部分组净销售额×100%。分母必须与分子采用相同期间、渠道及有效订单口径。先按门店汇总，再计算全体总额；全体为零时比例留空。",
+      "type": "heading",
+      "text": "基本含义",
       "emphasis": []
     },
     {
       "type": "paragraph",
-      "text": "净销售可能因退款为负，贡献率并不必然介于0%和100%之间。",
+      "text": "贡献率=分组净销售额÷全部分组净销售额×100%。",
       "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "分母必须与分子采用相同期间、渠道及有效订单口径。"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "使用要点",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "先按门店汇总，再计算全体总额；全体为零时比例留空。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "净销售可能因退款为负，贡献率并不必然介于0%和100%之间。"
+      ]
     }
   ],
   "syntax": {
-    "purpose": "统计期间 2025年；渠道 线下门店；输出粒度 门店；金额 马币分。"
+    "purpose": "多表汇总与贡献率的语法模板如下，各部分含义见下方说明。"
   },
   "dataDescriptions": {
     "stores": "共 3 行；字段：store_id、store_name、city、fulfillment_warehouse_id。",

@@ -5,18 +5,41 @@
   "teachingKind": "business",
   "conceptBlocks": [
     {
-      "type": "paragraph",
-      "text": "销售贡献率=商品年度净销售额÷全部商品年度净销售额×100；库存占比=商品年底库存成本价值÷全部商品年底库存成本价值×100。库存价值为各仓数量×单位成本之和。",
+      "type": "heading",
+      "text": "基本含义",
       "emphasis": []
     },
     {
       "type": "paragraph",
-      "text": "错配差值=库存占比−销售贡献率，单位为百分点。销售是期间流量，库存是时点存量，不能直接相减。分母为零时保留空值；先分别汇总再连接，避免销售明细与库存快照多对多放大。",
+      "text": "销售贡献率=商品年度净销售额÷全部商品年度净销售额×100；库存占比=商品年底库存成本价值÷全部商品年底库存成本价值×100。",
       "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "库存价值为各仓数量×单位成本之和。",
+        "错配差值=库存占比−销售贡献率，单位为百分点。"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "使用要点",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "销售是期间流量，库存是时点存量，不能直接相减。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "分母为零时保留空值；先分别汇总再连接，避免销售明细与库存快照多对多放大。"
+      ]
     }
   ],
   "syntax": {
-    "purpose": "统计期间 2025年；快照日期 2025-12-31；输出粒度 商品；金额 马币分；差值 百分点。"
+    "purpose": "商品销售贡献与库存资金占用错配的语法模板如下，各部分含义见下方说明。"
   },
   "dataDescriptions": {
     "inventory_snapshots": "共 3 行；字段：snapshot_id、warehouse_id、product_id、snapshot_date、quantity、unit_cost_cents。",

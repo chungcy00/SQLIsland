@@ -5,18 +5,41 @@
   "teachingKind": "syntax",
   "conceptBlocks": [
     {
-      "type": "paragraph",
-      "text": "集合合并是纵向叠加查询结果，不是横向连接字段。各分支列数相同、位置及业务含义对应。UNION ALL 保留全部行，UNION 对全部输出列去重，包括同样的空值组合。",
+      "type": "heading",
+      "text": "基本含义",
       "emphasis": []
     },
     {
       "type": "paragraph",
-      "text": "添加来源列会改变整行去重规则；如需保留来源又按客户去重，应另按客户汇总。整个集合的排序写在末尾。",
+      "text": "集合合并是纵向叠加查询结果，不是横向连接字段。",
       "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "各分支列数相同、位置及业务含义对应。",
+        "UNION ALL 保留全部行，UNION 对全部输出列去重，包括同样的空值组合。"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "使用要点",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "添加来源列会改变整行去重规则；如需保留来源又按客户去重，应另按客户汇总。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "整个集合的排序写在末尾。"
+      ]
     }
   ],
   "syntax": {
-    "purpose": "col 位置及语义对应的字段；ALL 保留重复记录。"
+    "purpose": "结果集合合并的语法模板如下，各部分含义见下方说明。"
   },
   "dataDescriptions": {
     "old_customers": "共 4 行；字段：customer_id、customer_name。",

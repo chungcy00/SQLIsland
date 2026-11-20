@@ -5,18 +5,25 @@
   "teachingKind": "business",
   "conceptBlocks": [
     {
-      "type": "paragraph",
-      "text": "高销售指净销售金额高，不代表销量件数高。毛利率为商品总毛利除以总净额，不是各订单毛利率的简单平均。NTILE(4) 将排序后的商品尽量均分成四组，第一组为销售靠前的一组；",
+      "type": "heading",
+      "text": "基本含义",
       "emphasis": []
     },
     {
       "type": "paragraph",
-      "text": "不是金额累计贡献25%。",
+      "text": "高销售指净销售金额高，不代表销量件数高。",
       "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "毛利率为商品总毛利除以总净额，不是各订单毛利率的简单平均。",
+        "NTILE(4) 将排序后的商品尽量均分成四组，第一组为销售靠前的一组；不是金额累计贡献25%。"
+      ]
     }
   ],
   "syntax": {
-    "purpose": "统计截止日 2025-12-31；金额 整数马币分；比率按题设；输出粒度 商品。"
+    "purpose": "高销售低毛利商品诊断的语法模板如下，各部分含义见下方说明。"
   },
   "dataDescriptions": {
     "v_sales_lines": "共 3 行；字段：order_item_id、order_id、store_id、customer_id、session_id、channel、order_date、product_id、promotion_id、net_qty、net_cents、cost_cents、discount_cents、refund_cents。"

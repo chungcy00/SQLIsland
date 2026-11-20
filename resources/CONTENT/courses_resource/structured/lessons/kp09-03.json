@@ -5,28 +5,42 @@
   "teachingKind": "syntax",
   "conceptBlocks": [
     {
-      "type": "paragraph",
-      "text": "NULLIF(a,b) 比较两个表达式；相等时返回 NULL，否则返回第一个表达式。用于除法时，可将零分母转换为 NULL，从而让无定义的结果明确显示为空。",
+      "type": "heading",
+      "text": "基本含义",
       "emphasis": []
     },
     {
       "type": "paragraph",
-      "text": "与 IFNULL 或 COALESCE 的方向不同，后者将缺失值替换为其他值。计算比率前必须确定分子、分母、统计范围及单位；不要因为分母为零就自动报告0%。",
+      "text": "NULLIF(a,b) 比较两个表达式；相等时返回 NULL，否则返回第一个表达式。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "用于除法时，可将零分母转换为 NULL，从而让无定义的结果明确显示为空。",
+        "与 IFNULL 或 COALESCE 的方向不同，后者将缺失值替换为其他值。"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "使用要点",
       "emphasis": []
     },
     {
       "type": "paragraph",
-      "text": "SQLite 中两个整数相除可能截断小数，乘以1.0可使示例进行实数除法；MySQL 的 / 与整数除法 DIV 不同，具体精度仍由数据类型和引擎决定。",
+      "text": "计算比率前必须确定分子、分母、统计范围及单位；不要因为分母为零就自动报告0%。",
       "emphasis": []
     },
     {
-      "type": "paragraph",
-      "text": "ROUND 用于最终展示，而不是在聚合前随意舍入。",
-      "emphasis": []
+      "type": "list",
+      "items": [
+        "SQLite 中两个整数相除可能截断小数，乘以1.0可使示例进行实数除法；MySQL 的 / 与整数除法 DIV 不同，具体精度仍由数据类型和引擎决定。",
+        "ROUND 用于最终展示，而不是在聚合前随意舍入。"
+      ]
     }
   ],
   "syntax": {
-    "purpose": "numerator 分子；denominator 分母；NULLIF 相等时返回空值；ROUND 结果保留指定小数位。"
+    "purpose": "NULLIF 与安全除法的语法模板如下，各部分含义见下方说明。"
   },
   "dataDescriptions": {
     "products": "共 6 行；字段：product_id、product_name、category、price、stock。"

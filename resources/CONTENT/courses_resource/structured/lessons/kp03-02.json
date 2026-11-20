@@ -5,28 +5,43 @@
   "teachingKind": "syntax",
   "conceptBlocks": [
     {
-      "type": "paragraph",
-      "text": "逻辑运算用于组合真假条件。AND 要求两个条件都为真；OR 要求至少一个条件为真（也允许两个都为真）；NOT 对条件取反。",
+      "type": "heading",
+      "text": "基本含义",
       "emphasis": []
     },
     {
       "type": "paragraph",
-      "text": "在本项目的常规语法设置中，NOT 的逻辑优先级高于 AND，AND 高于 OR；但最好主动用括号写出业务含义。实际需求常有两层：任一候选规则成立，但必须满足共同的限制。",
+      "text": "逻辑运算用于组合真假条件。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "AND 要求两个条件都为真；OR 要求至少一个条件为真（也允许两个都为真）；NOT 对条件取反。",
+        "在本项目的常规语法设置中，NOT 的逻辑优先级高于 AND，AND 高于 OR；但最好主动用括号写出业务含义。",
+        "实际需求常有两层：任一候选规则成立，但必须满足共同的限制。"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "使用要点",
       "emphasis": []
     },
     {
       "type": "paragraph",
-      "text": "例如低价或高库存的商品可参加促销，但零库存必须排除。若把共同限制只写在 OR 的一侧，另一侧通过的商品可能绕过限制。",
+      "text": "例如低价或高库存的商品可参加促销，但零库存必须排除。",
       "emphasis": []
     },
     {
-      "type": "paragraph",
-      "text": "涉及 NULL 时，未知条件的取反仍可能是未知，并不是所有记录都能分为真与假两类。",
-      "emphasis": []
+      "type": "list",
+      "items": [
+        "若把共同限制只写在 OR 的一侧，另一侧通过的商品可能绕过限制。",
+        "涉及 NULL 时，未知条件的取反仍可能是未知，并不是所有记录都能分为真与假两类。"
+      ]
     }
   ],
   "syntax": {
-    "purpose": "AND 两个条件都成立；OR 至少一个条件成立；NOT 对括号内条件取反；() 明确条件组合范围。"
+    "purpose": "AND、OR、NOT 与优先级的语法模板如下，各部分含义见下方说明。"
   },
   "dataDescriptions": {
     "products": "共 6 行；字段：product_id、product_name、category、price、stock。"

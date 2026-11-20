@@ -5,18 +5,18 @@
   "teachingKind": "business",
   "conceptBlocks": [
     {
-      "type": "paragraph",
-      "text": "截至2025年底，重复=同供应商同发票号多张；大额=原始面额严格超过供应商期间内面额均值两倍；超付=净应付减实付小于零；",
+      "type": "heading",
+      "text": "基本含义",
       "emphasis": []
     },
     {
       "type": "paragraph",
-      "text": "价格差=原面额与本次开票数量按采购单价重算金额的绝对差超过100分。",
+      "text": "截至2025年底，重复=同供应商同发票号多张；大额=原始面额严格超过供应商期间内面额均值两倍；超付=净应付减实付小于零；价格差=原面额与本次开票数量按采购单价重算金额的绝对差超过100分。",
       "emphasis": []
     }
   ],
   "syntax": {
-    "purpose": "统计截止日 2025-12-31；金额 整数马币分；比率按题设；输出粒度 发票（本模拟每采购单至多一张正常发票；重复异常专用）。"
+    "purpose": "多规则异常交易筛查的语法模板如下，各部分含义见下方说明。"
   },
   "dataDescriptions": {
     "purchase_order_items": "共 3 行；字段：po_item_id、po_id、product_id、contract_id、quantity_ordered、unit_price_cents。",

@@ -5,13 +5,24 @@
   "teachingKind": "business",
   "conceptBlocks": [
     {
-      "type": "paragraph",
-      "text": "采购承诺、合格收货、扣贷项净开票、实际付款及未付余额是不同业务事件的金额。各自先聚合到供应商，再对齐；未付余额是净开票减付款，并非未收货承诺。",
+      "type": "heading",
+      "text": "基本含义",
       "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "采购承诺、合格收货、扣贷项净开票、实际付款及未付余额是不同业务事件的金额。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "各自先聚合到供应商，再对齐；未付余额是净开票减付款，并非未收货承诺。"
+      ]
     }
   ],
   "syntax": {
-    "purpose": "统计截止日 2025-12-31；金额 整数马币分；输出粒度 供应商。"
+    "purpose": "采购承诺、收货、开票及付款敞口的语法模板如下，各部分含义见下方说明。"
   },
   "dataDescriptions": {
     "suppliers": "共 3 行；字段：supplier_id、supplier_name、region。",

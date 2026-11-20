@@ -5,18 +5,25 @@
   "teachingKind": "business",
   "conceptBlocks": [
     {
-      "type": "paragraph",
-      "text": "任职区间左闭右开：开始日计在职，结束日不计。期初取月首日前一天，期末取月末当天。月离职率=离职人数÷期初期末平均人数；",
+      "type": "heading",
+      "text": "基本含义",
       "emphasis": []
     },
     {
       "type": "paragraph",
-      "text": "本题滚动三月率=三月离职总数÷三月平均人数之和，不是三个月累计离职率。",
+      "text": "任职区间左闭右开：开始日计在职，结束日不计。",
       "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "期初取月首日前一天，期末取月末当天。",
+        "月离职率=离职人数÷期初期末平均人数；本题滚动三月率=三月离职总数÷三月平均人数之和，不是三个月累计离职率。"
+      ]
     }
   ],
   "syntax": {
-    "purpose": "统计截止日 2025-12-31；金额 整数马币分；比率按题设；输出粒度 部门×月。"
+    "purpose": "人员规模变动与离职率的语法模板如下，各部分含义见下方说明。"
   },
   "dataDescriptions": {
     "calendar_days": "共 3 行；字段：day、month_key、day_index。",

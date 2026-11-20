@@ -5,18 +5,25 @@
   "teachingKind": "advanced",
   "conceptBlocks": [
     {
-      "type": "paragraph",
-      "text": "类型转换解决数据如何参与计算；类别标准化解决不同写法是否代表同一业务类别。转换前应验证输入格式与允许范围；映射规则应明确未知类别处理。",
+      "type": "heading",
+      "text": "基本含义",
       "emphasis": []
     },
     {
       "type": "paragraph",
-      "text": "SQLite 的 DECIMAL 类型亲和性不等于 MySQL 的精确十进制类型。",
+      "text": "类型转换解决数据如何参与计算；类别标准化解决不同写法是否代表同一业务类别。",
       "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "转换前应验证输入格式与允许范围；映射规则应明确未知类别处理。",
+        "SQLite 的 DECIMAL 类型亲和性不等于 MySQL 的精确十进制类型。"
+      ]
     }
   ],
   "syntax": {
-    "purpose": "expr 已核验的数值文本；condition 标准化后的类别匹配条件。"
+    "purpose": "类型转换与类别标准化的语法模板如下，各部分含义见下方说明。"
   },
   "dataDescriptions": {
     "raw_data": "共 6 行；字段：id、name、amount、category。"

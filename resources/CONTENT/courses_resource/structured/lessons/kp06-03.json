@@ -5,23 +5,43 @@
   "teachingKind": "syntax",
   "conceptBlocks": [
     {
-      "type": "paragraph",
-      "text": "MIN 和 MAX 从非空输入中分别选出最小值和最大值。它们适合检查金额或价格范围、最新和最早日期等。使用日期时须确保数据类型或文本格式可正确比较。",
+      "type": "heading",
+      "text": "基本含义",
       "emphasis": []
     },
     {
       "type": "paragraph",
-      "text": "两个函数返回的是值，不是包含该值的整条记录；同一个最小值可能属于多个商品。如果输入为空或全部为 NULL，则返回 NULL。只需要范围时使用聚合即可；",
+      "text": "MIN 和 MAX 从非空输入中分别选出最小值和最大值。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "它们适合检查金额或价格范围、最新和最早日期等。",
+        "使用日期时须确保数据类型或文本格式可正确比较。",
+        "两个函数返回的是值，不是包含该值的整条记录；同一个最小值可能属于多个商品。"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "使用要点",
       "emphasis": []
     },
     {
       "type": "paragraph",
-      "text": "需要对应商品明细时必须进一步筛选或排序。若业务要求所有并列第一名，应使用极值比较，不应直接限制为一行。",
+      "text": "如果输入为空或全部为 NULL，则返回 NULL。",
       "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "只需要范围时使用聚合即可；需要对应商品明细时必须进一步筛选或排序。",
+        "若业务要求所有并列第一名，应使用极值比较，不应直接限制为一行。"
+      ]
     }
   ],
   "syntax": {
-    "purpose": "MIN 最小非空值；MAX 最大非空值；column_name 需要比较的字段。"
+    "purpose": "MIN 与 MAX的语法模板如下，各部分含义见下方说明。"
   },
   "dataDescriptions": {
     "products": "共 6 行；字段：product_id、product_name、category、price、stock。"

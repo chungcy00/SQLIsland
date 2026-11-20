@@ -5,13 +5,25 @@
   "teachingKind": "advanced",
   "conceptBlocks": [
     {
-      "type": "paragraph",
-      "text": "移动平均平滑短期波动；环比比较本期与上一自然期的变化率。三行窗口只有在每月一行且日期连续时才代表三个月。首两月可按已有行计算，也可按严格完整窗口口径返回空值，必须明确。",
+      "type": "heading",
+      "text": "基本含义",
       "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "移动平均平滑短期波动；环比比较本期与上一自然期的变化率。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "三行窗口只有在每月一行且日期连续时才代表三个月。",
+        "首两月可按已有行计算，也可按严格完整窗口口径返回空值，必须明确。"
+      ]
     }
   ],
   "syntax": {
-    "purpose": "2 PRECEDING 前两行；CURRENT ROW 包含当前行。"
+    "purpose": "移动平均与环比的语法模板如下，各部分含义见下方说明。"
   },
   "dataDescriptions": {
     "monthly": "共 4 行；字段：month、sales。"

@@ -5,23 +5,42 @@
   "teachingKind": "syntax",
   "conceptBlocks": [
     {
-      "type": "paragraph",
-      "text": "CASE 是查询中的条件表达式，可以为每行计算一个新值，不会像 WHERE 一样删除不符合条件的记录。搜索式 CASE 从上到下判断 WHEN，返回首个为真的分支；",
+      "type": "heading",
+      "text": "基本含义",
       "emphasis": []
     },
     {
       "type": "paragraph",
-      "text": "若没有真条件，返回 ELSE，省略 ELSE 时返回 NULL。条件可能重叠，所以应先判断更具体的规则。例如库存为0同时满足小于50，必须先判断缺货再判断低库存。",
+      "text": "CASE 是查询中的条件表达式，可以为每行计算一个新值，不会像 WHERE 一样删除不符合条件的记录。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "搜索式 CASE 从上到下判断 WHEN，返回首个为真的分支；若没有真条件，返回 ELSE，省略 ELSE 时返回 NULL。",
+        "条件可能重叠，所以应先判断更具体的规则。"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "使用要点",
       "emphasis": []
     },
     {
       "type": "paragraph",
-      "text": "NULL 与数值比较通常未知，不会命中普通分支，因此有缺失时需单独处理。分类规则应明确边界及异常负值，不把未知数据当作正常。",
+      "text": "例如库存为0同时满足小于50，必须先判断缺货再判断低库存。",
       "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "NULL 与数值比较通常未知，不会命中普通分支，因此有缺失时需单独处理。",
+        "分类规则应明确边界及异常负值，不把未知数据当作正常。"
+      ]
     }
   ],
   "syntax": {
-    "purpose": "WHEN 判断条件；THEN 命中后的返回值；ELSE 无命中时的默认值；END 结束表达式。"
+    "purpose": "CASE WHEN 分类的语法模板如下，各部分含义见下方说明。"
   },
   "dataDescriptions": {
     "products": "共 6 行；字段：product_id、product_name、category、price、stock。"

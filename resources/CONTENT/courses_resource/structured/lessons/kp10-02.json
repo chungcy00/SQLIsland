@@ -5,18 +5,41 @@
   "teachingKind": "syntax",
   "conceptBlocks": [
     {
-      "type": "paragraph",
-      "text": "多行子查询返回候选集合。IN 判断左侧值是否等于集合中任一值；重复候选不会重复输出外层行。单列比较要求子查询返回一列，多列元组比较须匹配列数。",
+      "type": "heading",
+      "text": "基本含义",
       "emphasis": []
     },
     {
       "type": "paragraph",
-      "text": "对于无匹配且集合含 NULL 的情况，判断可能为未知。若只需要客户名单，成员判断通常比直接连接订单明细更符合目标粒度。",
+      "text": "多行子查询返回候选集合。",
       "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "IN 判断左侧值是否等于集合中任一值；重复候选不会重复输出外层行。",
+        "单列比较要求子查询返回一列，多列元组比较须匹配列数。"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "使用要点",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "对于无匹配且集合含 NULL 的情况，判断可能为未知。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "若只需要客户名单，成员判断通常比直接连接订单明细更符合目标粒度。"
+      ]
     }
   ],
   "syntax": {
-    "purpose": "key 两表含义一致的匹配键；p 形成候选集合的条件。"
+    "purpose": "IN 与多行子查询的语法模板如下，各部分含义见下方说明。"
   },
   "dataDescriptions": {
     "customers": "共 4 行；字段：customer_id、customer_name。",

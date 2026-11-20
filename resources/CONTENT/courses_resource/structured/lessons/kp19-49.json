@@ -5,13 +5,25 @@
   "teachingKind": "business",
   "conceptBlocks": [
     {
-      "type": "paragraph",
-      "text": "银行原始支出为负，净支出取负号后求和；退款冲回减少净支出。每真实参考号一行，无参考号银行行按独立编号保留。差额=银行净支出−账簿费用。",
+      "type": "heading",
+      "text": "基本含义",
       "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "银行原始支出为负，净支出取负号后求和；退款冲回减少净支出。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "每真实参考号一行，无参考号银行行按独立编号保留。",
+        "差额=银行净支出−账簿费用。"
+      ]
     }
   ],
   "syntax": {
-    "purpose": "统计截止日 2025-12-31；金额 整数马币分；比率按题设；输出粒度 对账参考号。"
+    "purpose": "银行流水与凭证对账的语法模板如下，各部分含义见下方说明。"
   },
   "dataDescriptions": {
     "bank_transactions": "共 3 行；字段：bank_id、transaction_date、reference_no、amount_cents。",

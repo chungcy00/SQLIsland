@@ -5,18 +5,25 @@
   "teachingKind": "business",
   "conceptBlocks": [
     {
+      "type": "heading",
+      "text": "基本含义",
+      "emphasis": []
+    },
+    {
       "type": "paragraph",
       "text": "期间毛利=净销售额−对应销售成本；库存标准价值=数量×单位成本；两端平均库存=(期初库存价值+期末库存价值)÷2；库存投资回报=期间毛利÷平均库存价值，单位为倍。",
       "emphasis": []
     },
     {
-      "type": "paragraph",
-      "text": "缺少任何预期商品、仓库、日期组合的快照时不能当零；平均库存及回报留空。完整零库存的回报也不可定义。",
-      "emphasis": []
+      "type": "list",
+      "items": [
+        "缺少任何预期商品、仓库、日期组合的快照时不能当零；平均库存及回报留空。",
+        "完整零库存的回报也不可定义。"
+      ]
     }
   ],
   "syntax": {
-    "purpose": "统计期间 2025年；期初 2024-12-31；期末 2025-12-31；输出粒度 类别；金额 马币分；回报 倍。"
+    "purpose": "销售毛利与库存投资回报的语法模板如下，各部分含义见下方说明。"
   },
   "dataDescriptions": {
     "categories": "共 3 行；字段：category_id、category_name。",

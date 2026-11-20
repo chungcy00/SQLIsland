@@ -5,13 +5,25 @@
   "teachingKind": "business",
   "conceptBlocks": [
     {
-      "type": "paragraph",
-      "text": "合同差价衡量履约价格偏离，历史变动率衡量同供应商同商品的成交价波动。承诺成本=订购数量×成交单价；加权单价=总采购金额÷总订购量。历史基准须在报告期过滤前计算。",
+      "type": "heading",
+      "text": "基本含义",
       "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "合同差价衡量履约价格偏离，历史变动率衡量同供应商同商品的成交价波动。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "承诺成本=订购数量×成交单价；加权单价=总采购金额÷总订购量。",
+        "历史基准须在报告期过滤前计算。"
+      ]
     }
   ],
   "syntax": {
-    "purpose": "统计截止日 2025-12-31；金额 整数马币分；比率按题设；输出粒度 采购行。"
+    "purpose": "采购成本与价格差异的语法模板如下，各部分含义见下方说明。"
   },
   "dataDescriptions": {
     "purchase_order_items": "共 3 行；字段：po_item_id、po_id、product_id、contract_id、quantity_ordered、unit_price_cents。",

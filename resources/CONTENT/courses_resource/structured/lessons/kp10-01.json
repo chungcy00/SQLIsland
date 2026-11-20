@@ -5,18 +5,41 @@
   "teachingKind": "syntax",
   "conceptBlocks": [
     {
-      "type": "paragraph",
-      "text": "标量子查询是一列且最多一行的查询，它作为一个值参与外层表达式。零行得到 NULL，多行在 MySQL 中报错。分析师经常需要将明细与动态基准比较，例如价格高于整体均值；",
+      "type": "heading",
+      "text": "基本含义",
       "emphasis": []
     },
     {
       "type": "paragraph",
-      "text": "硬编码均值会在数据更新后失效。聚合函数不带分组时可形成单行基准，但空输入的平均值为 NULL，普通比较不会保留任何行。外层查询依然逐条商品判断，查询结果不改变原表。",
+      "text": "标量子查询是一列且最多一行的查询，它作为一个值参与外层表达式。",
       "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "零行得到 NULL，多行在 MySQL 中报错。",
+        "分析师经常需要将明细与动态基准比较，例如价格高于整体均值；硬编码均值会在数据更新后失效。"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "使用要点",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "聚合函数不带分组时可形成单行基准，但空输入的平均值为 NULL，普通比较不会保留任何行。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "外层查询依然逐条商品判断，查询结果不改变原表。"
+      ]
     }
   ],
   "syntax": {
-    "purpose": "AVG 对非空数值计算均值；外层 col 待比较的明细值。"
+    "purpose": "标量子查询的语法模板如下，各部分含义见下方说明。"
   },
   "dataDescriptions": {
     "products": "共 6 行；字段：product_id、product_name、category、price、stock。"

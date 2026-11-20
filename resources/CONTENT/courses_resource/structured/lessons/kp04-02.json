@@ -5,23 +5,43 @@
   "teachingKind": "syntax",
   "conceptBlocks": [
     {
-      "type": "paragraph",
-      "text": "当查询结果很多时，LIMIT 限制最多返回多少行，OFFSET 指定跳过多少行。分页是在确定排序后截取结果。例如每页两条，第一页跳过0条，第二页跳过2条，第三页跳过4条；",
+      "type": "heading",
+      "text": "基本含义",
       "emphasis": []
     },
     {
       "type": "paragraph",
-      "text": "一般偏移量为（页码减一）乘每页条数，页码从1开始。LIMIT 不会自动排序，也不会自动包含所有并列记录。若业务要求保留所有并列名次，不能直接用固定行数代替排名规则。",
+      "text": "当查询结果很多时，LIMIT 限制最多返回多少行，OFFSET 指定跳过多少行。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "分页是在确定排序后截取结果。",
+        "例如每页两条，第一页跳过0条，第二页跳过2条，第三页跳过4条；一般偏移量为（页码减一）乘每页条数，页码从1开始。",
+        "LIMIT 不会自动排序，也不会自动包含所有并列记录。"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "使用要点",
       "emphasis": []
     },
     {
       "type": "paragraph",
-      "text": "分页依赖稳定排序；即使排序稳定，如果不同页查询之间数据发生变化，也可能重复或遗漏。高页码性能问题可后续了解，不属于本节重点。",
+      "text": "若业务要求保留所有并列名次，不能直接用固定行数代替排名规则。",
       "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "分页依赖稳定排序；即使排序稳定，如果不同页查询之间数据发生变化，也可能重复或遗漏。",
+        "高页码性能问题可后续了解，不属于本节重点。"
+      ]
     }
   ],
   "syntax": {
-    "purpose": "LIMIT 最多返回的行数；OFFSET 跳过的行数；ORDER BY 确定截取之前的排列顺序。"
+    "purpose": "LIMIT 与 OFFSET的语法模板如下，各部分含义见下方说明。"
   },
   "dataDescriptions": {
     "products": "共 6 行；字段：product_id、product_name、category、price、stock。"

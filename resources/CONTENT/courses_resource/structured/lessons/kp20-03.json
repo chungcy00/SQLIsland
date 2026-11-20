@@ -5,18 +5,25 @@
   "teachingKind": "business",
   "conceptBlocks": [
     {
-      "type": "paragraph",
-      "text": "分组内排名先聚合到业务对象，再按所属组建立窗口，最后在外层筛名次。ROW_NUMBER 为每行分配唯一序号，RANK 同额并列且跳号，DENSE_RANK 同额并列不跳号。",
+      "type": "heading",
+      "text": "基本含义",
       "emphasis": []
     },
     {
       "type": "paragraph",
-      "text": "固定最多三行使用 ROW_NUMBER，要求前三个名次包含并列使用 RANK，要求前三种不同金额使用 DENSE_RANK。",
+      "text": "分组内排名先聚合到业务对象，再按所属组建立窗口，最后在外层筛名次。",
       "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "ROW_NUMBER 为每行分配唯一序号，RANK 同额并列且跳号，DENSE_RANK 同额并列不跳号。",
+        "固定最多三行使用 ROW_NUMBER，要求前三个名次包含并列使用 RANK，要求前三种不同金额使用 DENSE_RANK。"
+      ]
     }
   ],
   "syntax": {
-    "purpose": "统计期间 2025年；渠道 线下门店；输出粒度 门店×商品；金额 马币分；N 本例为3。"
+    "purpose": "分组内排名与前N名的语法模板如下，各部分含义见下方说明。"
   },
   "dataDescriptions": {
     "stores": "共 3 行；字段：store_id、store_name、city、fulfillment_warehouse_id。",

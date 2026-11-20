@@ -5,18 +5,25 @@
   "teachingKind": "advanced",
   "conceptBlocks": [
     {
-      "type": "paragraph",
-      "text": "窗口帧是在分区内为当前行选出的计算范围。ROWS 按排序后具体行位置确定边界；RANGE 在本例的截至当前值边界包含全部同值行。",
+      "type": "heading",
+      "text": "基本含义",
       "emphasis": []
     },
     {
       "type": "paragraph",
-      "text": "带排序的聚合窗口默认帧可能包含并列，因此应显式写出业务需要的帧。",
+      "text": "窗口帧是在分区内为当前行选出的计算范围。",
       "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "ROWS 按排序后具体行位置确定边界；RANGE 在本例的截至当前值边界包含全部同值行。",
+        "带排序的聚合窗口默认帧可能包含并列，因此应显式写出业务需要的帧。"
+      ]
     }
   ],
   "syntax": {
-    "purpose": "UNBOUNDED PRECEDING 分区起点；CURRENT ROW 当前行或当前排序值边界，取决于帧类型。"
+    "purpose": "窗口边界与累计计算的语法模板如下，各部分含义见下方说明。"
   },
   "dataDescriptions": {
     "monthly": "共 4 行；字段：month、sales。"

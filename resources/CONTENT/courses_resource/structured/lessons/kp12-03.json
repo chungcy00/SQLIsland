@@ -5,13 +5,25 @@
   "teachingKind": "function",
   "conceptBlocks": [
     {
-      "type": "paragraph",
-      "text": "日期差忽略时分秒，比较日期部分；完整经过单位差则考虑时间部分并截取完整单位。两种函数参数方向不同。业务账龄应指定固定截止日，负值可表示未到期，不能一律取绝对值。",
+      "type": "heading",
+      "text": "基本含义",
       "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "日期差忽略时分秒，比较日期部分；完整经过单位差则考虑时间部分并截取完整单位。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "两种函数参数方向不同。",
+        "业务账龄应指定固定截止日，负值可表示未到期，不能一律取绝对值。"
+      ]
     }
   ],
   "syntax": {
-    "purpose": "DAY 完整天数单位；start_date,end_date 起止值。"
+    "purpose": "日期差与时间单位差的语法模板如下，各部分含义见下方说明。"
   },
   "dataDescriptions": {},
   "problem": "应付账款核查以固定截止日计算经过天数。示例从2026年1月31日至2月3日，不包括起始日作为额外一天。",

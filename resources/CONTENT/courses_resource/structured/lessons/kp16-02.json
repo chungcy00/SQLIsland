@@ -5,13 +5,25 @@
   "teachingKind": "advanced",
   "conceptBlocks": [
     {
-      "type": "paragraph",
-      "text": "缺失代表数据未提供；异常是违反规则或需要核实的记录。负金额可能是退款，零金额可能是赠品，不应自动纠正。条件分类只返回首个命中的标签；多异常审计可以为每项规则生成独立标记。",
+      "type": "heading",
+      "text": "基本含义",
       "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "缺失代表数据未提供；异常是违反规则或需要核实的记录。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "负金额可能是退款，零金额可能是赠品，不应自动纠正。",
+        "条件分类只返回首个命中的标签；多异常审计可以为每项规则生成独立标记。"
+      ]
     }
   ],
   "syntax": {
-    "purpose": "condition 已经定义的数据质量规则。"
+    "purpose": "缺失与异常检测的语法模板如下，各部分含义见下方说明。"
   },
   "dataDescriptions": {
     "raw_data": "共 6 行；字段：id、name、amount、category。"

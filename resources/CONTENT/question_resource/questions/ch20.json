@@ -9,7 +9,7 @@
       "projectId": "retail",
       "title": "各门店销售额前三名商品",
       "context": "商品经理需要2025年每家门店净销售额最高的最多三件商品。",
-      "requirements": "统计2025-01-01至2025-12-31的线下有效销售明细v_sales_lines。视图仅含completed订单，净额已扣除截至2025-12-31确认的退款，并归属原订单日期，金额为马币分。先按store_id、product_id汇总net_cents，仅纳入汇总净销售额大于0的商品。使用ROW_NUMBER按门店分区、net_cents降序及product_id升序编号，选取编号不超过3的商品。同额商品按product_id确定先后，每门店最多3行；不足3件返回实际存在的商品，无正净销售门店不返回行。按store_id、sales_rank升序输出。\n输出字段名称及顺序：store_id, product_id, net_cents, sales_rank。",
+      "requirements": "1. 统计 2025-01-01 至 2025-12-31 的线下有效销售明细（视图 v_sales_lines）。该视图只含已完成（completed）的订单，净额已扣除截至 2025-12-31 确认的退款，并归属到原订单日期，金额单位为马币分。\n2. 先按 store_id、product_id 汇总 net_cents，只保留汇总净销售额大于 0 的商品。\n3. 用 ROW_NUMBER 在每个门店内排名：先按 net_cents 降序，net_cents 相同时按 product_id 升序编号，取编号不超过 3 的商品，每个门店最多 3 行。\n4. 商品不足 3 件时，返回实际存在的商品；没有正净销售额的门店不返回行。\n输出字段名称及顺序：store_id, product_id, net_cents, sales_rank\n结果排序要求：按 store_id 升序排列；store_id 相同时，再按 sales_rank 升序排列。",
       "grain": "每门店每入选商品一行",
       "commonError": {
         "example": "忽略客户去重、完整月份或汇总粒度会改变业务指标。",
@@ -465,8 +465,8 @@
     {
       "projectId": "enterprise",
       "title": "商品销售贡献与库存资金占用错配",
-      "context": "销售＋库存联合分析：管理层要求以同一企业口径核对业务数据。",
-      "requirements": "2025年按商品汇总所有渠道净销售，年底各仓库存总价值；计算两个全局份额和差值（库存占比-销售占比），保留全部商品，按差值倒序。\n输出字段名称及顺序：product_id, net_cents, stock_cents, sales_pct, stock_pct, gap_points。输出顺序不作要求。金额单位为马币分；派生金额及比率按题设保留小数，零分母为NULL。",
+      "context": "销售与库存联合分析：管理层要求用同一套企业数据和计算规则核对业务数据。",
+      "requirements": "1. 统计 2025 年所有渠道按商品汇总的净销售额，以及年底各仓库的库存总价值。\n2. 计算两个全局占比（销售占比、库存占比）和差值（库存占比 − 销售占比），保留全部商品。\n输出字段名称及顺序：product_id, net_cents, stock_cents, sales_pct, stock_pct, gap_points\n结果排序要求：不要求排序，结果行的先后顺序不影响判断。\n计算及格式要求：金额单位为马币分；计算得到的金额和比率按题目要求保留指定的小数位；分母为 0 时，返回 NULL。",
       "grain": "商品",
       "commonError": "只用有销售的商品作为库存分母会漏掉滞销。",
       "executionSteps": [
@@ -4715,8 +4715,8 @@
     {
       "projectId": "enterprise",
       "title": "销售毛利与库存投资回报",
-      "context": "销售＋库存联合分析：管理层要求以同一企业口径核对业务数据。",
-      "requirements": "2025年全部渠道，按类别计算净销售毛利与2024年底/2025年底平均库存标准价值，毛利/平均库存为库存投资回报倍数；保留全部类别。 缺失期初或期末快照时对应类别的平均库存与回报倍数返回NULL。\n输出字段名称及顺序：category_id, gross_cents, avg_stock_cents, gmroi。输出顺序：gmroi DESC。金额单位为马币分；派生金额及比率按题设保留小数，零分母为NULL。",
+      "context": "销售与库存联合分析：管理层要求用同一套企业数据和计算规则核对业务数据。",
+      "requirements": "1. 统计 2025 年全部渠道，按类别计算净销售毛利，以及 2024 年底、2025 年底的平均库存标准价值；库存投资回报倍数 = 毛利 ÷ 平均库存。\n2. 保留全部类别。\n3. 缺少期初或期末快照时，对应类别的平均库存和回报倍数返回 NULL。\n输出字段名称及顺序：category_id, gross_cents, avg_stock_cents, gmroi\n结果排序要求：按 gmroi 降序排列。\n计算及格式要求：金额单位为马币分；计算得到的金额和比率按题目要求保留指定的小数位；分母为 0 时，返回 NULL。",
       "grain": "类别",
       "commonError": "用销售收入替代毛利会变成另一个指标。",
       "executionSteps": [
@@ -5067,7 +5067,7 @@
       "projectId": "enterprise",
       "title": "多表汇总与销售贡献率",
       "context": "管理层需要比较2025年各门店在全体线下净销售中的贡献。",
-      "requirements": "连接stores与订单粒度视图v_order_net，统计2025-01-01至2025-12-31的线下有效订单。视图仅含completed订单，净额已扣除截至2025-12-31确认的退款，并归属原订单日期。金额为马币分。每个门店一行，保留无销售门店并将其net_cents置0。sales_pct=100.0*该门店净销售额/全部stores门店在相同期间的线下净销售额，四舍五入2位小数，全体净销售为0时返回NULL。使用窗口求和计算总体分母。。\n输出字段名称及顺序：store_id, net_cents, sales_pct。",
+      "requirements": "1. 连接 stores 与订单粒度视图 v_order_net，统计 2025-01-01 至 2025-12-31 的线下有效订单。该视图只含 completed 订单，净额已扣除截至 2025-12-31 确认的退款，并归属到原订单日期；金额单位为马币分。\n2. 每个门店一行；没有销售的门店也要保留，其 net_cents 记为 0。\n3. sales_pct = 100.0 × 该门店净销售额 ÷ 全部门店在同一期间的线下净销售额，四舍五入保留 2 位小数；全部门店净销售额为 0 时，返回 NULL。\n4. 使用窗口函数求和计算总体分母。\n输出字段名称及顺序：store_id, net_cents, sales_pct",
       "grain": "每门店一行",
       "commonError": {
         "example": "忽略客户去重、完整月份或汇总粒度会改变业务指标。",
@@ -5370,8 +5370,8 @@
     {
       "projectId": "enterprise",
       "title": "订单结算与收入核对",
-      "context": "销售＋财务联合分析：管理层要求以同一企业口径核对业务数据。",
-      "requirements": "2025年全部已完成订单，支付成功金额减实际退款，比较净销售金额；输出存在差额的订单。退款本库即退款已支付，支付日期≤年底；失败支付不计。\n输出字段名称及顺序：order_id, net_cents, cash_net_cents, difference_cents。输出顺序（含决胜键）：o.order_id。金额单位为马币分；派生金额及比率按题设保留小数，零分母为NULL。",
+      "context": "销售与财务联合分析：管理层要求用同一套企业数据和计算规则核对业务数据。",
+      "requirements": "1. 统计 2025 年全部已完成订单：支付成功金额减去实际退款，与净销售金额比较。\n2. 只输出存在差额的订单。\n3. 退款以本库中已支付的退款为准，支付日期不晚于年底；失败的支付不计入。\n输出字段名称及顺序：order_id, net_cents, cash_net_cents, difference_cents\n结果排序要求：按 order_id 升序排列。\n计算及格式要求：金额单位为马币分；计算得到的金额和比率按题目要求保留指定的小数位；分母为 0 时，返回 NULL。",
       "grain": "订单",
       "commonError": "使用所有付款状态或连接拆分付款导致重复。",
       "executionSteps": [
@@ -5614,7 +5614,7 @@
       "projectId": "enterprise",
       "title": "月度销售趋势与缺失月份",
       "context": "管理层需要2025年完整12个月的线下净销售趋势，包括没有销售的月份。",
-      "requirements": "从calendar_days取得2025-01至2025-12的12个不同month_key。汇总同期v_order_net中channel=store的订单净销售额。视图仅含completed订单，净额已扣除截至2025-12-31确认的退款，并归属原订单日期，金额为马币分。左连接补齐月份，无销售月份net_cents填0，再对连续月份使用LAG计算previous_net_cents和change_cents=net_cents-previous_net_cents。change_pct=100.0*change_cents/previous_net_cents，四舍五入2位小数，上一月为0时返回NULL。1月的三个上月及变化字段均为NULL，不读取2024年。每月一行，按month_key升序。不使用递归查询。\n输出字段名称及顺序：month_key, net_cents, previous_net_cents, change_cents, change_pct。",
+      "requirements": "1. 从 calendar_days 取得 2025-01 至 2025-12 这 12 个不重复的 month_key。\n2. 汇总同期 v_order_net 中 channel = store 的订单净销售额。该视图只含 completed 订单，净额已扣除截至 2025-12-31 确认的退款，并归属到原订单日期；金额单位为马币分。\n3. 用左连接补齐月份，没有销售的月份 net_cents 填 0；再对连续月份使用 LAG 计算 previous_net_cents 和 change_cents = net_cents − previous_net_cents。\n4. change_pct = 100.0 × change_cents ÷ previous_net_cents，四舍五入保留 2 位小数；上一个月为 0 时，返回 NULL。\n5. 1 月的上月值和变化字段都为 NULL，不读取 2024 年的数据。每月一行，不使用递归查询。\n输出字段名称及顺序：month_key, net_cents, previous_net_cents, change_cents, change_pct\n结果排序要求：按 month_key 升序排列。",
       "grain": "2025年每自然月一行，共12行",
       "commonError": {
         "example": "忽略客户去重、完整月份或汇总粒度会改变业务指标。",
@@ -5948,8 +5948,8 @@
     {
       "projectId": "enterprise",
       "title": "采购承诺、收货、开票及付款敞口",
-      "context": "采购＋财务联合分析：管理层要求以同一企业口径核对业务数据。",
-      "requirements": "截至2025年底每供应商，采购订单金额、实际合格收货计价、发票金额、实付及未付余额；两套数据分别按供应商汇总，保留无采购供应商。 本库v_invoice_balance的billed_cents为发票面额减截至截止日已批准贷项后的净应付，paid_cents仅计截止日前付款；原始发票面额保留在supplier_invoice_items。\n输出字段名称及顺序：supplier_id, ordered_cents, received_cents, billed_cents, paid_cents, balance_cents。输出顺序不作要求。金额单位为马币分；派生金额及比率按题设保留小数，零分母为NULL。",
+      "context": "采购与财务联合分析：管理层要求用同一套企业数据和计算规则核对业务数据。",
+      "requirements": "1. 统计截至 2025 年底每个供应商的：采购订单金额、实际合格收货的计价金额、发票金额、实付金额和未付余额。\n2. 两套数据（采购与收货、发票与付款）分别按供应商汇总后再合并，保留没有采购记录的供应商。\n3. 本库中 v_invoice_balance 的 billed_cents 是发票面额扣除截至截止日已批准贷项后的净应付，paid_cents 只计截止日前的付款；原始发票面额保存在 supplier_invoice_items。\n输出字段名称及顺序：supplier_id, ordered_cents, received_cents, billed_cents, paid_cents, balance_cents\n结果排序要求：不要求排序，结果行的先后顺序不影响判断。\n计算及格式要求：金额单位为马币分；计算得到的金额和比率按题目要求保留指定的小数位；分母为 0 时，返回 NULL。",
       "grain": "供应商",
       "commonError": "采购行和发票行直接连接会重复计入付款。",
       "executionSteps": [
@@ -6662,8 +6662,8 @@
     {
       "projectId": "enterprise",
       "title": "渠道广告后的贡献利润",
-      "context": "电商＋财务联合分析：管理层要求以同一企业口径核对业务数据。",
-      "requirements": "2025年线上订单归因会话渠道，净销售、毛利减广告支出为广告后贡献；未分摊管理、人力或配送费用；输出贡献率；按广告后贡献金额降序、渠道编号升序排列。\n输出字段名称及顺序：source_id, net_cents, gross_cents, spend_cents, contribution_cents, contribution_pct。输出顺序（含决胜键）：contribution_cents DESC,t.source_id。金额单位为马币分；派生金额及比率按题设保留小数，零分母为NULL。",
+      "context": "电商与财务联合分析：管理层要求用同一套企业数据和计算规则核对业务数据。",
+      "requirements": "1. 统计 2025 年的线上订单，并归因到会话渠道。\n2. 广告后贡献 = 毛利 − 广告支出；不分摊管理、人力或配送费用。\n3. 输出净销售额、毛利、广告后贡献和贡献率。\n输出字段名称及顺序：source_id, net_cents, gross_cents, spend_cents, contribution_cents, contribution_pct\n结果排序要求：按 contribution_cents 降序排列；contribution_cents 相同时，再按 source_id 升序排列。\n计算及格式要求：金额单位为马币分；计算得到的金额和比率按题目要求保留指定的小数位；分母为 0 时，返回 NULL。",
       "grain": "渠道",
       "commonError": "广告后毛利不等于公司净利润。",
       "executionSteps": [
@@ -6951,8 +6951,8 @@
     {
       "projectId": "enterprise",
       "title": "门店人效及人工占比",
-      "context": "人力＋销售联合分析：管理层要求以同一企业口径核对业务数据。",
-      "requirements": "2025年线下门店，按员工月归属门店的人力成本、出勤+加班工时；销售每小时及人工占净销售比例；保留所有门店。\n输出字段名称及顺序：store_id, net_cents, labor_cents, worked_hours, sales_per_hour_cents, labor_pct。输出顺序：net_cents DESC。金额单位为马币分；派生金额及比率按题设保留小数，零分母为NULL。",
+      "context": "人力与销售联合分析：管理层要求用同一套企业数据和计算规则核对业务数据。",
+      "requirements": "1. 统计 2025 年线下门店：按员工当月归属门店统计人力成本，以及出勤工时与加班工时之和。\n2. 计算每小时销售额，以及人力成本占净销售额的比例。\n3. 保留所有门店。\n输出字段名称及顺序：store_id, net_cents, labor_cents, worked_hours, sales_per_hour_cents, labor_pct\n结果排序要求：按 net_cents 降序排列。\n计算及格式要求：金额单位为马币分；计算得到的金额和比率按题目要求保留指定的小数位；分母为 0 时，返回 NULL。",
       "grain": "门店",
       "commonError": "不得使用当前归属替代历史岗位或重复累加月薪。",
       "executionSteps": [
@@ -7301,8 +7301,8 @@
     {
       "projectId": "enterprise",
       "title": "月度经营汇总表",
-      "context": "企业综合经营联合分析：管理层要求以同一企业口径核对业务数据。",
-      "requirements": "2025年每月全渠道净销售及毛利、费用分录、人工估算成本、广告支出、采购承诺金额；广告支出独立展示（不并入费用避免潜在双计）；经营贡献=毛利-费用-人工，不是净利润。\n输出字段名称及顺序：month_key, net_cents, gross_cents, expense_cents, labor_cents, advertising_cents, committed_purchase_cents, operating_contribution_cents。输出顺序（含决胜键）：m.month_key。金额单位为马币分；派生金额及比率按题设保留小数，零分母为NULL。",
+      "context": "企业综合经营联合分析：管理层要求用同一套企业数据和计算规则核对业务数据。",
+      "requirements": "1. 统计 2025 年每个月全渠道的：净销售额、毛利、费用分录、人工估算成本、广告支出和采购承诺金额。\n2. 广告支出单独展示，不并入费用，避免重复计算。\n3. 经营贡献 = 毛利 − 费用 − 人工，它不是净利润。\n输出字段名称及顺序：month_key, net_cents, gross_cents, expense_cents, labor_cents, advertising_cents, committed_purchase_cents, operating_contribution_cents\n结果排序要求：按 month_key 升序排列。\n计算及格式要求：金额单位为马币分；计算得到的金额和比率按题目要求保留指定的小数位；分母为 0 时，返回 NULL。",
       "grain": "月",
       "commonError": "采购承诺不是费用，不能直接从当月利润扣除。",
       "executionSteps": [

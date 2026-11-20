@@ -5,13 +5,40 @@
   "teachingKind": "business",
   "conceptBlocks": [
     {
-      "type": "paragraph",
-      "text": "环比比较上一自然月，同比比较去年同月。两者均为（本期−基期）÷基期×100%。仅有连续月份和每店每月唯一记录时，窗口偏移1与12才分别对应上月和去年同月。零基期无定义。",
+      "type": "heading",
+      "text": "基本含义",
       "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "环比比较上一自然月，同比比较去年同月。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "两者均为（本期−基期）÷基期×100%。"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "使用要点",
+      "emphasis": []
+    },
+    {
+      "type": "paragraph",
+      "text": "仅有连续月份和每店每月唯一记录时，窗口偏移1与12才分别对应上月和去年同月。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "零基期无定义。"
+      ]
     }
   ],
   "syntax": {
-    "purpose": "统计截止日 2025-12-31；金额 整数马币分；比率按题设；输出粒度 门店×月。"
+    "purpose": "销售趋势、同比与环比的语法模板如下，各部分含义见下方说明。"
   },
   "dataDescriptions": {
     "calendar_days": "共 3 行；字段：day、month_key、day_index。",

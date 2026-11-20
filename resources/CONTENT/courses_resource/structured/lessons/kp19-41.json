@@ -5,18 +5,25 @@
   "teachingKind": "business",
   "conceptBlocks": [
     {
-      "type": "paragraph",
-      "text": "首购是客户在有效线上订单历史中的第一笔订单，而不是报告期内第一笔。客户与订单是两种不同粒度：本题给订单贴首购或复购标签，同一客户可在两个组出现。客单价=订单净额合计÷订单数；",
+      "type": "heading",
+      "text": "基本含义",
       "emphasis": []
     },
     {
       "type": "paragraph",
-      "text": "人均消费=净额合计÷去重客户数，二者回答不同问题。",
+      "text": "首购是客户在有效线上订单历史中的第一笔订单，而不是报告期内第一笔。",
       "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "客户与订单是两种不同粒度：本题给订单贴首购或复购标签，同一客户可在两个组出现。",
+        "客单价=订单净额合计÷订单数；人均消费=净额合计÷去重客户数，二者回答不同问题。"
+      ]
     }
   ],
   "syntax": {
-    "purpose": "统计截止日 2025-12-31；金额 整数马币分；比率按题设；输出粒度 订单所属客户阶段。"
+    "purpose": "新老客户收入与客单价的语法模板如下，各部分含义见下方说明。"
   },
   "dataDescriptions": {
     "customers": "共 3 行；字段：customer_id、customer_name、signup_date、region、member_since_date。",

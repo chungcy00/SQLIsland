@@ -5,23 +5,41 @@
   "teachingKind": "syntax",
   "conceptBlocks": [
     {
-      "type": "paragraph",
-      "text": "反向匹配用于找出有主档却没有交易的对象，例如未购买客户、未收货采购单。NOT EXISTS 在没有满足相关条件的行时为真。",
+      "type": "heading",
+      "text": "基本含义",
       "emphasis": []
     },
     {
       "type": "paragraph",
-      "text": "NOT IN 在候选集合出现 NULL 时，未匹配值的比较可能为未知；WHERE 不保留未知，因此结果可能少于预期。对非空客户主键，本例用 NOT EXISTS 最直接。",
+      "text": "反向匹配用于找出有主档却没有交易的对象，例如未购买客户、未收货采购单。",
+      "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "NOT EXISTS 在没有满足相关条件的行时为真。",
+        "NOT IN 在候选集合出现 NULL 时，未匹配值的比较可能为未知；WHERE 不保留未知，因此结果可能少于预期。"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "使用要点",
       "emphasis": []
     },
     {
       "type": "paragraph",
-      "text": "若外层键也允许空值，需要另外定义缺失键的业务处理规则。",
+      "text": "对非空客户主键，本例用 NOT EXISTS 最直接。",
       "emphasis": []
+    },
+    {
+      "type": "list",
+      "items": [
+        "若外层键也允许空值，需要另外定义缺失键的业务处理规则。"
+      ]
     }
   ],
   "syntax": {
-    "purpose": "NOT EXISTS 没有符合条件的内层记录；NOT IN 不属于候选集合，须考虑 NULL。"
+    "purpose": "NOT EXISTS 与 NOT IN的语法模板如下，各部分含义见下方说明。"
   },
   "dataDescriptions": {
     "customers": "共 4 行；字段：customer_id、customer_name。",
