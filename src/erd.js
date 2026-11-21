@@ -190,6 +190,149 @@ export function mountErd(container, { schema, onPreview }) {
     };
     applyTransform();
   }
+  // 整理版面：每一列的表从上到下等距排齐（不再按连线参差错落），跨列的连线走表格上方/下方的专用通道
+  const GAP = 44;
+  const HALF = 85; // 列间距 170 的一半：竖向通道放在两列正中
+  function tidyColumns(links) {
+    const keys = shown.map((table) => nodeKeys.get(table.name));
+    const byX = new Map();
+    for (const key of keys) {
+      const x = Math.round(layout.node(key).x);
+      if (!byX.has(x)) byX.set(x, []);
+      byX.get(x).push(key);
+    }
+    const xs = [...byX.keys()].sort((a, b) => a - b);
+    const colOf = new Map();
+    let maxBottom = 0;
+    xs.forEach((x, ci) => {
+      const list = byX.get(x).sort((a, b) => layout.node(a).y - layout.node(b).y);
+      let y = 32;
+      for (const key of list) {
+        const node = layout.node(key);
+        node.y = y + node.height / 2;
+        y += node.height + GAP;
+        colOf.set(key, ci);
+      }
+      maxBottom = Math.max(maxBottom, y - GAP);
+    });
+    // 让相邻两列里有关系的表尽量“水平对齐”（连线字段在同一高度 → 直线、更短）：来回扫几遍，按邻居位置牵引，再排开不重叠
+    const offset = (tableName, column) => {
+      const index = tables.get(tableName).columns.findIndex((field) => field.name === column);
+      return index >= 0 ? HEADER + index * ROW + ROW / 2 : HEADER / 2;
+    };
+    const pulls = new Map(); // key -> [{other, mine, theirs}]
+    for (const relation of links) {
+      if (relation.fromTable === relation.toTable) continue;
+      const a = nodeKeys.get(relation.fromTable), b = nodeKeys.get(relation.toTable);
+      if (Math.abs(colOf.get(a) - colOf.get(b)) !== 1) continue;
+      const pairs = relation.fromColumns.length ? relation.fromColumns.map((c, i) => [c, relation.toColumns[i]]) : [[null, null]];
+      const [fc, tc] = pairs[0];
+      for (const [x, y, mine, theirs] of [[a, b, offset(relation.fromTable, fc), offset(relation.toTable, tc)], [b, a, offset(relation.toTable, tc), offset(relation.fromTable, fc)]]) {
+        if (!pulls.has(x)) pulls.set(x, []);
+        pulls.get(x).push({ other: y, mine, theirs });
+      }
+    }
+    const topOf = (key) => layout.node(key).y - layout.node(key).height / 2;
+    const place = (ci) => {
+      const list = byX.get(xs[ci]);
+      const want = new Map(list.map((key) => {
+        const ps = pulls.get(key) || [];
+        const desired = ps.length ? ps.reduce((sum, p) => sum + topOf(p.other) + p.theirs - p.mine, 0) / ps.length : topOf(key);
+        return [key, desired];
+      }));
+      let y = -1e9;
+      for (const key of list) { // 保持原有上下顺序，只排开重叠
+        const node = layout.node(key);
+        const top = Math.max(want.get(key), y);
+        node.y = top + node.height / 2;
+        y = top + node.height + GAP;
+      }
+      // 排开后整体居中到“想去的位置”的平均处，避免一堆表同时想对齐一个枢纽时全部往下堆
+      const drift = list.reduce((sum, key) => sum + topOf(key) - want.get(key), 0) / list.length;
+      for (const key of list) layout.node(key).y -= drift;
+    };
+    for (let sweep = 0; sweep < 3; sweep++) {
+      for (let ci = 1; ci < xs.length; ci++) place(ci);
+      for (let ci = xs.length - 2; ci >= 0; ci--) place(ci);
+    }
+    // 牵引可能让整体越排越靠下：把最上面的表拉回顶部边距
+    const minTop = Math.min(...keys.map(topOf));
+    for (const key of keys) layout.node(key).y -= minTop - 32;
+    maxBottom = 0;
+    for (const key of keys) maxBottom = Math.max(maxBottom, layout.node(key).y + layout.node(key).height / 2);
+    const plans = new Map();
+    let top = 0, bottom = 0;
+    for (const relation of links) {
+      if (relation.fromTable === relation.toTable) continue;
+      const a = nodeKeys.get(relation.fromTable), b = nodeKeys.get(relation.toTable);
+      const ca = colOf.get(a), cb = colOf.get(b);
+      const plan = { ca, cb };
+      {
+        const [fc0, tc0] = relation.fromColumns.length ? [relation.fromColumns[0], relation.toColumns[0]] : [null, null];
+        plan.ay = topOf(a) + offset(relation.fromTable, fc0);
+        plan.by = topOf(b) + offset(relation.toTable, tc0);
+      }
+      if (Math.abs(ca - cb) > 1) {
+        // 跨列的线：优先在“中间各列都没有表挡着”的高度直接横穿（折角最少、最短），实在没有才绕到图的上/下方通道
+        const [lo, hi] = ca < cb ? [ca, cb] : [cb, ca];
+        const free = (y) => {
+          for (let ci = lo + 1; ci < hi; ci++)
+            for (const key of byX.get(xs[ci])) {
+              const n = layout.node(key);
+              if (y > n.y - n.height / 2 - 8 && y < n.y + n.height / 2 + 8) return false;
+            }
+          return true;
+        };
+        const [fc, tc] = relation.fromColumns.length ? [relation.fromColumns[0], relation.toColumns[0]] : [null, null];
+        const ay = topOf(a) + offset(relation.fromTable, fc), by = topOf(b) + offset(relation.toTable, tc);
+        if (free(by)) plan.mode = "toTarget";
+        else if (free(ay)) plan.mode = "fromSource";
+        else {
+          const lowY = Math.min(ay, by), highY = Math.max(ay, by);
+          let found = null;
+          for (let y = lowY; y <= highY && found === null; y += 6) if (free(y)) found = y;
+          if (found !== null) { plan.mode = "free"; plan.y = found; }
+        }
+        if (!plan.mode) {
+          const mid = (ay + by) / 2;
+          plan.side = mid < maxBottom / 2 ? "top" : "bottom";
+          plan.lane = plan.side === "top" ? top++ : bottom++;
+        }
+      }
+      plans.set(relation.id, plan);
+    }
+    // 给每条线在列间通道里分配自己的竖线位置（互不重叠），并按方向排序，尽量不交叉
+    const uses = new Map();
+    const use = (gap, plan, slot) => {
+      if (!uses.has(gap)) uses.set(gap, []);
+      uses.get(gap).push({ plan, slot });
+    };
+    for (const plan of plans.values()) {
+      const rightward = plan.cb > plan.ca, same = plan.ca === plan.cb;
+      const gapA = same ? plan.ca : rightward ? plan.ca : plan.ca - 1;
+      const gapB = rightward ? plan.cb - 1 : plan.cb;
+      if (same) use(gapA, plan, "A");
+      else if (plan.mode === "toTarget") use(gapA, plan, "A");
+      else if (plan.mode === "fromSource") use(gapB, plan, "B");
+      else if (Math.abs(plan.ca - plan.cb) === 1) use(Math.min(plan.ca, plan.cb), plan, "A");
+      else { use(gapA, plan, "A"); use(gapB, plan, "B"); }
+    }
+    for (const list of uses.values()) {
+      const key = ({ plan }) => (plan.by > plan.ay ? -1 : 1) * (plan.ay + plan.by);
+      list.sort((p, q) => key(p) - key(q));
+      const spacing = Math.min(12, 100 / list.length);
+      list.forEach(({ plan, slot }, i) => { plan["off" + slot] = (i - (list.length - 1) / 2) * spacing; });
+    }
+    const topArea = top ? top * 10 + 20 : 0, bottomArea = bottom ? bottom * 10 + 20 : 0;
+    for (const key of keys) layout.node(key).y += topArea;
+    for (const plan of plans.values()) {
+      if (plan.mode === "free") plan.y += topArea;
+      if (!plan.side) continue;
+      plan.y = plan.side === "top" ? 14 + (top - 1 - plan.lane) * 10 : maxBottom + topArea + 22 + plan.lane * 10;
+    }
+    layout.graph().height = maxBottom + topArea + bottomArea + 32;
+    return plans;
+  }
   function draw(shouldFit = false) {
     shown = visibleTables();
     const included = new Set(shown.map((table) => table.name));
@@ -200,8 +343,8 @@ export function mountErd(container, { schema, onPreview }) {
     layout = new dagre.graphlib.Graph({ multigraph: true });
     layout.setGraph({
       rankdir: "LR",
-      nodesep: 42,
-      ranksep: 150,
+      nodesep: 48,
+      ranksep: 170,
       marginx: 32,
       marginy: 32,
       ranker: "network-simplex",
@@ -219,8 +362,11 @@ export function mountErd(container, { schema, onPreview }) {
         { weight: relation.kind === "foreign" ? 2 : 1 },
         relation.id,
       );
-    if (shown.length) dagre.layout(layout);
-    else layout.setGraph({ ...layout.graph(), width: 0, height: 0 });
+    let plans = new Map();
+    if (shown.length) {
+      dagre.layout(layout);
+      plans = tidyColumns(links);
+    } else layout.setGraph({ ...layout.graph(), width: 0, height: 0 });
     nodes.innerHTML = shown
       .map((table) => {
         const node = layout.node(nodeKeys.get(table.name));
@@ -250,14 +396,11 @@ export function mountErd(container, { schema, onPreview }) {
     }
     edges.innerHTML = links
       .map((relation) => {
-        const route = layout.edge({
-          v: nodeKeys.get(relation.fromTable),
-          w: nodeKeys.get(relation.toTable),
-          name: relation.id,
-        });
-        const from = layout.node(nodeKeys.get(relation.fromTable)),
-          to = layout.node(nodeKeys.get(relation.toTable));
-        const right = to.x >= from.x;
+        const plan = plans.get(relation.id) || { ca: 0, cb: 0 };
+        const rightward = plan.cb > plan.ca;
+        const sameColumn = plan.ca === plan.cb;
+        const sideA = sameColumn ? "right" : rightward ? "right" : "left";
+        const sideB = sameColumn ? "right" : rightward ? "left" : "right";
         const pairs = relation.fromColumns.length
           ? relation.fromColumns.map((column, index) => [
               column,
@@ -266,40 +409,39 @@ export function mountErd(container, { schema, onPreview }) {
           : [[null, null]];
         const paths = pairs
           .map(([source, target], index) => {
-            const a = port(
-              relation.fromTable,
-              source,
-              right ? "right" : "left",
-            );
-            const b = port(
-              relation.toTable,
-              target,
-              relation.fromTable === relation.toTable
-                ? "right"
-                : right
-                  ? "left"
-                  : "right",
-            );
+            const a = port(relation.fromTable, source, sideA);
+            const b = port(relation.toTable, target, relation.fromTable === relation.toTable ? "right" : sideB);
             let d;
             if (relation.fromTable === relation.toTable)
               d = `M ${a.x} ${a.y} C ${a.x + 70} ${a.y - 30},${b.x + 70} ${b.y + 30},${b.x} ${b.y}`;
             else {
-              const middle = route.points.slice(1, -1);
-              const points = [
-                a,
-                { x: a.x + (right ? 24 : -24), y: a.y },
-                ...middle,
-                { x: b.x + (right ? -24 : 24), y: b.y },
-                b,
-              ];
-              d = points
-                .map(
-                  (point, index) =>
-                    `${index ? "L" : "M"} ${point.x} ${point.y}`,
-                )
-                .join(" ");
+              // 正交走线：水平出线 → 在列间通道竖直转弯 → 水平进入，全部直角；跨列的线绕到表格上/下方的通道
+              const sa = sideA === "right" ? 1 : -1, sb = sideB === "right" ? 1 : -1;
+              const stubA = { x: a.x + sa * 24, y: a.y };
+              const stubB = { x: b.x + sb * 24, y: b.y };
+              const offA = plan.offA || 0, offB = plan.offB ?? plan.offA ?? 0;
+              const points = [a, stubA];
+              if (plan.mode === "toTarget") {
+                const chA = a.x + sa * HALF + offA;
+                points.push({ x: chA, y: a.y }, { x: chA, y: b.y });
+              } else if (plan.mode === "fromSource") {
+                const chB = b.x + sb * HALF + offB;
+                points.push({ x: chB, y: a.y }, { x: chB, y: b.y });
+              } else if (plan.mode === "free") {
+                const chA = a.x + sa * HALF + offA, chB = b.x + sb * HALF + offB;
+                points.push({ x: chA, y: a.y }, { x: chA, y: plan.y }, { x: chB, y: plan.y }, { x: chB, y: b.y });
+              } else if (plan.side) {
+                const chA = a.x + sa * HALF + offA, chB = b.x + sb * HALF + offB;
+                points.push({ x: chA, y: a.y }, { x: chA, y: plan.y }, { x: chB, y: plan.y }, { x: chB, y: b.y });
+              } else {
+                const mx = sameColumn ? a.x + HALF + offA : (a.x + b.x) / 2 + offA;
+                points.push({ x: mx, y: a.y }, { x: mx, y: b.y });
+              }
+              points.push(stubB, b);
+              d = points.map((point, i) => `${i ? "L" : "M"} ${point.x} ${point.y}`).join(" ");
             }
-            return `<path class="erd-wire" d="${d}" data-from-field="${escape(source || "")}" data-to-field="${escape(target || "")}"/>${index === 0 && relation.kind === "foreign" ? `<text x="${a.x + (right ? 8 : -8)}" y="${a.y - 7}" text-anchor="${right ? "start" : "end"}">${relation.fromCardinality}</text><text x="${b.x + (right ? -8 : 8)}" y="${b.y - 7}" text-anchor="${right ? "end" : "start"}">${relation.toCardinality}</text>` : ""}`;
+            const right = sideA === "right";
+            return `<path class="erd-wire" d="${d}" data-from-field="${escape(source || "")}" data-to-field="${escape(target || "")}"/>${index === 0 && relation.kind === "foreign" ? `<text x="${a.x + (right ? 8 : -8)}" y="${a.y - 7}" text-anchor="${right ? "start" : "end"}">${relation.fromCardinality}</text><text x="${b.x + (sideB === "right" ? 8 : -8)}" y="${b.y - 7}" text-anchor="${sideB === "right" ? "start" : "end"}">${relation.toCardinality}</text>` : ""}`;
           })
           .join("");
         const label =
