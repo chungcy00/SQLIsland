@@ -2575,6 +2575,8 @@ td.cell-bad { background: var(--err-bg); color: var(--err); font-weight: 600; }
 .judge-feedback details[open] > summary, .answer-support details[open] > summary { border-bottom: 1px solid var(--line); margin-bottom: 12px; }
 .judge-feedback details[open], .answer-support details[open] { padding-bottom: 12px; }
 /* 滑动切题：首末题轻微回弹 */
+.fc-tap.bounce-left { animation: bounce-left 0.2s ease-out; }
+.fc-tap.bounce-right { animation: bounce-right 0.2s ease-out; }
 .quiz-details.bounce-left { animation: bounce-left 0.2s ease-out; }
 .quiz-details.bounce-right { animation: bounce-right 0.2s ease-out; }
 @keyframes bounce-left { 40% { transform: translateX(-12px); } }
