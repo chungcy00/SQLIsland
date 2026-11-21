@@ -10,11 +10,11 @@ PLATFORM="$ANDROID_SDK_ROOT/platforms/android-36/android.jar"
 OUT="$TASK_ROOT/android/build"
 mkdir -p "$OUT/classes" "$OUT/dex" "$TASK_ROOT/artifacts"
 MANIFEST="android/app/src/main/AndroidManifest.xml"
-APK_NAME="数屿SQL-0.6.3.apk"
+APK_NAME="数屿SQL-0.6.4.apk"
 if [ "${BUILD_DEBUG:-0}" = "1" ]; then
  sed 's/<application /<application android:debuggable="true" /' "$MANIFEST" > "$OUT/AndroidManifest.xml"
  MANIFEST="$OUT/AndroidManifest.xml"
- APK_NAME="数屿SQL-0.6.3-test.apk"
+ APK_NAME="数屿SQL-0.6.4-test.apk"
 fi
 "$BT/aapt2" compile --dir android/app/src/main/res -o "$OUT/resources.zip"
 "$BT/aapt2" link -o "$OUT/base.apk" -I "$PLATFORM" --manifest "$MANIFEST" -A android/app/src/main/assets --java "$OUT/generated" "$OUT/resources.zip"

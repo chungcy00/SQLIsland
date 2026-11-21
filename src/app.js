@@ -499,7 +499,12 @@ app.addEventListener("touchstart", (event) => {
   if ((!onReview && !onSpot) || event.touches.length !== 1) return;
   const touch = event.touches[0];
   if (touch.clientX < 20) return;
-  if (event.target.closest("pre, code, table, .table-wrap, .fc-scroll, button, summary, a, input, textarea, select, [role=tab]")) return;
+  if (event.target.closest("button, summary, a, input, textarea, select, [role=tab]")) return;
+  // 代码框/表格只有真的能滚动（内容超出）时才让给它自己滚，否则可以从上面滑动切卡
+  for (let el = event.target; el && el !== app; el = el.parentElement) {
+    if (!el.matches?.("pre, table, .table-wrap, .fc-scroll, .fc-code")) continue;
+    if (el.scrollWidth > el.clientWidth + 1 || el.scrollHeight > el.clientHeight + 1) return;
+  }
   const zone = onSpot ? event.target.closest(".fc-open, .fc-tap[data-action=spotFlip]") : event.target.closest(".fc-tap, .fc");
   if (!zone) return;
   cardSwipe = { x: touch.clientX, y: touch.clientY, spot: !!onSpot };
