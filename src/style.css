@@ -3351,3 +3351,8 @@ nav .nav-svg { color: var(--primary); }
 .fc-fn-data .fc-h { margin-top: 0; }
 .fc-fn-data h4 { margin: 8px 0 4px; font-size: 0.8125rem; }
 .fc-fn-data .fc-h small { display: block; margin-left: 12px; font-weight: 400; font-size: 0.75rem; color: var(--ink2); }
+/* 闪卡拖动切卡：图片不触发浏览器原生拖拽 */
+.fc-tap img { -webkit-user-drag: none; }
+/* 随手翻/卡片库翻面后：评分行与“复制为个人卡片”之间留出间距 */
+.fc-open .rating { margin: 0 0 16px; }
+.fc-open .rating + .actions { margin-top: 0; }

@@ -492,12 +492,12 @@ app.addEventListener("touchend", (event) => {
 }, { passive: true });
 // 闪卡复习页：左滑下一张（跳过）、右滑上一张；排程模式翻面后须先评分，所以背面不响应左滑
 let cardSwipe = null;
-app.addEventListener("touchstart", (event) => {
+function beginCardSwipe(event, point) {
   cardSwipe = null;
   const onReview = route() === "/review" && state.flashSession;
   const onSpot = route() === "/cards" && document.querySelector('.fc-tap[data-action="spotFlip"]');
-  if ((!onReview && !onSpot) || event.touches.length !== 1) return;
-  const touch = event.touches[0];
+  if (!onReview && !onSpot) return;
+  const touch = point;
   if (touch.clientX < 20) return;
   if (event.target.closest("button, summary, a, input, textarea, select, [role=tab]")) return;
   // 代码框/表格只有真的能滚动（内容超出）时才让给它自己滚，否则可以从上面滑动切卡
@@ -508,19 +508,21 @@ app.addEventListener("touchstart", (event) => {
   const zone = onSpot ? event.target.closest(".fc-open, .fc-tap[data-action=spotFlip]") : event.target.closest(".fc-tap, .fc");
   if (!zone) return;
   cardSwipe = { x: touch.clientX, y: touch.clientY, spot: !!onSpot };
-}, { passive: true });
-app.addEventListener("touchend", (event) => {
+}
+function finishCardSwipe(touch) {
   if (!cardSwipe) return;
-  const touch = event.changedTouches[0];
   const dx = touch.clientX - cardSwipe.x, dy = touch.clientY - cardSwipe.y;
   const cardSwipe0 = cardSwipe;
   cardSwipe = null;
   if (Math.abs(dx) < 80 || Math.abs(dx) < 2 * Math.abs(dy)) return;
+  swipedAt = Date.now();
   if (cardSwipe0.spot) {
     document.querySelector(dx < 0 ? '[data-action="spotNext"]' : '[data-action="spotPrev"]')?.click();
     return;
   }
-  const target = document.querySelector(dx < 0 ? '[data-action="skipCard"]' : '[data-action="undoRating"], [data-action="prevCard"]');
+  let target = document.querySelector(dx < 0 ? '[data-action="skipCard"]' : '[data-action="undoRating"], [data-action="prevCard"]');
+  // 排程模式的背面没有“下一张”按钮：左滑等同跳过（不评分），与正面的“跳过”一致
+  if (!target && dx < 0 && state.flashSession) { target = document.createElement("button"); target.dataset.action = "skipCard"; app.appendChild(target); setTimeout(() => target.remove(), 0); }
   const session = state.flashSession;
   let usable = !!target;
   if (dx > 0 && session) {
@@ -535,7 +537,15 @@ app.addEventListener("touchend", (event) => {
   } else if (usable) { target.click(); return; }
   const card = document.querySelector(".fc-tap");
   if (card) { card.classList.remove("bounce-left", "bounce-right"); void card.offsetWidth; card.classList.add(dx < 0 ? "bounce-left" : "bounce-right"); setTimeout(() => card.classList.remove("bounce-left", "bounce-right"), 220); }
-}, { passive: true });
+}
+let swipedAt = 0;
+app.addEventListener("touchstart", (event) => { if (event.touches.length === 1) beginCardSwipe(event, event.touches[0]); else cardSwipe = null; }, { passive: true });
+app.addEventListener("touchend", (event) => finishCardSwipe(event.changedTouches[0]), { passive: true });
+// 电脑端/鼠标：按住拖动同样切卡（触屏已由 touch 事件处理，这里只接鼠标）
+app.addEventListener("pointerdown", (event) => { if (event.pointerType === "mouse" && event.button === 0) beginCardSwipe(event, event); });
+window.addEventListener("pointerup", (event) => { if (event.pointerType === "mouse") finishCardSwipe(event); });
+// 拖动切卡之后浏览器还会补发一次点击（会误翻面），在这里吃掉
+app.addEventListener("click", (event) => { if (event.isTrusted && Date.now() - swipedAt < 400) { event.stopPropagation(); event.preventDefault(); } }, true);
 window.addEventListener("resize", () => { if (route().startsWith("/question/")) requestAnimationFrame(syncStems); });
 // 参考答案/解析的展开状态：默认折叠；用户点“查看参考答案”后展开，之后运行/提交重新渲染也保持用户当前的展开或折叠选择
 const openFolds = new Set();
@@ -1290,7 +1300,7 @@ function cardsPage() {
     ${button(icon("flip") + `<span>进入「${modeText}」3D 翻卡学习</span>`, "startCards", newMode, "primary full start-flip")}${state.flashSession ? button("继续上次复习", "resumeCards", "", "tonal full") : ""}</section>
     ${spot ? `<div class="section-heading"><h2>随手翻一张</h2><span class="row">${spotHistory.length ? button("上一张", "spotPrev", "", "text-button") : ""}${button(icon("skip") + " 换一张", "spotNext", "", "text-button")}</span></div>
     ${spotBack
-      ? `<div class="fc-open"><div class="fc-tap" role="button" tabindex="0" data-action="spotFlip" aria-label="点击卡片翻回正面">${cardView.back(asRichCard(spot), cardRunBlock(spot))}</div><div class="actions">${button("复制为个人卡片", "copyCard", spot.id, "outline")}</div></div>`
+      ? `<div class="fc-open"><div class="fc-tap" role="button" tabindex="0" data-action="spotFlip" aria-label="点击卡片翻回正面">${cardView.back(asRichCard(spot), cardRunBlock(spot))}</div>${spotRatingRow(spot)}<div class="actions">${button("复制为个人卡片", "copyCard", spot.id, "outline")}</div></div>`
       : `<div class="fc-tap" role="button" tabindex="0" data-action="spotFlip" aria-label="点击翻面">${cardView.front(asRichCard(spot))}</div><p class="fc-hint center">先默想答案，再点击卡片翻面核对</p>`}` : ""}
     <div class="section-heading"><small class="card-match-count">匹配到 ${matching.length} 张 · 点击卡片直接翻面</small>${cardFlipped.size ? button(icon("reset") + " 全部正面", "allFront", "", "text-button") : ""}</div>
     <div class="search">${icon("search")}<input id="card-search" value="${e(cardSearch)}" placeholder="搜索闪卡问题、答案、卡号或标签…" aria-label="搜索闪卡"></div>
@@ -1300,12 +1310,26 @@ function cardsPage() {
     ${matching.slice(0, cardBrowseLimit).map((c) => {
       const rich = asRichCard(c);
       return cardFlipped.has(c.id)
-        ? `<div class="fc-open"><div class="fc-tap" role="button" tabindex="0" data-action="miniFlip" data-arg="${e(c.id)}" aria-label="点击卡片翻回正面">${cardView.back(rich, cardRunBlock(c))}</div><div class="actions">${button("复制为个人卡片", "copyCard", c.id, "outline")}</div></div>`
+        ? `<div class="fc-open"><div class="fc-tap" role="button" tabindex="0" data-action="miniFlip" data-arg="${e(c.id)}" aria-label="点击卡片翻回正面">${cardView.back(rich, cardRunBlock(c))}</div>${spotRatingRow(c, "libRate")}<div class="actions">${button("复制为个人卡片", "copyCard", c.id, "outline")}</div></div>`
         : `<button class="fc-mini" data-action="miniFlip" data-arg="${e(c.id)}"><span class="fc-mini-tags">${e(rich.typeLabel)}${c.interviewTier ? " · " + e(c.interviewTier) : ""}</span><span class="fc-mini-q">${e(rich.front.prompt)}</span><span class="row between">${cardStatus(c)}<span class="tap">${icon("reset")}轻触翻面看答案</span></span></button>`;
     }).join("")}
     ${matching.length > cardBrowseLimit ? button("加载更多闪卡", "moreCards", "", "outline full") : ""}${matching.length ? "" : empty("暂无匹配闪卡", "", button("清除搜索", "resetCardSearch", "", "outline"), "09_empty_magnifier")}`,
     "flashcards",
   );
+}
+// “随手翻一张”翻到背面后也能评分，这样随手看的卡也会进入复习计划、记录薄弱点
+function spotRatingRow(card, action = "spotRate") {
+  const schedule = scheduler.repeat(state.reviews[card.id] ? hydrate(state.reviews[card.id]) : createEmptyCard(), now());
+  return `<div class="rating">${["忘记", "困难", "记得", "熟练"].map((label, i) => button(label + `<small>${interval(schedule[i + 1].card.due)}</small>`, action, action === "spotRate" ? i + 1 : card.id + "|" + (i + 1), "rate-" + (i + 1))).join("")}</div>`;
+}
+// 卡片库/随手翻里评分：套用 FSRS 排程、记一次复习事件与学习活动
+async function recordCardRating(id, rating) {
+  const wasNew = !state.reviews[id];
+  const output = scheduler.repeat(state.reviews[id] ? hydrate(state.reviews[id]) : createEmptyCard(), now())[rating];
+  state.reviews[id] = output.card;
+  state.reviewEvents.push({ id: Date.now() + "-" + id, cardId: id, rating, time: now().toISOString(), wasNew, log: output.log });
+  await markActivity();
+  toast("已记录：" + ["忘记", "困难", "记得", "熟练"][rating - 1] + "。");
 }
 function cardPreviewPage() {
   const list = content.cards.filter((c) => c.type === cardPreview.type);
@@ -2209,6 +2233,27 @@ async function handleAction(action, arg, element) {
       spotBack = !spotBack;
       await render();
       break;
+    case "spotRate": {
+      const id = spotId;
+      if (!id || !spotBack) return;
+      await recordCardRating(id, Number(arg));
+      // 评完自动换下一张（仍可右滑回到这张）
+      spotHistory.push(id);
+      spotHistory = spotHistory.slice(-30);
+      const pool = allCards();
+      spotId = pool[Math.floor(Math.random() * pool.length)]?.id;
+      spotBack = false;
+      await render();
+      break;
+    }
+    case "libRate": {
+      const [id, n] = String(arg).split("|");
+      if (!cardFlipped.has(id)) return;
+      await recordCardRating(id, Number(n));
+      cardFlipped.delete(id);
+      await render();
+      break;
+    }
     case "spotPrev":
       if (spotHistory.length) { spotId = spotHistory.pop(); spotBack = false; await render(); }
       break;

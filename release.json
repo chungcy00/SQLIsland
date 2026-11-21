@@ -1,11 +1,12 @@
 {
-  "version": "0.6.4",
-  "versionCode": 23,
+  "version": "1.0.0",
+  "versionCode": 24,
   "releaseDate": "2026-11-21",
   "repository": "chungcy00/SQLIsland",
   "notes": [
-    "闪卡：支持左右滑动切换上一张、下一张。",
-    "修复：闪卡正面有代码时，滑动无法切换。"
+    "数屿 SQL 1.0.0 正式版：80 节课程、200 道练习题、332 张闪卡，全部离线可用。",
+    "闪卡：支持左右滑动切换上一张、下一张（电脑上可用鼠标拖动）。",
+    "闪卡：“随手翻一张”和卡片库翻面后可直接评分，记录薄弱知识点。"
   ],
   "appName": "数屿SQL",
   "assetPrefix": "ShuyuSQL"

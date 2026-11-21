@@ -321,7 +321,7 @@ export function createCardView({ e, table, code, tag, runSlot = null, formatSql 
     return parts.join("");
   }
 
-  const art = (card) => (card.illustrationKey ? `<img class="fc-art" src="assets/flashcards/${card.illustrationKey}.png" alt="">` : "");
+  const art = (card) => (card.illustrationKey ? `<img class="fc-art" draggable="false" src="assets/flashcards/${card.illustrationKey}.png" alt="">` : "");
 
   // 卡片外的标签行：类别 · 级别（一行，不重复）。
   function meta(card) {
