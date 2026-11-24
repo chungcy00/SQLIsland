@@ -1,0 +1,15 @@
+{
+  "id": "i007-t04",
+  "questionId": "i007",
+  "datasetId": "i007-interview",
+  "visibility": "hidden",
+  "variant": "t04",
+  "kind": "query",
+  "setupSql": "CREATE TABLE staff(staff_id INTEGER PRIMARY KEY,employee_name TEXT NOT NULL,bonus INTEGER NOT NULL,manager_id INTEGER);\n",
+  "expected": {
+    "columns": [
+      "employee_name"
+    ],
+    "rows": []
+  }
+}

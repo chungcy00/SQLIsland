@@ -1,0 +1,25 @@
+{
+  "id": "i095-t03",
+  "questionId": "i095",
+  "datasetId": "i095-interview",
+  "visibility": "hidden",
+  "variant": "t03",
+  "kind": "query",
+  "setupSql": "CREATE TABLE stores(store_code TEXT PRIMARY KEY,store_name TEXT NOT NULL);CREATE TABLE orders(order_code TEXT PRIMARY KEY,store_code TEXT NOT NULL,amount REAL NOT NULL);\nINSERT INTO stores VALUES('A','一店'),('B','二店'),('C','三店'),('D','空店');INSERT INTO orders VALUES('x1','A',100),('x2','B',0),('x3','B',0),('x4','B',0),('x5','B',0),('x6','B',0),('x7','B',0),('x8','B',0),('x9','B',0),('x10','B',0),('x11','B',0),('x12','C',40);",
+  "expected": {
+    "columns": [
+      "store_name",
+      "avg_amount"
+    ],
+    "rows": [
+      [
+        "一店",
+        100.0
+      ],
+      [
+        "三店",
+        40.0
+      ]
+    ]
+  }
+}

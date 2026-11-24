@@ -33,7 +33,7 @@ try {
     .fill("SELECT DISTINCT price FROM products ORDER BY price");
   await page.waitForTimeout(250);
   await page.getByRole("button", { name: "运行", exact: true }).click();
-  await page.locator("table").waitFor();
+  await page.locator(".query-output table").waitFor();
   await page.getByRole("button", { name: "提交答案", exact: true }).click();
   await page.getByText("回答正确", { exact: false }).waitFor();
   await route("/cards");

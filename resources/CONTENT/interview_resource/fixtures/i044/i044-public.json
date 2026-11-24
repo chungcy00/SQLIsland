@@ -1,0 +1,22 @@
+{
+  "id": "i044-public",
+  "questionId": "i044",
+  "datasetId": "i044-interview",
+  "visibility": "public",
+  "variant": "public",
+  "kind": "query",
+  "setupSql": "CREATE TABLE directory(staff_no INTEGER PRIMARY KEY,staff_name TEXT NOT NULL);CREATE TABLE payroll(staff_no INTEGER PRIMARY KEY,salary INTEGER NOT NULL);\nINSERT INTO directory VALUES(1,'阿竹'),(2,'小敏'),(4,'阿光');INSERT INTO payroll VALUES(2,3000),(3,2500),(4,4000);",
+  "expected": {
+    "columns": [
+      "staff_no"
+    ],
+    "rows": [
+      [
+        1
+      ],
+      [
+        3
+      ]
+    ]
+  }
+}

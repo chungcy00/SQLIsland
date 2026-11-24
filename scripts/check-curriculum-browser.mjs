@@ -5,7 +5,7 @@ const base = 'http://127.0.0.1:4173/';
 const content = await (await fetch(base + 'content.json')).json();
 const points = content.chapters.flatMap(chapter => chapter.knowledgePoints);
 assert.equal(points.length, 80);
-assert.equal(content.questions.length, 200);
+assert.equal(content.questions.length, 120);
 assert.equal(content.cards.length, 332);
 const browser = await chromium.launch({channel:'chrome', headless:true});
 const page = await browser.newPage({viewport:{width:390,height:844}});
@@ -56,7 +56,7 @@ try {
   await visit('/lesson/kp08-04', '#note[data-id=kp08-04]');
   assert.doesNotMatch(await page.locator('#note').inputValue(), /旧笔记保留/);
   await visit('/practice', '.route-summary');
-  assert.match(await page.locator('.route-summary').innerText(), /0 \/ 200/);
+  assert.match(await page.locator('.route-summary').innerText(), /0 \/ 120/);
   await visit('/question/q0255', '#sql-editor[data-id=q0255]');
   assert.equal(await page.locator('#sql-editor').inputValue(), '');
   await page.locator('[data-action=hint]').click();

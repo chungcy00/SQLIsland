@@ -1,0 +1,25 @@
+{
+  "id": "i005-public",
+  "questionId": "i005",
+  "datasetId": "i005-interview",
+  "visibility": "public",
+  "variant": "public",
+  "kind": "query",
+  "setupSql": "CREATE TABLE clients(client_id INTEGER PRIMARY KEY,customer_name TEXT NOT NULL,referrer_id INTEGER);\nINSERT INTO clients VALUES (1,'阿青',NULL),(2,'阿杰',7),(3,'阿夏',2),(4,'阿兰',NULL);",
+  "expected": {
+    "columns": [
+      "customer_name"
+    ],
+    "rows": [
+      [
+        "阿青"
+      ],
+      [
+        "阿夏"
+      ],
+      [
+        "阿兰"
+      ]
+    ]
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "id": "i035-public",
+  "questionId": "i035",
+  "datasetId": "i035-interview",
+  "visibility": "public",
+  "variant": "public",
+  "kind": "query",
+  "setupSql": "CREATE TABLE staff(staff_id INTEGER PRIMARY KEY,staff_name TEXT NOT NULL UNIQUE);CREATE TABLE trips(staff_id INTEGER,km INTEGER NOT NULL);\nINSERT INTO staff VALUES(1,'阿兰'),(2,'小美'),(3,'阿杰');INSERT INTO trips VALUES(1,20),(1,30),(2,50);",
+  "expected": {
+    "columns": [
+      "staff_name",
+      "total_km"
+    ],
+    "rows": [
+      [
+        "小美",
+        50
+      ],
+      [
+        "阿兰",
+        50
+      ],
+      [
+        "阿杰",
+        0
+      ]
+    ]
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "id": "i047-public",
+  "questionId": "i047",
+  "datasetId": "i047-interview",
+  "visibility": "public",
+  "variant": "public",
+  "kind": "query",
+  "setupSql": "CREATE TABLE visits(member_name TEXT NOT NULL,visit_date TEXT NOT NULL,PRIMARY KEY(member_name,visit_date));\nINSERT INTO visits VALUES('阿兰','2026-04-01'),('阿兰','2026-04-02'),('小桃','2026-04-01'),('小桃','2026-04-03'),('小田','2026-04-05');",
+  "expected": {
+    "columns": [
+      "next_day_retention"
+    ],
+    "rows": [
+      [
+        0.33
+      ]
+    ]
+  }
+}

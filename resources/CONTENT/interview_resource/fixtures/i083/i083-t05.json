@@ -1,0 +1,21 @@
+{
+  "id": "i083-t05",
+  "questionId": "i083",
+  "datasetId": "i083-interview",
+  "visibility": "hidden",
+  "variant": "t05",
+  "kind": "query",
+  "setupSql": "CREATE TABLE events(machine TEXT,event_type TEXT,day TEXT);\nINSERT INTO events VALUES('甲','恢复','2026-01-02'),('甲','停机','2026-01-04'),('乙','停机','2026-02-02'),('乙','恢复','2026-02-03');",
+  "expected": {
+    "columns": [
+      "machine",
+      "downtime_days"
+    ],
+    "rows": [
+      [
+        "乙",
+        1
+      ]
+    ]
+  }
+}

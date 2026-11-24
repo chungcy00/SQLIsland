@@ -1,0 +1,19 @@
+{
+  "id": "i047-t02",
+  "questionId": "i047",
+  "datasetId": "i047-interview",
+  "visibility": "hidden",
+  "variant": "t02",
+  "kind": "query",
+  "setupSql": "CREATE TABLE visits(member_name TEXT NOT NULL,visit_date TEXT NOT NULL,PRIMARY KEY(member_name,visit_date));\nINSERT INTO visits VALUES('甲','2026-01-01'),('甲','2026-01-03'),('乙','2026-02-01');",
+  "expected": {
+    "columns": [
+      "next_day_retention"
+    ],
+    "rows": [
+      [
+        0.0
+      ]
+    ]
+  }
+}

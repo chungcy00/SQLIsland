@@ -1,0 +1,37 @@
+{
+  "id": "i048-public",
+  "questionId": "i048",
+  "datasetId": "i048-interview",
+  "visibility": "public",
+  "variant": "public",
+  "kind": "query",
+  "setupSql": "CREATE TABLE roster(position_no INTEGER PRIMARY KEY,staff_name TEXT NOT NULL);\nINSERT INTO roster VALUES(1,'小李'),(2,'小朱'),(3,'小桂'),(4,'小凌'),(5,'小青');",
+  "expected": {
+    "columns": [
+      "position_no",
+      "staff_name"
+    ],
+    "rows": [
+      [
+        1,
+        "小朱"
+      ],
+      [
+        2,
+        "小李"
+      ],
+      [
+        3,
+        "小凌"
+      ],
+      [
+        4,
+        "小桂"
+      ],
+      [
+        5,
+        "小青"
+      ]
+    ]
+  }
+}

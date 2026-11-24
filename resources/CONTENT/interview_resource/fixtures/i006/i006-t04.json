@@ -1,0 +1,15 @@
+{
+  "id": "i006-t04",
+  "questionId": "i006",
+  "datasetId": "i006-interview",
+  "visibility": "hidden",
+  "variant": "t04",
+  "kind": "query",
+  "setupSql": "CREATE TABLE members(member_id INTEGER PRIMARY KEY,member_name TEXT NOT NULL); CREATE TABLE orders(order_id INTEGER PRIMARY KEY,member_id INTEGER NOT NULL);\n",
+  "expected": {
+    "columns": [
+      "member_name"
+    ],
+    "rows": []
+  }
+}

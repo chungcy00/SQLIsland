@@ -1,0 +1,17 @@
+{
+  "id": "i004-t04",
+  "questionId": "i004",
+  "datasetId": "i004-interview",
+  "visibility": "hidden",
+  "variant": "t04",
+  "kind": "query",
+  "setupSql": "CREATE TABLE sites(site_name TEXT PRIMARY KEY,floor_area INTEGER NOT NULL,monthly_visitors INTEGER NOT NULL);\n",
+  "expected": {
+    "columns": [
+      "site_name",
+      "floor_area",
+      "monthly_visitors"
+    ],
+    "rows": []
+  }
+}

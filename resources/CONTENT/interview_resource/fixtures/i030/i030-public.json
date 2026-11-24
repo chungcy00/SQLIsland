@@ -1,0 +1,19 @@
+{
+  "id": "i030-public",
+  "questionId": "i030",
+  "datasetId": "i030-interview",
+  "visibility": "public",
+  "variant": "public",
+  "kind": "query",
+  "setupSql": "CREATE TABLE passengers(passenger_name TEXT PRIMARY KEY,weight INTEGER NOT NULL,boarding_turn INTEGER UNIQUE NOT NULL);\nINSERT INTO passengers VALUES ('兰兰',300,1),('小岳',400,2),('阿河',250,3),('小夏',200,4);",
+  "expected": {
+    "columns": [
+      "passenger_name"
+    ],
+    "rows": [
+      [
+        "阿河"
+      ]
+    ]
+  }
+}

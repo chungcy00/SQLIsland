@@ -1,0 +1,15 @@
+{
+  "id": "i052-t03",
+  "questionId": "i052",
+  "datasetId": "i052-interview",
+  "visibility": "hidden",
+  "variant": "t03",
+  "kind": "query",
+  "setupSql": "CREATE TABLE products(product_name TEXT PRIMARY KEY);CREATE TABLE sales(product_name TEXT NOT NULL,sale_day TEXT NOT NULL,units INT NOT NULL);\nINSERT INTO products VALUES('甲');INSERT INTO sales VALUES('甲','2026-01-02',4);",
+  "expected": {
+    "columns": [
+      "product_name"
+    ],
+    "rows": []
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "id": "i090-t02",
+  "questionId": "i090",
+  "datasetId": "i090-interview",
+  "visibility": "hidden",
+  "variant": "t02",
+  "kind": "query",
+  "setupSql": "CREATE TABLE payments(member TEXT,month TEXT,amount INTEGER,PRIMARY KEY(member,month));\nINSERT INTO payments VALUES('甲','2026-01',50),('甲','2026-02',60);",
+  "expected": {
+    "columns": [
+      "member",
+      "early_total",
+      "recent_total"
+    ],
+    "rows": []
+  }
+}

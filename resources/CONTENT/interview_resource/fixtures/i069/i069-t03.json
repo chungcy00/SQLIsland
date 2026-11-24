@@ -1,0 +1,33 @@
+{
+  "id": "i069-t03",
+  "questionId": "i069",
+  "datasetId": "i069-interview",
+  "visibility": "hidden",
+  "variant": "t03",
+  "kind": "query",
+  "setupSql": "CREATE TABLE teams(team TEXT PRIMARY KEY,parent_team TEXT);\nINSERT INTO teams VALUES('根',NULL),('甲','根'),('乙','甲'),('丙','乙');",
+  "expected": {
+    "columns": [
+      "team",
+      "team_role"
+    ],
+    "rows": [
+      [
+        "根",
+        "根组"
+      ],
+      [
+        "甲",
+        "中间组"
+      ],
+      [
+        "乙",
+        "中间组"
+      ],
+      [
+        "丙",
+        "末端组"
+      ]
+    ]
+  }
+}

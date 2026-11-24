@@ -1,0 +1,25 @@
+{
+  "id": "i021-public",
+  "questionId": "i021",
+  "datasetId": "i021-interview",
+  "visibility": "public",
+  "variant": "public",
+  "kind": "query",
+  "setupSql": "CREATE TABLE work_log(workstation TEXT,job_code TEXT,stage TEXT,minute_mark REAL,PRIMARY KEY(workstation,job_code,stage));\nINSERT INTO work_log VALUES ('甲','a','start',1),('甲','a','end',5),('甲','b','start',2),('甲','b','end',6),('乙','c','start',4),('乙','c','end',10);",
+  "expected": {
+    "columns": [
+      "workstation",
+      "avg_minutes"
+    ],
+    "rows": [
+      [
+        "乙",
+        6.0
+      ],
+      [
+        "甲",
+        4.0
+      ]
+    ]
+  }
+}

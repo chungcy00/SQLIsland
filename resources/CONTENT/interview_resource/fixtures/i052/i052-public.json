@@ -1,0 +1,19 @@
+{
+  "id": "i052-public",
+  "questionId": "i052",
+  "datasetId": "i052-interview",
+  "visibility": "public",
+  "variant": "public",
+  "kind": "query",
+  "setupSql": "CREATE TABLE products(product_name TEXT PRIMARY KEY);CREATE TABLE sales(product_name TEXT NOT NULL,sale_day TEXT NOT NULL,units INT NOT NULL);\nINSERT INTO products VALUES('茶'),('纸'),('杯');INSERT INTO sales VALUES('茶','2026-04-03',2),('茶','2026-06-30',3),('纸','2026-05-01',2),('纸','2026-07-01',1);",
+  "expected": {
+    "columns": [
+      "product_name"
+    ],
+    "rows": [
+      [
+        "茶"
+      ]
+    ]
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "id": "i050-public",
+  "questionId": "i050",
+  "datasetId": "i050-interview",
+  "visibility": "public",
+  "variant": "public",
+  "kind": "query",
+  "setupSql": "CREATE TABLE monthly_spend(customer_name TEXT PRIMARY KEY,amount INTEGER NOT NULL);\nINSERT INTO monthly_spend VALUES('小青',1500),('阿张',2000),('小美',5000),('小志',6000);",
+  "expected": {
+    "columns": [
+      "spend_band",
+      "customer_count"
+    ],
+    "rows": [
+      [
+        "低消费",
+        1
+      ],
+      [
+        "中消费",
+        2
+      ],
+      [
+        "高消费",
+        1
+      ]
+    ]
+  }
+}

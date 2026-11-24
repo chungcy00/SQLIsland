@@ -1,0 +1,28 @@
+{
+  "id": "i031-public",
+  "questionId": "i031",
+  "datasetId": "i031-interview",
+  "visibility": "public",
+  "variant": "public",
+  "kind": "query",
+  "setupSql": "CREATE TABLE search_logs(search_term TEXT NOT NULL, score INTEGER NOT NULL, position INTEGER NOT NULL);\nINSERT INTO search_logs VALUES ('口红',4,1),('口红',2,2),('耳机',5,1),('耳机',1,2);",
+  "expected": {
+    "columns": [
+      "search_term",
+      "quality",
+      "poor_percentage"
+    ],
+    "rows": [
+      [
+        "口红",
+        2.5,
+        50.0
+      ],
+      [
+        "耳机",
+        2.75,
+        50.0
+      ]
+    ]
+  }
+}

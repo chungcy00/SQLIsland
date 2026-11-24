@@ -1,0 +1,28 @@
+{
+  "id": "i059-public",
+  "questionId": "i059",
+  "datasetId": "i059-interview",
+  "visibility": "public",
+  "variant": "public",
+  "kind": "query",
+  "setupSql": "CREATE TABLE managers(manager TEXT PRIMARY KEY,joined_day TEXT NOT NULL);CREATE TABLE orders(order_code TEXT PRIMARY KEY,manager TEXT NOT NULL,order_day TEXT NOT NULL);\nINSERT INTO managers VALUES('阿明','2025-01-01'),('小欢','2026-01-01');INSERT INTO orders VALUES('A1','阿明','2026-04-01'),('A2','阿明','2025-11-01');",
+  "expected": {
+    "columns": [
+      "manager",
+      "joined_day",
+      "orders_2026"
+    ],
+    "rows": [
+      [
+        "小欢",
+        "2026-01-01",
+        0
+      ],
+      [
+        "阿明",
+        "2025-01-01",
+        1
+      ]
+    ]
+  }
+}

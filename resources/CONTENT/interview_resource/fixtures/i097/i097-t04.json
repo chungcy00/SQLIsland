@@ -1,0 +1,21 @@
+{
+  "id": "i097-t04",
+  "questionId": "i097",
+  "datasetId": "i097-interview",
+  "visibility": "hidden",
+  "variant": "t04",
+  "kind": "query",
+  "setupSql": "CREATE TABLE visits(member_name TEXT NOT NULL,visit_day TEXT NOT NULL);\nINSERT INTO visits VALUES('甲','2026-04-01'),('甲','2026-04-02'),('甲','2026-04-03'),('甲','2026-04-06'),('甲','2026-04-07'),('甲','2026-04-08'),('甲','2026-04-09');",
+  "expected": {
+    "columns": [
+      "member_name",
+      "longest_streak"
+    ],
+    "rows": [
+      [
+        "甲",
+        4
+      ]
+    ]
+  }
+}

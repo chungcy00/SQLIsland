@@ -1,0 +1,33 @@
+{
+  "id": "i082-public",
+  "questionId": "i082",
+  "datasetId": "i082-interview",
+  "visibility": "public",
+  "variant": "public",
+  "kind": "query",
+  "setupSql": "CREATE TABLE sales(day TEXT,product TEXT,amount INTEGER);\nINSERT INTO sales VALUES('2026-01-01','茶',10),('2026-02-03','茶',20),('2026-03-31','书',30),('2026-04-01','花',20);",
+  "expected": {
+    "columns": [
+      "quarter",
+      "product",
+      "total_sales"
+    ],
+    "rows": [
+      [
+        1,
+        "书",
+        30
+      ],
+      [
+        1,
+        "茶",
+        30
+      ],
+      [
+        2,
+        "花",
+        20
+      ]
+    ]
+  }
+}

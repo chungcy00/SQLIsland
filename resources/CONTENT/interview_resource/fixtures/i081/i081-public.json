@@ -1,0 +1,23 @@
+{
+  "id": "i081-public",
+  "questionId": "i081",
+  "datasetId": "i081-interview",
+  "visibility": "public",
+  "variant": "public",
+  "kind": "query",
+  "setupSql": "CREATE TABLE items(order_no TEXT,product TEXT,PRIMARY KEY(order_no,product));\nINSERT INTO items VALUES('a','苹果'),('a','橙子'),('b','苹果'),('b','橙子'),('b','牛奶');",
+  "expected": {
+    "columns": [
+      "product_a",
+      "product_b",
+      "order_count"
+    ],
+    "rows": [
+      [
+        "橙子",
+        "苹果",
+        2
+      ]
+    ]
+  }
+}

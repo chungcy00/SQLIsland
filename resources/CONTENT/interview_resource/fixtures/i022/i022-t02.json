@@ -1,0 +1,22 @@
+{
+  "id": "i022-t02",
+  "questionId": "i022",
+  "datasetId": "i022-interview",
+  "visibility": "hidden",
+  "variant": "t02",
+  "kind": "query",
+  "setupSql": "CREATE TABLE members(member_no INTEGER PRIMARY KEY,raw_name TEXT NOT NULL);\nINSERT INTO members VALUES (1,'a'),(2,'Z');",
+  "expected": {
+    "columns": [
+      "cleaned_name"
+    ],
+    "rows": [
+      [
+        "A"
+      ],
+      [
+        "Z"
+      ]
+    ]
+  }
+}

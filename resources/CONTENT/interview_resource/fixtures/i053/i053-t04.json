@@ -1,0 +1,25 @@
+{
+  "id": "i053-t04",
+  "questionId": "i053",
+  "datasetId": "i053-interview",
+  "visibility": "hidden",
+  "variant": "t04",
+  "kind": "query",
+  "setupSql": "CREATE TABLE checkins(trainee TEXT NOT NULL,day TEXT NOT NULL,room TEXT NOT NULL);\nINSERT INTO checkins VALUES('甲','2026-01-01','一'),('甲','2025-12-31','二'),('乙','2026-01-02','三');",
+  "expected": {
+    "columns": [
+      "trainee",
+      "first_day"
+    ],
+    "rows": [
+      [
+        "乙",
+        "2026-01-02"
+      ],
+      [
+        "甲",
+        "2025-12-31"
+      ]
+    ]
+  }
+}

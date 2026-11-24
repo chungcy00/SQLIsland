@@ -1,0 +1,19 @@
+{
+  "id": "i038-t03",
+  "questionId": "i038",
+  "datasetId": "i038-interview",
+  "visibility": "hidden",
+  "variant": "t03",
+  "kind": "query",
+  "setupSql": "CREATE TABLE staff(staff_id INTEGER PRIMARY KEY,staff_name TEXT NOT NULL,manager_id INTEGER);\nINSERT INTO staff VALUES(1,'主管甲',NULL),(2,'组员甲',1),(3,'组员乙',1),(4,'组员丙',1),(5,'组员丁',1),(6,'组员戊',1),(7,'组员己',1),(8,'孙组员',2);",
+  "expected": {
+    "columns": [
+      "staff_name"
+    ],
+    "rows": [
+      [
+        "主管甲"
+      ]
+    ]
+  }
+}

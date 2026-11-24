@@ -1,0 +1,25 @@
+{
+  "id": "i077-public",
+  "questionId": "i077",
+  "datasetId": "i077-interview",
+  "visibility": "public",
+  "variant": "public",
+  "kind": "query",
+  "setupSql": "CREATE TABLE exams(student TEXT,subject TEXT,exam_day TEXT,score INTEGER,PRIMARY KEY(student,subject,exam_day));\nINSERT INTO exams VALUES('甲','语文','2026-01-01',60),('甲','语文','2026-02-01',80),('乙','数学','2026-01-01',90),('乙','数学','2026-02-01',70);",
+  "expected": {
+    "columns": [
+      "student",
+      "subject",
+      "first_score",
+      "last_score"
+    ],
+    "rows": [
+      [
+        "甲",
+        "语文",
+        60,
+        80
+      ]
+    ]
+  }
+}

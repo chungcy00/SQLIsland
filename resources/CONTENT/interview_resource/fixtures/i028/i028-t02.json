@@ -1,0 +1,29 @@
+{
+  "id": "i028-t02",
+  "questionId": "i028",
+  "datasetId": "i028-interview",
+  "visibility": "hidden",
+  "variant": "t02",
+  "kind": "query",
+  "setupSql": "CREATE TABLE payments(payment_no INTEGER PRIMARY KEY,currency TEXT NOT NULL,amount INTEGER NOT NULL,status TEXT NOT NULL,paid_on TEXT NOT NULL);\nINSERT INTO payments VALUES (1,'MYR',0,'approved','2026-03-10');",
+  "expected": {
+    "columns": [
+      "month",
+      "currency",
+      "transaction_count",
+      "approved_count",
+      "transaction_total",
+      "approved_total"
+    ],
+    "rows": [
+      [
+        "2026-03",
+        "MYR",
+        1,
+        1,
+        0,
+        0
+      ]
+    ]
+  }
+}

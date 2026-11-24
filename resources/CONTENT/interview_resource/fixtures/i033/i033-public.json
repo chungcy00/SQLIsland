@@ -1,0 +1,25 @@
+{
+  "id": "i033-public",
+  "questionId": "i033",
+  "datasetId": "i033-interview",
+  "visibility": "public",
+  "variant": "public",
+  "kind": "query",
+  "setupSql": "CREATE TABLE members(member_id INTEGER PRIMARY KEY); CREATE TABLE signups(event_name TEXT NOT NULL,member_id INTEGER NOT NULL,PRIMARY KEY(event_name,member_id));\nINSERT INTO members VALUES(1),(2),(3),(4);INSERT INTO signups VALUES('双十一',1),('双十一',2),('夏日节',1),('夏日节',2),('夏日节',3);",
+  "expected": {
+    "columns": [
+      "event_name",
+      "signup_percentage"
+    ],
+    "rows": [
+      [
+        "夏日节",
+        75.0
+      ],
+      [
+        "双十一",
+        50.0
+      ]
+    ]
+  }
+}

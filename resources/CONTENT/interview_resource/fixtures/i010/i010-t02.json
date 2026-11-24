@@ -1,0 +1,28 @@
+{
+  "id": "i010-t02",
+  "questionId": "i010",
+  "datasetId": "i010-interview",
+  "visibility": "hidden",
+  "variant": "t02",
+  "kind": "query",
+  "setupSql": "CREATE TABLE departments(dept_id INTEGER PRIMARY KEY,department_name TEXT NOT NULL); CREATE TABLE staff(employee_id INTEGER PRIMARY KEY,employee_name TEXT NOT NULL,dept_id INTEGER NOT NULL,bonus INTEGER NOT NULL);\nINSERT INTO departments VALUES (1,'甲'),(2,'乙'); INSERT INTO staff VALUES (1,'甲员',1,50),(2,'乙员',2,60);",
+  "expected": {
+    "columns": [
+      "department_name",
+      "employee_name",
+      "bonus"
+    ],
+    "rows": [
+      [
+        "甲",
+        "甲员",
+        50
+      ],
+      [
+        "乙",
+        "乙员",
+        60
+      ]
+    ]
+  }
+}

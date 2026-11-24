@@ -1,0 +1,23 @@
+{
+  "id": "i026-t04",
+  "questionId": "i026",
+  "datasetId": "i026-interview",
+  "visibility": "hidden",
+  "variant": "t04",
+  "kind": "query",
+  "setupSql": "CREATE TABLE staff(staff_no INTEGER PRIMARY KEY,name TEXT NOT NULL,tenure INTEGER NOT NULL,supervisor_no INTEGER);\nINSERT INTO staff VALUES (1,'甲',6,NULL),(2,'乙',3,NULL),(3,'丙',2,2),(4,'丁',4,2);",
+  "expected": {
+    "columns": [
+      "supervisor_name",
+      "reports_count",
+      "avg_tenure"
+    ],
+    "rows": [
+      [
+        "乙",
+        2,
+        3
+      ]
+    ]
+  }
+}

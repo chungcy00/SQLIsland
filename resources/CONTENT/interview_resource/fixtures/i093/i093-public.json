@@ -1,0 +1,31 @@
+{
+  "id": "i093-public",
+  "questionId": "i093",
+  "datasetId": "i093-interview",
+  "visibility": "public",
+  "variant": "public",
+  "kind": "database_state",
+  "setupSql": "CREATE TABLE enrollments(student_name TEXT,course_name TEXT,score INTEGER,status TEXT); CREATE TABLE graduation_archive(student_name TEXT,course_name TEXT, UNIQUE(student_name,course_name));\nINSERT INTO enrollments VALUES ('林安','数据库',92,'已完成'),('陈清','报表',79,'已完成'),('周明','报表',88,'学习中'),('林安','数据库',90,'已完成'),('吴琳','数据库',81,'已完成'); INSERT INTO graduation_archive VALUES ('林安','数据库'),('郑远','设计');",
+  "probes": [],
+  "expectedTable": {
+    "name": "graduation_archive",
+    "columns": [
+      "student_name",
+      "course_name"
+    ],
+    "rows": [
+      [
+        "林安",
+        "数据库"
+      ],
+      [
+        "郑远",
+        "设计"
+      ],
+      [
+        "吴琳",
+        "数据库"
+      ]
+    ]
+  }
+}

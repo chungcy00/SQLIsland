@@ -1,0 +1,15 @@
+{
+  "id": "i062-t02",
+  "questionId": "i062",
+  "datasetId": "i062-interview",
+  "visibility": "hidden",
+  "variant": "t02",
+  "kind": "query",
+  "setupSql": "CREATE TABLE enrolments(student TEXT NOT NULL,course TEXT NOT NULL,PRIMARY KEY(student,course));\nINSERT INTO enrolments VALUES('甲','演讲'),('乙','演讲'),('丙','演讲'),('丁','演讲');",
+  "expected": {
+    "columns": [
+      "course"
+    ],
+    "rows": []
+  }
+}

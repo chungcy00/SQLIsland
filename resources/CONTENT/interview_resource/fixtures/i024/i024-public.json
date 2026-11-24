@@ -1,0 +1,37 @@
+{
+  "id": "i024-public",
+  "questionId": "i024",
+  "datasetId": "i024-interview",
+  "visibility": "public",
+  "variant": "public",
+  "kind": "query",
+  "setupSql": "CREATE TABLE channel_log(contact_day TEXT,channel TEXT,enquiry TEXT,partner TEXT);\nINSERT INTO channel_log VALUES ('2026-11-01','网页','E1','P1'),('2026-11-01','网页','E1','P2'),('2026-11-01','网页','E2','P1'),('2026-11-01','门店','E3','P3'),('2026-11-02','网页','E4','P1');",
+  "expected": {
+    "columns": [
+      "contact_day",
+      "channel",
+      "enquiry_count",
+      "partner_count"
+    ],
+    "rows": [
+      [
+        "2026-11-01",
+        "网页",
+        2,
+        2
+      ],
+      [
+        "2026-11-01",
+        "门店",
+        1,
+        1
+      ],
+      [
+        "2026-11-02",
+        "网页",
+        1,
+        1
+      ]
+    ]
+  }
+}

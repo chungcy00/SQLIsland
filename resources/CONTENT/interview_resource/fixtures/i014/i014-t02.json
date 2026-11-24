@@ -1,0 +1,18 @@
+{
+  "id": "i014-t02",
+  "questionId": "i014",
+  "datasetId": "i014-interview",
+  "visibility": "hidden",
+  "variant": "t02",
+  "kind": "query",
+  "setupSql": "CREATE TABLE events(session_no INTEGER PRIMARY KEY,title TEXT NOT NULL,description TEXT NOT NULL,rating REAL NOT NULL);\nINSERT INTO events VALUES (1,'手工课','无聊',9.0),(2,'读书会','精彩',8.0);",
+  "expected": {
+    "columns": [
+      "session_no",
+      "title",
+      "description",
+      "rating"
+    ],
+    "rows": []
+  }
+}

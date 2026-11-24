@@ -1,0 +1,19 @@
+{
+  "id": "i030-t02",
+  "questionId": "i030",
+  "datasetId": "i030-interview",
+  "visibility": "hidden",
+  "variant": "t02",
+  "kind": "query",
+  "setupSql": "CREATE TABLE passengers(passenger_name TEXT PRIMARY KEY,weight INTEGER NOT NULL,boarding_turn INTEGER UNIQUE NOT NULL);\nINSERT INTO passengers VALUES ('阿山',1000,1);",
+  "expected": {
+    "columns": [
+      "passenger_name"
+    ],
+    "rows": [
+      [
+        "阿山"
+      ]
+    ]
+  }
+}

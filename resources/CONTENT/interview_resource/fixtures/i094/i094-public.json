@@ -1,0 +1,39 @@
+{
+  "id": "i094-public",
+  "questionId": "i094",
+  "datasetId": "i094-interview",
+  "visibility": "public",
+  "variant": "public",
+  "kind": "database_state",
+  "setupSql": "CREATE TABLE projects(project_code TEXT PRIMARY KEY,project_status TEXT);CREATE TABLE tasks(task_code TEXT PRIMARY KEY,project_code TEXT,task_status TEXT,task_name TEXT);\nINSERT INTO projects VALUES ('甲项目','已撤销'),('乙项目','执行中'); INSERT INTO tasks VALUES('A','甲项目','待办','对账'),('B','甲项目','已完成','评审'),('C','乙项目','待办','测试'),('D',NULL,'待办','归档');",
+  "probes": [],
+  "expectedTable": {
+    "name": "tasks",
+    "columns": [
+      "task_code",
+      "project_code",
+      "task_status",
+      "task_name"
+    ],
+    "rows": [
+      [
+        "B",
+        "甲项目",
+        "已完成",
+        "评审"
+      ],
+      [
+        "C",
+        "乙项目",
+        "待办",
+        "测试"
+      ],
+      [
+        "D",
+        null,
+        "待办",
+        "归档"
+      ]
+    ]
+  }
+}

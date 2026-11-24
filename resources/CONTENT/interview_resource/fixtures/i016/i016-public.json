@@ -1,0 +1,33 @@
+{
+  "id": "i016-public",
+  "questionId": "i016",
+  "datasetId": "i016-interview",
+  "visibility": "public",
+  "variant": "public",
+  "kind": "query",
+  "setupSql": "CREATE TABLE items(item_code INTEGER PRIMARY KEY,product_name TEXT NOT NULL); CREATE TABLE trade_lines(trade_no INTEGER PRIMARY KEY,item_code INTEGER NOT NULL,year INTEGER NOT NULL,price INTEGER NOT NULL);\nINSERT INTO items VALUES (10,'雨伞'),(20,'水杯'); INSERT INTO trade_lines VALUES (1,10,2025,25),(2,10,2026,26),(3,20,2026,15);",
+  "expected": {
+    "columns": [
+      "product_name",
+      "year",
+      "price"
+    ],
+    "rows": [
+      [
+        "雨伞",
+        2025,
+        25
+      ],
+      [
+        "雨伞",
+        2026,
+        26
+      ],
+      [
+        "水杯",
+        2026,
+        15
+      ]
+    ]
+  }
+}

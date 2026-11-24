@@ -1,0 +1,21 @@
+{
+  "id": "i075-public",
+  "questionId": "i075",
+  "datasetId": "i075-interview",
+  "visibility": "public",
+  "variant": "public",
+  "kind": "query",
+  "setupSql": "CREATE TABLE catalog(product TEXT PRIMARY KEY,description TEXT NOT NULL);\nINSERT INTO catalog VALUES('甲','包装 BT1234-5678 已入库'),('乙','BT123-5678'),('丙','BT1234-56789');",
+  "expected": {
+    "columns": [
+      "product",
+      "description"
+    ],
+    "rows": [
+      [
+        "甲",
+        "包装 BT1234-5678 已入库"
+      ]
+    ]
+  }
+}

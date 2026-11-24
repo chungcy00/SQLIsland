@@ -1,0 +1,19 @@
+{
+  "id": "i062-public",
+  "questionId": "i062",
+  "datasetId": "i062-interview",
+  "visibility": "public",
+  "variant": "public",
+  "kind": "query",
+  "setupSql": "CREATE TABLE enrolments(student TEXT NOT NULL,course TEXT NOT NULL,PRIMARY KEY(student,course));\nINSERT INTO enrolments VALUES('甲','写作'),('乙','写作'),('丙','写作'),('丁','写作'),('戊','写作'),('甲','阅读'),('乙','阅读');",
+  "expected": {
+    "columns": [
+      "course"
+    ],
+    "rows": [
+      [
+        "写作"
+      ]
+    ]
+  }
+}

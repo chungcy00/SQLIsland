@@ -1,0 +1,19 @@
+{
+  "id": "i042-t04",
+  "questionId": "i042",
+  "datasetId": "i042-interview",
+  "visibility": "hidden",
+  "variant": "t04",
+  "kind": "query",
+  "setupSql": "CREATE TABLE products(product_name TEXT PRIMARY KEY,reusable_pack TEXT NOT NULL,low_carbon TEXT NOT NULL);\nINSERT INTO products VALUES('甲','N','N'),('乙','Y','N'),('丙','N','Y'),('丁','Y','Y');",
+  "expected": {
+    "columns": [
+      "product_name"
+    ],
+    "rows": [
+      [
+        "丁"
+      ]
+    ]
+  }
+}

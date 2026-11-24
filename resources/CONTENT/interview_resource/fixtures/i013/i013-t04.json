@@ -1,0 +1,22 @@
+{
+  "id": "i013-t04",
+  "questionId": "i013",
+  "datasetId": "i013-interview",
+  "visibility": "hidden",
+  "variant": "t04",
+  "kind": "query",
+  "setupSql": "CREATE TABLE salespeople(salesperson_id INTEGER PRIMARY KEY,name TEXT NOT NULL); CREATE TABLE clients(client_id INTEGER PRIMARY KEY,client_name TEXT NOT NULL); CREATE TABLE deals(deal_id INTEGER PRIMARY KEY,salesperson_id INTEGER NOT NULL,client_id INTEGER NOT NULL);\nINSERT INTO salespeople VALUES (1,'甲'),(2,'乙'),(3,'丙'); INSERT INTO clients VALUES (1,'宏森集团'),(2,'其他公司'); INSERT INTO deals VALUES (1,1,2),(2,1,2),(3,2,1);",
+  "expected": {
+    "columns": [
+      "name"
+    ],
+    "rows": [
+      [
+        "甲"
+      ],
+      [
+        "丙"
+      ]
+    ]
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "id": "i064-t04",
+  "questionId": "i064",
+  "datasetId": "i064-interview",
+  "visibility": "hidden",
+  "variant": "t04",
+  "kind": "query",
+  "setupSql": "CREATE TABLE quarterly(dept TEXT NOT NULL,quarter TEXT NOT NULL,income INT NOT NULL,PRIMARY KEY(dept,quarter));\nINSERT INTO quarterly VALUES('甲','Q1',0),('甲','Q2',22);",
+  "expected": {
+    "columns": [
+      "dept",
+      "q1_income",
+      "q2_income",
+      "q3_income",
+      "q4_income"
+    ],
+    "rows": [
+      [
+        "甲",
+        0,
+        22,
+        null,
+        null
+      ]
+    ]
+  }
+}

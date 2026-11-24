@@ -1,0 +1,29 @@
+{
+  "id": "i011-public",
+  "questionId": "i011",
+  "datasetId": "i011-interview",
+  "visibility": "public",
+  "variant": "public",
+  "kind": "query",
+  "setupSql": "CREATE TABLE staff(staff_id INTEGER PRIMARY KEY,name TEXT NOT NULL); CREATE TABLE rewards(staff_id INTEGER PRIMARY KEY,bonus INTEGER);\nINSERT INTO staff VALUES (1,'阿宁'),(2,'小青'),(3,'小杰'),(4,'可欣'); INSERT INTO rewards VALUES (1,300),(2,900),(4,NULL);",
+  "expected": {
+    "columns": [
+      "name",
+      "bonus"
+    ],
+    "rows": [
+      [
+        "阿宁",
+        300
+      ],
+      [
+        "小杰",
+        null
+      ],
+      [
+        "可欣",
+        null
+      ]
+    ]
+  }
+}

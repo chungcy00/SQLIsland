@@ -1,0 +1,33 @@
+{
+  "id": "i069-public",
+  "questionId": "i069",
+  "datasetId": "i069-interview",
+  "visibility": "public",
+  "variant": "public",
+  "kind": "query",
+  "setupSql": "CREATE TABLE teams(team TEXT PRIMARY KEY,parent_team TEXT);\nINSERT INTO teams VALUES('总部',NULL),('销售','总部'),('技术','总部'),('华南','销售');",
+  "expected": {
+    "columns": [
+      "team",
+      "team_role"
+    ],
+    "rows": [
+      [
+        "总部",
+        "根组"
+      ],
+      [
+        "销售",
+        "中间组"
+      ],
+      [
+        "技术",
+        "末端组"
+      ],
+      [
+        "华南",
+        "末端组"
+      ]
+    ]
+  }
+}

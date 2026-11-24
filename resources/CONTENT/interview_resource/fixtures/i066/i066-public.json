@@ -1,0 +1,21 @@
+{
+  "id": "i066-public",
+  "questionId": "i066",
+  "datasetId": "i066-interview",
+  "visibility": "public",
+  "variant": "public",
+  "kind": "query",
+  "setupSql": "CREATE TABLE contacts(employee TEXT PRIMARY KEY,email TEXT NOT NULL);\nINSERT INTO contacts VALUES('小宁','Amy-7@team.example'),('小易','8amy@team.example'),('小雪','Lily#1@team.example');",
+  "expected": {
+    "columns": [
+      "employee",
+      "email"
+    ],
+    "rows": [
+      [
+        "小宁",
+        "Amy-7@team.example"
+      ]
+    ]
+  }
+}

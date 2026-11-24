@@ -1,0 +1,16 @@
+{
+  "id": "i009-t04",
+  "questionId": "i009",
+  "datasetId": "i009-interview",
+  "visibility": "hidden",
+  "variant": "t04",
+  "kind": "query",
+  "setupSql": "CREATE TABLE store_revenue(entry_id INTEGER PRIMARY KEY,revenue INTEGER NOT NULL);\n",
+  "expected": {
+    "columns": [
+      "revenue",
+      "ranking"
+    ],
+    "rows": []
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "id": "i042-public",
+  "questionId": "i042",
+  "datasetId": "i042-interview",
+  "visibility": "public",
+  "variant": "public",
+  "kind": "query",
+  "setupSql": "CREATE TABLE products(product_name TEXT PRIMARY KEY,reusable_pack TEXT NOT NULL,low_carbon TEXT NOT NULL);\nINSERT INTO products VALUES('纸杯','Y','N'),('购物袋','Y','Y'),('餐盒','N','Y');",
+  "expected": {
+    "columns": [
+      "product_name"
+    ],
+    "rows": [
+      [
+        "购物袋"
+      ]
+    ]
+  }
+}

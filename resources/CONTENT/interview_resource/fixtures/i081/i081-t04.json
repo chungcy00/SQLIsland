@@ -1,0 +1,23 @@
+{
+  "id": "i081-t04",
+  "questionId": "i081",
+  "datasetId": "i081-interview",
+  "visibility": "hidden",
+  "variant": "t04",
+  "kind": "query",
+  "setupSql": "CREATE TABLE items(order_no TEXT,product TEXT,PRIMARY KEY(order_no,product));\nINSERT INTO items VALUES('a','纸'),('a','笔'),('b','笔'),('b','纸'),('c','笔'),('c','纸'),('c','胶');",
+  "expected": {
+    "columns": [
+      "product_a",
+      "product_b",
+      "order_count"
+    ],
+    "rows": [
+      [
+        "笔",
+        "纸",
+        3
+      ]
+    ]
+  }
+}

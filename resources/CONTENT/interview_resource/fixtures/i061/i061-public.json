@@ -1,0 +1,25 @@
+{
+  "id": "i061-public",
+  "questionId": "i061",
+  "datasetId": "i061-interview",
+  "visibility": "public",
+  "variant": "public",
+  "kind": "query",
+  "setupSql": "CREATE TABLE profiles(customer_name TEXT PRIMARY KEY,tags TEXT NOT NULL);\nINSERT INTO profiles VALUES('小林','ALLG01 HOT'),('小文','VIP ALLG02'),('小叶','SMALLG01');",
+  "expected": {
+    "columns": [
+      "customer_name",
+      "tags"
+    ],
+    "rows": [
+      [
+        "小林",
+        "ALLG01 HOT"
+      ],
+      [
+        "小文",
+        "VIP ALLG02"
+      ]
+    ]
+  }
+}

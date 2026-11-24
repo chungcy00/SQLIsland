@@ -1,0 +1,40 @@
+{
+  "id": "i092-t04",
+  "questionId": "i092",
+  "datasetId": "i092-interview",
+  "visibility": "hidden",
+  "variant": "t04",
+  "kind": "database_state",
+  "setupSql": "CREATE TABLE staff_roster(employee_no INTEGER PRIMARY KEY, employee_name TEXT NOT NULL, shift_code TEXT NOT NULL CHECK(shift_code IN ('D','N')));\nINSERT INTO staff_roster VALUES (4,'乙','N'),(2,'甲','D'),(1,'丙','N'),(3,'丁','D');",
+  "probes": [],
+  "expectedTable": {
+    "name": "staff_roster",
+    "columns": [
+      "employee_no",
+      "employee_name",
+      "shift_code"
+    ],
+    "rows": [
+      [
+        1,
+        "丙",
+        "D"
+      ],
+      [
+        2,
+        "甲",
+        "N"
+      ],
+      [
+        3,
+        "丁",
+        "N"
+      ],
+      [
+        4,
+        "乙",
+        "D"
+      ]
+    ]
+  }
+}

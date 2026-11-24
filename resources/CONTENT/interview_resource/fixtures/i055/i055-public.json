@@ -1,0 +1,21 @@
+{
+  "id": "i055-public",
+  "questionId": "i055",
+  "datasetId": "i055-interview",
+  "visibility": "public",
+  "variant": "public",
+  "kind": "query",
+  "setupSql": "CREATE TABLE customers(customer_name TEXT PRIMARY KEY);CREATE TABLE ledger(customer_name TEXT NOT NULL,change_amount INT NOT NULL);\nINSERT INTO customers VALUES('阿棠'),('小果'),('阿荣');INSERT INTO ledger VALUES('阿棠',15000),('阿棠',-3000),('小果',10000),('阿荣',3000);",
+  "expected": {
+    "columns": [
+      "customer_name",
+      "balance"
+    ],
+    "rows": [
+      [
+        "阿棠",
+        12000
+      ]
+    ]
+  }
+}

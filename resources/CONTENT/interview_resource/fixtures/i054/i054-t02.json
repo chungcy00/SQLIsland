@@ -1,0 +1,25 @@
+{
+  "id": "i054-t02",
+  "questionId": "i054",
+  "datasetId": "i054-interview",
+  "visibility": "hidden",
+  "variant": "t02",
+  "kind": "query",
+  "setupSql": "CREATE TABLE actions(advisor TEXT NOT NULL,action_day TEXT NOT NULL,action_name TEXT NOT NULL);\nINSERT INTO actions VALUES('甲','2026-07-01','A'),('甲','2026-07-02','A'),('乙','2026-07-31','B'),('丙','2026-08-01','B');",
+  "expected": {
+    "columns": [
+      "action_day",
+      "active_advisors"
+    ],
+    "rows": [
+      [
+        "2026-07-02",
+        1
+      ],
+      [
+        "2026-07-31",
+        1
+      ]
+    ]
+  }
+}

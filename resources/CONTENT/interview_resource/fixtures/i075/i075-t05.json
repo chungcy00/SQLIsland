@@ -1,0 +1,25 @@
+{
+  "id": "i075-t05",
+  "questionId": "i075",
+  "datasetId": "i075-interview",
+  "visibility": "hidden",
+  "variant": "t05",
+  "kind": "query",
+  "setupSql": "CREATE TABLE catalog(product TEXT PRIMARY KEY,description TEXT NOT NULL);\nINSERT INTO catalog VALUES('有效','起始 BT0000-1234 结束'),('标点','BT0000-1234,结束'),('嵌入','前缀BT0000-1234后缀'),('单独','BT9876-5432');",
+  "expected": {
+    "columns": [
+      "product",
+      "description"
+    ],
+    "rows": [
+      [
+        "有效",
+        "起始 BT0000-1234 结束"
+      ],
+      [
+        "单独",
+        "BT9876-5432"
+      ]
+    ]
+  }
+}

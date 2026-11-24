@@ -1,0 +1,15 @@
+{
+  "id": "i008-t05",
+  "questionId": "i008",
+  "datasetId": "i008-interview",
+  "visibility": "hidden",
+  "variant": "t05",
+  "kind": "query",
+  "setupSql": "CREATE TABLE daily_traffic(record_id INTEGER PRIMARY KEY,visit_date TEXT UNIQUE NOT NULL,visitor_count INTEGER NOT NULL);\n",
+  "expected": {
+    "columns": [
+      "record_id"
+    ],
+    "rows": []
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "id": "i075-t04",
+  "questionId": "i075",
+  "datasetId": "i075-interview",
+  "visibility": "hidden",
+  "variant": "t04",
+  "kind": "query",
+  "setupSql": "CREATE TABLE catalog(product TEXT PRIMARY KEY,description TEXT NOT NULL);\nINSERT INTO catalog VALUES('甲','现货 BT9999-0000'),('乙','BT9999-0000 在仓'),('丙','BT9999-0000A');",
+  "expected": {
+    "columns": [
+      "product",
+      "description"
+    ],
+    "rows": [
+      [
+        "乙",
+        "BT9999-0000 在仓"
+      ],
+      [
+        "甲",
+        "现货 BT9999-0000"
+      ]
+    ]
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "id": "i002-public",
+  "questionId": "i002",
+  "datasetId": "i002-interview",
+  "visibility": "public",
+  "variant": "public",
+  "kind": "query",
+  "setupSql": "CREATE TABLE catalog(sku INTEGER PRIMARY KEY,list_price INTEGER NOT NULL);\nINSERT INTO catalog VALUES (1,120),(2,280),(3,450),(4,280),(5,180);",
+  "expected": {
+    "columns": [
+      "SecondHighestPrice"
+    ],
+    "rows": [
+      [
+        280
+      ]
+    ]
+  }
+}

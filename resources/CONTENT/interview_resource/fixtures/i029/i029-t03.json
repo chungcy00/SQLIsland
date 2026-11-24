@@ -1,0 +1,19 @@
+{
+  "id": "i029-t03",
+  "questionId": "i029",
+  "datasetId": "i029-interview",
+  "visibility": "hidden",
+  "variant": "t03",
+  "kind": "query",
+  "setupSql": "CREATE TABLE deliveries(delivery_no INTEGER PRIMARY KEY,customer TEXT NOT NULL,ordered_on TEXT NOT NULL,wanted_on TEXT NOT NULL,delivered_on TEXT NOT NULL);\nINSERT INTO deliveries VALUES (1,'甲','2026-01-01','2026-01-01','2026-01-02'),(2,'乙','2026-01-02','2026-01-02','2026-01-03');",
+  "expected": {
+    "columns": [
+      "ontime_rate"
+    ],
+    "rows": [
+      [
+        0.0
+      ]
+    ]
+  }
+}

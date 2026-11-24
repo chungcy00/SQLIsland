@@ -1,0 +1,28 @@
+{
+  "id": "i076-public",
+  "questionId": "i076",
+  "datasetId": "i076-interview",
+  "visibility": "public",
+  "variant": "public",
+  "kind": "query",
+  "setupSql": "CREATE TABLE sales(sale_day TEXT NOT NULL,amount INTEGER NOT NULL);\nINSERT INTO sales VALUES('2026-01-01',3),('2026-01-01',8),('2026-01-01',5),('2026-01-02',6);",
+  "expected": {
+    "columns": [
+      "sale_day",
+      "odd_total",
+      "even_total"
+    ],
+    "rows": [
+      [
+        "2026-01-01",
+        8,
+        8
+      ],
+      [
+        "2026-01-02",
+        0,
+        6
+      ]
+    ]
+  }
+}

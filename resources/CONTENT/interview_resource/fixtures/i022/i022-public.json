@@ -1,0 +1,25 @@
+{
+  "id": "i022-public",
+  "questionId": "i022",
+  "datasetId": "i022-interview",
+  "visibility": "public",
+  "variant": "public",
+  "kind": "query",
+  "setupSql": "CREATE TABLE members(member_no INTEGER PRIMARY KEY,raw_name TEXT NOT NULL);\nINSERT INTO members VALUES (1,'aLICE'),(2,'BOB'),(3,'cHArLiE');",
+  "expected": {
+    "columns": [
+      "cleaned_name"
+    ],
+    "rows": [
+      [
+        "Alice"
+      ],
+      [
+        "Bob"
+      ],
+      [
+        "Charlie"
+      ]
+    ]
+  }
+}

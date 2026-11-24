@@ -1,0 +1,22 @@
+{
+  "id": "i008-t03",
+  "questionId": "i008",
+  "datasetId": "i008-interview",
+  "visibility": "hidden",
+  "variant": "t03",
+  "kind": "query",
+  "setupSql": "CREATE TABLE daily_traffic(record_id INTEGER PRIMARY KEY,visit_date TEXT UNIQUE NOT NULL,visitor_count INTEGER NOT NULL);\nINSERT INTO daily_traffic VALUES (1,'2024-02-28',20),(2,'2024-02-29',30),(3,'2024-03-01',50);",
+  "expected": {
+    "columns": [
+      "record_id"
+    ],
+    "rows": [
+      [
+        2
+      ],
+      [
+        3
+      ]
+    ]
+  }
+}

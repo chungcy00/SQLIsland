@@ -1,0 +1,15 @@
+{
+  "id": "i057-t02",
+  "questionId": "i057",
+  "datasetId": "i057-interview",
+  "visibility": "hidden",
+  "variant": "t02",
+  "kind": "query",
+  "setupSql": "CREATE TABLE categories(category TEXT PRIMARY KEY);CREATE TABLE purchases(buyer TEXT NOT NULL,category TEXT NOT NULL);\nINSERT INTO categories VALUES('A'),('B'),('C');INSERT INTO purchases VALUES('甲','A'),('甲','B'),('乙','C');",
+  "expected": {
+    "columns": [
+      "buyer"
+    ],
+    "rows": []
+  }
+}

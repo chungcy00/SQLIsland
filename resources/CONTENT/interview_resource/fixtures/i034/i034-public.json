@@ -1,0 +1,21 @@
+{
+  "id": "i034-public",
+  "questionId": "i034",
+  "datasetId": "i034-interview",
+  "visibility": "public",
+  "variant": "public",
+  "kind": "query",
+  "setupSql": "CREATE TABLE products(product_id INTEGER PRIMARY KEY, product_name TEXT NOT NULL UNIQUE);CREATE TABLE shipments(product_id INTEGER,ship_date TEXT NOT NULL,units INTEGER NOT NULL);\nINSERT INTO products VALUES(1,'牛奶'),(2,'纸巾'),(3,'面包');INSERT INTO shipments VALUES(1,'2026-03-01',40),(1,'2026-03-31',60),(2,'2026-03-10',90),(3,'2026-02-28',200);",
+  "expected": {
+    "columns": [
+      "product_name",
+      "total_units"
+    ],
+    "rows": [
+      [
+        "牛奶",
+        100
+      ]
+    ]
+  }
+}

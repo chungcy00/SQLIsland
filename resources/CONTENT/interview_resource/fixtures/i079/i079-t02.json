@@ -1,0 +1,17 @@
+{
+  "id": "i079-t02",
+  "questionId": "i079",
+  "datasetId": "i079-interview",
+  "visibility": "hidden",
+  "variant": "t02",
+  "kind": "query",
+  "setupSql": "CREATE TABLE books(book TEXT PRIMARY KEY,total_copies INTEGER NOT NULL CHECK(total_copies>0));CREATE TABLE loans(loan_no INTEGER PRIMARY KEY,book TEXT NOT NULL,returned_at TEXT);\nINSERT INTO books VALUES('历史',1);INSERT INTO loans VALUES(1,'历史','2026-01-03');",
+  "expected": {
+    "columns": [
+      "book",
+      "total_copies",
+      "borrowed"
+    ],
+    "rows": []
+  }
+}

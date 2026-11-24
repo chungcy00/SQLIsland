@@ -1,0 +1,15 @@
+{
+  "id": "i015-t02",
+  "questionId": "i015",
+  "datasetId": "i015-interview",
+  "visibility": "hidden",
+  "variant": "t02",
+  "kind": "query",
+  "setupSql": "CREATE TABLE report_views(report_id INTEGER NOT NULL,author_name TEXT NOT NULL,viewer_name TEXT NOT NULL,viewed_at TEXT NOT NULL);\nINSERT INTO report_views VALUES (1,'甲','乙','2026-01-01');",
+  "expected": {
+    "columns": [
+      "analyst_name"
+    ],
+    "rows": []
+  }
+}

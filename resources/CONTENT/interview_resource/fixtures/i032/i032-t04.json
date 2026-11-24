@@ -1,0 +1,38 @@
+{
+  "id": "i032-t04",
+  "questionId": "i032",
+  "datasetId": "i032-interview",
+  "visibility": "hidden",
+  "variant": "t04",
+  "kind": "query",
+  "setupSql": "CREATE TABLE staff(staff_id INTEGER PRIMARY KEY,staff_name TEXT UNIQUE NOT NULL); CREATE TABLE trainings(training_name TEXT PRIMARY KEY); CREATE TABLE attendance(staff_id INTEGER,training_name TEXT);\nINSERT INTO staff VALUES(4,'小唐'),(8,'小仪');INSERT INTO trainings VALUES('销售'),('财务');INSERT INTO attendance VALUES(4,'销售'),(8,'销售'),(8,'销售');",
+  "expected": {
+    "columns": [
+      "staff_name",
+      "training_name",
+      "attend_count"
+    ],
+    "rows": [
+      [
+        "小仪",
+        "财务",
+        0
+      ],
+      [
+        "小仪",
+        "销售",
+        2
+      ],
+      [
+        "小唐",
+        "财务",
+        0
+      ],
+      [
+        "小唐",
+        "销售",
+        1
+      ]
+    ]
+  }
+}

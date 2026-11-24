@@ -1,0 +1,37 @@
+{
+  "id": "i027-public",
+  "questionId": "i027",
+  "datasetId": "i027-interview",
+  "visibility": "public",
+  "variant": "public",
+  "kind": "query",
+  "setupSql": "CREATE TABLE payroll(role_no INTEGER PRIMARY KEY,employee_name TEXT NOT NULL,base_pay INTEGER NOT NULL);\nINSERT INTO payroll VALUES (1,'Alice',1000),(2,'Ben',1100),(3,'Mia',1200),(4,'Cindy',1300),(5,'Dan',1400);",
+  "expected": {
+    "columns": [
+      "employee_name",
+      "allowance"
+    ],
+    "rows": [
+      [
+        "Alice",
+        1000
+      ],
+      [
+        "Ben",
+        0
+      ],
+      [
+        "Mia",
+        0
+      ],
+      [
+        "Cindy",
+        0
+      ],
+      [
+        "Dan",
+        1400
+      ]
+    ]
+  }
+}

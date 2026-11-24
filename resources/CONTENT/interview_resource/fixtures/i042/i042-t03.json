@@ -1,0 +1,22 @@
+{
+  "id": "i042-t03",
+  "questionId": "i042",
+  "datasetId": "i042-interview",
+  "visibility": "hidden",
+  "variant": "t03",
+  "kind": "query",
+  "setupSql": "CREATE TABLE products(product_name TEXT PRIMARY KEY,reusable_pack TEXT NOT NULL,low_carbon TEXT NOT NULL);\nINSERT INTO products VALUES('水瓶','Y','Y'),('包装盒','Y','Y');",
+  "expected": {
+    "columns": [
+      "product_name"
+    ],
+    "rows": [
+      [
+        "水瓶"
+      ],
+      [
+        "包装盒"
+      ]
+    ]
+  }
+}

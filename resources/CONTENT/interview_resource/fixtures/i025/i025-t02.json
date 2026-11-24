@@ -1,0 +1,21 @@
+{
+  "id": "i025-t02",
+  "questionId": "i025",
+  "datasetId": "i025-interview",
+  "visibility": "hidden",
+  "variant": "t02",
+  "kind": "query",
+  "setupSql": "CREATE TABLE follows(series_name TEXT NOT NULL,user_code TEXT NOT NULL,PRIMARY KEY(series_name,user_code));\nINSERT INTO follows VALUES ('秋日','U1');",
+  "expected": {
+    "columns": [
+      "series_name",
+      "followers"
+    ],
+    "rows": [
+      [
+        "秋日",
+        1
+      ]
+    ]
+  }
+}

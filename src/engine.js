@@ -339,6 +339,12 @@ export function checkStructure(sql, required = []) {
     const keyNames = keys
       .filter((n) => n.type === "column_ref")
       .map((n) => n.column);
+    // GROUP BY 1, 2 按位置引用 SELECT 列（MySQL 与 SQLite 都支持）：把被引用的普通列也算作分组键。
+    for (const key of keys) {
+      if (key.type !== "number" || !Number.isInteger(key.value)) continue;
+      const target = (select.columns || [])[key.value - 1]?.expr;
+      if (target?.type === "column_ref") keyNames.push(target.column);
+    }
     for (const col of select.columns || []) {
       if (col.expr.type === "column_ref" && !keyNames.includes(col.expr.column))
         return {

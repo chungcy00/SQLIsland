@@ -1,0 +1,29 @@
+{
+  "id": "i041-public",
+  "questionId": "i041",
+  "datasetId": "i041-interview",
+  "visibility": "public",
+  "variant": "public",
+  "kind": "query",
+  "setupSql": "CREATE TABLE staff(staff_no INTEGER PRIMARY KEY,name TEXT NOT NULL);CREATE TABLE codes(staff_no INTEGER PRIMARY KEY,internal_code TEXT NOT NULL);\nINSERT INTO staff VALUES(1,'小唐'),(2,'阿玉'),(3,'小青');INSERT INTO codes VALUES(1,'E100'),(3,'E300');",
+  "expected": {
+    "columns": [
+      "name",
+      "internal_code"
+    ],
+    "rows": [
+      [
+        "小唐",
+        "E100"
+      ],
+      [
+        "阿玉",
+        null
+      ],
+      [
+        "小青",
+        "E300"
+      ]
+    ]
+  }
+}

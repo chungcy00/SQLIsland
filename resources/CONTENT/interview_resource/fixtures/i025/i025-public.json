@@ -1,0 +1,25 @@
+{
+  "id": "i025-public",
+  "questionId": "i025",
+  "datasetId": "i025-interview",
+  "visibility": "public",
+  "variant": "public",
+  "kind": "query",
+  "setupSql": "CREATE TABLE follows(series_name TEXT NOT NULL,user_code TEXT NOT NULL,PRIMARY KEY(series_name,user_code));\nINSERT INTO follows VALUES ('春日','U1'),('春日','U2'),('夏日','U1'),('夏日','U3'),('夏日','U4');",
+  "expected": {
+    "columns": [
+      "series_name",
+      "followers"
+    ],
+    "rows": [
+      [
+        "夏日",
+        3
+      ],
+      [
+        "春日",
+        2
+      ]
+    ]
+  }
+}

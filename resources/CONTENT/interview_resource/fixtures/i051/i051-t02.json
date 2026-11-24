@@ -1,0 +1,16 @@
+{
+  "id": "i051-t02",
+  "questionId": "i051",
+  "datasetId": "i051-interview",
+  "visibility": "hidden",
+  "variant": "t02",
+  "kind": "query",
+  "setupSql": "CREATE TABLE sessions(session_code TEXT PRIMARY KEY,teacher TEXT NOT NULL,coordinator TEXT NOT NULL);\nINSERT INTO sessions VALUES('A01','甲','乙'),('A02','甲','乙'),('A03','甲','丙');",
+  "expected": {
+    "columns": [
+      "teacher",
+      "coordinator"
+    ],
+    "rows": []
+  }
+}

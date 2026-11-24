@@ -1,0 +1,27 @@
+{
+  "id": "i094-t05",
+  "questionId": "i094",
+  "datasetId": "i094-interview",
+  "visibility": "hidden",
+  "variant": "t05",
+  "kind": "database_state",
+  "setupSql": "CREATE TABLE projects(project_code TEXT PRIMARY KEY,project_status TEXT);CREATE TABLE tasks(task_code TEXT PRIMARY KEY,project_code TEXT,task_status TEXT,task_name TEXT);\nINSERT INTO tasks VALUES('A','不存在的项目','待办','未关联项目');",
+  "probes": [],
+  "expectedTable": {
+    "name": "tasks",
+    "columns": [
+      "task_code",
+      "project_code",
+      "task_status",
+      "task_name"
+    ],
+    "rows": [
+      [
+        "A",
+        "不存在的项目",
+        "待办",
+        "未关联项目"
+      ]
+    ]
+  }
+}

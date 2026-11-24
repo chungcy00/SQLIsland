@@ -1,0 +1,45 @@
+{
+  "id": "i028-public",
+  "questionId": "i028",
+  "datasetId": "i028-interview",
+  "visibility": "public",
+  "variant": "public",
+  "kind": "query",
+  "setupSql": "CREATE TABLE payments(payment_no INTEGER PRIMARY KEY,currency TEXT NOT NULL,amount INTEGER NOT NULL,status TEXT NOT NULL,paid_on TEXT NOT NULL);\nINSERT INTO payments VALUES (1,'MYR',100,'approved','2026-01-01'),(2,'MYR',200,'declined','2026-01-15'),(3,'MYR',400,'approved','2026-02-01'),(4,'USD',50,'approved','2026-01-31');",
+  "expected": {
+    "columns": [
+      "month",
+      "currency",
+      "transaction_count",
+      "approved_count",
+      "transaction_total",
+      "approved_total"
+    ],
+    "rows": [
+      [
+        "2026-01",
+        "MYR",
+        2,
+        1,
+        300,
+        100
+      ],
+      [
+        "2026-01",
+        "USD",
+        1,
+        1,
+        50,
+        50
+      ],
+      [
+        "2026-02",
+        "MYR",
+        1,
+        1,
+        400,
+        400
+      ]
+    ]
+  }
+}

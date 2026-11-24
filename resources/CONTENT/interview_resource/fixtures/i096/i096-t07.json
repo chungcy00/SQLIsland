@@ -1,0 +1,37 @@
+{
+  "id": "i096-t07",
+  "questionId": "i096",
+  "datasetId": "i096-interview",
+  "visibility": "hidden",
+  "variant": "t07",
+  "kind": "query",
+  "setupSql": "CREATE TABLE visits(member_name TEXT NOT NULL,visit_day TEXT NOT NULL);\nINSERT INTO visits VALUES('甲','2024-02-28'),('甲','2024-02-29'),('甲','2024-02-29'),('乙','2024-02-28'),('乙','2024-03-01'),('丙','2024-02-29'),('丙','2024-03-01');",
+  "expected": {
+    "columns": [
+      "first_day",
+      "new_members",
+      "returned_next_day",
+      "retention_rate"
+    ],
+    "rows": [
+      [
+        "2024-02-28",
+        2,
+        1,
+        0.5
+      ],
+      [
+        "2024-02-29",
+        1,
+        1,
+        1.0
+      ],
+      [
+        "2024-03-01",
+        0,
+        0,
+        0.0
+      ]
+    ]
+  }
+}

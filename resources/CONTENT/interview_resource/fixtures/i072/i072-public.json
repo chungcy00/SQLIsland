@@ -1,0 +1,21 @@
+{
+  "id": "i072-public",
+  "questionId": "i072",
+  "datasetId": "i072-interview",
+  "visibility": "public",
+  "variant": "public",
+  "kind": "query",
+  "setupSql": "CREATE TABLE logins(customer TEXT NOT NULL,login_at TEXT NOT NULL);\nINSERT INTO logins VALUES('小艾','2024-12-31 23:59:59'),('小艾','2025-05-02 08:10:00'),('小艾','2025-12-30 12:00:00'),('小林','2026-01-01 00:00:00');",
+  "expected": {
+    "columns": [
+      "customer",
+      "last_login"
+    ],
+    "rows": [
+      [
+        "小艾",
+        "2025-12-30 12:00:00"
+      ]
+    ]
+  }
+}

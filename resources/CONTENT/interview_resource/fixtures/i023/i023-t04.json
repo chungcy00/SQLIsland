@@ -1,0 +1,19 @@
+{
+  "id": "i023-t04",
+  "questionId": "i023",
+  "datasetId": "i023-interview",
+  "visibility": "hidden",
+  "variant": "t04",
+  "kind": "query",
+  "setupSql": "CREATE TABLE feedback(feedback_no INTEGER PRIMARY KEY,content TEXT NOT NULL);\nINSERT INTO feedback VALUES (1,'1234567890123456'),(2,'a'),(3,'123456789012345');",
+  "expected": {
+    "columns": [
+      "content"
+    ],
+    "rows": [
+      [
+        "1234567890123456"
+      ]
+    ]
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "id": "i071-t03",
+  "questionId": "i071",
+  "datasetId": "i071-interview",
+  "visibility": "hidden",
+  "variant": "t03",
+  "kind": "query",
+  "setupSql": "CREATE TABLE assignments(project TEXT,employee TEXT,PRIMARY KEY(project,employee));CREATE TABLE staff(employee TEXT PRIMARY KEY,years INTEGER NOT NULL);\nINSERT INTO staff VALUES('甲',3),('乙',4),('丙',8);INSERT INTO assignments VALUES('甲组','甲'),('甲组','丙'),('乙组','乙'),('乙组','丙');",
+  "expected": {
+    "columns": [
+      "project",
+      "avg_years"
+    ],
+    "rows": [
+      [
+        "乙组",
+        6.0
+      ],
+      [
+        "甲组",
+        5.5
+      ]
+    ]
+  }
+}

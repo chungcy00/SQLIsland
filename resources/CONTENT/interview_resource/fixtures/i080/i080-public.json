@@ -1,0 +1,21 @@
+{
+  "id": "i080-public",
+  "questionId": "i080",
+  "datasetId": "i080-interview",
+  "visibility": "public",
+  "variant": "public",
+  "kind": "query",
+  "setupSql": "CREATE TABLE reviews(employee TEXT,review_day TEXT,score INTEGER,PRIMARY KEY(employee,review_day));\nINSERT INTO reviews VALUES('甲','2026-01-01',2),('甲','2026-02-01',3),('甲','2026-03-01',4),('乙','2026-01-01',2),('乙','2026-02-01',2),('乙','2026-03-01',4);",
+  "expected": {
+    "columns": [
+      "employee",
+      "improvement_score"
+    ],
+    "rows": [
+      [
+        "甲",
+        2
+      ]
+    ]
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "id": "i059-t03",
+  "questionId": "i059",
+  "datasetId": "i059-interview",
+  "visibility": "hidden",
+  "variant": "t03",
+  "kind": "query",
+  "setupSql": "CREATE TABLE managers(manager TEXT PRIMARY KEY,joined_day TEXT NOT NULL);CREATE TABLE orders(order_code TEXT PRIMARY KEY,manager TEXT NOT NULL,order_day TEXT NOT NULL);\nINSERT INTO managers VALUES('甲','2025-01-01');INSERT INTO orders VALUES('A1','甲','2025-01-01'),('A2','甲','2027-01-01');",
+  "expected": {
+    "columns": [
+      "manager",
+      "joined_day",
+      "orders_2026"
+    ],
+    "rows": [
+      [
+        "甲",
+        "2025-01-01",
+        0
+      ]
+    ]
+  }
+}

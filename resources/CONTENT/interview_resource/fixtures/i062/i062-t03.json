@@ -1,0 +1,22 @@
+{
+  "id": "i062-t03",
+  "questionId": "i062",
+  "datasetId": "i062-interview",
+  "visibility": "hidden",
+  "variant": "t03",
+  "kind": "query",
+  "setupSql": "CREATE TABLE enrolments(student TEXT NOT NULL,course TEXT NOT NULL,PRIMARY KEY(student,course));\nINSERT INTO enrolments VALUES('甲','A'),('乙','A'),('丙','A'),('丁','A'),('戊','A'),('甲','B'),('乙','B'),('丙','B'),('丁','B'),('戊','B');",
+  "expected": {
+    "columns": [
+      "course"
+    ],
+    "rows": [
+      [
+        "A"
+      ],
+      [
+        "B"
+      ]
+    ]
+  }
+}

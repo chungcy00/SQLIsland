@@ -1,0 +1,21 @@
+{
+  "id": "i051-public",
+  "questionId": "i051",
+  "datasetId": "i051-interview",
+  "visibility": "public",
+  "variant": "public",
+  "kind": "query",
+  "setupSql": "CREATE TABLE sessions(session_code TEXT PRIMARY KEY,teacher TEXT NOT NULL,coordinator TEXT NOT NULL);\nINSERT INTO sessions VALUES('A01','林老师','小乔'),('A02','林老师','小乔'),('A03','林老师','小乔'),('A04','林老师','小雨'),('A05','陈老师','小乔');",
+  "expected": {
+    "columns": [
+      "teacher",
+      "coordinator"
+    ],
+    "rows": [
+      [
+        "林老师",
+        "小乔"
+      ]
+    ]
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "id": "i016-t02",
+  "questionId": "i016",
+  "datasetId": "i016-interview",
+  "visibility": "hidden",
+  "variant": "t02",
+  "kind": "query",
+  "setupSql": "CREATE TABLE items(item_code INTEGER PRIMARY KEY,product_name TEXT NOT NULL); CREATE TABLE trade_lines(trade_no INTEGER PRIMARY KEY,item_code INTEGER NOT NULL,year INTEGER NOT NULL,price INTEGER NOT NULL);\nINSERT INTO items VALUES (1,'茶杯'); INSERT INTO trade_lines VALUES (1,1,2025,10),(2,1,2025,10);",
+  "expected": {
+    "columns": [
+      "product_name",
+      "year",
+      "price"
+    ],
+    "rows": [
+      [
+        "茶杯",
+        2025,
+        10
+      ],
+      [
+        "茶杯",
+        2025,
+        10
+      ]
+    ]
+  }
+}

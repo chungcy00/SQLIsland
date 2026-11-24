@@ -1,0 +1,25 @@
+{
+  "id": "i060-t04",
+  "questionId": "i060",
+  "datasetId": "i060-interview",
+  "visibility": "hidden",
+  "variant": "t04",
+  "kind": "query",
+  "setupSql": "CREATE TABLE movements(product_name TEXT NOT NULL,direction TEXT NOT NULL CHECK(direction IN ('入库','出库')),units INT NOT NULL CHECK(units>0));\nINSERT INTO movements VALUES('A','入库',10),('A','出库',10),('B','入库',1);",
+  "expected": {
+    "columns": [
+      "product_name",
+      "net_units"
+    ],
+    "rows": [
+      [
+        "A",
+        0
+      ],
+      [
+        "B",
+        1
+      ]
+    ]
+  }
+}

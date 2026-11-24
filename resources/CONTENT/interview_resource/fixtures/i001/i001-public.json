@@ -1,0 +1,22 @@
+{
+  "id": "i001-public",
+  "questionId": "i001",
+  "datasetId": "i001-interview",
+  "visibility": "public",
+  "variant": "public",
+  "kind": "query",
+  "setupSql": "CREATE TABLE members(member_id INTEGER PRIMARY KEY, phone TEXT NOT NULL);\nINSERT INTO members VALUES (1,'012100'),(2,'013200'),(3,'012100'),(4,'014300'),(5,'013200');",
+  "expected": {
+    "columns": [
+      "phone"
+    ],
+    "rows": [
+      [
+        "012100"
+      ],
+      [
+        "013200"
+      ]
+    ]
+  }
+}

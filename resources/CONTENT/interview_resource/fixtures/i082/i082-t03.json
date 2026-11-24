@@ -1,0 +1,28 @@
+{
+  "id": "i082-t03",
+  "questionId": "i082",
+  "datasetId": "i082-interview",
+  "visibility": "hidden",
+  "variant": "t03",
+  "kind": "query",
+  "setupSql": "CREATE TABLE sales(day TEXT,product TEXT,amount INTEGER);\nINSERT INTO sales VALUES('2026-10-01','纸',20),('2026-12-31','墨',21),('2026-09-30','纸',30);",
+  "expected": {
+    "columns": [
+      "quarter",
+      "product",
+      "total_sales"
+    ],
+    "rows": [
+      [
+        3,
+        "纸",
+        30
+      ],
+      [
+        4,
+        "墨",
+        21
+      ]
+    ]
+  }
+}

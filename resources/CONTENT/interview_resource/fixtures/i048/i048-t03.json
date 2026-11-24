@@ -1,0 +1,33 @@
+{
+  "id": "i048-t03",
+  "questionId": "i048",
+  "datasetId": "i048-interview",
+  "visibility": "hidden",
+  "variant": "t03",
+  "kind": "query",
+  "setupSql": "CREATE TABLE roster(position_no INTEGER PRIMARY KEY,staff_name TEXT NOT NULL);\nINSERT INTO roster VALUES(1,'甲'),(2,'乙'),(3,'丙'),(4,'丁');",
+  "expected": {
+    "columns": [
+      "position_no",
+      "staff_name"
+    ],
+    "rows": [
+      [
+        1,
+        "乙"
+      ],
+      [
+        2,
+        "甲"
+      ],
+      [
+        3,
+        "丁"
+      ],
+      [
+        4,
+        "丙"
+      ]
+    ]
+  }
+}

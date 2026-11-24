@@ -1,0 +1,25 @@
+{
+  "id": "i039-t02",
+  "questionId": "i039",
+  "datasetId": "i039-interview",
+  "visibility": "hidden",
+  "variant": "t02",
+  "kind": "query",
+  "setupSql": "CREATE TABLE members(member_id INTEGER PRIMARY KEY,member_name TEXT NOT NULL);CREATE TABLE requests(member_id INTEGER,status TEXT NOT NULL);\nINSERT INTO members VALUES(1,'阿芬'),(2,'小力');",
+  "expected": {
+    "columns": [
+      "member_name",
+      "confirmation_rate"
+    ],
+    "rows": [
+      [
+        "阿芬",
+        0.0
+      ],
+      [
+        "小力",
+        0.0
+      ]
+    ]
+  }
+}

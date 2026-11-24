@@ -1,0 +1,23 @@
+{
+  "id": "i086-t05",
+  "questionId": "i086",
+  "datasetId": "i086-interview",
+  "visibility": "hidden",
+  "variant": "t05",
+  "kind": "query",
+  "setupSql": "CREATE TABLE inventory(store TEXT,product TEXT,stock INTEGER CHECK(stock>0),PRIMARY KEY(store,product));\nINSERT INTO inventory VALUES('甲','甲商品',5),('甲','乙商品',10),('乙','甲商品',5),('乙','乙商品',11);",
+  "expected": {
+    "columns": [
+      "store",
+      "max_stock",
+      "min_stock"
+    ],
+    "rows": [
+      [
+        "乙",
+        11,
+        5
+      ]
+    ]
+  }
+}

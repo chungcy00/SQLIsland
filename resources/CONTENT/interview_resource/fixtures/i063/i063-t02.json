@@ -1,0 +1,19 @@
+{
+  "id": "i063-t02",
+  "questionId": "i063",
+  "datasetId": "i063-interview",
+  "visibility": "hidden",
+  "variant": "t02",
+  "kind": "query",
+  "setupSql": "CREATE TABLE amounts(amount INTEGER NOT NULL);\nINSERT INTO amounts VALUES(100),(100),(200),(200);",
+  "expected": {
+    "columns": [
+      "max_unique_amount"
+    ],
+    "rows": [
+      [
+        null
+      ]
+    ]
+  }
+}

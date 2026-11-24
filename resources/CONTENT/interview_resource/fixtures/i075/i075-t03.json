@@ -1,0 +1,21 @@
+{
+  "id": "i075-t03",
+  "questionId": "i075",
+  "datasetId": "i075-interview",
+  "visibility": "hidden",
+  "variant": "t03",
+  "kind": "query",
+  "setupSql": "CREATE TABLE catalog(product TEXT PRIMARY KEY,description TEXT NOT NULL);\nINSERT INTO catalog VALUES('甲','无效 BT1234-12 有效 BT0000-1111'),('乙','BT1234-5678,完好'),('丙','BTabcd-5678');",
+  "expected": {
+    "columns": [
+      "product",
+      "description"
+    ],
+    "rows": [
+      [
+        "甲",
+        "无效 BT1234-12 有效 BT0000-1111"
+      ]
+    ]
+  }
+}

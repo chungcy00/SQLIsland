@@ -1,0 +1,23 @@
+{
+  "id": "i087-t05",
+  "questionId": "i087",
+  "datasetId": "i087-interview",
+  "visibility": "hidden",
+  "variant": "t05",
+  "kind": "query",
+  "setupSql": "CREATE TABLE reviews(product TEXT,stars INTEGER CHECK(stars BETWEEN 1 AND 5));\nINSERT INTO reviews VALUES('甲',1),('甲',1),('甲',1),('甲',1),('甲',3),('乙',1),('乙',5),('乙',5),('乙',4),('乙',4);",
+  "expected": {
+    "columns": [
+      "product",
+      "review_count",
+      "extreme_pct"
+    ],
+    "rows": [
+      [
+        "乙",
+        5,
+        60.0
+      ]
+    ]
+  }
+}

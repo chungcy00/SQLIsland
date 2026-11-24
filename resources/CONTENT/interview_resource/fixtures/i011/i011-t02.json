@@ -1,0 +1,25 @@
+{
+  "id": "i011-t02",
+  "questionId": "i011",
+  "datasetId": "i011-interview",
+  "visibility": "hidden",
+  "variant": "t02",
+  "kind": "query",
+  "setupSql": "CREATE TABLE staff(staff_id INTEGER PRIMARY KEY,name TEXT NOT NULL); CREATE TABLE rewards(staff_id INTEGER PRIMARY KEY,bonus INTEGER);\nINSERT INTO staff VALUES (1,'晨晨'),(2,'林林');",
+  "expected": {
+    "columns": [
+      "name",
+      "bonus"
+    ],
+    "rows": [
+      [
+        "晨晨",
+        null
+      ],
+      [
+        "林林",
+        null
+      ]
+    ]
+  }
+}

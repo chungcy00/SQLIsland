@@ -1,0 +1,19 @@
+{
+  "id": "i029-public",
+  "questionId": "i029",
+  "datasetId": "i029-interview",
+  "visibility": "public",
+  "variant": "public",
+  "kind": "query",
+  "setupSql": "CREATE TABLE deliveries(delivery_no INTEGER PRIMARY KEY,customer TEXT NOT NULL,ordered_on TEXT NOT NULL,wanted_on TEXT NOT NULL,delivered_on TEXT NOT NULL);\nINSERT INTO deliveries VALUES (1,'甲','2026-02-01','2026-02-02','2026-02-02'),(2,'甲','2026-02-05','2026-02-05','2026-02-06'),(3,'乙','2026-02-03','2026-02-03','2026-02-04'),(4,'丙','2026-02-02','2026-02-02','2026-02-02');",
+  "expected": {
+    "columns": [
+      "ontime_rate"
+    ],
+    "rows": [
+      [
+        66.67
+      ]
+    ]
+  }
+}

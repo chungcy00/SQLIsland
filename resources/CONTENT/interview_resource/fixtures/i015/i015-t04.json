@@ -1,0 +1,19 @@
+{
+  "id": "i015-t04",
+  "questionId": "i015",
+  "datasetId": "i015-interview",
+  "visibility": "hidden",
+  "variant": "t04",
+  "kind": "query",
+  "setupSql": "CREATE TABLE report_views(report_id INTEGER NOT NULL,author_name TEXT NOT NULL,viewer_name TEXT NOT NULL,viewed_at TEXT NOT NULL);\nINSERT INTO report_views VALUES (1,'小华','小明','2026-02-01'),(2,'小明','小明','2026-02-02');",
+  "expected": {
+    "columns": [
+      "analyst_name"
+    ],
+    "rows": [
+      [
+        "小明"
+      ]
+    ]
+  }
+}

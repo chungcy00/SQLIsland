@@ -1,0 +1,17 @@
+{
+  "id": "i073-t02",
+  "questionId": "i073",
+  "datasetId": "i073-interview",
+  "visibility": "hidden",
+  "variant": "t02",
+  "kind": "query",
+  "setupSql": "CREATE TABLE requests(customer TEXT NOT NULL,units INTEGER NOT NULL);\nINSERT INTO requests VALUES('甲',2),('甲',20);",
+  "expected": {
+    "columns": [
+      "customer",
+      "request_count",
+      "avg_units"
+    ],
+    "rows": []
+  }
+}

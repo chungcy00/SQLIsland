@@ -1,0 +1,29 @@
+{
+  "id": "i027-t02",
+  "questionId": "i027",
+  "datasetId": "i027-interview",
+  "visibility": "hidden",
+  "variant": "t02",
+  "kind": "query",
+  "setupSql": "CREATE TABLE payroll(role_no INTEGER PRIMARY KEY,employee_name TEXT NOT NULL,base_pay INTEGER NOT NULL);\nINSERT INTO payroll VALUES (1,'matt',100),(3,'Mark',200),(5,'May',300);",
+  "expected": {
+    "columns": [
+      "employee_name",
+      "allowance"
+    ],
+    "rows": [
+      [
+        "matt",
+        0
+      ],
+      [
+        "Mark",
+        0
+      ],
+      [
+        "May",
+        0
+      ]
+    ]
+  }
+}

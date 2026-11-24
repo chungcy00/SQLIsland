@@ -1,0 +1,21 @@
+{
+  "id": "i080-t03",
+  "questionId": "i080",
+  "datasetId": "i080-interview",
+  "visibility": "hidden",
+  "variant": "t03",
+  "kind": "query",
+  "setupSql": "CREATE TABLE reviews(employee TEXT,review_day TEXT,score INTEGER,PRIMARY KEY(employee,review_day));\nINSERT INTO reviews VALUES('甲','2026-01-01',9),('甲','2026-02-01',1),('甲','2026-03-01',2),('甲','2026-04-01',3);",
+  "expected": {
+    "columns": [
+      "employee",
+      "improvement_score"
+    ],
+    "rows": [
+      [
+        "甲",
+        2
+      ]
+    ]
+  }
+}

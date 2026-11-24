@@ -1,0 +1,19 @@
+{
+  "id": "i049-public",
+  "questionId": "i049",
+  "datasetId": "i049-interview",
+  "visibility": "public",
+  "variant": "public",
+  "kind": "query",
+  "setupSql": "CREATE TABLE checks(sample_no INTEGER PRIMARY KEY,result_code TEXT NOT NULL);\nINSERT INTO checks VALUES(1,'A'),(2,'A'),(3,'A'),(4,'B'),(5,'B'),(6,'A');",
+  "expected": {
+    "columns": [
+      "result_code"
+    ],
+    "rows": [
+      [
+        "A"
+      ]
+    ]
+  }
+}

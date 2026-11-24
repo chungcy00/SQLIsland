@@ -1,0 +1,25 @@
+{
+  "id": "i003-t02",
+  "questionId": "i003",
+  "datasetId": "i003-interview",
+  "visibility": "hidden",
+  "variant": "t02",
+  "kind": "query",
+  "setupSql": "CREATE TABLE customers(customer_id INTEGER PRIMARY KEY,customer_name TEXT NOT NULL); CREATE TABLE shipping(address_id INTEGER PRIMARY KEY,customer_id INTEGER UNIQUE,city TEXT);\nINSERT INTO customers VALUES (1,'甲'),(2,'乙');",
+  "expected": {
+    "columns": [
+      "customer_name",
+      "city"
+    ],
+    "rows": [
+      [
+        "甲",
+        null
+      ],
+      [
+        "乙",
+        null
+      ]
+    ]
+  }
+}

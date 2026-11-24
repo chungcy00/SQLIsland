@@ -1,0 +1,19 @@
+{
+  "id": "i047-t04",
+  "questionId": "i047",
+  "datasetId": "i047-interview",
+  "visibility": "hidden",
+  "variant": "t04",
+  "kind": "query",
+  "setupSql": "CREATE TABLE visits(member_name TEXT NOT NULL,visit_date TEXT NOT NULL,PRIMARY KEY(member_name,visit_date));\nINSERT INTO visits VALUES('小青','2025-12-31'),('小青','2026-01-01'),('小白','2026-02-28'),('小白','2026-03-01'),('小明','2026-05-01');",
+  "expected": {
+    "columns": [
+      "next_day_retention"
+    ],
+    "rows": [
+      [
+        0.67
+      ]
+    ]
+  }
+}

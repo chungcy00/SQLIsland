@@ -1,0 +1,19 @@
+{
+  "id": "i063-public",
+  "questionId": "i063",
+  "datasetId": "i063-interview",
+  "visibility": "public",
+  "variant": "public",
+  "kind": "query",
+  "setupSql": "CREATE TABLE amounts(amount INTEGER NOT NULL);\nINSERT INTO amounts VALUES(900),(900),(450),(300),(300),(120);",
+  "expected": {
+    "columns": [
+      "max_unique_amount"
+    ],
+    "rows": [
+      [
+        450
+      ]
+    ]
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "id": "i068-t04",
+  "questionId": "i068",
+  "datasetId": "i068-interview",
+  "visibility": "hidden",
+  "variant": "t04",
+  "kind": "query",
+  "setupSql": "CREATE TABLE policies(policy_code TEXT PRIMARY KEY,premium_old REAL NOT NULL,premium_new REAL NOT NULL,x INTEGER NOT NULL,y INTEGER NOT NULL);\nINSERT INTO policies VALUES('P1',5,10.10,1,1),('P2',5,20.20,1,1),('P3',5,30.30,2,2);",
+  "expected": {
+    "columns": [
+      "total_premium"
+    ],
+    "rows": [
+      [
+        30.3
+      ]
+    ]
+  }
+}

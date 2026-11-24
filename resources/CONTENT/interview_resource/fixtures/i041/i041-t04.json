@@ -1,0 +1,21 @@
+{
+  "id": "i041-t04",
+  "questionId": "i041",
+  "datasetId": "i041-interview",
+  "visibility": "hidden",
+  "variant": "t04",
+  "kind": "query",
+  "setupSql": "CREATE TABLE staff(staff_no INTEGER PRIMARY KEY,name TEXT NOT NULL);CREATE TABLE codes(staff_no INTEGER PRIMARY KEY,internal_code TEXT NOT NULL);\nINSERT INTO staff VALUES(7,'小赵');INSERT INTO codes VALUES(8,'M80');",
+  "expected": {
+    "columns": [
+      "name",
+      "internal_code"
+    ],
+    "rows": [
+      [
+        "小赵",
+        null
+      ]
+    ]
+  }
+}

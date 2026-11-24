@@ -1,0 +1,23 @@
+{
+  "id": "i031-t02",
+  "questionId": "i031",
+  "datasetId": "i031-interview",
+  "visibility": "hidden",
+  "variant": "t02",
+  "kind": "query",
+  "setupSql": "CREATE TABLE search_logs(search_term TEXT NOT NULL, score INTEGER NOT NULL, position INTEGER NOT NULL);\nINSERT INTO search_logs VALUES ('护肤',5,1),('护肤',4,2);",
+  "expected": {
+    "columns": [
+      "search_term",
+      "quality",
+      "poor_percentage"
+    ],
+    "rows": [
+      [
+        "护肤",
+        3.5,
+        0.0
+      ]
+    ]
+  }
+}

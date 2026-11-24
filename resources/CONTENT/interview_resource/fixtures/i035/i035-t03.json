@@ -1,0 +1,21 @@
+{
+  "id": "i035-t03",
+  "questionId": "i035",
+  "datasetId": "i035-interview",
+  "visibility": "hidden",
+  "variant": "t03",
+  "kind": "query",
+  "setupSql": "CREATE TABLE staff(staff_id INTEGER PRIMARY KEY,staff_name TEXT NOT NULL UNIQUE);CREATE TABLE trips(staff_id INTEGER,km INTEGER NOT NULL);\nINSERT INTO staff VALUES(1,'阿山');INSERT INTO trips VALUES(1,1),(1,2),(1,4);",
+  "expected": {
+    "columns": [
+      "staff_name",
+      "total_km"
+    ],
+    "rows": [
+      [
+        "阿山",
+        7
+      ]
+    ]
+  }
+}

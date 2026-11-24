@@ -1,0 +1,17 @@
+{
+  "id": "i016-t04",
+  "questionId": "i016",
+  "datasetId": "i016-interview",
+  "visibility": "hidden",
+  "variant": "t04",
+  "kind": "query",
+  "setupSql": "CREATE TABLE items(item_code INTEGER PRIMARY KEY,product_name TEXT NOT NULL); CREATE TABLE trade_lines(trade_no INTEGER PRIMARY KEY,item_code INTEGER NOT NULL,year INTEGER NOT NULL,price INTEGER NOT NULL);\nINSERT INTO items VALUES (1,'A');",
+  "expected": {
+    "columns": [
+      "product_name",
+      "year",
+      "price"
+    ],
+    "rows": []
+  }
+}

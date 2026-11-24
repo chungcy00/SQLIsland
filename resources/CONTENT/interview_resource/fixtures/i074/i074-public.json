@@ -1,0 +1,21 @@
+{
+  "id": "i074-public",
+  "questionId": "i074",
+  "datasetId": "i074-interview",
+  "visibility": "public",
+  "variant": "public",
+  "kind": "query",
+  "setupSql": "CREATE TABLE contacts(agent TEXT PRIMARY KEY,email TEXT NOT NULL);\nINSERT INTO contacts VALUES('甲','amy_1@desk.com'),('乙','9amy@desk.com'),('丙','amy@desk.org');",
+  "expected": {
+    "columns": [
+      "agent",
+      "email"
+    ],
+    "rows": [
+      [
+        "甲",
+        "amy_1@desk.com"
+      ]
+    ]
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "id": "i055-t03",
+  "questionId": "i055",
+  "datasetId": "i055-interview",
+  "visibility": "hidden",
+  "variant": "t03",
+  "kind": "query",
+  "setupSql": "CREATE TABLE customers(customer_name TEXT PRIMARY KEY);CREATE TABLE ledger(customer_name TEXT NOT NULL,change_amount INT NOT NULL);\nINSERT INTO customers VALUES('甲');INSERT INTO ledger VALUES('甲',14000),('甲',-5000);",
+  "expected": {
+    "columns": [
+      "customer_name",
+      "balance"
+    ],
+    "rows": []
+  }
+}

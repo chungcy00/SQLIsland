@@ -1,0 +1,33 @@
+{
+  "id": "i010-public",
+  "questionId": "i010",
+  "datasetId": "i010-interview",
+  "visibility": "public",
+  "variant": "public",
+  "kind": "query",
+  "setupSql": "CREATE TABLE departments(dept_id INTEGER PRIMARY KEY,department_name TEXT NOT NULL); CREATE TABLE staff(employee_id INTEGER PRIMARY KEY,employee_name TEXT NOT NULL,dept_id INTEGER NOT NULL,bonus INTEGER NOT NULL);\nINSERT INTO departments VALUES (1,'采购'),(2,'客服'),(3,'行政'); INSERT INTO staff VALUES (11,'甲',1,800),(12,'乙',1,800),(13,'丙',1,600),(21,'丁',2,500),(22,'戊',2,700);",
+  "expected": {
+    "columns": [
+      "department_name",
+      "employee_name",
+      "bonus"
+    ],
+    "rows": [
+      [
+        "采购",
+        "甲",
+        800
+      ],
+      [
+        "采购",
+        "乙",
+        800
+      ],
+      [
+        "客服",
+        "戊",
+        700
+      ]
+    ]
+  }
+}

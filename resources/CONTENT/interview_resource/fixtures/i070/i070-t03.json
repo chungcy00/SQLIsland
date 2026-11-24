@@ -1,0 +1,19 @@
+{
+  "id": "i070-t03",
+  "questionId": "i070",
+  "datasetId": "i070-interview",
+  "visibility": "hidden",
+  "variant": "t03",
+  "kind": "query",
+  "setupSql": "CREATE TABLE quotes(price INTEGER NOT NULL);CREATE TABLE params(n INTEGER NOT NULL CHECK(n>=1));\nINSERT INTO quotes VALUES(1),(5),(3);INSERT INTO params VALUES(1);",
+  "expected": {
+    "columns": [
+      "nth_price"
+    ],
+    "rows": [
+      [
+        5
+      ]
+    ]
+  }
+}

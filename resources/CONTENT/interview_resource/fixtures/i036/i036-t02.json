@@ -1,0 +1,28 @@
+{
+  "id": "i036-t02",
+  "questionId": "i036",
+  "datasetId": "i036-interview",
+  "visibility": "hidden",
+  "variant": "t02",
+  "kind": "query",
+  "setupSql": "CREATE TABLE daily_sales(sale_date TEXT NOT NULL,item_name TEXT NOT NULL);\nINSERT INTO daily_sales VALUES('2026-04-02','笔'),('2026-04-03','水杯');",
+  "expected": {
+    "columns": [
+      "sale_date",
+      "item_count",
+      "item_names"
+    ],
+    "rows": [
+      [
+        "2026-04-02",
+        1,
+        "笔"
+      ],
+      [
+        "2026-04-03",
+        1,
+        "水杯"
+      ]
+    ]
+  }
+}

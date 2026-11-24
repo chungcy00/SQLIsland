@@ -1,0 +1,25 @@
+{
+  "id": "i024-t03",
+  "questionId": "i024",
+  "datasetId": "i024-interview",
+  "visibility": "hidden",
+  "variant": "t03",
+  "kind": "query",
+  "setupSql": "CREATE TABLE channel_log(contact_day TEXT,channel TEXT,enquiry TEXT,partner TEXT);\nINSERT INTO channel_log VALUES ('2026-11-04','网页','E1','P1'),('2026-11-04','网页','E1','P1'),('2026-11-04','网页','E1','P1');",
+  "expected": {
+    "columns": [
+      "contact_day",
+      "channel",
+      "enquiry_count",
+      "partner_count"
+    ],
+    "rows": [
+      [
+        "2026-11-04",
+        "网页",
+        1,
+        1
+      ]
+    ]
+  }
+}

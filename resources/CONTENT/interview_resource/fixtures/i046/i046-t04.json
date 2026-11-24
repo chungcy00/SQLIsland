@@ -1,0 +1,25 @@
+{
+  "id": "i046-t04",
+  "questionId": "i046",
+  "datasetId": "i046-interview",
+  "visibility": "hidden",
+  "variant": "t04",
+  "kind": "query",
+  "setupSql": "CREATE TABLE teaching(teacher_name TEXT NOT NULL,course_name TEXT NOT NULL,location_name TEXT NOT NULL);\nINSERT INTO teaching VALUES('甲','统计','A'),('乙','统计','B'),('乙','查询','B');",
+  "expected": {
+    "columns": [
+      "teacher_name",
+      "course_count"
+    ],
+    "rows": [
+      [
+        "乙",
+        2
+      ],
+      [
+        "甲",
+        1
+      ]
+    ]
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "id": "i040-public",
+  "questionId": "i040",
+  "datasetId": "i040-interview",
+  "visibility": "public",
+  "variant": "public",
+  "kind": "query",
+  "setupSql": "CREATE TABLE price_changes(product_name TEXT NOT NULL,new_price INTEGER NOT NULL,change_date TEXT NOT NULL,PRIMARY KEY(product_name,change_date));\nINSERT INTO price_changes VALUES('纸巾',20,'2026-05-10'),('纸巾',25,'2026-05-16'),('牛奶',35,'2026-05-20'),('茶叶',12,'2026-05-01');",
+  "expected": {
+    "columns": [
+      "product_name",
+      "effective_price"
+    ],
+    "rows": [
+      [
+        "牛奶",
+        10
+      ],
+      [
+        "纸巾",
+        25
+      ],
+      [
+        "茶叶",
+        12
+      ]
+    ]
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "id": "i057-public",
+  "questionId": "i057",
+  "datasetId": "i057-interview",
+  "visibility": "public",
+  "variant": "public",
+  "kind": "query",
+  "setupSql": "CREATE TABLE categories(category TEXT PRIMARY KEY);CREATE TABLE purchases(buyer TEXT NOT NULL,category TEXT NOT NULL);\nINSERT INTO categories VALUES('纸品'),('餐具');INSERT INTO purchases VALUES('小林','纸品'),('小林','餐具'),('小林','纸品'),('小乔','纸品');",
+  "expected": {
+    "columns": [
+      "buyer"
+    ],
+    "rows": [
+      [
+        "小林"
+      ]
+    ]
+  }
+}

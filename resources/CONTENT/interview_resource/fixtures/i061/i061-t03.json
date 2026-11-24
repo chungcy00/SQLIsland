@@ -1,0 +1,25 @@
+{
+  "id": "i061-t03",
+  "questionId": "i061",
+  "datasetId": "i061-interview",
+  "visibility": "hidden",
+  "variant": "t03",
+  "kind": "query",
+  "setupSql": "CREATE TABLE profiles(customer_name TEXT PRIMARY KEY,tags TEXT NOT NULL);\nINSERT INTO profiles VALUES('甲','VIP ALLG99'),('乙','VIP ALLG');",
+  "expected": {
+    "columns": [
+      "customer_name",
+      "tags"
+    ],
+    "rows": [
+      [
+        "甲",
+        "VIP ALLG99"
+      ],
+      [
+        "乙",
+        "VIP ALLG"
+      ]
+    ]
+  }
+}

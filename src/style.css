@@ -3356,3 +3356,40 @@ nav .nav-svg { color: var(--primary); }
 /* 随手翻/卡片库翻面后：评分行与“复制为个人卡片”之间留出间距 */
 .fc-open .rating { margin: 0 0 16px; }
 .fc-open .rating + .actions { margin-top: 0; }
+
+/* 面试刷题 */
+.interview-card { display: block; width: 100%; margin: 12px 0; padding: 16px; text-align: left; background: var(--surface, #fff); color: inherit; border: 1px solid var(--line, #cfe0ea); border-radius: 18px; font-weight: 400; }
+.interview-card-head { display: flex; align-items: center; gap: 10px; }
+.interview-card-head strong { flex: 1; font-size: 1.0625rem; }
+.interview-card-head .icon { width: 22px; height: 22px; }
+.interview-card-sub { display: block; margin: 8px 0 12px; color: var(--muted); line-height: 1.5; }
+.interview-card-foot { display: flex; justify-content: space-between; align-items: center; color: var(--muted); font-size: .8125rem; }
+.interview-card-foot b { display: inline-flex; align-items: center; gap: 4px; color: var(--primary); font-weight: 600; }
+.interview-card-foot .icon { width: 14px; height: 14px; }
+.interview-card .progress { display: block; margin: 12px 0 0; }
+.interview-intro { margin: 0 0 12px; font-size: .8125rem; line-height: 1.6; }
+.interview-topic { color: var(--muted); display: block; margin-top: 2px; }
+.interview-list .link-row h3 { margin: 4px 0 0; }
+.interview-lessons { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: -6px 0 14px; }
+.interview-lessons small { color: var(--muted); font-size: .75rem; }
+.interview-note { font-size: .75rem; line-height: 1.6; margin: 8px 0 0; }
+.iv-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 2px 0 6px; }
+.iv-meta small { margin-left: auto; color: var(--muted); font-variant-numeric: tabular-nums; }
+.iv-chapter { color: var(--muted); font-size: .8125rem; }
+.iv-ref { margin: 0 0 8px; color: var(--muted); font-size: .75rem; }
+.iv-section { margin: 18px 0 0; }
+.iv-section h2 { font-size: 1rem; margin: 0 0 8px; }
+.iv-section p { margin: 0 0 8px; line-height: 1.7; }
+.iv-section .iv-caption { color: var(--muted); font-size: .8125rem; }
+.iv-fields { margin: 0 0 10px; }
+.iv-fields td:first-child, .iv-fields th:first-child { white-space: nowrap; }
+.iv-order b { margin-right: 8px; }
+.iv-schema h4 { margin: 12px 0 6px; font-size: .8125rem; color: var(--muted); }
+.iv-section .source-table { margin-top: 0; }
+/* SQL 键盘：26 键字母布局与底部固定编辑键 */
+.keypad.keypad-letters { flex-direction: column; flex-wrap: nowrap; gap: 6px; }
+.keypad .key-row { display: flex; justify-content: center; gap: 5px; }
+.keypad .key-row button { flex: 1 1 0; max-width: 11%; padding: 8px 0; }
+.keypad-fixed { display: flex; gap: 6px; flex: none; padding: 6px 8px 8px; background: var(--lake); border-top: 1px solid var(--line); }
+.keypad-fixed button { flex: 1; min-height: 42px; background: var(--surface); border-radius: 7px; font-size: 0.8125rem; }
+.keypad-fixed button:first-child { flex: 2.4; }

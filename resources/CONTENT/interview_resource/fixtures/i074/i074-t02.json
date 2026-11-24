@@ -1,0 +1,21 @@
+{
+  "id": "i074-t02",
+  "questionId": "i074",
+  "datasetId": "i074-interview",
+  "visibility": "hidden",
+  "variant": "t02",
+  "kind": "query",
+  "setupSql": "CREATE TABLE contacts(agent TEXT PRIMARY KEY,email TEXT NOT NULL);\nINSERT INTO contacts VALUES('甲','a@desk.com'),('乙','a@@desk.com'),('丙','a@desk.com.cn');",
+  "expected": {
+    "columns": [
+      "agent",
+      "email"
+    ],
+    "rows": [
+      [
+        "甲",
+        "a@desk.com"
+      ]
+    ]
+  }
+}

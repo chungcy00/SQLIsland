@@ -1,0 +1,16 @@
+{
+  "id": "i085-t03",
+  "questionId": "i085",
+  "datasetId": "i085-interview",
+  "visibility": "hidden",
+  "variant": "t03",
+  "kind": "query",
+  "setupSql": "CREATE TABLE meetings(employee TEXT,day TEXT,hours REAL);\nINSERT INTO meetings VALUES('甲','2026-01-05',15),('甲','2026-01-12',10);",
+  "expected": {
+    "columns": [
+      "employee",
+      "overbooked_weeks"
+    ],
+    "rows": []
+  }
+}

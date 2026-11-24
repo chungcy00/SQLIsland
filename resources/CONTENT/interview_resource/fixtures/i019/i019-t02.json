@@ -1,0 +1,31 @@
+{
+  "id": "i019-t02",
+  "questionId": "i019",
+  "datasetId": "i019-interview",
+  "visibility": "hidden",
+  "variant": "t02",
+  "kind": "query",
+  "setupSql": "CREATE TABLE sales(transaction_no INTEGER PRIMARY KEY,product_code TEXT NOT NULL,sale_year INTEGER NOT NULL,quantity INTEGER NOT NULL,price INTEGER NOT NULL);\nINSERT INTO sales VALUES (1,'A',2021,1,8),(2,'B',2020,2,7);",
+  "expected": {
+    "columns": [
+      "product_code",
+      "first_year",
+      "quantity",
+      "price"
+    ],
+    "rows": [
+      [
+        "A",
+        2021,
+        1,
+        8
+      ],
+      [
+        "B",
+        2020,
+        2,
+        7
+      ]
+    ]
+  }
+}

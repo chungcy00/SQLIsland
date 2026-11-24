@@ -1,0 +1,17 @@
+{
+  "id": "i088-t02",
+  "questionId": "i088",
+  "datasetId": "i088-interview",
+  "visibility": "hidden",
+  "variant": "t02",
+  "kind": "query",
+  "setupSql": "CREATE TABLE orders(order_no TEXT PRIMARY KEY,member TEXT,product TEXT,day TEXT);\nINSERT INTO orders VALUES('a','甲','茶','2026-01-01'),('b','甲','茶','2026-02-01'),('c','甲','茶','2026-03-01');",
+  "expected": {
+    "columns": [
+      "member",
+      "order_count",
+      "distinct_products"
+    ],
+    "rows": []
+  }
+}

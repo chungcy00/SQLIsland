@@ -1,0 +1,29 @@
+{
+  "id": "i003-public",
+  "questionId": "i003",
+  "datasetId": "i003-interview",
+  "visibility": "public",
+  "variant": "public",
+  "kind": "query",
+  "setupSql": "CREATE TABLE customers(customer_id INTEGER PRIMARY KEY,customer_name TEXT NOT NULL); CREATE TABLE shipping(address_id INTEGER PRIMARY KEY,customer_id INTEGER UNIQUE,city TEXT);\nINSERT INTO customers VALUES (1,'小明'),(2,'小美'),(3,'小华'); INSERT INTO shipping VALUES (101,1,'古晋'),(102,3,'美里');",
+  "expected": {
+    "columns": [
+      "customer_name",
+      "city"
+    ],
+    "rows": [
+      [
+        "小明",
+        "古晋"
+      ],
+      [
+        "小美",
+        null
+      ],
+      [
+        "小华",
+        "美里"
+      ]
+    ]
+  }
+}

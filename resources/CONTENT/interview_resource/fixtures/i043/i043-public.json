@@ -1,0 +1,38 @@
+{
+  "id": "i043-public",
+  "questionId": "i043",
+  "datasetId": "i043-interview",
+  "visibility": "public",
+  "variant": "public",
+  "kind": "query",
+  "setupSql": "CREATE TABLE quotes(product_name TEXT PRIMARY KEY,web_price INTEGER,shop_price INTEGER,partner_price INTEGER);\nINSERT INTO quotes VALUES('茶叶',20,NULL,25),('纸巾',NULL,9,12);",
+  "expected": {
+    "columns": [
+      "product_name",
+      "channel",
+      "price"
+    ],
+    "rows": [
+      [
+        "茶叶",
+        "网店",
+        20
+      ],
+      [
+        "纸巾",
+        "实体店",
+        9
+      ],
+      [
+        "茶叶",
+        "合作渠道",
+        25
+      ],
+      [
+        "纸巾",
+        "合作渠道",
+        12
+      ]
+    ]
+  }
+}

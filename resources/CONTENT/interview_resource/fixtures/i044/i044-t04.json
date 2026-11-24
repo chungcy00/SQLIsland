@@ -1,0 +1,22 @@
+{
+  "id": "i044-t04",
+  "questionId": "i044",
+  "datasetId": "i044-interview",
+  "visibility": "hidden",
+  "variant": "t04",
+  "kind": "query",
+  "setupSql": "CREATE TABLE directory(staff_no INTEGER PRIMARY KEY,staff_name TEXT NOT NULL);CREATE TABLE payroll(staff_no INTEGER PRIMARY KEY,salary INTEGER NOT NULL);\nINSERT INTO payroll VALUES(7,1000),(8,1200);",
+  "expected": {
+    "columns": [
+      "staff_no"
+    ],
+    "rows": [
+      [
+        7
+      ],
+      [
+        8
+      ]
+    ]
+  }
+}

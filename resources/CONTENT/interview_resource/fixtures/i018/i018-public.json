@@ -1,0 +1,29 @@
+{
+  "id": "i018-public",
+  "questionId": "i018",
+  "datasetId": "i018-interview",
+  "visibility": "public",
+  "variant": "public",
+  "kind": "query",
+  "setupSql": "CREATE TABLE visits(visit_no INTEGER PRIMARY KEY,customer_id INTEGER NOT NULL); CREATE TABLE orders(order_no INTEGER PRIMARY KEY,visit_no INTEGER NOT NULL);\nINSERT INTO visits VALUES (1,10),(2,10),(3,20),(4,30),(5,20); INSERT INTO orders VALUES (100,1),(101,1),(102,3);",
+  "expected": {
+    "columns": [
+      "customer_id",
+      "count_no_order"
+    ],
+    "rows": [
+      [
+        10,
+        1
+      ],
+      [
+        20,
+        1
+      ],
+      [
+        30,
+        1
+      ]
+    ]
+  }
+}

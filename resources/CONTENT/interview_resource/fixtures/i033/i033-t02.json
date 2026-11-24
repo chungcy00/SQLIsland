@@ -1,0 +1,21 @@
+{
+  "id": "i033-t02",
+  "questionId": "i033",
+  "datasetId": "i033-interview",
+  "visibility": "hidden",
+  "variant": "t02",
+  "kind": "query",
+  "setupSql": "CREATE TABLE members(member_id INTEGER PRIMARY KEY); CREATE TABLE signups(event_name TEXT NOT NULL,member_id INTEGER NOT NULL,PRIMARY KEY(event_name,member_id));\nINSERT INTO members VALUES(1),(2);INSERT INTO signups VALUES('新品发布',1),('新品发布',2);",
+  "expected": {
+    "columns": [
+      "event_name",
+      "signup_percentage"
+    ],
+    "rows": [
+      [
+        "新品发布",
+        100.0
+      ]
+    ]
+  }
+}

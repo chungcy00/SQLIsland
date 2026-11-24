@@ -1,0 +1,23 @@
+{
+  "id": "i090-public",
+  "questionId": "i090",
+  "datasetId": "i090-interview",
+  "visibility": "public",
+  "variant": "public",
+  "kind": "query",
+  "setupSql": "CREATE TABLE payments(member TEXT,month TEXT,amount INTEGER,PRIMARY KEY(member,month));\nINSERT INTO payments VALUES('甲','2026-01',100),('甲','2026-02',100),('甲','2026-04',20),('甲','2026-05',20),('乙','2026-01',50),('乙','2026-02',50),('乙','2026-06',100);",
+  "expected": {
+    "columns": [
+      "member",
+      "early_total",
+      "recent_total"
+    ],
+    "rows": [
+      [
+        "甲",
+        200,
+        40
+      ]
+    ]
+  }
+}

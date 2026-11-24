@@ -1,0 +1,15 @@
+{
+  "id": "i045-t02",
+  "questionId": "i045",
+  "datasetId": "i045-interview",
+  "visibility": "hidden",
+  "variant": "t02",
+  "kind": "query",
+  "setupSql": "CREATE TABLE staff(staff_no INTEGER PRIMARY KEY,name TEXT NOT NULL,salary INTEGER NOT NULL,manager_no INTEGER);\nINSERT INTO staff VALUES(1,'主管',5000,NULL),(2,'组员',2000,1);",
+  "expected": {
+    "columns": [
+      "name"
+    ],
+    "rows": []
+  }
+}

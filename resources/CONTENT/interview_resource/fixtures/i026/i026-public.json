@@ -1,0 +1,28 @@
+{
+  "id": "i026-public",
+  "questionId": "i026",
+  "datasetId": "i026-interview",
+  "visibility": "public",
+  "variant": "public",
+  "kind": "query",
+  "setupSql": "CREATE TABLE staff(staff_no INTEGER PRIMARY KEY,name TEXT NOT NULL,tenure INTEGER NOT NULL,supervisor_no INTEGER);\nINSERT INTO staff VALUES (1,'小芳',8,NULL),(2,'小青',2,1),(3,'小慧',3,1),(4,'小亮',5,NULL),(5,'小东',4,4);",
+  "expected": {
+    "columns": [
+      "supervisor_name",
+      "reports_count",
+      "avg_tenure"
+    ],
+    "rows": [
+      [
+        "小芳",
+        2,
+        3
+      ],
+      [
+        "小亮",
+        1,
+        4
+      ]
+    ]
+  }
+}

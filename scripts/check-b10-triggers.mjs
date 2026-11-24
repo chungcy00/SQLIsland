@@ -24,7 +24,7 @@ async function fresh(patch) {
 async function solve(page, difficultyOf) {
   const picked = await page.evaluate(async difficultyOf => {
     const content = await (await fetch('content.json')).json();
-    const q = content.questions.find(item => item.type === '独立编写' && difficultyOf.includes(item.difficulty) && item.referenceSolutions?.[0]?.sqliteSql);
+    const q = content.questions.find(item => item.type !== '选择' && item.type !== '代码填空' && item.type !== '代码纠错' && difficultyOf.includes(item.difficulty) && item.referenceSolutions?.[0]?.sqliteSql);
     return {id: q.id, sql: q.referenceSolutions[0].sqliteSql};
   }, difficultyOf);
   await page.goto(`${base}#/question/${picked.id}`); await page.locator('#sql-editor').waitFor();

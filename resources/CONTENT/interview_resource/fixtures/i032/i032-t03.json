@@ -1,0 +1,23 @@
+{
+  "id": "i032-t03",
+  "questionId": "i032",
+  "datasetId": "i032-interview",
+  "visibility": "hidden",
+  "variant": "t03",
+  "kind": "query",
+  "setupSql": "CREATE TABLE staff(staff_id INTEGER PRIMARY KEY,staff_name TEXT UNIQUE NOT NULL); CREATE TABLE trainings(training_name TEXT PRIMARY KEY); CREATE TABLE attendance(staff_id INTEGER,training_name TEXT);\nINSERT INTO staff VALUES(5,'小新');INSERT INTO trainings VALUES('安全');INSERT INTO attendance VALUES(5,'安全');",
+  "expected": {
+    "columns": [
+      "staff_name",
+      "training_name",
+      "attend_count"
+    ],
+    "rows": [
+      [
+        "小新",
+        "安全",
+        1
+      ]
+    ]
+  }
+}

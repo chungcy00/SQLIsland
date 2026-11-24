@@ -214,6 +214,7 @@ let quizScroll = {};
 let quizExpanded = false;
 let lessonExampleResult = null;
 const questionTableCache = new Map();
+let interviewFilters = { search: "", platform: "", chapter: "", difficulty: "", status: "" };
 const projectSchemas = new Map();
 let selectedOption = "",
   hints = 0,
@@ -300,7 +301,9 @@ const knowledgePoints = () => content.chapters.flatMap((c) => c.knowledgePoints)
 const getKP = (id) => knowledgePoints().find((k) => k.id === id);
 const completedLesson = (id) => lessonComplete(state, content.curriculumMigration, id);
 const completedKnowledgePoints = () => knowledgePoints().filter((k) => completedLesson(k.id)).length;
-const getQuestion = (id) => content.questions.find((q) => q.id === id);
+const allQuestions = () => [...content.questions, ...(content.interview || [])];
+const getQuestion = (id) => allQuestions().find((q) => q.id === id);
+const isInterview = (q) => q?.chapterId === "interview";
 const allCards = () => [...content.cards, ...state.userCards];
 const favorite = (id) => state.favorites.includes(id);
 const favButton = (id) =>
@@ -314,7 +317,7 @@ const draftForQuestion = (id) => questionDraft(state.drafts[id], getQuestion(id)
 const independentDone = (id) =>
   attempted(id).some((a) => a.pass && a.independent);
 function wrongQuestions() {
-  return content.questions.filter((q) =>
+  return allQuestions().filter((q) =>
     attempted(q.id).some((a) => !a.pass && !a.ungraded),
   );
 }
@@ -1027,6 +1030,147 @@ function practiceChapters(list, filtered) {
     </section>`;
   }).join("") + '</div>';
 }
+function ivSection(title, inner) {
+  return inner ? `<section class="iv-section"><h2>${e(title)}</h2>${inner}</section>` : "";
+}
+function ivParagraphs(text) {
+  return String(text || "").split(/\n+/).filter(Boolean).map((line) => `<p>${e(line)}</p>`).join("");
+}
+function ivDoc(q, tableName, column) {
+  const docs = q.columnDocs || [];
+  if (!docs.length) return "";
+  const hit = docs.find((d) => d[0] === tableName && d[1] === column) || docs.find((d) => d[1] === column);
+  return hit?.[2] || "";
+}
+// 面试题统一阅读模板：题目名称 → 难度/章节 → 描述 → 任务要求 → 输出要求 → 示例输入 → 示例输出 → 示例说明（无数据不显示）
+function ivLines(q) {
+  // 章节题的 requirements 是“任务 + 带标签的几行”；面试题直接有 task 字段
+  const labelled = {};
+  const free = [];
+  for (const line of String(q.requirements || "").split("\n")) {
+    const m = line.match(/^(输出字段名称及顺序|结果排序要求|计算及格式要求)：(.*)$/);
+    if (m) labelled[m[1]] = m[2]; else if (line.trim()) free.push(line);
+  }
+  return { task: q.task || free.join("\n"), order: labelled["结果排序要求"], format: labelled["计算及格式要求"] };
+}
+function interviewReading(q, tables, expectedTable) {
+  const interview = isInterview(q);
+  const kp = interview ? getKP(q.primaryKnowledgePointIds?.[0]) : null;
+  const chapter = interview ? (kp ? getChapter(kp.chapterId) : null) : getChapter(q.chapterId);
+  const state = q.executionMode === "database_state";
+  const siblings = interview ? content.interview : content.questions.filter((item) => item.chapterId === q.chapterId);
+  const index = siblings.findIndex((item) => item.id === q.id) + 1;
+  const ref = interview && q.reference?.platform ? `考点参考 ${q.reference.platform}${q.reference.number ? " " + q.reference.number : ""}` : "";
+  const meta = `<div class="iv-meta">${tag(q.difficulty)}${chapter ? `<span class="iv-chapter">第 ${chapter.number} 章 · ${e(chapter.title)}</span>` : ""}<small>${e(q.id.toUpperCase())} · ${index} / ${siblings.length}</small></div>${ref ? `<p class="iv-ref">${e(ref)}</p>` : ""}${interview ? interviewLessons(q) : ""}`;
+  const lines = ivLines(q);
+  const orderText = state
+    ? "本题直接修改数据表，不要求返回查询结果；判题时比较执行后表中的全部数据。"
+    : lines.order || (q.orderSensitive
+      ? "需按任务要求中的排序规则输出，判题时同时比较行的先后顺序。"
+      : "不要求排序；判题时比较各行及其重复次数，不比较行的先后顺序。");
+  const columns = state ? [] : q.expectedOutput.columns || [];
+  const hasDocs = columns.some((name) => ivDoc(q, "", name));
+  const fieldTable = columns.length
+    ? `<div class="table-wrap iv-fields"><table><thead><tr><th>字段名称</th>${hasDocs ? "<th>字段含义</th>" : ""}</tr></thead><tbody>${columns.map((name) => `<tr><td><code>${e(name)}</code></td>${hasDocs ? `<td>${ivDoc(q, "", name) ? e(ivDoc(q, "", name)) : '<span class="muted">—</span>'}</td>` : ""}</tr>`).join("")}</tbody></table></div>`
+    : "";
+  const output = state
+    ? expectedTable?.rows
+      ? `<p class="iv-caption">执行后 <code>${e(expectedTable.name)}</code> 表的数据：</p>${table(expectedTable.columns, expectedTable.rows)}`
+      : ""
+    : table(q.expectedOutput.columns, q.expectedOutput.rows) + (q.expectedOutput.rows.length ? "" : '<p class="muted">示例数据下结果为空（0 行）。</p>');
+  return `<h1 class="quiz-title">${e(q.title.split(" · ")[0])}</h1>${meta}
+    ${ivSection("题目描述", ivParagraphs(q.context))}
+    ${ivSection("任务要求", ivParagraphs(lines.task))}
+    ${ivSection("输出要求", `${fieldTable}<p class="iv-order"><b>排序规则</b>${e(orderText)}</p>${lines.format ? `<p class="iv-order"><b>计算及格式</b>${e(lines.format)}</p>` : ""}`)}
+    ${ivSection("示例输入", tables?.length ? renderTables(tables, true) : "")}
+    ${ivSection(state ? "示例输出（操作后的数据）" : "示例输出", output)}`;
+}
+function interviewSchemaPane(q, tables, fields) {
+  if (!tables?.length) return empty("暂无公开数据表");
+  return tables.map((t) => {
+    const cols = (fields || []).find((f) => f.name === t.name)?.columns || [];
+    const docOf = (c) => ivDoc(q, t.name, c.name) || c.description || c.comment || "";
+    const withDocs = cols.some((c) => docOf(c));
+    const rows = cols.map((c) => `<tr><td><code>${e(c.name)}</code></td><td>${e(c.type || "—")}${c.primaryKey ? " · 主键" : ""}</td>${withDocs ? `<td>${docOf(c) ? e(docOf(c)) : '<span class="muted">—</span>'}</td>` : ""}</tr>`).join("");
+    return `<section class="source-table iv-schema"><div class="row between table-heading"><h3><span class="source-table-name">${e(t.name)}</span></h3><small>${t.rowCount ?? t.rows.length} 行</small></div>
+      ${rows ? `<h4>字段</h4><div class="table-wrap iv-fields"><table><thead><tr><th>字段名称</th><th>类型</th>${withDocs ? "<th>说明</th>" : ""}</tr></thead><tbody>${rows}</tbody></table></div>` : ""}
+      <h4>示例数据</h4>${table(t.columns, t.rows.slice(0, 20))}${(t.rowCount ?? 0) > 20 ? "<small>预览前 20 行</small>" : ""}</section>`;
+  }).join("");
+}
+function interviewLessons(q) {
+  const ids = (q.primaryKnowledgePointIds?.length ? q.primaryKnowledgePointIds : q.knowledgePointIds || []).slice(0, 1); // 题目窗格高度有限，只放主考点课文
+  const points = ids.map(getKP).filter(Boolean);
+  if (!points.length) return "";
+  return `<div class="interview-lessons"><small>相关课文</small>${points.map((k) => goButton(e(k.title), "/lesson/" + k.id, "chip")).join("")}</div>`;
+}
+function interviewChapters() {
+  const ids = new Set(content.interview.flatMap((q) => (q.primaryKnowledgePointIds || []).map((id) => getKP(id)?.chapterId)).filter(Boolean));
+  return content.chapters.filter((c) => ids.has(c.id));
+}
+function filterInterview(list = content.interview) {
+  const f = interviewFilters;
+  const keyword = f.search.trim().toLowerCase();
+  return list.filter(
+    (q) =>
+      (!keyword ||
+        [q.id, q.title, q.topic, q.requirements, q.reference?.title, q.reference?.platform, q.reference?.number]
+          .filter(Boolean)
+          .some((text) => String(text).toLowerCase().includes(keyword))) &&
+      (!f.platform || q.reference?.platform === f.platform) &&
+      (!f.difficulty || q.difficulty === f.difficulty) &&
+      (!f.chapter || getKP(q.primaryKnowledgePointIds?.[0])?.chapterId === f.chapter) &&
+      (!f.status ||
+        (f.status === "未作答"
+          ? !attempted(q.id).length
+          : f.status === "已独立完成"
+            ? independentDone(q.id)
+            : f.status === "待巩固"
+              ? attempted(q.id).some((a) => !a.pass && !a.ungraded) && !masteredWrong(q.id)
+              : attempted(q.id).length > 0)),
+  );
+}
+function interviewRows(list) {
+  return list.map((q) => {
+    const history = attempted(q.id);
+    const done = independentDone(q.id);
+    const needsReview = history.some((a) => !a.pass && !a.ungraded) && !masteredWrong(q.id);
+    const status = done ? "已独立完成" : needsReview ? "待巩固" : history.length ? "已作答" : "未作答";
+    let statusIcon = '<span class="point-dot"></span>';
+    if (history.length) statusIcon = icon("edit");
+    if (needsReview) statusIcon = icon("wrong");
+    if (done) statusIcon = icon("check");
+    const source = q.reference?.platform ? q.reference.platform + (q.reference.number ? " " + q.reference.number : "") : "";
+    return goButton(
+      `<span class="question-status ${done ? "done" : needsReview ? "needs-review" : ""}" role="img" aria-label="${status}" title="${status}">${statusIcon}</span>
+      <div class="grow"><div class="question-row-meta"><small class="question-id">${e(q.id.toUpperCase())}</small>${tag(q.difficulty)}${source ? tag(source) : ""}</div><h3>${e(q.title)}</h3><small class="interview-topic">${e(q.topic)}</small></div>${icon("right", "chevron")}`,
+      "/question/" + q.id,
+      "link-row chapter-question-row",
+    );
+  }).join("");
+}
+function interviewPage() {
+  const list = content.interview;
+  const f = interviewFilters;
+  const filtered = filterInterview(list);
+  const done = list.filter((q) => independentDone(q.id)).length;
+  const platforms = [...new Set(list.map((q) => q.reference?.platform).filter(Boolean))];
+  const opts = (values, current, label) =>
+    `<option value="">${label}</option>${values.map((v) => `<option value="${e(typeof v === "object" ? v.id : v)}" ${current === (typeof v === "object" ? v.id : v) ? "selected" : ""}>${e(typeof v === "object" ? v.title : v)}</option>`).join("")}`;
+  shell(
+    "面试刷题",
+    `<div class="row between route-summary"><small>已独立完成 ${done} / ${list.length} 题</small></div>
+    <p class="muted interview-intro">按 LeetCode、LintCode、牛客的常见考点整理的 SQL 面试题。题干、数据与答案均为原创，所有题目都在本机判题。</p>
+    <div class="progress" role="progressbar" aria-label="面试刷题进度" aria-valuemin="0" aria-valuemax="${list.length}" aria-valuenow="${done}"><span style="width:${(done / list.length) * 100}%"></span></div>
+    <div class="actions">${button(icon("play") + " 随机一题", "randomQuestion", "", "primary")}${goButton(icon("wrong") + " 错题重练", "/wrong", "outline")}</div>
+    <div class="search">${icon("search")}<input id="interview-search" value="${e(f.search)}" placeholder="搜索题号、题目或考点" aria-label="搜索面试题"></div>
+    <div class="chips question-difficulties" aria-label="难度筛选">${["", "简单", "中等"].map((difficulty) => button(difficulty || "全部难度", "interviewDifficulty", difficulty, "chip " + (f.difficulty === difficulty ? "selected" : ""))).join("")}</div>
+    <div class="practice-selectors"><select data-ifilter="chapter" aria-label="按课文章节筛选">${opts(interviewChapters().map((c) => ({ id: c.id, title: `第 ${c.number} 章 ${c.title}` })), f.chapter, "全部章节")}</select><select data-ifilter="platform" aria-label="参考平台筛选">${opts(platforms, f.platform, "全部平台")}</select><select data-ifilter="status" aria-label="状态筛选">${opts(["未作答", "已作答", "待巩固", "已独立完成"], f.status, "全部状态")}</select><button class="icon-button" data-action="resetInterview" aria-label="重置筛选" title="重置筛选">${icon("reset")}</button></div>
+    <small class="practice-match-count">${filtered.length} 道题</small>
+    <div class="chapter-questions interview-list">${interviewRows(filtered)}</div>${filtered.length ? "" : empty("暂无匹配题目", "", button("重置筛选", "resetInterview", "", "outline"), "09_empty_magnifier")}`,
+    "practice",
+    true,
+  );
+}
 function practice(path) {
   let list = content.questions;
   let title = "练习";
@@ -1040,7 +1184,7 @@ function practice(path) {
     `<option value="">${label}</option>${values.map((v) => `<option value="${e(typeof v === "object" ? v.id : v)}" ${current === (v.id || v) ? "selected" : ""}>${e(v.title || v)}</option>`).join("")}`;
   shell(
     title,
-    `<div class="row between route-summary"><small>已独立完成 ${summaryStats().done} / ${content.questions.length} 题</small>${goButton("业务实战", "/projects", "small-button")}</div><div class="actions">${button(icon("play") + " 随机练习", "randomQuestion", "", "primary")}${goButton(icon("wrong") + " 错题重练", "/wrong", "outline")}</div><div class="search">${icon("search")}<input id="search" value="${e(search)}" placeholder="搜索题号或题目" aria-label="搜索题目"></div>
+    `<div class="row between route-summary"><small>已独立完成 ${summaryStats().done} / ${content.questions.length} 题</small>${goButton("业务实战", "/projects", "small-button")}</div><div class="actions">${button(icon("play") + " 随机练习", "randomQuestion", "", "primary")}${goButton(icon("wrong") + " 错题重练", "/wrong", "outline")}</div>${(() => { const done = content.interview.filter((q) => independentDone(q.id)).length; return button(`<span class="interview-card-head">${icon("project")}<strong>面试刷题</strong>${icon("right", "chevron")}</span><small class="interview-card-sub">${content.interview.length} 道原创改编题 · 简单与中等难度</small><span class="interview-card-foot"><span>已完成 ${done} / ${content.interview.length} 题</span><b>进入题库 ${icon("right")}</b></span><span class="progress" aria-hidden="true"><span style="width:${(done / content.interview.length) * 100}%"></span></span>`, "go", "/interview", "interview-card"); })()}<div class="search">${icon("search")}<input id="search" value="${e(search)}" placeholder="搜索题号或题目" aria-label="搜索题目"></div>
     <div class="chips question-difficulties" aria-label="难度筛选">${["", "入门", "简单", "中等", "困难", "挑战"].map((difficulty) => button(difficulty || "全部难度", "questionDifficulty", difficulty, "chip " + (questionFilters.difficulty === difficulty ? "selected" : ""))).join("")}</div>
     <div class="practice-selectors"><select data-filter="chapter" aria-label="章节筛选">${opts(content.chapters, questionFilters.chapter, "全部章节")}</select><select data-filter="type" aria-label="题型筛选">${opts([...new Set(content.questions.map((q) => q.type))], questionFilters.type, "全部题型")}</select><select data-filter="status" aria-label="状态筛选">${opts(["未作答", "已作答", "待巩固", "已独立完成"], questionFilters.status, "全部状态")}</select><button class="icon-button" data-action="resetQuestions" aria-label="重置筛选" title="重置筛选">${icon("reset")}</button></div>
     <small class="practice-match-count">${filtered.length} 道题</small>
@@ -1091,63 +1235,45 @@ function editor(id, value, keyboardVisible = state.settings.customKeyboard) {
     ) +
     '</div><div id="keypad" class="keypad">' +
     keys("语法") +
+    '</div><div class="keypad-fixed" aria-label="常用编辑键">' +
+    FIXED_KEYS() +
     "</div></div></div>"
   );
 }
+const SYNTAX_KEYS = [
+  "SELECT ", "FROM ", "WHERE ", "GROUP BY ", "HAVING ", "ORDER BY ", "DESC", "ASC", "LIMIT ", "OFFSET ", "DISTINCT ", "AS ",
+  "JOIN ", "LEFT JOIN ", "INNER JOIN ", "CROSS JOIN ", "ON ", "AND ", "OR ", "NOT ", "IN (", "BETWEEN ", "LIKE ", "IS NULL", "IS NOT NULL", "EXISTS (", "NULL",
+  "CASE ", "WHEN ", "THEN ", "ELSE ", "END", "WITH ", "UNION ", "UNION ALL ", "INTERSECT ", "EXCEPT ",
+  "COUNT(", "SUM(", "AVG(", "MAX(", "MIN(", "ROUND(", "COALESCE(", "IFNULL(", "NULLIF(", "CAST(", "ABS(",
+  "SUBSTR(", "LENGTH(", "TRIM(", "UPPER(", "LOWER(", "REPLACE(", "INSTR(", "CONCAT(", "DATE(", "STRFTIME(", "DATEDIFF(", "JULIANDAY(",
+  "OVER (", "PARTITION BY ", "ROWS BETWEEN ", "UNBOUNDED PRECEDING", "CURRENT ROW", "ROW_NUMBER()", "RANK()", "DENSE_RANK()", "LAG(", "LEAD(", "NTILE(",
+  "INSERT INTO ", "VALUES (", "UPDATE ", "SET ", "DELETE FROM ",
+];
+const QWERTY_ROWS = ["QWERTYUIOP", "ASDFGHJKL", "ZXCVBNM"];
 function keys(mode) {
   if (mode === "字段") {
     const groups = editorFields.length ? editorFields : labInfo?.fields || [];
+    if (!groups.length) return "<small>先选择数据表。</small>";
+    const names = `<details class="field-group" open><summary>数据表</summary><div class="field-keys">${groups.map((group) => button(e(group.name), "insert", group.name)).join("")}</div></details>`;
     return (
+      names +
       groups
         .map(
           (group, index) =>
-            `<details class="field-group" ${index === 0 ? "open" : ""}><summary>${e(group.name)}</summary><div class="field-keys">${group.columns.map((column) => button(e(column.name), "insert", column.name)).join("")}</div></details>`,
+            `<details class="field-group" ${index === 0 ? "open" : ""}><summary>${e(group.name)} 的字段</summary><div class="field-keys">${group.columns.map((column) => button(e(column.name), "insert", column.name)).join("")}</div></details>`,
         )
-        .join("") || "<small>先选择数据表。</small>"
+        .join("")
     );
   }
+  if (mode === "字母")
+    return QWERTY_ROWS.map((row) => `<div class="key-row">${row.split("").map((k) => button(k, "insert", k)).join("")}</div>`).join("");
   const list =
     mode === "符号"
-      ? [
-          "(",
-          ")",
-          ",",
-          ";",
-          "=",
-          "<>",
-          ">=",
-          "<=",
-          "'",
-          "*",
-          "+",
-          "-",
-          "/",
-          "%",
-        ]
-      : mode === "字母"
-        ? "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("")
-        : [
-            "SELECT ",
-            "FROM ",
-            "WHERE ",
-            "GROUP BY ",
-            "ORDER BY ",
-            "JOIN ",
-            "ON ",
-            "AS ",
-            "COUNT(",
-            "SUM(",
-            "LIMIT ",
-            "NULL",
-            "\n",
-            "  ",
-          ];
-  return list
-    .map((k) =>
-      button(e(k === "\n" ? "换行" : k === "  " ? "缩进" : k), "insert", k),
-    )
-    .join("");
+      ? ["(", ")", ",", ";", ".", "=", "<>", "!=", ">=", "<=", ">", "<", "'", "*", "+", "-", "/", "%", "||", "_"]
+      : SYNTAX_KEYS;
+  return list.map((k) => button(e(k), "insert", k)).join("");
 }
+const FIXED_KEYS = () => [["空格", " "], ["换行", "\n"], ["缩进", "  "]].map(([label, value]) => button(label, "insert", value)).join("");
 function choiceExplanation(q) {
   const inline = new Set((q.options || []).map((option) => `${option.id}. ${option.explanation}`));
   return q.explanation.split("\n").filter((line) => !inline.has(line.trim())).join("\n");
@@ -1196,6 +1322,8 @@ async function questionFields(q) {
     fields = names.map((name) => ({ name, columns: dictionary.tables?.[name]?.columns || [] }));
   } else {
     const fixture = await publicFixture(q);
+    if (fixture?.setupSql && !fixture.tables?.length) await questionTables(q); // 用 setupSql 建表的夹具：字段来自实际建出的表
+    if (questionFieldCache.has(q.id)) return questionFieldCache.get(q.id);
     fields = (fixture?.tables || []).map((t) => ({ name: t.name, columns: t.columns.map((c) => typeof c === "string" ? { name: c } : c) }));
   }
   questionFieldCache.set(q.id, fields);
@@ -1226,21 +1354,25 @@ async function questionPage(id, renderVersion = revision) {
     hints = draftForQuestion(id).hints || 0;
     answerShown = draftForQuestion(id).answerShown || false;
   }
-  const chapter = getChapter(q.chapterId);
-  const chapterQuestions = content.questions.filter((item) => item.chapterId === q.chapterId);
+  const interview = isInterview(q);
+  const chapter = interview ? null : getChapter(q.chapterId);
+  const chapterQuestions = interview ? content.interview : content.questions.filter((item) => item.chapterId === q.chapterId);
   const sequence = questionSequence?.includes(id) ? questionSequence.map(getQuestion).filter(Boolean) : chapterQuestions;
   const position = sequence.findIndex((item) => item.id === id);
   const submitted = attempted(id).length > 0;
   if (q.type !== "选择") editorFields = await questionFields(q);
-  const head = `<div class="question-meta">${tag(q.type)}${tag(q.difficulty)}<small>${q.id.toUpperCase()}</small></div><h1 class="quiz-title">${e(q.title.split(" · ")[0])}</h1><p class="question-location">第 ${chapter.number} 章 · ${e(chapter.title)}<span>${chapterQuestions.findIndex((item) => item.id === id) + 1} / ${chapterQuestions.length}</span></p>`;
+  const head = `<div class="question-meta">${tag(q.type)}${tag(q.difficulty)}<small>${q.id.toUpperCase()}</small></div><h1 class="quiz-title">${e(q.title.split(" · ")[0])}</h1><p class="question-location">${interview ? "面试刷题" + (q.reference?.platform ? " · 考点参考 " + e(q.reference.platform) + (q.reference.number ? " " + e(q.reference.number) : "") : "") : `第 ${chapter.number} 章 · ${e(chapter.title)}`}<span>${chapterQuestions.findIndex((item) => item.id === id) + 1} / ${chapterQuestions.length}</span></p>${interview ? interviewLessons(q) : ""}`;
   const split = q.type !== "选择";
   let body = split ? `<div class="quiz-details quiz-split">` : `<div class="quiz-details">${head}`;
   if (q.type === "选择") {
     body += `<p class="choice-requirements">${e(q.requirements)}</p><div class="choice-options" role="radiogroup" aria-label="答案选项">${q.options.map((o) => `<div class="choice-item">${`<button class="option ${selectedOption === o.id ? "selected" : ""}" data-action="option" data-arg="${e(o.id)}" role="radio" aria-checked="${selectedOption === o.id}"><b>${e(o.id)}</b><span>${e(o.text)}</span>${selectedOption === o.id ? icon("check") : ""}</button>`}${submitted && o.explanation ? `<p class="option-explanation ${o.id === q.correctOptionId ? "correct" : ""}">${o.id === q.correctOptionId ? icon("check") : ""}${e(o.explanation)}</p>` : ""}</div>`).join("")}</div>`;
   } else {
+    const reading = interview || q.type === "独立编写";
+    const ivFixture = reading ? await publicFixture(q) : null;
+    if (reading && !questionTableCache.get(q.id)) { try { await questionTables(q); } catch { /* 数据表加载失败时保留“重新加载”入口 */ } }
     const cachedTables = questionTableCache.get(q.id);
-    const tablesInner = cachedTables ? (cachedTables.length ? renderTables(cachedTables, false) : empty("暂无公开数据表")) : `<p class="muted quiz-tables-pending" data-qid="${e(q.id)}">正在加载本题的数据表…</p>`;
-    body += `<div class="quiz-top"><div class="tabs">${["题目", "数据表"].map((t) => button(t, "quizTab", t, quizTab === t ? "selected" : "")).join("")}</div><div class="quiz-pane" data-pane="题目" ${quizTab === "题目" ? "" : "hidden"}>${head}${q.context ? `<p class="question-context">${e(q.context)}</p>` : ""}${questionRequirements(q)}</div><div class="quiz-pane" data-pane="数据表" ${quizTab === "数据表" ? "" : "hidden"}>${tablesInner}</div></div><div class="quiz-splitter" role="separator" aria-orientation="horizontal" tabindex="0" aria-label="调整题目区与代码区高度"></div><div class="quiz-bottom">`;
+    const tablesInner = reading ? (cachedTables ? interviewSchemaPane(q, cachedTables, questionFieldCache.get(q.id)) : '<p class="muted quiz-tables-pending" data-qid="' + e(q.id) + '">正在加载本题的数据表…</p>') : cachedTables ? (cachedTables.length ? renderTables(cachedTables, false) : empty("暂无公开数据表")) : `<p class="muted quiz-tables-pending" data-qid="${e(q.id)}">正在加载本题的数据表…</p>`;
+    body += `<div class="quiz-top"><div class="tabs">${["题目", "数据表"].map((t) => button(t, "quizTab", t, quizTab === t ? "selected" : "")).join("")}</div><div class="quiz-pane" data-pane="题目" ${quizTab === "题目" ? "" : "hidden"}>${reading ? interviewReading(q, cachedTables, ivFixture?.expectedTable) : `${head}${q.context ? `<p class="question-context">${e(q.context)}</p>` : ""}${questionRequirements(q)}`}</div><div class="quiz-pane" data-pane="数据表" ${quizTab === "数据表" ? "" : "hidden"}>${tablesInner}</div></div><div class="quiz-splitter" role="separator" aria-orientation="horizontal" tabindex="0" aria-label="调整题目区与代码区高度"></div><div class="quiz-bottom">`;
     body += `<section class="question-code"><h2>${q.type === "代码纠错" ? "修正代码" : q.type === "代码填空" ? "补全代码" : "编写 SQL"}</h2>${q.type === "代码填空" ? `<p class="input-guidance">补全 ${e([...new Set((q.initialCode || "").match(/\{\{[^}]+\}\}/g) || [])].join("、") || "代码中的空位")}，可编辑完整 SQL。</p>` : ""}${editor(q.id, draftForQuestion(id).code ?? formatSqlForDisplay(q.initialCode ?? ""), questionKeyboard && state.settings.customKeyboard)}</section>`;
   }
   body += `<section class="question-execution"><div class="actions">${q.type !== "选择" ? button(actionIcon(busy ? "stop" : "play") + (busy ? " 停止" : " 运行"), busy ? "stop" : "runQuestion", q.id, "outline") : ""}<button class="primary" data-action="submitQuestion" data-arg="${id}" ${busy ? "disabled" : ""}>${actionIcon("send")}${busy ? "执行中…" : "提交答案"}</button></div></section>`;
@@ -1252,7 +1384,7 @@ async function questionPage(id, renderVersion = revision) {
   const hintMax = Math.min(q.hints.length, 3), hintOpen = openFolds.has(id + ":hints"), refOpen = openFolds.has(id + ":ref");
   const hintLabel = hints === 0 ? "提示 0/" + hintMax : !hintOpen ? "展开提示 " + Math.min(hints, 3) + "/" + hintMax : hints >= hintMax ? "收起提示 " + hintMax + "/" + hintMax : "提示 " + hints + "/" + hintMax;
   const refLabel = !answerShown ? "查看参考答案" : refOpen ? "收起参考答案" : "展开参考答案";
-  body += `<section class="answer-support"><div class="actions"><button class="outline" data-action="hint" data-arg="${id}" aria-expanded="${hintOpen}">${actionIcon("hint")}${hintLabel}</button><button class="outline" data-action="showAnswer" data-arg="${id}" aria-expanded="${refOpen}">${actionIcon("answer")}${refLabel}</button></div>${hints && hintOpen ? `<ol class="hint-list">${q.hints.slice(0, hints).map((hint, index) => `<li><small>提示 ${index + 1}</small><p>${e(hint)}</p></li>`).join("")}</ol>` : ""}${answerShown && refOpen ? `<div class="reference-answer"><h3>参考答案</h3>${q.type === "选择" ? `<p>正确选项 ${e(q.correctOptionId)}</p>` : code(q.referenceSolutions[0]?.mysqlSql || q.initialCode)}<p>${e(q.type === "选择" ? choiceExplanation(q) : q.explanation)}</p></div>` : ""}</section>`;
+  body += `<section class="answer-support"><div class="actions"><button class="outline" data-action="hint" data-arg="${id}" aria-expanded="${hintOpen}">${actionIcon("hint")}${hintLabel}</button><button class="outline" data-action="showAnswer" data-arg="${id}" aria-expanded="${refOpen}">${actionIcon("answer")}${refLabel}</button></div>${hints && hintOpen ? `<ol class="hint-list">${q.hints.slice(0, hints).map((hint, index) => `<li><small>提示 ${index + 1}</small><p>${e(hint)}</p></li>`).join("")}</ol>` : ""}${answerShown && refOpen ? `<div class="reference-answer"><h3>参考答案</h3>${q.type === "选择" ? `<p>正确选项 ${e(q.correctOptionId)}</p>` : code(q.referenceSolutions[0]?.mysqlSql || q.initialCode)}<p>${e(q.type === "选择" ? choiceExplanation(q) : q.explanation)}</p>${interview ? '<p class="muted interview-note">本题库的数据和判题都在本机 SQLite 上验证，参考答案按 SQLite 写法给出；面试时请按目标数据库调整日期、字符串等函数。</p>' : ""}</div>` : ""}</section>`;
   body += `${sequenceButtons(sequence[position - 1], sequence[position + 1], "question")}${split ? "</div></div>" : "</div>"}`;
   if (route() !== "/question/" + id || renderVersion !== revision) return;
   captureQuizScroll();
@@ -1709,7 +1841,7 @@ function wrongPage(id) {
 function favoritesPage() {
   const known = [
     ...content.chapters.flatMap((c) => c.knowledgePoints),
-    ...content.questions,
+    ...allQuestions(),
     ...allCards(),
   ];
   const list = known.filter((x) => favorite(x.id));
@@ -1720,7 +1852,7 @@ function favoritesPage() {
           .map((x) => {
             const path = x.id.startsWith("kp")
               ? "/lesson/" + x.id
-              : x.id.startsWith("q")
+              : x.id.startsWith("q") || /^i\d{3}$/.test(x.id)
                 ? "/question/" + x.id
                 : "/cards";
             return linkRow(x.title || x.front?.question, "", path, "star");
@@ -1915,6 +2047,7 @@ async function render() {
         "mine",
         true,
       );
+    else if (path === "/interview") interviewPage();
     else if (path.startsWith("/projects")) await projectsPage(path.split("/")[2]);
     else if (path.startsWith("/lab")) await labPage(path.split("/")[2]);
     else if (path === "/mine") mine();
@@ -2097,7 +2230,7 @@ function validateState(value) {
   );
   if (value.completed.some((id) => !known.has(id)))
     throw new Error("备份包含无法识别的知识点 ID。");
-  const qIds = new Set([...content.questions.map((q) => q.id), ...content.curriculumMigration.removedQuestions]);
+  const qIds = new Set([...allQuestions().map((q) => q.id), ...content.curriculumMigration.removedQuestions]);
   if (
     value.attempts.some(
       (a) =>
@@ -2201,6 +2334,14 @@ async function handleAction(action, arg, element) {
       break;
     case "questionDifficulty":
       questionFilters.difficulty = arg;
+      await render();
+      break;
+    case "interviewDifficulty":
+      interviewFilters.difficulty = arg;
+      await render();
+      break;
+    case "resetInterview":
+      interviewFilters = { search: "", platform: "", chapter: "", difficulty: "", status: "" };
       await render();
       break;
     case "resetQuestions":
@@ -2347,7 +2488,9 @@ async function handleAction(action, arg, element) {
       if (arg.startsWith("/question/")) {
         loadedQuestionId = null;
         const current = route();
-        if (current.startsWith("/practice")) {
+        if (current.startsWith("/interview")) {
+          questionSequence = filterInterview().map((q) => q.id);
+        } else if (current.startsWith("/practice")) {
           const kp = current.startsWith("/practice/kp/") ? current.split("/").pop() : null;
           questionSequence = filterQuestions(content.questions.filter((q) => !kp || q.knowledgePointIds.includes(kp))).map((q) => q.id);
         } else if (current.startsWith("/lesson/")) {
@@ -2539,7 +2682,7 @@ async function handleAction(action, arg, element) {
     }
     case "randomQuestion": {
       const kp = route().startsWith("/practice/kp/") ? route().split("/").pop() : null;
-      const list = filterQuestions(content.questions.filter((q) => !kp || q.knowledgePointIds.includes(kp)));
+      const list = route().startsWith("/interview") ? filterInterview() : filterQuestions(content.questions.filter((q) => !kp || q.knowledgePointIds.includes(kp)));
       questionSequence = list.map((q) => q.id);
       if (list.length) {
         loadedQuestionId = null;
@@ -2610,6 +2753,8 @@ async function handleAction(action, arg, element) {
         editorFields = questionFieldCache.get(id) || [];
       }
       document.querySelector("#keypad").innerHTML = keys(arg);
+      document.querySelector("#keypad").classList.toggle("keypad-letters", arg === "字母");
+      document.querySelector("#keypad").scrollTop = 0;
       element.parentElement
         .querySelectorAll("button")
         .forEach((b) => b.classList.toggle("selected", b === element));
@@ -3211,8 +3356,10 @@ app.addEventListener("input", (event) => {
     const status = document.querySelector("#note-status");
     if (status) status.textContent = "";
   }
-  else if (input.id === "search" || input.id === "card-search") {
-    if (input.id === "card-search") {
+  else if (input.id === "search" || input.id === "card-search" || input.id === "interview-search") {
+    if (input.id === "interview-search") {
+      interviewFilters.search = input.value;
+    } else if (input.id === "card-search") {
       cardSearch = input.value;
       cardBrowseLimit = 40;
     } else {
@@ -3242,6 +3389,10 @@ app.addEventListener("change", async (event) => {
     if (input.id === "card-chapter") cardChapter = input.value;
     if (input.dataset.filter) {
       questionFilters[input.dataset.filter] = input.value;
+      await render();
+    }
+    if (input.dataset.ifilter) {
+      interviewFilters[input.dataset.ifilter] = input.value;
       await render();
     }
     if (input.dataset.setting) {
@@ -3578,7 +3729,7 @@ async function loadQuizTables(retry = false) {
   pane.innerHTML = '<p class="muted quiz-tables-pending">正在加载本题的数据表…</p>';
   try {
     const tables = await questionTables(q);
-    pane.innerHTML = tables.length ? renderTables(tables, false) : empty("暂无公开数据表");
+    pane.innerHTML = (isInterview(q) || q.type === "独立编写") ? interviewSchemaPane(q, tables, questionFieldCache.get(q.id)) : tables.length ? renderTables(tables, false) : empty("暂无公开数据表");
   } catch (error) {
     pane.innerHTML = `<div class="notice error">${e(error.message)}</div><button class="outline" data-action="quizTab" data-arg="数据表" data-retry="1">重新加载数据表</button>`;
   }

@@ -1,0 +1,18 @@
+{
+  "id": "i077-t02",
+  "questionId": "i077",
+  "datasetId": "i077-interview",
+  "visibility": "hidden",
+  "variant": "t02",
+  "kind": "query",
+  "setupSql": "CREATE TABLE exams(student TEXT,subject TEXT,exam_day TEXT,score INTEGER,PRIMARY KEY(student,subject,exam_day));\nINSERT INTO exams VALUES('甲','英语','2026-01-01',88);",
+  "expected": {
+    "columns": [
+      "student",
+      "subject",
+      "first_score",
+      "last_score"
+    ],
+    "rows": []
+  }
+}

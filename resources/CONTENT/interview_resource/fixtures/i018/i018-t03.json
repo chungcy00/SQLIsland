@@ -1,0 +1,16 @@
+{
+  "id": "i018-t03",
+  "questionId": "i018",
+  "datasetId": "i018-interview",
+  "visibility": "hidden",
+  "variant": "t03",
+  "kind": "query",
+  "setupSql": "CREATE TABLE visits(visit_no INTEGER PRIMARY KEY,customer_id INTEGER NOT NULL); CREATE TABLE orders(order_no INTEGER PRIMARY KEY,visit_no INTEGER NOT NULL);\nINSERT INTO visits VALUES (1,1),(2,2); INSERT INTO orders VALUES (1,1),(2,2);",
+  "expected": {
+    "columns": [
+      "customer_id",
+      "count_no_order"
+    ],
+    "rows": []
+  }
+}

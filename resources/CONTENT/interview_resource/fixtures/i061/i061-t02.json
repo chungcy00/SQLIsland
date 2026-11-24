@@ -1,0 +1,25 @@
+{
+  "id": "i061-t02",
+  "questionId": "i061",
+  "datasetId": "i061-interview",
+  "visibility": "hidden",
+  "variant": "t02",
+  "kind": "query",
+  "setupSql": "CREATE TABLE profiles(customer_name TEXT PRIMARY KEY,tags TEXT NOT NULL);\nINSERT INTO profiles VALUES('甲','NOTALLG'),('乙','ALLG'),('丙','ALLG01');",
+  "expected": {
+    "columns": [
+      "customer_name",
+      "tags"
+    ],
+    "rows": [
+      [
+        "乙",
+        "ALLG"
+      ],
+      [
+        "丙",
+        "ALLG01"
+      ]
+    ]
+  }
+}

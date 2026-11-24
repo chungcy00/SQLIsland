@@ -1,0 +1,15 @@
+{
+  "id": "i005-t02",
+  "questionId": "i005",
+  "datasetId": "i005-interview",
+  "visibility": "hidden",
+  "variant": "t02",
+  "kind": "query",
+  "setupSql": "CREATE TABLE clients(client_id INTEGER PRIMARY KEY,customer_name TEXT NOT NULL,referrer_id INTEGER);\nINSERT INTO clients VALUES (1,'甲',7),(2,'乙',7);",
+  "expected": {
+    "columns": [
+      "customer_name"
+    ],
+    "rows": []
+  }
+}

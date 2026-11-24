@@ -1,0 +1,23 @@
+{
+  "id": "i031-t03",
+  "questionId": "i031",
+  "datasetId": "i031-interview",
+  "visibility": "hidden",
+  "variant": "t03",
+  "kind": "query",
+  "setupSql": "CREATE TABLE search_logs(search_term TEXT NOT NULL, score INTEGER NOT NULL, position INTEGER NOT NULL);\nINSERT INTO search_logs VALUES ('电池',1,1),('电池',2,4);",
+  "expected": {
+    "columns": [
+      "search_term",
+      "quality",
+      "poor_percentage"
+    ],
+    "rows": [
+      [
+        "电池",
+        0.75,
+        100.0
+      ]
+    ]
+  }
+}

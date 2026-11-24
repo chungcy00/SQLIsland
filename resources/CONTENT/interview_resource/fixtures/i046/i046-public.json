@@ -1,0 +1,25 @@
+{
+  "id": "i046-public",
+  "questionId": "i046",
+  "datasetId": "i046-interview",
+  "visibility": "public",
+  "variant": "public",
+  "kind": "query",
+  "setupSql": "CREATE TABLE teaching(teacher_name TEXT NOT NULL,course_name TEXT NOT NULL,location_name TEXT NOT NULL);\nINSERT INTO teaching VALUES('刘老师','数据基础','一楼'),('刘老师','数据基础','二楼'),('刘老师','报表制作','一楼'),('陈老师','数据基础','三楼');",
+  "expected": {
+    "columns": [
+      "teacher_name",
+      "course_count"
+    ],
+    "rows": [
+      [
+        "刘老师",
+        2
+      ],
+      [
+        "陈老师",
+        1
+      ]
+    ]
+  }
+}

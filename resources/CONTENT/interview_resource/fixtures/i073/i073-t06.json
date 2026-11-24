@@ -1,0 +1,23 @@
+{
+  "id": "i073-t06",
+  "questionId": "i073",
+  "datasetId": "i073-interview",
+  "visibility": "hidden",
+  "variant": "t06",
+  "kind": "query",
+  "setupSql": "CREATE TABLE requests(customer TEXT NOT NULL,units INTEGER NOT NULL);\nINSERT INTO requests VALUES('边界',1),('边界',1),('边界',4),('不达标',1),('不达标',2),('不达标',3);",
+  "expected": {
+    "columns": [
+      "customer",
+      "request_count",
+      "avg_units"
+    ],
+    "rows": [
+      [
+        "边界",
+        3,
+        2.0
+      ]
+    ]
+  }
+}

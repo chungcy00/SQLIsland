@@ -1,0 +1,23 @@
+{
+  "id": "i082-t02",
+  "questionId": "i082",
+  "datasetId": "i082-interview",
+  "visibility": "hidden",
+  "variant": "t02",
+  "kind": "query",
+  "setupSql": "CREATE TABLE sales(day TEXT,product TEXT,amount INTEGER);\nINSERT INTO sales VALUES('2026-04-01','甲',5),('2026-06-30','甲',8),('2026-05-01','乙',10);",
+  "expected": {
+    "columns": [
+      "quarter",
+      "product",
+      "total_sales"
+    ],
+    "rows": [
+      [
+        2,
+        "甲",
+        13
+      ]
+    ]
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "id": "i066-t04",
+  "questionId": "i066",
+  "datasetId": "i066-interview",
+  "visibility": "hidden",
+  "variant": "t04",
+  "kind": "query",
+  "setupSql": "CREATE TABLE contacts(employee TEXT PRIMARY KEY,email TEXT NOT NULL);\nINSERT INTO contacts VALUES('甲','Z@team.example'),('乙','a+z@team.example'),('丙','a@team.example@team.example');",
+  "expected": {
+    "columns": [
+      "employee",
+      "email"
+    ],
+    "rows": [
+      [
+        "甲",
+        "Z@team.example"
+      ]
+    ]
+  }
+}

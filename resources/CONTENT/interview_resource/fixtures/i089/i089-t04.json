@@ -1,0 +1,28 @@
+{
+  "id": "i089-t04",
+  "questionId": "i089",
+  "datasetId": "i089-interview",
+  "visibility": "hidden",
+  "variant": "t04",
+  "kind": "query",
+  "setupSql": "CREATE TABLE orders(customer TEXT,order_at TEXT,status TEXT);\nINSERT INTO orders VALUES('甲','2026-01-01 18:01','完成'),('甲','2026-01-02 18:01','完成'),('甲','2026-01-03 19:01','完成'),('乙','2026-01-01 18:30','完成'),('乙','2026-01-02 19:30','完成'),('乙','2026-01-03 21:30','完成');",
+  "expected": {
+    "columns": [
+      "customer",
+      "completed_orders",
+      "golden_orders"
+    ],
+    "rows": [
+      [
+        "甲",
+        3,
+        3
+      ],
+      [
+        "乙",
+        3,
+        2
+      ]
+    ]
+  }
+}

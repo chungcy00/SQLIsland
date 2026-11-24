@@ -1,0 +1,16 @@
+{
+  "id": "i072-t03",
+  "questionId": "i072",
+  "datasetId": "i072-interview",
+  "visibility": "hidden",
+  "variant": "t03",
+  "kind": "query",
+  "setupSql": "CREATE TABLE logins(customer TEXT NOT NULL,login_at TEXT NOT NULL);\nINSERT INTO logins VALUES('甲','2024-11-01 09:00:00');",
+  "expected": {
+    "columns": [
+      "customer",
+      "last_login"
+    ],
+    "rows": []
+  }
+}

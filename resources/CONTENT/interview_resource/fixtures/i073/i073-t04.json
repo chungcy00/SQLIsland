@@ -1,0 +1,23 @@
+{
+  "id": "i073-t04",
+  "questionId": "i073",
+  "datasetId": "i073-interview",
+  "visibility": "hidden",
+  "variant": "t04",
+  "kind": "query",
+  "setupSql": "CREATE TABLE requests(customer TEXT NOT NULL,units INTEGER NOT NULL);\nINSERT INTO requests VALUES('小林',2),('小林',2),('小林',26),('小王',10),('小王',20),('小王',30),('小陈',20),('小陈',30),('小陈',40);",
+  "expected": {
+    "columns": [
+      "customer",
+      "request_count",
+      "avg_units"
+    ],
+    "rows": [
+      [
+        "小林",
+        3,
+        10.0
+      ]
+    ]
+  }
+}

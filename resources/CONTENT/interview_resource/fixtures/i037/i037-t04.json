@@ -1,0 +1,28 @@
+{
+  "id": "i037-t04",
+  "questionId": "i037",
+  "datasetId": "i037-interview",
+  "visibility": "hidden",
+  "variant": "t04",
+  "kind": "query",
+  "setupSql": "CREATE TABLE shifts(work_day TEXT NOT NULL,staff_id INTEGER NOT NULL,start_minute INTEGER NOT NULL,end_minute INTEGER NOT NULL);\nINSERT INTO shifts VALUES('2026-04-01',5,0,20),('2026-04-01',5,25,35),('2026-04-01',4,0,30);",
+  "expected": {
+    "columns": [
+      "work_day",
+      "staff_id",
+      "total_minutes"
+    ],
+    "rows": [
+      [
+        "2026-04-01",
+        4,
+        30
+      ],
+      [
+        "2026-04-01",
+        5,
+        30
+      ]
+    ]
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "id": "i014-public",
+  "questionId": "i014",
+  "datasetId": "i014-interview",
+  "visibility": "public",
+  "variant": "public",
+  "kind": "query",
+  "setupSql": "CREATE TABLE events(session_no INTEGER PRIMARY KEY,title TEXT NOT NULL,description TEXT NOT NULL,rating REAL NOT NULL);\nINSERT INTO events VALUES (1,'木工体验','有趣',8.5),(2,'茶艺课','精彩',9.2),(3,'城市讲座','无聊',7.9),(4,'陶艺课','有趣',9.8),(5,'烘焙坊','精彩',9.1);",
+  "expected": {
+    "columns": [
+      "session_no",
+      "title",
+      "description",
+      "rating"
+    ],
+    "rows": [
+      [
+        5,
+        "烘焙坊",
+        "精彩",
+        9.1
+      ],
+      [
+        1,
+        "木工体验",
+        "有趣",
+        8.5
+      ]
+    ]
+  }
+}

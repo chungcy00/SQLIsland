@@ -1,0 +1,19 @@
+{
+  "id": "i002-t03",
+  "questionId": "i002",
+  "datasetId": "i002-interview",
+  "visibility": "hidden",
+  "variant": "t03",
+  "kind": "query",
+  "setupSql": "CREATE TABLE catalog(sku INTEGER PRIMARY KEY,list_price INTEGER NOT NULL);\nINSERT INTO catalog VALUES (1,999);",
+  "expected": {
+    "columns": [
+      "SecondHighestPrice"
+    ],
+    "rows": [
+      [
+        null
+      ]
+    ]
+  }
+}

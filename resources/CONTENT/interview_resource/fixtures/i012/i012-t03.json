@@ -1,0 +1,19 @@
+{
+  "id": "i012-t03",
+  "questionId": "i012",
+  "datasetId": "i012-interview",
+  "visibility": "hidden",
+  "variant": "t03",
+  "kind": "query",
+  "setupSql": "CREATE TABLE purchases(order_id INTEGER PRIMARY KEY, member_id INTEGER NOT NULL);\nINSERT INTO purchases VALUES (1,1),(2,2),(3,2),(4,2),(5,1);",
+  "expected": {
+    "columns": [
+      "member_id"
+    ],
+    "rows": [
+      [
+        2
+      ]
+    ]
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "id": "i098-public",
+  "questionId": "i098",
+  "datasetId": "i098-interview",
+  "visibility": "public",
+  "variant": "public",
+  "kind": "query",
+  "setupSql": "CREATE TABLE sessions(session_code TEXT PRIMARY KEY,customer TEXT NOT NULL,started_at TEXT NOT NULL,ended_at TEXT NOT NULL); CREATE TABLE payments(payment_code TEXT PRIMARY KEY,customer TEXT NOT NULL,paid_at TEXT NOT NULL,status TEXT NOT NULL);\nINSERT INTO sessions VALUES('s1','甲','2026-01-01 09:00','2026-01-01 09:30'),('s2','乙','2026-01-01 10:00','2026-01-01 10:30');INSERT INTO payments VALUES('p1','甲','2026-01-01 09:10','已支付'),('p2','甲','2026-01-01 09:12','已支付');",
+  "expected": {
+    "columns": [
+      "visit_day",
+      "sessions",
+      "converted_sessions",
+      "conversion_rate"
+    ],
+    "rows": [
+      [
+        "2026-01-01",
+        2,
+        1,
+        0.5
+      ]
+    ]
+  }
+}

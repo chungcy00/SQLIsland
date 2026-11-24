@@ -1,0 +1,22 @@
+{
+  "id": "i020-t02",
+  "questionId": "i020",
+  "datasetId": "i020-interview",
+  "visibility": "hidden",
+  "variant": "t02",
+  "kind": "query",
+  "setupSql": "CREATE TABLE tasters(taster_id INTEGER PRIMARY KEY,taster_name TEXT NOT NULL); CREATE TABLE goods(product_code INTEGER PRIMARY KEY,product_name TEXT NOT NULL); CREATE TABLE ratings(product_code INTEGER NOT NULL,taster_id INTEGER NOT NULL,score INTEGER NOT NULL,rated_on TEXT NOT NULL,PRIMARY KEY(product_code,taster_id));\nINSERT INTO tasters VALUES (1,'阿北'),(2,'阿东'); INSERT INTO goods VALUES (1,'饼干'),(2,'蛋糕'); INSERT INTO ratings VALUES (1,1,4,'2026-03-01'),(2,2,4,'2026-03-02');",
+  "expected": {
+    "columns": [
+      "result"
+    ],
+    "rows": [
+      [
+        "阿东"
+      ],
+      [
+        "蛋糕"
+      ]
+    ]
+  }
+}

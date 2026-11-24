@@ -1,0 +1,27 @@
+{
+  "id": "i091-t03",
+  "questionId": "i091",
+  "datasetId": "i091-interview",
+  "visibility": "hidden",
+  "variant": "t03",
+  "kind": "database_state",
+  "setupSql": "CREATE TABLE member_registry(record_id INTEGER PRIMARY KEY, email TEXT NOT NULL);\nINSERT INTO member_registry VALUES (7,'a@store.test'),(10,'b@store.test');",
+  "probes": [],
+  "expectedTable": {
+    "name": "member_registry",
+    "columns": [
+      "record_id",
+      "email"
+    ],
+    "rows": [
+      [
+        7,
+        "a@store.test"
+      ],
+      [
+        10,
+        "b@store.test"
+      ]
+    ]
+  }
+}

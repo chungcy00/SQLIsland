@@ -1,0 +1,28 @@
+{
+  "id": "i079-t04",
+  "questionId": "i079",
+  "datasetId": "i079-interview",
+  "visibility": "hidden",
+  "variant": "t04",
+  "kind": "query",
+  "setupSql": "CREATE TABLE books(book TEXT PRIMARY KEY,total_copies INTEGER NOT NULL CHECK(total_copies>0));CREATE TABLE loans(loan_no INTEGER PRIMARY KEY,book TEXT NOT NULL,returned_at TEXT);\nINSERT INTO books VALUES('甲',2),('乙',1),('丙',1);INSERT INTO loans VALUES(1,'甲',NULL),(2,'甲',NULL),(3,'乙',NULL);",
+  "expected": {
+    "columns": [
+      "book",
+      "total_copies",
+      "borrowed"
+    ],
+    "rows": [
+      [
+        "乙",
+        1,
+        1
+      ],
+      [
+        "甲",
+        2,
+        2
+      ]
+    ]
+  }
+}

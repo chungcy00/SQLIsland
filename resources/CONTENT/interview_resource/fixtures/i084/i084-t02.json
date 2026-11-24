@@ -1,0 +1,17 @@
+{
+  "id": "i084-t02",
+  "questionId": "i084",
+  "datasetId": "i084-interview",
+  "visibility": "hidden",
+  "variant": "t02",
+  "kind": "query",
+  "setupSql": "CREATE TABLE fuel(driver TEXT,day TEXT,liters_per_100km REAL);\nINSERT INTO fuel VALUES('甲','2026-01-01',7),('甲','2026-03-01',6);",
+  "expected": {
+    "columns": [
+      "driver",
+      "first_avg",
+      "second_avg"
+    ],
+    "rows": []
+  }
+}

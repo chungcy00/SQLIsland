@@ -1,0 +1,33 @@
+{
+  "id": "i081-t02",
+  "questionId": "i081",
+  "datasetId": "i081-interview",
+  "visibility": "hidden",
+  "variant": "t02",
+  "kind": "query",
+  "setupSql": "CREATE TABLE items(order_no TEXT,product TEXT,PRIMARY KEY(order_no,product));\nINSERT INTO items VALUES('a','甲'),('a','乙'),('a','丙'),('b','甲'),('b','丙'),('b','乙');",
+  "expected": {
+    "columns": [
+      "product_a",
+      "product_b",
+      "order_count"
+    ],
+    "rows": [
+      [
+        "丙",
+        "乙",
+        2
+      ],
+      [
+        "丙",
+        "甲",
+        2
+      ],
+      [
+        "乙",
+        "甲",
+        2
+      ]
+    ]
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "id": "i065-t03",
+  "questionId": "i065",
+  "datasetId": "i065-interview",
+  "visibility": "hidden",
+  "variant": "t03",
+  "kind": "query",
+  "setupSql": "CREATE TABLE assignments(employee TEXT NOT NULL,team TEXT NOT NULL,is_primary TEXT NOT NULL,PRIMARY KEY(employee,team));\nINSERT INTO assignments VALUES('甲','A组','N'),('甲','Z组','Y');",
+  "expected": {
+    "columns": [
+      "employee",
+      "team"
+    ],
+    "rows": [
+      [
+        "甲",
+        "Z组"
+      ]
+    ]
+  }
+}

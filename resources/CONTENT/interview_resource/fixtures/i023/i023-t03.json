@@ -1,0 +1,22 @@
+{
+  "id": "i023-t03",
+  "questionId": "i023",
+  "datasetId": "i023-interview",
+  "visibility": "hidden",
+  "variant": "t03",
+  "kind": "query",
+  "setupSql": "CREATE TABLE feedback(feedback_no INTEGER PRIMARY KEY,content TEXT NOT NULL);\nINSERT INTO feedback VALUES (1,'ABCDEFGHIJKLMNOPQ'),(2,'ABCDEFGHIJKLMNOP');",
+  "expected": {
+    "columns": [
+      "content"
+    ],
+    "rows": [
+      [
+        "ABCDEFGHIJKLMNOPQ"
+      ],
+      [
+        "ABCDEFGHIJKLMNOP"
+      ]
+    ]
+  }
+}

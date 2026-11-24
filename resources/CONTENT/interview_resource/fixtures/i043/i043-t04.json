@@ -1,0 +1,23 @@
+{
+  "id": "i043-t04",
+  "questionId": "i043",
+  "datasetId": "i043-interview",
+  "visibility": "hidden",
+  "variant": "t04",
+  "kind": "query",
+  "setupSql": "CREATE TABLE quotes(product_name TEXT PRIMARY KEY,web_price INTEGER,shop_price INTEGER,partner_price INTEGER);\nINSERT INTO quotes VALUES('饼干',NULL,NULL,NULL),('面包',5,NULL,NULL);",
+  "expected": {
+    "columns": [
+      "product_name",
+      "channel",
+      "price"
+    ],
+    "rows": [
+      [
+        "面包",
+        "网店",
+        5
+      ]
+    ]
+  }
+}

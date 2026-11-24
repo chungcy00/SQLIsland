@@ -1,0 +1,15 @@
+{
+  "id": "i001-t02",
+  "questionId": "i001",
+  "datasetId": "i001-interview",
+  "visibility": "hidden",
+  "variant": "t02",
+  "kind": "query",
+  "setupSql": "CREATE TABLE members(member_id INTEGER PRIMARY KEY, phone TEXT NOT NULL);\nINSERT INTO members VALUES (1,'11'),(2,'22');",
+  "expected": {
+    "columns": [
+      "phone"
+    ],
+    "rows": []
+  }
+}

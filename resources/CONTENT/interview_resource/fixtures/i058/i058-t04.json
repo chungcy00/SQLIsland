@@ -1,0 +1,21 @@
+{
+  "id": "i058-t04",
+  "questionId": "i058",
+  "datasetId": "i058-interview",
+  "visibility": "hidden",
+  "variant": "t04",
+  "kind": "query",
+  "setupSql": "CREATE TABLE links(member_a TEXT NOT NULL,member_b TEXT NOT NULL,PRIMARY KEY(member_a,member_b));\nINSERT INTO links VALUES('甲','乙'),('甲','丙'),('丁','乙'),('戊','乙');",
+  "expected": {
+    "columns": [
+      "member",
+      "partner_count"
+    ],
+    "rows": [
+      [
+        "乙",
+        3
+      ]
+    ]
+  }
+}

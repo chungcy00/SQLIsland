@@ -1,0 +1,25 @@
+{
+  "id": "i017-t04",
+  "questionId": "i017",
+  "datasetId": "i017-interview",
+  "visibility": "hidden",
+  "variant": "t04",
+  "kind": "query",
+  "setupSql": "CREATE TABLE price_periods(code TEXT NOT NULL,start_date TEXT NOT NULL,end_date TEXT NOT NULL,price REAL NOT NULL,PRIMARY KEY(code,start_date)); CREATE TABLE units_sold(code TEXT NOT NULL,sold_date TEXT NOT NULL,units INTEGER NOT NULL);\nINSERT INTO price_periods VALUES ('X','2026-01-01','2026-01-31',2.5),('Y','2026-01-01','2026-01-31',7); INSERT INTO units_sold VALUES ('X','2026-01-02',2),('X','2026-01-03',1),('Y','2026-01-01',3);",
+  "expected": {
+    "columns": [
+      "code",
+      "average_price"
+    ],
+    "rows": [
+      [
+        "X",
+        2.5
+      ],
+      [
+        "Y",
+        7.0
+      ]
+    ]
+  }
+}

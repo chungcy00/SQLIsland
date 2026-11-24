@@ -1,0 +1,33 @@
+{
+  "id": "i037-public",
+  "questionId": "i037",
+  "datasetId": "i037-interview",
+  "visibility": "public",
+  "variant": "public",
+  "kind": "query",
+  "setupSql": "CREATE TABLE shifts(work_day TEXT NOT NULL,staff_id INTEGER NOT NULL,start_minute INTEGER NOT NULL,end_minute INTEGER NOT NULL);\nINSERT INTO shifts VALUES('2026-02-01',1,0,30),('2026-02-01',1,40,70),('2026-02-01',2,10,25),('2026-02-02',1,0,10);",
+  "expected": {
+    "columns": [
+      "work_day",
+      "staff_id",
+      "total_minutes"
+    ],
+    "rows": [
+      [
+        "2026-02-01",
+        1,
+        60
+      ],
+      [
+        "2026-02-01",
+        2,
+        15
+      ],
+      [
+        "2026-02-02",
+        1,
+        10
+      ]
+    ]
+  }
+}

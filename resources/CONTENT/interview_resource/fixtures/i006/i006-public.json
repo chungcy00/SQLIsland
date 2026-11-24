@@ -1,0 +1,19 @@
+{
+  "id": "i006-public",
+  "questionId": "i006",
+  "datasetId": "i006-interview",
+  "visibility": "public",
+  "variant": "public",
+  "kind": "query",
+  "setupSql": "CREATE TABLE members(member_id INTEGER PRIMARY KEY,member_name TEXT NOT NULL); CREATE TABLE orders(order_id INTEGER PRIMARY KEY,member_id INTEGER NOT NULL);\nINSERT INTO members VALUES (1,'小松'),(2,'小禾'),(3,'小鱼'); INSERT INTO orders VALUES (10,1),(11,1),(12,3);",
+  "expected": {
+    "columns": [
+      "member_name"
+    ],
+    "rows": [
+      [
+        "小禾"
+      ]
+    ]
+  }
+}

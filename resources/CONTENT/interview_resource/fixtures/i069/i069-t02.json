@@ -1,0 +1,21 @@
+{
+  "id": "i069-t02",
+  "questionId": "i069",
+  "datasetId": "i069-interview",
+  "visibility": "hidden",
+  "variant": "t02",
+  "kind": "query",
+  "setupSql": "CREATE TABLE teams(team TEXT PRIMARY KEY,parent_team TEXT);\nINSERT INTO teams VALUES('总部',NULL);",
+  "expected": {
+    "columns": [
+      "team",
+      "team_role"
+    ],
+    "rows": [
+      [
+        "总部",
+        "根组"
+      ]
+    ]
+  }
+}

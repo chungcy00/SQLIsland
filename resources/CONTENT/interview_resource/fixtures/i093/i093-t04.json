@@ -1,0 +1,31 @@
+{
+  "id": "i093-t04",
+  "questionId": "i093",
+  "datasetId": "i093-interview",
+  "visibility": "hidden",
+  "variant": "t04",
+  "kind": "database_state",
+  "setupSql": "CREATE TABLE enrollments(student_name TEXT,course_name TEXT,score INTEGER,status TEXT); CREATE TABLE graduation_archive(student_name TEXT,course_name TEXT, UNIQUE(student_name,course_name));\nINSERT INTO enrollments VALUES ('甲','甲课',90,'已完成'),('甲','乙课',90,'已完成'),('乙','甲课',80,'已完成');",
+  "probes": [],
+  "expectedTable": {
+    "name": "graduation_archive",
+    "columns": [
+      "student_name",
+      "course_name"
+    ],
+    "rows": [
+      [
+        "甲",
+        "甲课"
+      ],
+      [
+        "甲",
+        "乙课"
+      ],
+      [
+        "乙",
+        "甲课"
+      ]
+    ]
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "id": "i086-t02",
+  "questionId": "i086",
+  "datasetId": "i086-interview",
+  "visibility": "hidden",
+  "variant": "t02",
+  "kind": "query",
+  "setupSql": "CREATE TABLE inventory(store TEXT,product TEXT,stock INTEGER CHECK(stock>0),PRIMARY KEY(store,product));\nINSERT INTO inventory VALUES('甲','茶',50);",
+  "expected": {
+    "columns": [
+      "store",
+      "max_stock",
+      "min_stock"
+    ],
+    "rows": []
+  }
+}

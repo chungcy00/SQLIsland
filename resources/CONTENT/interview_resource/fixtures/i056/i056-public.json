@@ -1,0 +1,37 @@
+{
+  "id": "i056-public",
+  "questionId": "i056",
+  "datasetId": "i056-interview",
+  "visibility": "public",
+  "variant": "public",
+  "kind": "query",
+  "setupSql": "CREATE TABLE materials(a INT NOT NULL,b INT NOT NULL,c INT NOT NULL);\nINSERT INTO materials VALUES(3,4,5),(1,2,3),(4,4,4);",
+  "expected": {
+    "columns": [
+      "a",
+      "b",
+      "c",
+      "can_form"
+    ],
+    "rows": [
+      [
+        3,
+        4,
+        5,
+        "可以"
+      ],
+      [
+        1,
+        2,
+        3,
+        "不可以"
+      ],
+      [
+        4,
+        4,
+        4,
+        "可以"
+      ]
+    ]
+  }
+}

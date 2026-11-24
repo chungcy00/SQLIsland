@@ -1,0 +1,28 @@
+{
+  "id": "i067-public",
+  "questionId": "i067",
+  "datasetId": "i067-interview",
+  "visibility": "public",
+  "variant": "public",
+  "kind": "query",
+  "setupSql": "CREATE TABLE income(sale_day TEXT NOT NULL,amount INTEGER NOT NULL);\nINSERT INTO income VALUES('2026-01-01',10),('2026-01-02',20),('2026-01-03',30),('2026-01-04',40),('2026-01-05',50),('2026-01-06',60),('2026-01-07',70),('2026-01-07',7),('2026-01-08',80);",
+  "expected": {
+    "columns": [
+      "sale_day",
+      "total_7d",
+      "avg_7d"
+    ],
+    "rows": [
+      [
+        "2026-01-07",
+        287,
+        41.0
+      ],
+      [
+        "2026-01-08",
+        357,
+        51.0
+      ]
+    ]
+  }
+}

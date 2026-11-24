@@ -1,0 +1,25 @@
+{
+  "id": "i065-public",
+  "questionId": "i065",
+  "datasetId": "i065-interview",
+  "visibility": "public",
+  "variant": "public",
+  "kind": "query",
+  "setupSql": "CREATE TABLE assignments(employee TEXT NOT NULL,team TEXT NOT NULL,is_primary TEXT NOT NULL,PRIMARY KEY(employee,team));\nINSERT INTO assignments VALUES('小乐','销售','N'),('小林','运营','Y'),('小林','销售','N');",
+  "expected": {
+    "columns": [
+      "employee",
+      "team"
+    ],
+    "rows": [
+      [
+        "小乐",
+        "销售"
+      ],
+      [
+        "小林",
+        "运营"
+      ]
+    ]
+  }
+}

@@ -10,6 +10,7 @@ import {
   readdir,
   rm,
 } from "node:fs/promises";
+import { readFileSync } from "node:fs";
 import { createHash } from "node:crypto";
 import path from "node:path";
 const assetSource = path.resolve("resources/ASSETS");
@@ -61,6 +62,15 @@ for (let i = 1; i <= 20; i++) {
     ).questions,
   );
 }
+// 章节练习题精简：只打包 keep-120.json 中的 120 题（保留原题号，不重编；源题库文件不改）。
+// 移出的题号并入 curriculumMigration.removedQuestions，使旧备份里的历史记录仍可导入，但不再计入当前题量。
+const keep120 = JSON.parse(await readFile(`${contentSource}/question_resource/keep-120.json`));
+const keepSet = new Set(keep120.keepIds);
+if (keepSet.size !== keep120.count) throw new Error("keep-120.json 题号数量与 count 不一致");
+const fullIds = new Set(questions.map((question) => question.id));
+for (const id of keepSet) if (!fullIds.has(id)) throw new Error("keep-120.json 含不存在的题号 " + id);
+const retiredQuestionIds = questions.filter((question) => !keepSet.has(question.id)).map((question) => question.id);
+questions.splice(0, questions.length, ...questions.filter((question) => keepSet.has(question.id)));
 // 闪卡：以 332 张统一数据为唯一内容来源（旧 200 张不再打包）；原始 JSON 不改，打包副本去掉 examples 的 actual。
 cards.push(
   ...addDataSets(
@@ -77,7 +87,16 @@ cards.push(
   for (const card of cards) if (teaching.figures?.[card.id]) card.teach = teaching.figures[card.id];
   for (const card of cards) if (teaching.functions?.[card.id]) card.fnSpec = teaching.functions[card.id];
 }
+// 面试刷题：独立题库（chapterId "interview"），不进入 200 道章节练习题。
+const interview = JSON.parse(await readFile(`${contentSource}/interview_resource/questions.json`)).questions;
 const courseStructureStatus = await loadCourseStructures(chapters);
+// 课文结构校验读取的是原始课程文件，所以关联题号的精简放在校验之后
+for (const chapter of chapters) {
+  for (const point of chapter.knowledgePoints) {
+    point.relatedQuestionIds = (point.relatedQuestionIds || []).filter((id) => keepSet.has(id));
+    if (!point.relatedQuestionIds.length) throw new Error(point.id + " 精简后没有关联练习题");
+  }
+}
 const integerPolicies = JSON.parse(await readFile("src/integer-column-policy.json"));
 for (const question of questions) {
   const policy = integerPolicies[question.id];
@@ -100,8 +119,13 @@ await writeFile(
     contentVersion: contentManifest.auditRelease,
     chapters,
     courseStructureStatus,
-    curriculumMigration: JSON.parse(await readFile(contentSource + "/courses_resource/curriculum-migration.json")),
+    curriculumMigration: (() => {
+      const migration = JSON.parse(readFileSync(contentSource + "/courses_resource/curriculum-migration.json"));
+      migration.removedQuestions = [...new Set([...(migration.removedQuestions || []), ...retiredQuestionIds])];
+      return migration;
+    })(),
     questions,
+    interview,
     cards,
   }),
 );
@@ -119,6 +143,12 @@ for (const root of ["dist", "android/app/src/main/assets"]) {
 for (const entry of await readdir(fixtures, { withFileTypes: true })) {
   if (!/^q\d{4}$/.test(entry.name) || activeIds.has(entry.name)) {
     await cp(path.join(fixtures, entry.name), path.join("dist/fixtures", entry.name), { recursive: true });
+  }
+}
+for (const root of ["dist", "android/app/src/main/assets"]) {
+  for (const question of interview) {
+    await rm(path.join(root, "fixtures", question.id), { recursive: true, force: true });
+    await cp(path.join(contentSource, "interview_resource/fixtures", question.id), path.join(root, "fixtures", question.id), { recursive: true });
   }
 }
 const databases = JSON.parse(
@@ -174,5 +204,5 @@ await writeFile(
 await mkdir("android/app/src/main/assets", { recursive: true });
 await cp("dist", "android/app/src/main/assets", { recursive: true });
 console.log(
-  `Built ${chapters.length} chapters, ${questions.length} questions, ${cards.length} cards, ${files.length} offline files.`,
+  `Built ${chapters.length} chapters, ${questions.length} questions, ${interview.length} interview questions, ${cards.length} cards, ${files.length} offline files.`,
 );

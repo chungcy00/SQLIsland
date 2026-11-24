@@ -37,7 +37,7 @@ try {
   await route('/practice');
   assert.equal(await page.locator('.practice-selectors select').count(), 3);
   const initialRows = await page.locator('.question-id').count();
-  assert.equal(initialRows, 4);
+  assert.equal(initialRows, 3);
   await page.locator('[data-filter=status]').selectOption('未作答');
   await page.locator('[data-filter=type]').selectOption('选择');
   assert.equal(await page.locator('[data-filter=type]').inputValue(), '选择');
@@ -63,7 +63,7 @@ try {
   assert.equal(await page.locator('#search').inputValue(), 'q0006');
   assert.equal(await page.locator('.question-id').count(), 1);
   await page.locator('[data-action=resetQuestions]').click();
-  await page.waitForFunction(() => document.querySelectorAll('.question-id').length === 4);
+  await page.waitForFunction(() => document.querySelectorAll('.question-id').length === 3);
   assert.equal(await page.locator('.question-id').count(), initialRows);
   assert.equal(await page.locator('.practice-chapters .chapter-card').count(), 20);
   const chapterButtons = page.locator('[data-action=togglePracticeChapter]');
@@ -73,8 +73,8 @@ try {
       await page.waitForFunction((i) => document.querySelectorAll('[data-action=togglePracticeChapter]')[i]?.getAttribute('aria-expanded') === 'true', index);
     }
   }
-  assert.equal(await page.locator('.question-id').count(), 200);
-  assert.equal(new Set(await page.locator('.question-id').allTextContents()).size, 200);
+  assert.equal(await page.locator('.question-id').count(), 120);
+  assert.equal(new Set(await page.locator('.question-id').allTextContents()).size, 120);
   await chapterButtons.first().click();
   await page.waitForFunction(() => document.querySelector('[data-action=togglePracticeChapter]')?.getAttribute('aria-expanded') === 'false');
   await chapterButtons.first().click();
@@ -82,7 +82,7 @@ try {
   await page.locator('.chapter-question-row').first().scrollIntoViewIfNeeded();
   const practiceScroll = await page.evaluate(() => window.scrollY);
   await page.locator('.chapter-question-row').first().click();
-  await page.waitForURL('**/#/question/q0003');
+  await page.waitForURL('**/#/question/q0005');
   await page.locator('.quiz-title').waitFor();
   await page.locator('[data-action=back]').click();
   await page.waitForURL('**/#/practice');
@@ -131,8 +131,8 @@ try {
   assert.ok(await note.evaluate((n) => n.scrollHeight <= n.clientHeight + 2));
   await note.fill('简短笔记');
   assert.ok(await note.evaluate((n) => n.clientHeight) <= initialHeight + 2);
-  await route('/question/q0012');
-  assert.equal(await page.locator('#sql-editor').inputValue(), 'SELECT {{blank1}} category\nFROM products\nORDER BY category;');
+  await route('/question/q0024');
+  assert.equal(await page.locator('#sql-editor').inputValue(), 'SELECT product_id, price\nFROM products\nWHERE {{blank1}};');
   await route('/card-edit/new');
   for (const id of ['card-front', 'card-back', 'card-explanation']) {
     const field = page.locator('#' + id);

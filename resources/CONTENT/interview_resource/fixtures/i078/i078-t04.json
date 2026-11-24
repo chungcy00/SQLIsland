@@ -1,0 +1,23 @@
+{
+  "id": "i078-t04",
+  "questionId": "i078",
+  "datasetId": "i078-interview",
+  "visibility": "hidden",
+  "variant": "t04",
+  "kind": "query",
+  "setupSql": "CREATE TABLE usage(member TEXT,plan TEXT CHECK(plan IN ('试用','付费')),minutes REAL NOT NULL);\nINSERT INTO usage VALUES('甲','试用',3),('甲','试用',4),('甲','试用',5),('甲','付费',1),('甲','付费',2),('甲','付费',2);",
+  "expected": {
+    "columns": [
+      "member",
+      "trial_avg",
+      "paid_avg"
+    ],
+    "rows": [
+      [
+        "甲",
+        4.0,
+        1.67
+      ]
+    ]
+  }
+}

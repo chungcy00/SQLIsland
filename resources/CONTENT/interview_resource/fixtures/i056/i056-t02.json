@@ -1,0 +1,31 @@
+{
+  "id": "i056-t02",
+  "questionId": "i056",
+  "datasetId": "i056-interview",
+  "visibility": "hidden",
+  "variant": "t02",
+  "kind": "query",
+  "setupSql": "CREATE TABLE materials(a INT NOT NULL,b INT NOT NULL,c INT NOT NULL);\nINSERT INTO materials VALUES(2,2,4),(2,3,4);",
+  "expected": {
+    "columns": [
+      "a",
+      "b",
+      "c",
+      "can_form"
+    ],
+    "rows": [
+      [
+        2,
+        2,
+        4,
+        "不可以"
+      ],
+      [
+        2,
+        3,
+        4,
+        "可以"
+      ]
+    ]
+  }
+}

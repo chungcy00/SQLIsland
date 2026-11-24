@@ -1,0 +1,21 @@
+{
+  "id": "i034-t02",
+  "questionId": "i034",
+  "datasetId": "i034-interview",
+  "visibility": "hidden",
+  "variant": "t02",
+  "kind": "query",
+  "setupSql": "CREATE TABLE products(product_id INTEGER PRIMARY KEY, product_name TEXT NOT NULL UNIQUE);CREATE TABLE shipments(product_id INTEGER,ship_date TEXT NOT NULL,units INTEGER NOT NULL);\nINSERT INTO products VALUES(1,'电池'),(2,'灯泡');INSERT INTO shipments VALUES(1,'2026-03-01',100),(2,'2026-04-01',110);",
+  "expected": {
+    "columns": [
+      "product_name",
+      "total_units"
+    ],
+    "rows": [
+      [
+        "电池",
+        100
+      ]
+    ]
+  }
+}

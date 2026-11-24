@@ -1,0 +1,33 @@
+{
+  "id": "i004-public",
+  "questionId": "i004",
+  "datasetId": "i004-interview",
+  "visibility": "public",
+  "variant": "public",
+  "kind": "query",
+  "setupSql": "CREATE TABLE sites(site_name TEXT PRIMARY KEY,floor_area INTEGER NOT NULL,monthly_visitors INTEGER NOT NULL);\nINSERT INTO sites VALUES ('北站',5500,20000),('南站',1500,120000),('西站',800,7000),('东站',5000,100000);",
+  "expected": {
+    "columns": [
+      "site_name",
+      "floor_area",
+      "monthly_visitors"
+    ],
+    "rows": [
+      [
+        "北站",
+        5500,
+        20000
+      ],
+      [
+        "南站",
+        1500,
+        120000
+      ],
+      [
+        "东站",
+        5000,
+        100000
+      ]
+    ]
+  }
+}

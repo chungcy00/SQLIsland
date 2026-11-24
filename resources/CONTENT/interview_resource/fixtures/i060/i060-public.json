@@ -1,0 +1,25 @@
+{
+  "id": "i060-public",
+  "questionId": "i060",
+  "datasetId": "i060-interview",
+  "visibility": "public",
+  "variant": "public",
+  "kind": "query",
+  "setupSql": "CREATE TABLE movements(product_name TEXT NOT NULL,direction TEXT NOT NULL CHECK(direction IN ('入库','出库')),units INT NOT NULL CHECK(units>0));\nINSERT INTO movements VALUES('茶','入库',100),('茶','出库',30),('纸','入库',20),('纸','出库',40);",
+  "expected": {
+    "columns": [
+      "product_name",
+      "net_units"
+    ],
+    "rows": [
+      [
+        "纸",
+        -20
+      ],
+      [
+        "茶",
+        70
+      ]
+    ]
+  }
+}
